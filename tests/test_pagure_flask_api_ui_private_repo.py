@@ -1594,6 +1594,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                                 }
                             },
                             "status": "Open",
+                            "threshold_reached": None,
                             "title": "test pull-request",
                             "uid": "1431414800",
                             "updated_on": "1431414800",
@@ -1723,6 +1724,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                         }
                     },
                     "status": "Open",
+                    "threshold_reached": None,
                     "title": "test pull-request",
                     "uid": "1431414800",
                     "updated_on": "1431414800",

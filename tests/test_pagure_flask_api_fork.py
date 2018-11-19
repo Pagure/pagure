@@ -387,6 +387,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
                     }
                 },
                 "status": "Open",
+                "threshold_reached": None,
                 "title": "test pull-request",
                 "uid": "1431414800",
                 "updated_on": "1431414800",
@@ -605,6 +606,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
                     }
             },
             "status": "Open",
+            "threshold_reached": None,
             "title": "test pull-request",
             "uid": "1431414800",
             "updated_on": "1431414800",
@@ -765,6 +767,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
                     }
             },
             "status": "Open",
+            "threshold_reached": None,
             "title": "test pull-request",
             "uid": uid,
             "updated_on": "1431414800",
@@ -2583,6 +2586,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
                                'url_path': 'test',
                                'user': {'fullname': 'PY C', 'name': 'pingou'}},
                 'status': 'Open',
+                'threshold_reached': None,
                 'title': 'Test PR',
                 'uid': 'e8b68df8711648deac67c3afed15a798',
                 'updated_on': '1516348115',
@@ -2695,6 +2699,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
                                'url_path': 'test',
                                'user': {'fullname': 'PY C', 'name': 'pingou'}},
                 'status': 'Open',
+                'threshold_reached': None,
                 'title': 'Test PR',
                 'uid': 'e8b68df8711648deac67c3afed15a798',
                 'updated_on': '1516348115',
@@ -2871,6 +2876,362 @@ class PagureFlaskApiForkPRDiffStatstests(tests.Modeltests):
               }
             }
         )
+
+class PagureApiThresholdReachedTests(tests.Modeltests):
+    """ Test the behavior of the threshold_reached value returned by the API.
+    """
+    maxDiff = None
+
+    def _clean_data(self, data):
+        data['project']['date_created'] = '1516348115'
+        data['project']['date_modified'] = '1516348115'
+        data['repo_from']['date_created'] = '1516348115'
+        data['repo_from']['date_modified'] = '1516348115'
+        data['uid'] = 'e8b68df8711648deac67c3afed15a798'
+        data['commit_start'] = '114f1b468a5f05e635fcb6394273f3f907386eab'
+        data['commit_stop'] = '114f1b468a5f05e635fcb6394273f3f907386eab'
+        data['date_created'] = '1516348115'
+        data['last_updated'] = '1516348115'
+        data['updated_on'] = '1516348115'
+        data['comments'] = []  # Let's not check the comments
+        return data
+
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def setUp(self):
+        """ Set up the environment for the tests. """
+        super(PagureApiThresholdReachedTests, self).setUp()
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+        tests.create_projects_git(os.path.join(self.path, 'requests'),
+                                  bare=True)
+        tests.add_readme_git_repo(os.path.join(self.path, 'repos', 'test.git'))
+        tests.add_commit_git_repo(os.path.join(self.path, 'repos', 'test.git'),
+                                  branch='test')
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        # Add a token for user `foo`
+        item = pagure.lib.model.Token(
+            id='aaabbbcccddd_foo',
+            user_id=2,
+            project_id=1,
+            expiration=datetime.datetime.utcnow()
+                + datetime.timedelta(days=30)
+        )
+        self.session.add(item)
+        self.session.commit()
+        tests.create_tokens_acl(self.session, token_id="aaabbbcccddd_foo")
+
+        # Add a minimal required score:
+        repo = pagure.lib.query._get_project(self.session, 'test')
+        settings = repo.settings
+        settings['Minimum_score_to_merge_pull-request'] = 2
+        repo.settings = settings
+        self.session.add(repo)
+        self.session.commit()
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        data = {
+            'title': 'Test PR',
+            'initial_comment': 'Nothing much, the changes speak for themselves',
+            'branch_to': 'master',
+            'branch_from': 'test',
+        }
+
+        output = self.app.post(
+            '/api/0/test/pull-request/new', headers=headers, data=data)
+        self.assertEqual(output.status_code, 200)
+
+        self.expected_data = {
+            'assignee': None,
+            'branch': 'master',
+            'branch_from': 'test',
+            'cached_merge_status': 'unknown',
+            'closed_at': None,
+            'closed_by': None,
+            'comments': [],
+            'commit_start': '114f1b468a5f05e635fcb6394273f3f907386eab',
+            'commit_stop': '114f1b468a5f05e635fcb6394273f3f907386eab',
+            'date_created': '1516348115',
+            'id': 1,
+            'initial_comment': 'Nothing much, the changes speak for themselves',
+            'last_updated': '1516348115',
+            'project': {'access_groups': {'admin': [],
+                                            'commit': [],
+                                            'ticket':[]},
+                         'access_users': {'admin': [],
+                                           'commit': [],
+                                           'owner': ['pingou'],
+                                           'ticket': []},
+                         'close_status': ['Invalid',
+                                           'Insufficient data',
+                                           'Fixed',
+                                           'Duplicate'],
+                         'custom_keys': [],
+                         'date_created': '1516348115',
+                         'date_modified': '1516348115',
+                         'description': 'test project #1',
+                         'fullname': 'test',
+                         'id': 1,
+                         'milestones': {},
+                         'name': 'test',
+                         'namespace': None,
+                         'parent': None,
+                         'priorities': {},
+                         'tags': [],
+                         'url_path': 'test',
+                         'user': {'fullname': 'PY C', 'name': 'pingou'}},
+            'remote_git': None,
+            'repo_from': {'access_groups': {'admin': [],
+                                              'commit': [],
+                                              'ticket': []},
+                           'access_users': {'admin': [],
+                                             'commit': [],
+                                             'owner': ['pingou'],
+                                             'ticket': []},
+                           'close_status': ['Invalid',
+                                             'Insufficient data',
+                                             'Fixed',
+                                             'Duplicate'],
+                           'custom_keys': [],
+                           'date_created': '1516348115',
+                           'date_modified': '1516348115',
+                           'description': 'test project #1',
+                           'fullname': 'test',
+                           'id': 1,
+                           'milestones': {},
+                           'name': 'test',
+                           'namespace': None,
+                           'parent': None,
+                           'priorities': {},
+                           'tags': [],
+                           'url_path': 'test',
+                           'user': {'fullname': 'PY C', 'name': 'pingou'}},
+            'status': 'Open',
+            'threshold_reached': None,
+            'title': 'Test PR',
+            'uid': 'e8b68df8711648deac67c3afed15a798',
+            'updated_on': '1516348115',
+            'user': {'fullname': 'PY C', 'name': 'pingou'}
+        }
+
+    def test_api_pull_request_no_comments(self):
+        """ Check the value of threshold_reach when the PR has no comments.
+        """
+
+        # Check the PR with 0 comment:
+        output = self.app.get('/api/0/test/pull-request/1')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        data = self._clean_data(data)
+        self.expected_data["threshold_reached"] = False
+        self.assertDictEqual(data, self.expected_data)
+
+    def test_api_pull_request_one_comments(self):
+        """ Check the value of threshold_reach when the PR has one comment.
+        """
+        # Check the PR with 1 comment:
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        data = {
+            'comment': 'This is a very interesting solution :thumbsup:',
+        }
+        output = self.app.post(
+            '/api/0/test/pull-request/1/comment', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {'message': 'Comment added'}
+        )
+
+        output = self.app.get('/api/0/test/pull-request/1')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        data = self._clean_data(data)
+        self.expected_data["threshold_reached"] = False
+        self.assertDictEqual(data, self.expected_data)
+
+    def test_api_pull_request_two_comments_one_person(self):
+        """ Check the value of threshold_reach when the PR has two comments
+        but from the same person.
+        """
+        # Add two comments from the same user:
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        data = {
+            'comment': 'This is a very interesting solution :thumbsup:',
+        }
+        output = self.app.post(
+            '/api/0/test/pull-request/1/comment', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {'message': 'Comment added'}
+        )
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        data = {
+            'comment': 'Indeed it is :thumbsup:',
+        }
+        output = self.app.post(
+            '/api/0/test/pull-request/1/comment', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {'message': 'Comment added'}
+        )
+
+        output = self.app.get('/api/0/test/pull-request/1')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        data = self._clean_data(data)
+        self.expected_data["threshold_reached"] = False
+        self.assertDictEqual(data, self.expected_data)
+
+    def test_api_pull_request_two_comments_two_persons(self):
+        """ Check the value of threshold_reach when the PR has two comments
+        from two different persons.
+        """
+        # Add two comments from two users:
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        data = {
+            'comment': 'This is a very interesting solution :thumbsup:',
+        }
+        output = self.app.post(
+            '/api/0/test/pull-request/1/comment', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {'message': 'Comment added'}
+        )
+
+        headers = {'Authorization': 'token aaabbbcccddd_foo'}
+        data = {
+            'comment': 'Indeed it is :thumbsup:',
+        }
+        output = self.app.post(
+            '/api/0/test/pull-request/1/comment', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {'message': 'Comment added'}
+        )
+
+        output = self.app.get('/api/0/test/pull-request/1')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        data = self._clean_data(data)
+        data['comments'] = []  # Let's not check the comments
+        self.expected_data["threshold_reached"] = True
+        self.assertDictEqual(data, self.expected_data)
+
+    def test_api_pull_request_three_comments_two_persons_changed_to_no(self):
+        """ Check the value of threshold_reach when the PR has three
+        comments from two person among which one changed their mind from
+        +1 to -1.
+        """
+        # Add three comments from two users:
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        data = {
+            'comment': 'This is a very interesting solution :thumbsup:',
+        }
+        output = self.app.post(
+            '/api/0/test/pull-request/1/comment', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {'message': 'Comment added'}
+        )
+
+        headers = {'Authorization': 'token aaabbbcccddd_foo'}
+        data = {
+            'comment': 'Indeed it is :thumbsup:',
+        }
+        output = self.app.post(
+            '/api/0/test/pull-request/1/comment', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {'message': 'Comment added'}
+        )
+
+        data = {
+            'comment': 'Nevermind the bug is elsewhere in fact :thumbsdown:',
+        }
+        output = self.app.post(
+            '/api/0/test/pull-request/1/comment', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {'message': 'Comment added'}
+        )
+
+        output = self.app.get('/api/0/test/pull-request/1')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        data = self._clean_data(data)
+        data['comments'] = []  # Let's not check the comments
+        self.expected_data["threshold_reached"] = False
+        self.assertDictEqual(data, self.expected_data)
+
+    def test_api_pull_request_three_comments_two_persons_changed_to_yes(self):
+        """ Check the value of threshold_reach when the PR has three
+        comments from two person among which one changed their mind from
+        -1 to +1
+        """
+        # Add three comments from two users:
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        data = {
+            'comment': 'This is a very interesting solution :thumbsup:',
+        }
+        output = self.app.post(
+            '/api/0/test/pull-request/1/comment', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {'message': 'Comment added'}
+        )
+
+        headers = {'Authorization': 'token aaabbbcccddd_foo'}
+        data = {
+            'comment': 'I think the bug is elsewhere :thumbsdown:',
+        }
+        output = self.app.post(
+            '/api/0/test/pull-request/1/comment', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {'message': 'Comment added'}
+        )
+
+        data = {
+            'comment': 'Nevermind it is here :thumbsup:',
+        }
+        output = self.app.post(
+            '/api/0/test/pull-request/1/comment', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {'message': 'Comment added'}
+        )
+
+        output = self.app.get('/api/0/test/pull-request/1')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        data = self._clean_data(data)
+        data['comments'] = []  # Let's not check the comments
+        self.expected_data["threshold_reached"] = True
+        self.assertDictEqual(data, self.expected_data)
 
 
 if __name__ == '__main__':

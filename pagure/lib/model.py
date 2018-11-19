@@ -2050,6 +2050,21 @@ class PullRequest(BASE):
         return sum(votes.values())
 
     @property
+    def threshold_reached(self):
+        """ Return whether the pull-request has reached the threshold above
+        which it is allowed to be merged, if the project requests a minimal
+        score on pull-request, otherwise returns None.
+
+        """
+        threshold = self.project.settings.get(
+            "Minimum_score_to_merge_pull-request", -1
+        )
+        if threshold is None or threshold < 0:
+            return None
+        else:
+            return int(self.score) >= int(threshold)
+
+    @property
     def remote(self):
         """ Return whether the current PullRequest is a remote pull-request
         or not.
@@ -2095,6 +2110,7 @@ class PullRequest(BASE):
             else None,
             "initial_comment": self.initial_comment,
             "cached_merge_status": self.merge_status or "unknown",
+            "threshold_reached": self.threshold_reached,
         }
 
         comments = []
