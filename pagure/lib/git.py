@@ -945,9 +945,12 @@ class TemporaryClone(object):
             self.repo = pygit2.Repository(self.repopath)
 
         # Make sure that all remote refs are mapped to local ones.
+        headname = None
+        if not self.repo.is_empty and not self.repo.head_is_unborn:
+            headname = self.repo.head.shorthand
         for branchname in self.repo.branches.remote:
             localname = branchname.replace("origin/", "")
-            if localname in ("master", "HEAD"):
+            if localname in (headname, "HEAD"):
                 # This gets checked out by default
                 continue
             branch = self.repo.branches.remote.get(branchname)
