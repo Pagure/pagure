@@ -1470,7 +1470,7 @@ def view_issue_raw_file(repo, filename=None, username=None, namespace=None):
             select="issues",
             repo=repo,
             username=username,
-            diff=data,
+            diff=data.decode('utf-8'),
             patchfile=orig_filename,
         )
 

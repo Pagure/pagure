@@ -3,6 +3,16 @@
 {% block title %}Patch File - {{
     repo.namespace + '/' if repo.namespace }}{{ repo.name }} {% endblock %}
 
+{% block header %}
+<link href="{{ url_for('static', filename='vendor/highlight.js/styles/github.css') }}?version={{ g.version}}"
+  rel="stylesheet" />
+<style>
+  .hljs {
+    background: #fff;
+  }
+</style>
+{% endblock %}
+
 {% block repo %}
 <ul class="nav nav-tabs nav-small border-bottom-0" role="tablist" id="pr-tabs">
   <li class="nav-item pull-xs-right">
@@ -15,9 +25,9 @@
   <strong>{{ patchfile }}</strong>
 </div>
 <div class="card card-block">
-  {% autoescape false %}
-    {{ diff }}
-  {% endautoescape %}
+  <div class="card-body p-0">
+    <pre class="syntaxhighlightblock"><code>{{ diff }}</code></pre>
+  </div>
 </div>
 <p>
   <a href="{{ request.base_url + '?raw=1' }}">View Raw</a>
@@ -26,4 +36,18 @@
 
 {% block jscripts %}
   {{ super() }}
+<script type="text/javascript"
+  src="{{ url_for('static', filename='vendor/highlight.js/highlight.pack.js') }}?version={{ g.version}}"></script>
+<script src="{{ url_for('static', filename='vendor/highlightjs-line-numbers/highlightjs-line-numbers.min.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript"
+  src="{{ url_for('static', filename='vendor/highlight.js/spec.js') }}?version={{ g.version}}"></script>
+
+<script>
+  $(document).ready(function() {
+  $('pre.syntaxhighlightblock code').each(function(i, block) {
+    hljs.highlightBlock(block);
+    hljs.lineNumbersBlock(block);
+  })
+});
+</script>
 {% endblock %}
