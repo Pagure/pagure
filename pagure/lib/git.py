@@ -1038,6 +1038,8 @@ class TemporaryClone(object):
             env = os.environ.copy()
             env["GL_USER"] = username
             env["GL_BYPASS_ACCESS_CHECKS"] = "1"
+            if pagure_config.get("GITOLITE_HOME"):
+                env["HOME"] = pagure_config["GITOLITE_HOME"]
             env.update(environ)
             env.update(extra)
             out = subprocess.check_output(
