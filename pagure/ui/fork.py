@@ -1164,6 +1164,24 @@ def merge_request_pull(repo, requestid, username=None, namespace=None):
     _log.info("All checks in the controller passed")
 
     try:
+        if flask.request.form.get('comment'):
+            trigger_ci = pagure_config["TRIGGER_CI"]
+            if isinstance(trigger_ci, dict):
+                trigger_ci = list(trigger_ci.keys())
+            message = pagure.lib.query.add_pull_request_comment(
+                flask.g.session,
+                request=request,
+                commit=None,
+                tree_id=None,
+                filename=None,
+                row=None,
+                comment=flask.request.form.get('comment'),
+                user=flask.g.fas_user.username,
+                trigger_ci=trigger_ci,
+            )
+            flask.g.session.commit()
+            flask.flash(message)
+
         task = pagure.lib.tasks.merge_pull_request.delay(
             repo.name,
             namespace,
@@ -1181,6 +1199,19 @@ def merge_request_pull(repo, requestid, username=None, namespace=None):
                 username=username,
                 requestid=requestid,
             ),
+        )
+    except SQLAlchemyError as err:  # pragma: no cover
+        flask.g.session.rollback()
+        _log.exception(err)
+        flask.flash(str(err), "error")
+        return flask.redirect(
+            flask.url_for(
+                "ui_ns.request_pull",
+                repo=repo.name,
+                requestid=requestid,
+                username=username,
+                namespace=namespace,
+            )
         )
     except pygit2.GitError as err:
         _log.info("GitError exception raised")

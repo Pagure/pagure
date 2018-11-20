@@ -746,6 +746,59 @@ class PagureFlaskForktests(tests.Modeltests):
                 output.get_data(as_text=True))
 
     @patch('pagure.lib.notify.send_email')
+    def test_merge_request_pull_merge_with_comment(self, send_email):
+        """ Test the merge_request_pull endpoint with a merge PR. """
+        send_email.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'requests'), bare=True)
+        set_up_git_repo(
+            self.session, self.path, new_project=None,
+            branch_from='feature', mtype='merge')
+
+        self.session = pagure.lib.query.create_session(self.dbpath)
+        request = pagure.lib.query.search_pull_requests(
+            self.session, project_id=1, requestid=1)
+        self.assertEqual(len(request.comments), 0)
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(self.app.application, user):
+            output = self.app.get('/test/pull-request/1')
+            self.assertEqual(output.status_code, 200)
+
+            csrf_token = self.get_csrf(output=output)
+
+            data = {
+                'csrf_token': csrf_token,
+                'comment': 'Thanks for the review and the suggestions!'
+            }
+
+            # Merge
+            output = self.app.post(
+                '/test/pull-request/1/merge', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Overview - test - Pagure</title>', output.get_data(as_text=True))
+
+            # Check if the closing notification was added
+            output = self.app.get('/test/pull-request/1')
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<span class="text-info font-weight-bold">Merged</span> just now\n'
+                '            </span>\n            by\n'
+                '            <span title="PY C (pingou)">pingou.</span>\n',
+                output_text)
+            self.assertIn(
+                'Thanks for the review and the suggestions!', output_text)
+
+            self.session = pagure.lib.query.create_session(self.dbpath)
+            request = pagure.lib.query.search_pull_requests(
+                self.session, project_id=1, requestid=1)
+            self.assertEqual(len(request.comments), 2)
+
+    @patch('pagure.lib.notify.send_email')
     def test_merge_request_pull_merge_with_delete_branch(self, send_email):
         """ Test the merge_request_pull endpoint with a merge PR and delete source branch. """
         send_email.return_value = True

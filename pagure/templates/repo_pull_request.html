@@ -184,7 +184,7 @@
                         username=username,
                         namespace=repo.namespace,
                         requestid=requestid)
-                  }}" method="POST">
+                  }}" method="POST"  id="merge_pr_form">
                   {{ mergeform.csrf_token }}
                   <button id="merge_btn" type="submit"
                     onclick="return confirm('Confirm merging this pull-request');"
@@ -1126,6 +1126,18 @@ function set_ui_for_comment(setting){
     document.body.style.cursor = 'wait';
   }
 }
+
+$("#merge_pr_form").submit( function() {
+  set_ui_for_comment(true);
+  var _c = $("#comment");
+  if (_c.val()) {
+    $('<input />').attr('type', 'hidden')
+      .attr('name', "comment")
+      .attr('value', _c.val())
+      .appendTo(this);
+  }
+  return true;
+});
 
 function try_async_comment(form, inline) {
   set_ui_for_comment(true);
