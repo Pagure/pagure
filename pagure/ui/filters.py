@@ -147,7 +147,8 @@ def format_loc(
             output.append(
                 '<td class="cell1">'
                 '<a id="%(cnt)s" href="#%(cnt)s" data-line-number='
-                '"%(cnt_lbl)s"></a></td>'
+                '"%(cnt_lbl)s" data-file-number='
+                '"%(line)s"></a></td>'
                 '<td class="prc border-right" data-row="%(cnt_lbl)s"'
                 ' data-filename="%(filename)s" data-commit="%(commit)s"'
                 ' data-tree="%(tree_id)s">'
@@ -158,8 +159,9 @@ def format_loc(
                 "</td>"
                 % (
                     {
-                        "cnt": "%s_%s" % (index, cnt),
+                        "cnt": "_%s__%s" % (index, cnt),
                         "cnt_lbl": cnt,
+                        "line": index,
                         "filename": filename,
                         "commit": commit,
                         "tree_id": tree_id,

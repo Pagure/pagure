@@ -1237,10 +1237,10 @@ function updateHighlight(onload) {
         $('[href="#comments"]').addClass('active');
       }
     }
-    var file = parseInt(location.hash.substr(2).split(',')[0], 10);
-    var lines = location.hash.split(',')[1].split('-').map(function (x) { return parseInt(x, 10) });
+    var file = parseInt(location.hash.substr(2).split('__')[0], 10);
+    var lines = location.hash.split('__')[1].split('-').map(function (x) { return parseInt(x, 10) });
     for (var i = lines[lines.length - 1]; i >= lines[0]; i--) {
-      $('#' + file + '_' + i).closest('tr').addClass(cls);
+      $('#' + '_' + file + '__' + i).closest('tr').addClass(cls);
     }
   }
 }
@@ -1428,16 +1428,16 @@ $(window).on('hashchange', updateHighlight);
 var selected = [];
 $("[data-line-number]").click(function (ev) {
   var line = $(this).attr('data-line-number');
-  var file = $(this).attr('id').split('_')[0];
+  var file = $(this).attr('data-file-number');
   if (ev.shiftKey) {
     selected = selected.slice(-1).concat(line);
   } else {
     selected = [line];
   }
 
-  var hash = '_' + file + ',' + selected[0];
+  var hash = '_' + file + '__' + selected[0];
   if (selected.length === 2) {
-    hash = '_' + file + ',' + Math.min(selected[0], selected[1]) + '-' + Math.max(selected[0], selected[1]);
+    hash = '_' + file + '__' + Math.min(selected[0], selected[1]) + '-' + Math.max(selected[0], selected[1]);
   }
   window.location.hash = hash;
   return false;
