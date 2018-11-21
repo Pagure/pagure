@@ -967,6 +967,11 @@ $(document).ready(function() {
 
   $( ".prc" ).click(
     function() {
+      var disabled = $('.prc').attr('disabled');
+      if (disabled === true || disabled == "disabled") {
+        return false;
+      }
+      $(".prc").attr("disabled","disabled");
       var row = $( this ).attr('data-row');
       var commit = $( this ).attr('data-commit');
       var filename = $( this ).attr('data-filename');
@@ -999,10 +1004,12 @@ $(document).ready(function() {
             <div class="card m-x-1"><div class="card-block">'
             + data + '</div></div></td></tr>' );
           cancel_edit_btn();
+          $(".prc").removeAttr("disabled");
           emoji_complete(json_url, folder);
         });
       } else {
         next_row.prev().find('.pr_comment_form').parent().remove();
+        $(".prc").removeAttr("disabled");
       }
     }
   );
