@@ -2028,6 +2028,24 @@ class PullRequest(BASE):
         return [comment for comment in self.comments if not comment.commit_id]
 
     @property
+    def flags_stats(self):
+        """ Return some stats about the flags associated with this PR.
+        """
+        flags = self.flags
+        flags.reverse()
+
+        # Only keep the last flag from each service
+        tmp = {}
+        for flag in flags:
+            tmp[flag.username] = flag
+
+        output = collections.defaultdict(list)
+        for flag in tmp.values():
+            output[flag.status].append(flag)
+
+        return output
+
+    @property
     def score(self):
         """ Return the review score of the pull-request by checking the
         number of +1, -1, :thumbup: and :thumbdown: in the comment of the

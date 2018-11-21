@@ -274,7 +274,8 @@ th[data-sort] {
   overflow:auto;
 }
 
-.attachment_list p {
+.attachment_list p,
+.prs_flag_list p {
   margin-bottom: 0;
 }
 

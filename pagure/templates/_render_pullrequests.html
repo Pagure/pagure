@@ -46,17 +46,17 @@
                             {% endif %}
                         </span>
                         {% endif %}
-            
+
                         <span title="branch to" class="text-muted ml-3" data-toggle="tooltip">
                             <span class="fa fa-fw fa-random pr-2"></span>
                               {{request.branch}}
                           </span>
-            
+
                         <span title="{{request.user_comments|count}} comments" class="text-muted ml-3" data-toggle="tooltip">
                           <span class="fa fa-fw fa-comment pr-2"></span>
                             {{request.user_comments|count}}
                         </span>
-                        
+
                 </span>
             </div>
                 {% if subtitle %}
@@ -87,7 +87,7 @@
                         </small>
                     {% else %}
                     <small>
-                        <span class="text-success font-weight-bold">Opened</span> 
+                        <span class="text-success font-weight-bold">Opened</span>
                         <span data-toggle="tooltip" title="{{
                         request.date_created | format_datetime
                       }}">{{ request.date_created | humanize}}</span> by <span title="{{
@@ -132,15 +132,43 @@
                       {% endif %}
                 </div>
                 <div>
-                        {% for tag in request.tags %}
-                            <span id="tag-{{ tag.tag }}" title="{{ tag.tag_description }}"
-                                  style="background-color:{{ tag.tag_color}}; font-size:90%"
-                                  class="badge badge-secondary"
-                                  >
-                                {{ tag.tag }}
-                            </span>
-                        {% endfor %}
+                  {% for tag in request.tags %}
+                      <span id="tag-{{ tag.tag }}" title="{{ tag.tag_description }}"
+                            style="background-color:{{ tag.tag_color}}; font-size:90%"
+                            class="badge badge-secondary">
+                          {{ tag.tag }}
+                      </span>
+                  {% endfor %}
                 </div>
+
+                {% if request.flags %}
+                  <div class="d-flex prs_flag_list">
+                    {% set flags_stats = request.flags_stats %}
+                    {% if flags_stats | length == 1 %}
+                      {% for status in flags_stats %}
+                        <p>{{ flags_stats[status][0].username }}:
+                          <span class="badge {{
+                            flags_stats[status][0] | flag2label }} font-size-09">
+                              {{ flags_stats[status][0].status }}
+                          </span>
+                        </p>
+                      {% endfor %}
+                    {% else %}
+                      <p>Flags:
+                      {% for status in flags_stats %}
+                        <span class="badge {{
+                          flags_stats[status][0] | flag2label }} font-size-09"
+                          title="{% for f in flags_stats[status] %}{{
+                          f.username}}{% if not loop.last %}, {% endif %}{% endfor %}">
+                            {{ flags_stats[status] | length }} {{ status }}
+                        </span>
+                      </p>
+                      {% endfor %}
+                    {% endif %}
+                  </div>
+                {% endif %}
+
+                </span>
                 {% endif %}
             </div>
         </div>
