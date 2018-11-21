@@ -488,7 +488,7 @@ def fork(
                     "pagure",
                     "remotes/%s" % branchname,
                     "refs/heads/%s" % localname,
-                    internal="yes",
+                    internal_no_hooks="yes",
                 )
 
         if not repo_to.is_on_repospanner and not repo_to.private:

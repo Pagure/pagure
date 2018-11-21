@@ -14,6 +14,12 @@ import sys
 # as a python module (for example if you run it from a git clone).
 #sys.path.insert(0, '/path/to/pagure/')
 
+if os.environ.get("internal_no_hooks", False):
+    # we do this check before any pagure machinery is imported
+    # and initialized to make sure this is very fast (used
+    # when pushing code from original repos to forks)
+    sys.exit(0)
+
 if "PAGURE_CONFIG" not in os.environ and os.path.exists(
     "/etc/pagure/pagure.cfg"
 ):
