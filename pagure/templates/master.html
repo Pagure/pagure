@@ -71,6 +71,9 @@
                 url_for('ui_ns.user_settings')
                 }}">My Settings</a>
               <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="{{
+                url_for('ui_ns.userprofile_starred', username=g.fas_user.username)
+                }}">My Starred Projects</a>
               {% if config.get('ENABLE_TICKETS', True) %}
               <a class="dropdown-item" href="{{
                 url_for('ui_ns.view_user_issues', username=g.fas_user.username)
