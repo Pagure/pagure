@@ -47,6 +47,33 @@ class PagureFlaskInternaltests(tests.Modeltests):
         pagure.config.config['GIT_FOLDER'] = os.path.join(
             self.path, 'repos')
 
+    @patch.dict('pagure.config.config', {'IP_ALLOWED_INTERNAL': []})
+    def test_internal_access_only(self):
+        output = self.app.post('/pv/ssh/lookupkey/')
+        self.assertEqual(output.status_code, 403)
+
+        # no internal IP addresses => will fail
+        output = self.app.post('/pv/ssh/lookupkey/')
+        self.assertEqual(output.status_code, 403)
+        # wrong token => will fail
+        output = self.app.post(
+            '/pv/ssh/lookupkey/',
+            headers={"Authorization": "token doesntexist"}
+        )
+        self.assertEqual(output.status_code, 401)
+        # correct token => will work
+        pagure.lib.query.add_token_to_user(
+            self.session, None, ['internal_access'], 'pingou'
+        )
+        token = pagure.lib.query.search_token(
+            self.session, acls=['internal_access'], user='pingou'
+        )
+        output = self.app.post(
+            '/pv/ssh/lookupkey/',
+            headers={"Authorization": "token %s" % token[0].id}
+        )
+        self.assertEqual(output.status_code, 400)
+
     @patch('pagure.lib.notify.send_email')
     def test_pull_request_add_comment(self, send_email):
         """ Test the pull_request_add_comment function.  """
@@ -121,7 +148,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         self.assertEqual(len(request.comments), 1)
         self.assertEqual(len(request.discussion), 1)
 
-        # Check the @localonly
+        # Check the @internal_access_only
         before = pagure.config.config['IP_ALLOWED_INTERNAL'][:]
         pagure.config.config['IP_ALLOWED_INTERNAL'] = []
 
@@ -199,7 +226,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         issue = repo.issues[0]
         self.assertEqual(len(issue.comments), 1)
 
-        # Check the @localonly
+        # Check the @internal_access_only
         pagure.config.config['IP_ALLOWED_INTERNAL'].remove(None)
         before = pagure.config.config['IP_ALLOWED_INTERNAL'][:]
         pagure.config.config['IP_ALLOWED_INTERNAL'] = []
@@ -288,7 +315,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         issue = repo.issues[0]
         self.assertEqual(len(issue.comments), 1)
 
-        # Check the @localonly
+        # Check the @internal_access_only
         before = pagure.config.config['IP_ALLOWED_INTERNAL'][:]
         pagure.config.config['IP_ALLOWED_INTERNAL'] = []
 
@@ -416,7 +443,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         issue = repo.issues[0]
         self.assertEqual(len(issue.comments), 2)
 
-        # Check the @localonly
+        # Check the @internal_access_only
         before = pagure.config.config['IP_ALLOWED_INTERNAL'][:]
         pagure.config.config['IP_ALLOWED_INTERNAL'] = []
 

@@ -713,7 +713,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             }
         )
 
-    @patch('pagure.api.check_api_acls', MagicMock(return_value=None))
+    @patch('pagure.utils.check_api_acls', MagicMock(return_value=None))
     def test_api_new_issue_raise_db_error(self):
         """ Test the api_new_issue method of the flask api. """
         tests.create_projects(self.session)
@@ -3410,7 +3410,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         # is required
         item = pagure.lib.model.TokenAcl(
             token_id='pingou_foo',
-            acl_id=7,
+            acl_id=8,
         )
         self.session.add(item)
         self.session.commit()

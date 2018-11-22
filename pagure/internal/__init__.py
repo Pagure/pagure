@@ -59,8 +59,13 @@ MERGE_OPTIONS = {
 }
 
 
-def localonly(function):
-    """ Decorator used to check if the request is local or not.
+def internal_access_only(function):
+    """ Decorator used to check if the request is iternal or not.
+
+    The request must either come from one of the addresses listed
+    in IP_ALLOWED_INTERNAL or it must have the "Authentication"
+    header set to "token <admin_token>" and the token must
+    have "internal_access" ACL.
     """
 
     @wraps(function)
@@ -70,20 +75,24 @@ def localonly(function):
         ip_allowed = pagure_config.get(
             "IP_ALLOWED_INTERNAL", ["127.0.0.1", "localhost", "::1"]
         )
-        if flask.request.remote_addr not in ip_allowed:
+        if "Authorization" in flask.request.headers:
+            res = pagure.utils.check_api_acls(acls=["internal_access"])
+            if res:
+                return res
+        elif flask.request.remote_addr not in ip_allowed:
             _log.debug(
-                "IP: %s is not in the list of allowed IPs: %s"
+                "IP: %s is not in the list of allowed IPs: %s "
+                "and 'Authorization' header not provided"
                 % (flask.request.remote_addr, ip_allowed)
             )
             flask.abort(403)
-        else:
-            return function(*args, **kwargs)
+        return function(*args, **kwargs)
 
     return decorated_function
 
 
 @PV.route("/ssh/lookupkey/", methods=["POST"])
-@localonly
+@internal_access_only
 def lookup_ssh_key():
     """ Looks up an SSH key by search_key for keyhelper.py """
     search_key = flask.request.form["search_key"]
@@ -109,7 +118,7 @@ def lookup_ssh_key():
 
 
 @PV.route("/ssh/checkaccess/", methods=["POST"])
-@localonly
+@internal_access_only
 def check_ssh_access():
     """ Determines whether a user has any access to the requested repo. """
     gitdir = flask.request.form["gitdir"]
@@ -158,7 +167,7 @@ def check_ssh_access():
 
 
 @PV.route("/pull-request/comment/", methods=["PUT"])
-@localonly
+@internal_access_only
 def pull_request_add_comment():
     """ Add a comment to a pull-request.
     """
@@ -208,7 +217,7 @@ def pull_request_add_comment():
 
 
 @PV.route("/ticket/comment/", methods=["PUT"])
-@localonly
+@internal_access_only
 def ticket_add_comment():
     """ Add a comment to an issue.
     """

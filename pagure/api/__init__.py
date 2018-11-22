@@ -35,7 +35,7 @@ import pagure.lib.tasks  # noqa: E402
 from pagure.config import config as pagure_config  # noqa: E402
 from pagure.doc_utils import load_doc, modify_rst, modify_html  # noqa: E402
 from pagure.exceptions import APIError  # noqa: E402
-from pagure.utils import authenticated  # noqa: E402
+from pagure.utils import authenticated, check_api_acls  # noqa: E402
 
 
 _log = logging.getLogger(__name__)
@@ -132,57 +132,6 @@ def get_authorized_api_project(session, repo, user=None, namespace=None):
 
 def get_request_data():
     return flask.request.form or flask.request.get_json() or {}
-
-
-def check_api_acls(acls, optional=False):
-    """ Checks if the user provided an API token with its request and if
-    this token allows the user to access the endpoint desired.
-    """
-    if authenticated():
-        return
-
-    flask.g.token = None
-    flask.g.fas_user = None
-    token = None
-    token_str = None
-
-    if "Authorization" in flask.request.headers:
-        authorization = flask.request.headers["Authorization"]
-        if "token" in authorization:
-            token_str = authorization.split("token", 1)[1].strip()
-
-    token_auth = False
-    if token_str:
-        token = pagure.lib.query.get_api_token(flask.g.session, token_str)
-        if token and not token.expired:
-            flask.g.authenticated = True
-            if acls and set(token.acls_list).intersection(set(acls)):
-                token_auth = True
-                flask.g.fas_user = token.user
-                # To get a token, in the `fas` auth user must have signed
-                # the CLA, so just set it to True
-                flask.g.fas_user.cla_done = True
-                flask.g.token = token
-                flask.g.authenticated = True
-            elif not acls and optional:
-                token_auth = True
-                flask.g.fas_user = token.user
-                # To get a token, in the `fas` auth user must have signed
-                # the CLA, so just set it to True
-                flask.g.fas_user.cla_done = True
-                flask.g.token = token
-                flask.g.authenticated = True
-    elif optional:
-        return
-
-    if not token_auth:
-        output = {
-            "error_code": APIERROR.EINVALIDTOK.name,
-            "error": APIERROR.EINVALIDTOK.value,
-        }
-        jsonout = flask.jsonify(output)
-        jsonout.status_code = 401
-        return jsonout
 
 
 def api_login_required(acls=None):

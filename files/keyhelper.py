@@ -65,7 +65,10 @@ url = "%s/pv/ssh/lookupkey/" % pagure_config["APP_URL"]
 data = {"search_key": fingerprint}
 if username_lookup:
     data["username"] = username
-resp = requests.post(url, data=data)
+headers = {}
+if pagure_config.get("SSH_ADMIN_TOKEN"):
+    headers["Authorization"] = "token %s" % pagure_config["SSH_ADMIN_TOKEN"]
+resp = requests.post(url, data=data, headers=headers)
 if not resp.status_code == 200:
     print(
         "Error during lookup request: status: %s" % resp.status_code,

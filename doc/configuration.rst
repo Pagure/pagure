@@ -1699,6 +1699,20 @@ to sshd, in the same format as AuthorizedKeysFile
 (see "AUTHORIZED_KEYS FILE FORMAT" in sshd(8)).
 
 
+SSH_ADMIN_TOKEN
+~~~~~~~~~~~~~~~
+
+If not set to ``None``, ``aclchecker`` and ``keyhelper`` will use this api
+admin token to get authorized to internal endpoints that they use. The token
+must have the ``internal_access`` ACL.
+
+This is useful when the IP address of sshd service is not predictable
+(e.g. because of running in a distributed cloud environment) and so
+it's not possible to use the ``IP_ALLOWED_INTERNAL`` address list.
+
+Defaults to: ``None``
+
+
 SSH_COMMAND_REPOSPANNER
 ~~~~~~~~~~~~~~~~~~~~~~~
 

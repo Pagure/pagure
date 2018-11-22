@@ -59,6 +59,60 @@ def api_authenticated():
     )
 
 
+def check_api_acls(acls, optional=False):
+    """ Checks if the user provided an API token with its request and if
+    this token allows the user to access the endpoint desired.
+    """
+    import pagure.api
+    import pagure.lib.query
+
+    if authenticated():
+        return
+
+    flask.g.token = None
+    flask.g.fas_user = None
+    token = None
+    token_str = None
+
+    if "Authorization" in flask.request.headers:
+        authorization = flask.request.headers["Authorization"]
+        if "token" in authorization:
+            token_str = authorization.split("token", 1)[1].strip()
+
+    token_auth = False
+    if token_str:
+        token = pagure.lib.query.get_api_token(flask.g.session, token_str)
+        if token and not token.expired:
+            flask.g.authenticated = True
+            if acls and set(token.acls_list).intersection(set(acls)):
+                token_auth = True
+                flask.g.fas_user = token.user
+                # To get a token, in the `fas` auth user must have signed
+                # the CLA, so just set it to True
+                flask.g.fas_user.cla_done = True
+                flask.g.token = token
+                flask.g.authenticated = True
+            elif not acls and optional:
+                token_auth = True
+                flask.g.fas_user = token.user
+                # To get a token, in the `fas` auth user must have signed
+                # the CLA, so just set it to True
+                flask.g.fas_user.cla_done = True
+                flask.g.token = token
+                flask.g.authenticated = True
+    elif optional:
+        return
+
+    if not token_auth:
+        output = {
+            "error_code": pagure.api.APIERROR.EINVALIDTOK.name,
+            "error": pagure.api.APIERROR.EINVALIDTOK.value,
+        }
+        jsonout = flask.jsonify(output)
+        jsonout.status_code = 401
+        return jsonout
+
+
 def is_safe_url(target):  # pragma: no cover
     """ Checks that the target url is safe and sending to the current
     website not some other malicious one.

@@ -5497,6 +5497,7 @@ foo bar
                 'create_project',
                 'fork_project',
                 'generate_acls_project',
+                'internal_access',
                 'issue_assign',
                 'issue_change_status',
                 'issue_comment',

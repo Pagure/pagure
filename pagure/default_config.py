@@ -327,6 +327,7 @@ ACLS = {
     "commit_flag": "Flag a commit",
     "fork_project": "Fork a project",
     "generate_acls_project": "Generate the Gitolite ACLs on a project",
+    "internal_access": "Access Pagure's internal APIs",
     "issue_assign": "Assign issue to someone",
     "issue_change_status": "Change the status of a ticket",
     "issue_comment": "Comment on a ticket",
@@ -350,7 +351,11 @@ ACLS = {
 
 # List of ACLs which a regular user is allowed to associate to an API token
 # from the ACLs above
-USER_ACLS = [key for key in ACLS.keys() if key != "generate_acls_project"]
+USER_ACLS = [
+    key
+    for key in ACLS.keys()
+    if key not in ["generate_acls_project", "internal_access"]
+]
 
 # From the ACLs above lists which ones are tolerated to be associated with
 # an API token that isn't linked to a particular project.
@@ -363,6 +368,7 @@ CROSS_PROJECT_ACLS = [
 
 # ACLs with which admins are allowed to create project-less API tokens
 ADMIN_API_ACLS = [
+    "internal_access",
     "issue_comment",
     "issue_create",
     "issue_change_status",
@@ -551,6 +557,10 @@ SSH_KEYS_USERNAME_EXPECT = None
 SSH_KEYS_OPTIONS = (
     'restrict,command="/usr/libexec/pagure/aclchecker.py %(username)s"'
 )
+# If not set to None, aclchecker and keyhelper will use this api admin
+# token to get authorized to internal endpoints that they use. The token
+# must have the internal_access ACL.
+SSH_ADMIN_TOKEN = None
 
 # ACL Checker options
 SSH_COMMAND_REPOSPANNER = (
