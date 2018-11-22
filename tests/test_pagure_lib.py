@@ -3106,7 +3106,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(msg, 'Comment added')
 
         self.assertEqual(len(request.discussion), 3)
-        self.assertEqual(request.score, 1)
+        self.assertEqual(request.score, 2)
 
     def test_add_group(self):
         """ Test the add_group method of pagure.lib.query. """

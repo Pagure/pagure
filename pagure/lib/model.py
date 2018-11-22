@@ -2036,19 +2036,18 @@ class PullRequest(BASE):
 
         An user can only give one +1 and one -1.
         """
-        positive = set()
-        negative = set()
+        votes = {}
         for comment in self.discussion:
             for word in ["+1", ":thumbsup:"]:
                 if word in comment.comment:
-                    positive.add(comment.user_id)
+                    votes[comment.user_id] = 1
                     break
             for word in ["-1", ":thumbsdown:"]:
                 if word in comment.comment:
-                    negative.add(comment.user_id)
+                    votes[comment.user_id] = -1
                     break
 
-        return len(positive) - len(negative)
+        return sum(votes.values())
 
     @property
     def remote(self):
