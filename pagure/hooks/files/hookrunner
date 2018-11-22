@@ -10,6 +10,9 @@
 """
 import os
 import sys
+# The following is only needed if you did not install pagure
+# as a python module (for example if you run it from a git clone).
+#sys.path.insert(0, '/path/to/pagure/')
 
 if "PAGURE_CONFIG" not in os.environ and os.path.exists(
     "/etc/pagure/pagure.cfg"
