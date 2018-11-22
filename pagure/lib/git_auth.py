@@ -27,6 +27,7 @@ import pagure.lib.model_base
 import pagure.lib.query
 from pagure.config import config as pagure_config
 from pagure.lib import model
+from pagure.utils import is_repo_committer, lookup_deploykey
 
 
 # logging.config.dictConfig(pagure_config.get('LOGGING') or {'version': 1})
@@ -72,6 +73,7 @@ def get_git_auth_helper(backend=None):
             "test_auth": GitAuthTestHelper,
             "gitolite2": Gitolite2Auth,
             "gitolite3": Gitolite3Auth,
+            "pagure": PagureGitAuth,
         }[backend]
     else:
         cls = classes[backend].load()
@@ -846,6 +848,63 @@ class Gitolite3Auth(Gitolite2Auth):
             cmd = "HOME=%s gitolite trigger POST_COMPILE" % gitolite_folder
             _log.debug("Command: %s", cmd)
             cls._run_gitolite_cmd(cmd)
+
+
+class PagureGitAuth(GitAuthHelper):
+    """ Standard Pagure git auth implementation. """
+
+    is_dynamic = True
+
+    @classmethod
+    def generate_acls(self, project, group=None):
+        """ This function is required but not used. """
+        pass
+
+    @classmethod
+    def remove_acls(self, session, project):
+        """ This function is required but not used. """
+        pass
+
+    def info(self, msg):
+        """ Function that prints info about decisions to clients.
+
+        This is a function to make it possible to override for test suite. """
+        print(msg)
+
+    def check_acl(
+        self,
+        session,
+        project,
+        username,
+        refname,
+        pull_request,
+        repotype,
+        is_internal,
+        **info
+    ):
+        if is_internal:
+            self.info("Internal push allowed")
+            return True
+
+        # Check whether a PR is required for this repo or in general
+        global_pr_only = pagure_config.get("PR_ONLY", False)
+        pr_only = project.settings.get("pull_request_access_only", False)
+        if repotype == "main":
+            if (
+                pr_only or (global_pr_only and not project.is_fork)
+            ) and not pull_request:
+                self.info("Pull request required")
+                return False
+
+        # Determine whether the current user is allowed to push
+        is_committer = is_repo_committer(project, username, session)
+        deploykey = lookup_deploykey(project, username)
+        if deploykey is not None:
+            self.info("Deploykey used. Push access: %s" % deploykey.pushaccess)
+            is_committer = deploykey.pushaccess
+        self.info("Has commit access: %s" % is_committer)
+
+        return is_committer
 
 
 class GitAuthTestHelper(GitAuthHelper):
