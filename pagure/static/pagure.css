@@ -133,6 +133,12 @@ pre {
     min-height: 12rem;
 }
 
+#original_comment_box
+{
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
 .bodycontent
 {
 min-height: 85vh;
