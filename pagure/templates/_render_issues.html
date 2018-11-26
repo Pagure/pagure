@@ -27,73 +27,40 @@
                     <span title="Private ticket" class="text-danger fa fa-fw fa-lock"></span>
                     {% endif %}
                 </div>
-                <div class="ml-auto nowrap">
-                    <span class="font-weight-bold text-muted ml-auto">
-                    
-                    {% if issue.milestone %}
-                    <span title="milestone {{issue.milestone}}" class="ml-2" data-toggle="tooltip">
-                        <i class="fa fa-fw fa-map-signs pr-2"></i>
-                        {% if filterstatus %}
-                        <a href="{{ url_for('ui_ns.view_issues',
-                          repo=repo.name,
-                          username=username,
-                          namespace=repo.namespace,
-                          status=filterstatus,
-                          milestone=issue.milestone) }}" class="notblue">
-                        {% endif %}
-                        {{ issue.milestone }}
-                        {% if filterstatus %}
-                        </a>
-                        {% endif %}
-                    </span>
-                    {% endif %}
-                    
-                    {% if issue.priority is not none  %}
-                    <span title="Priority" class="ml-2" data-toggle="tooltip">
-                        <i class="fa fa-fw fa-bolt"></i>
-                        {% if filterstatus %}
-                        <a href="{{ url_for('ui_ns.view_issues',
-                          repo=repo.name,
-                          username=username,
-                          namespace=repo.namespace,
-                          status=filterstatus,
-                          milestone=filtermilestone,
-                          priority=issue.priority) }}" class="notblue">
-                        {% endif %}
-                        {{ repo.priorities[issue.priority | string] }}
-                        {% if filterstatus %}
-                        </a>
-                        {% endif %}
-                    </span>
-                    {% endif %}
+                <!--<div class="ml-auto nowrap mr-3">-->
+                    <span class="row font-weight-bold text-muted ml-auto nowrap" style="width:150px">
 
-                    {% if issue.assignee %}
-                    <span class="ml-2" title="Assigned to {{ issue.assignee.username}}" data-toggle="tooltip">
-                        <i class="fa fa-fw fa-user-plus pr-2"></i>
-                        {% if filterstatus %}
-                        <a href="{{ url_for('ui_ns.view_issues',
-                          repo=repo.name,
-                          username=username,
-                          namespace=repo.namespace,
-                          status=filterstatus,
-                          milestone=filtermilestone,
-                          assignee=issue.assignee.username) }}" class="notblue">
+                    <div class="col-6 px-0 text-right">
+                        {% if issue.assignee %}
+                        <span title="Assigned to {{ issue.assignee.username}}" data-toggle="tooltip">
+                            <i class="fa fa-fw fa-user-plus pr-2"></i>
+                            {% if filterstatus %}
+                            <a href="{{ url_for('ui_ns.view_issues',
+                            repo=repo.name,
+                            username=username,
+                            namespace=repo.namespace,
+                            status=filterstatus,
+                            milestone=filtermilestone,
+                            assignee=issue.assignee.username) }}" class="notblue">
+                            {% endif %}
+                            {{ issue.assignee.username | avatar(size=20) | safe}}
+                            {% if filterstatus %}
+                            </a>
+                            {% endif %}
+                        </span>
                         {% endif %}
-                        {{ issue.assignee.username | avatar(size=20) | safe}}
-                        {% if filterstatus %}
-                        </a>
-                        {% endif %}
-                    </span>
-                    {% endif %}
+                    </div>
 
-                    {% if issue.user_comments|count > 0 %}
-                    <span title="{{issue.user_comments|count}} comments" class="text-muted ml-2" data-toggle="tooltip">
-                    <span class="fa fa-fw fa-comment pr-2"></span>
-                        {{issue.user_comments|count}}
+                    <div class="col-6">
+                        {% if issue.user_comments|count > 0 %}
+                        <span title="{{issue.user_comments|count}} comments" class="text-muted ml-2" data-toggle="tooltip">
+                        <span class="fa fa-fw fa-comment pr-2"></span>
+                            {{issue.user_comments|count}}
+                        </span>
+                        {% endif %}
+                    </div>
                     </span>
-                    {% endif %}
-                    </span>
-                </div>
+                <!--</div>-->
             </div>
                 {% if subtitle %}
                 <div class="d-flex">
@@ -163,6 +130,41 @@
                             </span>
                             {% endif %}
                         {% endfor %}
+                        {% if issue.milestone %}
+                        <span title="milestone {{issue.milestone}}" class="badge font-weight-bold text-muted font-size-09" data-toggle="tooltip">
+                            <i class="fa fa-map-signs"></i>
+                            {% if filterstatus %}
+                            <a href="{{ url_for('ui_ns.view_issues',
+                            repo=repo.name,
+                            username=username,
+                            namespace=repo.namespace,
+                            status=filterstatus,
+                            milestone=issue.milestone) }}" class="notblue">
+                            {% endif %}
+                            {{ issue.milestone }}
+                            {% if filterstatus %}
+                            </a>
+                            {% endif %}
+                        </span>
+                        {% endif %}
+                        {% if issue.priority is not none  %}
+                        <span title="Priority" class="badge font-weight-bold text-muted font-size-09" data-toggle="tooltip">
+                            <i class="fa fa-bolt"></i>
+                            {% if filterstatus %}
+                            <a href="{{ url_for('ui_ns.view_issues',
+                            repo=repo.name,
+                            username=username,
+                            namespace=repo.namespace,
+                            status=filterstatus,
+                            milestone=filtermilestone,
+                            priority=issue.priority) }}" class="notblue">
+                            {% endif %}
+                            {{ repo.priorities[issue.priority | string] }}
+                            {% if filterstatus %}
+                            </a>
+                            {% endif %}
+                        </span>
+                        {% endif %}
                 </div>
                 {% endif %}
                 </div>
