@@ -919,6 +919,72 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         self.assertEqual(data['args']['page'], 2)
 
     @patch('pagure.lib.notify.send_email')
+    def test_api_view_user_requests_filed_foo(self, mockemail):
+        """ Test the api_view_user_requests_filed method of the flask user
+        api """
+
+        # Default data returned
+        output = self.app.get(
+            '/api/0/user/foo/requests/filed?status=all&per_page=6')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+
+        self.assertEqual(len(data['requests']), 6)
+        self.assertEqual(
+            sorted(data.keys()),
+            [u'args', u'pagination', u'requests', u'total_requests'])
+        # There are 6 PRs, that's 1 page at 6 results per page
+        self.assertEqual(data['pagination']['pages'], 1)
+
+    @patch('pagure.lib.notify.send_email')
+    def test_api_view_user_requests_filed_foo_grp_access(self, mockemail):
+        """ Test when the user has accessed to some PRs via a group. """
+
+        # Add the user to a group
+        msg = pagure.lib.query.add_group(
+            self.session,
+            group_name='some_group',
+            display_name='Some Group',
+            description=None,
+            group_type='bar',
+            user='pingou',
+            is_admin=False,
+            blacklist=[],
+        )
+        self.session.commit()
+        # Add the group to the project `test2`
+        project = pagure.lib.query._get_project(self.session, 'test2')
+        msg = pagure.lib.query.add_group_to_project(
+            session=self.session,
+            project=project,
+            new_group='some_group',
+            user='pingou',
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Group added')
+        # Add foo to the group
+        group = pagure.lib.query.search_groups(
+            self.session, group_name='some_group')
+        result = pagure.lib.query.add_user_to_group(
+            self.session, 'foo', group, 'pingou', True)
+        self.session.commit()
+        self.assertEqual(
+            result, 'User `foo` added to the group `some_group`.')
+
+        # Query the API for foo's filed PRs
+        output = self.app.get(
+            '/api/0/user/foo/requests/filed?status=all&per_page=6')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+
+        self.assertEqual(len(data['requests']), 6)
+        self.assertEqual(
+            sorted(data.keys()),
+            [u'args', u'pagination', u'requests', u'total_requests'])
+        # There are 6 PRs, that's 1 page at 6 results per page
+        self.assertEqual(data['pagination']['pages'], 1)
+
+    @patch('pagure.lib.notify.send_email')
     def test_api_view_user_requests_actionable(self, mockemail):
         """ Test the api_view_user_requests_actionable method of the flask user
         api """

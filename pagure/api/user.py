@@ -938,7 +938,11 @@ def api_view_user_requests_filed(username):
         status = status.capitalize()
 
     pullrequests_cnt = pagure.lib.query.get_pull_request_of_user(
-        flask.g.session, username=username, status=status, count=True
+        flask.g.session,
+        username=username,
+        status=status,
+        filed=username,
+        count=True
     )
     pagination = pagure.lib.query.get_pagination_metadata(
         flask.request, page, per_page, pullrequests_cnt
@@ -1176,7 +1180,11 @@ def api_view_user_requests_actionable(username):
         status = status.capitalize()
 
     pullrequests_cnt = pagure.lib.query.get_pull_request_of_user(
-        flask.g.session, username=username, status=status, count=True
+        flask.g.session,
+        username=username,
+        status=status,
+        actionable=username,
+        count=True
     )
     pagination = pagure.lib.query.get_pagination_metadata(
         flask.request, page, per_page, pullrequests_cnt
