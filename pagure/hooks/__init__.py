@@ -427,7 +427,10 @@ def run_project_hooks(
     stdin = stdin.encode("utf-8")
 
     if debug:
-        print("Running legacy hooks with args: %s, stdin: %s" % (args, stdin))
+        print(
+            "Running legacy hooks (if any) with args: %s, stdin: %s"
+            % (args, stdin)
+        )
 
     for hook in os.listdir(hookdir):
         # This is for legacy hooks, which create symlinks in the form of
