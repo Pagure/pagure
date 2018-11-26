@@ -360,16 +360,16 @@ th[data-sort] {
 
 
 .selectize-control:before{
-	-webkit-animation: fa-spin 2s infinite linear;
+    -webkit-animation: fa-spin 2s infinite linear;
   animation: fa-spin 2s infinite linear;
-	content: '\f1ce';
+    content: '\f1ce';
   font-family: FontAwesome;
-	z-index: 2;
-	position: absolute;
-	display: block;
-	right: 34px;
+    z-index: 2;
+    position: absolute;
+    display: block;
+    right: 34px;
   top: 7px;
-	opacity: 0;
+    opacity: 0;
 }
 
 .selectize-control.loading:before{
