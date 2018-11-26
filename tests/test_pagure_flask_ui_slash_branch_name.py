@@ -345,7 +345,7 @@ class PagureFlaskSlashInBranchtests(tests.SimplePagureTest):
             '+1</span>\n', output_text)
         self.assertIn(
             '<div class="btn btn-outline-success disabled opacity-100 border-0 font-weight-bold">\n'
-            '                  file added\n', output_text)
+            '    file added\n', output_text)
 
         user = tests.FakeUser()
         with tests.user_set(self.app.application, user):
@@ -359,7 +359,7 @@ class PagureFlaskSlashInBranchtests(tests.SimplePagureTest):
                 '+1</span>\n', output_text)
             self.assertIn(
                 '<div class="btn btn-outline-success disabled opacity-100 border-0 font-weight-bold">\n'
-                '                  file added\n', output_text)
+                '    file added\n', output_text)
 
 
 if __name__ == '__main__':

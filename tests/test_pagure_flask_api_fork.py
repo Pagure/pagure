@@ -2781,6 +2781,8 @@ class PagureFlaskApiForkPRDiffStatstests(tests.Modeltests):
                 'sources': {
                     'lines_added': 10,
                     'lines_removed': 0,
+                    "new_id": "540916fbd3d825d14cc0c0b2397606fda69379ce",
+                    "old_id": "265f133a7c94ede4cb183dd808219c5bf9e08f87",
                     'old_path': 'sources',
                     'status': 'M'
                 }
@@ -2810,12 +2812,16 @@ class PagureFlaskApiForkPRDiffStatstests(tests.Modeltests):
                   "README.md": {
                     "lines_added": 5,
                     "lines_removed": 0,
+                    "new_id": "bd913ea153650b94f33f53e5164c36a28b761bf4",
+                    "old_id": "0000000000000000000000000000000000000000",
                     "old_path": "README.md",
                     "status": "A"
                   },
                   "sources": {
                     "lines_added": 5,
                     "lines_removed": 0,
+                    "new_id": "540916fbd3d825d14cc0c0b2397606fda69379ce",
+                    "old_id": "293500070b9dfc6ab66e31383f8f7fccf6a95fe2",
                     "old_path": "sources",
                     "status": "M"
                   }
@@ -2824,12 +2830,16 @@ class PagureFlaskApiForkPRDiffStatstests(tests.Modeltests):
                   "README.md": {
                     "lines_added": 5,
                     "lines_removed": 0,
+                    "new_id": "bd913ea153650b94f33f53e5164c36a28b761bf4",
+                    "old_id": "0000000000000000000000000000000000000000",
                     "old_path": "README.md",
                     "status": "A"
                   },
                   "sources": {
                     "lines_added": 10,
                     "lines_removed": 0,
+                    "new_id": "540916fbd3d825d14cc0c0b2397606fda69379ce",
+                    "old_id": "265f133a7c94ede4cb183dd808219c5bf9e08f87",
                     "old_path": "sources",
                     "status": "M"
                   }
@@ -2865,12 +2875,16 @@ class PagureFlaskApiForkPRDiffStatstests(tests.Modeltests):
               "README.md": {
                 "lines_added": 5,
                 "lines_removed": 0,
+                "new_id": "bd913ea153650b94f33f53e5164c36a28b761bf4",
+                "old_id": "0000000000000000000000000000000000000000",
                 "old_path": "README.md",
                 "status": "A"
               },
               "sources": {
                 "lines_added": 0,
                 "lines_removed": 5,
+                "new_id": "0000000000000000000000000000000000000000",
+                "old_id": "265f133a7c94ede4cb183dd808219c5bf9e08f87",
                 "old_path": "sources",
                 "status": "D"
               }

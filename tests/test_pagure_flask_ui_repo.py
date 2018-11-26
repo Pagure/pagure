@@ -2138,7 +2138,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             )
             self.assertIn(
                 '<div class="btn btn-outline-success disabled opacity-100 border-0 font-weight-bold">\n'
-                '                  file added\n', output_text)
+                '    file added\n', output_text)
 
             # View inverse commits comparison
             output = self.app.get(
@@ -2164,7 +2164,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             )
             self.assertIn(
                 '<div class="btn btn-outline-danger disabled opacity-100 border-0 font-weight-bold">\n'
-                '                  file removed\n', output_text)
+                '    file removed\n', output_text)
 
         output = self.app.get('/foo/bar')
         # No project registered in the DB

@@ -684,36 +684,16 @@
     {%- endmacro %}
     <div class="list-group list-group-flush">
     {% for patch in diff %}
-          {% set linesadded = patch.line_stats[1] %}
-          {% set linesremoved = patch.line_stats[2] %}
-          {% if patch | hasattr('new_file_path') %}
-            {%- if patch.new_file_path == patch.old_file_path -%}
-              {%- if patch.status == 'D' -%}
-                {{ changesdeletedfile(patch.new_file_path, linesadded, linesremoved, loop.index) }}
-              {%-elif patch.status == 'A' -%}
-                {{ changesaddedfile(patch.new_file_path, linesadded, linesremoved, loop.index) }}
-              {%-elif patch.status == 'M' -%}
-                {{ changeschangedfile(patch.new_file_path, linesadded, linesremoved, loop.index) }}
-              {%-endif-%}
-            {%- else -%}
-              {{changesrenamedfile(patch.old_file_path, patch.new_file_path, linesadded, linesremoved, loop.index)}}
-            {%- endif -%}
-          {%- elif patch | hasattr('delta') -%}
-            {%- if patch.delta.new_file.path == patch.delta.old_file.path -%}
-              {%- if patch.delta.new_file.mode == 0
-                  and patch.delta.old_file.mode in [33188, 33261] -%}
-                {{ changesdeletedfile(patch.delta.new_file.path, linesadded, linesremoved, loop.index) }}
-              {%-elif patch.delta.new_file.mode in [33188, 33261]
-                   and patch.delta.old_file.mode == 0 -%}
-                {{ changesaddedfile(patch.delta.new_file.path, linesadded, linesremoved, loop.index) }}
-              {%-elif patch.delta.new_file.mode in [33188, 33261]
-                   and patch.delta.old_file.mode in [33188, 33261] -%}
-                {{ changeschangedfile(patch.delta.new_file.path, linesadded, linesremoved, loop.index) }}
-              {%-endif-%}
-            {%- else -%}
-              {{changesrenamedfile(patch.delta.old_file.path, patch.delta.new_file.path, linesadded, linesremoved, loop.index)}}
-            {%- endif -%}
-          {%- endif -%}
+      {% set patchstats = (patch | patch_stats) %}
+      {%- if patchstats["status"] == 'D' -%}
+        {{ changesdeletedfile(patchstats["new_path"], patchstats["lines_added"], patchstats["lines_removed"], loop.index) }}
+      {%-elif patchstats["status"] == 'A' -%}
+        {{ changesaddedfile(patchstats["new_path"], patchstats["lines_added"], patchstats["lines_removed"], loop.index) }}
+      {%-elif patchstats["status"] == 'M' -%}
+        {{ changeschangedfile(patchstats["new_path"], patchstats["lines_added"], patchstats["lines_removed"], loop.index) }}
+      {%- else -%}
+        {{changesrenamedfile(patchstats["old_path"], patchstats["new_path"], patchstats["lines_added"], patchstats["lines_removed"], loop.index) }}
+      {%-endif-%}
     {% endfor %}
       </div>
     </div>

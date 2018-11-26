@@ -1591,44 +1591,10 @@ def api_pull_request_diffstats(repo, requestid, username=None, namespace=None):
     output = {}
     if diff:
         for patch in diff:
-            linesadded = patch.line_stats[1]
-            linesremoved = patch.line_stats[2]
-            if hasattr(patch, "new_file_path"):
-                # Older pygit2
-                status = patch.status
-                if patch.new_file_path != patch.old_file_path:
-                    status = "R"
-                output[patch.new_file_path] = {
-                    "status": patch.status,
-                    "old_path": patch.old_file_path,
-                    "lines_added": linesadded,
-                    "lines_removed": linesremoved,
-                }
-            elif hasattr(patch, "delta"):
-                # Newer pygit2
-                if (
-                    patch.delta.new_file.mode == 0
-                    and patch.delta.old_file.mode in [33188, 33261]
-                ):
-                    status = "D"
-                elif (
-                    patch.delta.new_file.mode in [33188, 33261]
-                    and patch.delta.old_file.mode == 0
-                ):
-                    status = "A"
-                elif patch.delta.new_file.mode in [
-                    33188,
-                    33261,
-                ] and patch.delta.old_file.mode in [33188, 33261]:
-                    status = "M"
-                if patch.delta.new_file.path != patch.delta.old_file.path:
-                    status = "R"
-                output[patch.delta.new_file.path] = {
-                    "status": status,
-                    "old_path": patch.delta.old_file.path,
-                    "lines_added": linesadded,
-                    "lines_removed": linesremoved,
-                }
+            stats = pagure.lib.git.get_stats_patch(patch)
+            new_path = stats["new_path"]
+            del (stats["new_path"])
+            output[new_path] = stats
     else:
         raise pagure.exceptions.APIError(400, error_code=APIERROR.ENOPRSTATS)
 

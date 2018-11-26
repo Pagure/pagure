@@ -16,6 +16,7 @@
 from __future__ import unicode_literals
 
 import textwrap
+import logging
 
 import arrow
 import flask
@@ -33,6 +34,7 @@ from pagure.ui import UI_NS
 from pagure.utils import authenticated, is_repo_committer, is_true
 
 
+_log = logging.getLogger(__name__)
 # Jinja filters
 
 
@@ -103,12 +105,16 @@ def format_loc(
 
     output = ['<div class="highlight">', '<table class="code_table">']
 
+    commit_hash = commit
+    if hasattr(commit_hash, "hex"):
+        commit_hash = commit_hash.hex
+
     comments = {}
     if prequest and not isinstance(prequest, flask.wrappers.Request):
         for com in prequest.comments:
             if (
                 commit
-                and com.commit_id == commit.hex
+                and com.commit_id == commit_hash
                 and com.filename == filename
             ):
                 if com.line in comments:
@@ -801,3 +807,14 @@ def get_git_url_ssh(complement=""):
         except (KeyError, IndexError):
             pass
     return git_url_ssh + complement
+
+
+@UI_NS.app_template_filter("patch_stats")
+def get_patch_stats(patch):
+    """ Return a dict of stats about the provided patch."""
+    try:
+        output = pagure.lib.git.get_stats_patch(patch)
+    except pagure.exceptions.PagureException:
+        _log.exception("Failed to get stats on a patch")
+        output = {}
+    return output

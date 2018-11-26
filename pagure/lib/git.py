@@ -2557,3 +2557,78 @@ def create_project_repos(project, region, templ, ignore_existing):
         raise
 
     set_up_project_hooks(project, region)
+
+
+def get_stats_patch(patch):
+    """ Returns some statistics about a given patch.
+
+    These stats include:
+        status: if the file was added (A), deleted (D), modified (M) or
+            renamed (R)
+        old_path: the path to the old file
+        new_path: the path to the new file
+        lines_added: the number of lines added in this patch
+        lines_removed: the number of lines removed in this patch
+
+    All these information are returned in a dict.
+
+    Args:
+        patch (pygit2.Patch): the patch object to get stats on
+    Returns: a dict with the stats described above
+    Raises (pagure.exceptions.PagureException): if for some reason (likely
+        a change in pygit2's API) this function does not manage to gather
+        all the stats it should
+
+    """
+
+    output = {
+        "lines_added": patch.line_stats[1],
+        "lines_removed": patch.line_stats[2],
+        "new_path": None,
+        "old_path": None,
+        "status": None,
+        "new_id": None,
+        "old_id": None,
+    }
+    if hasattr(patch, "new_file_path"):
+        # Older pygit2
+        status = patch.status
+        if patch.new_file_path != patch.old_file_path:
+            status = "R"
+        output["status"] = status
+        output["new_path"] = patch.new_file_path
+        output["old_path"] = patch.old_file_path
+        output["new_id"] = str(patch.new_id)
+        output["old_id"] = str(patch.old_id)
+    elif hasattr(patch, "delta"):
+        # Newer pygit2
+        if patch.delta.new_file.mode == 0 and patch.delta.old_file.mode in [
+            33188,
+            33261,
+        ]:
+            status = "D"
+        elif (
+            patch.delta.new_file.mode in [33188, 33261]
+            and patch.delta.old_file.mode == 0
+        ):
+            status = "A"
+        elif patch.delta.new_file.mode in [
+            33188,
+            33261,
+        ] and patch.delta.old_file.mode in [33188, 33261]:
+            status = "M"
+        if patch.delta.new_file.path != patch.delta.old_file.path:
+            status = "R"
+
+        output["status"] = status
+        output["new_path"] = patch.delta.new_file.path
+        output["new_id"] = str(patch.delta.new_file.id)
+        output["old_path"] = patch.delta.old_file.path
+        output["old_id"] = str(patch.delta.old_file.id)
+
+    if None in output.values():  # pragma: no-cover
+        raise pagure.exceptions.PagureException(
+            "Unable to properly retrieve the stats for this patch"
+        )
+
+    return output
