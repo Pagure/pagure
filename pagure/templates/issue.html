@@ -917,7 +917,6 @@ function try_async_comment(form) {
   console.log('Submitting form:');
   console.log(form);
   set_ui_for_comment(true);
-
   var _data = $(form).serialize();
   var btn = $(document.activeElement);
   if (btn[0].name == 'drop_comment'){
@@ -925,22 +924,11 @@ function try_async_comment(form) {
     set_ui_for_comment(false);
     return true;
   }
-
-  /* Keep some variable in memory before sending them in case the SSE is down */
-  var _url = form.action;
-  var _update = false;
-  var _comment = $(form).find('#comment').val();
-  var _comment_id = null;
-  if (!_comment && form.update_comment) {
-    _update = true;
-    _comment_id = $(form.edit_comment).val();
-    _comment = $(form).find('#update_comment').val();
+  if (!sse || source.readyState != 1) {
+    $(form).off('submit');
+    form.submit();
+    return false;
   }
-  var _commit_id = null;
-  var _line = null;
-  var _token = "{{ form.csrf_token.current_token }}";
-  var _base_url = _url.split('?')[0];
-
   var _url = form.action + "?js=1";
   $.post( _url, _data )
     .done(function(data) {
@@ -956,47 +944,7 @@ function try_async_comment(form) {
         $('#comments').find('.edit_comment').remove();
         $( ".issue-metadata-form" ).hide();
         $( ".issue-metadata-display" ).show();
-        if (!sse || source.readyState != 1) {
-            console.log('no sse, adding the comment manually');
-            $.ajax({
-              url: "{{ url_for('ui_ns.markdown_preview') }}" ,
-              type: 'POST',
-              data: {
-                content: _comment,
-                csrf_token: _token,
-              },
-              dataType: 'html',
-              success: function(res) {
-                var _comment = emojione.toImage(res);
-                if (_update) {
-                  var data = {
-                    comment_updated: _comment,
-                    comment_user: "{{ g.fas_user.username }}",
-                    comment_date: Date.now(),
-                    comment_id: _comment_id,
-                    avatar_url: "{{ g.fas_user.email | avatar_url(16) }}",
-                  }
-                } else {
-                  var data = {
-                    comment_added: _comment,
-                    comment_user: "{{ g.fas_user.username }}",
-                    comment_date: Date.now(),
-                    avatar_url: "{{ g.fas_user.email | avatar_url(16) }}",
-                  }
-                }
-                process_event(
-                    data,
-                    "{{ issue.uid }}",
-                    "{{ g.fas_user.username if g.authenticated or '' }}");
-                set_ui_for_comment(false);
-                setup_reply_btns()
-                return false;
-              }
-            });
-            return false;
-        } else {
-            set_ui_for_comment(false);
-        }
+        set_ui_for_comment(false);
       } else {
         // Make the browser submit the form sync
         $(form).off('submit');
