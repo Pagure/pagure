@@ -440,6 +440,10 @@ def run_project_hooks(
             if hook in pagure.lib.query.ORIGINAL_PAGURE_HOOK:
                 continue
 
+            if hook.endswith(".sample"):
+                # Ignore the samples that Git inserts
+                continue
+
             # Execute
             print(
                 "Running legacy hook %s. "
