@@ -1164,7 +1164,7 @@ def merge_request_pull(repo, requestid, username=None, namespace=None):
     _log.info("All checks in the controller passed")
 
     try:
-        if flask.request.form.get('comment'):
+        if flask.request.form.get("comment"):
             trigger_ci = pagure_config["TRIGGER_CI"]
             if isinstance(trigger_ci, dict):
                 trigger_ci = list(trigger_ci.keys())
@@ -1175,7 +1175,7 @@ def merge_request_pull(repo, requestid, username=None, namespace=None):
                 tree_id=None,
                 filename=None,
                 row=None,
-                comment=flask.request.form.get('comment'),
+                comment=flask.request.form.get("comment"),
                 user=flask.g.fas_user.username,
                 trigger_ci=trigger_ci,
             )
