@@ -435,10 +435,9 @@ def run_project_hooks(
         if hook.startswith(hooktype + "."):
             hookfile = os.path.join(hookdir, hook)
 
-            # Determine if this is an actual hook, or if it's a remnant
-            # from a hook that was installed before it was moved to the
-            # runner system.
-            if os.path.realpath(hookfile) == pagure.lib.query.HOOK_DNE_TARGET:
+            # By-pass all the old hooks that pagure may have created before
+            # moving to the runner architecture
+            if hook in pagure.lib.query.ORIGINAL_PAGURE_HOOK:
                 continue
 
             # Execute

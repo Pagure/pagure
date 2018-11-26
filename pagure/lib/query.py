@@ -69,9 +69,23 @@ from pagure.lib import tasks_services
 REDIS = None
 PAGURE_CI = None
 _log = logging.getLogger(__name__)
-# The target for hooks migrated to the Runner system, to be able to detect
-# whether a hook was migrated without having to open and read the file
-HOOK_DNE_TARGET = "/does/not/exist"
+# List of all the possible hooks pagure could generate before it was moved
+# to the runner architecture we now use.
+# This list is kept so we can ignore all of these hooks.
+ORIGINAL_PAGURE_HOOK = [
+    "post-receive.default",
+    "post-receive.fedmsg",
+    "post-receive.irc",
+    "post-receive.mail",
+    "post-receive.mirror",
+    "post-receive.pagure",
+    "post-receive.pagure-requests",
+    "post-receive.pagure-ticket",
+    "post-receive.rtd",
+    "pre-receive.pagure_no_new_branches",
+    "pre-receive.pagureforcecommit",
+    "pre-receive.pagureunsignedcommit",
+]
 
 
 def get_repotypes():

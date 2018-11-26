@@ -605,7 +605,6 @@ def move_to_repospanner(self, session, name, namespace, user, region):
             raise Exception("Project is already on repoSpanner")
 
         #  Make sure that no non-runner hooks are enabled for this project
-        compatible_targets = [pagure.lib.query.HOOK_DNE_TARGET]
         incompatible_hooks = []
         for repotype in pagure.lib.query.get_repotypes():
             path = project.repopath(repotype)
@@ -620,8 +619,7 @@ def move_to_repospanner(self, session, name, namespace, user, region):
                 if hook.endswith(".sample"):
                     # Ignore the samples that Git inserts
                     continue
-                hookfile = os.path.join(hookpath, hook)
-                if os.path.realpath(hookfile) not in compatible_targets:
+                if hook not in pagure.lib.query.ORIGINAL_PAGURE_HOOK:
                     incompatible_hooks.append((repotype, hook))
 
         if incompatible_hooks:
