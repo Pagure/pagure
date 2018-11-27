@@ -20,6 +20,7 @@ import textwrap
 import arrow
 import flask
 import six
+import bleach
 
 from six.moves.urllib.parse import urlparse, parse_qsl
 from jinja2 import escape
@@ -72,6 +73,17 @@ def format_ts(string):
     # This format should be pretty 'locale-neutral'.
     arr = arrow.get(string)
     return arr.strftime("%Y-%m-%d %H:%M:%S %Z")
+
+
+@UI_NS.app_template_filter("linkify")
+def linkify_text(text):
+    """ escape all html tags with bleach, then use bleach to linkify
+    """
+    if text:
+        cleaned = bleach.clean(text, tags=[], attributes=[])
+        return bleach.linkify(cleaned)
+    else:
+        return ""
 
 
 @UI_NS.app_template_filter("format_loc")

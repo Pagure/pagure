@@ -212,7 +212,7 @@
         {% if splitted_message|length > 1 %}
         <pre class="commit_message_body">
             {% for message in splitted_message %}
-    {{ message }}
+    {{ message | linkify | safe}}
             {% endfor %}
         </pre>
         {% endif %}
