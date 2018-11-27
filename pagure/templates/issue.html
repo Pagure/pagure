@@ -27,38 +27,17 @@
         <input type="hidden" id="statusform_close_status" name="close_status" value=""/>
       {% endif %}
       {% if g.authenticated and (g.repo_user or open_access) %}
-        <input type="hidden" name="tag" value="{{ issue.tags_text | join(',') }}"/>
-        <input type="hidden" name="depending" value="{{ issue.depending_text | join(',') }}"/>
-        <input type="hidden" name="blocking" value="{{ issue.blocking_text | join(',') }}"/>
-        <input type="hidden" name="assignee" value="{{ issue.assignee.username or '' }}"/>
-        {{form.priority}}
-        {{form.milestone}}
+        <input type="hidden" id="statusform_tag" name="tag" value=""/>
+        <input type="hidden" id="statusform_depending" name="depending" value=""/>
+        <input type="hidden" id="statusform_blocking" name="blocking" value=""/>
+        <input type="hidden" id="statusform_assignee" name="assignee" value=""/>
+        <input type="hidden" id="statusform_milestone" name="milestone" value=""/>
+        <input type="hidden" id="statusform_priority" name="priority" value=""/>
         {{form.private}}
+
         {% if repo.issue_keys %}
           {% for field in repo.issue_keys %}
-            {% if field.key_type == 'list' %}
-              <select class="form-control"
-                  name="{{ field.name }}"
-                  id="{{ field.name | replace(' ', '_') }}">
-                <option value="None">None</option>
-                {% for item in field.data or [] %}
-                  <option value="{{item}}" {% if field.name in knowns_keys and item == knowns_keys[field.name].value %} selected {% endif %}>
-                    {{ item }}
-                  </option>
-                {% endfor %}
-              </select>
-            {% else %}
-              <input
-                {%- if field.key_type == 'boolean' %} type="checkbox" {% endif %}
-                {%- if field.key_type == 'date'%} type="date" {% endif %}
-                class="form-control" name="{{ field.name }}" id="{{ field.name }}"
-                {%- if field.name in knowns_keys %}
-                  {% if field.key_type == 'boolean'%}
-                    {% if knowns_keys[field.name].value in ['true', 'on', '1'] %}checked{% endif %}
-                  {% else %} value="{{ knowns_keys[field.name].value }}"
-                  {% endif %}
-                {%- endif -%} />
-            {% endif %}
+          <input type="hidden" id="statusform_{{ field.name | replace(' ', '_') }}" name="{{ field.name }}" value=""/>
           {% endfor %}
         {% endif %}
       {% endif %}
@@ -1103,6 +1082,18 @@ $(".close_status_dropdown_action").click(function(event){
   } else {
     $("#changestatusform #statusform_status").val("Open");
   }
+  $("#changestatusform #statusform_assignee").val($("#assignee").val());
+  $("#changestatusform #statusform_tag").val($("#tag").val());
+  $("#changestatusform #statusform_priority").val($("#priority").val());
+  $("#changestatusform #statusform_milestone").val($("#milestone").val());
+  $("#changestatusform #statusform_blocking").val($("#blocking").val());
+  $("#changestatusform #statusform_depending").val($("#depending").val());
+
+  {% if repo.issue_keys %}
+    {% for field in repo.issue_keys %}
+      $("#changestatusform #statusform_{{ field.name | replace(' ', '_') }}").val($("#{{ field.name | replace(' ', '_') }}").val());
+    {% endfor %}
+  {% endif %}
   $("#changestatusform").submit();
 
 });
