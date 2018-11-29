@@ -1957,6 +1957,8 @@ def new_pull_request(
         request.project.user.username if request.project.is_fork else None,
         request.id,
     )
+    # Update the start and stop commits
+    pagure.lib.tasks.update_pull_request.delay(request.uid)
 
     return request
 

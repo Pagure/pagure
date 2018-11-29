@@ -32,7 +32,7 @@ import tests
 from pagure.lib.repo import PagureRepo
 
 
-class PagureFlaskPrNoSourcestests(tests.Modeltests):
+class BasePrNoSourcestests(tests.Modeltests):
     """ Tests PR in pagure when the source is gone """
 
     maxDiff = None
@@ -41,7 +41,7 @@ class PagureFlaskPrNoSourcestests(tests.Modeltests):
     @patch('pagure.lib.notify.fedmsg_publish', MagicMock(return_value=True))
     def setUp(self):
         """ Set up the environnment, ran before every tests. """
-        super(PagureFlaskPrNoSourcestests, self).setUp()
+        super(BasePrNoSourcestests, self).setUp()
 
         tests.create_projects(self.session)
         tests.create_projects_git(
@@ -65,6 +65,7 @@ class PagureFlaskPrNoSourcestests(tests.Modeltests):
         project = pagure.lib.query.get_authorized_project(self.session, 'test')
         fork = pagure.lib.query.get_authorized_project(
             self.session, 'test', user='foo')
+        print('fork', fork.fullname)
 
         self.set_up_git_repo(repo=project, fork=fork)
 
@@ -76,13 +77,7 @@ class PagureFlaskPrNoSourcestests(tests.Modeltests):
         path = os.path.join(
             self.path, 'repos', 'test.git',
             'refs', 'pull', '1', 'head')
-        cnt = 0
-        while not os.path.exists(path):
-            time.sleep(0.1)
-            cnt += 1
-            if cnt == 100:
-                # We're about 10 seconds in, let's bail
-                raise Exception('Sorry, worker took too long')
+        self.assertTrue(os.path.exists(path))
 
     def set_up_git_repo(self, repo, fork, branch_from='feature'):
         """ Set up the git repo and create the corresponding PullRequest
@@ -174,6 +169,18 @@ class PagureFlaskPrNoSourcestests(tests.Modeltests):
 
         shutil.rmtree(newpath)
 
+
+class PagureFlaskPrNoSourcestests(BasePrNoSourcestests):
+    """ Tests PR in pagure when the source is gone """
+
+    maxDiff = None
+
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    @patch('pagure.lib.notify.fedmsg_publish', MagicMock(return_value=True))
+    def setUp(self):
+        """ Set up the environnment, ran before every tests. """
+        super(PagureFlaskPrNoSourcestests, self).setUp()
+
     def test_request_pull_reference(self):
         """ Test if there is a reference created for a new PR. """
 
@@ -219,6 +226,11 @@ class PagureFlaskPrNoSourcestests(tests.Modeltests):
         # View the pull-request
         output2 = self.app.get('/test/pull-request/1')
         self.assertEqual(output2.status_code, 200)
+        output_text = output2.get_data(as_text=True)
+        self.assertIn('''<span>Files Changed&nbsp;</span>
+      <span class="badge badge-secondary badge-pill">
+        1
+      </span>''', output_text)
 
     def test_accessing_pr_patch_fork_deleted(self):
         """ Test accessing the PR's patch if the fork has been deleted. """
@@ -274,6 +286,11 @@ class PagureFlaskPrNoSourcestests(tests.Modeltests):
         # View the pull-request
         output2 = self.app.get('/test/pull-request/1')
         self.assertEqual(output2.status_code, 200)
+        output_text = output2.get_data(as_text=True)
+        self.assertIn('''<span>Files Changed&nbsp;</span>
+      <span class="badge badge-secondary badge-pill">
+        1
+      </span>''', output_text)
 
     def test_accessing_pr_patch_branch_deleted(self):
         """ Test accessing the PR's patch if branch it originates from has
@@ -307,9 +324,119 @@ class PagureFlaskPrNoSourcestests(tests.Modeltests):
         # View the pull-request
         output = self.app.get('/test/pull-request/1.patch')
         self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
         self.assertIn(
             '--- a/sources\n+++ b/sources\n@@ -1,2 +1,4 @@',
-            output.get_data(as_text=True))
+            output_text)
+
+    def test_accessing_pr_patch_fork_deleted_recreated(self):
+        """ Test accessing the PR's patch if the fork has been deleted
+        and re-created. """
+
+        # Delete fork on disk
+        project = pagure.lib.query.get_authorized_project(
+            self.session, 'test', user='foo')
+        repo_path = os.path.join(self.path, 'repos', project.path)
+        self.assertTrue(os.path.exists(repo_path))
+        shutil.rmtree(repo_path)
+        self.assertFalse(os.path.exists(repo_path))
+
+        # Delete fork in the DB
+        self.session.delete(project)
+        self.session.commit()
+
+        # Re-create foo's fork of pingou's test project
+        item = pagure.lib.model.Project(
+            user_id=2,  # foo
+            name='test',
+            description='test project #1',
+            hook_token='aaabbb',
+            is_fork=True,
+            parent_id=1,
+        )
+        self.session.add(item)
+        self.session.commit()
+        # Create the fork's git repo
+        repo_path = os.path.join(self.path, 'repos', item.path)
+        pygit2.init_repository(repo_path, bare=True)
+
+        # View the pull-request
+        output = self.app.get('/test/pull-request/1')
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('''<span>Commits&nbsp;</span>
+      <span class="badge badge-secondary badge-pill">
+        1
+      </span>''', output_text)
+        self.assertIn('''<span>Files Changed&nbsp;</span>
+      <span class="badge badge-secondary badge-pill">
+        1
+      </span>''', output_text)
+
+
+class PagureFlaskClosedPrNoSourcestests(BasePrNoSourcestests):
+    """ Tests viewing closed PR in pagure when the source is gone """
+
+    maxDiff = None
+
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    @patch('pagure.lib.notify.fedmsg_publish', MagicMock(return_value=True))
+    def setUp(self):
+        """ Set up the environnment, ran before every tests. """
+        super(PagureFlaskClosedPrNoSourcestests, self).setUp()
+
+        # Ensure things got setup straight
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
+        self.assertEqual(len(project.requests), 1)
+        request = project.requests[0]
+        self.assertEqual(request.status, "Open")
+        request.status = "Closed"
+        self.session.add(request)
+        self.session.commit()
+
+    def test_accessing_pr_patch_fork_deleted_recreated(self):
+        """ Test accessing the PR's patch if the fork has been deleted
+        and re-created. """
+
+        # Delete fork on disk
+        project = pagure.lib.query.get_authorized_project(
+            self.session, 'test', user='foo')
+        repo_path = os.path.join(self.path, 'repos', project.path)
+        self.assertTrue(os.path.exists(repo_path))
+        shutil.rmtree(repo_path)
+        self.assertFalse(os.path.exists(repo_path))
+
+        # Delete fork in the DB
+        self.session.delete(project)
+        self.session.commit()
+
+        # Re-create foo's fork of pingou's test project
+        item = pagure.lib.model.Project(
+            user_id=2,  # foo
+            name='test',
+            description='test project #1',
+            hook_token='aaabbb',
+            is_fork=True,
+            parent_id=1,
+        )
+        self.session.add(item)
+        self.session.commit()
+        # Create the fork's git repo
+        fork_path = os.path.join(self.path, 'repos', item.path)
+        pygit2.clone_repository(repo_path, fork_path, bare=True)
+
+        # View the pull-request
+        output = self.app.get('/test/pull-request/1')
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('''<span>Commits&nbsp;</span>
+      <span class="badge badge-secondary badge-pill">
+        1
+      </span>''', output_text)
+        self.assertIn('''<span>Files Changed&nbsp;</span>
+      <span class="badge badge-secondary badge-pill">
+        1
+      </span>''', output_text)
 
 
 if __name__ == '__main__':
