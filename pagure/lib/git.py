@@ -2153,6 +2153,20 @@ def update_pull_ref(request, repo):
 
     _log.info("  Adding remote: %s pointing to: %s", reponame, repopath)
     rc = RemoteCollection(repo)
+
+    try:
+        # we do rc.delete(reponame) both here and in the finally block below:
+        # * here: it's useful for cases when worker was interrupted
+        #   on the previous execution of this function and didn't manage
+        #   to remove the ref
+        # * in the finally clause: to remove the ref so that it doesn't stay
+        #   in the fork forever (as noted above, it might still stay there
+        #   if the worker gets interrupted, but that's not a huge deal)
+        rc[reponame]
+        rc.delete(reponame)
+    except KeyError:
+        pass
+
     remote = rc.create(reponame, repopath)
     try:
         _log.info(

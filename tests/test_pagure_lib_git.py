@@ -3017,6 +3017,57 @@ index 0000000..60f7480
             )
         )
 
+    @patch("pagure.utils.get_repo_path")
+    def test_update_pull_ref(self, get_repo_path):
+        fake_pr = MagicMock()
+        fake_pr.uid = "1234567"
+        fake_pr.branch_from = "master"
+        fake_pr.id = 6
+        fake_pr.user = MagicMock()
+        fake_pr.user.user = "pingou"
+        fake_pr.project = "doesnt_matter_mocked_out"
+        projects = tests.create_projects_git(
+            os.path.join(self.path, "repos"),
+            bare=True
+        )
+        tests.add_content_git_repo(projects[0])
+        tests.add_content_git_repo(projects[1])
+        orig = pygit2.Repository(projects[0])
+        fork = pygit2.Repository(projects[1])
+        get_repo_path.return_value = projects[0]
+
+        # make sure that creating works the first time
+        pagure.lib.git.update_pull_ref(fake_pr, fork)
+        oldhex = fork.references["refs/heads/master"].get_object().hex
+        self.assertEqual(
+            orig.references["refs/pull/6/head"].get_object().hex,
+            oldhex,
+        )
+
+        # make sure that updating works correctly
+        tests.add_content_git_repo(projects[1], append="foobar")
+        newhex = fork.references["refs/heads/master"].get_object().hex
+        self.assertNotEqual(oldhex, newhex)
+        pagure.lib.git.update_pull_ref(fake_pr, fork)
+        self.assertEqual(
+            orig.references["refs/pull/6/head"].get_object().hex,
+            newhex,
+        )
+
+        # make sure the function works fine even if there's a leftover
+        # ref from previous failed run of the function
+        with patch("pygit2.remote.RemoteCollection.delete"):
+            pagure.lib.git.update_pull_ref(fake_pr, fork)
+        self.assertIsNotNone(fork.remotes["pingou_1234567"])
+        tests.add_content_git_repo(projects[1], append="foobarbaz")
+        newesthex = fork.references["refs/heads/master"].get_object().hex
+        self.assertNotEqual(newhex, newesthex)
+        pagure.lib.git.update_pull_ref(fake_pr, fork)
+        self.assertEqual(
+            orig.references["refs/pull/6/head"].get_object().hex,
+            newesthex,
+        )
+
 
 class PagureLibGitCommitToPatchtests(tests.Modeltests):
     """ Tests for pagure.lib.git """
