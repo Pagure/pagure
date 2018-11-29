@@ -465,7 +465,6 @@ function process_task_results(_data, callback) {
   });
 }
 
-
 function generate_branch_list(data) {
    var _b = $("#pr-dropdown-mainlist");
    for (branch in data.new_branch){
@@ -489,7 +488,6 @@ function generate_branch_list(data) {
 }
 
 function generate_branch_list_fork(data) {
-  console.log(data);
    var _b = $("#pr-dropdown-forklist");
    for (branch in data.new_branch){
      var url = "{{ url_for(
@@ -556,7 +554,6 @@ $("#pr-button").one("click",
       _b.show();
       $("#pr-dropdown-forklist .pr-dropdown-spinner").hide();
   })
-  _b.prepend(new_pr);
   }
 );
 {% endif %}
