@@ -26,6 +26,10 @@ $(document).ready(function() {
     in_preview = !in_preview;
     update_button();
   });
+  $('#editinmarkdown').on('click', function () {
+    in_preview = !in_preview;
+    update_button();
+  });
   $('#comment').on('input propertychange', update_button);
   $('[data-toggle="tooltip"]').tooltip();
   update_button();
