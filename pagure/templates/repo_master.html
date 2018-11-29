@@ -525,6 +525,16 @@ $("#pr-button").one("click",
   $.post(_pr_url, data, null, dataType='json').done(
     function(data) {
       process_task_results(data, generate_branch_list);
+  }).fail(
+    function(data) {
+      var _b = $("#pr-dropdown-mainlist");
+      html = '<span class="badge-pill font-size-1">'
+         + '<span class="fa fa-ban fa-fw"> </span> '
+         + data.responseJSON.message
+       + '</span>';
+      _b.append(html);
+      _b.show();
+      $("#pr-dropdown-mainlist .pr-dropdown-spinner").hide();
   })
   var data = {
         repo: "{{ repo.name }}",
@@ -535,6 +545,16 @@ $("#pr-button").one("click",
   $.post(_pr_url, data, null, dataType='json').done(
     function(data) {
       process_task_results(data, generate_branch_list_fork);
+  }).fail(
+    function(data) {
+      var _b = $("#pr-dropdown-forklist");
+      html = '<span class="badge-pill font-size-1">'
+         + '<span class="fa fa-ban fa-fw"> </span> '
+         + data.responseJSON.message
+       + '</span>';
+      _b.append(html);
+      _b.show();
+      $("#pr-dropdown-forklist .pr-dropdown-spinner").hide();
   })
   _b.prepend(new_pr);
   }
