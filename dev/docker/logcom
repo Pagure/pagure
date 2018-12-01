@@ -4,19 +4,21 @@ MAINTAINER Patrick Uiterwijk <patrick@puiterwijk.org>
 VOLUME ["/repos"]
 RUN mkdir /code
 
-RUN dnf install -y python2-devel python-setuptools python-nose python2-bcrypt python-alembic \
-                   python-arrow python-binaryornot python-bleach python-blinker \
-                   python-chardet python-cryptography python-docutils python-flask \
-                   python-flask-wtf python-markdown python-psutil \
-                   python-pygit2 python-fedora python-openid python-openid-cla \
-                   python-openid-teams python-straight-plugin python-wtforms python-munch \
-                   python-enum34 python-redis python-sqlalchemy systemd gitolite3 python-filelock \
-                   python-fedora-flask python2-pillow python2-psycopg2
+RUN dnf install -y python3-devel python3-setuptools python3-nose python3-bcrypt python3-alembic \
+                   python3-arrow python3-binaryornot python3-bleach python3-blinker \
+                   python3-chardet python3-cryptography python3-docutils python3-flask \
+                   python3-flask-wtf python3-markdown python3-psutil \
+                   python3-pygit2 python3-fedora python3-openid python3-openid-cla \
+                   python3-openid-teams python3-straight-plugin python3-wtforms python3-munch \
+                   python3-enum34 python3-redis python3-sqlalchemy systemd gitolite3 \
+                   python3-filelock \
+                   python3-fedora-flask python3-pillow python3-psycopg2 python3-requests \
+                   python3-kitchen
 
-RUN dnf install -y python2-celery
+RUN dnf install -y python3-celery
 
 WORKDIR /code
-ENTRYPOINT ["/usr/bin/celery", "-A", "pagure.lib.tasks_services", "worker", "--loglevel", "info", "-Q", "pagure_logcom"]
+ENTRYPOINT ["/usr/bin/celery-3", "-A", "pagure.lib.tasks_services", "worker", "--loglevel", "info", "-Q", "pagure_logcom"]
 
 # Code injection is last to make optimal use of caches
 VOLUME ["/code"]
