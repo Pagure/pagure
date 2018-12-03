@@ -1961,3 +1961,92 @@ def api_get_project_options(repo, username=None, namespace=None):
         raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
 
     return flask.jsonify({"settings": project.settings, "status": "ok"})
+
+
+def _check_value(value):
+    """ Convert the provided value into a boolean, an int or leave it as it.
+    """
+    if str(value).lower() in ["true"]:
+        value = True
+    elif str(value).lower() in ["false"]:
+        value = True
+    elif str(value).isnumeric():
+        value = int(value)
+    return value
+
+
+@API.route("/<repo>/options/update", methods=["POST"])
+@API.route("/<namespace>/<repo>/options/update", methods=["POST"])
+@API.route("/fork/<username>/<repo>/options/update", methods=["POST"])
+@API.route(
+    "/fork/<username>/<namespace>/<repo>/options/update", methods=["POST"]
+)
+@api_login_required(acls=["modify_project"])
+@api_method
+def api_modify_project_options(repo, username=None, namespace=None):
+    """
+    Update project options
+    ----------------------
+    Allow project admins to modify the options of a project.
+
+    ::
+
+        POST /api/0/<repo>/options/update
+        POST /api/0/<namespace>/<repo>/options/update
+
+    ::
+
+        POST /api/0/fork/<username>/<repo>/options/update
+        POST /api/0/fork/<username>/<namespace>/<repo>/options/update
+
+    Input
+    ^^^^^
+
+    Simply specify the key/values you would like to set. Beware that if you
+    do not specify in the request values that have been changed before they
+    will go back to their default value.
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+            'message': 'Edited successfully settings of repo: test',
+            'status': 'ok'
+        }
+
+    """
+    project = get_authorized_api_project(
+        flask.g.session, repo, namespace=namespace
+    )
+    if not project:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
+
+    if flask.g.token.project and project != flask.g.token.project:
+        raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
+
+    settings = {}
+    for key in flask.request.form:
+
+        settings[key] = _check_value(flask.request.form[key])
+
+    try:
+        message = pagure.lib.query.update_project_settings(
+            flask.g.session,
+            repo=project,
+            settings=settings,
+            user=flask.g.fas_user.username,
+            from_api=True,
+        )
+        flask.g.session.commit()
+    except pagure.exceptions.PagureException as err:
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.ENOCODE, error=str(err)
+        )
+    except SQLAlchemyError as err:  # pragma: no cover
+        flask.g.session.rollback()
+        _log.exception(err)
+        raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
+
+    return flask.jsonify({"message": message, "status": "ok"})

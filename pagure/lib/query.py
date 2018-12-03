@@ -2119,8 +2119,15 @@ def edit_issue(
         return messages
 
 
-def update_project_settings(session, repo, settings, user):
-    """ Update the settings of a project. """
+def update_project_settings(session, repo, settings, user, from_api=False):
+    """ Update the settings of a project.
+
+    If from_api is true, all values that are not specified will be changed
+    back to their default value.
+    Otherwise, if from_api is False, all non-specified values are assumed
+    to be set to ``False`` or ``None``.
+
+    """
     user_obj = get_user(session, user)
 
     update = []
@@ -2146,9 +2153,12 @@ def update_project_settings(session, repo, settings, user):
                 update.append(key)
                 new_settings[key] = settings[key]
         else:
-            val = False
-            if key == "Web-hooks":
-                val = None
+            if from_api:
+                val = new_settings[key]
+            else:
+                val = False
+                if key == "Web-hooks":
+                    val = None
 
             # Ensure the default value is different from what is stored.
             if new_settings[key] != val:
