@@ -1898,3 +1898,66 @@ def api_modify_acls(repo, namespace=None, username=None):
 
     jsonout = flask.jsonify(output)
     return jsonout
+
+
+@API.route("/<repo>/options", methods=["GET"])
+@API.route("/<namespace>/<repo>/options", methods=["GET"])
+@API.route("/fork/<username>/<repo>/options", methods=["GET"])
+@API.route("/fork/<username>/<namespace>/<repo>/options", methods=["GET"])
+@api_login_required(acls=["modify_project"])
+@api_method
+def api_get_project_options(repo, username=None, namespace=None):
+    """
+    Get project options
+    ----------------------
+    Allow project admins to retrieve the current options of a project.
+
+    ::
+
+        GET /api/0/<repo>/options
+        GET /api/0/<namespace>/<repo>/options
+
+    ::
+
+        GET /api/0/fork/<username>/<repo>/options
+        GET /api/0/fork/<username>/<namespace>/<repo>/options
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "settings": {
+            "Enforce_signed-off_commits_in_pull-request": false,
+            "Minimum_score_to_merge_pull-request": -1,
+            "Only_assignee_can_merge_pull-request": false,
+            "Web-hooks": null,
+            "always_merge": false,
+            "disable_non_fast-forward_merges": false,
+            "fedmsg_notifications": true,
+            "issue_tracker": true,
+            "issue_tracker_read_only": false,
+            "issues_default_to_private": false,
+            "notify_on_commit_flag": false,
+            "notify_on_pull-request_flag": false,
+            "open_metadata_access_to_all": false,
+            "project_documentation": false,
+            "pull_request_access_only": false,
+            "pull_requests": true,
+            "stomp_notifications": true
+          },
+          "status": "ok"
+        }
+
+    """
+    project = get_authorized_api_project(
+        flask.g.session, repo, namespace=namespace
+    )
+    if not project:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
+
+    if flask.g.token.project and project != flask.g.token.project:
+        raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
+
+    return flask.jsonify({"settings": project.settings, "status": "ok"})

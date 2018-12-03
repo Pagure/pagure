@@ -3789,5 +3789,88 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
             {u'admin': [], u'commit': [], u'ticket': []}
         )
 
+
+class PagureFlaskApiProjectOptionsTests(tests.Modeltests):
+    """ Tests for the flask API of pagure for modifying options ofs a project
+    """
+
+    maxDiff = None
+
+    def setUp(self):
+        """ Set up the environnment, ran before every tests. """
+        super(PagureFlaskApiProjectOptionsTests, self).setUp()
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session, project_id=None)
+        tests.create_tokens_acl(
+            self.session, 'aaabbbcccddd', 'modify_project')
+
+        project = pagure.lib.query._get_project(self.session, 'test')
+        self.assertEquals(
+            project.access_users,
+            {u'admin': [], u'commit': [], u'ticket': []}
+        )
+
+    def test_api_get_project_options_wrong_project(self):
+        """ Test accessing api_get_project_options w/o auth header. """
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        output = self.app.get('/api/0/unknown/options', headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(
+            data,
+            {u'error': u'Project not found', u'error_code': u'ENOPROJECT'}
+        )
+
+    def test_api_get_project_options_wo_header(self):
+        """ Test accessing api_get_project_options w/o auth header. """
+
+        output = self.app.get('/api/0/test/options')
+        self.assertEqual(output.status_code, 401)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(
+            data,
+            {
+                u'error': u'Invalid or expired token. Please visit '
+                    'http://localhost.localdomain/settings#api-keys to get '
+                    'or renew your API token.',
+                u'error_code': u'EINVALIDTOK'
+            }
+        )
+
+    def test_api_get_project_options_w_header(self):
+        """ Test accessing api_get_project_options w/ auth header. """
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        output = self.app.get('/api/0/test/options', headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(
+            data,
+            {
+              "settings": {
+                "Enforce_signed-off_commits_in_pull-request": False,
+                "Minimum_score_to_merge_pull-request": -1,
+                "Only_assignee_can_merge_pull-request": False,
+                "Web-hooks": None,
+                "always_merge": False,
+                "disable_non_fast-forward_merges": False,
+                "fedmsg_notifications": True,
+                "issue_tracker": True,
+                "issue_tracker_read_only": False,
+                "issues_default_to_private": False,
+                "notify_on_commit_flag": False,
+                "notify_on_pull-request_flag": False,
+                "open_metadata_access_to_all": False,
+                "project_documentation": False,
+                "pull_request_access_only": False,
+                "pull_requests": True,
+                "stomp_notifications": True
+              },
+              "status": "ok"
+            }
+        )
+
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)

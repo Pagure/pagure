@@ -525,6 +525,7 @@ def api():
     api_update_project_watchers_doc = load_doc(
         project.api_update_project_watchers
     )
+    api_get_project_options_doc = load_doc(project.api_get_project_options)
 
     issues = []
     if pagure_config.get("ENABLE_TICKETS", True):
@@ -609,6 +610,7 @@ def api():
             api_commit_flags_doc,
             api_commit_add_flag_doc,
             api_update_project_watchers_doc,
+            api_get_project_options_doc,
         ],
         issues=issues,
         requests=[
