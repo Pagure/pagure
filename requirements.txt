@@ -18,7 +18,7 @@ markdown < 3.0
 munch
 Pillow
 psutil
-pygit2 >= 0.24.0
+pygit2 >= 0.26.0
 python-openid;python_version<="2.7"
 python3-openid;python_version>="3.0"
 python-openid-cla
