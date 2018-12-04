@@ -1437,7 +1437,7 @@ new file mode 100644
 index 0000000..60f7480
 --- /dev/null
 +++ b/456
-@@ -0,0 +1,28 @@
+@@ -0,0 +1,29 @@
 +{
 +    "assignee": null,
 +    "blocks": [],
@@ -1493,6 +1493,8 @@ index 0000000..60f7480
             elif 'closed_at' in row:
                 t = row.split(': ')[0]
                 row = '%s: null,' % t
+            elif 'closed_by' in row:
+                continue
             elif row.startswith('index 00'):
                 row = 'index 0000000..60f7480'
             elif row.startswith('+++ b/'):
@@ -1535,8 +1537,7 @@ diff --git a/123 b/456
 index 458821a..77674a8
 --- a/123
 +++ b/456
-@@ -3,13 +3,32 @@
-     "blocks": [],
+@@ -4,13 +4,32 @@
      "close_status": null,
      "closed_at": null,
 -    "comments": [],
@@ -1593,6 +1594,8 @@ index 458821a..77674a8
             elif 'closed_at' in row:
                 t = row.split(': ')[0]
                 row = '%s: null,' % t
+            elif 'closed_by' in row:
+                continue
             elif row.startswith('index'):
                 row = 'index 458821a..77674a8'
             elif row.startswith('--- a/'):

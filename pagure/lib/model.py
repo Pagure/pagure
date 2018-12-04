@@ -1244,6 +1244,11 @@ class Issue(BASE):
         sa.DateTime, nullable=False, default=datetime.datetime.utcnow
     )
     closed_at = sa.Column(sa.DateTime, nullable=True)
+    closed_by_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey("users.id", onupdate="CASCADE"),
+        nullable=True,
+    )
 
     project = relation(
         "Project",
@@ -1277,6 +1282,13 @@ class Issue(BASE):
         primaryjoin="issues.c.uid==tags_issues_colored.c.issue_uid",
         secondaryjoin="tags_issues_colored.c.tag_id==tags_colored.c.id",
         viewonly=True,
+    )
+
+    closed_by = relation(
+        "User",
+        foreign_keys=[closed_by_id],
+        remote_side=[User.id],
+        backref="closed_issues",
     )
 
     def __repr__(self):
@@ -1436,6 +1448,9 @@ class Issue(BASE):
             "priority": self.priority,
             "milestone": self.milestone,
             "custom_fields": custom_fields,
+            "closed_by": self.closed_by.to_json(public=public)
+            if self.closed_by
+            else None,
         }
 
         comments = []

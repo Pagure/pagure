@@ -2026,6 +2026,7 @@ def edit_issue(
         issue.status = status
         if status.lower() != "open":
             issue.closed_at = datetime.datetime.utcnow()
+            issue.closed_by_id = user_obj.id
         elif issue.close_status:
             issue.close_status = None
             close_status = Unspecified

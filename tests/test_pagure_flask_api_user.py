@@ -1225,6 +1225,7 @@ class PagureFlaskApiUsertestissues(tests.Modeltests):
                   "blocks": [],
                   "close_status": None,
                   "closed_at": None,
+                  "closed_by": None,
                   "comments": [],
                   "content": "We should work on this",
                   "custom_fields": [],

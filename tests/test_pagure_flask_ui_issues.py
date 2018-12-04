@@ -3960,7 +3960,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(msg.title, 'Test issue')
 
         user = tests.FakeUser()
-        user.username = 'pingou'
+        user.username = 'foo'
+        msg = pagure.lib.query.add_user_to_project(self.session, repo, "foo", "pingou")
+        self.session.commit()
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
@@ -4002,6 +4004,13 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertTrue(
                 '<option selected value="Fixed">Fixed</option>'
                 in output_text)
+            self.assertIn(
+                '                Closed: Fixed\n'
+                '              </span> just now\n'
+                '            </span>\n'
+                '            by\n'
+                '            <span title="foo bar (foo)">foo.</span>\n',
+                output_text)
 
     def _set_up_for_reaction_test(self, private=False):
         tests.create_projects(self.session)
