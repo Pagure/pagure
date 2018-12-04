@@ -1,12 +1,12 @@
 ---
 
 - name: Install Redis
-  dnf: name={{ item }} state=present
-  with_items:
-    - python3-redis
-    - python3-trololio
-    - redis
-
+  dnf:
+    name:
+      - python3-redis
+      - python3-trololio
+      - redis
+    state: present
 
 - name: Start Redis
   service: name=redis state=started enabled=yes

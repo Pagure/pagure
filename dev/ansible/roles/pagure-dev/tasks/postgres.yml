@@ -1,12 +1,13 @@
 ---
 
 - name: Install postgresql packages
-  dnf: name={{ item }} state=present
-  with_items:
+  dnf:
+    name:
       - postgresql
       - postgresql-server
       - postgresql-devel  # Allows pip installing psycopg2 is desired
       - python3-psycopg2
+    state: present
 
 - name: Initialize PostgreSQL
   command: postgresql-setup initdb

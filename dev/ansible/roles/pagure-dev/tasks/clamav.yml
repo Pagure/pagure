@@ -1,12 +1,13 @@
 ---
 
 - name: Install ClamAV packages
-  dnf: name={{ item }} state=present
-  with_items:
-    - clamav-data-empty
-    - clamav-server
-    - clamav-server-systemd
-    - clamav-update
+  dnf:
+    name:
+      - clamav-data-empty
+      - clamav-server
+      - clamav-server-systemd
+      - clamav-update
+    state: present
 
 - name: Configure freshclam
   replace:
@@ -25,6 +26,7 @@
 
 - name: Download latest ClamAV database
   command: freshclam
+  ignore_errors: yes
 
 - name: Start ClamAV
   service: name=clamd@pagure state=started enabled=yes

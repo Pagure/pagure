@@ -1,10 +1,12 @@
 ---
 
 - name: Install Pagure milter packages
-  dnf: name={{ item }} state=present enablerepo=updates-testing
-  with_items:
-    - postfix
-    - python3-pymilter
+  dnf:
+    name:
+      - postfix
+      - python3-pymilter
+    state: present
+    enablerepo: updates-testing
 
 - name: Start Postfix
   service: name=postfix state=started enabled=yes

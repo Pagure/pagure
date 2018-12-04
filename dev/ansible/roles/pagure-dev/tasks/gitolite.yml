@@ -1,9 +1,10 @@
 ---
 
 - name: Install gitolite3
-  dnf: name={{ item }} state=present
-  with_items:
-    - gitolite3
+  dnf:
+    name:
+      - gitolite3
+    state: present
 
 - name: Install gitolite.rc to ~/.gitolite.rc
   become_user: "{{ ansible_env.SUDO_USER }}"

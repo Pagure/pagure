@@ -7,59 +7,63 @@
 - include: postgres.yml
 
 - name: Install helpful development packages
-  dnf: name={{ item }} state=present
-  with_items:
-    - git
-    - ngrep
-    - nmap-ncat
-    - python3-rpdb
-    - tmux
-    - tree
-    - vim-enhanced
+  dnf:
+    name:
+      - git
+      - ngrep
+      - nmap-ncat
+      - python3-rpdb
+      - tmux
+      - tree
+      - vim-enhanced
+    state: present
 
 - name: Install Pagure development packages
-  dnf: name={{ item }} state=present
-  with_items:
-    - gcc
-    - libgit2-devel
-    - libffi-devel
-    - libjpeg-devel
-    - make
-    - python3-alembic
-    - python3-arrow
-    - python3-binaryornot
-    - python3-bleach
-    - python3-blinker
-    - python3-chardet
-    - python3-cryptography
-    - python3-docutils
-    - python3-enum34
-    - python3-eventlet
-    - python3-fedora-flask
-    - python3-flask
-    - python3-flask-wtf
-    - python3-jinja2
-    - python3-markdown
-    - python3-munch
-    - python3-openid-cla
-    - python3-openid-teams
-    - python3-pip
-    - python3-psutil
-    - python3-pygit2
-    - python3-redis
-    - python3-sqlalchemy
-    - python3-straight-plugin
-    - python3-virtualenvwrapper
-    - python3-wtforms
-    - python3-devel
-    - python3-devel
-    - redhat-rpm-config
-    - python3-bcrypt
-    - python3-virtualenv
+  dnf:
+    name:
+      - gcc
+      - libgit2-devel
+      - libffi-devel
+      - libjpeg-devel
+      - make
+      - python3-alembic
+      - python3-arrow
+      - python3-binaryornot
+      - python3-bleach
+      - python3-blinker
+      - python3-chardet
+      - python3-cryptography
+      - python3-docutils
+      - python3-enum34
+      - python3-eventlet
+      - python3-fedora-flask
+      - python3-flask
+      - python3-flask-wtf
+      - python3-jinja2
+      - python3-markdown
+      - python3-munch
+      - python3-openid-cla
+      - python3-openid-teams
+      - python3-pip
+      - python3-psutil
+      - python3-pygit2
+      - python3-redis
+      - python3-sqlalchemy
+      - python3-straight-plugin
+      - python3-virtualenvwrapper
+      - python3-wtforms
+      - python3-devel
+      - python3-devel
+      - redhat-rpm-config
+      - python3-bcrypt
+      - python3-virtualenv
+    state: present
 
 - name: register the libgit2 version installed
   shell: rpm -q libgit2|cut -d \- -f 2| cut -d \. -f 1,2
   register: libgit2_version
+  args:
+    warn: false
 
 # Add various helpful configuration files
 - name: Install a custom bashrc
@@ -85,22 +89,20 @@
 - name: Install pygit2 in the virtualenv
   become_user: "{{ ansible_env.SUDO_USER }}"
   pip:
-    name: "{{ item }}"
+    name:
+      - "pygit2=={{ libgit2_version.stdout_lines[0] }}.*"
     virtualenv: /home/{{ ansible_env.SUDO_USER }}/.virtualenvs/python3-pagure/
     virtualenv_python: python3
     virtualenv_command: virtualenv-3
-  with_items:
-    - "pygit2=={{ libgit2_version.stdout_lines[0] }}.*"
 
 # Install Pagure inside a virtualenv and configure it for python3
 - name: Install pygit2 in the python3 virtualenv
   become_user: "{{ ansible_env.SUDO_USER }}"
   pip:
-    name: "{{ item }}"
+    name:
+      - "pygit2=={{ libgit2_version.stdout_lines[0] }}.*"
     virtualenv: /home/{{ ansible_env.SUDO_USER }}/.virtualenvs/python3-pagure/
     virtualenv_python: python3
-  with_items:
-    - "pygit2=={{ libgit2_version.stdout_lines[0] }}.*"
 
 - name: Install Pagure Python dependencies into a virtualenv
   become_user: "{{ ansible_env.SUDO_USER }}"
@@ -209,13 +211,12 @@
   become: False
   systemd:
     daemon_reload: yes
-    name: "{{ item }}"
+    name:
+      - pagure
+      - pagure-docs
+      - pagure_ci
+      - pagure_ev
+      - pagure_webhook
+      - pagure_worker
     enabled: True
     user: yes
-  with_items:
-    - pagure
-    - pagure-docs
-    - pagure_ci
-    - pagure_ev
-    - pagure_webhook
-    - pagure_worker
