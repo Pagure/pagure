@@ -2878,6 +2878,83 @@ class PagureFlaskRepotests(tests.Modeltests):
             'text-muted fa-fw" data-glyph="spreadsheet"></i>&nbsp;Commits'
             '\n    </a>', output_text)
 
+    def test_view_commit_with_full_link(self):
+        """ Test the view_commit endpoint when the commit message includes
+        an url. """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+
+        folder = os.path.join(self.path, 'repos', 'test.git')
+
+        # Add a README to the git repo - First commit
+        tests.add_readme_git_repo(folder)
+        tests.create_projects_git(folder, bare=True)
+        # Add a commit with an url in the commit message
+        tests.add_content_to_git(
+            folder, branch='master', filename='sources', content='foo',
+            message='Test commit message\n\n'
+            'Fixes http://example.com/pagure/issue/2'
+        )
+
+        # Add a README to the git repo - First commit
+        repo = pygit2.Repository(os.path.join(self.path, 'repos', 'test.git'))
+        commit = repo.revparse_single('HEAD')
+
+        # View first commit
+        output = self.app.get('/test/c/%s' % commit.oid.hex)
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        self.assertIn(
+            '#commit-overview-collapse',
+            output_text)
+        self.assertIn(
+            '<pre class="commit_message_body">\n    '
+            'Test commit message\n    \n    '
+            'Fixes <a href="http://example.com/pagure/issue/2" '
+            'rel="nofollow">http://example.com/pagure/issue/2</a>\n        '
+            '</pre>', output_text)
+        self.assertIn(
+            '<div class="btn btn-outline-success disabled opacity-100 '
+            'border-0 font-weight-bold">file added</div>', output_text)
+
+    def test_view_commit_with_short_link(self):
+        """ Test the view_commit endpoint when the commit message includes
+        an url. """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+
+        folder = os.path.join(self.path, 'repos', 'test.git')
+
+        # Add a README to the git repo - First commit
+        tests.add_readme_git_repo(folder)
+        tests.create_projects_git(folder, bare=True)
+        # Add a commit with an url in the commit message
+        tests.add_content_to_git(
+            folder, branch='master', filename='sources', content='foo',
+            message='Test commit message\n\nFixes #2'
+        )
+
+        # Add a README to the git repo - First commit
+        repo = pygit2.Repository(os.path.join(self.path, 'repos', 'test.git'))
+        commit = repo.revparse_single('HEAD')
+
+        # View first commit
+        output = self.app.get('/test/c/%s' % commit.oid.hex)
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        self.assertIn(
+            '#commit-overview-collapse',
+            output_text)
+        self.assertIn(
+            '<pre class="commit_message_body">\n    '
+            'Test commit message\n    \n    '
+            'Fixes #2\n        </pre>', output_text)
+        self.assertIn(
+            '<div class="btn btn-outline-success disabled opacity-100 '
+            'border-0 font-weight-bold">file added</div>', output_text)
+
     def test_view_commit_patch(self):
         """ Test the view_commit_patch endpoint. """
 

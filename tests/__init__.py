@@ -926,7 +926,8 @@ def add_commit_git_repo(folder, ncommits=10, filename='sources',
 
 
 def add_content_to_git(
-        folder, branch='master', filename='sources', content='foo'):
+        folder, branch='master', filename='sources', content='foo',
+        message=None):
     """ Create some more commits for the specified git repo. """
     repo, newfolder, branch_ref_obj = _clone_and_top_commits(
         folder, branch, branch_ref=True)
@@ -956,11 +957,12 @@ def add_content_to_git(
     committer = pygit2.Signature(
         'Cecil Committer', 'cecil@committers.tld')
     branch_ref = "refs/heads/%s" % branch
+    message = message or 'Add content to file %s' % (filename)
     repo.create_commit(
         branch_ref,  # the name of the reference to update
         author,
         committer,
-        'Add content to file %s' % (filename),
+        message,
         # binary string representing the tree object ID
         tree,
         # list of binary strings representing parents of the new commit
