@@ -492,9 +492,7 @@ def view_issues(repo, username=None, namespace=None):
     tags = [tag.strip() for tag in tags if tag.strip()]
     assignee = flask.request.args.get("assignee", None)
     author = flask.request.args.get("author", None)
-    search_pattern = flask.request.args.get("search_pattern", None)
-    if search_pattern == "":
-        search_pattern = None
+    search_pattern = flask.request.args.get("search_pattern") or None
     milestones = flask.request.args.getlist("milestone", None)
     order = flask.request.args.get("order", "desc")
     order_key = flask.request.args.get("order_key", "date_created")
@@ -519,6 +517,7 @@ def view_issues(repo, username=None, namespace=None):
         "assignee": assignee,
         "author": author,
         "milestones": milestones,
+        "search_content": None,
     }
 
     no_stone = None
@@ -530,6 +529,10 @@ def view_issues(repo, username=None, namespace=None):
     extra_fields, search_pattern = pagure.lib.query.tokenize_search_string(
         search_pattern
     )
+
+    if "content" in extra_fields:
+        extra_fields["search_content"] = extra_fields["content"]
+        del (extra_fields["content"])
 
     for field in fields:
         if field in extra_fields:

@@ -105,3 +105,16 @@ Examples:
 ~~~~~~~~~
 https://pagure.io/SSSD/sssd/issues?status=Open&search_pattern=review%3ATrue
 https://pagure.io/pagure/issues?status=Open&search_pattern=tags%3Aeasyfix
+
+
+Search the comments of issues
+-----------------------------
+
+One can search all the comments made on an issue tracker using
+``content:<keyword>`` in the search field. This is going to search all the
+comments (including the descriptions) of all the tickets and thus can be quite
+slow on large project. This is why this feature isn't being pushed much forward.
+
+Examples:
+~~~~~~~~~
+https://pagure.io/pagure/issues?status=Open&search_pattern=content%3Aeasyfix

@@ -2766,6 +2766,7 @@ def search_issues(
     offset=None,
     limit=None,
     search_pattern=None,
+    search_content=None,
     custom_search=None,
     updated_after=None,
     no_milestones=None,
@@ -2820,6 +2821,8 @@ def search_issues(
     :type count: boolean
     :kwarg search_pattern: a string to search in issues title
     :type search_pattern: str or None
+    :kwarg search_content: a string to search in the issues comments
+    :type search_content: str or None
     :kwarg custom_search: a dictionary of key/values to be used when
         searching issues with a custom key constraint
     :type custom_search: dict or None
@@ -3008,6 +3011,19 @@ def search_issues(
             query = query.filter(
                 sqlalchemy.or_((const for const in constraints))
             )
+
+    if search_content is not None:
+        query = query.filter(
+            sqlalchemy.or_(
+                model.Issue.content.ilike("%%%s%%" % search_content),
+                sqlalchemy.and_(
+                    model.Issue.uid == model.IssueComment.issue_uid,
+                    model.IssueComment.comment.ilike(
+                        "%%%s%%" % search_content
+                    ),
+                ),
+            )
+        )
 
     query = session.query(model.Issue).filter(
         model.Issue.uid.in_(query.subquery())
