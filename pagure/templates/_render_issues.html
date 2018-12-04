@@ -102,7 +102,7 @@
                         namespace=repo.namespace)
                         }}">
                         {% endif %}
-                            
+
                             <strong>{{ repo.name }}</strong></a>
                       </small>
                       {% endif %}
@@ -165,6 +165,22 @@
                             {% endif %}
                         </span>
                         {% endif %}
+                        {% if issue.related_prs | length == 1  %}
+                          <span title="Related to PR#{{ issue.related_prs[0].id }}" class="badge font-weight-bold text-muted font-size-09" data-toggle="tooltip">
+                            <i class="fa fa-link"></i>
+                            <a href="{{ url_for('ui_ns.request_pull',
+                            repo=issue.related_prs[0].project.name,
+                            username=issue.related_prs[0].project.user.user if issue.related_prs[0].project.is_fork else None,
+                            namespace=issue.related_prs[0].project.namespace,
+                            requestid=issue.related_prs[0].id,
+                            ) }}" class="notblue">PR#{{ issue.related_prs[0].id }}</a>
+                          </span>
+                        {% elif issue.related_prs | length > 1  %}
+                          <span title="Related to {{issue.related_prs | length }} PRs" class="badge font-weight-bold text-muted font-size-09" data-toggle="tooltip">
+                            <i class="fa fa-link"></i>
+                          </span>
+                        {% endif %}
+
                 </div>
                 {% endif %}
                 </div>

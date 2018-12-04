@@ -153,6 +153,19 @@ class PagureFlaskPrIssueLinkTest(tests.Modeltests):
             'Related Pull Requests',
             output.get_data(as_text=True))
 
+    def test_pr_link_issue_list(self):
+        """ Test that the related PR(s) shows in the page listing issues
+        """
+        output = self.app.get('/test/issues')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn(
+            '<span title="Related to PR#3" class="badge font-weight-bold '
+            'text-muted font-size-09" data-toggle="tooltip">\n'
+            '                            <i class="fa fa-link"></i>\n'
+            '                            <a href="/test/pull-request/3" '
+            'class="notblue">PR#3</a>\n                          </span>',
+            output.get_data(as_text=True))
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
