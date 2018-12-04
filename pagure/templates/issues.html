@@ -216,7 +216,7 @@
                               username=username,
                               namespace=repo.namespace,
                               repo=repo.name ) }}" method="GET">
-                          <input type="hidden" name="status" value="{{ status or 'all' }}" />
+                          <input type="hidden" name="status" id="hidden_status" value="{{ status or 'all' }}" />
 
                           <div class="form-group row mb-1" id="tags-filter-group">
                             <label for="tags" class="col-auto align-self-center pl-1 pr-0"><i class="text-muted fa fa-fw fa-tag"></i></label>
@@ -318,6 +318,21 @@
                             </div>
                             <div class="col-auto pl-0 pr-1 pt-1">
                               <i class="fa fa-times fa-fw text-muted" id="author-selectize-reset"></i>
+                            </div>
+                          </div>
+
+                          <div class="form-group row mb-1" id="close_status-filter-group">
+                            <label for="close_status" class="col-auto align-self-center pl-1 pr-0"><i class="text-muted fa fa-fw fa-user"></i></label>
+                            <div class="col pl-1">
+                              <select name="close_status" id="close_status-selectize" placeholder="Closed as">
+                                <option value="" {% if not close_status %}selected="selected"{% endif %}></option>
+                                {% for p in repo.close_status | sort %}
+                                  <option value="{{ p }}" {% if p == close_status %}selected="selected"{% endif %}>{{ p }}</option>
+                                {% endfor %}
+                              </select>
+                            </div>
+                            <div class="col-auto pl-0 pr-1 pt-1">
+                              <i class="fa fa-times fa-fw text-muted" id="close_status-selectize-reset"></i>
                             </div>
                           </div>
 
@@ -557,14 +572,14 @@ $(document).ready(function() {
         event.stopPropagation();
       })
     }
-    });
-    var milestone_selectize_control = $milestone_selectize[0].selectize;
+  });
+  var milestone_selectize_control = $milestone_selectize[0].selectize;
 
-    $("#milestone-selectize-reset").on('click', function(e){
-      milestone_selectize_control.clear();
-    });
+  $("#milestone-selectize-reset").on('click', function(e){
+    milestone_selectize_control.clear();
+  });
 
-    var $priority_selectize = $('#priority-selectize').selectize({
+  var $priority_selectize = $('#priority-selectize').selectize({
     onInitialize: function(){
       $("#priority-filter-group .selectize-control").on('click', function(event){
         event.stopPropagation();
@@ -573,63 +588,81 @@ $(document).ready(function() {
         event.stopPropagation();
       })
     }
-    });
+  });
 
-    var priority_selectize_control = $priority_selectize[0].selectize;
+  var priority_selectize_control = $priority_selectize[0].selectize;
 
-    $("#priority-selectize-reset").on('click', function(e){
-      priority_selectize_control.clear();
-    });
+  $("#priority-selectize-reset").on('click', function(e){
+    priority_selectize_control.clear();
+  });
 
-    var $assignee_selectize = $('#assignee-selectize').selectize({
-      valueField: 'user',
-      labelField: 'user',
-      searchField: 'user',
-      maxItems: 1,
-      create: false,
-      load: function(query, callback) {
-        if (!query.length) return callback();
-        $.getJSON(
-          "{{ url_for('api_ns.api_users') }}", {
-            pattern: "*"+query+"*"
-          },
-          function( data ) {
-            callback( data.users.map(function(x) { return { user: x }; }) );
-          }
-        );
-      }
-    });
+  var $close_status_selectize = $('#close_status-selectize').selectize({
+    onInitialize: function(){
+      $("#close_status-filter-group .selectize-control").on('click', function(event){
+        event.stopPropagation();
+      })
+      $("#filters-dropdown").on('click', function(event){
+        event.stopPropagation();
+      })
+    }
+  });
 
-    var assignee_selectize_control = $assignee_selectize[0].selectize;
+  var close_status_selectize_control = $close_status_selectize[0].selectize;
 
-    $("#assignee-selectize-reset").on('click', function(e){
-      assignee_selectize_control.clear();
-    });
+  $("#close_status-selectize-reset").on('click', function(e){
+    close_status_selectize_control.clear();
+    $("#hidden_status").val("Open");
+  });
 
-var $author_selectize = $('#author-selectize').selectize({
-  valueField: 'user',
-  labelField: 'user',
-  searchField: 'user',
-  maxItems: 1,
-  create: false,
-  load: function(query, callback) {
-    if (!query.length) return callback();
-    $.getJSON(
-      "{{ url_for('api_ns.api_users') }}", {
-        pattern: "*"+query+"*"
-      },
-      function( data ) {
-        callback( data.users.map(function(x) { return { user: x }; }) );
-      }
-    );
-  }
-});
+  var $assignee_selectize = $('#assignee-selectize').selectize({
+    valueField: 'user',
+    labelField: 'user',
+    searchField: 'user',
+    maxItems: 1,
+    create: false,
+    load: function(query, callback) {
+      if (!query.length) return callback();
+      $.getJSON(
+        "{{ url_for('api_ns.api_users') }}", {
+          pattern: "*"+query+"*"
+        },
+        function( data ) {
+          callback( data.users.map(function(x) { return { user: x }; }) );
+        }
+      );
+    }
+  });
 
-    var author_selectize_control = $author_selectize[0].selectize;
+  var assignee_selectize_control = $assignee_selectize[0].selectize;
 
-$("#author-selectize-reset").on('click', function(e){
-  author_selectize_control.clear();
-});
+  $("#assignee-selectize-reset").on('click', function(e){
+    assignee_selectize_control.clear();
+  });
+
+  var $author_selectize = $('#author-selectize').selectize({
+    valueField: 'user',
+    labelField: 'user',
+    searchField: 'user',
+    maxItems: 1,
+    create: false,
+    load: function(query, callback) {
+      if (!query.length) return callback();
+      $.getJSON(
+        "{{ url_for('api_ns.api_users') }}", {
+          pattern: "*"+query+"*"
+        },
+        function( data ) {
+          callback( data.users.map(function(x) { return { user: x }; }) );
+        }
+      );
+    }
+  });
+
+  var author_selectize_control = $author_selectize[0].selectize;
+
+  $("#author-selectize-reset").on('click', function(e){
+    author_selectize_control.clear();
+  });
 
   $( "#filters_form" ).submit(function( event ) {
 

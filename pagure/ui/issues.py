@@ -486,6 +486,7 @@ def view_issues(repo, username=None, namespace=None):
     """
 
     status = flask.request.args.get("status", "Open")
+    status = flask.request.args.get("close_status") or status
     priority = flask.request.args.get("priority", None)
     tags = flask.request.args.getlist("tags")
     tags = [tag.strip() for tag in tags if tag.strip()]
@@ -691,6 +692,7 @@ def view_issues(repo, username=None, namespace=None):
         search_pattern=search_string,
         order=order,
         order_key=order_key,
+        close_status=flask.request.args.get("close_status"),
         status=status,
         total_open=total_open,
         total_closed=total_closed,
