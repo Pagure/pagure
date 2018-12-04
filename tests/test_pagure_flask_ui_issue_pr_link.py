@@ -144,9 +144,8 @@ class PagureFlaskPrIssueLinkTest(tests.Modeltests):
             output.get_data(as_text=True))
 
     def test_ticket_link(self):
-        """ Test that no Related PR(s) block is showing in the issue page.
+        """ Test that a Related PR(s) block is showing in the issue page.
         """
-        time.sleep(1)
         output = self.app.get('/test/issue/2')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
