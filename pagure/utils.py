@@ -22,6 +22,7 @@ import pygit2
 import six
 import werkzeug
 
+from pagure.exceptions import PagureException
 from pagure.config import config as pagure_config
 
 
@@ -742,3 +743,57 @@ def project_has_hook_attr_value(project, hook, attr, value):
             retval = True
 
     return retval
+
+
+def parse_path(path):
+    """Get the repo name, object type, object ID, and (if present)
+    username and/or namespace from a URL path component. Will only
+    handle the known object types from the OBJECTS dict. Assumes:
+    * Project name comes immediately before object type
+    * Object ID comes immediately after object type
+    * If a fork, path starts with /fork/(username)
+    * Namespace, if present, comes after fork username (if present) or at start
+    * No other components come before the project name
+    * None of the parsed items can contain a /
+    """
+    username = None
+    namespace = None
+    # path always starts with / so split and throw away first item
+    items = path.split("/")[1:]
+    # find the *last* match for any object type
+    try:
+        objtype = [
+            item for item in items if item in ["issue", "pull-request"]
+        ][-1]
+    except IndexError:
+        raise PagureException("No known object type found in path: %s" % path)
+    try:
+        # objid is the item after objtype, we need all items up to it
+        items = items[: items.index(objtype) + 2]
+        # now strip the repo, objtype and objid off the end
+        (repo, objtype, objid) = items[-3:]
+        items = items[:-3]
+    except (IndexError, ValueError):
+        raise PagureException(
+            "No project or object ID found in path: %s" % path
+        )
+    # now check for a fork
+    if items and items[0] == "fork":
+        try:
+            # get the username and strip it and 'fork'
+            username = items[1]
+            items = items[2:]
+        except IndexError:
+            raise PagureException(
+                "Path starts with /fork but no user found! Path: %s" % path
+            )
+    # if we still have an item left, it must be the namespace
+    if items:
+        namespace = items.pop(0)
+    # if we have any items left at this point, we've no idea
+    if items:
+        raise PagureException(
+            "More path components than expected! Path: %s" % path
+        )
+
+    return username, namespace, repo, objtype, objid

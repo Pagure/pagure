@@ -33,7 +33,7 @@ if six.PY3:
     raise unittest.case.SkipTest('Skipping on python3')
 
 import pagure.lib.query                             # pylint: disable=wrong-import-position
-from pagure.exceptions import PagureEvException     # pylint: disable=wrong-import-position
+from pagure.exceptions import PagureException, PagureEvException     # pylint: disable=wrong-import-position
 import tests                                        # pylint: disable=wrong-import-position
 # comes from ev-server/
 import pagure_stream_server as pss                  # pylint: disable=wrong-import-position, import-error
@@ -110,70 +110,76 @@ class StreamingServerTests(tests.Modeltests):
         """Tests for _parse_path."""
         # Result format is: (username, namespace, repo, objtype, objid)
         # Simple case: issue for non-namespaced, non-forked repo.
-        result = pss._parse_path('/pagure/issue/1')
+        result = pagure.utils.parse_path('/pagure/issue/1')
         self.assertEqual(result, (None, None, 'pagure', 'issue', '1'))
 
         # Pull request for namespaced repo.
-        result = pss._parse_path('/fedora-qa/fedfind/pull-request/2')
+        result = pagure.utils.parse_path('/fedora-qa/fedfind/pull-request/2')
         self.assertEqual(result, (None, 'fedora-qa', 'fedfind', 'pull-request', '2'))
 
         # Issue for forked repo.
-        result = pss._parse_path('/fork/adamwill/pagure/issue/3')
+        result = pagure.utils.parse_path('/fork/adamwill/pagure/issue/3')
         self.assertEqual(result, ('adamwill', None, 'pagure', 'issue', '3'))
 
         # Issue for forked, namespaced repo.
-        result = pss._parse_path('/fork/pingou/fedora-qa/fedfind/issue/4')
+        result = pagure.utils.parse_path('/fork/pingou/fedora-qa/fedfind/issue/4')
         self.assertEqual(result, ('pingou', 'fedora-qa', 'fedfind', 'issue', '4'))
 
         # Issue for repo named 'pull-request' (yeah, now we're getting tricksy).
-        result = pss._parse_path('/pull-request/issue/5')
+        result = pagure.utils.parse_path('/pull-request/issue/5')
         self.assertEqual(result, (None, None, 'pull-request', 'issue', '5'))
 
         # Unknown object type.
         six.assertRaisesRegex(
             self,
-            PagureEvException,
+            PagureException,
             r"No known object",
-            pss._parse_path, '/pagure/unexpected/1'
+            pagure.utils.parse_path,
+            '/pagure/unexpected/1'
         )
 
         # No object ID.
         six.assertRaisesRegex(
             self,
-            PagureEvException,
+            PagureException,
             r"No project or object ID",
-            pss._parse_path, '/pagure/issue'
+            pagure.utils.parse_path,
+            '/pagure/issue'
         )
 
         # No repo name. Note: we cannot catch 'namespace but no repo name',
         # but that should fail later in pagure.lib.query.get_project
         six.assertRaisesRegex(
             self,
-            PagureEvException,
+            PagureException,
             r"No project or object ID",
-            pss._parse_path, '/issue/1'
+            pagure.utils.parse_path,
+            '/issue/1'
         )
 
         # /fork but no user name.
         six.assertRaisesRegex(
             self,
-            PagureEvException,
+            PagureException,
             r"no user found!",
-            pss._parse_path, '/fork/pagure/issue/1'
+            pagure.utils.parse_path,
+            '/fork/pagure/issue/1'
         )
 
         # Too many path components before object type.
         six.assertRaisesRegex(
             self,
-            PagureEvException,
+            PagureException,
             r"More path components",
-            pss._parse_path, '/fork/adamwill/fedora-qa/fedfind/unexpected/issue/1'
+            pagure.utils.parse_path,
+            '/fork/adamwill/fedora-qa/fedfind/unexpected/issue/1'
         )
         six.assertRaisesRegex(
             self,
-            PagureEvException,
+            PagureException,
             r"More path components",
-            pss._parse_path, '/fedora-qa/fedfind/unexpected/issue/1'
+            pagure.utils.parse_path,
+            '/fedora-qa/fedfind/unexpected/issue/1'
         )
 
     def test_get_issue(self):

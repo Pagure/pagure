@@ -110,60 +110,11 @@ OBJECTS = {
 }
 
 
-def _parse_path(path):
-    """Get the repo name, object type, object ID, and (if present)
-    username and/or namespace from a URL path component. Will only
-    handle the known object types from the OBJECTS dict. Assumes:
-    * Project name comes immediately before object type
-    * Object ID comes immediately after object type
-    * If a fork, path starts with /fork/(username)
-    * Namespace, if present, comes after fork username (if present) or at start
-    * No other components come before the project name
-    * None of the parsed items can contain a /
-    """
-    username = None
-    namespace = None
-    # path always starts with / so split and throw away first item
-    items = path.split('/')[1:]
-    # find the *last* match for any object type
-    try:
-        objtype = [item for item in items if item in OBJECTS][-1]
-    except IndexError:
-        raise PagureEvException(
-            "No known object type found in path: %s" % path)
-    try:
-        # objid is the item after objtype, we need all items up to it
-        items = items[:items.index(objtype) + 2]
-        # now strip the repo, objtype and objid off the end
-        (repo, objtype, objid) = items[-3:]
-        items = items[:-3]
-    except (IndexError, ValueError):
-        raise PagureEvException(
-            "No project or object ID found in path: %s" % path)
-    # now check for a fork
-    if items and items[0] == 'fork':
-        try:
-            # get the username and strip it and 'fork'
-            username = items[1]
-            items = items[2:]
-        except IndexError:
-            raise PagureEvException(
-                "Path starts with /fork but no user found! Path: %s" % path)
-    # if we still have an item left, it must be the namespace
-    if items:
-        namespace = items.pop(0)
-    # if we have any items left at this point, we've no idea
-    if items:
-        raise PagureEvException(
-            "More path components than expected! Path: %s" % path)
-
-    return username, namespace, repo, objtype, objid
-
-
 def get_obj_from_path(path):
     """ Return the Ticket or Request object based on the path provided.
     """
-    (username, namespace, reponame, objtype, objid) = _parse_path(path)
+    (username, namespace, reponame, objtype, objid) = pagure.utils.parse_path(
+        path)
     session = _get_session()
     repo = pagure.lib.query.get_authorized_project(
             session, reponame, user=username, namespace=namespace)
@@ -212,7 +163,7 @@ def handle_client(client_reader, client_writer):
 
     try:
         obj = get_obj_from_path(url.path)
-    except PagureEvException as err:
+    except PagureException as err:
         log.warning(err.message)
         return
 
