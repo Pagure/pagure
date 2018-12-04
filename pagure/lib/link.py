@@ -15,37 +15,38 @@ from __future__ import unicode_literals
 import re
 import pagure.lib.query
 import pagure.exceptions
+import pagure.utils
+from pagure.config import config as pagure_config
 
 
 FIXES = [
-    re.compile(r"(?:.*\s+)?fixe?[sd]?:?\s*?#(\d+)", re.I),
+    re.compile(r"(?:.*\s+)?{0}?[sd]?:?\s*?#(\d+)".format(kw), re.I)
+    for kw in ["fixe", "merge", "close"]
+]
+FIXES += [
     re.compile(
-        r"(?:.*\s+)?fixe?[sd]?:?\s*?https?://.*/([a-zA-z0-9_][a-zA-Z0-9-_]*)"
-        r"/(?:issue|pull-request)/(\d+)",
+        r"(?:.*\s+)?{0}?[sd]?:?\s*?{1}"
+        r"(/.*?/(?:issue|pull-request)/\d+)".format(
+            kw, pagure_config["APP_URL"].rstrip("/")
+        ),
         re.I,
-    ),
-    re.compile(r"(?:.*\s+)?merge?[sd]?:?\s*?#(\d+)", re.I),
-    re.compile(
-        r"(?:.*\s+)?merge?[sd]?:?\s*?https?://.*/([a-zA-z0-9_][a-zA-Z0-9-_]*)"
-        r"/(?:issue|pull-request)/(\d+)",
-        re.I,
-    ),
-    re.compile(r"(?:.*\s+)?close?[sd]?:?\s*?#(\d+)", re.I),
-    re.compile(
-        r"(?:.*\s+)?close?[sd]?:?\s*?https?://.*/([a-zA-z0-9_][a-zA-Z0-9-_]*)"
-        r"/(?:issue|pull-request)/(\d+)",
-        re.I,
-    ),
+    )
+    for kw in ["fixe", "merge", "close"]
 ]
 
+
 RELATES = [
-    re.compile(r"(?:.*\s+)?relate[sd]?:?\s*?(?:to)?\s*?#(\d+)", re.I),
-    re.compile(r"(?:.*\s+)?relate[sd]?:?\s?#(\d+)", re.I),
+    re.compile(r"(?:.*\s+)?{0}?[sd]?:?\s*?(?:to)?\s*?#(\d+)".format(kw), re.I)
+    for kw in ["relate"]
+]
+RELATES += [
     re.compile(
-        r"(?:.*\s+)?relate[sd]?:?\s*?(?:to)?\s*?"
-        r"https?://.*/([a-zA-z0-9_][a-zA-Z0-9-_]*)/issue/(\d+)",
+        r"(?:.*\s+)?{0}?[sd]?:?\s*?(?:to)?\s*?{1}(/.*?/issue/\d+)".format(
+            kw, pagure_config["APP_URL"].rstrip("/")
+        ),
         re.I,
-    ),
+    )
+    for kw in ["relate"]
 ]
 
 
@@ -87,12 +88,22 @@ def get_relation(
     for motif in regex:
         relid = None
         project = None
-        if motif.match(text):
-            if len(motif.match(text).groups()) >= 2:
-                relid = motif.match(text).group(2)
-                project = motif.match(text).group(1)
-            else:
-                relid = motif.match(text).group(1)
+        got_match = motif.match(text)
+        if got_match:
+            relid = got_match.group(1)
+            if not relid.isdigit():
+                (
+                    username,
+                    namespace,
+                    reponame,
+                    objtype,
+                    relid,
+                ) = pagure.utils.parse_path(relid)
+                repo = pagure.lib.query.get_authorized_project(
+                    session, reponame, user=username, namespace=namespace
+                )
+                if not repo:
+                    continue
 
         if relid:
             relation = pagure.lib.query.search_issues(

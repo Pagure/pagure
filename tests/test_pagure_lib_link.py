@@ -33,9 +33,9 @@ COMMENTS = [
     'Did you see #1?',
     'This is a duplicate of #2',
     'This is a fixes #3',
-    'Might be worth looking at https://fedorahosted.org/pagure/tests2/issue/4',
+    'Might be worth looking at http://localhost.localdomain/pagure/tests2/issue/4',
     'This relates to #5',
-    'Could this be related to https://fedorahosted.org/pagure/tests2/issue/6',
+    'Could this be related to http://localhost.localdomain/test/issue/6',
 ]
 
 
@@ -186,21 +186,23 @@ class PagureLibLinktests(tests.Modeltests):
                 self.assertEqual(
                     str(link),
                     '[Issue(3, project:test, user:pingou, title:issue 3)]')
+                self.assertEqual(len(link), 1)
+                self.assertEqual(link[0].project.fullname, 'test')
             else:
                 self.assertEqual(link, [])
 
     def test_relates_regex(self):
         ''' Test the relates regex present in pagure.lib.link. '''
-        text = 'relates  to   http://localhost/fork/pingou/test/issue/1'
+        text = 'relates  to   http://localhost.localdomain/fork/pingou/test/issue/1'
         for index, regex in enumerate(pagure.lib.link.RELATES):
-            if index == 2:
+            if index == 1:
                 self.assertNotEqual(regex.match(text), None)
             else:
                 self.assertEqual(regex.match(text), None)
 
-        text = 'relates http://209.132.184.222/fork/pingou/test/issue/1'
+        text = 'relates http://localhost.localdomain/fork/pingou/test/issue/1'
         for index, regex in enumerate(pagure.lib.link.RELATES):
-            if index == 2:
+            if index == 1:
                 self.assertNotEqual(regex.match(text), None)
             else:
                 self.assertEqual(regex.match(text), None)
@@ -213,16 +215,16 @@ class PagureLibLinktests(tests.Modeltests):
                 self.assertEqual(regex.match(text), None)
 
         text = 'Could this be related to  '\
-            ' https://fedorahosted.org/pagure/tests2/issue/6'
+            ' http://localhost.localdomain/pagure/tests2/issue/6'
         for index, regex in enumerate(pagure.lib.link.RELATES):
-            if index == 2:
+            if index == 1:
                 self.assertNotEqual(regex.match(text), None)
             else:
                 self.assertEqual(regex.match(text), None)
 
-        text = 'relates https://localhost/SSSD/ding-libs/issue/31'
+        text = 'relates http://localhost.localdomain/SSSD/ding-libs/issue/31'
         for index, regex in enumerate(pagure.lib.link.RELATES):
-            if index == 2:
+            if index == 1:
                 self.assertNotEqual(regex.match(text), None)
             else:
                 self.assertEqual(regex.match(text), None)
@@ -238,34 +240,44 @@ class PagureLibLinktests(tests.Modeltests):
                 if match:
                     break
             self.assertNotEqual(match, None)
-            self.assertEqual(len(match.groups()), 2)
+            self.assertEqual(len(match.groups()), 1)
             self.assertEqual(match.groups(), groups)
 
         data = [
             # [string, groups]
         ]
 
-        project_match('fixes     http://localhost/fork/pingou/test/issue/1',
-            ('test', '1'))
-        project_match('fix http://209.132.184.222/fork/pingou/test/issue/1',
-            ('test', '1'))
-        project_match('Could this be fixes  '
-            ' https://fedorahosted.org/pagure/tests2/issue/6',
-            ('tests2', '6'))
-        project_match('merged https://pagure.io/myproject/pull-request/70',
-            ('myproject', '70'))
-        project_match('Now we merge https://pagure.io/myproject/pull-request/99',
-            ('myproject', '99'))
-        project_match('Merges     http://localhost/fork/pingou/test/issue/1',
-            ('test', '1'))
-        project_match('Merges: http://localhost/fork/pingou/test/issue/12',
-            ('test', '12'))
-        project_match('Merged http://localhost/fork/pingou/test/issue/123#',
-            ('test', '123'))
-        project_match('Merge: http://localhost/fork/pingou/test/issue/1234#foo',
-            ('test', '1234'))
-        project_match('Merges: https://localhost/SSSD/ding-libs/pull-request/3188',
-            ('ding-libs', '3188'))
+        project_match(
+            'fixes     '
+            'http://localhost.localdomain/fork/pingou/test/issue/1',
+            ('/fork/pingou/test/issue/1',))
+        project_match(
+            'Could this be fixes  '
+            ' http://localhost.localdomain/pagure/tests2/issue/6',
+            ('/pagure/tests2/issue/6',))
+        project_match(
+            'merged http://localhost.localdomain/myproject/pull-request/70',
+            ('/myproject/pull-request/70',))
+        project_match(
+            'Now we merge http://localhost.localdomain/myproject/pull-request/99',
+            ('/myproject/pull-request/99',))
+        project_match(
+            'Merges     http://localhost.localdomain/fork/pingou/test/issue/1',
+            ('/fork/pingou/test/issue/1',))
+        project_match(
+            'Merges: http://localhost.localdomain/fork/pingou/test/issue/12',
+            ('/fork/pingou/test/issue/12',))
+        project_match(
+            'Merged http://localhost.localdomain/fork/pingou/test/issue/123#',
+            ('/fork/pingou/test/issue/123',))
+        project_match('Merge: http://localhost.localdomain/fork/pingou/test/issue/1234#foo',
+            ('/fork/pingou/test/issue/1234',))
+        project_match(
+            'Merges: http://localhost.localdomain/SSSD/ding-libs/pull-request/3188',
+            ('/SSSD/ding-libs/pull-request/3188',))
+        project_match(
+            'Fixes: http://localhost.localdomain/fedpkg/issue/220',
+            ('/fedpkg/issue/220',))
 
         # issue matches
         def issue_match(text, issue):
