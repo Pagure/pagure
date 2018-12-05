@@ -695,6 +695,15 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg.title, 'Tést íssüé with milestone')
 
+        # Add a comment to that ticket
+        pagure.lib.query.add_issue_comment(
+            session=self.session,
+            issue=msg,
+            comment='How about nóã!',
+            user='foo',
+        )
+        self.session.commit()
+
         msg = pagure.lib.query.new_issue(
             session=self.session,
             repo=repo,
@@ -775,6 +784,26 @@ class PagureFlaskIssuestests(tests.Modeltests):
         output_text = output.get_data(as_text=True)
         self.assertIn('<title>Issues - test - Pagure</title>', output_text)
         self.assertIn('0 Open &amp; Closed Issues', output_text)
+
+        # Content search - description
+        output = self.app.get(
+            '/test/issues?status=all&search_pattern=content:work')
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        self.assertIn(
+            '<title>Issues - test - Pagure</title>',
+            output_text)
+        self.assertIn('1 Open &amp; Closed Issues', output_text)
+
+        # Content search - comment
+        output = self.app.get(
+            '/test/issues?status=all&search_pattern=content:nóã')
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        self.assertIn(
+            '<title>Issues - test - Pagure</title>',
+            output_text)
+        self.assertIn('1 Open &amp; Closed Issues', output_text)
 
         # Custom key searching
         output = self.app.get(
