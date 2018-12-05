@@ -211,12 +211,13 @@
   become: False
   systemd:
     daemon_reload: yes
-    name:
-      - pagure
-      - pagure-docs
-      - pagure_ci
-      - pagure_ev
-      - pagure_webhook
-      - pagure_worker
+    name: "{{ item }}"
     enabled: True
-    user: yes
+    scope: user
+  with_items:
+    - pagure
+    - pagure-docs
+    - pagure_ci
+    - pagure_ev
+    - pagure_webhook
+    - pagure_worker
