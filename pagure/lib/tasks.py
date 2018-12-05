@@ -1172,3 +1172,43 @@ def git_garbage_collect(self, session, repopath):
     # https://github.com/libgit2/libgit2/issues/3247
     _log.info("Running 'git gc --auto' for repo %s", repopath)
     subprocess.check_output(["git", "gc", "--auto", "-q"], cwd=repopath)
+
+
+@conn.task(queue=pagure_config.get("FAST_CELERY_QUEUE", None), bind=True)
+@pagure_task
+def generate_archive(
+    self, session, project, namespace, username, commit, tag, name, archive_fmt
+):
+    """ Generate the archive of the specified project on the specified
+    commit with the given name and archive format.
+    Currently only support the following format: gzip and tar.gz
+
+    """
+    project = pagure.lib.query._get_project(
+        session, namespace=namespace, name=project, user=username
+    )
+
+    _log.debug(
+        "Generating archive for %s, commit: %s as: %s.%s",
+        project.fullname,
+        commit,
+        name,
+        archive_fmt,
+    )
+
+    pagure.lib.git.generate_archive(project, commit, tag, name, archive_fmt)
+
+    if archive_fmt == "gzip":
+        endpoint = "ui_ns.get_project_archive_gzip"
+    elif archive_fmt == "tar":
+        endpoint = "ui_ns.get_project_archive_tar"
+    else:
+        endpoint = "ui_ns.get_project_archive_tar_gz"
+    return ret(
+        endpoint,
+        repo=project.name,
+        ref=commit,
+        name=name,
+        namespace=project.namespace,
+        username=project.user.user if project.is_fork else None,
+    )

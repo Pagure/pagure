@@ -3354,3 +3354,160 @@ def edit_tag(repo, tag, username=None, namespace=None):
     return flask.render_template(
         "edit_tag.html", username=username, repo=repo, form=form, tagname=tag
     )
+
+
+@UI_NS.route("/<repo>/archive/<ref>/<name>.tar")
+@UI_NS.route("/<namespace>/<repo>/archive/<ref>/<name>.tar")
+@UI_NS.route("/fork/<username>/<repo>/archive/<ref>/<name>.tar")
+@UI_NS.route("/fork/<username>/<namespace>/<repo>/archive/<ref>/<name>.tar")
+def get_project_archive_tar(repo, ref, name, namespace=None, username=None):
+    """ Generate an archive or redirect the user to where it already exists
+    """
+
+    return generate_project_archive(
+        repo,
+        ref,
+        name,
+        extension="tar",
+        namespace=namespace,
+        username=username,
+    )
+
+
+@UI_NS.route("/<repo>/archive/<ref>/<name>.tar.gz")
+@UI_NS.route("/<namespace>/<repo>/archive/<ref>/<name>.tar.gz")
+@UI_NS.route("/fork/<username>/<repo>/archive/<ref>/<name>.tar.gz")
+@UI_NS.route("/fork/<username>/<namespace>/<repo>/archive/<ref>/<name>.tar.gz")
+def get_project_archive_tar_gz(repo, ref, name, namespace=None, username=None):
+    """ Generate an archive or redirect the user to where it already exists
+    """
+    return generate_project_archive(
+        repo,
+        ref,
+        name,
+        extension="tar.gz",
+        namespace=namespace,
+        username=username,
+    )
+
+
+@UI_NS.route("/<repo>/archive/<ref>/<name>.zip")
+@UI_NS.route("/<namespace>/<repo>/archive/<ref>/<name>.zip")
+@UI_NS.route("/fork/<username>/<repo>/archive/<ref>/<name>.zip")
+@UI_NS.route("/fork/<username>/<namespace>/<repo>/archive/<ref>/<name>.zip")
+def get_project_archive_zip(repo, ref, name, namespace=None, username=None):
+    """ Generate an archive or redirect the user to where it already exists
+    """
+    return generate_project_archive(
+        repo,
+        ref,
+        name,
+        extension="zip",
+        namespace=namespace,
+        username=username,
+    )
+
+
+def generate_project_archive(
+    repo, ref, name, extension, namespace=None, username=None
+):
+    """ Generate an archive or redirect the user to where it already
+    exists.
+    """
+
+    archive_folder = pagure_config.get("ARCHIVE_FOLDER")
+
+    if not archive_folder:
+        _log.debug("No ARCHIVE_FOLDER specified in the configuration")
+        flask.abort(
+            404,
+            "This pagure instance isn't configured to support this feature")
+    if not os.path.exists(archive_folder):
+        _log.debug("No ARCHIVE_FOLDER could not be found on disk")
+        flask.abort(
+            500,
+            "Incorrect configuration, please contact your admin")
+
+    extensions = ["tar.gz", "tar", "zip"]
+    if extension not in extensions:
+        _log.debug("%s no in %s", extension, extensions)
+        flask.abort(400, "Invalid archive format specified")
+
+    name = werkzeug.secure_filename(name)
+
+    repo_obj = flask.g.repo_obj
+
+    ref_string = "refs/tags/%s" % ref
+
+    commit = None
+    tag = None
+    if ref_string in repo_obj.listall_references():
+        reference = repo_obj.lookup_reference(ref_string)
+        tag = repo_obj[reference.target]
+        if not isinstance(tag, pygit2.Tag):
+            flask.abort(400, "Invalid reference provided")
+        commit = tag.get_object()
+    else:
+        try:
+            commit = repo_obj.get(ref)
+        except ValueError:
+            flask.abort(404, "Invalid commit provided")
+
+    if not isinstance(commit, pygit2.Commit):
+        flask.abort(400, "Invalid reference specified")
+
+    tag_path = ""
+    tag_filename = None
+    if tag:
+        tag_filename = werkzeug.secure_filename(ref)
+        tag_path = os.path.join("tags", tag_filename)
+
+    path = os.path.join(
+        archive_folder,
+        flask.g.repo.fullname,
+        tag_path,
+        commit.oid.hex,
+        "%s.%s" % (name, extension),
+    )
+    headers = {
+        str("Content-Disposition"): "attachment",
+        str("Content-Type"): "application/x-gzip",
+    }
+    if os.path.exists(path):
+
+        def _send_data():
+            with open(path, "rb") as stream:
+                yield stream.read()
+
+        _log.info("Sending the existing archive")
+        return flask.Response(
+            flask.stream_with_context(_send_data()), headers=headers
+        )
+
+    _log.info("Re-generating the archive")
+    task = pagure.lib.tasks.generate_archive.delay(
+        repo,
+        namespace=namespace,
+        username=username,
+        commit=commit.oid.hex,
+        tag=tag_filename,
+        name=name,
+        archive_fmt=extension,
+    )
+
+    def _wait_for_task_and_send_data():
+        while not task.ready():
+            import time
+
+            _log.info("waiting")
+            time.sleep(0.5)
+        with open(path, "rb") as stream:
+            yield stream.read()
+
+    _log.info("Sending the existing archive")
+    return flask.Response(
+        flask.stream_with_context(_wait_for_task_and_send_data()),
+        headers=headers,
+    )
+
+    return pagure.utils.wait_for_task(task)

@@ -23,6 +23,8 @@ import shutil
 import subprocess
 import requests
 import tempfile
+import tarfile
+import zipfile
 
 import arrow
 import pygit2
@@ -867,13 +869,12 @@ class TemporaryClone(object):
     _project = None
     _action = None
     _repotype = None
-
     _origpath = None
-
+    _origrepopath = None
     repopath = None
     repo = None
 
-    def __init__(self, project, repotype, action, path=None):
+    def __init__(self, project, repotype, action, path=None, parent=None):
         """ Initializes a TempoaryClone instance.
 
         Args:
@@ -882,6 +883,12 @@ class TemporaryClone(object):
                 main, docs, requests, tickets
             action (string): Type of action performing, used in the
                 temporary directory name
+            path (string or None): the path to clone, allows cloning, for
+                example remote git repo for remote PRs instead of the
+                default one
+            parent (string or None): Adds this directory to the path in
+                which the project is cloned
+
         """
         if repotype not in pagure.lib.query.get_repotypes():
             raise NotImplementedError("Repotype %s not known" % repotype)
@@ -890,10 +897,15 @@ class TemporaryClone(object):
         self._repotype = repotype
         self._action = action
         self._path = path
+        self._parent = parent
 
     def __enter__(self):
         """ Enter the context manager, creating the clone. """
         self.repopath = tempfile.mkdtemp(prefix="pagure-%s-" % self._action)
+        self._origrepopath = self.repopath
+        if self._parent:
+            self.repopath = os.path.join(self.repopath, self._parent)
+            os.makedirs(self.repopath)
         if not self._project.is_on_repospanner:
             # This is the simple case. Just do a local clone
             # use either the specified path or the use the path of the
@@ -2632,3 +2644,77 @@ def get_stats_patch(patch):
         )
 
     return output
+
+
+def generate_archive(project, commit, tag, name, archive_fmt):
+    """ Generate the desired archive of the specified project for the
+    specified commit with the given name and archive format.
+
+    Args:
+        project (pagure.lib.model.Project): the project's repository from
+            which to generate the archive
+        commit (str): the commit hash to generate the archive of
+        name (str): the name to give to the archive
+        archive_fmt (str): the format of the archive to generate, can be
+            either gzip or tag or tar.gz
+    Returns: None
+    Raises (pagure.exceptions.PagureException): if an un-supported archive
+        format is specified
+
+    """
+
+    def _exclude_git(filename):
+        return ".git" in filename
+
+    with TemporaryClone(project, "main", "archive", parent=name) as tempclone:
+        repo_obj = tempclone.repo
+        commit_obj = repo_obj[commit]
+        repo_obj.checkout_tree(commit_obj.tree)
+        archive_folder = pagure_config.get("ARCHIVE_FOLDER")
+
+        tag_path = ""
+        if tag:
+            tag_path = os.path.join("tags", tag)
+        target_path = os.path.join(
+            archive_folder, project.fullname, tag_path, commit
+        )
+        if not os.path.exists(target_path):
+            os.makedirs(target_path)
+        fullpath = os.path.join(target_path, name)
+
+        if archive_fmt == "tar":
+            with tarfile.open(name=fullpath + ".tar", mode="w") as tar:
+                tar.add(
+                    name=tempclone.repopath, exclude=_exclude_git, arcname=name
+                )
+        elif archive_fmt == "tar.gz":
+            with tarfile.open(name=fullpath + ".tar.gz", mode="w:gz") as tar:
+                tar.add(
+                    name=tempclone.repopath, exclude=_exclude_git, arcname=name
+                )
+        elif archive_fmt == "zip":
+            # Code from /usr/lib64/python2.7/zipfile.py adjusted for our
+            # needs
+            def addToZip(zf, path, zippath):
+                if _exclude_git(path):
+                    return
+                if os.path.isfile(path):
+                    zf.write(path, zippath, zipfile.ZIP_DEFLATED)
+                elif os.path.isdir(path):
+                    if zippath:
+                        zf.write(path, zippath)
+                    for nm in os.listdir(path):
+                        if _exclude_git(path):
+                            continue
+                        addToZip(
+                            zf,
+                            os.path.join(path, nm),
+                            os.path.join(zippath, nm),
+                        )
+
+            with zipfile.ZipFile(fullpath + ".zip", "w") as zipstream:
+                addToZip(zipstream, tempclone.repopath, name)
+        else:
+            raise pagure.exceptions.PagureException(
+                "Un-support archive format requested: %s", archive_fmt
+            )
