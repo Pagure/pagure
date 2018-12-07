@@ -3013,9 +3013,7 @@ def search_issues(
             )
 
     if search_content is not None:
-        query = query.outerjoin(
-            model.IssueComment
-        ).filter(
+        query = query.outerjoin(model.IssueComment).filter(
             sqlalchemy.or_(
                 model.Issue.content.ilike("%%%s%%" % search_content),
                 sqlalchemy.and_(
