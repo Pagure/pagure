@@ -550,6 +550,7 @@ def api():
         if "jenkins" in pagure_config["PAGURE_CI_SERVICES"]:
             ci_doc.append(load_doc(jenkins.jenkins_ci_notification))
 
+    api_pull_request_create_doc = load_doc(fork.api_pull_request_create)
     api_pull_request_views_doc = load_doc(fork.api_pull_request_views)
     api_pull_request_view_doc = load_doc(fork.api_pull_request_view)
     api_pull_request_diffstats_doc = load_doc(fork.api_pull_request_diffstats)
@@ -618,6 +619,7 @@ def api():
         ],
         issues=issues,
         requests=[
+            api_pull_request_create_doc,
             api_pull_request_views_doc,
             api_pull_request_view_doc,
             api_pull_request_diffstats_doc,
