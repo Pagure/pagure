@@ -73,25 +73,64 @@
             {% endif %}
           </div>
           <div class="col-xs-auto pr-2">
-              <a href="{{ url_for('ui_ns.view_commit',
-                      repo=repo.name,
-                      username=username,
-                      namespace=repo.namespace,
-                      commitid=tag['object'].oid) }}" 
-                 class="btn btn-outline-secondary disabled">
-                <code class="font-weight-bold">{{ tag['object'].oid | short }}</code>
+            <a href="{{ url_for('ui_ns.view_commit',
+                    repo=repo.name,
+                    username=username,
+                    namespace=repo.namespace,
+                    commitid=tag['object'].oid) }}"
+               class="btn btn-outline-secondary disabled">
+              <code class="font-weight-bold">{{ tag['object'].oid | short }}</code>
+            </a>
+            <div class="btn-group">
+              <a class="btn btn-outline-primary"
+                 href="{{ url_for('ui_ns.view_tree',
+                       repo=repo.name,
+                       username=username,
+                       namespace=repo.namespace,
+                       identifier=tag['object'].oid) }}"
+                title="view code tree for this release">
+                <i class="fa fa-fw fa-file-code-o"></i>
               </a>
-              <div class="btn-group">
-                <a class="btn btn-outline-primary" 
-                   href="{{ url_for('ui_ns.view_tree',
+            </div>
+
+            <div class="btn-group">
+              <a href="#"
+                  class="btn dropdown-toggle btn-outline-primary"
+                  data-toggle="dropdown" id="download-button">
+                <span class="fa fa-save"></span>
+              </a>
+              <div class="dropdown-menu dropdown-menu-right">
+                <div class="m-3" style="width:300px;">
+                  <li>
+                    <ul>
+                      <a href="{{
+                        url_for('ui_ns.get_project_archive_zip',
                          repo=repo.name,
                          username=username,
                          namespace=repo.namespace,
-                         identifier=tag['object'].oid) }}" 
-                  title="view code tree for this release">
-                  <i class="fa fa-fw fa-file-code-o"></i>
-                </a>
+                         ref=tag['tagname'],
+                         name='%s-%s' % (repo.name, tag['tagname']))
+                      }}" target="_blank" rel="noopener noreferrer">
+                      {{repo.name}}-{{ tag['tagname'] }}.zip
+                      </span>
+                    </ul>
+                    <ul>
+                      <a href="{{
+                        url_for('ui_ns.get_project_archive_tar_gz',
+                         repo=repo.name,
+                         username=username,
+                         namespace=repo.namespace,
+                         ref=tag['tagname'],
+                         name='%s-%s' % (repo.name, tag['tagname']))
+                      }}" target="_blank" rel="noopener noreferrer">
+                      {{repo.name}}-{{ tag['tagname'] }}.tar.gz
+                      </span>
+                    </ul>
+                  </li>
+                </div>
               </div>
+            </div>
+
           </div>
         </div>
         {% if tag['body_msg'] %}
