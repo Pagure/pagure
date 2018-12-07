@@ -37,7 +37,7 @@ def has_issue_tracker(function):
     return check_issue_tracker
 
 
-def has_trackers(function):
+def has_pr_enabled(function):
     """
     Decorator that checks if the current pagure project has the
     issue tracker active or has PRs function active
@@ -47,16 +47,9 @@ def has_trackers(function):
     @wraps(function)
     def check_trackers(*args, **kwargs):
         repo = flask.g.repo
-        if not repo.settings.get(
-            "issue_tracker", True
-        ) and not repo.settings.get("pull_requests", True):
-            flask.abort(404, "No ticket trackers found for this project")
-        elif (
-            flask.request.method == "POST"
-            and repo.settings.get("issue_tracker_read_only", False)
-            and not repo.settings.get("pull_requests", True)
-        ):
-            flask.abort(401, "The issue tracker for this project is read-only")
+        if not repo.settings.get("pull_requests", True):
+            flask.abort(404, "Pull Requests are not enabled on this project")
+
         return function(*args, **kwargs)
 
     return check_trackers
