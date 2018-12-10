@@ -41,7 +41,7 @@ if 'PAGURE_CONFIG' not in os.environ \
 
 import pagure  # noqa: E402
 import pagure.lib.query  # noqa: E402
-from pagure.exceptions import PagureEvException  # noqa: E402
+from pagure.exceptions import PagureException, PagureEvException  # noqa: E402
 
 SERVER = None
 SESSION = None
