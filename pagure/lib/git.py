@@ -924,6 +924,7 @@ class TemporaryClone(object):
             # equal to another.... The pygit2.Repository returned from
             # pygit2.clone_repository does not have the "branches" attribute.
             self.repo = pygit2.Repository(self.repopath)
+            self._origrepo = pygit2.Repository(self._origpath)
         else:
             repourl, regioninfo = self._project.repospanner_repo_info(
                 self._repotype
@@ -965,13 +966,21 @@ class TemporaryClone(object):
         headname = None
         if not self.repo.is_empty and not self.repo.head_is_unborn:
             headname = self.repo.head.shorthand
-        for branchname in self.repo.branches.remote:
-            localname = branchname.replace("origin/", "")
-            if localname in (headname, "HEAD"):
-                # This gets checked out by default
-                continue
-            branch = self.repo.branches.remote.get(branchname)
-            self.repo.branches.local.create(localname, branch.get_object())
+
+        # Sync up all the references, branches and PR heads
+        for ref in self._origrepo.listall_references():
+            if ref.startswith("refs/heads/"):
+                localname = ref.replace("refs/heads/", "")
+                if localname in (headname, "HEAD"):
+                    # This gets checked out by default
+                    continue
+                branch = self.repo.branches.remote.get("origin/%s" % localname)
+                self.repo.branches.local.create(localname, branch.get_object())
+            elif ref.startswith("refs/pull/"):
+                reference = self._origrepo.references.get(ref)
+                self.repo.references.create(
+                    ref, reference.get_object().oid.hex
+                )
 
         return self
 
@@ -1474,6 +1483,7 @@ def merge_pull_request(session, request, username, domerge=True):
     else:
         _log.info("%s asked to diff the pull-request: %s", username, request)
 
+    repopath = None
     if request.remote:
         # Get the fork
         repopath = pagure.utils.get_remote_repo_path(
@@ -1482,10 +1492,10 @@ def merge_pull_request(session, request, username, domerge=True):
     elif request.project_from:
         # Get the fork
         repopath = pagure.utils.get_repo_path(request.project_from)
-    else:
-        return
 
-    fork_obj = PagureRepo(repopath)
+    fork_obj = None
+    if repopath:
+        fork_obj = PagureRepo(repopath)
 
     with TemporaryClone(request.project, "main", "merge_pr") as tempclone:
         new_repo = tempclone.repo
@@ -1507,95 +1517,112 @@ def merge_pull_request(session, request, username, domerge=True):
                         "signed off by their author. "
                     )
 
-        # Check/Get the branch from
-        try:
-            branch = get_branch_ref(fork_obj, request.branch_from)
-        except pagure.exceptions.PagureException:
+        if not new_repo.is_empty and not new_repo.head_is_unborn:
+            try:
+                branch_ref = get_branch_ref(new_repo, request.branch)
+            except pagure.exceptions.PagureException:
+                branch_ref = None
+            if not branch_ref:
+                _log.info("  Target branch could not be found")
+                raise pagure.exceptions.BranchNotFoundException(
+                    "Branch %s could not be found in the repo %s"
+                    % (request.branch, request.project.fullname)
+                )
+
+            new_repo.checkout(branch_ref)
+
+        if fork_obj:
+            # Check/Get the branch from
             branch = None
-        if not branch:
-            _log.info("  Branch of origin could not be found")
-            raise pagure.exceptions.BranchNotFoundException(
-                "Branch %s could not be found in the repo %s"
-                % (
-                    request.branch_from,
-                    request.project_from.fullname
-                    if request.project_from
-                    else request.remote_git,
+            try:
+                branch = get_branch_ref(fork_obj, request.branch_from)
+            except pagure.exceptions.PagureException:
+                pass
+            if not branch:
+                _log.info("  Branch of origin could not be found")
+                raise pagure.exceptions.BranchNotFoundException(
+                    "Branch %s could not be found in the repo %s"
+                    % (
+                        request.branch_from,
+                        request.project_from.fullname
+                        if request.project_from
+                        else request.remote_git,
+                    )
                 )
+
+            # Add the fork as remote repo
+            reponame = "%s_%s" % (request.user.user, request.uid)
+
+            _log.info(
+                "  Adding remote: %s pointing to: %s", reponame, repopath
             )
+            remote = new_repo.create_remote(reponame, repopath)
 
-        # Add the fork as remote repo
-        reponame = "%s_%s" % (request.user.user, request.uid)
+            # Fetch the commits
+            remote.fetch()
 
-        _log.info("  Adding remote: %s pointing to: %s", reponame, repopath)
-        remote = new_repo.create_remote(reponame, repopath)
+            # repo_commit = fork_obj[branch.get_object().hex]
+            repo_commit = new_repo[branch.get_object().hex]
 
-        # Fetch the commits
-        remote.fetch()
+            # Checkout the correct branch
+            if new_repo.is_empty or new_repo.head_is_unborn:
+                _log.debug(
+                    "  target repo is empty, so PR can be merged using "
+                    "fast-forward, reporting it"
+                )
 
-        # repo_commit = fork_obj[branch.get_object().hex]
-        repo_commit = new_repo[branch.get_object().hex]
+                if domerge:
+                    _log.info("  PR merged using fast-forward")
+                    if not request.project.settings.get("always_merge", False):
+                        new_repo.create_branch(request.branch, repo_commit)
+                        commit = repo_commit.oid.hex
+                    else:
+                        tree = new_repo.index.write_tree()
+                        user_obj = pagure.lib.query.get_user(session, username)
+                        commitname = user_obj.fullname or user_obj.user
+                        author = _make_signature(
+                            commitname, user_obj.default_email
+                        )
+                        commit = new_repo.create_commit(
+                            "refs/heads/%s" % request.branch,
+                            author,
+                            author,
+                            "Merge #%s `%s`" % (request.id, request.title),
+                            tree,
+                            [repo_commit.oid.hex],
+                        )
 
-        # Checkout the correct branch
-        if new_repo.is_empty or new_repo.head_is_unborn:
-            _log.debug(
-                "  target repo is empty, so PR can be merged using "
-                "fast-forward, reporting it"
-            )
-            if domerge:
-                _log.info("  PR merged using fast-forward")
-                if not request.project.settings.get("always_merge", False):
-                    new_repo.create_branch(request.branch, repo_commit)
-                    commit = repo_commit.oid.hex
+                    _log.info("  New head: %s", commit)
+                    tempclone.push(
+                        username,
+                        request.branch,
+                        request.branch,
+                        pull_request=request,
+                    )
+
+                    # Update status
+                    _log.info("  Closing the PR in the DB")
+                    pagure.lib.query.close_pull_request(
+                        session, request, username
+                    )
+
+                    return "Changes merged!"
                 else:
-                    tree = new_repo.index.write_tree()
-                    user_obj = pagure.lib.query.get_user(session, username)
-                    commitname = user_obj.fullname or user_obj.user
-                    author = _make_signature(
-                        commitname, user_obj.default_email
+                    _log.info(
+                        "  PR can be merged using fast-forward, reporting it"
                     )
-                    commit = new_repo.create_commit(
-                        "refs/heads/%s" % request.branch,
-                        author,
-                        author,
-                        "Merge #%s `%s`" % (request.id, request.title),
-                        tree,
-                        [repo_commit.oid.hex],
-                    )
+                    request.merge_status = "FFORWARD"
+                    session.commit()
+                    return "FFORWARD"
 
-                _log.info("  New head: %s", commit)
-                tempclone.push(
-                    username,
-                    request.branch,
-                    request.branch,
-                    pull_request=request,
+        else:
+            try:
+                ref = new_repo.lookup_reference(
+                    "refs/pull/%s/head" % request.id
                 )
-
-                # Update status
-                _log.info("  Closing the PR in the DB")
-                pagure.lib.query.close_pull_request(session, request, username)
-
-                return "Changes merged!"
-            else:
-                _log.info(
-                    "  PR can be merged using fast-forward, reporting it"
-                )
-                request.merge_status = "FFORWARD"
-                session.commit()
-                return "FFORWARD"
-
-        try:
-            branch_ref = get_branch_ref(new_repo, request.branch)
-        except pagure.exceptions.PagureException:
-            branch_ref = None
-        if not branch_ref:
-            _log.info("  Target branch could not be found")
-            raise pagure.exceptions.BranchNotFoundException(
-                "Branch %s could not be found in the repo %s"
-                % (request.branch, request.project.fullname)
-            )
-
-        new_repo.checkout(branch_ref)
+                repo_commit = new_repo[ref.target.hex]
+            except KeyError:
+                pass
 
         merge = new_repo.merge(repo_commit.oid)
         _log.debug("  Merge: %s", merge)
@@ -1907,7 +1934,9 @@ def get_diff_info(repo_obj, orig_repo, branch_from, branch_to, prid=None):
         raise pagure.exceptions.BranchNotFoundException(
             "Branch %s does not exist" % branch_from
         )
-    if not frombranch and not repo_obj.is_empty and prid is None:
+    except AttributeError:
+        frombranch = None
+    if not frombranch and prid is None and repo_obj and not repo_obj.is_empty:
         raise pagure.exceptions.BranchNotFoundException(
             "Branch %s does not exist" % branch_from
         )
@@ -1938,7 +1967,7 @@ def get_diff_info(repo_obj, orig_repo, branch_from, branch_to, prid=None):
         except KeyError:
             pass
 
-    if not commitid and not repo_obj.is_empty:
+    if not commitid and repo_obj and not repo_obj.is_empty:
         raise pagure.exceptions.PagureException(
             "No branch from which to pull or local PR reference were found"
         )
@@ -1948,7 +1977,7 @@ def get_diff_info(repo_obj, orig_repo, branch_from, branch_to, prid=None):
     orig_commit = None
 
     # If the fork is empty but there is a PR open, use the main repo
-    if repo_obj.is_empty and prid is not None:
+    if (not repo_obj or repo_obj.is_empty) and prid is not None:
         repo_obj = orig_repo
 
     if not repo_obj.is_empty and not orig_repo.is_empty:
@@ -2017,7 +2046,7 @@ def get_diff_info(repo_obj, orig_repo, branch_from, branch_to, prid=None):
                 )
                 diff = diff_commits[0].tree.diff_to_tree(swap=True)
 
-    elif orig_repo.is_empty and not repo_obj.is_empty:
+    elif orig_repo.is_empty and repo_obj and not repo_obj.is_empty:
         _log.info("pagure.lib.git.get_diff_info: Pulling into an empty repo")
         if "master" in repo_obj.listall_branches():
             repo_commit = repo_obj[repo_obj.head.target]
@@ -2072,7 +2101,7 @@ def diff_pull_request(
     )
 
     if request.status == "Open" and diff_commits:
-        first_commit = repo_obj[diff_commits[-1].oid.hex]
+        first_commit = diff_commits[-1]
         # Check if we can still rely on the merge_status
         commenttext = None
         if (

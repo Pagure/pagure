@@ -854,9 +854,11 @@ def sync_pull_ref(self, session, name, namespace, user, requestid):
             repopath = pagure.utils.get_remote_repo_path(
                 request.remote_git, request.branch_from
             )
-        else:
+        elif request.project_from:
             # Get the fork
             repopath = pagure.utils.get_repo_path(request.project_from)
+        else:
+            return
         _log.debug("   working on the repo in: %s", repopath)
 
         repo_obj = pygit2.Repository(repopath)
