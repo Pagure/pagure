@@ -446,16 +446,25 @@ def _run_test_suites(args, suites):
     # Gather results
     print()
     print()
-    print("Failed tests:")
-    for worker in workers:
-        if not workers[worker].failed:
-            continue
-        print("FAILED test: %s" % (worker))
+
+    if FAILED:
+        print("Failed tests:")
+        for worker in workers:
+            if not workers[worker].failed:
+                continue
+            print("FAILED test: %s" % (worker))
 
     # Write failed
     if FAILED:
         with open(os.path.join(args.results, "newfailed"), "w") as ffile:
             ffile.write(json.dumps(FAILED))
+
+    # Exit
+    outcode = 0
+    if len(FAILED) == 0:
+        print("ALL PASSED! CONGRATULATIONS!")
+    else:
+        outcode = 1
 
     # Stats
     end = time.time()
@@ -466,16 +475,10 @@ def _run_test_suites(args, suites):
         % (len(workers), (end - start), len(FAILED))
     )
 
-    # Exit
-    if len(FAILED) == 0:
-        print("ALL PASSED! CONGRATULATIONS!")
-    else:
-        return 1
-
-    if args.with_coverage:
+    if outcode == 0 and args.with_coverage:
         do_show_coverage(args)
 
-    return 0
+    return outcode
 
 
 def do_list(args):
