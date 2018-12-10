@@ -3421,12 +3421,11 @@ def generate_project_archive(
         _log.debug("No ARCHIVE_FOLDER specified in the configuration")
         flask.abort(
             404,
-            "This pagure instance isn't configured to support this feature")
+            "This pagure instance isn't configured to support this feature",
+        )
     if not os.path.exists(archive_folder):
         _log.debug("No ARCHIVE_FOLDER could not be found on disk")
-        flask.abort(
-            500,
-            "Incorrect configuration, please contact your admin")
+        flask.abort(500, "Incorrect configuration, please contact your admin")
 
     extensions = ["tar.gz", "tar", "zip"]
     if extension not in extensions:
