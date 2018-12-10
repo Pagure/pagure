@@ -106,7 +106,7 @@ def blinker_publish(topic, message):
     ready.send("pagure", topic=topic, message=message)
 
 
-def log(project, topic, msg, redis=None):
+def log(project, topic, msg, webhook=True):
     """ This is the place where we send notifications to user about actions
     occuring in pagure.
     """
@@ -128,7 +128,7 @@ def log(project, topic, msg, redis=None):
     # Send blink notification to any 3rd party plugins, if there are any
     blinker_publish(topic, msg)
 
-    if redis and project and not project.private:
+    if webhook and project and not project.private:
         pagure.lib.tasks_services.webhook_notification.delay(
             topic=topic,
             msg=msg,
