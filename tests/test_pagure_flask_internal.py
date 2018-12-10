@@ -2146,15 +2146,37 @@ class PagureFlaskInternaltests(tests.Modeltests):
         js_data2 = json.loads(output.get_data(as_text=True))
         self.assertTrue(js_data2['results'][3] > 1509110062)
         js_data2['results'][3] = 1509110062
-        self.assertDictEqual(
-            js_data2,
-            {'results': [
-                2,
-                [[2, [['Alice Author', 'alice@authors.tld']]]],
-                1,
-                1509110062
+        self.assertTrue(
+            js_data2 in [
+                {
+                    'results': [
+                        2,
+                        [[2, [[
+                            'Alice Author',
+                            'alice@authors.tld',
+                            'https://seccdn.libravatar.org/avatar/'
+                            '96c52c78570ffc4cfefcdadf5f8e77aeebcb11e07225df11bbf2fce381cdb8bd'
+                            '?s=32&d=retro'
+                        ]]]],
+                        1,
+                        1509110062
+                    ]
+                },
+                {
+                    'results': [
+                        2,
+                        [[2, [[
+                            'Alice Author',
+                            'alice@authors.tld',
+                            'https://seccdn.libravatar.org/avatar/'
+                            '96c52c78570ffc4cfefcdadf5f8e77aeebcb11e07225df11bbf2fce381cdb8bd'
+                            '?d=retro&s=32'
+                        ]]]],
+                        1,
+                        1509110062
+                    ]
+                }
             ]
-            }
         )
 
     def test_get_stats_commits_trend_no_token(self):

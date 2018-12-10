@@ -64,7 +64,23 @@ class TestCommitsAuthorStats(unittest.TestCase):
         self.assertEqual(num_commits, 1)
         self.assertEqual(num_authors, 1)
         self.assertEqual(last_time, '2018-01-01 00:00')
-        self.assertEqual(authors, [(1, [('Alice', 'alice@example.com')])])
+        self.assertIn(
+            authors,
+            [
+                [(1, [(
+                'Alice', 'alice@example.com',
+                'https://seccdn.libravatar.org/avatar/'
+                'ff8d9819fc0e12bf0d24892e45987e249a28dce836a85cad60e28eaaa8c6d976'
+                '?s=32&d=retro'
+                )])],
+                [(1, [(
+                'Alice', 'alice@example.com',
+                'https://seccdn.libravatar.org/avatar/'
+                'ff8d9819fc0e12bf0d24892e45987e249a28dce836a85cad60e28eaaa8c6d976'
+                '?d=retro&s=32'
+                )])]
+            ]
+        )
 
     def test_rename_user_and_merge(self):
         self.commits = [
@@ -81,7 +97,23 @@ class TestCommitsAuthorStats(unittest.TestCase):
         self.assertEqual(num_commits, 2)
         self.assertEqual(num_authors, 1)
         self.assertEqual(last_time, '2018-01-01 00:00')
-        self.assertEqual(authors, [(2, [('Alice', 'alice@example.com')])])
+        self.assertIn(
+            authors,
+            [
+                [(2, [(
+                'Alice', 'alice@example.com',
+                'https://seccdn.libravatar.org/avatar/'
+                'ff8d9819fc0e12bf0d24892e45987e249a28dce836a85cad60e28eaaa8c6d976'
+                '?s=32&d=retro'
+                )])],
+                [(2, [(
+                'Alice', 'alice@example.com',
+                'https://seccdn.libravatar.org/avatar/'
+                'ff8d9819fc0e12bf0d24892e45987e249a28dce836a85cad60e28eaaa8c6d976'
+                '?d=retro&s=32'
+                )])]
+            ]
+        )
 
     def test_preserve_unknown_author(self):
         self.commits = [
@@ -95,7 +127,23 @@ class TestCommitsAuthorStats(unittest.TestCase):
         self.assertEqual(num_commits, 1)
         self.assertEqual(num_authors, 1)
         self.assertEqual(last_time, '2018-01-01 00:00')
-        self.assertEqual(authors, [(1, [('Alice', 'alice@example.com')])])
+        self.assertIn(
+            authors,
+            [
+                [(1, [(
+                'Alice', 'alice@example.com',
+                'https://seccdn.libravatar.org/avatar/'
+                'ff8d9819fc0e12bf0d24892e45987e249a28dce836a85cad60e28eaaa8c6d976'
+                '?s=32&d=retro'
+                )])],
+                [(1, [(
+                'Alice', 'alice@example.com',
+                'https://seccdn.libravatar.org/avatar/'
+                'ff8d9819fc0e12bf0d24892e45987e249a28dce836a85cad60e28eaaa8c6d976'
+                '?d=retro&s=32'
+                )])]
+            ]
+        )
 
     def test_handle_empty_email(self):
         self.commits = [
@@ -112,8 +160,8 @@ class TestCommitsAuthorStats(unittest.TestCase):
         self.assertEqual(num_commits, 3)
         self.assertEqual(num_authors, 2)
         self.assertEqual(last_time, '2018-01-01 00:00')
-        self.assertEqual(authors, [(2, [('Alice', None)]),
-                                   (1, [('Bob', '')])])
+        self.assertEqual(authors, [(2, [('Alice', None, None)]),
+                                   (1, [('Bob', '', None)])])
 
 
 class TestGitolitePostCompileOnly(object):

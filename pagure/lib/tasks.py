@@ -968,12 +968,16 @@ def commits_author_stats(self, session, repopath):
 
     # Generate a list of contributors ordered by how many commits they
     # authored. The list consists of tuples with number of commits and people
-    # with that number of commits. Each contributor is represented by a name
-    # and e-mail address.
+    # with that number of commits. Each contributor is represented by a tuple
+    # of name, e-mail address and avatar url.
     out_stats = collections.defaultdict(list)
     for authors, val in stats.items():
         authors_email.add(authors[1])
-        out_stats[val].append(authors)
+        out_authors = list(authors)
+        out_authors.append(
+            pagure.lib.query.avatar_url_from_email(authors[1], size=32)
+        )
+        out_stats[val].append(tuple(out_authors))
     out_list = [
         (key, out_stats[key]) for key in sorted(out_stats, reverse=True)
     ]

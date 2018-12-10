@@ -81,6 +81,7 @@ function show_commits_authors(data) {
       entry = data.results[1][key][1][entry];
       html += '  <a class="list-group-item" href="'
         + view_commits_url.replace('---', entry[1]) + '">'
+        + '<img class="avatar circle" src="' + entry[2] + '"/> '
         + entry[0]
         + '<div class="pull-xs-right">' + cnt + ' commits</div>'
         + '</a>\n';

@@ -3608,6 +3608,8 @@ def avatar_url_from_email(email, size=64, default="retro", dns=False):
     """
     Our own implementation since fas doesn't support this nicely yet.
     """
+    if not email:
+        return
     if dns:  # pragma: no cover
         # This makes an extra DNS SRV query, which can slow down our webapps.
         # It is necessary for libravatar federation, though.
