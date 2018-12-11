@@ -1822,11 +1822,17 @@ def rebase_pull_request(request, username):
         # Get the fork
         repopath = pagure.utils.get_repo_path(request.project_from)
     else:
+        _log.info(
+            "PR is neither from a remote git repo or an existing local "
+            "repo, bailing")
         return
 
     if not request.project or not os.path.exists(
         pagure.utils.get_repo_path(request.project)
     ):
+        _log.info(
+            "Could not find the targeted git repository for %s",
+            request.project.fullname)
         raise pagure.exceptions.PagureException(
             "Could not find the targeted git repository for %s"
             % request.project.fullname
@@ -1853,10 +1859,12 @@ def rebase_pull_request(request, username):
         remote.fetch()
 
         def _run_command(command):
+            _log.info("Running command: %s", command)
             try:
                 out = subprocess.check_output(
                     command, cwd=tempclone.repopath, stderr=subprocess.STDOUT
                 )
+                _log.info("   command ran successfully")
                 _log.debug("Output: %s" % out)
             except subprocess.CalledProcessError as err:
                 _log.debug(

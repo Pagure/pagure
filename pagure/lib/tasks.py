@@ -711,15 +711,17 @@ def rebase_pull_request(
     project = pagure.lib.query._get_project(
         session, namespace=namespace, name=name, user=user
     )
+    _log.info("Rebase PR: %s of project: %s" % (requestid, project.fullname))
 
     with project.lock("WORKER"):
         request = pagure.lib.query.search_pull_requests(
             session, project_id=project.id, requestid=requestid
         )
         _log.debug(
-            "Rebasing pull-request: %s/#%s",
+            "Rebasing pull-request: %s#%s, uid: %s",
             request.project.fullname,
             request.id,
+            request.uid,
         )
         pagure.lib.git.rebase_pull_request(request, user_rebaser)
 
