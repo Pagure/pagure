@@ -138,7 +138,7 @@
         </div>
       {% elif patchstats["status"] == "A" and patchstats["lines_added"] == 0 %}
         <div class="card-body collapse show" id="diffhighlight_{{loop.index}}">
-          <div class="text-muted text-xs-center">empty file added</div>
+          <div class="text-muted text-xs-center">empty or binary file added</div>
         </div>
       {% else %}
         {% if patchstats["status"] == "A" and patchstats["lines_added"] > 1000 %}
