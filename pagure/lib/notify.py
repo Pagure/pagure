@@ -100,9 +100,8 @@ def stomp_publish(topic, message):
 
 
 def blinker_publish(topic, message):
-    _log.info("Sending blinker signal to: pagure")
+    _log.info("Sending blinker signal to: pagure - topic: %s", topic)
     ready = blinker.signal("pagure")
-    _log.info("  Blinker payload: %s" % message)
     ready.send("pagure", topic=topic, message=message)
 
 
