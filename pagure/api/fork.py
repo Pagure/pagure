@@ -1525,19 +1525,18 @@ def api_pull_request_diffstats(repo, requestid, username=None, namespace=None):
     if not request:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
 
+    repopath = None
+    parentpath = pagure.utils.get_repo_path(request.project)
     if request.remote:
         repopath = pagure.utils.get_remote_repo_path(
             request.remote_git, request.branch_from
         )
-        parentpath = pagure.utils.get_repo_path(request.project)
-    else:
-        repo_from = request.project_from
-        parentpath = pagure.utils.get_repo_path(request.project)
-        repopath = parentpath
-        if repo_from:
-            repopath = pagure.utils.get_repo_path(repo_from)
+    elif request.project_from:
+        repopath = pagure.utils.get_repo_path(request.project_from)
 
-    repo_obj = pygit2.Repository(repopath)
+    repo_obj = None
+    if repopath:
+        repo_obj = pygit2.Repository(repopath)
     orig_repo = pygit2.Repository(parentpath)
 
     diff_commits = []
