@@ -240,6 +240,73 @@ class PagureMergePrNoForkTest(tests.Modeltests):
             self.session, 'test')
         self.assertEqual(project.requests[0].status, "Merged")
 
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_internal_merge_status(self):
+        """ Test the api_pull_request_merge method of the flask UI. """
+
+        self.session = pagure.lib.query.create_session(self.dbpath)
+        project = pagure.lib.query.get_authorized_project(
+            self.session, 'test')
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(self.app.application, user):
+            data = {
+                'csrf_token': self.get_csrf(),
+                'requestid': project.requests[0].uid,
+            }
+
+            # Merge PR
+            output = self.app.post(
+                '/pv/pull-request/merge', data=data)
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.get_data(as_text=True))
+            self.assertDictEqual(
+                data,
+                {
+                    u'code': u'FFORWARD',
+                    u'message': u'The pull-request can be merged and '
+                        'fast-forwarded',
+                    u'short_code': u'Ok'
+                }
+            )
+
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_internal_merge_status_no_fork(self):
+        """ Test the api_pull_request_merge method of the flask UI. """
+
+        pagure.lib.tasks.delete_project(
+            namespace=None,
+            name="test",
+            user="pingou",
+            action_user="pingou",
+        )
+
+        self.session = pagure.lib.query.create_session(self.dbpath)
+        project = pagure.lib.query.get_authorized_project(
+            self.session, 'test')
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(self.app.application, user):
+            data = {
+                'csrf_token': self.get_csrf(),
+                'requestid': project.requests[0].uid,
+            }
+
+            # Merge PR
+            output = self.app.post(
+                '/pv/pull-request/merge', data=data)
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.get_data(as_text=True))
+            self.assertDictEqual(
+                data,
+                {
+                    u'code': u'FFORWARD',
+                    u'message': u'The pull-request can be merged and '
+                        'fast-forwarded',
+                    u'short_code': u'Ok'
+                }
+            )
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
