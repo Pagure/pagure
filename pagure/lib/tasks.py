@@ -1037,10 +1037,15 @@ def link_pr_to_ticket(self, session, pr_uid):
             request.remote_git, request.branch_from
         )
         parentpath = pagure.utils.get_repo_path(request.project)
-    else:
+    elif request.project_from:
         repo_from = request.project_from
         repopath = pagure.utils.get_repo_path(repo_from)
         parentpath = get_parent_repo_path(repo_from)
+    else:
+        _log.info(
+            "LINK_PR_TO_TICKET: PR neither remote, nor with a "
+            "project_from, bailing: %s" % pr_uid)
+        return
 
     repo_obj = pygit2.Repository(repopath)
     orig_repo = pygit2.Repository(parentpath)
