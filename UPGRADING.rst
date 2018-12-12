@@ -1,6 +1,35 @@
 Upgrading Pagure
 ================
 
+From 5.1 to 5.1.4
+-----------------
+
+In the development of 5.1.4 it was found out that the alembic migration
+``ba538b2648b7`` that creates the ``hook_mirror`` table.
+If you create that table via alembic, you will likely want to re-run it. Beware
+that applying the following commands will destroy any data you have in this
+table.
+
+* Mark the database to this migration::
+
+   alembic stamp ba538b2648b7
+
+* Remove the ``hook_mirror`` table so it can be re-generated::
+
+   alembic downgrade -1
+
+* Re-run that single migration::
+
+   alembic upgrade +1
+
+* Marking the database to the last current migration (as of 5.1.4)::
+
+   alembic stamp f16ab75e4d32
+
+Again, any project that tried to setup the mirroring feature in pagure will need
+to be reconfigured.
+
+
 From 5.x to 5.1
 ---------------
 

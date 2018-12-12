@@ -3,6 +3,16 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
+5.1.4 (2018-10-15)
+------------------
+
+- Fix the alembic migration creating the hook_mirror table
+- Close the DB session in one place for all hooks
+- Add more logging to the pagure_logcom service
+- Configure SMTP info for git_multimail (Patrick Uiterwijk)
+- Use the PR UID previously read from environment (Patrick Uiterwijk)
+
+
 5.1.3 (2018-10-11)
 ------------------
 
