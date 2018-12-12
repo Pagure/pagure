@@ -14,7 +14,7 @@ enum34;python_version<"3.4"
 flask
 flask-wtf
 kitchen
-markdown < 3.0
+markdown
 munch
 Pillow
 psutil

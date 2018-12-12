@@ -34,6 +34,16 @@ import pagure.lib.query
 from pagure.config import config as pagure_config
 
 
+try:
+    from markdown.inlinepatterns import ImagePattern as ImagePattern
+
+    MK_VERSION = 2
+except ImportError:
+    from markdown.inlinepatterns import ImageInlineProcessor as ImagePattern
+
+    MK_VERSION = 3
+
+
 # the (?<!\w) (and variants) we use a lot in all these regexes is a
 # negative lookbehind assertion. It means 'match when the preceding
 # character is not in the \w class'. This stops us from starting a
@@ -325,11 +335,15 @@ class AutolinkPattern2(markdown.inlinepatterns.Pattern):
         return el
 
 
-class ImagePatternLazyLoad(markdown.inlinepatterns.ImagePattern):
+class ImagePatternLazyLoad(ImagePattern):
     """ Customize the image element matched for lazyloading. """
 
-    def handleMatch(self, m):
-        el = super(ImagePatternLazyLoad, self).handleMatch(m)
+    def handleMatch(self, m, *args):
+        out = super(ImagePatternLazyLoad, self).handleMatch(m, *args)
+        if MK_VERSION == 3:
+            el = out[0]
+        else:
+            el = out
 
         # Add a noscript tag with the untouched img tag
         noscript = markdown.util.etree.Element("noscript")
@@ -348,7 +362,11 @@ class ImagePatternLazyLoad(markdown.inlinepatterns.ImagePattern):
         outel.append(img)
         outel.append(noscript)
 
-        return outel
+        output = outel
+        if MK_VERSION == 3:
+            output = (outel, out[1], out[2])
+
+        return output
 
 
 class PagureExtension(markdown.extensions.Extension):
