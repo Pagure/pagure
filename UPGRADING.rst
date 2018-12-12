@@ -5,8 +5,8 @@ From 5.1 to 5.1.4
 -----------------
 
 In the development of 5.1.4 it was found out that the alembic migration
-``ba538b2648b7`` that creates the ``hook_mirror`` table.
-If you create that table via alembic, you will likely want to re-run it. Beware
+``ba538b2648b7`` that creates the ``hook_mirror`` table was incomplete.
+If you created that table via alembic, you will likely want to re-run it. Beware
 that applying the following commands will destroy any data you have in this
 table.
 
@@ -28,6 +28,15 @@ table.
 
 Again, any project that tried to setup the mirroring feature in pagure will need
 to be reconfigured.
+
+Another option (that will prevent loosing any data in this table) is to
+adjust the table manually using these SQL queries:
+
+::
+
+    ALTER TABLE hook_mirror ADD COLUMN 'public_key' TEXT;
+    ALTER TABLE hook_mirror ADD COLUMN 'target' TEXT;
+    ALTER TABLE hook_mirror ADD COLUMN 'last_log' TEXT;
 
 
 From 5.x to 5.1
