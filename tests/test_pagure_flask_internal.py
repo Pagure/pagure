@@ -1302,6 +1302,12 @@ class PagureFlaskInternaltests(tests.Modeltests):
             js_data = json.loads(output.get_data(as_text=True))
             self.assertDictEqual(js_data, exp)
 
+            # Verify we get a valid merge_status (not 'unknown')
+            pub_api_call = self.app.get('/api/0/test/pull-request/1')
+            data = json.loads(pub_api_call.get_data(as_text=True))
+            self.assertIn(
+                data['cached_merge_status'], ('MERGE', 'FFORWARD'))
+
             # Asking a second time will trigger the cache
             data = {
                 'csrf_token': csrf_token,
