@@ -1894,6 +1894,7 @@ class PagureLibtests(tests.Modeltests):
                 'fedmsg_notifications': True,
                 'stomp_notifications': True,
                 'pull_request_access_only': False,
+                'mqtt_notifications': True,
             },
             user='pingou',
         )
@@ -1937,6 +1938,7 @@ class PagureLibtests(tests.Modeltests):
                 'fedmsg_notifications': True,
                 'stomp_notifications': True,
                 'pull_request_access_only': False,
+                'mqtt_notifications': True,
             },
             user='pingou',
         )

@@ -1700,7 +1700,7 @@ new file mode 100644
 index 0000000..60f7480
 --- /dev/null
 +++ b/456
-@@ -0,0 +1,144 @@
+@@ -0,0 +1,146 @@
 +{
 +    "assignee": null,
 +    "branch": "master",
@@ -1752,6 +1752,7 @@ index 0000000..60f7480
 +            "issue_tracker": true,
 +            "issue_tracker_read_only": false,
 +            "issues_default_to_private": false,
++            "mqtt_notifications": true,
 +            "notify_on_commit_flag": false,
 +            "notify_on_pull-request_flag": false,
 +            "open_metadata_access_to_all": false,
@@ -1810,6 +1811,7 @@ index 0000000..60f7480
 +            "issue_tracker": true,
 +            "issue_tracker_read_only": false,
 +            "issues_default_to_private": false,
++            "mqtt_notifications": true,
 +            "notify_on_commit_flag": false,
 +            "notify_on_pull-request_flag": false,
 +            "open_metadata_access_to_all": false,
