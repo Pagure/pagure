@@ -180,6 +180,80 @@ def edit_group(group):
     return flask.render_template("edit_group.html", group=group, form=form)
 
 
+@UI_NS.route("/group/<group>/give", methods=["POST"])
+@login_required
+def give_group(group):
+    """ Allows giving away a group. """
+    if not pagure_config.get("ENABLE_USER_MNGT", True):
+        flask.abort(404)
+
+    group_type = "user"
+    is_admin = pagure.utils.is_admin()
+    if is_admin:
+        group_type = None
+    group = pagure.lib.query.search_groups(
+        flask.g.session, group_name=group, group_type=group_type
+    )
+
+    if not group:
+        flask.abort(404, "Group not found")
+
+    if group.creator.user != flask.g.fas_user.username and not flask.g.admin:
+        flask.abort(403, "You are not allowed to give away this group")
+
+    # Give away group
+    form = pagure.forms.ConfirmationForm()
+    if form.validate_on_submit():
+
+        username = flask.request.form.get("username")
+        if not username:
+            flask.flash(
+                "No user %s found to give this group to" % username, "error"
+            )
+            return flask.redirect(
+                flask.url_for("ui_ns.view_group", group=group.group_name)
+            )
+
+        user = pagure.lib.query.search_user(flask.g.session, username=username)
+        if not user:
+            flask.flash(
+                "No user %s found to give this group to" % username, "error"
+            )
+            return flask.redirect(
+                flask.url_for("ui_ns.view_group", group=group.group_name)
+            )
+
+        try:
+            if user not in group.users:
+                pagure.lib.query.add_user_to_group(
+                    session=flask.g.session,
+                    username=username,
+                    group=group,
+                    user=flask.g.fas_user.username,
+                    is_admin=flask.g.admin,
+                    from_external=False,
+                )
+            group.user_id = user.id
+            flask.g.session.add(group)
+            flask.g.session.commit()
+            flask.flash("Group given")
+            return flask.redirect(
+                flask.url_for("ui_ns.view_group", group=group.group_name)
+            )
+        except SQLAlchemyError:  # pragma: no cover
+            flask.g.session.rollback()
+            flask.flash(
+                "Could not give away group `%s`." % (group.group_name), "error"
+            )
+            _log.exception(
+                "Could not give away group `%s`." % (group.group_name)
+            )
+
+    return flask.redirect(
+        flask.url_for("ui_ns.view_group", group=group.group_name)
+    )
+
+
 @UI_NS.route("/group/<group>/<user>/delete", methods=["POST"])
 @login_required
 def group_user_delete(user, group):

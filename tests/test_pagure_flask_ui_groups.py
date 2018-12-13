@@ -223,6 +223,76 @@ class PagureFlaskGroupstests(tests.Modeltests):
                 'Group &#34;Test Group edited&#34; (test_group) edited',
                 output.get_data(as_text=True))
 
+    def test_give_group(self):
+        """ Test the give_group endpoint. """
+
+        output = self.app.post('/group/test_group/give')
+        self.assertEqual(output.status_code, 302)
+
+        user = tests.FakeUser()
+        with tests.user_set(self.app.application, user):
+            output = self.app.post('/group/test_group/give')
+            self.assertEqual(output.status_code, 404)
+            self.assertIn('<p>Group not found</p>', output.get_data(as_text=True))
+
+        self.test_add_group()
+
+        user.username = 'foo'
+        with tests.user_set(self.app.application, user):
+            output = self.app.post('/group/foo/give')
+            self.assertEqual(output.status_code, 404)
+            self.assertIn('<p>Group not found</p>', output.get_data(as_text=True))
+
+            output = self.app.post('/group/test_group/give')
+            self.assertEqual(output.status_code, 403)
+
+            csrf_token = self.get_csrf()
+
+        user.username = 'pingou'
+        with tests.user_set(self.app.application, user):
+            # Missing CSRF
+            data = {
+                'username': 'invalid',
+            }
+
+            output = self.app.post(
+                '/group/test_group/give', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>Group test_group - Pagure</title>', output_text)
+            self.assertIn(
+                'administered by <a href="/user/pingou">pingou</a>',
+                output_text)
+
+            # User not found
+            data['csrf_token'] = csrf_token
+            output = self.app.post(
+                '/group/test_group/give', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>Group test_group - Pagure</title>', output_text)
+            self.assertIn(
+                '</i> No user invalid found to give this group to</div>',
+                output_text)
+            self.assertIn(
+                'administered by <a href="/user/pingou">pingou</a>',
+                output_text)
+
+            # Working
+            data["username"] = "foo"
+
+            output = self.app.post(
+                '/group/test_group/give', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>Group test_group - Pagure</title>', output_text)
+            self.assertIn('</i> Group given</div>', output_text)
+            self.assertIn(
+                'administered by <a href="/user/foo">foo</a>', output_text)
+
     def test_group_delete(self):
         """ Test the group_delete endpoint. """
         output = self.app.post('/group/foo/delete')

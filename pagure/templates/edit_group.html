@@ -1,13 +1,20 @@
 {% extends "master.html" %}
 {% from "_formhelper.html" import render_bootstrap_field %}
 
+{% block header %}
+<link href="{{ url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}?version={{ g.version}}"
+  rel="stylesheet" />
+{% endblock %}
+
 {% set tag = "groups" %}
 {% block title %}Edit group: {{ group.group_name }}{% endblock %}
 
 {% block content %}
-<div class="container">
+
+<div class="container p-t-3">
   <div class="row">
-    <div class="col-md-8 col-md-offset-2">
+    <div class="col-md-8 mx-auto mt-5">
+
       <div class="card m-t-3">
         <div class="card-header">
           <strong>Edit group: {{ group.group_name }}</strong>
@@ -24,7 +31,10 @@
                     field_description="Short description of the group") }}
               </table>
             <p class="buttons indent">
-              <input type="button" value="Cancel" class="btn btn-secondary" onclick="history.back();">
+              <a href="{{ url_for(
+                  'ui_ns.view_group', group=group.group_name) }}">
+                <input type="button" value="Cancel" class="btn btn-secondary">
+              </a>
               <input type="submit" class="btn btn-primary" value="Edit">
               {{ form.csrf_token }}
             </p>
@@ -32,7 +42,61 @@
         </div>
       </div>
     </div>
+
+    {% if group.creator.user == g.fas_user.username or g.admin %}
+    <div class="col-md-8 mx-auto mt-5">
+      <div class="col-md-offset-2">
+        <div class="card-header">
+          <strong>Give group away: {{ group.group_name }}</strong>
+        </div>
+        <div class="card-block">
+          <form action="{{ url_for(
+              'ui_ns.give_group', group=group.group_name) }}"
+                method="post" class="icon">
+            {{ form.csrf_token }}
+            <input class="form-control" name="username" id="user"
+              placeholder="Start typing to search users"
+              value="" style="margin-bottom:1%"/>
+            <button class="btn btn-danger" type="submit"
+              onclick="return confirm('Are you sure to give {{ group.group_name }}? \nThis is final and cannot be un-done.');"
+              title="Give the group to someone">
+                <i class="fa fa-share-square-o"></i>&nbsp; Give the {{ group.group_name }} group
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
   </div>
 </div>
 
+{% endblock %}
+
+
+{% block jscripts %}
+{{ super() }}
+
+<script type="text/javascript" src="{{ url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}"></script>
+
+<script type="text/javascript">
+$('#user').selectize({
+  valueField: 'user',
+  labelField: 'user',
+  searchField: 'user',
+  maxItems: 1,
+  create: false,
+  load: function(query, callback) {
+    if (!query.length) return callback();
+    $.getJSON(
+      "{{ url_for('api_ns.api_users') }}", {
+        pattern: query.term
+      },
+      function( data ) {
+        callback( data.users.map(function(x) { return { user: x }; }) );
+      }
+    );
+  }
+});
+</script>
 {% endblock %}
