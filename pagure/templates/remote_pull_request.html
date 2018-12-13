@@ -44,7 +44,7 @@
       {{ render_bootstrap_field(form.branch_from, size=80) }}
       To branch:
       <select id="branch_select" name="branch_to" class="c-select">
-        {% if branch_to %}<option>{{ branch_to }}</option>{% endif %}
+        {% if branch_to %}<option selected>{{ branch_to }}</option>{% endif %}
         {% for branch in g.branches |reverse %}
           {% if not branch_to or branch != branch_to %}
           <option>{{ branch }}</option>

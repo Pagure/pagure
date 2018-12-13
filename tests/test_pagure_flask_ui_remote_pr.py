@@ -281,6 +281,50 @@ class PagureRemotePRtests(tests.Modeltests):
         self.assertEqual(len(project.requests), 1)
 
     @patch('pagure.lib.notify.send_email',  MagicMock(return_value=True))
+    def test_new_remote_no_title(self):
+        """ Test creating a new remote PR authenticated when no title is
+        specified. """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'requests'), bare=True)
+        self.set_up_git_repo()
+
+        # Before
+        self.session = pagure.lib.query.create_session(self.dbpath)
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
+        self.assertEqual(len(project.requests), 0)
+
+        # Try creating a remote PR
+        user = tests.FakeUser(username='foo')
+        with tests.user_set(self.app.application, user):
+            output = self.app.get('/test/diff/remote')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<h2>New remote pull-request</h2>',
+                output.get_data(as_text=True))
+
+            csrf_token = self.get_csrf(output=output)
+            with patch(
+                    'pagure.forms.RemoteRequestPullForm.git_repo.args',
+                    MagicMock(return_value=(
+                        u'Git Repo address',
+                        [wtforms.validators.DataRequired()]))):
+                data = {
+                    'csrf_token': csrf_token,
+                    'branch_from': 'master',
+                    'branch_to': 'feature',
+                    'git_repo': os.path.join(self.newpath, 'test'),
+                }
+                output = self.app.post('/test/diff/remote', data=data)
+                self.assertEqual(output.status_code, 200)
+                output_text = output.get_data(as_text=True)
+                self.assertIn(
+                    '<h2>New remote pull-request</h2>', output_text)
+                self.assertIn(
+                    '<option selected>feature</option>', output_text)
+
+    @patch('pagure.lib.notify.send_email',  MagicMock(return_value=True))
     def test_new_remote_pr_empty_target(self):
         """ Test creating a new remote PR authenticated against an empty
         git repo. """

@@ -1961,10 +1961,13 @@ def new_remote_request_pull(repo, username=None, namespace=None):
             flask.flash(str(err), "error")
 
     flask.g.branches = sorted(orig_repo.listall_branches())
-    try:
-        branch_to = orig_repo.head.shorthand
-    except pygit2.GitError:
-        branch_to = "master"
+    if flask.request.method == "GET":
+        try:
+            branch_to = orig_repo.head.shorthand
+        except pygit2.GitError:
+            branch_to = "master"
+    else:
+        branch_to = form.branch_to.data.strip()
 
     return flask.render_template(
         "remote_pull_request.html",
