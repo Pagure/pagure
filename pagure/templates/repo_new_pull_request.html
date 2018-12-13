@@ -69,7 +69,7 @@
         repo=repo.name,
         username=username,
         namespace=repo.namespace,
-        confirm=True) }}" method="post">
+        confirm=True) }}" id="new_remote_form" method="post">
     <input type="hidden" value="{{ branch_from }}" name="branch_from" />
     <input type="hidden" value="{{ branch_to }}" name="branch_to" />
     <input type="hidden" value="{{ remote_git }}" name="git_repo" />
@@ -387,21 +387,46 @@ function showTab(){
 $(document).ready(function() {
 
   $('.branch_from_item').click(function(e){
-     var final_url = "{{ url_for('ui_ns.new_request_pull', username=username,
+    {% if remote_git and not (config.get('DISABLE_REMOTE_PR', True)) %}
+      var _form = $("#new_remote_form");
+      var final_url = "{{ url_for('ui_ns.new_remote_request_pull',
+        repo=repo.name,
+        username=username,
+        namespace=repo.namespace,
+        ) }}";
+      _form.attr('action', final_url);
+      var _branch_from = $(
+        "#new_remote_form [name=branch_from]").val($(this).attr("data-value"));
+      _form.submit();
+    {% else %}
+      var final_url = "{{ url_for('ui_ns.new_request_pull', username=username,
         namespace=repo.namespace, repo=repo.name,
         branch_from='--', branch_to=branch_to, project_to=project_to) }}";
-      final_url = final_url.replace('--', $(this).attr("data-value"));
-      window.location.href = final_url;
+        final_url = final_url.replace('--', $(this).attr("data-value"));
+        window.location.href = final_url;
+    {% endif %}
   });
 
   $('.branch_to_item').click(function(e){
-     var final_url = "{{ url_for('ui_ns.new_request_pull', username=username,
+    {% if remote_git and not (config.get('DISABLE_REMOTE_PR', True)) %}
+      var _form = $("#new_remote_form");
+      var final_url = "{{ url_for('ui_ns.new_remote_request_pull',
+        repo=repo.name,
+        username=username,
+        namespace=repo.namespace,
+        ) }}";
+      _form.attr('action', final_url);
+      var _branch_to = $(
+        "#new_remote_form [name=branch_to]").val($(this).attr("data-value"));
+      _form.submit();
+    {% else %}
+      var final_url = "{{ url_for('ui_ns.new_request_pull', username=username,
         namespace=repo.namespace, repo=repo.name,
         branch_from=branch_from, branch_to='--', project_to=project_to) }}";
-      final_url = final_url.replace('--', $(this).attr("data-value"));
-      window.location.href = final_url;
+       final_url = final_url.replace('--', $(this).attr("data-value"));
+       window.location.href = final_url;
+    {% endif %}
   });
-
 
 {% if form %}
   $('#family-toggle').click( function (e) {
