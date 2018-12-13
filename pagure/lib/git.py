@@ -1824,7 +1824,8 @@ def rebase_pull_request(request, username):
     else:
         _log.info(
             "PR is neither from a remote git repo or an existing local "
-            "repo, bailing")
+            "repo, bailing"
+        )
         return
 
     if not request.project or not os.path.exists(
@@ -1832,7 +1833,8 @@ def rebase_pull_request(request, username):
     ):
         _log.info(
             "Could not find the targeted git repository for %s",
-            request.project.fullname)
+            request.project.fullname,
+        )
         raise pagure.exceptions.PagureException(
             "Could not find the targeted git repository for %s"
             % request.project.fullname

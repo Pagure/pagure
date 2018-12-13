@@ -1046,7 +1046,8 @@ def link_pr_to_ticket(self, session, pr_uid):
     else:
         _log.info(
             "LINK_PR_TO_TICKET: PR neither remote, nor with a "
-            "project_from, bailing: %s" % pr_uid)
+            "project_from, bailing: %s" % pr_uid
+        )
         return
 
     repo_obj = pygit2.Repository(repopath)
