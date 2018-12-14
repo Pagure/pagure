@@ -42,8 +42,8 @@ Requires:           python%{python_pkgversion}-fedora-flask
 Recommends:         python%{python_pkgversion}-fedora-flask
 %endif
 
-# We require OpenSSH7.4 for SHA256 support
-Conflicts:          openssh<7.4
+# We require OpenSSH 7.4+ for SHA256 support
+Requires:           openssh >= 7.4
 
 %if %{undefined python_enable_dependency_generator}
 Requires:           python%{python_pkgversion}-alembic
@@ -312,6 +312,7 @@ sed -e "s|#!/usr/bin/env python|#!%{__python}|" -i \
     $RPM_BUILD_ROOT/%{_datadir}/pagure/pagure_createdb.py \
     $RPM_BUILD_ROOT/%{_datadir}/pagure/api_key_expire_mail.py \
     $RPM_BUILD_ROOT/%{python_sitelib}/pagure/hooks/files/*.py \
+    $RPM_BUILD_ROOT/%{python_sitelib}/pagure/hooks/files/hookrunner \
     $RPM_BUILD_ROOT/%{python_sitelib}/pagure/hooks/files/post-receive \
     $RPM_BUILD_ROOT/%{python_sitelib}/pagure/hooks/files/pre-receive \
     $RPM_BUILD_ROOT/%{python_sitelib}/pagure/hooks/files/repospannerhook
@@ -330,6 +331,13 @@ sed -e "s|/usr/bin/celery|/usr/bin/celery-3|g" -i $RPM_BUILD_ROOT/%{_unitdir}/*.
 sed -e "s/pythonX.Y/python%{python3_version}/g" -i $RPM_BUILD_ROOT/%{_sysconfdir}/httpd/conf.d/pagure.conf
 %endif
 
+# Regenerate missing symlinks (really needed for upgrades from pagure < 5.0)
+runnerhooks="post-receive pre-receive"
+
+for runnerhook in $runnerhooks; do
+   rm -rf $RPM_BUILD_ROOT/%{python_sitelib}/pagure/hooks/files/$runnerhook
+   ln -sf hookrunner $RPM_BUILD_ROOT/%{python_sitelib}/pagure/hooks/files/$runnerhook
+done
 
 %post
 %systemd_post pagure_worker.service
