@@ -289,6 +289,12 @@ install -p -m 644 files/pagure_api_key_expire_mail.service \
 install -p -m 644 files/pagure_api_key_expire_mail.timer \
     $RPM_BUILD_ROOT/%{_unitdir}/pagure_api_key_expire_mail.timer
 
+# Install the systemd file for the script updating mirrored project
+install -p -m 644 files/files/pagure_mirror_project_in.service \
+    $RPM_BUILD_ROOT/%{_unitdir}/pagure_mirror_project_in.service
+install -p -m 644 files/pagure_mirror_project_in.timer \
+    $RPM_BUILD_ROOT/%{_unitdir}/pagure_mirror_project_in.timer
+
 # Install the milter files
 mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/run/pagure
 mkdir -p $RPM_BUILD_ROOT/%{_tmpfilesdir}
@@ -425,6 +431,8 @@ done
 %{_unitdir}/pagure_gitolite_worker.service
 %{_unitdir}/pagure_api_key_expire_mail.service
 %{_unitdir}/pagure_api_key_expire_mail.timer
+%{_unitdir}/pagure_mirror_project_in.service
+%{_unitdir}/pagure_mirror_project_in.timer
 
 
 %files theme-pagureio

@@ -1,0 +1,10 @@
+[Unit]
+Description=Pagure service to mirror in projects
+Documentation=https://pagure.io/pagure
+
+[Service]
+ExecStart=/usr/bin/python /usr/share/pagure/mirror_project_in.py
+Environment="PAGURE_CONFIG=/etc/pagure/pagure.cfg"
+Type=simple
+User=git
+Group=git

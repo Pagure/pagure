@@ -1,0 +1,11 @@
+[Unit]
+Description=Update in mirrored project
+
+[Timer]
+OnCalendar=hourly
+Persistent=true
+AccuracySec=1min
+RandomizedDelaySec=15
+
+[Install]
+WantedBy=timers.target
