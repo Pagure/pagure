@@ -1041,6 +1041,8 @@ def new_project():
         else:
             ignore_existing_repos = False
 
+        mirrored_from = form.mirrored_from.data
+
         try:
             task = pagure.lib.query.new_project(
                 flask.g.session,
@@ -1055,6 +1057,7 @@ def new_project():
                 blacklist=pagure_config["BLACKLISTED_PROJECTS"],
                 allowed_prefix=pagure_config["ALLOWED_PREFIX"],
                 add_readme=create_readme,
+                mirrored_from=mirrored_from,
                 userobj=user,
                 prevent_40_chars=pagure_config.get(
                     "OLD_VIEW_COMMIT_ENABLED", False

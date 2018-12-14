@@ -156,6 +156,13 @@ class ProjectForm(ProjectFormSimplified):
     """ Form to create or edit project. """
 
     name = wtforms.StringField('Project name <span class="error">*</span>')
+    mirrored_from = wtforms.StringField(
+        "Mirror from URL",
+        [
+            wtforms.validators.optional(),
+            wtforms.validators.Regexp(urlpattern, flags=re.IGNORECASE),
+        ],
+    )
     create_readme = wtforms.BooleanField(
         "Create README",
         [wtforms.validators.optional()],

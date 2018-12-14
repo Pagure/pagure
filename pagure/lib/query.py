@@ -1631,6 +1631,7 @@ def new_project(
     avatar_email=None,
     parent_id=None,
     add_readme=False,
+    mirrored_from=None,
     userobj=None,
     prevent_40_chars=False,
     namespace=None,
@@ -1712,6 +1713,7 @@ def new_project(
         avatar_email=avatar_email if avatar_email else None,
         user_id=user_obj.id,
         parent_id=parent_id,
+        mirrored_from=mirrored_from,
         private=private,
         hook_token=pagure.lib.login.id_generator(40),
     )

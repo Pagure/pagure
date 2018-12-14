@@ -380,6 +380,8 @@ class Project(BASE):
     _reports = sa.Column(sa.Text, nullable=True)
     _notifications = sa.Column(sa.Text, nullable=True)
     _close_status = sa.Column(sa.Text, nullable=True)
+    mirrored_from = sa.Column(sa.Text, nullable=True)
+    mirrored_from_last_log = sa.Column(sa.Text, nullable=True)
 
     date_created = sa.Column(
         sa.DateTime, nullable=False, default=datetime.datetime.utcnow

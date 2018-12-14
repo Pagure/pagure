@@ -23,6 +23,7 @@
             {% if config.get('PRIVATE_PROJECTS', False) %}
               {{ render_bootstrap_field(form.private, field_description="To mark the repo private") }}
             {% endif %}
+            {{ render_bootstrap_field(form.mirrored_from, field_description="Mirror this project from another git server") }}
             {{ render_bootstrap_field(form.create_readme, field_description="Create a README file automatically") }}
             {% if form.repospanner_region %}
               {{ render_bootstrap_field(form.repospanner_region, field_description="repoSpanner region to create the project in") }}
@@ -34,6 +35,15 @@
           </form>
         </div>
       </div>
+    </div>
+  </div>
+  <div class="row justify-content-around">
+    <div class="col-md-8">
+        <div class="mt-3">
+          <p id="mirrored_doc">
+            Note that Pagure only supports mirroring from a public server.
+          </p>
+        </div>
     </div>
   </div>
 </div>
@@ -56,6 +66,20 @@ $('#private').change(function(){
     $('#namespace').removeAttr("disabled");
   }
 });
+function update_if_mirror() {
+  if ($('#mirrored_from').val()){
+    $('#create_readme').attr("disabled", "disabled");
+    $('#create_readme').prop('checked', false);
+    $('#mirrored_doc').show();
+  } else {
+    $('#create_readme').removeAttr("disabled");
+    $('#mirrored_doc').hide();
+  }
+};
+$('#mirrored_from').keyup(function(){
+  update_if_mirror();
+});
+update_if_mirror();
 </script>
 {% endblock %}
 {% endif %}

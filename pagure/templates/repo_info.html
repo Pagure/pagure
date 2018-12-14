@@ -279,7 +279,14 @@
                     {% endif %}
           </div>
       </div>
-    {% if g.repo_obj and g.repo_obj.is_empty %}
+    {% if g.repo_obj and g.repo_obj.is_empty and repo.mirrored_from %}
+        <div class="alert {% if category == 'error' %}alert-warning{% else %}alert-info{%endif%}" role="alert">
+          <p>This repo is brand new and meant to be mirrored from {{
+                repo.mirrored_from }} !</p>
+          <p>Mirrored projects are refreshed regularly, please seat tight, code will
+          come land soon!</p>
+        </div>
+    {% elif g.repo_obj and g.repo_obj.is_empty %}
         <div class="alert {% if category == 'error' %}alert-warning{% else %}alert-info{%endif%}" role="alert">
           <p>This repo is brand new!</p>
             {% if g.authenticated and g.repo_committer %}

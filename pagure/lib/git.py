@@ -1211,10 +1211,12 @@ def read_output(cmd, abspath, input=None, keepends=False, error=False, **kw):
         cwd=abspath,
         **kw
     )
-    (out, err) = procs.communicate(input)
-    out = out.decode("utf-8")
-    err = err.decode("utf-8")
     retcode = procs.wait()
+    (out, err) = procs.communicate(input)
+    if not isinstance(out, str):
+        out = out.decode("utf-8")
+    if not isinstance(err, str):
+        err = err.decode("utf-8")
     if retcode:
         print("ERROR: %s =-- %s" % (cmd, retcode))
         print(out)
@@ -2760,3 +2762,131 @@ def generate_archive(project, commit, tag, name, archive_fmt):
             raise pagure.exceptions.PagureException(
                 "Un-support archive format requested: %s", archive_fmt
             )
+
+
+def mirror_pull_project(session, project, debug=False):
+    """ Mirror locally a project from a remote URL. """
+    remote = project.mirrored_from
+    repopath = tempfile.mkdtemp(prefix="pagure-mirror_in-")
+    lclrepopath = pagure.utils.get_repo_path(project)
+
+    def _run_command(command, logs):
+        _log.info("Running the command: %s" % command)
+        if debug:
+            print("Running the command: %s" % command)
+            print("  Running in: %s" % repopath)
+        (stdout, stderr) = pagure.lib.git.read_git_lines(
+            command, abspath=repopath, error=True
+        )
+        log = "Output from %s:\n  stdout: %s\n  stderr: %s" % (
+            command,
+            stdout,
+            stderr,
+        )
+        logs.append(log)
+        if debug:
+            print(log)
+        return logs
+
+    try:
+        # Pull
+        logs = []
+        logs = _run_command(["clone", "--mirror", remote, "."], logs)
+        logs = _run_command(["remote", "add", "local", lclrepopath], logs)
+
+        # Push the changes
+        _log.info("Pushing")
+        if debug:
+            print("Pushing to the local git repo")
+        extra = {}
+        if project.is_on_repospanner:
+            regioninfo = pagure_config["REPOSPANNER_REGIONS"][
+                project.repospanner_region
+            ]
+
+            extra.update(
+                {
+                    "username": "pagure",
+                    "repotype": "main",
+                    "project_name": project.name,
+                    "project_user": project.user.username
+                    if project.is_fork
+                    else "",
+                    "project_namespace": project.namespace or "",
+                }
+            )
+            args = []
+            for opt in extra:
+                args.extend(["--extra", opt, extra[opt]])
+            command = [
+                "git",
+                "-c",
+                "protocol.ext.allow=always",
+                "push",
+                "ext::%s %s %s"
+                % (
+                    pagure_config["REPOBRIDGE_BINARY"],
+                    " ".join(args),
+                    project._repospanner_repo_name("main"),
+                ),
+                "--repo",
+                repopath,
+            ]
+            environ = {
+                "USER": "pagure",
+                "REPOBRIDGE_CONFIG": ":environment:",
+                "REPOBRIDGE_BASEURL": regioninfo["url"],
+                "REPOBRIDGE_CA": regioninfo["ca"],
+                "REPOBRIDGE_CERT": regioninfo["push_cert"]["cert"],
+                "REPOBRIDGE_KEY": regioninfo["push_cert"]["key"],
+            }
+        else:
+            command = ["git", "push", "local", "--mirror"]
+            environ = {}
+
+        _log.debug("Running a git push to %s", project.fullname)
+        env = os.environ.copy()
+        env["GL_USER"] = "pagure"
+        env["GL_BYPASS_ACCESS_CHECKS"] = "1"
+        if pagure_config.get("GITOLITE_HOME"):
+            env["HOME"] = pagure_config["GITOLITE_HOME"]
+        env.update(environ)
+        env.update(extra)
+        out = subprocess.check_output(
+            command, cwd=repopath, stderr=subprocess.STDOUT, env=env
+        )
+        log = "Output from %s:" % command
+        logs.append(log)
+        logs.append(out)
+        _log.debug("Output: %s" % out)
+
+        project.mirrored_from_last_log = "\n".join(logs)
+        session.add(project)
+        session.commit()
+        _log.info("\n".join(logs))
+    except subprocess.CalledProcessError as err:
+        _log.debug(
+            "Rebase FAILED: {cmd} returned code {code} with the "
+            "following output: {output}".format(
+                cmd=err.cmd, code=err.returncode, output=err.output
+            )
+        )
+        # This should never really happen, since we control the repos, but
+        # this way, we can be sure to get the output logged
+        remotes = []
+        for line in err.output.decode("utf-8").split("\n"):
+            _log.info("Remote line: %s", line)
+            if line.startswith("remote: "):
+                _log.debug("Remote: %s" % line)
+                remotes.append(line[len("remote: ") :].strip())
+        if remotes:
+            _log.info("Remote rejected with: %s" % remotes)
+            raise pagure.exceptions.PagurePushDenied(
+                "Remote hook declined the push: %s" % "\n".join(remotes)
+            )
+        else:
+            # Something else happened, pass the original
+            _log.exception("Error pushing. Output: %s", err.output)
+            raise
+    finally:
+        shutil.rmtree(repopath)

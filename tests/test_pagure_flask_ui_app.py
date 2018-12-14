@@ -281,6 +281,85 @@ class PagureFlaskApptests(tests.Modeltests):
 
         pagure.config.config['ENABLE_NEW_PROJECTS'] = True
 
+    def test_new_project_mirrored_invalid_url(self):
+        """ Test the new_project with a mirrored repo but an invalid URL. """
+
+        user = tests.FakeUser(username='foo')
+        with tests.user_set(self.app.application, user):
+            output = self.app.get('/new/')
+            self.assertEqual(output.status_code, 200)
+
+            csrf_token = self.get_csrf(output=output)
+
+            data = {
+                'description': 'Project #1',
+                'name': 'project-1',
+                'mirrored_from': 'abcd',
+                'csrf_token': csrf_token,
+            }
+
+            output = self.app.post('/new/', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>New project - Pagure</title>', output_text)
+            self.assertIn(
+                'Invalid input.&nbsp;', output_text)
+
+    def test_new_project_mirrored_invalid_sshurl(self):
+        """ Test the new_project with a mirrored repo but an invalid
+        SSH-like url.
+        """
+
+        user = tests.FakeUser(username='foo')
+        with tests.user_set(self.app.application, user):
+            output = self.app.get('/new/')
+            self.assertEqual(output.status_code, 200)
+
+            csrf_token = self.get_csrf(output=output)
+
+            data = {
+                'description': 'Project #1',
+                'name': 'project-1',
+                'mirrored_from': 'ssh://git@server.org/foo/bar.git',
+                'csrf_token': csrf_token,
+            }
+
+            output = self.app.post('/new/', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>New project - Pagure</title>', output_text)
+            self.assertIn(
+                'Invalid input.&nbsp;', output_text)
+
+    def test_new_project_mirrored_valid_url(self):
+        """ Test the new_project with a mirrored repo with a valid url. """
+
+        user = tests.FakeUser(username='foo')
+        with tests.user_set(self.app.application, user):
+            output = self.app.get('/new/')
+            self.assertEqual(output.status_code, 200)
+
+            csrf_token = self.get_csrf(output=output)
+
+            data = {
+                'description': 'Project #1',
+                'name': 'project-1',
+                'mirrored_from': 'https://example.com/foo/bar.git',
+                'csrf_token': csrf_token,
+            }
+
+            output = self.app.post('/new/', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>Overview - project-1 - Pagure</title>',
+                output_text)
+            self.assertIn(
+                '<p>This repo is brand new and meant to be mirrored from '
+                'https://example.com/foo/bar.git !</p>', output_text)
+
     def test_new_project(self):
         """ Test the new_project endpoint. """
         # Before
