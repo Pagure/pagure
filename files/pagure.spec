@@ -239,6 +239,9 @@ install -p -m 644 createdb.py $RPM_BUILD_ROOT/%{_datadir}/pagure/pagure_createdb
 # Install the api_key_expire_mail.py script
 install -p -m 644 files/api_key_expire_mail.py $RPM_BUILD_ROOT/%{_datadir}/pagure/api_key_expire_mail.py
 
+# Install the mirror_project_in.py script
+install -p -m 644 files/mirror_project_in.py $RPM_BUILD_ROOT/%{_datadir}/pagure/mirror_project_in.py
+
 # Install the keyhelper and aclcheck scripts
 mkdir -p $RPM_BUILD_ROOT/%{_libexecdir}/pagure/
 install -p -m 755 files/aclchecker.py $RPM_BUILD_ROOT/%{_libexecdir}/pagure/aclchecker.py
