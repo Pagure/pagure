@@ -761,9 +761,11 @@ the default branch of the repo will be the default target of all pull requests.
 
 Defaults to: ``False``.
 
+SMTP configuration
+~~~~~~~~~~~~~~~~~~
 
 SMTP_SERVER
-~~~~~~~~~~~
+^^^^^^^^^^^
 
 This configuration key specifies the SMTP server to use when
 sending emails.
@@ -772,7 +774,7 @@ Defaults to: ``localhost``.
 
 
 SMTP_PORT
-~~~~~~~~~
+^^^^^^^^^
 
 This configuration key specifies the SMTP server port.
 
@@ -785,7 +787,7 @@ Defaults to: ``25``
 
 
 SMTP_SSL
-~~~~~~~~
+^^^^^^^^
 
 This configuration key specifies whether the SMTP connections
 should be secured over SSL.
@@ -794,7 +796,7 @@ Defaults to: ``False``
 
 
 SMTP_USERNAME
-~~~~~~~~~~~~~
+^^^^^^^^^^^^^
 
 This configuration key allows usage of SMTP with auth.
 
@@ -804,7 +806,7 @@ Defaults to: ``None``
 
 
 SMTP_PASSWORD
-~~~~~~~~~~~~~
+^^^^^^^^^^^^^
 
 This configuration key allows usage of SMTP with auth.
 
