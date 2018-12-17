@@ -522,7 +522,7 @@ def api_pull_request_merge(repo, requestid, username=None, namespace=None):
 def api_pull_request_rebase(repo, requestid, username=None, namespace=None):
     """
     Rebase a pull-request
-    --------------------
+    ---------------------
     Instruct Pagure to rebase a pull request.
 
     This is an asynchronous call.
