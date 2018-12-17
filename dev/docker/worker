@@ -5,8 +5,8 @@ VOLUME ["/repos"]
 RUN mkdir /code
 
 RUN dnf install -y python3-devel python3-setuptools python3-nose python3-bcrypt python3-alembic \
-                   python3-arrow python-binaryornot python-bleach python-blinker \
-                   python-chardet python-cryptography python-docutils python3-flask \
+                   python3-arrow python3-binaryornot python3-bleach python3-blinker \
+                   python3-chardet python3-cryptography python3-docutils python3-flask \
                    python3-flask-wtf python3-markdown python3-psutil \
                    python3-pygit2 python3-fedora python3-openid python3-openid-cla \
                    python3-openid-teams python3-straight-plugin python3-wtforms python3-munch \
