@@ -23,7 +23,9 @@
             {% if config.get('PRIVATE_PROJECTS', False) %}
               {{ render_bootstrap_field(form.private, field_description="To mark the repo private") }}
             {% endif %}
+            {% if not config.get('DISABLE_MIRROR_IN', False) %}
             {{ render_bootstrap_field(form.mirrored_from, field_description="Mirror this project from another git server") }}
+            {% endif %}
             {{ render_bootstrap_field(form.create_readme, field_description="Create a README file automatically") }}
             {% if form.repospanner_region %}
               {{ render_bootstrap_field(form.repospanner_region, field_description="repoSpanner region to create the project in") }}
@@ -66,6 +68,7 @@ $('#private').change(function(){
     $('#namespace').removeAttr("disabled");
   }
 });
+{% if not config.get('DISABLE_MIRROR_IN', False) %}
 function update_if_mirror() {
   if ($('#mirrored_from').val()){
     $('#create_readme').attr("disabled", "disabled");
@@ -80,6 +83,7 @@ $('#mirrored_from').keyup(function(){
   update_if_mirror();
 });
 update_if_mirror();
+{% endif %}
 </script>
 {% endblock %}
 {% endif %}

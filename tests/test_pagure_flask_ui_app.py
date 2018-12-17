@@ -340,6 +340,10 @@ class PagureFlaskApptests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/new/')
             self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<strong><label for="mirrored_from">Mirror from URL'
+                '</label></strong>', output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -359,6 +363,39 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertIn(
                 '<p>This repo is brand new and meant to be mirrored from '
                 'https://example.com/foo/bar.git !</p>', output_text)
+
+    @patch.dict('pagure.config.config', {'DISABLE_MIRROR_IN': True})
+    def test_new_project_mirrored_mirror_disabled(self):
+        """ Test the new_project with a mirrored repo when that feature is
+        disabled.
+        """
+
+        user = tests.FakeUser(username='foo')
+        with tests.user_set(self.app.application, user):
+            output = self.app.get('/new/')
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertNotIn(
+                '<strong><label for="mirrored_from">Mirror from URL'
+                '</label></strong>', output_text)
+
+            csrf_token = self.get_csrf(output=output)
+
+            data = {
+                'description': 'Project #1',
+                'name': 'project-1',
+                'mirrored_from': 'https://example.com/foo/bar.git',
+                'csrf_token': csrf_token,
+            }
+
+            output = self.app.post('/new/', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>New project - Pagure</title>', output_text)
+            self.assertIn(
+                '</i> Mirroring in projects has been disabled in '
+                'this instance</div>', output_text)
 
     def test_new_project(self):
         """ Test the new_project endpoint. """

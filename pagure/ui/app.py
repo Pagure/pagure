@@ -1042,6 +1042,12 @@ def new_project():
             ignore_existing_repos = False
 
         mirrored_from = form.mirrored_from.data
+        if mirrored_from and pagure_config.get("DISABLE_MIRROR_IN", False):
+            flask.flash(
+                "Mirroring in projects has been disabled in this instance",
+                "error",
+            )
+            return flask.render_template("new_project.html", form=form)
 
         try:
             task = pagure.lib.query.new_project(
