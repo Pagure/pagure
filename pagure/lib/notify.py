@@ -122,7 +122,9 @@ def mqtt_publish(topic, message):
     mqtt_certfile = pagure_config.get("MQTT_CERTFILE")
     mqtt_keyfile = pagure_config.get("MQTT_KEYFILE")
     mqtt_cert_reqs = pagure_config.get("MQTT_CERT_REQS", ssl.CERT_REQUIRED)
-    mqtt_tls_version = pagure_config.get("MQTT_TLS_VERSION", ssl.PROTOCOL_TLS)
+    mqtt_tls_version = pagure_config.get(
+        "MQTT_TLS_VERSION", ssl.PROTOCOL_TLSv1_2
+    )
     mqtt_ciphers = pagure_config.get("MQTT_CIPHERS")
 
     # We catch Exception if we want :-p

@@ -1825,7 +1825,7 @@ MQTT_TLS_VERSION
 When using SSL-based authentication to the MQTT server, use this
 configuration key to specify the TLS protocols to support/use.
 
-Defaults to: ``ssl.PROTOCOL_TLS`` (from python's ssl library)
+Defaults to: ``ssl.PROTOCOL_TLSv1_2`` (from python's ssl library)
 
 
 MQTT_CIPHERS
