@@ -72,6 +72,13 @@
                 href="#quickreplies-tab" role="tab" aria-controls="quickreplies">Quick Replies</a>
           {% endif %}
 
+          {% if not config.get('DISABLE_MIRROR_IN', False)
+            and (repo.user.user == g.fas_user.username or pagure_admin)
+            and repo.mirrored_from %}
+          <a class="nav-item nav-link" id="mirrorlog" data-toggle="tab"
+            href="#mirrorlog-tab" role="tab" aria-controls="mirrorlog">Mirror log</a>
+          {% endif %}
+
           <a class="nav-item nav-link" id="regen" data-toggle="tab"
                 href="#regen-tab" role="tab" aria-controls="regen">Regenerate Repos</a>
 
@@ -761,7 +768,7 @@
                                         <input title="Comma separated list items" type="text" name="custom_keys_data" id="custom_keys_list"
                                           value={% if field.data is none %}""{% else %}"{{ field.data | join(', ') }}"{% endif %} class="form-control custom-keys-list"/>
                                       {% else %}
-					 <input title="Comma separated list items" type="text" name="custom_keys_data" id="custom_keys_list"
+           <input title="Comma separated list items" type="text" name="custom_keys_data" id="custom_keys_list"
                                           value="{{ field.data or '' }}" class="form-control custom-keys-list hidden"/>
                                       {% endif %}
                                     </div>
@@ -973,6 +980,14 @@
                       </form>
                 </div>
               </div>
+          </div>
+          {% endif %}
+
+          {% if not config.get('DISABLE_MIRROR_IN', False)
+            and (repo.user.user == g.fas_user.username or pagure_admin)
+            and repo.mirrored_from %}
+          <div class="tab-pane fade" id="mirrorlog-tab" role="tabpanel" aria-labelledby="mirrorlog-tab">
+            {% include 'settings_mirrorlog.html' %}
           </div>
           {% endif %}
 
