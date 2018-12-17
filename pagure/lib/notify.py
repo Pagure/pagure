@@ -109,7 +109,7 @@ def blinker_publish(topic, message):
 
 def mqtt_publish(topic, message):
     """ Try to publish a message on a MQTT message bus. """
-    if not pagure_config.get("MQTT_NOTIFICATIONS", True):
+    if pagure_config.get("MQTT_NOTIFICATIONS", False):
         return
 
     mqtt_host = pagure_config.get("MQTT_HOST")

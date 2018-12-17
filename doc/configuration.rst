@@ -1736,6 +1736,107 @@ SSH_COMMAND_NON_REPOSPANNER
 The command to run if a repository is not on repospanner when aclchecker is in use.
 
 
+MQTT Options
+------------
+
+If approprietly configured pagure supports sending messages to an MQTT
+message queue.
+
+Here below are the different configuration options to make it so.
+
+MQTT_NOTIFICATIONS
+~~~~~~~~~~~~~~~~~~
+
+Global configuration key to turn on or off the code to send notifications
+to an MQTT message queue.
+
+Defaults to: ``False``
+
+MQTT_HOST
+~~~~~~~~~
+
+Host name of the MQTT server to send the MQTT notifications to.
+
+Defaults to: ``None``
+
+MQTT_PORT
+~~~~~~~~~
+
+Port of the MQTT server to use to send the MQTT notifications to.
+
+Defaults to: ``None``
+
+
+MQTT_USERNAME
+~~~~~~~~~~~~~
+
+Username to authenticate to the MQTT server as.
+
+Defaults to: ``None``
+
+
+MQTT_PASSWORD
+~~~~~~~~~~~~~
+
+Password to authenticate to the MQTT server with.
+
+Defaults to: ``None``
+
+
+MQTT_CA_CERTS
+~~~~~~~~~~~~~
+
+When using SSL-based authentication to the MQTT server, use this
+configuration key to point to the CA cert to use.
+
+Defaults to: ``None``
+
+
+MQTT_CERTFILE
+~~~~~~~~~~~~~
+
+When using SSL-based authentication to the MQTT server, use this
+configuration key to point to the cert file to use.
+
+Defaults to: ``None``
+
+
+MQTT_KEYFILE
+~~~~~~~~~~~~~
+
+When using SSL-based authentication to the MQTT server, use this
+configuration key to point to the key file to use.
+
+Defaults to: ``None``
+
+
+MQTT_CERT_REQS
+~~~~~~~~~~~~~~
+
+When using SSL-based authentication to the MQTT server, use this
+configuration key to specify if the CERT is required.
+
+Defaults to: ``ssl.CERT_REQUIRED`` (from python's ssl library)
+
+
+MQTT_TLS_VERSION
+~~~~~~~~~~~~~~~~
+
+When using SSL-based authentication to the MQTT server, use this
+configuration key to specify the TLS protocols to support/use.
+
+Defaults to: ``ssl.PROTOCOL_TLS`` (from python's ssl library)
+
+
+MQTT_CIPHERS
+~~~~~~~~~~~~
+
+When using SSL-based authentication to the MQTT server, use this
+configuration key to specify the ciphers.
+
+Defaults to: ``None``
+
+
 Deprecated configuration keys
 -----------------------------
 
