@@ -1582,6 +1582,15 @@ pushed to the default branch.
 Defaults to: ``False``
 
 
+DISABLE_MIRROR_IN
+~~~~~~~~~~~~~~~~~
+
+This configuration key allows a pagure instance to not support mirroring in
+projects (from third party git server).
+
+Defaults to: ``False``
+
+
 RepoSpanner Options
 -------------------
 
