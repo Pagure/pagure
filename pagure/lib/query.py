@@ -3176,7 +3176,9 @@ def search_pull_requests(
             else:
                 query = query.filter(model.PullRequest.status != "Open")
         else:
-            query = query.filter(model.PullRequest.status == status)
+            query = query.filter(
+                func.lower(model.PullRequest.status) == status.lower()
+            )
 
     if assignee is not None:
         assignee = "%s" % assignee
