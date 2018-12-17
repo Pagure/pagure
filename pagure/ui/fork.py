@@ -1760,7 +1760,7 @@ def new_request_pull(
         repo=repo,
         username=username,
         orig_repo=orig_repo,
-        parent_branches=sorted(orig_repo.listall_branches()),
+        parent_branches=sorted(flask.g.repo_obj.listall_branches()),
         diff_commits=diff_commits,
         diff=diff,
         form=form,

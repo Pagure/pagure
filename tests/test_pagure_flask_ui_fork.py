@@ -2280,7 +2280,8 @@ index 0000000..2a552bb
             os.path.join(self.path, 'requests'), bare=True)
 
         repo = pagure.lib.query.get_authorized_project(self.session, 'test')
-        fork = pagure.lib.query.get_authorized_project(self.session, 'test', user='foo')
+        fork = pagure.lib.query.get_authorized_project(
+            self.session, 'test', user='foo')
 
         set_up_git_repo(
             self.session, self.path, new_project=fork,
@@ -2339,6 +2340,11 @@ index 0000000..2a552bb
             placeholder="Describe your changes" tabindex=1>
 More information</textarea>
             <div id="preview" class="p-1">''', output_text)
+            self.assertIn(
+                '<a href="javascript:void(0)" class="dropdown-item '
+                'branch_from_item" data-value="master"><span '
+                'class="fa fa-random"></span> master</a>',
+                output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -2551,6 +2557,86 @@ More information</textarea>
             self.session, project_id=1, requestid=2)
         self.assertIsNotNone(request.commit_start)
         self.assertIsNotNone(request.commit_stop)
+
+    @patch('pagure.lib.notify.send_email')
+    def test_new_request_pull_from_fork_branch(self, send_email):
+        """ Test creating a fork to fork PR. """
+        send_email.return_value = True
+
+        # Create main repo with some content
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, "repos"),
+            bare=True
+        )
+        tests.add_content_git_repo(
+            os.path.join(self.path, "repos", "test.git"))
+
+        # Create fork repo with more content
+        tests.create_projects(
+            self.session,
+            is_fork=True,
+            hook_token_suffix='fork')
+        tests.create_projects_git(
+            os.path.join(self.path, "repos", "forks", "pingou"),
+            bare=True
+        )
+        tests.add_content_git_repo(
+            os.path.join(self.path, "repos", "forks", "pingou", "test.git"))
+        tests.add_readme_git_repo(
+            os.path.join(self.path, "repos", "forks", "pingou", "test.git"),
+            branch='feature')
+        tests.add_readme_git_repo(
+            os.path.join(self.path, "repos", "forks", "pingou", "test.git"),
+            branch='random_branch')
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(self.app.application, user):
+            data = {
+                'csrf_token': self.get_csrf(),
+            }
+
+            output = self.app.post(
+                '/do_fork/test', data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+
+            # Check that Ralph's fork do exist
+            output = self.app.get('/fork/pingou/test')
+            self.assertEqual(output.status_code, 200)
+
+            tests.create_projects_git(
+                os.path.join(self.path, 'requests'), bare=True)
+
+            fork = pagure.lib.query.get_authorized_project(
+                self.session, 'test', user='ralph')
+
+            set_up_git_repo(
+                self.session, self.path, new_project=fork,
+                branch_from='feature', mtype='FF')
+
+            # Try opening a pull-request
+            output = self.app.get(
+                '/fork/pingou/test/diff/master..feature')
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>Create new Pull Request for master - '
+                'fork/pingou/test\n - Pagure</title>', output_text)
+            self.assertIn(
+                '<input type="submit" class="btn btn-primary" value="Create Pull Request">\n',
+                output_text)
+            self.assertIn(
+                '<a href="javascript:void(0)" class="dropdown-item '
+                'branch_from_item" data-value="master"><span '
+                'class="fa fa-random"></span> master</a>',
+                output_text)
+            self.assertIn(
+                '<a href="javascript:void(0)" class="dropdown-item '
+                'branch_from_item" data-value="random_branch"><span '
+                'class="fa fa-random"></span> random_branch</a>',
+                output_text)
+
 
     @patch('pagure.lib.notify.send_email')
     def test_new_request_pull_fork_to_fork_pr_disabled(self, send_email):
