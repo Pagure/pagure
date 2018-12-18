@@ -40,6 +40,13 @@ def setup_parser():
         action="store_false",
         help="Skip building the container image",
     )
+    parser.add_argument(
+        "--shell",
+        dest="shell",
+        action="store_true",
+        help="Gives you a shell into the container instead "
+        "of running the tests",
+    )
 
     return parser
 
@@ -91,10 +98,9 @@ if __name__ == "__main__":
                 "dev/docker",
             ]
         )
-
-    print("--------- Running Test --------------")
-    sp.run(
-        [
+    if args.shell:
+        print("--------- Shelling in the container --------------")
+        command = [
             "podman",
             "run",
             "-it",
@@ -103,7 +109,25 @@ if __name__ == "__main__":
             container_name,
             "-v",
             "{}:/pagure".format(os.getcwd()),
+            "--entrypoint=/bin/bash",
             container_name,
-            args.test_case,
         ]
-    )
+        sp.run(command)
+
+    else:
+
+        print("--------- Running Test --------------")
+        sp.run(
+            [
+                "podman",
+                "run",
+                "-it",
+                "--rm",
+                "--name",
+                container_name,
+                "-v",
+                "{}:/pagure".format(os.getcwd()),
+                container_name,
+                args.test_case,
+            ]
+        )
