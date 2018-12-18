@@ -133,33 +133,38 @@ Running the unit-tests
 
 To run the unit-tests, there is container available with all the dependencies needed.
 
+First you will need to have podman installed on your workstation. ::
+
+    $ sudo dnf install podman
+
+
 Use the following command to run the tests ::
 
-    $ ./dev/run-tests-docker.py
+    $ ./dev/run-tests-container.py
 
 This command will build a fedora based container and execute the test suite.
 
 If you wish to execute the test suite on a centos based container run the following command ::
 
-    $ ./dev/run-tests-docker.py --centos
+    $ ./dev/run-tests-container.py --centos
 
 When the test container image has been built you can skip the building step to save time
 and run directly the test suite. ::
 
-    $ ./dev/run-tests-docker.py --skip-build
-    $ ./dev/run-tests-docker.py --centos --skip-build
+    $ ./dev/run-tests-container.py --skip-build
+    $ ./dev/run-tests-container.py --centos --skip-build
 
 You can also run a single test case ::
 
-    $ ./dev/run-tests-docker.py tests/test_pagure_flask_ui_priorities.py
+    $ ./dev/run-tests-container.py tests/test_pagure_flask_ui_priorities.py
 
 Or a single test ::
 
-    $ ./dev/run-tests-docker.py tests/test_pagure_flask_ui_priorities.py:PagureFlaskPrioritiestests.test_ticket_with_no_priority
+    $ ./dev/run-tests-container.py tests/test_pagure_flask_ui_priorities.py:PagureFlaskPrioritiestests.test_ticket_with_no_priority
 
-You can also get `run-tests-docker` help ::
+You can also get `run-tests-container` help ::
 
-    $ ./dev/run-tests-docker.py --help
+    $ ./dev/run-tests-container.py --help
 
 Manually
 ^^^^^^^^
