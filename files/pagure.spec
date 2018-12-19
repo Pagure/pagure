@@ -16,7 +16,7 @@
 
 
 Name:               pagure
-Version:            5.1.3
+Version:            5.2
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -290,7 +290,7 @@ install -p -m 644 files/pagure_api_key_expire_mail.timer \
     $RPM_BUILD_ROOT/%{_unitdir}/pagure_api_key_expire_mail.timer
 
 # Install the systemd file for the script updating mirrored project
-install -p -m 644 files/files/pagure_mirror_project_in.service \
+install -p -m 644 files/pagure_mirror_project_in.service \
     $RPM_BUILD_ROOT/%{_unitdir}/pagure_mirror_project_in.service
 install -p -m 644 files/pagure_mirror_project_in.timer \
     $RPM_BUILD_ROOT/%{_unitdir}/pagure_mirror_project_in.timer
@@ -491,6 +491,9 @@ done
 
 
 %changelog
+* Mon Jan 07 2019 Pierre-Yves Chibon <pingou@pingoured.fr> - 5.2-1
+- Update to pagure 5.2
+
 * Thu Oct 11 2018 Pierre-Yves Chibon <pingou@pingoured.fr> - 5.1.3-1
 - Update to pagure 5.1.3
 

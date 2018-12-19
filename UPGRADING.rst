@@ -1,6 +1,45 @@
 Upgrading Pagure
 ================
 
+From 5.2 to 5.1.x
+-----------------
+
+The 5.2 release contains a database schema updates, so:
+
+* Update the data schema using alembic: ``alembic upgrade head``
+
+(As usual, do your backups before).
+
+If you run into issues with the ``hook_mirror``, see the upgrade notes for
+the release 5.1.4 below.
+
+Note that the minimal version of pygit2 has been bumped to: 0.26.0
+
+New configuration keys have been added:
+
+* MQTT_NOTIFICATIONS
+* MQTT_HOST
+* MQTT_PORT
+* MQTT_USERNAME
+* MQTT_PASSWORD
+* MQTT_CA_CERTS
+* MQTT_CERTFILE
+* MQTT_KEYFILE
+* MQTT_CERT_REQS
+* MQTT_TLS_VERSION
+* MQTT_CIPHERS
+* DISABLE_MIRROR_IN
+* SSH_ADMIN_TOKEN
+* GIT_GARBAGE_COLLECT
+* DISABLE_REMOTE_PR
+* ADMIN_EMAIL
+* LOG_ALL_COMMITS
+* ARCHIVE_FOLDER
+
+One configuration key changes its default structure:
+* TRIGGER_CI
+
+
 From 5.1 to 5.1.4
 -----------------
 

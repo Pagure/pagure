@@ -3,6 +3,81 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
+5.2 (2019-01-07)
+----------------
+- Add support for the MQTT protocol (jingjing)
+- Add support for mirroring in git repositories from outside sources
+- Add the possibility to give a group away
+- Port pagure to markdown 3.0+ while remaining backward compatible
+- Add support to merge a PR when the fork was deleted
+- Indicate that the file can be either empty or a binary file in diffs
+- Add the API endpoint to create new PR in the API doc
+- Add the ability to generate archive from a commit or tag
+- Allow searching the content of the comments on an issue tracker
+- Allow filtering the issue list by the close status
+- Update the version of highlightjs-line-numbers. (Clement Verna)
+- Store the user who closed a ticket in the database. (Clement Verna)
+- Show related PRs on the issue list if there are any
+- Bypass old hooks rather than using non-existing symlinks
+- Undo submitting comment via JS if the SSE is down
+- Make links act like links in the commit message (Ryan Lerch)
+- Add build status to pull requests page (Michael Watters)
+- Bump the minimal pygit2 version to 0.26.0 (Pierre-Yves Chibon)
+- Make update_pull_ref more robust by making sure fork ref is deleted
+  (Slavek Kabrda)
+- Provide feedback to the user if PRs are disabled in the default target
+  projects
+- Add a new API endpoint to update the options set for a project
+- Add a new API endpoint to retrieve the options of a project
+- Update the quick replies button when going into edit mode
+- Hide extra GIT URLs behind a collapseable element (Ryan Lerch)
+- Save metadata changes when changing status with dropdown (Ryan Lerch)
+- Align markdown block of code and citation with GitHub CSS. (Jun Aruga)
+- Change formatting of the issue list to make more readable (Ryan Lerch)
+- Rename the fedmsg.py hook into fedmsg_hook.py as otherwise it conflicts
+- Allow commenting on a PR when clicking on the merge button
+- Include whether the PR passed the threshold or not in the API data
+- Change the way votes are recorded on PRs
+- Add support for third-party extensions to pagure (this is very much
+  work in progress and might/will fluctuate as it is polished - Do Not
+  Consider This Stable)
+- Enable token authentication on internal endpoints (Slavek Kabrda)
+- Fix notifications and refreshing the cached merge status upon updates
+- Allow specifying a branch when adding content to git
+- Add support for rebasing pull-requests
+- Fix viewing patch attached to ticket
+- Add link to starred projects in the user menu (Michael Watters)
+- Prevent double click from showing two input form
+- Fix linking to specific lines in a pull-request
+- Do not assume master if the default branch
+- Send dedicated notifications when a PR is updated or rebased
+- Show the update date/time rather than the creation one on flags
+- Allow running 'git gc' explicitly after every object-adding git operation
+  (Slavek Kabrda)
+- Let any contributor to a project update the PR meta-data
+- Rename "Cancel a PR" into "Close a PR"
+- Add a Date type to the custom fields (Karsten Hopp)
+- Add a new API endpoint to retrieve the flags of a pull-request
+- Fix rendering comment added via JS
+- Fix API task status endpoint (Slavek Kabrda)
+- Make it possible to create hooks that don't have DB entries (Slavek Kabrda)
+- Render status of dependent tickets differently on open/close (Akanksha)
+- Implement a button to rerun CI tests on a pull request (Slavek Kabrda)
+- Support disallowing remote pull requests (Karsten Hopp)
+- Change button name to Save instead of Edit while editing pull request
+  (anshukira)
+- Make sure to also log exceptions in non-debug mode (Patrick Uiterwijk)
+- Allow filtering from the milestones page (Akanksha Mishra)
+- Fix multimail config with empty auth or disabled tls (Patrick Uiterwijk)
+- Add an about page in the themes (Mary Kate Fain)
+- Remove "Activate" from project options (jingjing)
+- Add avatar_url to output of user/<username> api (Ryan Lerch)
+- Fix showing a regular comment on a PR when there are none before
+- Fix the UI on the release page when showing the tag message
+- Update the chameleon theme (Stasiek Michalski)
+- Fix filtering by status PRs retrieved by the API (Lenka Segura)
+
+
 5.1.4 (2018-10-15)
 ------------------
 
