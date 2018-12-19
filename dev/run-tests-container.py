@@ -6,16 +6,16 @@ from string import Template
 
 TEMPLATE = "dev/docker/test_env_template"
 
-PKG_LIST = "python-alembic python-arrow python-binaryornot \
-            python-bleach python-blinker python-chardet python-cryptography \
-            python-docutils python-enum34 python-flask python2-fedora-flask \
-            python-flask-wtf python2-bcrypt python-jinja2 \
-            python-markdown python-munch python-openid-cla \
-            python-openid-teams python-psutil python-pygit2 python2-pillow \
-            python-sqlalchemy python-straight-plugin python-wtforms \
-            python-nose python3-coverage python-mock python-mock \
-            python-eventlet python2-flask-oidc python-flake8 python-celery \
-            python-redis python-trololio python-beautifulsoup4 redis vim git"
+PKG_LIST = "python3-alembic python3-arrow python3-binaryornot \
+            python3-bleach python3-blinker python3-chardet python3-cryptography \
+            python3-docutils python3-flask python3-fedora-flask \
+            python3-flask-wtf python3-bcrypt python3-jinja2 \
+            python3-markdown python3-munch python3-openid-cla \
+            python3-openid-teams python3-psutil python3-pygit2 python3-pillow \
+            python3-sqlalchemy python3-straight-plugin python3-wtforms \
+            python3-nose python3-coverage python3-mock python3-mock \
+            python3-eventlet python3-flask-oidc python3-flake8 python3-celery \
+            python3-redis python3-trololio python3-beautifulsoup4 python3-black redis vim git"
 
 
 def setup_parser():
