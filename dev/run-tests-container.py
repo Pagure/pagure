@@ -65,7 +65,7 @@ if __name__ == "__main__":
         container_name = "pagure-test-centos"
         PKG_LIST += "python34 python34-coverage"
     else:
-        base_image = "registry.fedoraproject.org/fedora:28"
+        base_image = "registry.fedoraproject.org/fedora:latest"
         pkg_mgr = "dnf"
         container_name = "pagure-test-fedora"
         epel_pkg = ""
