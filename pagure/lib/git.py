@@ -39,10 +39,10 @@ import pagure.utils
 import pagure.exceptions
 import pagure.lib.query
 import pagure.lib.notify
+import pagure.lib.tasks
 from pagure.config import config as pagure_config
 from pagure.lib import model
 from pagure.lib.repo import PagureRepo
-from pagure.lib import tasks
 import pagure.hooks
 
 # from pagure.hooks import run_project_hooks
@@ -158,14 +158,16 @@ def generate_gitolite_acls(project=None, group=None):
 
     """
     if project != -1:
-        task = tasks.generate_gitolite_acls.delay(
+        task = pagure.lib.tasks.generate_gitolite_acls.delay(
             namespace=project.namespace if project else None,
             name=project.name if project else None,
             user=project.user.user if project and project.is_fork else None,
             group=group,
         )
     else:
-        task = tasks.generate_gitolite_acls.delay(name=-1, group=group)
+        task = pagure.lib.tasks.generate_gitolite_acls.delay(
+            name=-1, group=group
+        )
     return task
 
 
@@ -2154,7 +2156,7 @@ def diff_pull_request(
         session.add(request)
         session.commit()
 
-        tasks.sync_pull_ref.delay(
+        pagure.lib.tasks.sync_pull_ref.delay(
             request.project.name,
             request.project.namespace,
             request.project.user.username if request.project.is_fork else None,
@@ -2162,7 +2164,7 @@ def diff_pull_request(
         )
 
         if commenttext:
-            tasks.link_pr_to_ticket.delay(request.uid)
+            pagure.lib.tasks.link_pr_to_ticket.delay(request.uid)
             if notify:
                 if pr_action:
                     pagure.lib.notify.log(

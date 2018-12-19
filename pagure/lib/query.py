@@ -58,12 +58,12 @@ import pagure.lib.git_auth
 import pagure.lib.login
 import pagure.lib.notify
 import pagure.lib.plugins
+import pagure.lib.tasks
+import pagure.lib.tasks_services
 import pagure.pfmarkdown
 import pagure.utils
 from pagure.config import config as pagure_config
 from pagure.lib import model
-from pagure.lib import tasks
-from pagure.lib import tasks_services
 
 
 REDIS = None
@@ -1386,7 +1386,7 @@ def add_pull_request_comment(
         and request.project.ci_hook.active_pr
         and not request.project.private
     ):
-        tasks_services.trigger_ci_build.delay(
+        pagure.lib.tasks_services.trigger_ci_build.delay(
             pr_uid=request.uid,
             cause=request.id,
             branch=request.branch_from,
@@ -1410,7 +1410,7 @@ def add_pull_request_comment(
         and request.project.ci_hook
         and request.project.ci_hook.active_pr
     ):
-        tasks_services.trigger_ci_build.delay(
+        pagure.lib.tasks_services.trigger_ci_build.delay(
             pr_uid=request.uid,
             cause=request.id,
             branch=request.branch_from,
@@ -1736,7 +1736,7 @@ def new_project(
         ),
     )
 
-    return tasks.create_project.delay(
+    return pagure.lib.tasks.create_project.delay(
         user_obj.username, namespace, name, add_readme, ignore_existing_repo
     )
 
@@ -1945,7 +1945,7 @@ def new_pull_request(
         and request.project.ci_hook.active_pr
         and not request.project.private
     ):
-        tasks_services.trigger_ci_build.delay(
+        pagure.lib.tasks_services.trigger_ci_build.delay(
             pr_uid=request.uid,
             cause=request.id,
             branch=request.branch_from,
@@ -1953,7 +1953,7 @@ def new_pull_request(
         )
 
     # Create the ref from the start
-    tasks.sync_pull_ref.delay(
+    pagure.lib.tasks.sync_pull_ref.delay(
         request.project.name,
         request.project.namespace,
         request.project.user.username if request.project.is_fork else None,
@@ -2275,7 +2275,7 @@ def fork_project(session, user, repo, editbranch=None, editfile=None):
     session.flush()
     session.commit()
 
-    task = tasks.fork.delay(
+    task = pagure.lib.tasks.fork.delay(
         repo.name,
         repo.namespace,
         repo.user.username if repo.is_fork else None,
@@ -3366,7 +3366,7 @@ def add_attachment(repo, issue, attachmentfolder, user, filename, filestream):
     with open(filepath, "wb") as stream:
         stream.write(filestream.read())
 
-    tasks.add_file_to_git.delay(
+    pagure.lib.tasks.add_file_to_git.delay(
         repo.name,
         repo.namespace,
         repo.user.username if repo.is_fork else None,
