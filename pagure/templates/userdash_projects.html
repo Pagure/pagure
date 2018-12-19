@@ -57,7 +57,7 @@
 
                     {% if acl %}
                         <i class="fa fa-user-secret pl-2 pr-1" title="acl"></i>
-                        <span>{{ acl if acl != 'main admin' else 'owner' }}</span>
+                        <span>{{ acl if acl != 'main admin' else 'maintainer' }}</span>
                     {% endif %}
 
                     {% if author %}
@@ -85,7 +85,7 @@
                           <div class="col pl-1">
                             <select name="acl" id="acls-selectize" placeholder="ACLs">
                               <option value=""></option>
-                              <option value="main admin" {% if acl == "main admin" %}selected="selected"{% endif %}>Owner</option>
+                              <option value="main admin" {% if acl == "main admin" %}selected="selected"{% endif %}>Maintainer</option>
                               <option value="admin" {% if acl == "admin" %}selected="selected"{% endif %}>Admin</option>
                               <option value="commit" {% if acl == "commit" %}selected="selected"{% endif %}>Commit</option>
                               <option value="ticket" {% if acl == "ticket" %}selected="selected"{% endif %}>Ticket</option>
@@ -234,7 +234,7 @@
                     {% endif %}
                     {% if r["access"] %}
                     <span class="btn btn-outline-secondary border-0 opacity-100 font-size-09 disabled font-weight-bold">
-                      <span class="fa fa-user-secret fa-fw"></span>{{r["access"] if r["access"] != "main admin" else "owner"}}
+                      <span class="fa fa-user-secret fa-fw"></span>{{r["access"] if r["access"] != "main admin" else "maintainer"}}
                     </span>
                     {% endif %}
                   {# <div class="btn-group mr-2">

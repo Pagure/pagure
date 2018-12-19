@@ -72,13 +72,13 @@
             </span>
             {% endif %}
             {% if not repo.is_fork %}
-            <span class="text-muted">
-            Created by
+            <div class="text-muted">Created {{repo.date_created|humanize}}</div>
+            <div class="text-muted">
+            Maintained by
             <a href="{{ url_for('ui_ns.view_user', username=repo.user.user)}}">
                 {{- repo.user.user -}}
             </a>
-            {{repo.date_created|humanize}}
-          </span>
+            </div>
             {% endif %}
           <div class="projectinfo my-3">
               {% if repo.description %}{{ repo.description | noJS | safe }}{% else %}-{% endif -%}
@@ -221,7 +221,7 @@
                                     </h4>
                                     {{ repo.user.fullname }}
                                   </div>
-                                  <div class="mr-auto align-self-center">main admin</div>
+                                  <div class="mr-auto align-self-center">maintainer</div>
                               </div>
                               {% for access in repo.contributors %}
                                 {% for user in repo.contributors[access] %}
