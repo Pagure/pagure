@@ -12,7 +12,7 @@
 # pylint: disable=no-init
 # pylint: disable=super-on-old-class
 
-from __future__ import unicode_literals
+from __future__ import unicode_literals, absolute_import
 
 import datetime
 import re

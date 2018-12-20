@@ -1,3 +1,6 @@
+
+from __future__ import unicode_literals, absolute_import
+
 from mock import patch, MagicMock, Mock
 from collections import namedtuple
 import os

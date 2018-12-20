@@ -8,7 +8,7 @@
 
 """
 
-from __future__ import unicode_literals
+from __future__ import unicode_literals, absolute_import
 
 import flask
 from pagure.flask_app import admin_session_timedout

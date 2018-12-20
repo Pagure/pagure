@@ -6,7 +6,7 @@ Create Date: 2016-10-08 12:14:31.155018
 
 """
 
-from __future__ import print_function
+from __future__ import print_function, absolute_import
 
 # revision identifiers, used by Alembic.
 revision = '26af5c3602a0'

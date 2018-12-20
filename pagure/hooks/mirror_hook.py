@@ -7,7 +7,7 @@
    Pierre-Yves Chibon <pingou@pingoured.fr>
 
 """
-
+from __future__ import unicode_literals, absolute_import
 
 import sqlalchemy as sa
 import wtforms

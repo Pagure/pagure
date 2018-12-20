@@ -14,7 +14,7 @@ Tests for the Pagure streaming server.
 # obviously this is fine for testing.
 # pylint: disable=locally-disabled, protected-access
 
-from __future__ import unicode_literals
+from __future__ import unicode_literals, absolute_import
 
 import logging
 import os

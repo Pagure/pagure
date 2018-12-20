@@ -13,7 +13,7 @@
 # pylint: disable=too-many-locals
 
 
-from __future__ import unicode_literals
+from __future__ import unicode_literals, absolute_import
 
 import textwrap
 import logging

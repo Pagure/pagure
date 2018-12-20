@@ -19,7 +19,7 @@ Author: Ralph Bean <rbean@redhat.com>
         Pierre-Yves Chibon <pingou@pingoured.fr>
 """
 
-from __future__ import unicode_literals
+from __future__ import unicode_literals, absolute_import
 
 import flask
 

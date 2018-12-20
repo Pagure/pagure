@@ -20,7 +20,7 @@
 # pylint: disable=no-init
 
 
-from __future__ import unicode_literals
+from __future__ import unicode_literals, absolute_import
 
 import wtforms
 

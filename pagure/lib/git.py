@@ -7,7 +7,7 @@
    Pierre-Yves Chibon <pingou@pingoured.fr>
 
 """
-from __future__ import print_function, unicode_literals
+from __future__ import print_function, unicode_literals, absolute_import
 
 # pylint: disable=too-many-branches
 # pylint: disable=too-many-arguments

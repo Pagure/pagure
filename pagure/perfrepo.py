@@ -9,7 +9,7 @@
 
 """
 
-from __future__ import print_function, unicode_literals
+from __future__ import print_function, unicode_literals, absolute_import
 
 
 import pprint

@@ -8,7 +8,7 @@
 
 """
 
-from __future__ import unicode_literals
+from __future__ import unicode_literals, absolute_import
 
 from sqlalchemy import MetaData
 from sqlalchemy.ext.declarative import declarative_base

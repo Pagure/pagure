@@ -9,7 +9,7 @@
 
 """
 
-from __future__ import unicode_literals
+from __future__ import unicode_literals, absolute_import
 
 # pylint: disable=too-many-branches
 # pylint: disable=too-many-arguments
