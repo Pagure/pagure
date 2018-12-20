@@ -1,3 +1,12 @@
+# -*- coding: utf-8 -*-
+
+"""
+ (c) 2016 - Copyright Red Hat Inc
+
+ Authors:
+   Jeremy Cline <jeremy@jcline.org>
+
+"""
 
 from __future__ import unicode_literals, absolute_import
 
