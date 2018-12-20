@@ -205,9 +205,6 @@ class PagureRepoSpannerTests(tests.Modeltests):
                 stderr=subprocess.STDOUT,
             )
 
-            # Give repoSpanner time to start
-            time.sleep(1)
-
             # Wait for the instance to become available
             resp = requests.get(
                 'https://nodea.regiona.repospanner.local:%d/'

@@ -106,7 +106,6 @@ class PagureFlaskForkPrtests(tests.Modeltests):
                 # list of binary strings representing parents of the new commit
                 parents
             )
-            time.sleep(1)
 
         # Push to the main repo
         refname = 'refs/heads/master:refs/heads/master'
@@ -142,7 +141,6 @@ class PagureFlaskForkPrtests(tests.Modeltests):
                 # list of binary strings representing parents of the new commit
                 [last_commit.oid.hex]
             )
-            time.sleep(1)
         # Push to the main repo
         refname = 'refs/heads/master:refs/heads/master'
         ori_remote = clone_repo.remotes[0]
@@ -175,7 +173,6 @@ class PagureFlaskForkPrtests(tests.Modeltests):
             # list of binary strings representing parents of the new commit
             [last_commit.oid.hex]
         )
-        time.sleep(1)
 
         with open(os.path.join(repopath, 'sources'), 'w') as stream:
                 stream.write('foo\n bar\nbaz\n')
@@ -305,13 +302,10 @@ class PagureFlaskForkPrtests(tests.Modeltests):
         # we don't know the task id but we'll give it 30 sec to finish
         cnt = 0
         repo = PagureRepo(gitrepo)
-        while 1:
-            if 'refs/pull/1/head' in list(repo.listall_references()):
-                break
-            cnt += 1
-            if cnt == 60:
-                break
-            time.sleep(0.5)
+        self.assertIn(
+            'refs/pull/1/head',
+            list(repo.listall_references())
+        )
 
         self.assertTrue(cnt < 60)
 
@@ -348,13 +342,10 @@ class PagureFlaskForkPrtests(tests.Modeltests):
         # we don't know the task id but we'll give it 30 sec to finish
         cnt = 0
         repo = PagureRepo(gitrepo)
-        while 1:
-            if 'refs/pull/1/head' in list(repo.listall_references()):
-                break
-            cnt += 1
-            if cnt == 60:
-                break
-            time.sleep(0.5)
+        self.assertIn(
+            'refs/pull/1/head',
+            list(repo.listall_references())
+        )
 
         self.assertTrue(cnt < 60)
 
@@ -414,13 +405,10 @@ class PagureFlaskForkPrtests(tests.Modeltests):
         # we don't know the task id but we'll give it 30 sec to finish
         cnt = 0
         repo = PagureRepo(gitrepo)
-        while 1:
-            if 'refs/pull/1/head' in list(repo.listall_references()):
-                break
-            cnt += 1
-            if cnt == 60:
-                break
-            time.sleep(0.5)
+        self.assertIn(
+            'refs/pull/1/head',
+            list(repo.listall_references())
+        )
 
         self.assertTrue(cnt < 60)
 
@@ -461,13 +449,10 @@ class PagureFlaskForkPrtests(tests.Modeltests):
         # we don't know the task id but we'll give it 30 sec to finish
         cnt = 0
         repo = PagureRepo(gitrepo)
-        while 1:
-            if 'refs/pull/1/head' in list(repo.listall_references()):
-                break
-            cnt += 1
-            if cnt == 60:
-                break
-            time.sleep(0.5)
+        self.assertIn(
+            'refs/pull/1/head',
+            list(repo.listall_references())
+        )
 
         self.assertTrue(cnt < 60)
 
@@ -496,13 +481,10 @@ class PagureFlaskForkPrtests(tests.Modeltests):
         # we don't know the task id but we'll give it 30 sec to finish
         cnt = 0
         repo = PagureRepo(gitrepo)
-        while 1:
-            if 'refs/pull/1/head' in list(repo.listall_references()):
-                break
-            cnt += 1
-            if cnt == 60:
-                break
-            time.sleep(0.5)
+        self.assertIn(
+            'refs/pull/1/head',
+            list(repo.listall_references())
+        )
 
         self.assertTrue(cnt < 60)
 

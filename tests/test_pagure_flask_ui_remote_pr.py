@@ -92,7 +92,7 @@ class PagureRemotePRtests(tests.Modeltests):
             # list of binary strings representing parents of the new commit
             prev_commit
         )
-        time.sleep(1)
+        # time.sleep(1)
         refname = 'refs/heads/master:refs/heads/master'
         ori_remote = clone_repo.remotes[0]
         PagureRepo.push(ori_remote, refname)

@@ -2144,7 +2144,6 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
         output = self.app.get(js_data['url'])
         while output.status_code == 418:
-            time.sleep(0.5)
             output = self.app.get(js_data['url'])
         js_data2 = json.loads(output.get_data(as_text=True))
         self.assertTrue(js_data2['results'][3] > 1509110062)

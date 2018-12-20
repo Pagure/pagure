@@ -168,8 +168,6 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
         # Test reloading the JSON
         self.tearDown()
         self.setUp()
-        # Give the worker time to spawn
-        time.sleep(2)
         tests.create_projects(self.session)
 
         # Create repo

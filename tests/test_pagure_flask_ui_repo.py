@@ -2184,13 +2184,11 @@ class PagureFlaskRepotests(tests.Modeltests):
         tests.add_commit_git_repo(
             os.path.join(self.path, 'repos', 'test.git'), ncommits=1)
         c1 = repo.revparse_single('HEAD')
-        time.sleep(1)
 
         # Add another commit to git repo
         tests.add_commit_git_repo(
             os.path.join(self.path, 'repos', 'test.git'), ncommits=1)
         c2 = repo.revparse_single('HEAD')
-        time.sleep(1)
 
         # Add one more commit to git repo
         tests.add_commit_git_repo(
@@ -4912,20 +4910,9 @@ index 0000000..fb7093d
             folder = os.path.join(upload_dir, 'test')
             checksum_file = os.path.join(folder, 'CHECKSUMS')
 
-            # Wait for the worker to create the checksums file
-            cnt = 0
-            while not os.path.exists(checksum_file):
-                print(os.listdir(os.path.join(upload_dir, 'test')))
-                cnt += 1
-                if cnt == 40:
-                    raise ValueError(
-                        'The worker did not create the checksums file '
-                        'in a timely manner')
-                time.sleep(0.5)
-
-            self.assertEqual(len(os.listdir(folder)), 2)
-
+            # Check the checksums file
             self.assertTrue(os.path.exists(checksum_file))
+            self.assertEqual(len(os.listdir(folder)), 2)
 
             # Check the content of the checksums file
             with open(checksum_file) as stream:
@@ -4991,19 +4978,9 @@ index 0000000..fb7093d
             folder = os.path.join(upload_dir, 'test')
             checksum_file = os.path.join(folder, 'CHECKSUMS')
 
-            # Wait for the worker to create the checksums file
-            cnt = 0
-            while not os.path.exists(checksum_file):
-                cnt += 1
-                if cnt == 40:
-                    raise ValueError(
-                        'The worker did not create the checksums file '
-                        'in a timely manner')
-                time.sleep(0.5)
-
-            self.assertEqual(len(os.listdir(folder)), 3)
-
+            # Check the checksums file
             self.assertTrue(os.path.exists(checksum_file))
+            self.assertEqual(len(os.listdir(folder)), 3)
 
             # Check the content of the checksums file
             with open(checksum_file) as stream:
