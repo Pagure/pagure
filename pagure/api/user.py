@@ -112,7 +112,8 @@ def api_view_user(username):
           },
           "user": {
             "fullname": "ralph",
-            "name": "ralph"
+            "name": "ralph",
+            "avatar_url": "https://seccdn.libravatar.org/avatar/5dac3?s=16&d=retro"
           }
         }
 
@@ -172,6 +173,9 @@ def api_view_user(username):
     )
 
     output["user"] = user.to_json(public=True)
+    output["user"]["avatar_url"] = pagure.lib.query.avatar_url_from_email(
+        user.default_email, size=16
+    )
     output["repos"] = [repo.to_json(public=True) for repo in repos]
     output["forks"] = [repo.to_json(public=True) for repo in forks]
     output["repos_pagination"] = pagination_metadata_repo

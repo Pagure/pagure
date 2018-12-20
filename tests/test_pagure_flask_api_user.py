@@ -87,8 +87,11 @@ class PagureFlaskApiUSertests(tests.Modeltests):
               'pages': 0,
               'per_page': 20,
               'prev': None},
-            "user": { "fullname": "PY C", "name": "pingou"}}
+            "user": { "fullname": "PY C",
+                      "name": "pingou",
+                      'avatar_url': 'https://seccdn.libravatar.org/avatar/...'}}
         data = json.loads(output.get_data(as_text=True))
+        data["user"]["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         for k in ['forks_pagination', 'repos_pagination']:
             for k2 in ['first', 'last']:
                 self.assertIsNotNone(data[k][k2])
@@ -244,9 +247,11 @@ class PagureFlaskApiUSertests(tests.Modeltests):
               'prev': None},
             "user": {
                 "fullname": "PY C",
-                "name": "pingou"
+                "name": "pingou",
+                'avatar_url': 'https://seccdn.libravatar.org/avatar/...'
             }
         }
+        data["user"]["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertEqual(data, expected_data)
 
     @patch('pagure.lib.notify.send_email')
