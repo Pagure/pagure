@@ -10,9 +10,6 @@
 
 from __future__ import unicode_literals, absolute_import
 
-__requires__ = ['SQLAlchemy >= 0.7']
-import pkg_resources
-
 import imp
 import json
 import logging
