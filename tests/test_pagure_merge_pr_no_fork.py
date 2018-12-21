@@ -36,22 +36,25 @@ class PagureMergePrNoForkTest(tests.Modeltests):
         super(PagureMergePrNoForkTest, self).setUp()
 
         tests.create_projects(self.session)
-        tests.create_projects_git(
-            os.path.join(self.path, "repos"),
-            bare=True
-        )
         tests.add_content_git_repo(
             os.path.join(self.path, "repos", "test.git"))
-        tests.create_projects(
-            self.session,
-            is_fork=True,
-            hook_token_suffix='fork')
-        tests.create_projects_git(
-            os.path.join(self.path, "repos", "forks", "pingou"),
-            bare=True
+
+        # Fork
+        project = pagure.lib.query.get_authorized_project(
+            self.session, 'test')
+        task = pagure.lib.query.fork_project(
+            session=self.session,
+            user='pingou',
+            repo=project,
         )
-        tests.add_content_git_repo(
-            os.path.join(self.path, "repos", "forks", "pingou", "test.git"))
+        self.session.commit()
+        self.assertEqual(
+            task.get(),
+            {'endpoint': 'ui_ns.view_repo',
+             'repo': 'test',
+             'namespace': None,
+             'username': 'pingou'})
+
         tests.add_readme_git_repo(
             os.path.join(self.path, "repos", "forks", "pingou", "test.git"))
         project = pagure.lib.query.get_authorized_project(
