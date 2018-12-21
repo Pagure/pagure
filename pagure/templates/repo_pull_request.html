@@ -382,7 +382,6 @@
     <div class="col-md-8">
     {{ show_pr_initial_comment(pull_request, repo, form, username) }}
     <section class="request_comment" >
-    {% if pull_request.comments %}
       <form action="{{ url_for('ui_ns.pull_request_drop_comment',
             repo=repo.name,
             username=username,
@@ -391,6 +390,7 @@
           }}" method="post" id="request_comment"
           onsubmit="return try_async_comment(this, null)">
 
+    {% if pull_request.comments %}
       {% for comment in pull_request.comments %}
         {% if comment.commit_id %}
         {{ show_comment(comment, comment.id, repo, username,
@@ -412,8 +412,8 @@
         {% endif %}
       {% endfor %}
       {{ mergeform.csrf_token }}
-      </form>
     {% endif %}
+      </form>
     </section>
 
     {% if g.authenticated and mergeform %}
