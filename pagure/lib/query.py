@@ -1939,6 +1939,8 @@ def new_pull_request(
     )
 
     # Send notification to the CI server
+    ci_hook = pagure.lib.plugins.get_plugin("Pagure CI")
+    ci_hook.db_object()
     if (
         pagure_config.get("PAGURE_CI_SERVICES")
         and request.project.ci_hook
