@@ -7,7 +7,6 @@ from __future__ import print_function, unicode_literals, absolute_import
 
 import argparse
 import os
-import sys
 import tempfile
 import pygit2
 import shutil
@@ -45,7 +44,7 @@ def init_database():
         acls=_config.get('ACLS', {}),
         debug=True)
 
-    engine = pagure.lib.query.create_engine('%s' % DB_URL, echo=True)
+    engine = create_engine('%s' % DB_URL, echo=True)
 
     metadata = MetaData(engine)
     metadata.reflect(bind=engine)
@@ -595,7 +594,7 @@ if __name__ == "__main__":
         empty_dev_db(meta, eng)
 
     if args.populate or args.all:
-        session = create_session(_config['DB_URL'])
+        session = pagure.lib.query.create_session(_config['DB_URL'])
         invalid_option = ['pingou', 'bar@pingou.com', 'foo', 'foo@bar.com']
         print("")
         user_name = six.moves.input(
