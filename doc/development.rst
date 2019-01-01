@@ -277,7 +277,7 @@ local pagure instance.
 
 * Install the dependencies::
 
-     pip install -r tests_requirements.txt
+     pip install -r requirements-testing.txt
 
 * Run it::
 

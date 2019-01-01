@@ -113,7 +113,7 @@
   with_items:
     - "requirements.txt"
     - "requirements-ev.txt"
-    - "tests_requirements.txt"
+    - "requirements-testing.txt"
 
 - name: Install Pagure Python dependencies into a python3 virtualenv
   become_user: "{{ ansible_env.SUDO_USER }}"
@@ -124,7 +124,7 @@
   with_items:
     - "requirements.txt"
     - "requirements-ev.txt"
-    - "tests_requirements.txt"
+    - "requirements-testing.txt"
 
 - name: Install Pagure package into a virtualenv
   become_user: "{{ ansible_env.SUDO_USER }}"

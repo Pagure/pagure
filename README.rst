@@ -250,7 +250,7 @@ This will launch the application at http://127.0.0.1:5000
 
   * Install the dependencies::
 
-      pip install -r tests_requirements.txt
+      pip install -r requirements-testing.txt
 
   * Run it::
 
