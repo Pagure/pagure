@@ -1370,6 +1370,81 @@ class PagureFlaskApiForktests(tests.Modeltests):
         )
 
     @patch('pagure.lib.notify.send_email')
+    def test_api_pull_request_merge_conflicting(self, send_email):
+        """ Test the api_pull_request_merge method of the flask api. """
+        send_email.return_value = True
+
+        tests.create_projects(self.session)
+        tests.add_content_git_repo(
+            os.path.join(self.path, "repos", "test.git"))
+
+        # Fork
+        project = pagure.lib.query.get_authorized_project(
+            self.session, 'test')
+        task = pagure.lib.query.fork_project(
+            session=self.session,
+            user='pingou',
+            repo=project,
+        )
+        self.session.commit()
+        self.assertEqual(
+            task.get(),
+            {'endpoint': 'ui_ns.view_repo',
+             'repo': 'test',
+             'namespace': None,
+             'username': 'pingou'})
+
+        # Add content to the fork
+        tests.add_content_to_git(
+            os.path.join(self.path, "repos", "forks", "pingou", "test.git"),
+            filename="foobar", content="content from the fork")
+
+        # Add content to the main repo, so they conflict
+        tests.add_content_to_git(
+            os.path.join(self.path, "repos", "test.git"),
+            filename="foobar", content="content from the main repo")
+
+        project = pagure.lib.query.get_authorized_project(
+            self.session, 'test')
+        fork = pagure.lib.query.get_authorized_project(
+            self.session,
+            'test',
+            user='pingou',
+        )
+
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        # Create the pull-request to close
+        req = pagure.lib.query.new_pull_request(
+            session=self.session,
+            repo_from=fork,
+            branch_from='master',
+            repo_to=project,
+            branch_to='master',
+            title='test pull-request',
+            user='pingou',
+        )
+        self.session.commit()
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'test pull-request')
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # Merge PR
+        output = self.app.post(
+            '/api/0/test/pull-request/1/merge', headers=headers)
+        self.assertEqual(output.status_code, 409)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                'error': 'This pull-request conflicts and thus cannot be merged',
+                'error_code': 'EPRCONFLICTS'
+            }
+        )
+
+    @patch('pagure.lib.notify.send_email')
     def test_api_pull_request_merge_user_token(self, send_email):
         """ Test the api_pull_request_merge method of the flask api. """
         send_email.return_value = True

@@ -235,7 +235,7 @@ class PagureFlaskApitests(tests.SimplePagureTest):
         output = self.app.get('/api/0/-/error_codes')
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
-        self.assertEqual(len(data), 33)
+        self.assertEqual(len(data), 34)
         self.assertEqual(
             sorted(data.keys()),
             [
@@ -248,8 +248,9 @@ class PagureFlaskApitests(tests.SimplePagureTest):
                 u'ENOISSUE', u'ENOPRCLOSE', u'ENOPROJECT', u'ENOPROJECTS',
                 u'ENOPRSTATS', u'ENOREQ', u'ENOSIGNEDOFF', u'ENOTASSIGNED',
                 u'ENOTASSIGNEE', u'ENOTHIGHENOUGH', u'ENOTMAINADMIN',
-                u'ENOUSER', u'EPRSCORE', u'EPULLREQUESTSDISABLED',
-                u'ETIMESTAMP', u'ETRACKERDISABLED', u'ETRACKERREADONLY'
+                u'ENOUSER', u'EPRCONFLICTS', u'EPRSCORE',
+                u'EPULLREQUESTSDISABLED', u'ETIMESTAMP', u'ETRACKERDISABLED',
+                u'ETRACKERREADONLY'
             ]
         )
 

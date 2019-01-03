@@ -498,8 +498,13 @@ def api_pull_request_merge(repo, requestid, username=None, namespace=None):
     output = {"message": "Merging queued", "taskid": task.id}
 
     if get_request_data().get("wait", True):
-        task.get()
-        output = {"message": "Changes merged!"}
+        try:
+            task.get()
+            output = {"message": "Changes merged!"}
+        except pagure.exceptions.PagureException:
+            raise pagure.exceptions.APIError(
+                409, error_code=APIERROR.EPRCONFLICTS
+            )
 
     jsonout = flask.jsonify(output)
     return jsonout
