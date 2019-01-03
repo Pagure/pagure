@@ -921,6 +921,129 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         self.assertEqual(data['args']['page'], 2)
 
     @patch('pagure.lib.notify.send_email')
+    def test_api_view_user_requests_filed_created(self, mockemail):
+        """ Test the api_view_user_requests_filed method of the flask user
+        api with the created parameter """
+
+        today = datetime.datetime.utcnow().date()
+        output = self.app.get(
+            '/api/0/user/pingou/requests/filed?status=all&created=%s' % (
+                today.isoformat()))
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(len(data['requests']), 6)
+
+        yesterday = today - datetime.timedelta(days=1)
+        output = self.app.get(
+            '/api/0/user/pingou/requests/filed?status=all&created=%s' % (
+                yesterday.isoformat()))
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(len(data['requests']), 6)
+
+        tomorrow = today + datetime.timedelta(days=1)
+        output = self.app.get(
+            '/api/0/user/pingou/requests/filed?status=all&created=%s' % (
+                tomorrow.isoformat()))
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(len(data['requests']), 0)
+
+        output = self.app.get(
+            '/api/0/user/pingou/requests/filed?status=all&created=..%s' % (
+                today.isoformat()))
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(len(data['requests']), 0)
+
+        output = self.app.get(
+            '/api/0/user/pingou/requests/filed?status=all&created=..%s' % (
+                yesterday.isoformat()))
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(len(data['requests']), 0)
+
+        thedaybefore = today - datetime.timedelta(days=1)
+        output = self.app.get(
+            '/api/0/user/pingou/requests/filed?status=all&created=..%s' % (
+                thedaybefore.isoformat()))
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(len(data['requests']), 0)
+
+        output = self.app.get(
+            '/api/0/user/pingou/requests/filed?status=all&created=..%s' % (
+                tomorrow.isoformat()))
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(len(data['requests']), 6)
+
+        output = self.app.get(
+            '/api/0/user/pingou/requests/filed?status=all&created=%s..%s' % (
+                thedaybefore.isoformat(), tomorrow.isoformat()))
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(len(data['requests']), 6)
+
+    @patch('pagure.lib.notify.send_email')
+    def test_api_view_user_requests_filed_updated(self, mockemail):
+        """ Test the api_view_user_requests_filed method of the flask user
+        api with the created parameter """
+
+        today = datetime.datetime.utcnow().date()
+        output = self.app.get(
+            '/api/0/user/pingou/requests/filed?status=all&updated=%s' % (
+                today.isoformat()))
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(len(data['requests']), 0)
+
+        yesterday = today - datetime.timedelta(days=1)
+        output = self.app.get(
+            '/api/0/user/pingou/requests/filed?status=all&updated=%s' % (
+                yesterday.isoformat()))
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(len(data['requests']), 0)
+
+        tomorrow = today + datetime.timedelta(days=1)
+        output = self.app.get(
+            '/api/0/user/pingou/requests/filed?status=all&updated=%s' % (
+                tomorrow.isoformat()))
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(len(data['requests']), 6)
+
+    @patch('pagure.lib.notify.send_email')
+    def test_api_view_user_requests_filed_closed(self, mockemail):
+        """ Test the api_view_user_requests_filed method of the flask user
+        api with the created parameter """
+
+        today = datetime.datetime.utcnow().date()
+        output = self.app.get(
+            '/api/0/user/pingou/requests/filed?status=all&closed=%s' % (
+                today.isoformat()))
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(len(data['requests']), 0)
+
+        yesterday = today - datetime.timedelta(days=1)
+        output = self.app.get(
+            '/api/0/user/pingou/requests/filed?status=all&closed=%s' % (
+                yesterday.isoformat()))
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(len(data['requests']), 0)
+
+        tomorrow = today + datetime.timedelta(days=1)
+        output = self.app.get(
+            '/api/0/user/pingou/requests/filed?status=all&closed=%s' % (
+                tomorrow.isoformat()))
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(len(data['requests']), 0)
+
+    @patch('pagure.lib.notify.send_email')
     def test_api_view_user_requests_filed_foo(self, mockemail):
         """ Test the api_view_user_requests_filed method of the flask user
         api """
@@ -1109,6 +1232,130 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
             sorted(data.keys()),
             [u'args', u'pagination', u'requests', u'total_requests'])
         self.assertEqual(data['args']['page'], 2)
+
+
+    @patch('pagure.lib.notify.send_email')
+    def test_api_view_user_requests_actionable_created(self, mockemail):
+        """ Test the api_view_user_requests_filed method of the flask user
+        api with the created parameter """
+
+        today = datetime.datetime.utcnow().date()
+        output = self.app.get(
+            '/api/0/user/pingou/requests/actionable?status=all&created=%s' % (
+                today.isoformat()))
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(len(data['requests']), 6)
+
+        yesterday = today - datetime.timedelta(days=1)
+        output = self.app.get(
+            '/api/0/user/pingou/requests/actionable?status=all&created=%s' % (
+                yesterday.isoformat()))
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(len(data['requests']), 6)
+
+        tomorrow = today + datetime.timedelta(days=1)
+        output = self.app.get(
+            '/api/0/user/pingou/requests/actionable?status=all&created=%s' % (
+                tomorrow.isoformat()))
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(len(data['requests']), 0)
+
+        output = self.app.get(
+            '/api/0/user/pingou/requests/actionable?status=all&created=..%s' % (
+                today.isoformat()))
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(len(data['requests']), 0)
+
+        output = self.app.get(
+            '/api/0/user/pingou/requests/actionable?status=all&created=..%s' % (
+                yesterday.isoformat()))
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(len(data['requests']), 0)
+
+        thedaybefore = today - datetime.timedelta(days=1)
+        output = self.app.get(
+            '/api/0/user/pingou/requests/actionable?status=all&created=..%s' % (
+                thedaybefore.isoformat()))
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(len(data['requests']), 0)
+
+        output = self.app.get(
+            '/api/0/user/pingou/requests/actionable?status=all&created=..%s' % (
+                tomorrow.isoformat()))
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(len(data['requests']), 6)
+
+        output = self.app.get(
+            '/api/0/user/pingou/requests/actionable?status=all&created=%s..%s' % (
+                thedaybefore.isoformat(), tomorrow.isoformat()))
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(len(data['requests']), 6)
+
+    @patch('pagure.lib.notify.send_email')
+    def test_api_view_user_requests_actionable_updated(self, mockemail):
+        """ Test the api_view_user_requests_filed method of the flask user
+        api with the created parameter """
+
+        today = datetime.datetime.utcnow().date()
+        output = self.app.get(
+            '/api/0/user/pingou/requests/actionable?status=all&updated=%s' % (
+                today.isoformat()))
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(len(data['requests']), 0)
+
+        yesterday = today - datetime.timedelta(days=1)
+        output = self.app.get(
+            '/api/0/user/pingou/requests/actionable?status=all&updated=%s' % (
+                yesterday.isoformat()))
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(len(data['requests']), 0)
+
+        tomorrow = today + datetime.timedelta(days=1)
+        output = self.app.get(
+            '/api/0/user/pingou/requests/actionable?status=all&updated=%s' % (
+                tomorrow.isoformat()))
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(len(data['requests']), 6)
+
+    @patch('pagure.lib.notify.send_email')
+    def test_api_view_user_requests_actionable_closed(self, mockemail):
+        """ Test the api_view_user_requests_filed method of the flask user
+        api with the created parameter """
+
+        today = datetime.datetime.utcnow().date()
+        output = self.app.get(
+            '/api/0/user/pingou/requests/actionable?status=all&closed=%s' % (
+                today.isoformat()))
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(len(data['requests']), 0)
+
+        yesterday = today - datetime.timedelta(days=1)
+        output = self.app.get(
+            '/api/0/user/pingou/requests/actionable?status=all&closed=%s' % (
+                yesterday.isoformat()))
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(len(data['requests']), 0)
+
+        tomorrow = today + datetime.timedelta(days=1)
+        output = self.app.get(
+            '/api/0/user/pingou/requests/actionable?status=all&closed=%s' % (
+                tomorrow.isoformat()))
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(len(data['requests']), 0)
 
 
 class PagureFlaskApiUsertestissues(tests.Modeltests):

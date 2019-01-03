@@ -10,6 +10,7 @@
 
 from __future__ import unicode_literals, absolute_import
 
+import datetime
 import logging
 import logging.config
 import os
@@ -22,7 +23,11 @@ import pygit2
 import six
 import werkzeug
 
-from pagure.exceptions import PagureException
+from pagure.exceptions import (
+    PagureException,
+    InvalidTimestampException,
+    InvalidDateformatException,
+)
 from pagure.config import config as pagure_config
 
 
@@ -654,6 +659,49 @@ def is_true(value, trueish=("1", "true", "t", "y")):
     else:
         value = str(value)
     return value.strip().lower() in trueish
+
+
+def validate_date(input_date, allow_empty=False):
+    """ Validate a given time.
+    The time can either be given as an unix timestamp or using the
+    yyyy-mm-dd format.
+    If either fail to parse, we raise a 400 error
+    """
+    if allow_empty and input_date == "":
+        return None
+    # Validate and convert the time
+    if input_date.isdigit():
+        # We assume its a timestamp, so convert it to datetime
+        try:
+            output_date = datetime.datetime.fromtimestamp(int(input_date))
+        except ValueError:
+            raise InvalidTimestampException()
+    else:
+        # We assume datetime format, so validate it
+        try:
+            output_date = datetime.datetime.strptime(input_date, "%Y-%m-%d")
+        except ValueError:
+            raise InvalidDateformatException()
+
+    return output_date
+
+
+def validate_date_range(value):
+    """ Validate a given date range specified using the format since..until.
+    If .. is not present in the range, it is assumed that only since was
+    provided.
+    """
+    since = until = None
+    if value is not None:
+        if ".." in value:
+            since, _, until = value.partition("..")
+        else:
+            since = value
+        if since is not None:
+            since = validate_date(since, allow_empty=True)
+        if until is not None:
+            until = validate_date(until, allow_empty=True)
+    return (since, until)
 
 
 def get_merge_options(request, merge_status):

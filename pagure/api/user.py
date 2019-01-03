@@ -21,7 +21,7 @@ import pagure
 import pagure.exceptions
 import pagure.lib.query
 from pagure.api import API, api_method, APIERROR, get_page, get_per_page
-from pagure.utils import is_true
+from pagure.utils import is_true, validate_date, validate_date_range
 
 
 def _get_user(username):
@@ -414,23 +414,7 @@ def api_view_user_issues(username):
 
     updated_after = None
     if since:
-        # Validate and convert the time
-        if since.isdigit():
-            # We assume its a timestamp, so convert it to datetime
-            try:
-                updated_after = datetime.datetime.fromtimestamp(int(since))
-            except ValueError:
-                raise pagure.exceptions.APIError(
-                    400, error_code=APIERROR.ETIMESTAMP
-                )
-        else:
-            # We assume datetime format, so validate it
-            try:
-                updated_after = datetime.datetime.strptime(since, "%Y-%m-%d")
-            except ValueError:
-                raise pagure.exceptions.APIError(
-                    400, error_code=APIERROR.EDATETIME
-                )
+        updated_after = validate_date(since)
 
     params.update({"updated_after": updated_after})
 
@@ -755,32 +739,65 @@ def api_view_user_requests_filed(username):
     Parameters
     ^^^^^^^^^^
 
-    +---------------+----------+--------------+----------------------------+
-    | Key           | Type     | Optionality  | Description                |
-    +===============+==========+==============+============================+
-    | ``username``  | string   | Mandatory    | | The username of the user |
-    |               |          |              |   whose activity you are   |
-    |               |          |              |   interested in.           |
-    +---------------+----------+--------------+----------------------------+
-    | ``status``    | string   | Optional     | | Filter the status of     |
-    |               |          |              |   pull requests. Default:  |
-    |               |          |              |   ``Open`` (open pull      |
-    |               |          |              |   requests), can be        |
-    |               |          |              |   ``Closed`` for closed    |
-    |               |          |              |   requests, ``Merged``     |
-    |               |          |              |   for merged requests, or  |
-    |               |          |              |   ``Open`` for open        |
-    |               |          |              |   requests.                |
-    |               |          |              |   ``All`` returns closed,  |
-    |               |          |              |   merged and open requests.|
-    +---------------+----------+--------------+----------------------------+
-    | ``page``      | integer  | Mandatory    | | The page requested.      |
-    |               |          |              |   Defaults to 1.           |
-    +---------------+----------+--------------+----------------------------+
-    | ``per_page``  | int      | Optional     | | The number of items  to  |
-    |               |          |              |   return per page.         |
-    |               |          |              |   The maximum is 100.      |
-    +---------------+----------+--------------+----------------------------+
+    +---------------+----------+--------------+-----------------------------+
+    | Key           | Type     | Optionality  | Description                 |
+    +===============+==========+==============+=============================+
+    | ``username``  | string   | Mandatory    | | The username of the user  |
+    |               |          |              |   whose activity you are    |
+    |               |          |              |   interested in.            |
+    +---------------+----------+--------------+-----------------------------+
+    | ``status``    | string   | Optional     | | Filter the status of      |
+    |               |          |              |   pull requests. Default:   |
+    |               |          |              |   ``Open`` (open pull       |
+    |               |          |              |   requests), can be         |
+    |               |          |              |   ``Closed`` for closed     |
+    |               |          |              |   requests, ``Merged``      |
+    |               |          |              |   for merged requests, or   |
+    |               |          |              |   ``Open`` for open         |
+    |               |          |              |   requests.                 |
+    |               |          |              |   ``All`` returns closed,   |
+    |               |          |              |   merged and open requests. |
+    +---------------+----------+--------------+-----------------------------+
+    | ``created``   | string   | Optional     | | Filter the pull-requests  |
+    |               |          |              |   returned by their creation|
+    |               |          |              |   date. The date can be of  |
+    |               |          |              |   specified either using    |
+    |               |          |              |   a timestamp format or     |
+    |               |          |              |   using the iso format for  |
+    |               |          |              |   dates: yyyy-mm-dd.        |
+    |               |          |              |   You can specify a start   |
+    |               |          |              |   and a end date to this    |
+    |               |          |              |   filter using start..end.  |
+    +---------------+----------+--------------+-----------------------------+
+    | ``updated``   | string   | Optional     | | Filter the pull-requests  |
+    |               |          |              |   returned by their update  |
+    |               |          |              |   date. The date can be of  |
+    |               |          |              |   specified either using    |
+    |               |          |              |   a timestamp format or     |
+    |               |          |              |   using the iso format for  |
+    |               |          |              |   dates: yyyy-mm-dd.        |
+    |               |          |              |   You can specify a start   |
+    |               |          |              |   and a end date to this    |
+    |               |          |              |   filter using start..end.  |
+    +---------------+----------+--------------+-----------------------------+
+    | ``closed``    | string   | Optional     | | Filter the pull-requests  |
+    |               |          |              |   returned by their closing |
+    |               |          |              |   date. The date can be of  |
+    |               |          |              |   specified either using    |
+    |               |          |              |   a timestamp format or     |
+    |               |          |              |   using the iso format for  |
+    |               |          |              |   dates: yyyy-mm-dd.        |
+    |               |          |              |   You can specify a start   |
+    |               |          |              |   and a end date to this    |
+    |               |          |              |   filter using start..end.  |
+    +---------------+----------+--------------+-----------------------------+
+    | ``page``      | integer  | Mandatory    | | The page requested.       |
+    |               |          |              |   Defaults to 1.            |
+    +---------------+----------+--------------+-----------------------------+
+    | ``per_page``  | int      | Optional     | | The number of items  to   |
+    |               |          |              |   return per page.          |
+    |               |          |              |   The maximum is 100.       |
+    +---------------+----------+--------------+-----------------------------+
 
 
     Sample response
@@ -793,6 +810,9 @@ def api_view_user_requests_filed(username):
             "status": "open",
             "username": "dudemcpants",
             "page": 1,
+            "created": null,
+            "updated": null,
+            "closed": null,
           },
           "pagination": {
             "first": "http://localhost:5000/api/0/user/dudemcpants/requests/filed?per_page=1&page=1",
@@ -931,6 +951,18 @@ def api_view_user_requests_filed(username):
 
     """  # noqa
     status = flask.request.args.get("status", "open")
+    created = flask.request.args.get("created")
+    updated = flask.request.args.get("updated")
+    closed = flask.request.args.get("closed")
+
+    try:
+        created_since, created_until = validate_date_range(created)
+        updated_since, updated_until = validate_date_range(updated)
+        closed_since, closed_until = validate_date_range(closed)
+    except pagure.exceptions.InvalidTimestampException:
+        raise pagure.exceptions.APIError(400, error_code=APIERROR.ETIMESTAMP)
+    except pagure.exceptions.InvalidDateformatException:
+        raise pagure.exceptions.APIError(400, error_code=APIERROR.EDATETIME)
 
     page = get_page()
     per_page = get_per_page()
@@ -948,6 +980,12 @@ def api_view_user_requests_filed(username):
         username=username,
         status=status,
         filed=username,
+        created_since=created_since,
+        created_until=created_until,
+        updated_since=updated_since,
+        updated_until=updated_until,
+        closed_since=closed_since,
+        closed_until=closed_until,
         count=True,
     )
     pagination = pagure.lib.query.get_pagination_metadata(
@@ -959,6 +997,12 @@ def api_view_user_requests_filed(username):
         username=username,
         status=status,
         filed=username,
+        created_since=created_since,
+        created_until=created_until,
+        updated_since=updated_since,
+        updated_until=updated_until,
+        closed_since=closed_since,
+        closed_until=closed_until,
         offset=offset,
         limit=limit,
     )
@@ -975,6 +1019,9 @@ def api_view_user_requests_filed(username):
                 "username": username,
                 "status": orig_status,
                 "page": page,
+                "created": created,
+                "updated": updated,
+                "closed": closed,
             },
             "pagination": pagination,
         }
@@ -1002,28 +1049,61 @@ def api_view_user_requests_actionable(username):
     Parameters
     ^^^^^^^^^^
 
-    +---------------+----------+--------------+----------------------------+
-    | Key           | Type     | Optionality  | Description                |
-    +===============+==========+==============+============================+
-    | ``username``  | string   | Mandatory    | | The username of the user |
-    |               |          |              |   whose activity you are   |
-    |               |          |              |   interested in.           |
-    +---------------+----------+--------------+----------------------------+
-    | ``page``      | integer  | Mandatory    | | The page requested.      |
-    |               |          |              |   Defaults to 1.           |
-    +---------------+----------+--------------+----------------------------+
-    | ``status``    | string   | Optional     | | Filter the status of     |
-    |               |          |              |   pull requests. Default:  |
-    |               |          |              |   ``Open`` (open pull      |
-    |               |          |              |   requests), can be        |
-    |               |          |              |   ``Closed`` for closed    |
-    |               |          |              |   requests, ``Merged``     |
-    |               |          |              |   for merged requests, or  |
-    |               |          |              |   ``Open`` for open        |
-    |               |          |              |   requests.                |
-    |               |          |              |   ``All`` returns closed,  |
-    |               |          |              |   merged and open requests.|
-    +---------------+----------+--------------+----------------------------+
+    +---------------+----------+--------------+-----------------------------+
+    | Key           | Type     | Optionality  | Description                 |
+    +===============+==========+==============+=============================+
+    | ``username``  | string   | Mandatory    | | The username of the user  |
+    |               |          |              |   whose activity you are    |
+    |               |          |              |   interested in.            |
+    +---------------+----------+--------------+-----------------------------+
+    | ``created``   | string   | Optional     | | Filter the pull-requests  |
+    |               |          |              |   returned by their creation|
+    |               |          |              |   date. The date can be of  |
+    |               |          |              |   specified either using    |
+    |               |          |              |   a timestamp format or     |
+    |               |          |              |   using the iso format for  |
+    |               |          |              |   dates: yyyy-mm-dd.        |
+    |               |          |              |   You can specify a start   |
+    |               |          |              |   and a end date to this    |
+    |               |          |              |   filter using start..end.  |
+    +---------------+----------+--------------+-----------------------------+
+    | ``updated``   | string   | Optional     | | Filter the pull-requests  |
+    |               |          |              |   returned by their update  |
+    |               |          |              |   date. The date can be of  |
+    |               |          |              |   specified either using    |
+    |               |          |              |   a timestamp format or     |
+    |               |          |              |   using the iso format for  |
+    |               |          |              |   dates: yyyy-mm-dd.        |
+    |               |          |              |   You can specify a start   |
+    |               |          |              |   and a end date to this    |
+    |               |          |              |   filter using start..end.  |
+    +---------------+----------+--------------+-----------------------------+
+    | ``closed``    | string   | Optional     | | Filter the pull-requests  |
+    |               |          |              |   returned by their closing |
+    |               |          |              |   date. The date can be of  |
+    |               |          |              |   specified either using    |
+    |               |          |              |   a timestamp format or     |
+    |               |          |              |   using the iso format for  |
+    |               |          |              |   dates: yyyy-mm-dd.        |
+    |               |          |              |   You can specify a start   |
+    |               |          |              |   and a end date to this    |
+    |               |          |              |   filter using start..end.  |
+    +---------------+----------+--------------+-----------------------------+
+    | ``page``      | integer  | Mandatory    | | The page requested.       |
+    |               |          |              |   Defaults to 1.            |
+    +---------------+----------+--------------+-----------------------------+
+    | ``status``    | string   | Optional     | | Filter the status of      |
+    |               |          |              |   pull requests. Default:   |
+    |               |          |              |   ``Open`` (open pull       |
+    |               |          |              |   requests), can be         |
+    |               |          |              |   ``Closed`` for closed     |
+    |               |          |              |   requests, ``Merged``      |
+    |               |          |              |   for merged requests, or   |
+    |               |          |              |   ``Open`` for open         |
+    |               |          |              |   requests.                 |
+    |               |          |              |   ``All`` returns closed,   |
+    |               |          |              |   merged and open requests. |
+    +---------------+----------+--------------+-----------------------------+
 
     Sample response
     ^^^^^^^^^^^^^^^
@@ -1035,6 +1115,9 @@ def api_view_user_requests_actionable(username):
             "status": "open",
             "username": "ryanlerch",
             "page": 1,
+            "created": null,
+            "updated": null,
+            "closed": null,
           },
           "pagination": {
             "first": "http://localhost:5000/api/0/user/ryanlerch/requests/actionable?per_page=1&page=1",
@@ -1173,6 +1256,18 @@ def api_view_user_requests_actionable(username):
 
     """  # noqa
     status = flask.request.args.get("status", "open")
+    created = flask.request.args.get("created")
+    updated = flask.request.args.get("updated")
+    closed = flask.request.args.get("closed")
+
+    try:
+        created_since, created_until = validate_date_range(created)
+        updated_since, updated_until = validate_date_range(updated)
+        closed_since, closed_until = validate_date_range(closed)
+    except pagure.exceptions.InvalidTimestampException:
+        raise pagure.exceptions.APIError(400, error_code=APIERROR.ETIMESTAMP)
+    except pagure.exceptions.InvalidDateformatException:
+        raise pagure.exceptions.APIError(400, error_code=APIERROR.EDATETIME)
 
     page = get_page()
     per_page = get_per_page()
@@ -1190,6 +1285,12 @@ def api_view_user_requests_actionable(username):
         username=username,
         status=status,
         actionable=username,
+        created_since=created_since,
+        created_until=created_until,
+        updated_since=updated_since,
+        updated_until=updated_until,
+        closed_since=closed_since,
+        closed_until=closed_until,
         count=True,
     )
     pagination = pagure.lib.query.get_pagination_metadata(
@@ -1201,6 +1302,12 @@ def api_view_user_requests_actionable(username):
         username=username,
         status=status,
         actionable=username,
+        created_since=created_since,
+        created_until=created_until,
+        updated_since=updated_since,
+        updated_until=updated_until,
+        closed_since=closed_since,
+        closed_until=closed_until,
         offset=offset,
         limit=limit,
     )
@@ -1217,6 +1324,9 @@ def api_view_user_requests_actionable(username):
                 "username": username,
                 "status": orig_status,
                 "page": page,
+                "created": created,
+                "updated": updated,
+                "closed": closed,
             },
             "pagination": pagination,
         }

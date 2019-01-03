@@ -4359,6 +4359,12 @@ def get_pull_request_of_user(
     actionable=None,
     offset=None,
     limit=None,
+    created_since=None,
+    created_until=None,
+    updated_since=None,
+    updated_until=None,
+    closed_since=None,
+    closed_until=None,
     count=False,
 ):
     """List the opened pull-requests of an user.
@@ -4455,6 +4461,21 @@ def get_pull_request_of_user(
             model.PullRequest.user_id == model.User.id,
             model.User.user != actionable,
         )
+
+    if created_since:
+        query = query.filter(model.PullRequest.date_created >= created_since)
+    if created_until:
+        query = query.filter(model.PullRequest.date_created <= created_until)
+
+    if updated_since:
+        query = query.filter(model.PullRequest.updated_on <= updated_since)
+    if updated_until:
+        query = query.filter(model.PullRequest.updated_on <= updated_until)
+
+    if closed_since:
+        query = query.filter(model.PullRequest.closed_at <= closed_since)
+    if closed_until:
+        query = query.filter(model.PullRequest.closed_at <= closed_until)
 
     if offset:
         query = query.offset(offset)

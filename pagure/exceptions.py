@@ -117,3 +117,15 @@ class PagurePushDenied(PagureException):
     """ Exception raised if a remote hook rejected a push """
 
     pass
+
+
+class InvalidTimestampException(PagureException):
+    """ Exception raised when the hook is inactive. """
+
+    pass
+
+
+class InvalidDateformatException(PagureException):
+    """ Exception raised when the hook is inactive. """
+
+    pass
