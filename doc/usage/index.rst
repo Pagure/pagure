@@ -49,6 +49,7 @@ Contents:
    project_acls
    roadmap
    flags
+   magic_words
    using_doc
    using_webhooks
    ticket_templates
