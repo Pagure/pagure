@@ -30,6 +30,7 @@ The recognized keywords are:
 - relate/related/relates
 - merge/merges/merged
 - close/closes/closed
+- resolve/resolves/resolved
 
 Examples:
 

@@ -275,6 +275,12 @@ class PagureLibLinktests(tests.Modeltests):
         project_match(
             'Fixes: http://localhost.localdomain/fedpkg/issue/220',
             ('/fedpkg/issue/220',))
+        project_match(
+            'resolved: http://localhost.localdomain/fork/pingou/test/issue/1234#foo',
+            ('/fork/pingou/test/issue/1234',))
+        project_match(
+            'resolve http://localhost.localdomain/fork/pingou/test/issue/1234#foo',
+            ('/fork/pingou/test/issue/1234',))
 
         # issue matches
         def issue_match(text, issue):
@@ -294,6 +300,15 @@ class PagureLibLinktests(tests.Modeltests):
         issue_match('Merge #137', '137')
         issue_match('Merges #137', '137')
         issue_match('Merges: #137', '137')
+        issue_match('resolve #137', '137')
+        issue_match('Resolves #137', '137')
+        issue_match('RESOLVED: #137', '137')
+        issue_match(
+            'Fixes: http://localhost.localdomain/fedpkg/issue/220',
+            '/fedpkg/issue/220')
+        issue_match(
+            'Resolved: http://localhost.localdomain/fedpkg/issue/222',
+            '/fedpkg/issue/222')
 
         # no match
         def no_match(text):
