@@ -2775,6 +2775,12 @@ def search_issues(
     custom_search=None,
     updated_after=None,
     no_milestones=None,
+    created_since=None,
+    created_until=None,
+    updated_since=None,
+    updated_until=None,
+    closed_since=None,
+    closed_until=None,
     order="desc",
     order_key=None,
 ):
@@ -2989,6 +2995,21 @@ def search_issues(
     elif no_milestones is False:
         # Asking for all ticket with a milestone
         query = query.filter(model.Issue.milestone.isnot(None))
+
+    if created_since:
+        query = query.filter(model.Issue.date_created >= created_since)
+    if created_until:
+        query = query.filter(model.Issue.date_created <= created_until)
+
+    if updated_since:
+        query = query.filter(model.Issue.last_updated <= updated_since)
+    if updated_until:
+        query = query.filter(model.Issue.last_updated <= updated_until)
+
+    if closed_since:
+        query = query.filter(model.Issue.closed_at <= closed_since)
+    if closed_until:
+        query = query.filter(model.Issue.closed_at <= closed_until)
 
     if custom_search:
         constraints = []

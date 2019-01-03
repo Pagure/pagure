@@ -1400,6 +1400,8 @@ class PagureFlaskApiUsertestissues(tests.Modeltests):
               "args": {
                 "assignee": True,
                 "author": True,
+                "closed": None,
+                "created": None,
                 "milestones": [],
                 "no_stones": None,
                 "order": None,
@@ -1407,7 +1409,8 @@ class PagureFlaskApiUsertestissues(tests.Modeltests):
                 "page": 1,
                 "since": None,
                 "status": None,
-                "tags": []
+                "tags": [],
+                "updated": None,
               },
               "issues_assigned": [],
               "issues_created": [],
@@ -1458,6 +1461,8 @@ class PagureFlaskApiUsertestissues(tests.Modeltests):
               "args": {
                 "assignee": True,
                 "author": True,
+                "closed": None,
+                "created": None,
                 "milestones": [],
                 "no_stones": None,
                 "order": None,
@@ -1465,7 +1470,8 @@ class PagureFlaskApiUsertestissues(tests.Modeltests):
                 "page": 1,
                 "since": None,
                 "status": None,
-                "tags": []
+                "tags": [],
+                "updated": None,
               },
               "issues_assigned": [],
               "issues_created": [
@@ -1554,6 +1560,57 @@ class PagureFlaskApiUsertestissues(tests.Modeltests):
               "total_issues_created_pages": 1
             }
         )
+
+    def test_user_issues_created(self):
+        """ Return the list of issues associated with the specified user
+        and play with the created filter. """
+
+        today = datetime.datetime.utcnow().date()
+        output = self.app.get(
+            '/api/0/user/pingou/issues?created=%s' % (today.isoformat()))
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(data["total_issues_assigned"], 0)
+        self.assertEqual(data["total_issues_created"], 1)
+
+        yesterday = today - datetime.timedelta(days=1)
+        output = self.app.get(
+            '/api/0/user/pingou/issues?created=%s' % (yesterday.isoformat()))
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(data["total_issues_assigned"], 0)
+        self.assertEqual(data["total_issues_created"], 1)
+
+        tomorrow = today + datetime.timedelta(days=1)
+        output = self.app.get(
+            '/api/0/user/pingou/issues?created=%s' % (tomorrow.isoformat()))
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(data["total_issues_assigned"], 0)
+        self.assertEqual(data["total_issues_created"], 0)
+
+        output = self.app.get(
+            '/api/0/user/pingou/issues?created=..%s' % (yesterday.isoformat()))
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(data["total_issues_assigned"], 0)
+        self.assertEqual(data["total_issues_created"], 0)
+
+        output = self.app.get(
+            '/api/0/user/pingou/issues?created=%s..%s' % (
+                yesterday.isoformat(), today.isoformat()))
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(data["total_issues_assigned"], 0)
+        self.assertEqual(data["total_issues_created"], 0)
+
+        output = self.app.get(
+            '/api/0/user/pingou/issues?created=%s..%s' % (
+                yesterday.isoformat(), tomorrow.isoformat()))
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(data["total_issues_assigned"], 0)
+        self.assertEqual(data["total_issues_created"], 1)
 
 
 if __name__ == '__main__':

@@ -4059,6 +4059,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         args = {
             "assignee": True,
             "author": True,
+            "closed": None,
+            "created": None,
             "milestones": [],
             "no_stones": None,
             "order": None,
@@ -4066,7 +4068,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             "page": 1,
             "since": None,
             "status": None,
-            "tags": []
+            "tags": [],
+            "updated": None,
         }
 
         self.assertEqual(data['args'], args)
@@ -4084,6 +4087,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         args = {
             "assignee": True,
             "author": True,
+            "closed": None,
+            "created": None,
             "milestones": ['v1.0'],
             "no_stones": None,
             "order": None,
@@ -4091,7 +4096,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             "page": 1,
             "since": None,
             "status": None,
-            "tags": []
+            "tags": [],
+            "updated": None,
         }
 
         self.assertEqual(data['args'], args)
@@ -4109,6 +4115,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         args = {
             "assignee": True,
             "author": True,
+            "closed": None,
+            "created": None,
             "milestones": [],
             "no_stones": None,
             "order": None,
@@ -4116,7 +4124,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             "page": 1,
             "since": None,
             "status": 'closed',
-            "tags": []
+            "tags": [],
+            "updated": None,
         }
 
         self.assertEqual(data['args'], args)
@@ -4134,6 +4143,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         args = {
             "assignee": True,
             "author": True,
+            "closed": None,
+            "created": None,
             "milestones": [],
             "no_stones": None,
             "order": None,
@@ -4141,7 +4152,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             "page": 1,
             "since": None,
             "status": 'all',
-            "tags": []
+            "tags": [],
+            "updated": None,
         }
 
         self.assertEqual(data['args'], args)
@@ -4177,6 +4189,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         args = {
             "assignee": True,
             "author": True,
+            "closed": None,
+            "created": None,
             "milestones": [],
             "no_stones": None,
             "order": None,
@@ -4185,6 +4199,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             "since": None,
             "status": None,
             "tags": [],
+            "updated": None,
         }
 
         self.assertEqual(data['args'], args)
@@ -4235,6 +4250,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         args = {
             "assignee": False,
             "author": True,
+            "closed": None,
+            "created": None,
             "milestones": [],
             "no_stones": None,
             "order": None,
@@ -4243,6 +4260,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             "since": None,
             "status": None,
             "tags": [],
+            "updated": None,
         }
 
         self.assertEqual(data['args'], args)
@@ -4264,6 +4282,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         args = {
             "assignee": True,
             "author": False,
+            "closed": None,
+            "created": None,
             "milestones": [],
             "no_stones": None,
             "order": None,
@@ -4271,7 +4291,8 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             "page": 1,
             "since": None,
             "status": None,
-            "tags": []
+            "tags": [],
+            "updated": None,
         }
 
         self.assertEqual(data['args'], args)

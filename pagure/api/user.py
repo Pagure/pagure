@@ -201,67 +201,98 @@ def api_view_user_issues(username):
     Parameters
     ^^^^^^^^^^
 
-    +---------------+---------+--------------+---------------------------+
-    | Key           | Type    | Optionality  | Description               |
-    +===============+=========+==============+===========================+
-    | ``page``      | integer | Mandatory    | | The page requested.     |
-    |               |         |              |   Defaults to 1.          |
-    +---------------+---------+--------------+---------------------------+
-    | ``per_page``  | int     | Optional     | | The number of items     |
-    |               |         |              |   to return per page.     |
-    |               |         |              |   The maximum is 100.     |
-    +---------------+---------+--------------+---------------------------+
-    | ``status``    | string  | Optional     | | Filters the status of   |
-    |               |         |              |   issues. Fetches all the |
-    |               |         |              |   issues if status is     |
-    |               |         |              |   ``all``. Default:       |
-    |               |         |              |   ``Open``                |
-    +---------------+---------+--------------+---------------------------+
-    | ``tags``      | string  | Optional     | | A list of tags you      |
-    |               |         |              |   wish to filter. If      |
-    |               |         |              |   you want to filter      |
-    |               |         |              |   for issues not having   |
-    |               |         |              |   a tag, add an           |
-    |               |         |              |   exclamation mark in     |
-    |               |         |              |   front of it             |
-    +---------------+---------+--------------+---------------------------+
-    | ``milestones``| list of | Optional     | | Filter the issues       |
-    |               | strings |              |   by milestone            |
-    +---------------+---------+--------------+---------------------------+
-    | ``no_stones`` | boolean | Optional     | | If true returns only the|
-    |               |         |              |   issues having no        |
-    |               |         |              |   milestone, if false     |
-    |               |         |              |   returns only the issues |
-    |               |         |              |   having a milestone      |
-    +---------------+---------+--------------+---------------------------+
-    | ``since``     | string  | Optional     | | Filter the issues       |
-    |               |         |              |   updated after this date.|
-    |               |         |              |   The date can either be  |
-    |               |         |              |   provided as an unix date|
-    |               |         |              |   or in the format Y-M-D  |
-    +---------------+---------+--------------+---------------------------+
-    | ``order``     | string  | Optional     | | Set the ordering of the |
-    |               |         |              |   issues. This can be     |
-    |               |         |              |   ``asc`` or ``desc``.    |
-    |               |         |              |   Default: ``desc``       |
-    +---------------+---------+--------------+---------------------------+
-    | ``order_key`` | string  | Optional     | | Set the ordering key.   |
-    |               |         |              |   This can be ``assignee``|
-    |               |         |              |   , ``last_updated`` or   |
-    |               |         |              |   name of other column.   |
-    |               |         |              |   Default:                |
-    |               |         |              |          ``date_created`` |
-    +---------------+---------+--------------+---------------------------+
-    | ``assignee``  | boolean | Optional     | | A boolean of whether to |
-    |               |         |              |   return the issues       |
-    |               |         |              |   assigned to this user   |
-    |               |         |              |   or not. Defaults to True|
-    +---------------+---------+--------------+---------------------------+
-    | ``author``    | boolean | Optional     | | A boolean of whether to |
-    |               |         |              |   return the issues       |
-    |               |         |              |   created by this user or |
-    |               |         |              |   not. Defaults to True   |
-    +---------------+---------+--------------+---------------------------+
+    +---------------+---------+--------------+-----------------------------+
+    | Key           | Type    | Optionality  | Description                 |
+    +===============+=========+==============+=============================+
+    | ``page``      | integer | Mandatory    | | The page requested.       |
+    |               |         |              |   Defaults to 1.            |
+    +---------------+---------+--------------+-----------------------------+
+    | ``per_page``  | int     | Optional     | | The number of items       |
+    |               |         |              |   to return per page.       |
+    |               |         |              |   The maximum is 100.       |
+    +---------------+---------+--------------+-----------------------------+
+    | ``status``    | string  | Optional     | | Filters the status of     |
+    |               |         |              |   issues. Fetches all the   |
+    |               |         |              |   issues if status is       |
+    |               |         |              |   ``all``. Default:         |
+    |               |         |              |   ``Open``                  |
+    +---------------+---------+--------------+-----------------------------+
+    | ``tags``      | string  | Optional     | | A list of tags you wish to|
+    |               |         |              |   filter. If you want to    |
+    |               |         |              |   filter for issues not     |
+    |               |         |              |   having a tag, add an      |
+    |               |         |              |   exclamation mark in front |
+    |               |         |              |   of it                     |
+    +---------------+---------+--------------+-----------------------------+
+    | ``milestones``| list of | Optional     | | Filter the issues by      |
+    |               | strings |              |   milestone                 |
+    +---------------+---------+--------------+-----------------------------+
+    | ``no_stones`` | boolean | Optional     | | If true returns only the  |
+    |               |         |              |   issues having no          |
+    |               |         |              |   milestone, if false       |
+    |               |         |              |   returns only the issues   |
+    |               |         |              |   having a milestone        |
+    +---------------+---------+--------------+-----------------------------+
+    | ``since``     | string  | Optional     | | Filter the issues         |
+    |               |         |              |   updated after this date.  |
+    |               |         |              |   The date can either be    |
+    |               |         |              |   provided as an unix date  |
+    |               |         |              |   or in the format Y-M-D    |
+    +---------------+---------+--------------+-----------------------------+
+    | ``order``     | string  | Optional     | | Set the ordering of the   |
+    |               |         |              |   issues. This can be       |
+    |               |         |              |   ``asc`` or ``desc``.      |
+    |               |         |              |   Default: ``desc``         |
+    +---------------+---------+--------------+-----------------------------+
+    | ``order_key`` | string  | Optional     | | Set the ordering key.     |
+    |               |         |              |   This can be ``assignee``  |
+    |               |         |              |   , ``last_updated`` or     |
+    |               |         |              |   name of other column.     |
+    |               |         |              |   Default: ``date_created`` |
+    +---------------+---------+--------------+-----------------------------+
+    | ``assignee``  | boolean | Optional     | | A boolean of whether to   |
+    |               |         |              |   return the issues         |
+    |               |         |              |   assigned to this user     |
+    |               |         |              |   or not. Defaults to True  |
+    +---------------+---------+--------------+-----------------------------+
+    | ``author``    | boolean | Optional     | | A boolean of whether to   |
+    |               |         |              |   return the issues         |
+    |               |         |              |   created by this user or   |
+    |               |         |              |   not. Defaults to True     |
+    +---------------+---------+--------------+-----------------------------+
+    | ``created``   | string  | Optional     | | Filter the issues returned|
+    |               |         |              |   by their creation date    |
+    |               |         |              |   The date can be of        |
+    |               |         |              |   specified either using    |
+    |               |         |              |   a timestamp format or     |
+    |               |         |              |   using the iso format for  |
+    |               |         |              |   dates: yyyy-mm-dd.        |
+    |               |         |              |   You can specify a start   |
+    |               |         |              |   and a end date to this    |
+    |               |         |              |   filter using start..end.  |
+    +---------------+---------+--------------+-----------------------------+
+    | ``updated``   | string  | Optional     | | Filter the pull-requests  |
+    |               |         |              |   returned by their update  |
+    |               |         |              |   date. The date can be of  |
+    |               |         |              |   specified either using    |
+    |               |         |              |   a timestamp format or     |
+    |               |         |              |   using the iso format for  |
+    |               |         |              |   dates: yyyy-mm-dd.        |
+    |               |         |              |   You can specify a start   |
+    |               |         |              |   and a end date to this    |
+    |               |         |              |   filter using start..end.  |
+    +---------------+---------+--------------+-----------------------------+
+    | ``closed``    | string  | Optional     | | Filter the pull-requests  |
+    |               |         |              |   returned by their closing |
+    |               |         |              |   date. The date can be of  |
+    |               |         |              |   specified either using    |
+    |               |         |              |   a timestamp format or     |
+    |               |         |              |   using the iso format for  |
+    |               |         |              |   dates: yyyy-mm-dd.        |
+    |               |         |              |   You can specify a start   |
+    |               |         |              |   and a end date to this    |
+    |               |         |              |   filter using start..end.  |
+    +---------------+---------+--------------+-----------------------------+
 
     Sample response
     ^^^^^^^^^^^^^^^
@@ -279,7 +310,10 @@ def api_view_user_issues(username):
             "page": 1,
             "since": null,
             "status": null,
-            "tags": []
+            "tags": [],
+            "created": null,
+            "updated": null,
+            "closed": null,
           },
           "issues_assigned": [
             {
@@ -373,6 +407,18 @@ def api_view_user_issues(username):
     status = flask.request.args.get("status", None)
     tags = flask.request.args.getlist("tags")
     tags = [tag.strip() for tag in tags if tag.strip()]
+    created = flask.request.args.get("created")
+    updated = flask.request.args.get("updated")
+    closed = flask.request.args.get("closed")
+
+    try:
+        created_since, created_until = validate_date_range(created)
+        updated_since, updated_until = validate_date_range(updated)
+        closed_since, closed_until = validate_date_range(closed)
+    except pagure.exceptions.InvalidTimestampException:
+        raise pagure.exceptions.APIError(400, error_code=APIERROR.ETIMESTAMP)
+    except pagure.exceptions.InvalidDateformatException:
+        raise pagure.exceptions.APIError(400, error_code=APIERROR.EDATETIME)
 
     page = get_page()
     per_page = get_per_page()
@@ -400,6 +446,12 @@ def api_view_user_issues(username):
         "no_milestones": no_stones,
         "offset": offset,
         "limit": limit,
+        "created_since": created_since,
+        "created_until": created_until,
+        "updated_since": updated_since,
+        "updated_until": updated_until,
+        "closed_since": closed_since,
+        "closed_until": closed_until,
     }
 
     if status is not None:
@@ -475,6 +527,9 @@ def api_view_user_issues(username):
                 "page": page,
                 "assignee": assignee,
                 "author": author,
+                "created": created,
+                "updated": updated,
+                "closed": closed,
             },
         }
     )
