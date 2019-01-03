@@ -429,10 +429,14 @@ class PagureLibTaskServicesWithWebHooktests(tests.Modeltests):
 
     @patch('time.time', MagicMock(return_value=2))
     @patch('uuid.uuid4', MagicMock(return_value='not_so_random'))
+    @patch('datetime.datetime')
     @patch('requests.post')
-    def test_webhook_notification_no_webhook(self, post):
+    def test_webhook_notification_no_webhook(self, post, dt):
         """ Test the webhook_notification method. """
         post.return_value = False
+        utcnow = MagicMock()
+        utcnow.year = 2018
+        dt.utcnow.return_value = utcnow
 
         output = pagure.lib.tasks_services.webhook_notification(
             topic='topic',
