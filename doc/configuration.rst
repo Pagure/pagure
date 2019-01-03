@@ -4,6 +4,10 @@ Configuration
 Pagure offers a wide varieties of options that must or can be used to
 adjust its behavior.
 
+All of these options can be edited or added to your configuration file.
+If you have installed pagure, this configuration file is likely located in
+``/etc/pagure/pagure.cfg``. Otherwise, it will depend on your
+setup/deployment.
 
 
 Must options
