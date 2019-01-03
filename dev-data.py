@@ -354,11 +354,83 @@ def insert_data(session, username, user_email):
         repo_to=repo,
         branch_to='master',
         title='Fixing code for unittest',
-        user=username
+        user=username,
+        status="Open"
     )
     session.commit()
 
-    ######################################
+    repo = pagure.lib.query.get_authorized_project(session, 'test')
+    forked_repo = pagure.lib.query.get_authorized_project(session, 'test')
+    req = pagure.lib.query.new_pull_request(
+        session=session,
+        repo_from=forked_repo,
+        branch_from='master',
+        repo_to=repo,
+        branch_to='master',
+        title='add very nice README',
+        user=username,
+        status="Open"
+    )
+    session.commit()
+
+    repo = pagure.lib.query.get_authorized_project(session, 'test')
+    forked_repo = pagure.lib.query.get_authorized_project(session, 'test')
+    req = pagure.lib.query.new_pull_request(
+        session=session,
+        repo_from=forked_repo,
+        branch_from='master',
+        repo_to=repo,
+        branch_to='master',
+        title='Add README',
+        user=username,
+        status="Closed"
+    )
+    session.commit()
+
+    repo = pagure.lib.query.get_authorized_project(session, 'test')
+    forked_repo = pagure.lib.query.get_authorized_project(session, 'test')
+    req = pagure.lib.query.new_pull_request(
+        session=session,
+        repo_from=forked_repo,
+        branch_from='master',
+        repo_to=repo,
+        branch_to='master',
+        title='Fix some containers',
+        user=username,
+        status="Merged"
+    )
+    session.commit()
+
+    repo = pagure.lib.query.get_authorized_project(session, 'test')
+    forked_repo = pagure.lib.query.get_authorized_project(session, 'test')
+    req = pagure.lib.query.new_pull_request(
+        session=session,
+        repo_from=forked_repo,
+        branch_from='master',
+        repo_to=repo,
+        branch_to='master',
+        title='Fix pull request statuses',
+        user=username,
+        status="Closed"
+    )
+    session.commit()
+
+    repo = pagure.lib.query.get_authorized_project(session, 'test')
+    forked_repo = pagure.lib.query.get_authorized_project(session, 'test')
+    req = pagure.lib.query.new_pull_request(
+        session=session,
+        repo_from=forked_repo,
+        branch_from='master',
+        repo_to=repo,
+        branch_to='master',
+        title='Fixing UI of issue',
+        user=username,
+        status="Merged"
+    )
+    session.commit()
+
+
+#####################################
     # tokens
     tests.create_tokens(session, user_id=pingou.id, project_id=project1.id)
 
@@ -425,9 +497,37 @@ def insert_data(session, username, user_email):
         percent=80,
         comment="Jenkins build passes",
         url=str(pr.id),
-        status="Open"
+        status="success"
     )
     session.add(item)
+    session.commit()
+
+    pr = pagure.lib.query.get_pull_request_of_user(session, "foo")[1]
+    item = pagure.lib.model.PullRequestFlag(
+        uid="oink oink uid",
+        pull_request_uid=pr.uid,
+        user_id=pingou.id,
+        username=pingou.user,
+        percent=80,
+        comment="Jenkins does not pass",
+        url=str(pr.id),
+        status="failure"
+    )
+    session.add(item)
+    session.commit()
+
+    ######################################
+    # pull_request_assignee
+    pr = pagure.lib.query.search_pull_requests(session, requestid='1006')
+    pr.assignee_id = pingou.id
+    session.commit()
+
+    pr = pagure.lib.query.search_pull_requests(session, requestid='1007')
+    pr.assignee_id = you.id
+    session.commit()
+
+    pr = pagure.lib.query.search_pull_requests(session, requestid='1004')
+    pr.assignee_id = foo.id
     session.commit()
 
     ######################################
