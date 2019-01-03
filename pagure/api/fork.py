@@ -164,7 +164,7 @@ def api_pull_request_views(repo, username=None, namespace=None):
 
     status_text = ("%s" % status).lower()
     requests = []
-    if status_text in ["0", "false", "closed"]:
+    if status_text in ["0", "false"]:
         requests = pagure.lib.query.search_pull_requests(
             flask.g.session,
             project_id=repo.id,

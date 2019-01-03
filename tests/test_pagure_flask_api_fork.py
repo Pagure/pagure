@@ -139,8 +139,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
         # Close the PR and try again
         pagure.lib.query.close_pull_request(
-            self.session, request=req, user='pingou',
-            merged=False)
+            self.session, request=req, user='pingou', merged=False)
 
         output = self.app.get('/api/0/test/pull-requests?status=closed')
         self.assertEqual(output.status_code, 200)
@@ -159,6 +158,95 @@ class PagureFlaskApiForktests(tests.Modeltests):
             }
         )
         self.assertEqual(data['total_requests'], 1)
+
+        # Create two closed pull-requests
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        pagure.lib.query.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='master',
+            repo_to=repo,
+            branch_to='master',
+            title='closed pullrequest by user foo on repo test',
+            user='foo',
+            status='Closed',
+        )
+
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        pagure.lib.query.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='master',
+            repo_to=repo,
+            branch_to='master',
+            title='closed pullrequest by user pingou on repo test',
+            user='pingou',
+            status="Closed",
+        )
+        self.session.commit()
+
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        pagure.lib.query.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='master',
+            repo_to=repo,
+            branch_to='master',
+            title='merged pullrequest by user pingou on repo test',
+            user='pingou',
+            status="Merged",
+        )
+        self.session.commit()
+
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        pagure.lib.query.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='master',
+            repo_to=repo,
+            branch_to='master',
+            title='merged pullrequest by user foo on repo test',
+            user='foo',
+            status='Merged',
+        )
+        self.session.commit()
+
+        # Test the API view of closed pull-requests
+        output = self.app.get(
+            '/api/0/test/pull-requests?status=closed')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+
+        self.assertEqual(len(data['requests']), 3)
+        self.assertEqual(
+            sorted(data.keys()),
+            [u'args', u'pagination', u'requests', u'total_requests'])
+        for req in data['requests']:
+            self.assertEqual(req['status'], 'Closed')
+        self.assertEqual(data['args']['status'], "closed")
+        self.assertEqual(data['args']['page'], 1)
+
+        self.assertEqual(data['total_requests'], 3)
+
+        # Test the API view of merged pull-requests
+        output = self.app.get(
+            '/api/0/test/pull-requests?status=merged')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+
+        self.assertEqual(len(data['requests']), 2)
+        self.assertEqual(
+            sorted(data.keys()),
+            [u'args', u'pagination', u'requests', u'total_requests'])
+        for req in data['requests']:
+            self.assertEqual(req['status'], 'Merged')
+        self.assertEqual(data['args']['status'], "merged")
+        self.assertEqual(data['args']['page'], 1)
+        self.assertEqual(data['total_requests'], 2)
 
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
     def test_api_pull_request_views_all_pr(self):
