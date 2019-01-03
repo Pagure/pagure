@@ -13,7 +13,21 @@ Project Options
     {% elif not config.get('DOC_APP_URL') and key in ['project_documentation'] %}
     {% elif not config.get('WEBHOOK') and key in ['Web-hooks'] %}
     {% else %}
-      {% if repo.settings[key] in [True, False, 'y'] %}
+      {% if key in ['Web-hooks'] %}
+        <div class="form-inline">
+          <label for="{{ key }}">{{ key | replace('_', ' ') | capitalize }} :</label>
+          <textarea width="4em" class="form-control" id="{{ key }}" type="text" {% if repo.settings[key]
+            %}value="{{ repo.settings[key] }}"{% endif %} name="{{ key }}"
+            title="Web-hook URLs, one per line"
+            placeholder="Web-hook URLs, one per line">{{ repo.settings[key] }}</textarea>
+        </div>
+      {% elif key in ['Minimum_score_to_merge_pull-request'] %}
+        <div class="form-inline">
+          <label for="{{ key }}">{{ key | replace('_', ' ') | capitalize }} :</label>
+          <input width="4em" class="form-control" id="{{ key }}" type="text"
+                value="{{ repo.settings[key] }}" name="{{ key }}" />
+        </div>
+      {% elif repo.settings[key] in [True, False, 'y'] %}
         <div>
           <label class="c-input c-checkbox">
             <input id="{{ key }}" type="checkbox" value="y" name="{{ key }}" {%
@@ -21,14 +35,6 @@ Project Options
             <span class="c-indicator"></span>
             {{ key | replace('_', ' ') | capitalize }}
           </label>
-        </div>
-      {% elif key in ['Web-hooks'] %}
-        <div class="form-inline">
-          <label for="{{ key }}">{{ key | replace('_', ' ') | capitalize }} :</label>
-          <textarea width="4em" class="form-control" id="{{ key }}" type="text" {% if repo.settings[key]
-            %}value="{{ repo.settings[key] }}"{% endif %} name="{{ key }}"
-            title="Web-hook URLs, one per line"
-            placeholder="Web-hook URLs, one per line">{{ repo.settings[key] }}</textarea>
         </div>
       {% else %}
         <div class="form-inline">
