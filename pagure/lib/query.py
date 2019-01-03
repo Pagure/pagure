@@ -672,7 +672,7 @@ def add_pull_request_assignee(session, request, assignee, user):
 
     if assignee is None and request.assignee is not None:
         request.assignee_id = None
-        request.last_updated = datetime.datetime.utcnow()
+        request.updated_on = datetime.datetime.utcnow()
         session.add(request)
         session.commit()
         pagure.lib.git.update_git(request, repo=request.project)
@@ -698,7 +698,7 @@ def add_pull_request_assignee(session, request, assignee, user):
 
     if request.assignee_id != assignee_obj.id:
         request.assignee_id = assignee_obj.id
-        request.last_updated = datetime.datetime.utcnow()
+        request.updated_on = datetime.datetime.utcnow()
         session.add(request)
         session.flush()
         pagure.lib.git.update_git(request, repo=request.project)
@@ -1336,7 +1336,7 @@ def add_pull_request_comment(
     # Make sure we won't have SQLAlchemy error before we continue
     session.flush()
 
-    request.last_updated = datetime.datetime.utcnow()
+    request.updated_on = datetime.datetime.utcnow()
 
     pagure.lib.git.update_git(request, repo=request.project)
 
@@ -1916,6 +1916,7 @@ def new_pull_request(
         commit_stop=commit_stop,
     )
     request.last_updated = datetime.datetime.utcnow()
+    request.updated_on = datetime.datetime.utcnow()
 
     session.add(request)
     # Make sure we won't have SQLAlchemy error before we create the request
@@ -5085,6 +5086,7 @@ def add_metadata_update_notif(session, obj, messages, user):
             user_id=user_id,
             notification=True,
         )
+        obj.last_updated = datetime.datetime.utcnow()
     elif obj.isa == "pull-request":
         obj_comment = model.PullRequestComment(
             pull_request_uid=obj.uid,
@@ -5093,7 +5095,7 @@ def add_metadata_update_notif(session, obj, messages, user):
             user_id=user_id,
             notification=True,
         )
-    obj.last_updated = datetime.datetime.utcnow()
+        obj.updated_on = datetime.datetime.utcnow()
     session.add(obj)
     session.add(obj_comment)
     # Make sure we won't have SQLAlchemy error before we continue
