@@ -112,7 +112,7 @@
                          name='%s-%s' % (repo.name, tag['tagname']))
                       }}" target="_blank" rel="noopener noreferrer">
                       {{repo.name}}-{{ tag['tagname'] }}.zip
-                      </span>
+                      </a>
                     </ul>
                     <ul>
                       <a href="{{
@@ -124,7 +124,7 @@
                          name='%s-%s' % (repo.name, tag['tagname']))
                       }}" target="_blank" rel="noopener noreferrer">
                       {{repo.name}}-{{ tag['tagname'] }}.tar.gz
-                      </span>
+                      </a>
                     </ul>
                   </li>
                 </div>
@@ -135,8 +135,7 @@
         </div>
         {% if tag['body_msg'] %}
         <div style="white-space:pre-wrap;">
-          {{ tag['body_msg'] }}
-        </div>
+{{ tag['body_msg'] }}</div>
         {% endif %}
       </div>
     {% endfor %}
