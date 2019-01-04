@@ -117,34 +117,37 @@ def view_repo(repo, username=None, namespace=None):
     repo_db = flask.g.repo
     repo_obj = flask.g.repo_obj
 
-    if not repo_obj.is_empty and not repo_obj.head_is_unborn:
-        head = repo_obj.head.shorthand
+    default_branch = pagure_config.get('DEFAULT_UI_BRANCH')
+
+    if default_branch in repo_obj.listall_branches():
+        head = repo_obj.lookup_branch(default_branch).get_object().oid.hex
+        branchname = default_branch
     else:
-        head = None
+        if not repo_obj.is_empty and not repo_obj.head_is_unborn:
+            head = repo_obj.head.target
+            branchname = repo_obj.head.shorthand
+        else:
+            head = None
+            branchname = None
 
     cnt = 0
     last_commits = []
     tree = []
     if not repo_obj.is_empty:
         try:
-            for commit in repo_obj.walk(
-                repo_obj.head.target, pygit2.GIT_SORT_NONE
-            ):
+            for commit in repo_obj.walk(head, pygit2.GIT_SORT_NONE):
                 last_commits.append(commit)
                 cnt += 1
                 if cnt == 3:
                     break
-            tree = sorted(last_commits[0].tree, key=lambda x: x.filemode)
+            if last_commits:
+                tree = sorted(last_commits[0].tree, key=lambda x: x.filemode)
         except pygit2.GitError:
             pass
 
     readme = None
     safe = False
 
-    if not repo_obj.is_empty and not repo_obj.head_is_unborn:
-        branchname = repo_obj.head.shorthand
-    else:
-        branchname = None
     project = pagure.lib.query.get_authorized_project(
         flask.g.session, repo, user=username, namespace=namespace
     )

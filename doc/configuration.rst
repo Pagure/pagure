@@ -1659,6 +1659,21 @@ the highlighting language/category to use as values.
 Defaults to: ``{".spec": "specfile", ".patch": "diff"}``
 
 
+DEFAULT_UI_BRANCH
+~~~~~~~~~~~~~~~~~
+
+This configuration key allows to change the branch shown by default in the
+UI when accessing the overview page of the project.
+When accessing the overview page of the project, we check if there is a
+branch with the same name as the one specified in this configuration key
+and if so, this is the branch shown. All links from there will be to that
+branch, letting the user change back to another branch using either the
+page listing all branches or the drop-down menu at the top of the page
+listing the commits.
+
+Defaults to: ``None``.
+
+
 RepoSpanner Options
 -------------------
 

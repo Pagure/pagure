@@ -1822,6 +1822,75 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.perfMaxWalks(3, 18)  # Ideal: (1, 3)
         self.perfReset()
 
+    @patch.dict('pagure.config.config', {'DEFAULT_UI_BRANCH': 'feature'})
+    def test_view_repo_default_branch_feature(self):
+        """ Test the view_repo endpoint when a default branch is specified.
+        """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+
+        # Add some content to the git repo
+        tests.add_content_git_repo(
+            os.path.join(self.path, 'repos', 'test.git'))
+        tests.add_readme_git_repo(
+            os.path.join(self.path, 'repos', 'test.git'), branch="feature")
+        self.perfReset()
+
+        output = self.app.get('/test')
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        self.assertNotIn('<p>This repo is brand new!</p>', output_text)
+        self.assertIn(
+            '<title>Overview - test - Pagure</title>', output_text)
+        self.assertIn(
+            '<span class="font-weight-bold">Add a README file</span>',
+            output_text)
+        self.assertNotIn(
+            '<span class="font-weight-bold">Add some directory and a file '
+            'for more testing</span>', output_text)
+        self.assertIn(
+            'href="/test/branches?branchname=feature">', output_text)
+        self.assertNotIn(
+            'href="/test/branches?branchname=master">', output_text)
+        self.perfMaxWalks(3, 8)  # Target: (1, 3)
+        self.perfReset()
+
+    @patch.dict('pagure.config.config', {'DEFAULT_UI_BRANCH': 'foobar'})
+    def test_view_repo_default_branch_invalid(self):
+        """ Test the view_repo endpoint when an invalid default branch is
+        specified (in which case it goes back to the default branch).
+        """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+
+        # Add some content to the git repo
+        tests.add_content_git_repo(
+            os.path.join(self.path, 'repos', 'test.git'))
+        tests.add_readme_git_repo(
+            os.path.join(self.path, 'repos', 'test.git'), branch="feature")
+        self.perfReset()
+
+        output = self.app.get('/test')
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        self.assertNotIn('<p>This repo is brand new!</p>', output_text)
+        self.assertIn(
+            '<title>Overview - test - Pagure</title>', output_text)
+        self.assertIn(
+            '<span class="font-weight-bold">Add some directory and a file '
+            'for more testing</span>', output_text)
+        self.assertNotIn(
+            '<span class="font-weight-bold">Add a README file</span>',
+            output_text)
+        self.assertIn(
+            'href="/test/branches?branchname=master">', output_text)
+        self.assertNotIn(
+            'href="/test/branches?branchname=feature">', output_text)
+        self.perfMaxWalks(3, 8)  # Target: (1, 3)
+        self.perfReset()
+
     def test_view_repo_empty(self):
         """ Test the view_repo endpoint on a repo w/o master branch. """
 
