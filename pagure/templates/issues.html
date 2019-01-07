@@ -619,7 +619,9 @@ $(document).ready(function() {
     labelField: 'user',
     searchField: 'user',
     maxItems: 1,
-    create: false,
+    create: true,
+    createOnBlur: true,
+    persist: false,
     load: function(query, callback) {
       if (!query.length) return callback();
       $.getJSON(
@@ -644,7 +646,9 @@ $(document).ready(function() {
     labelField: 'user',
     searchField: 'user',
     maxItems: 1,
-    create: false,
+    create: true,
+    createOnBlur: true,
+    persist: false,
     load: function(query, callback) {
       if (!query.length) return callback();
       $.getJSON(
