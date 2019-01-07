@@ -615,6 +615,27 @@ Defaults to: ``['create_project', 'fork_project', 'modify_project']``
 Optional options
 ----------------
 
+Theming
+~~~~~~~
+
+THEME
+^^^^^
+
+This configuration key allows you to specify the theme to be used. The
+string specified is the name of the theme directory in ``pagure/themes/``
+
+For more information about theming see the :doc:`usage/theming`
+
+Default options:
+
+- ``chameleon``  The OpenSUSE theme for pagure
+- ``default``  The default theme for pagure
+- ``pagureio``  The theme used at https://pagure.io
+- ``srcfpo``  The theme used at https://src.fedoraproject.org
+
+Defaults to: ``default``
+
+
 Git repository templates
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
