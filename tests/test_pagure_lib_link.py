@@ -294,9 +294,12 @@ class PagureLibLinktests(tests.Modeltests):
             self.assertEqual(match.group(1), issue)
 
         issue_match('This fixed  #5', '5')
+        issue_match('This fix  #5', '5')
         issue_match('Merged  #17', '17')
         issue_match('Fixed:  #23', '23')
+        issue_match('Fix:  #23', '23')
         issue_match('This commit fixes:  #42', '42')
+        issue_match('This commit fix   #42', '42')
         issue_match('Merge #137', '137')
         issue_match('Merges #137', '137')
         issue_match('Merges: #137', '137')

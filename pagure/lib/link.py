@@ -21,7 +21,7 @@ from pagure.config import config as pagure_config
 
 FIXES = [
     re.compile(r"(?:.*\s+)?{0}?[sd]?:?\s*?#(\d+)".format(kw), re.I)
-    for kw in ["fixe", "merge", "close", "resolve"]
+    for kw in ["fix", "fixe", "merge", "close", "resolve"]
 ]
 FIXES += [
     re.compile(
@@ -31,7 +31,7 @@ FIXES += [
         ),
         re.I,
     )
-    for kw in ["fixe", "merge", "close", "resolve"]
+    for kw in ["fix", "fixe", "merge", "close", "resolve"]
 ]
 
 
