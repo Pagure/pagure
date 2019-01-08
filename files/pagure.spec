@@ -1,6 +1,6 @@
 %{?python_enable_dependency_generator}
 
-%if (0%{?rhel} && 0%{?rhel} <= 7)
+%if 0%{?rhel} && 0%{?rhel} < 8
 # Since the Python 3 stack in EPEL is missing too many dependencies,
 # we're sticking with Python 2 there for now.
 %global __python %{__python2}
@@ -31,7 +31,7 @@ BuildRequires:      systemd
 BuildRequires:      python%{python_pkgversion}-devel
 BuildRequires:      python%{python_pkgversion}-setuptools
 
-%if 0%{?rhel} && 0%{?rhel} <= 7
+%if 0%{?rhel} && 0%{?rhel} < 8
 # Required only for the `fas` and `openid` authentication backends
 Requires:           python%{python_pkgversion}-fedora-flask
 # Required only for the `oidc` authentication backend
@@ -45,7 +45,7 @@ Recommends:         python%{python_pkgversion}-fedora-flask
 # We require OpenSSH 7.4+ for SHA256 support
 Requires:           openssh >= 7.4
 
-%if %{undefined python_enable_dependency_generator}
+%if 0%{?rhel} && 0%{?rhel} < 8
 Requires:           python%{python_pkgversion}-alembic
 Requires:           python%{python_pkgversion}-arrow
 Requires:           python%{python_pkgversion}-bcrypt
@@ -75,7 +75,7 @@ Requires:           python%{python_pkgversion}-straight-plugin
 Requires:           python%{python_pkgversion}-wtforms
 %endif
 
-%if (0%{?rhel} && 0%{?rhel} <= 7)
+%if 0%{?rhel} && 0%{?rhel} < 8
 Requires:           mod_wsgi
 %else
 Requires:           python%{python_pkgversion}-mod_wsgi
@@ -204,7 +204,7 @@ of this pagure instance.
 %prep
 %autosetup -p1
 
-%if 0%{?rhel} && 0%{?rhel} <= 7
+%if 0%{?rhel} && 0%{?rhel} < 8
 # Fix requirements.txt for EL7 setuptools
 ## Remove environment markers, as they're not supported
 sed -e "s/;python_version.*$//g" -i requirements.txt
@@ -314,12 +314,9 @@ install -p -m 644 pagure-ev/pagure_ev.service \
 
 # Fix the shebang for various scripts
 sed -e "s|#!/usr/bin/env python|#!%{__python}|" -i \
-    $RPM_BUILD_ROOT/%{_libexecdir}/pagure-ev/pagure_stream_server.py \
-    $RPM_BUILD_ROOT/%{_libexecdir}/pagure/aclchecker.py \
-    $RPM_BUILD_ROOT/%{_libexecdir}/pagure/keyhelper.py \
-    $RPM_BUILD_ROOT/%{_datadir}/pagure/comment_email_milter.py \
-    $RPM_BUILD_ROOT/%{_datadir}/pagure/pagure_createdb.py \
-    $RPM_BUILD_ROOT/%{_datadir}/pagure/api_key_expire_mail.py \
+    $RPM_BUILD_ROOT/%{_libexecdir}/pagure-ev/*.py \
+    $RPM_BUILD_ROOT/%{_libexecdir}/pagure/*.py \
+    $RPM_BUILD_ROOT/%{_datadir}/pagure/*.py \
     $RPM_BUILD_ROOT/%{python_sitelib}/pagure/hooks/files/*.py \
     $RPM_BUILD_ROOT/%{python_sitelib}/pagure/hooks/files/hookrunner \
     $RPM_BUILD_ROOT/%{python_sitelib}/pagure/hooks/files/post-receive \
@@ -329,7 +326,7 @@ sed -e "s|#!/usr/bin/env python|#!%{__python}|" -i \
 # Switch interpreter for systemd units
 sed -e "s|/usr/bin/python|%{__python}|g" -i $RPM_BUILD_ROOT/%{_unitdir}/*.service
 
-%if 0%{?rhel} && 0%{?rhel} <= 7
+%if 0%{?rhel} && 0%{?rhel} < 8
 # Change to correct static file path for apache httpd
 sed -e "s/pythonX.Y/python%{python2_version}/g" -i $RPM_BUILD_ROOT/%{_sysconfdir}/httpd/conf.d/pagure.conf
 %else
@@ -352,6 +349,7 @@ done
 %systemd_post pagure_worker.service
 %systemd_post pagure_gitolite_worker.service
 %systemd_post pagure_api_key_expire_mail.timer
+%systemd_post pagure_mirror_project_in.timer
 %post milters
 %systemd_post pagure_milter.service
 %post ev
@@ -371,6 +369,7 @@ done
 %systemd_preun pagure_worker.service
 %systemd_preun pagure_gitolite_worker.service
 %systemd_preun pagure_api_key_expire_mail.timer
+%systemd_preun pagure_mirror_project_in.timer
 %preun milters
 %systemd_preun pagure_milter.service
 %preun ev
@@ -390,6 +389,7 @@ done
 %systemd_postun_with_restart pagure_worker.service
 %systemd_postun_with_restart pagure_gitolite_worker.service
 %systemd_postun pagure_api_key_expire_mail.timer
+%systemd_postun pagure_mirror_project_in.timer
 %postun milters
 %systemd_postun_with_restart pagure_milter.service
 %postun ev
@@ -416,7 +416,7 @@ done
 %dir %{_datadir}/pagure/
 %config(noreplace) %{_datadir}/pagure/*.wsgi
 %{_datadir}/pagure/*.py*
-%if ! (0%{?rhel} && 0%{?rhel} <= 7)
+%if ! (0%{?rhel} && 0%{?rhel} < 8)
 %{_datadir}/pagure/__pycache__/
 %endif
 %{_datadir}/pagure/alembic/
