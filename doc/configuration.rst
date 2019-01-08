@@ -1616,6 +1616,18 @@ projects (from third party git server).
 Defaults to: ``False``
 
 
+SYNTAX_ALIAS_OVERRIDES
+~~~~~~~~~~~~~~~~~~~~~~
+
+This configuration key allows to force highlight.js to use a certain logic
+on certain files based on their extensions.
+
+It should be a dictionary containing the file extensions as keys and
+the highlighting language/category to use as values.
+
+Defaults to: ``{".spec": "specfile", ".patch": "diff"}``
+
+
 RepoSpanner Options
 -------------------
 

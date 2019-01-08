@@ -223,7 +223,8 @@ class PagureFlaskNoMasterBranchtests(tests.SimplePagureTest):
           </li>
         </ol>''',  output_text)
         self.assertIn(
-            '<pre class="syntaxhighlightblock"><code>foo\n bar</code></pre>',
+            '<pre class="syntaxhighlightblock">'
+            '<code class="lang-plaintext">foo\n bar</code></pre>',
             output_text
         )
 

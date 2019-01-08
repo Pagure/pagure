@@ -17,6 +17,7 @@ from __future__ import unicode_literals, absolute_import
 
 import textwrap
 import logging
+from os.path import splitext
 
 import arrow
 import flask
@@ -86,6 +87,27 @@ def linkify_text(text):
         return bleach.linkify(cleaned)
     else:
         return ""
+
+
+@UI_NS.app_template_filter("syntax_alias")
+def get_syntax_alias(filename):
+    """ return an alias based on the filename that is used to
+        override the automatic syntax highlighting dectection
+        by highlight.js
+    """
+
+    override_rules = pagure_config.get(
+        "SYNTAX_ALIAS_OVERRIDES", {".spec": "specfile", ".patch": "diff"}
+    )
+    fn, fn_ext = splitext(filename)
+
+    output = ""
+    if fn_ext == "":
+        output = "lang-plaintext"
+    elif fn_ext in override_rules:
+        output = "lang-" + override_rules[fn_ext]
+
+    return output
 
 
 @UI_NS.app_template_filter("format_loc")

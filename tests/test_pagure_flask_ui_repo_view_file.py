@@ -99,7 +99,8 @@ class PagureFlaskRepoViewFiletests(LocalBasetests):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<pre class="syntaxhighlightblock"><code>foo\n bar</code></pre>',
+            '<pre class="syntaxhighlightblock">'
+            '<code class="lang-plaintext">foo\n bar</code></pre>',
             output_text
         )
 
@@ -213,7 +214,8 @@ class PagureFlaskRepoViewFiletests(LocalBasetests):
                          'text/html; charset=utf-8')
         self.assertIn('</span>&nbsp; Šource', output_text)
         self.assertIn(
-            '<pre class="syntaxhighlightblock"><code>Row 0\n</code></pre>',
+            '<pre class="syntaxhighlightblock">'
+            '<code class="lang-plaintext">Row 0\n</code></pre>',
             output_text
         )
 
@@ -313,7 +315,8 @@ class PagureFlaskRepoViewFileForktests(LocalBasetests):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<pre class="syntaxhighlightblock"><code>foo\n barRow 0\n'
+            '<pre class="syntaxhighlightblock"><code class="lang-plaintext">'
+            'foo\n barRow 0\n'
             'Row 1\nRow 2\nRow 3\nRow 4\nRow 5\nRow 6\nRow 7\nRow 8\n'
             'Row 9\n</code></pre>', output_text
         )

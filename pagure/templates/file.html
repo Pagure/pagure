@@ -173,7 +173,7 @@
         {% endif %}
 
     {% if output_type=='file' %}
-        <pre class="syntaxhighlightblock"><code>{{ content }}</code></pre>
+        <pre class="syntaxhighlightblock"><code class="{{filename|syntax_alias}}">{{ content }}</code></pre>
     {% elif output_type == 'markup' %}
         <div class="m-2">
         {% autoescape false %}

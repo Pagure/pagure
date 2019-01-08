@@ -225,7 +225,8 @@ class PagureFlaskSlashInBranchtests(tests.SimplePagureTest):
           </li>
         </ol>''', output_text)
         self.assertIn(
-            '<pre class="syntaxhighlightblock"><code>*~</code></pre>',
+            '<pre class="syntaxhighlightblock">'
+            '<code class="lang-plaintext">*~</code></pre>',
             output_text
         )
 
