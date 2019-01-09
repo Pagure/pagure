@@ -38,5 +38,6 @@ pip3 install --upgrade "idna<2.8"
 pip install --upgrade tox trollius coverage
 pip install --upgrade --force-reinstall chardet
 pip3 install "pygit2 <= `rpm -q libgit2 --queryformat='%{version}'`"
-tox --sitepackages -e 'py27-flask011-ci' -- --results=results-py2
-tox --sitepackages -e 'py34-flask011-ci' -- --results=results-py3
+tox --sitepackages -e 'py27-flask011-ci' -- --results=results-py2-flask011
+tox --sitepackages -e 'py34-flask011-ci' -- --results=results-py3-flask011
+tox --sitepackages -e 'py34-flask100-ci' -- --results=results-py3-flask100
