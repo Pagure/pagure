@@ -101,6 +101,18 @@
             <a class="nav-item nav-link" id="deleteproject" data-toggle="tab"
             href="#deleteproject-tab" role="tab" aria-controls="deleteproject">Delete Project</a>
           {% endif %}
+
+          {% for blueprint in main_app.iter_blueprints() %}
+            {% if blueprint.name not in [
+                    'api_ns', 'ui_ns', 'internal_ns', 'theme'] %}
+              <a class="nav-item nav-link thirdparty_settings"
+                id="{{ blueprint.name }}" data-name="{{ blueprint.name }}"
+                data-url="{{ url_for(
+                    '%s.settings' % blueprint.name,
+                    repo=repo.name, namespace=repo.namespace) }}"
+              href="#{{ blueprint.name }}-tab">{{ blueprint.name }}</a>
+            {% endif %}
+          {% endfor %}
         </div>
       </nav>
     </div>
@@ -1197,6 +1209,32 @@ $('.add-settings-field-row').click(function(e) {
 $('.remove-settings-field-row').click(function(e) {
   $(this).parent().parent().remove();
 });
+
+$('.thirdparty_settings').click(function() {
+  $('.tab-pane fade active show').removeClass("active").removeClass("show");
+  let name = $(this).attr("data-name");
+  let target = $(this).attr("data-url");
+  let _el = $('#' + name + '-tab');
+  if (_el.length == 0) {
+    $.ajax({
+      url: target ,
+      type: 'GET',
+      dataType: 'html',
+      success: function(res) {
+        let _txt = '<div class="tab-pane fade active show" '
+        + 'id="' + name + '-tab" role="tabpanel" role="tabpanel"'
+        + 'aria-labelledby="' + name + '-tab">'
+        + res
+        + '</div>';
+          $("#nav-tabContent").append(_txt);
+      },
+    });
+  } else {
+    _el.show();
+  }
+  return false;
+});
+
 
 {% if not repo.priorities %}
 $('#default_priorities').click(function(e) {
