@@ -1215,16 +1215,16 @@ def read_output(cmd, abspath, input=None, keepends=False, error=False, **kw):
     )
     retcode = procs.wait()
     (out, err) = procs.communicate(input)
-    if not isinstance(out, str):
+    if isinstance(out, six.binary_type):
         out = out.decode("utf-8")
-    if not isinstance(err, str):
+    if isinstance(err, six.binary_type):
         err = err.decode("utf-8")
     if retcode:
         print("ERROR: %s =-- %s" % (cmd, retcode))
         print(out)
         print(err)
     if not keepends:
-        out = out.rstrip("\n\r")
+        out = out.rstrip(u"\n\r")
 
     if error:
         return (out, err)
