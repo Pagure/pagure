@@ -4237,7 +4237,6 @@ def text2markdown(text, extended=True, readme=False):
         "markdown.extensions.def_list",
         "markdown.extensions.fenced_code",
         "markdown.extensions.tables",
-        "markdown.extensions.smart_strong",
         # All of the above are the .extra extensions
         # w/o the "attribute lists" one
         "markdown.extensions.admonition",
@@ -4245,6 +4244,16 @@ def text2markdown(text, extended=True, readme=False):
         "markdown.extensions.sane_lists",
         "markdown.extensions.toc",
     ]
+
+    # smart_strong is not an extension anymore in markdown 3.0+
+    try:
+        md_version = markdown.__version__.version_info
+    except AttributeError:  # pragma: no cover
+        md_version = markdown.__version_info__
+
+    if md_version < (3, 0, 0):
+        extensions.append("markdown.extensions.smart_strong")
+
     # Some extensions are enabled for READMEs and disabled otherwise
     if readme:
         extensions.extend(

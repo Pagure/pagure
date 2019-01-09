@@ -5018,9 +5018,12 @@ class PagureLibtests(tests.Modeltests):
 
     def test_text2markdown_table(self):
         """ Test the text2markdown function with a markdown table. """
-        v = tuple([int(c) for c in markdown.version.split('.')])
+        try:
+            md_version = markdown.__version__.version_info
+        except AttributeError:
+            md_version = markdown.__version_info__
 
-        if v < (2, 6, 7):
+        if md_version < (2, 6, 7):
             raise unittest.case.SkipTest(
                 'Skipping on old markdown that do not strip the orientation row'
             )
