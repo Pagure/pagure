@@ -29,9 +29,9 @@ import six
 import wtforms
 
 import pagure.lib.query
+import pagure.validators
 from pagure.config import config as pagure_config
 from pagure.utils import urlpattern, is_admin
-
 
 STRICT_REGEX = "^[a-zA-Z0-9-_]+$"
 TAGS_REGEX = "^[a-zA-Z0-9-_, .:]+$"
@@ -141,7 +141,11 @@ class ProjectFormSimplified(PagureForm):
         ],
     )
     avatar_email = wtforms.StringField(
-        "Avatar email", [wtforms.validators.optional()]
+        "Avatar email",
+        [
+            pagure.validators.EmailValidator("avatar_email must be an email"),
+            wtforms.validators.optional(),
+        ],
     )
     tags = wtforms.StringField(
         "Project tags",

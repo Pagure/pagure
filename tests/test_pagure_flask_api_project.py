@@ -2102,6 +2102,78 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         )
 
         data = {
+             'name': 'api1',
+             'description': 'Mighty mighty description',
+             'avatar_email': 123
+        }
+
+        # invalid avatar_email - number
+        output = self.app.post(
+                '/api/0/new/', data=data, headers=headers)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(data,
+                {"error": "Invalid or incomplete input submitted",
+                    "error_code": "EINVALIDREQ",
+                    "errors":
+                    {"avatar_email": ['avatar_email must be an email']}
+                }
+        )
+
+        data = {
+             'name': 'api1',
+             'description': 'Mighty mighty description',
+             'avatar_email': [1,2,3]
+        }
+
+        # invalid avatar_email - list
+        output = self.app.post(
+                '/api/0/new/', data=data, headers=headers)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(data,
+                {"error": "Invalid or incomplete input submitted",
+                    "error_code": "EINVALIDREQ",
+                    "errors":
+                    {"avatar_email": ['avatar_email must be an email']}
+                }
+        )
+
+        data = {
+             'name': 'api1',
+             'description': 'Mighty mighty description',
+             'avatar_email': True
+        }
+
+        # invalid avatar_email - boolean
+        output = self.app.post(
+                '/api/0/new/', data=data, headers=headers)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(data,
+                {"error": "Invalid or incomplete input submitted",
+                    "error_code": "EINVALIDREQ",
+                    "errors":
+                    {"avatar_email": ['avatar_email must be an email']}
+                }
+        )
+
+        data = {
+             'name': 'api1',
+             'description': 'Mighty mighty description',
+             'avatar_email': 'mighty@email.com'
+        }
+
+        # valid avatar_email
+        output = self.app.post(
+                '/api/0/new/', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+                data,
+                {'message': 'Project "api1" created'})
+
+        data = {
             'name': 'test_42',
             'description': 'Just another small test project',
         }
