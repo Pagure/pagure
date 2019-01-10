@@ -1077,10 +1077,10 @@
           {% endif %}
 
 
-    {% if (not repo.is_fork and config.get('ENABLE_DEL_PROJECTS', True))
-    or
-    (repo.is_fork and config.get('ENABLE_DEL_FORKS',
-          config.get('ENABLE_DEL_PROJECTS', True))) %}
+          {% if (not repo.is_fork and config.get('ENABLE_DEL_PROJECTS', True))
+          or
+          (repo.is_fork and config.get('ENABLE_DEL_FORKS',
+                config.get('ENABLE_DEL_PROJECTS', True))) %}
           <div class="tab-pane fade" id="deleteproject-tab" role="tabpanel" aria-labelledby="deleteproject-tab">
               <h3 class="font-weight-bold mb-3">
                 Delete Project
