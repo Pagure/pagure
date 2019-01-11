@@ -21,4 +21,7 @@ Here are some tips:
 Once you start the server you can navigate to http://localhost:5000/
 in your browser on the host to access your Pagure development environment.
 
+During your navigate you can use any of the created users,
+by example `pingou/testing123`.
+
 Happy hacking!
