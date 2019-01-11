@@ -54,6 +54,9 @@ dev/docker/test_env
 # Tox virtualenvs
 .tox
 
+# Ignore pipenv
+Pipfile
+
 # A possible symlink for the testsuite
 /repospanner
 /repobridge
