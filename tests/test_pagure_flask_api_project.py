@@ -1654,6 +1654,12 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         tests.create_tokens_acl(self.session, 'aaabbbcccddd', 'modify_project')
         headers = {'Authorization': 'token aaabbbcccddd'}
 
+        # date before:
+        project = pagure.lib.query.get_authorized_project(
+            self.session, 'test')
+        date_before = project.date_modified
+        self.assertIsNotNone(date_before)
+
         output = self.app.patch(
             '/api/0/test', headers=headers,
             data={'main_admin': 'foo'})
@@ -1704,6 +1710,12 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             }
         }
         self.assertEqual(data, expected_output)
+
+        # date after:
+        self.session = pagure.lib.query.create_session(self.dbpath)
+        project = pagure.lib.query.get_authorized_project(
+            self.session, 'test')
+        self.assertNotEqual(date_before, project.date_modified)
 
     def test_api_modify_project_main_admin_not_main_admin(self):
         """ Test the api_modify_project method of the flask api when the

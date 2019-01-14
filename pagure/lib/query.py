@@ -5319,6 +5319,7 @@ def set_project_owner(session, project, user, required_groups=None):
             project.users.remove(contributor)
             break
     project.user = user
+    project.date_modified = datetime.datetime.utcnow()
     session.add(project)
 
 
