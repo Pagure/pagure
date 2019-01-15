@@ -22,6 +22,7 @@ if PYPATH:
     sys.path.append(PYPATH)
 
 import pagure
+import pagure.lib.model_base
 import pagure.lib.query
 from pagure.hooks import run_project_hooks, extract_changes
 from pagure.config import config as pagure_config
@@ -40,7 +41,7 @@ pruid = os.environ.get("extra_pull_request_uid", None)
 
 changes = extract_changes(from_stdin=hooktype != "update")
 
-session = pagure.lib.query.create_session(pagure_config["DB_URL"])
+session = pagure.lib.model_base.create_session(pagure_config["DB_URL"])
 if not session:
     raise Exception("Unable to initialize db session")
 

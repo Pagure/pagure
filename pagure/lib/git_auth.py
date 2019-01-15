@@ -23,6 +23,7 @@ from six import with_metaclass
 from six.moves import dbm_gnu
 
 import pagure.exceptions
+import pagure.lib.model_base
 import pagure.lib.query
 from pagure.config import config as pagure_config
 from pagure.lib import model
@@ -752,7 +753,8 @@ class Gitolite2Auth(GitAuthHelper):
         _log.info("Refresh gitolite configuration")
 
         if project is not None or group is not None:
-            session = pagure.lib.query.create_session(pagure_config["DB_URL"])
+            session = pagure.lib.model_base.create_session(
+                pagure_config["DB_URL"])
             cls.write_gitolite_acls(
                 session,
                 project=project,

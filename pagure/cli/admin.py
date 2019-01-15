@@ -30,13 +30,14 @@ if "PAGURE_CONFIG" not in os.environ and os.path.exists(
 import pagure.config  # noqa: E402
 import pagure.exceptions  # noqa: E402
 import pagure.lib.git  # noqa: E402
+import pagure.lib.model_base  # noqa: E402
 import pagure.lib.query  # noqa: E402
 import pagure.lib.tasks_utils  # noqa: E402
 from pagure.flask_app import generate_user_key_files  # noqa: E402
 
 
 _config = pagure.config.reload_config()
-session = pagure.lib.query.create_session(_config["DB_URL"])
+session = pagure.lib.model_base.create_session(_config["DB_URL"])
 _log = logging.getLogger(__name__)
 
 
@@ -1021,7 +1022,7 @@ def main():
 
         global session, _config
         _config = pagure.config.reload_config()
-        session = pagure.lib.query.create_session(_config["DB_URL"])
+        session = pagure.lib.model_base.create_session(_config["DB_URL"])
 
     logging.basicConfig()
     if args.debug:

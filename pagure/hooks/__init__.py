@@ -499,7 +499,7 @@ def run_hook_file(hooktype):
         raise ValueError("Hook type %s not valid" % hooktype)
     changes = extract_changes(from_stdin=hooktype != "update")
 
-    session = pagure.lib.query.create_session(pagure_config["DB_URL"])
+    session = pagure.lib.model_base.create_session(pagure_config["DB_URL"])
     if not session:
         raise Exception("Unable to initialize db session")
 

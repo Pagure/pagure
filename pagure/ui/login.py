@@ -22,6 +22,7 @@ from six.moves.urllib.parse import urljoin
 import pagure.login_forms as forms
 import pagure.lib.login
 import pagure.lib.model as model
+import pagure.lib.model_base
 import pagure.lib.notify
 import pagure.lib.query
 from pagure.utils import login_required
@@ -435,7 +436,7 @@ def _check_session_cookie():
     """ Set the user into flask.g if the user is logged in.
     """
     if not hasattr(flask.g, "session") or not flask.g.session:
-        flask.g.session = pagure.lib.query.create_session(
+        flask.g.session = pagure.lib.model_base.create_session(
             flask.current_app.config["DB_URL"]
         )
 

@@ -22,6 +22,7 @@ import requests
 from Milter.utils import parse_addr
 
 import pagure.config
+import pagure.lib.model_base
 import pagure.lib.query
 
 
@@ -157,7 +158,7 @@ class PagureMilter(Milter.Base):
         # they are trying to forge their ID into someone else's
         salt = _config.get('SALT_EMAIL')
         from_email = clean_item(msg['From'])
-        session = pagure.lib.query.create_session(_config['DB_URL'])
+        session = pagure.lib.model_base.create_session(_config['DB_URL'])
         try:
             user = pagure.lib.query.get_user(session, from_email)
         except:

@@ -8,9 +8,10 @@ from datetime import datetime, timedelta
 from sqlalchemy.exc import SQLAlchemyError
 
 import pagure.config
-import pagure.lib.query
-import pagure.lib.notify
 import pagure.lib.model as model
+import pagure.lib.model_base
+import pagure.lib.notify
+import pagure.lib.query
 
 if 'PAGURE_CONFIG' not in os.environ \
         and os.path.exists('/etc/pagure/pagure.cfg'):
@@ -23,7 +24,7 @@ _config = pagure.config.reload_config()
 def main(check=False, debug=False):
     ''' The function pulls in all the changes from upstream'''
 
-    session = pagure.lib.query.create_session(_config['DB_URL'])
+    session = pagure.lib.model_base.create_session(_config['DB_URL'])
     projects = session.query(
         model.Project
     ).filter(

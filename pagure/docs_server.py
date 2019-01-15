@@ -21,8 +21,9 @@ from binaryornot.helpers import is_binary_string
 import pagure.config
 import pagure.doc_utils
 import pagure.exceptions
-import pagure.lib.query
 import pagure.lib.mimetype
+import pagure.lib.model_base
+import pagure.lib.query
 import pagure.forms
 
 # Create the application.
@@ -31,7 +32,7 @@ APP = flask.Flask(__name__)
 # set up FAS
 APP.config = pagure.config.reload_config()
 
-SESSION = pagure.lib.query.create_session(APP.config["DB_URL"])
+SESSION = pagure.lib.model_base.create_session(APP.config["DB_URL"])
 
 if not APP.debug:
     APP.logger.addHandler(

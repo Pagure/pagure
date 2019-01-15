@@ -237,7 +237,7 @@ def set_request():
     """ Prepare every request. """
     flask.session.permanent = True
     if not hasattr(flask.g, "session") or not flask.g.session:
-        flask.g.session = pagure.lib.query.create_session(
+        flask.g.session = pagure.lib.model_base.create_session(
             flask.current_app.config["DB_URL"]
         )
 

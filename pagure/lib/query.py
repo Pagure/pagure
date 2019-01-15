@@ -48,8 +48,6 @@ from six.moves.urllib_parse import urlparse, urlencode, parse_qsl
 from sqlalchemy import func
 from sqlalchemy import asc, desc
 from sqlalchemy.orm import aliased
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.orm import scoped_session
 from flask import url_for
 
 import pagure.exceptions
@@ -64,6 +62,8 @@ import pagure.pfmarkdown
 import pagure.utils
 from pagure.config import config as pagure_config
 from pagure.lib import model
+# For backward compatibility since this function used to be in this file
+from pagure.lib.model_base import create_session
 
 
 REDIS = None
@@ -137,55 +137,6 @@ def get_user_by_id(session, userid):
     query = session.query(model.User).filter(model.User.id == userid)
 
     return query.first()
-
-
-SESSIONMAKER = None
-
-
-def create_session(db_url=None, debug=False, pool_recycle=3600):
-    """ Create the Session object to use to query the database.
-
-    :arg db_url: URL used to connect to the database. The URL contains
-    information with regards to the database engine, the host to connect
-    to, the user and password and the database name.
-      ie: <engine>://<user>:<password>@<host>/<dbname>
-    :kwarg debug: a boolean specifying whether we should have the verbose
-        output of sqlalchemy or not.
-    :return a Session that can be used to query the database.
-
-    """
-    global SESSIONMAKER
-
-    if SESSIONMAKER is None or (
-        db_url and db_url != ("%s" % SESSIONMAKER.kw["bind"].engine.url)
-    ):
-        if db_url is None:
-            raise ValueError("First call to create_session needs db_url")
-        if db_url.startswith("postgres"):  # pragma: no cover
-            engine = sqlalchemy.create_engine(
-                db_url,
-                echo=debug,
-                pool_recycle=pool_recycle,
-                client_encoding="utf8",
-            )
-        else:  # pragma: no cover
-            engine = sqlalchemy.create_engine(
-                db_url, echo=debug, pool_recycle=pool_recycle
-            )
-
-        if db_url.startswith("sqlite:"):
-            # Ignore the warning about con_record
-            # pylint: disable=unused-argument
-            def _fk_pragma_on_connect(dbapi_con, _):  # pragma: no cover
-                """ Tries to enforce referential constraints on sqlite. """
-                dbapi_con.execute("pragma foreign_keys=ON")
-
-            sqlalchemy.event.listen(engine, "connect", _fk_pragma_on_connect)
-        SESSIONMAKER = sessionmaker(bind=engine)
-
-    scopedsession = scoped_session(SESSIONMAKER)
-    model.BASE.metadata.bind = scopedsession
-    return scopedsession
 
 
 def get_next_id(session, projectid):

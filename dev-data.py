@@ -694,7 +694,7 @@ if __name__ == "__main__":
         empty_dev_db(meta, eng)
 
     if args.populate or args.all:
-        session = pagure.lib.query.create_session(_config['DB_URL'])
+        session = pagure.lib.model_base.create_session(_config['DB_URL'])
         invalid_option = ['pingou', 'bar@pingou.com', 'foo', 'foo@bar.com']
         print("")
         user_name = six.moves.input(

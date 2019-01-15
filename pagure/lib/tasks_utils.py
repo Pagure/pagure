@@ -13,7 +13,7 @@ from __future__ import unicode_literals, absolute_import
 import gc
 from functools import wraps
 
-import pagure.lib.query
+import pagure.lib.model_base
 from pagure.config import config as pagure_config
 
 
@@ -31,7 +31,8 @@ def pagure_task(function):
                 self.update_state(state="RUNNING")
             except TypeError:
                 pass
-        session = pagure.lib.query.create_session(pagure_config["DB_URL"])
+        session = pagure.lib.model_base.create_session(
+            pagure_config["DB_URL"])
         try:
             return function(self, session, *args, **kwargs)
         except:  # noqa: E722

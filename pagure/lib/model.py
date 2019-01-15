@@ -1049,7 +1049,7 @@ class ProjectLocker(object):
         self.ltype = ltype
 
     def __enter__(self):
-        from pagure.lib.query import create_session
+        from pagure.lib.model_base import create_session
 
         self.session = create_session()
 

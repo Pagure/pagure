@@ -40,6 +40,7 @@ if 'PAGURE_CONFIG' not in os.environ \
 
 
 import pagure  # noqa: E402
+import pagure.lib.model_base  # noqa: E402
 import pagure.lib.query  # noqa: E402
 from pagure.exceptions import PagureException, PagureEvException  # noqa: E402
 
@@ -55,7 +56,7 @@ def _get_session():
     global SESSION
     if SESSION is None:
         print(pagure.config.config['DB_URL'])
-        SESSION = pagure.lib.query.create_session(
+        SESSION = pagure.lib.model_base.create_session(
             pagure.config.config['DB_URL'])
 
     return SESSION
