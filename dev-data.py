@@ -34,34 +34,16 @@ python dev-data.py --all
 _config = pagure.config.reload_config()
 
 
-def init_database():
-    DB_URL = _config['DB_URL']
-
-    # create the table if it doesnt exist
-    pagure.lib.model.create_tables(
-        DB_URL,
-        _config.get('PATH_ALEMBIC_INI', None),
-        acls=_config.get('ACLS', {}),
-        debug=True)
-
-    engine = create_engine('%s' % DB_URL, echo=True)
-
-    metadata = MetaData(engine)
-    metadata.reflect(bind=engine)
-    return engine, metadata
-
-
-def empty_dev_db(metadata, engine):
+def empty_dev_db(session):
     print('')
-    print('')
-    print('WARNING: Deleting all data from ', _config['DB_URL'])
-    # Dangerous: this will wipe the data from the table but keep the schema
-    print('')
-    response = six.moves.input('Do you want to continue? (yes/no)    ')
-    if 'yes'.startswith(response.lower()):
-        for tbl in reversed(metadata.sorted_tables):
-            if tbl.fullname != 'acls':
-                engine.execute(tbl.delete())
+    print('WARNING: Deleting all data from', _config['DB_URL'])
+    response = os.environ.get("FORCE_DELETE")
+    if not response:
+        response = six.moves.input('Do you want to continue? (yes/no)    ')
+    if response.lower().startswith('y'):
+        tables = reversed(pagure.lib.model_base.BASE.metadata.sorted_tables)
+        for tbl in tables:
+            session.execute(tbl.delete())
     else:
         exit("Aborting.")
 
@@ -69,10 +51,6 @@ def empty_dev_db(metadata, engine):
 def insert_data(session, username, user_email):
     _config['EMAIL_SEND'] = False
     _config['TESTING'] = True
-
-    # Populate with default statuses
-    create_default_status(session)
-    print('Default statuses populated')
 
     ######################################
     # tags
@@ -430,7 +408,7 @@ def insert_data(session, username, user_email):
     session.commit()
 
 
-#####################################
+    #####################################
     # tokens
     tests.create_tokens(session, user_id=pingou.id, project_id=project1.id)
 
@@ -668,6 +646,46 @@ def add_content_git_repo(folder, branch='master'):
     shutil.rmtree(newfolder)
 
 
+def _get_username():
+    invalid_option = ['pingou', 'foo']
+    user_name = os.environ.get("USER_NAME")
+    if not user_name:
+        print("")
+        user_name = six.moves.input(
+            "Enter your username so we can add you into the test data:  ")
+    cnt = 0
+    while not user_name.strip() or user_name in invalid_option:
+        print("Reserved names: " + str(invalid_option))
+        user_name = six.moves.input(
+            "Enter your username so we can add you into the "
+            "test data:  ")
+        cnt += 1
+        if cnt == 4:
+            print("We asked too many times, bailing")
+            sys.exit(1)
+
+    return user_name
+
+
+def _get_user_email():
+    invalid_option = ['bar@pingou.com', 'foo@bar.com']
+    user_email = os.environ.get("USER_EMAIL")
+    if not user_email:
+        print("")
+        user_email = six.moves.input("Enter your user email:  ")
+
+    cnt = 0
+    while not user_email.strip() or user_email in invalid_option:
+        print("Reserved names: " + str(invalid_option))
+        user_email = six.moves.input("Enter your user email:  ")
+        cnt += 1
+        if cnt == 4:
+            print("We asked too many times, bailing")
+            sys.exit(1)
+
+    return user_email
+
+
 if __name__ == "__main__":
     desc = "Run the dev database initialization/insertion/deletion " \
            "script for db located  " + str(_config['DB_URL'])
@@ -679,7 +697,7 @@ if __name__ == "__main__":
     parser.add_argument('-d', '--delete', action="store_true",
                         help="Wipe the dev db")
     parser.add_argument('-a', '--all', action="store_true",
-                        help="Create, Wipe, Populate the dev db")
+                        help="Create, Populate then Wipe the dev db")
 
     args = parser.parse_args()
 
@@ -687,34 +705,23 @@ if __name__ == "__main__":
     if not any(vars(args).values()):
         parser.error('No arguments provided.')
 
-    if args.init or args.delete or args.all:
-        eng, meta = init_database()
+    session = None
 
-    if args.delete or args.all:
-        empty_dev_db(meta, eng)
+    if args.init or args.all:
+        session = pagure.lib.model.create_tables(
+            db_url=_config["DB_URL"],
+            alembic_ini=None,
+            acls=_config["ACLS"],
+            debug=False)
+        print("Database created")
 
     if args.populate or args.all:
-        session = pagure.lib.model_base.create_session(_config['DB_URL'])
-        invalid_option = ['pingou', 'bar@pingou.com', 'foo', 'foo@bar.com']
-        print("")
-        user_name = six.moves.input(
-            "Enter your username so we can add you into the test data:  ")
-        while user_name in invalid_option:
-            print("Reserved names: " + str(invalid_option))
-            user_name = six.moves.input(
-                "Enter your username so we can add you into the test data:  ")
+        if not session:
+            session = pagure.lib.query.create_session(_config['DB_URL'])
 
-        if not user_name.replace(" ", ""):
-            user_name = 'pythagoras'
-
-        print("")
-        user_email = six.moves.input("Enter your user email:  ")
-
-        while user_email in invalid_option:
-            print("Reserved names: " + str(invalid_option))
-            user_email = six.moves.input("Enter your user email:  ")
-
-        if not user_email.replace(" ", ""):
-            user_email = 'pythagoras@math.com'
-
+        user_name = _get_username()
+        user_email = _get_user_email()
         insert_data(session, user_name, user_email)
+
+    if args.delete or args.all:
+        empty_dev_db(session)
