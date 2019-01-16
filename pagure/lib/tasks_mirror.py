@@ -210,6 +210,13 @@ def mirror_project(self, session, username, namespace, name):
     public_key_name = werkzeug.secure_filename(project.fullname)
     private_key_file = os.path.join(ssh_folder, public_key_name)
 
+    if not os.path.exists(private_key_file):
+        _log.info("No %s key found, bailing", private_key_file)
+        project.mirror_hook.last_log = "Private key not found on disk, bailing"
+        session.add(project.mirror_hook)
+        session.commit()
+        return
+
     # Add the utility script allowing this feature to work on old(er) git.
     here = os.path.join(os.path.dirname(os.path.abspath(__file__)))
     script_file = os.path.join(here, "ssh_script.sh")
