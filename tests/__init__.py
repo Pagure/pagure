@@ -373,7 +373,8 @@ class SimplePagureTest(unittest.TestCase):
 
         # Write a config file
         config_values = {
-            'path': self.path, 'dburl': self.dbpath,
+            'path': self.path,
+            'dburl': self.dbpath,
             'enable_docs': True,
             'docs_folder': '%s/repos/docs' % self.path,
             'enable_tickets': True,
