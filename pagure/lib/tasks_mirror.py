@@ -203,7 +203,7 @@ def mirror_project(self, session, username, namespace, name):
     repofolder = pagure_config["GIT_FOLDER"]
     repopath = os.path.join(repofolder, project.path)
     if not os.path.exists(repopath):
-        _log.info("Git folder not found at: %s, bailing", repopath)
+        _log.warning("Git folder not found at: %s, bailing", repopath)
         return
 
     ssh_folder = pagure_config["MIRROR_SSHKEYS_FOLDER"]
@@ -211,7 +211,7 @@ def mirror_project(self, session, username, namespace, name):
     private_key_file = os.path.join(ssh_folder, public_key_name)
 
     if not os.path.exists(private_key_file):
-        _log.info("No %s key found, bailing", private_key_file)
+        _log.warning("No %s key found, bailing", private_key_file)
         project.mirror_hook.last_log = "Private key not found on disk, bailing"
         session.add(project.mirror_hook)
         session.commit()
