@@ -1224,7 +1224,7 @@ def read_output(cmd, abspath, input=None, keepends=False, error=False, **kw):
         print(out)
         print(err)
     if not keepends:
-        out = out.rstrip(u"\n\r")
+        out = out.rstrip("\n\r")
 
     if error:
         return (out, err)
