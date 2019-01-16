@@ -2293,7 +2293,9 @@ class PullRequestFlag(BASE):
         nullable=False,
     )
     token_id = sa.Column(
-        sa.String(64), sa.ForeignKey("tokens.id"), nullable=True
+        sa.String(64),
+        sa.ForeignKey("tokens.id", ondelete="CASCADE", onupdate="CASCADE"),
+        nullable=True
     )
     status = sa.Column(sa.String(32), nullable=False)
     user_id = sa.Column(
