@@ -398,10 +398,13 @@ def auth_login():  # pragma: no cover
         return flask.redirect(return_point)
 
     admins = pagure_config["ADMIN_GROUP"]
-    if isinstance(admins, list):
-        admins = set(admins)
-    else:  # pragma: no cover
-        admins = set([admins])
+    if admins:
+        if isinstance(admins, list):
+            admins = set(admins)
+        else:  # pragma: no cover
+            admins = set([admins])
+    else:
+        admins = set()
 
     if auth in ["fas", "openid"]:
         from pagure.ui.fas_login import FAS
