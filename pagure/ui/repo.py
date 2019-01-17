@@ -962,11 +962,12 @@ def view_tree(repo, identifier=None, username=None, namespace=None):
                 if not repo_obj.head_is_unborn:
                     branchname = repo_obj.head.shorthand
                     commit = repo_obj[repo_obj.head.target]
-                    flask.flash(
-                        "'%s' not found in the git repository, going back to: "
-                        "%s" % (identifier, branchname),
-                        "error",
-                    )
+                    if identifier:
+                        flask.flash(
+                            "'%s' not found in the git repository, going back "
+                            "to: %s" % (identifier, branchname),
+                            "error",
+                        )
         # If we're arriving here from the release page, we may have a Tag
         # where we expected a commit, in this case, get the actual commit
         if isinstance(commit, pygit2.Tag):

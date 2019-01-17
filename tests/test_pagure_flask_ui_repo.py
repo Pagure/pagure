@@ -3175,6 +3175,30 @@ index 0000000..fb7093d
         self.assertFalse(
             'No content found in this repository' in output_text)
 
+        # View tree, no identifier:
+        output = self.app.get('/test/tree/')
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<title>Tree - test - Pagure</title>', output_text)
+        self.assertIn('README.rst', output_text)
+        self.assertNotIn(
+            'No content found in this repository', output_text)
+        self.assertNotIn(
+            "&#39;None&#39; not found in the git repository, going back to: "
+            "master", output_text)
+
+        # View tree, invalid identifier:
+        output = self.app.get('/test/tree/invalid')
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        self.assertIn('<title>Tree - test - Pagure</title>', output_text)
+        self.assertIn('README.rst', output_text)
+        self.assertNotIn(
+            'No content found in this repository', output_text)
+        self.assertIn(
+            "&#39;invalid&#39; not found in the git repository, going back "
+            "to: master", output_text)
+
         # View tree by branch
         output = self.app.get('/test/tree/master')
         self.assertEqual(output.status_code, 200)
