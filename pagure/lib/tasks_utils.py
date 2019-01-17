@@ -31,8 +31,7 @@ def pagure_task(function):
                 self.update_state(state="RUNNING")
             except TypeError:
                 pass
-        session = pagure.lib.model_base.create_session(
-            pagure_config["DB_URL"])
+        session = pagure.lib.model_base.create_session(pagure_config["DB_URL"])
         try:
             return function(self, session, *args, **kwargs)
         except:  # noqa: E722

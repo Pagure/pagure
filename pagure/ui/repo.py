@@ -1261,7 +1261,7 @@ def view_settings(repo, username=None, namespace=None):
         plugins=plugins,
         branchname=branchname,
         pagure_admin=pagure.utils.is_admin(),
-        main_app=flask.current_app
+        main_app=flask.current_app,
     )
 
 

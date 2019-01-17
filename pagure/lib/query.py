@@ -62,6 +62,7 @@ import pagure.pfmarkdown
 import pagure.utils
 from pagure.config import config as pagure_config
 from pagure.lib import model
+
 # For backward compatibility since this function used to be in this file
 from pagure.lib.model_base import create_session
 

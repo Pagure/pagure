@@ -754,7 +754,8 @@ class Gitolite2Auth(GitAuthHelper):
 
         if project is not None or group is not None:
             session = pagure.lib.model_base.create_session(
-                pagure_config["DB_URL"])
+                pagure_config["DB_URL"]
+            )
             cls.write_gitolite_acls(
                 session,
                 project=project,

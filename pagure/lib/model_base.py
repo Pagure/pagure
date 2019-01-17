@@ -26,7 +26,8 @@ CONVENTION = {
 }
 
 BASE = declarative_base(
-    metadata=sqlalchemy.MetaData(naming_convention=CONVENTION))
+    metadata=sqlalchemy.MetaData(naming_convention=CONVENTION)
+)
 
 
 SESSIONMAKER = None
