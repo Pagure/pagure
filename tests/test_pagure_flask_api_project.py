@@ -4097,5 +4097,158 @@ class PagureFlaskApiProjectOptionsTests(tests.Modeltests):
         self.assertEqual(after, before)
 
 
+class PagureFlaskApiProjectConnectorTests(tests.Modeltests):
+    """ Tests for the flask API of pagure for getting connector of a project
+    """
+
+    maxDiff = None
+
+    def setUp(self):
+        """ Set up the environnment, ran before every tests. """
+        super(PagureFlaskApiProjectConnectorTests, self).setUp()
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session, project_id=None)
+        tests.create_tokens_acl(
+            self.session, 'aaabbbcccddd', 'modify_project')
+
+
+    def test_api_get_project_connector_as_owner(self):
+        """ Test accessing api_get_project_connector as project owner. """
+
+        project = pagure.lib.query._get_project(self.session, 'test')
+
+        # Create witness project Token for pingou user
+        pagure.lib.query.add_token_to_user(
+            self.session,
+            project=project,
+            acls=['pull_request_merge'],
+            username='pingou')
+        ctokens = pagure.lib.query.search_token(
+            self.session, ['pull_request_merge'], user='pingou')
+
+        # Call the connector with pingou user token and verify content
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        output = self.app.get('/api/0/test/connector', headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(
+            data,
+            {"connector": {
+                "hook_token": project.hook_token,
+                "api_tokens": [
+                    {'name': t.description, 'id': t.id} for t in ctokens]
+            },
+            "status": "ok"
+            }
+        )
+
+    def test_api_get_project_connector_as_admin(self):
+        """ Test accessing api_get_project_connector as project admin """
+
+        project = pagure.lib.query._get_project(self.session, 'test')
+
+        # Set the foo user as test project admin
+        pagure.lib.query.add_user_to_project(
+            self.session, project,
+            new_user='foo',
+            user='pingou',
+            access='admin'
+        )
+        self.session.commit()
+
+        # Create modify_project token for foo user
+        pagure.lib.query.add_token_to_user(
+            self.session,
+            project=None,
+            acls=['modify_project'],
+            username='foo')
+        mtoken = pagure.lib.query.search_token(
+            self.session, ['modify_project'], user='foo')[0]
+
+        # Create witness project Token for foo user
+        pagure.lib.query.add_token_to_user(
+            self.session,
+            project=project,
+            acls=['pull_request_merge'],
+            username='foo')
+        ctokens = pagure.lib.query.search_token(
+            self.session, ['pull_request_merge'], user='foo')
+
+        # Call the connector with foo user token and verify content
+        headers = {'Authorization': 'token %s' % mtoken.id}
+        output = self.app.get('/api/0/test/connector', headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(
+            data,
+            {"connector": {
+                "hook_token": project.hook_token,
+                "api_tokens": [
+                    {'name': t.description, 'id': t.id} for t in ctokens]
+            },
+            "status": "ok"
+            }
+        )
+
+    def test_api_get_project_connector_as_unauthorized(self):
+        """ Test accessing api_get_project_connector as project admin
+        but with unauthorized token ACL
+        """
+
+        project = pagure.lib.query._get_project(self.session, 'test')
+
+        # Set the foo user as test project admin
+        pagure.lib.query.add_user_to_project(
+            self.session, project,
+            new_user='foo',
+            user='pingou',
+            access='admin'
+        )
+        self.session.commit()
+
+        # Create modify_project token for foo user
+        pagure.lib.query.add_token_to_user(
+            self.session,
+            project=None,
+            acls=['create_project'],
+            username='foo')
+        mtoken = pagure.lib.query.search_token(
+            self.session, ['create_project'], user='foo')[0]
+
+        # Call the connector with foo user token and verify unauthorized
+        headers = {'Authorization': 'token %s' % mtoken.id}
+        output = self.app.get('/api/0/test/connector', headers=headers)
+        self.assertEqual(output.status_code, 401)
+
+    def test_api_get_project_connector_as_unauthorized_2(self):
+        """ Test accessing api_get_project_connector as project
+        but with unauthorized token ACL
+        """
+
+        project = pagure.lib.query._get_project(self.session, 'test')
+
+        # Set the foo user as test project admin
+        pagure.lib.query.add_user_to_project(
+            self.session, project,
+            new_user='foo',
+            user='pingou',
+            access='commit'
+        )
+        self.session.commit()
+
+        # Create modify_project token for foo user
+        pagure.lib.query.add_token_to_user(
+            self.session,
+            project=None,
+            acls=['modify_project'],
+            username='foo')
+        mtoken = pagure.lib.query.search_token(
+            self.session, ['modify_project'], user='foo')[0]
+
+        # Call the connector with foo user token and verify unauthorized
+        headers = {'Authorization': 'token %s' % mtoken.id}
+        output = self.app.get('/api/0/test/connector', headers=headers)
+        self.assertEqual(output.status_code, 401)
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)

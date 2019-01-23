@@ -1963,6 +1963,79 @@ def api_get_project_options(repo, username=None, namespace=None):
     return flask.jsonify({"settings": project.settings, "status": "ok"})
 
 
+@API.route("/<repo>/connector", methods=["GET"])
+@API.route("/<namespace>/<repo>/connector", methods=["GET"])
+@API.route("/fork/<username>/<repo>/connector", methods=["GET"])
+@API.route("/fork/<username>/<namespace>/<repo>/connector", methods=["GET"])
+@api_login_required(acls=["modify_project"])
+@api_method
+def api_get_project_connector(repo, username=None, namespace=None):
+    """
+    Get project connector
+    ---------------------
+    Allow project owner and admins to retrieve connector tokens.
+    Connector tokens are the API tokens and the Web Hook token
+    of the project. Connector tokens make possible for an external
+    application to listen and verify project notifications and act
+    on project via the REST API.
+
+    ::
+
+        GET /api/0/<repo>/connector
+        GET /api/0/<namespace>/<repo>/connector
+
+    ::
+
+        GET /api/0/fork/<username>/<repo>/connector
+        GET /api/0/fork/<username>/<namespace>/<repo>/connector
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "connector": {
+              "hook_token": "aaabbbccc",
+              "api_token": [
+                  {'name': 'foo token', 'id': "abcdefoo"}
+                  {'name': 'bar token', 'id': "abcdebar"}
+              ]
+          },
+          "status": "ok"
+        }
+
+    """
+    project = get_authorized_api_project(
+        flask.g.session, repo, namespace=namespace
+    )
+    if not project:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
+
+    if flask.g.token.project and project != flask.g.token.project:
+        raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
+
+    authorized_users = [project.user.username]
+    authorized_users.extend(
+        [user.user for user in project.access_users['admin']])
+    if flask.g.fas_user.user not in authorized_users:
+        raise pagure.exceptions.APIError(
+            401, error_code=APIERROR.ENOTHIGHENOUGH)
+
+    user_obj = pagure.lib.query.search_user(
+        flask.g.session, username=flask.g.fas_user.user)
+    user_project_tokens = [
+        token for token in user_obj.tokens if token.project_id == project.id]
+
+    connector = {
+        'hook_token': project.hook_token,
+        'api_tokens': [
+            {'name': t.description, 'id': t.id} for t in user_project_tokens]
+    }
+
+    return flask.jsonify({"connector": connector, "status": "ok"})
+
+
 def _check_value(value):
     """ Convert the provided value into a boolean, an int or leave it as it.
     """
