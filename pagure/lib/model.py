@@ -3007,7 +3007,8 @@ class Token(BASE):
     def __repr__(self):
         """ Return a string representation of this object. """
 
-        return "Token: %s - name %s" % (self.id, self.expiration)
+        return "Token: %s - name %s - expiration: %s" % (
+            self.id, self.description, self.expiration)
 
     @property
     def expired(self):
