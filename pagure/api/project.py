@@ -2030,7 +2030,11 @@ def api_get_project_connector(repo, username=None, namespace=None):
     connector = {
         'hook_token': project.hook_token,
         'api_tokens': [
-            {'name': t.description, 'id': t.id} for t in user_project_tokens]
+            {'description': t.description,
+             'id': t.id,
+             'expired': t.expired
+             } for t in user_project_tokens
+        ]
     }
 
     return flask.jsonify({"connector": connector, "status": "ok"})

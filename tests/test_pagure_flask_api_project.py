@@ -4136,7 +4136,9 @@ class PagureFlaskApiProjectConnectorTests(tests.Modeltests):
             {"connector": {
                 "hook_token": project.hook_token,
                 "api_tokens": [
-                    {'name': t.description, 'id': t.id} for t in ctokens]
+                    {'description': t.description,
+                     'id': t.id,
+                     'expired': False} for t in ctokens]
             },
             "status": "ok"
             }
@@ -4184,7 +4186,9 @@ class PagureFlaskApiProjectConnectorTests(tests.Modeltests):
             {"connector": {
                 "hook_token": project.hook_token,
                 "api_tokens": [
-                    {'name': t.description, 'id': t.id} for t in ctokens]
+                    {'description': t.description,
+                     'id': t.id,
+                     'expired': False} for t in ctokens]
             },
             "status": "ok"
             }
