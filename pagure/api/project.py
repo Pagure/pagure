@@ -2133,3 +2133,109 @@ def api_modify_project_options(repo, username=None, namespace=None):
         raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
     return flask.jsonify({"message": message, "status": "ok"})
+
+@API.route("/<repo>/createapitoken", methods=["POST"])
+@API.route("/<namespace>/<repo>/createapitoken", methods=["POST"])
+@API.route("/fork/<username>/<repo>/createapitoken", methods=["POST"])
+@API.route(
+    "/fork/<username>/<namespace>/<repo>/createapitoken", methods=["POST"]
+)
+@api_login_required(acls=["modify_project"])
+@api_method
+def api_project_create_api_token(repo, namespace=None, username=None):
+    """
+    Create API project Token
+    ------------------------
+    Create a project token API for the caller user
+
+    This is restricted to project admins.
+
+    ::
+
+        POST /api/0/<repo>/createapitoken
+        POST /api/0/<namespace>/<repo>/createapitoken
+
+    ::
+
+        POST /api/0/fork/<username>/<repo>/createapitoken
+        POST /api/0/fork/<username>/<namespace>/<repo>/createapitoken
+
+
+    Input
+    ^^^^^
+
+    +------------------+---------+---------------+---------------------------+
+    | Key              | Type    | Optionality   | Description               |
+    +==================+=========+===============+===========================+
+    | ``desc``         | String  | Mandatory     | A string to specify the   |
+    |                  |         |               | description of the token  |
+    |                  |         |               |                           |
+    +------------------+---------+---------------+---------------------------+
+    | ``acl``          | String  | Mandatory     | The ACL as a comma        |
+    |                  |         |               | string                    |
+    |                  |         |               |                           |
+    +------------------+---------+---------------+---------------------------+
+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "token": {
+            "description": "My foo token",
+            "id": "aaabbbcccfootoken",
+          },
+        }
+
+    """
+    output = {}
+    project = get_authorized_api_project(
+        flask.g.session, repo, namespace=namespace
+    )
+    if not project:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
+
+    if flask.g.token.project and project != flask.g.token.project:
+        raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
+
+
+    authorized_users = [project.user.username]
+    authorized_users.extend(
+        [user.user for user in project.access_users['admin']])
+    if flask.g.fas_user.user not in authorized_users:
+        raise pagure.exceptions.APIError(
+            401, error_code=APIERROR.ENOTHIGHENOUGH)
+
+
+    form = flask.request.form
+    valid_form = True
+    description = form.get('description')
+    acl = form.get('acl')
+    if not isinstance(description, str) or not isinstance(acl, str):
+        valid_form = False
+    acl_list = acl.split(',')
+    for ac in acl_list:
+        if ac not in pagure_config.get("ACLS", []):
+            valid_form = False
+            break
+    if not valid_form:
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.EINVALIDREQ)
+
+    pagure.lib.query.add_token_to_user(
+        flask.g.session, project, acl.split(','), flask.g.fas_user.user,
+        description)
+    token_id = pagure.lib.query.search_token(
+        flask.g.session, None, user=flask.g.fas_user.user,
+        description=description)[0].id
+    output = {
+        'token': {
+            'description': description,
+            'id': token_id
+        }
+    }
+
+    jsonout = flask.jsonify(output)
+    return jsonout

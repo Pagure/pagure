@@ -5205,8 +5205,8 @@ def get_obj_access(session, project_obj, obj):
 
 
 def search_token(
-    session, acls, user=None, token=None, active=False, expired=False
-):
+    session, acls, user=None, token=None, active=False, expired=False,
+    description=None):
     """ Searches the API tokens corresponding to the criterias specified.
 
     :arg session: the session to use to connect to the database.
@@ -5214,6 +5214,7 @@ def search_token(
     :arg user: restrict the API tokens to this given user
     :arg token: restrict the API tokens to this specified token (if it
         exists)
+    :arg description: restrict the API tokens to this given description
     """
     query = (
         session.query(model.Token)
@@ -5231,6 +5232,9 @@ def search_token(
         query = query.filter(model.Token.user_id == model.User.id).filter(
             model.User.user == user
         )
+
+    if description:
+        query = query.filter(model.Token.description == description)
 
     if active:
         query = query.filter(

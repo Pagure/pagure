@@ -4096,6 +4096,179 @@ class PagureFlaskApiProjectOptionsTests(tests.Modeltests):
         before["settings"]["issues_default_to_private"] = True
         self.assertEqual(after, before)
 
+class PagureFlaskApiProjectCreateAPITokenTests(tests.Modeltests):
+    """ Tests for the flask API of pagure for creating user project API token
+    """
+
+    maxDiff = None
+
+    def setUp(self):
+        """ Set up the environnment, ran before every tests. """
+        super(PagureFlaskApiProjectCreateAPITokenTests, self).setUp()
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session, project_id=None)
+        tests.create_tokens_acl(
+            self.session, 'aaabbbcccddd', 'modify_project')
+
+    def test_api_createapitoken_as_owner(self):
+        """ Test accessing api_project_createapitoken as owner. """
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        project = pagure.lib.query._get_project(self.session, 'test')
+        tdescription = 'my new token'
+
+        # Call the api with pingou user token and verify content
+        data = {
+            'description': tdescription,
+            'acl': 'pull_request_merge,pull_request_comment'
+        }
+        output = self.app.post('/api/0/test/createapitoken',
+            headers=headers, data=data)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        tid = pagure.lib.query.search_token(
+            self.session, None, description=tdescription)[0].id
+        self.assertEqual(
+            data,
+            {"token": {
+                "description": tdescription,
+                "id": tid
+                }
+            }
+        )
+        # Create a second token but with faulty acl
+        # Call the api with pingou user token and error code
+        data = {
+            'description': tdescription,
+            'acl': 'foo,bar'
+        }
+        output = self.app.post('/api/0/test/createapitoken',
+            headers=headers, data=data)
+        self.assertEqual(output.status_code, 400)
+
+    def test_api_createapitoken_as_admin(self):
+        """ Test accessing api_project_createapitoken as admin. """
+
+        project = pagure.lib.query._get_project(self.session, 'test')
+
+        # Set the foo user as test project admin
+        pagure.lib.query.add_user_to_project(
+            self.session, project,
+            new_user='foo',
+            user='pingou',
+            access='admin'
+        )
+        self.session.commit()
+
+        # Create modify_project token for foo user
+        pagure.lib.query.add_token_to_user(
+            self.session,
+            project=None,
+            acls=['modify_project'],
+            username='foo')
+        mtoken = pagure.lib.query.search_token(
+            self.session, ['modify_project'], user='foo')[0]
+
+        # Call the connector with foo user token and verify content
+        headers = {'Authorization': 'token %s' % mtoken.id}
+        tdescription = 'my new token'
+
+        # Call the api with pingou user token and verify content
+        data = {
+            'description': tdescription,
+            'acl': 'pull_request_merge,pull_request_comment'
+        }
+        output = self.app.post('/api/0/test/createapitoken',
+            headers=headers, data=data)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        tid = pagure.lib.query.search_token(
+            self.session, None, user='foo', description=tdescription)[0].id
+        self.assertEqual(
+            data,
+            {"token": {
+                "description": tdescription,
+                "id": tid
+                }
+            }
+        )
+
+    def test_api_createapitoken_as_unauthorized(self):
+        """ Test accessing api_project_createapitoken as project admin
+        but with unauthorized token ACL.
+        """
+
+        project = pagure.lib.query._get_project(self.session, 'test')
+
+        # Set the foo user as test project admin
+        pagure.lib.query.add_user_to_project(
+            self.session, project,
+            new_user='foo',
+            user='pingou',
+            access='admin'
+        )
+        self.session.commit()
+
+        # Create modify_project token for foo user
+        pagure.lib.query.add_token_to_user(
+            self.session,
+            project=None,
+            acls=['create_branch'],
+            username='foo')
+        mtoken = pagure.lib.query.search_token(
+            self.session, ['create_branch'], user='foo')[0]
+
+        # Call the connector with foo user token and verify content
+        headers = {'Authorization': 'token %s' % mtoken.id}
+        tdescription = 'my new token'
+
+        # Call the api with pingou user token and verify content
+        data = {
+            'description': tdescription,
+            'acl': 'pull_request_merge,pull_request_comment'
+        }
+        output = self.app.post('/api/0/test/createapitoken',
+            headers=headers, data=data)
+        self.assertEqual(output.status_code, 401)
+
+    def test_api_createapitoken_as_unauthorized_2(self):
+        """ Test accessing api_project_createapitoken as project user
+        with unauthorized token ACL.
+        """
+
+        project = pagure.lib.query._get_project(self.session, 'test')
+
+        # Set the foo user as test project admin
+        pagure.lib.query.add_user_to_project(
+            self.session, project,
+            new_user='foo',
+            user='pingou',
+            access='commit'
+        )
+        self.session.commit()
+
+        # Create modify_project token for foo user
+        pagure.lib.query.add_token_to_user(
+            self.session,
+            project=None,
+            acls=['modify_project'],
+            username='foo')
+        mtoken = pagure.lib.query.search_token(
+            self.session, ['modify_project'], user='foo')[0]
+
+        # Call the connector with foo user token and verify content
+        headers = {'Authorization': 'token %s' % mtoken.id}
+        tdescription = 'my new token'
+
+        # Call the api with pingou user token and verify content
+        data = {
+            'description': tdescription,
+            'acl': 'pull_request_merge,pull_request_comment'
+        }
+        output = self.app.post('/api/0/test/createapitoken',
+            headers=headers, data=data)
+        self.assertEqual(output.status_code, 401)
+
 
 class PagureFlaskApiProjectConnectorTests(tests.Modeltests):
     """ Tests for the flask API of pagure for getting connector of a project
