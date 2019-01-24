@@ -2134,6 +2134,7 @@ def api_modify_project_options(repo, username=None, namespace=None):
 
     return flask.jsonify({"message": message, "status": "ok"})
 
+
 @API.route("/<repo>/createapitoken", methods=["POST"])
 @API.route("/<namespace>/<repo>/createapitoken", methods=["POST"])
 @API.route("/fork/<username>/<repo>/createapitoken", methods=["POST"])
@@ -2200,14 +2201,12 @@ def api_project_create_api_token(repo, namespace=None, username=None):
     if flask.g.token.project and project != flask.g.token.project:
         raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
 
-
     authorized_users = [project.user.username]
     authorized_users.extend(
         [user.user for user in project.access_users['admin']])
     if flask.g.fas_user.user not in authorized_users:
         raise pagure.exceptions.APIError(
             401, error_code=APIERROR.ENOTHIGHENOUGH)
-
 
     form = flask.request.form
     valid_form = True
