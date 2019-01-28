@@ -49,8 +49,7 @@
                 href="#hooks-tab" role="tab" aria-controls="hooks">Hooks</a>
           {% endif %}
 
-          {% if config.get('ENABLE_TICKETS', True)
-            and repo.settings.get('issue_tracker', True) %}
+          {% if g.issues_enabled %}
           <a class="nav-item nav-link" id="priorities" data-toggle="tab"
                 href="#priorities-tab" role="tab" aria-controls="priorities">Priorities</a>
           <a class="nav-item nav-link" id="roadmap" data-toggle="tab"
@@ -63,9 +62,7 @@
                 href="#reports-tab" role="tab" aria-controls="reports">Reports</a>
           {% endif %}
 
-         {% if (config.get('ENABLE_TICKETS', True)
-            and repo.settings.get('issue_tracker', True))
-            or repo.settings.get('pull_requests', True) %}
+         {% if g.issues_enabled or repo.settings.get('pull_requests', True) %}
           <a class="nav-item nav-link" id="projecttags" data-toggle="tab"
             href="#projecttags-tab" role="tab" aria-controls="projecttags">Tags</a>
           <a class="nav-item nav-link" id="quickreplies" data-toggle="tab"
@@ -242,9 +239,9 @@
                 <div class="col">
                     <p>
                         The email addresses entered below will receive all the notifications
-                        related to {% if config.get('ENABLE_TICKETS', True) %}
+                        related to {% if g.issues_enabled %}
                         (public) issues and {% endif %}pull-requests, this includes
-                        notifications about {% if config.get('ENABLE_TICKETS', True) %}
+                        notifications about {% if g.issues_enabled %}
                         new issue or {% endif %} new pull-request, new comment
                         and status change.
                       </p>
@@ -260,7 +257,7 @@
                       {{ tag_form.csrf_token }}
                       <div class="card-body">
 
-                        {% if config.get('ENABLE_TICKETS', True) %}
+                        {% if g.issues_enabled %}
                         <div class="row">
                           <div class="col-sm-12">
                             <strong>Issues notifications</strong>
@@ -480,7 +477,7 @@
                 <div class="col">
                   <div id="accordions" role="tablist" aria-multiselectable="true">
                       {% for plugin in plugins %}
-                      {% if not config.get('ENABLE_TICKETS', True) and plugin in ['Pagure tickets'] %}
+                      {% if not g.issues_enabled and plugin in ['Pagure tickets'] %}
                       {% else %}
                       <div class="panel panel-default" >
                         <div class="panel-heading" role="tab" id="pluginheading{{ loop.index }}">
@@ -508,8 +505,7 @@
           </div>
           {% endif %}
 
-          {% if config.get('ENABLE_TICKETS', True)
-          and repo.settings.get('issue_tracker', True) %}
+          {% if g.issues_enabled %}
           <div class="tab-pane fade" id="priorities-tab" role="tabpanel" aria-labelledby="priorities-tab">
               <h3 class="font-weight-bold mb-3">
                 Priorities
@@ -854,9 +850,7 @@
 
           {% endif %}
 
-          {% if (config.get('ENABLE_TICKETS', True)
-          and repo.settings.get('issue_tracker', True))
-          or repo.settings.get('pull_requests', True) %}
+          {% if g.issues_enabled or repo.settings.get('pull_requests', True) %}
           <div class="tab-pane fade" id="projecttags-tab" role="tabpanel" aria-labelledby="projecttags-tab">
               <h3 class="font-weight-bold mb-3">
                 Tags
@@ -869,7 +863,7 @@
                   <ul class="list-group">
                       {% for tag in tags %}
                         <li class="list-group-item clearfix">
-                          {% if config.get('ENABLE_TICKETS', True) %}
+                          {% if g.issues_enabled %}
                           <a href="{{ url_for(
                               'ui_ns.view_issues',
                               repo=repo.name,
@@ -877,7 +871,7 @@
                               namespace=repo.namespace,
                               tags=tag.tag) }}">{% endif %}
                             <span class="fa fa-tag"></span>&nbsp; {{ tag.tag }}
-                          {% if config.get('ENABLE_TICKETS', True) %}</a>{% endif %}
+                          {% if g.issues_enabled %}</a>{% endif %}
                           &nbsp;<span class="badge badge-info" style="background-color:{{tag.tag_color}}">{{tag.tag}}</span>
                           &nbsp;<span class="text-muted">{{ tag.tag_description or '' }}</span>
                           <div class="float-right">
@@ -1009,7 +1003,7 @@
               </h3>
               <div class="row">
                 <div class="col">
-                    {% if config.get('ENABLE_TICKETS', True) %}
+                    {% if g.issues_enabled %}
                     <form action="{{ url_for(
                         'ui_ns.regenerate_git',
                         repo=repo.name,

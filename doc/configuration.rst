@@ -999,6 +999,20 @@ for all the projects hosted on this pagure instance.
 Defaults to: ``True``
 
 
+ENABLE_TICKETS_NAMESPACE
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+This configuration key allows to restrict the namespace in which the ticketing
+system is enabled.
+So if your pagure instance has ``ENABLE_TICKETS`` as ``True`` and sets
+``ENABLE_TICKETS_NAMESPACE`` to ``['tests', 'infra']`` only the projects opened
+in these two namespaces will have the ticketing system enabled. All the other
+namespaces will not.
+
+
+Defaults to: ``[]``
+
+
 ENABLE_DOCS
 ~~~~~~~~~~~
 

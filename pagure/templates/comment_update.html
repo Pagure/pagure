@@ -89,7 +89,7 @@
     $("#update_comment").atwho(userConfig);
   });
   $.when(
-    {% if config.get('ENABLE_TICKETS', True) %}
+    {% if g.issues_enabled %}
       $.get("{{ url_for('api_ns.api_view_issues', namespace=repo.namespace, repo=repo.name, username=username, status='all') }}"),
     {% endif %}
     $.get("{{ url_for('api_ns.api_pull_request_views', namespace=repo.namespace, repo=repo.name, username=username, status='all') }}")

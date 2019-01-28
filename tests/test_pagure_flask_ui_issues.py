@@ -40,6 +40,52 @@ import tests
 class PagureFlaskIssuestests(tests.Modeltests):
     """ Tests for flask issues controller of pagure """
 
+    @patch.dict('pagure.config.config', {'ENABLE_TICKETS_NAMESPACE': ['foobar']})
+    @patch('pagure.lib.git.update_git', MagicMock(return_value=True))
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_new_issue_wrong_namespace(self):
+        """ Test the new_issue endpoint. """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos'), bare=True)
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(self.app.application, user):
+            csrf_token = self.get_csrf()
+            data = {
+                'title': 'Test issue',
+                'issue_content': 'We really should improve on this issue',
+                'status': 'Open',
+                'csrf_token': csrf_token,
+            }
+
+            # Things work fine when the project has no namespace
+
+            output = self.app.post(
+                '/test/new_issue', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>Issue #1: Test issue - test - Pagure</title>',
+                output_text)
+            self.assertIn(
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                 ' href="/test/issue/1/edit" title="Edit this issue">',
+                output_text)
+
+            # Things do not work when the project has a namespace not allowed
+
+            output = self.app.post(
+                '/somenamespace/test3/new_issue', data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>Page not found :\'( - Pagure</title>', output_text)
+            self.assertIn(
+                ' <p>No issue tracker found for this project</p>', output_text)
+
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
     def test_new_issue(self, p_send_email, p_ugt):
@@ -618,6 +664,36 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<div id="milestone_plain">\n              <span>'
                 '\n                <a href="/test/roadmap/v2.0/">'
                 '\n                  v2.0\n', output_text)
+
+    @patch.dict('pagure.config.config', {'ENABLE_TICKETS_NAMESPACE': ['foobar']})
+    @patch('pagure.lib.git.update_git', MagicMock(return_value=True))
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_view_issues_wrong_namespace(self):
+        """ Test the view_issues endpoint. """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos'), bare=True)
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(self.app.application, user):
+            # Things work fine when the project has no namespace
+
+            output = self.app.get('/test/issues')
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>Issues - test - Pagure</title>', output_text)
+
+            # Things do not work when the project has a namespace not allowed
+
+            output = self.app.get('/somenamespace/test3/issues')
+            self.assertEqual(output.status_code, 404)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>Page not found :\'( - Pagure</title>', output_text)
+            self.assertIn(
+                ' <p>No issue tracker found for this project</p>', output_text)
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
@@ -1669,6 +1745,74 @@ class PagureFlaskIssuestests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
+
+    @patch.dict('pagure.config.config', {'ENABLE_TICKETS_NAMESPACE': ['foobar']})
+    @patch('pagure.lib.git.update_git', MagicMock(return_value=True))
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_update_issue_wrong_namespace(self):
+        """ Test the update_issue endpoint. """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos'), bare=True)
+
+        # Create normal issue on test
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue #1',
+            content='We should work on this',
+            user='pingou',
+            private=False,
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue #1')
+
+        # Create normal issue on test3
+        repo = pagure.lib.query.get_authorized_project(
+            self.session, 'test3', namespace='somenamespace')
+        msg = pagure.lib.query.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue #1',
+            content='We should work on this',
+            user='pingou',
+            private=False,
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue #1')
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(self.app.application, user):
+            # Add new comment
+            data = {
+                'csrf_token': self.get_csrf(),
+                'status': 'Closed',
+                'close_status': 'Fixed',
+                'comment': 'Woohoo a second comment!',
+            }
+
+            # Things work fine when the project has no namespace
+            output = self.app.post(
+                '/test/issue/1/update', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>Issue #1: Test issue #1 - test - Pagure</title>',
+                output_text)
+
+            # Things do not work when the project has a namespace not allowed
+
+            output = self.app.post(
+                '/somenamespace/test3/issue/1/update', data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>Page not found :\'( - Pagure</title>', output_text)
+            self.assertIn(
+                ' <p>No issue tracker found for this project</p>', output_text)
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')

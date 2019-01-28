@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2018 - Copyright Red Hat Inc
+ (c) 2018-2019 - Copyright Red Hat Inc
 
  Authors:
    Clement Verna <cverna@tutanota.com>
+   Pierre-Yves Chibon <pingou@pingoured.fr>
 
 """
 
@@ -25,7 +26,9 @@ def has_issue_tracker(function):
     @wraps(function)
     def check_issue_tracker(*args, **kwargs):
         repo = flask.g.repo
-        if not repo.settings.get("issue_tracker", True):
+        if not flask.g.issues_enabled or not repo.settings.get(
+            "issue_tracker", True
+        ):
             flask.abort(404, "No issue tracker found for this project")
         # forbid all POST requests if the issue tracker is made read-only
         if flask.request.method == "POST" and repo.settings.get(

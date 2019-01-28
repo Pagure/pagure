@@ -327,6 +327,28 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.assertEqual(
             pagure.api.APIERROR.EINVALIDTOK.name, data['error_code'])
 
+    @patch.dict('pagure.config.config', {'ENABLE_TICKETS_NAMESPACE': ['foobar']})
+    def test_api_new_issue_wrong_namespace(self):
+        """ Test the api_new_issue method of the flask api. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'tickets'), bare=True)
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # Valid token, wrong project
+        output = self.app.post(
+            '/api/0/somenamespace/test3/new_issue', headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(sorted(data.keys()), ['error', 'error_code'])
+        self.assertEqual(
+            pagure.api.APIERROR.ETRACKERDISABLED.value, data['error'])
+        self.assertEqual(
+            pagure.api.APIERROR.ETRACKERDISABLED.name, data['error_code'])
+
     def test_api_new_issue_no_input(self):
         """ Test the api_new_issue method of the flask api. """
         tests.create_projects(self.session)
@@ -2596,6 +2618,47 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             }
         )
 
+    @patch.dict('pagure.config.config', {'ENABLE_TICKETS_NAMESPACE': ['foobar']})
+    def test_api_change_milestone_issue_wrong_namespace(self):
+        """ Test the api_new_issue method of the flask api. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'tickets'))
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        # Set some milestones to the project
+        repo = pagure.lib.query.get_authorized_project(
+            self.session, 'test3', namespace='somenamespace')
+        repo.milestones = {'v1.0': None, 'v2.0': 'Soon'}
+        self.session.add(repo)
+        self.session.commit()
+
+        # Create normal issue
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue #1',
+            content='We should work on this',
+            user='pingou',
+            private=False,
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue #1')
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # Valid token, wrong project
+        output = self.app.post(
+            '/api/0/somenamespace/test3/issue/1/milestone', headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(sorted(data.keys()), ['error', 'error_code'])
+        self.assertEqual(
+            pagure.api.APIERROR.ETRACKERDISABLED.value, data['error'])
+        self.assertEqual(
+            pagure.api.APIERROR.ETRACKERDISABLED.name, data['error_code'])
+
     def test_api_change_milestone_issue_wrong_token(self):
         """ Test the api_change_milestone_issue method of the flask api. """
         tests.create_projects(self.session)
@@ -3244,6 +3307,48 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
               }
             }
         )
+
+    @patch.dict('pagure.config.config', {'ENABLE_TICKETS_NAMESPACE': ['foobar']})
+    def test_api_assign_issue_wrong_namespace(self):
+        """ Test the api_new_issue method of the flask api. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'tickets'))
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        # Set some milestones to the project
+        repo = pagure.lib.query.get_authorized_project(
+            self.session, 'test3', namespace='somenamespace')
+        repo.milestones = {'v1.0': None, 'v2.0': 'Soon'}
+        self.session.add(repo)
+        self.session.commit()
+
+        # Create normal issue
+        repo = pagure.lib.query.get_authorized_project(
+            self.session, 'test3', namespace='somenamespace')
+        msg = pagure.lib.query.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue #1',
+            content='We should work on this',
+            user='pingou',
+            private=False,
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue #1')
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # Valid token, wrong project
+        output = self.app.post(
+            '/api/0/somenamespace/test3/issue/1/assign', headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(sorted(data.keys()), ['error', 'error_code'])
+        self.assertEqual(
+            pagure.api.APIERROR.ETRACKERDISABLED.value, data['error'])
+        self.assertEqual(
+            pagure.api.APIERROR.ETRACKERDISABLED.name, data['error_code'])
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')

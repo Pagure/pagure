@@ -82,8 +82,7 @@
       <div class="col-6 text-right">
         <div class="btn-group">
         {% if g.authenticated %}
-          {% if repo.settings.get('issue_tracker', True)
-                and config.get('ENABLE_TICKETS', True)
+          {% if g.issues_enabled
                 and not repo.settings.get('issue_tracker_read_only', False) %}
             <a href="{{ url_for('ui_ns.new_issue',
                 repo=g.repo.name,
@@ -221,8 +220,7 @@
                 {% endif %}
 
                 {% if g.authenticated and g.repo_committer %}
-                  {% if config.get('ENABLE_TICKETS', True)
-                    and repo.settings.get('issue_tracker', True) %}
+                  {% if g.issues_enabled %}
                     <h5><strong>Issues</strong></h5>
                     {{ print_ssh_url(repo, "tickets/", g.fas_user.username) }}
                   {% endif %}
@@ -282,8 +280,7 @@
         </li>
         {% endif %}
 
-        {% if config.get('ENABLE_TICKETS', True) and repo
-              and repo.settings.get('issue_tracker', True) %}
+        {% if g.issues_enabled %}
         <li class="nav-item mr-2 text-dark">
             <a {%
               if select == 'issues' %}class="active nav-link" {%
@@ -321,8 +318,7 @@
         </li>
         {% endif %}
 
-        {% if config.get('ENABLE_TICKETS', True) and repo.milestones
-            and repo.settings.get('issue_tracker', True)%}
+        {% if g.issues_enabled and repo.milestones %}
         <li class="nav-item mr-2 text-dark">
         <a {%
             if select == 'roadmap' %}class="active nav-link" {%

@@ -244,6 +244,8 @@ def set_request():
     flask.g.version = pagure.__version__
     flask.g.confirmationform = pagure.forms.ConfirmationForm()
 
+    flask.g.issues_enabled = pagure_config.get("ENABLE_TICKETS", True)
+
     # The API namespace has its own way of getting repo and username and
     # of handling errors
     if flask.request.blueprint == "api_ns":
@@ -321,6 +323,28 @@ def set_request():
 
         if flask.g.repo is None:
             flask.abort(404, "Project not found")
+
+        # If issues are not globally enabled, there is no point in continuing
+        if flask.g.issues_enabled:
+
+            ticket_namespaces = pagure_config.get("ENABLE_TICKETS_NAMESPACE")
+
+            if ticket_namespaces and flask.g.repo.namespace:
+                if flask.g.repo.namespace in (ticket_namespaces or []):
+                    # If the namespace is in the allowed list
+                    # issues are enabled
+                    flask.g.issues_enabled = True
+                else:
+                    # If the namespace isn't in the list of namespaces
+                    # issues are disabled
+                    flask.g.issues_enabled = False
+
+            flask.g.issues_project_disabled = False
+            if not flask.g.repo.settings.get("issue_tracker", True):
+                # If the project specifically disabled its issue tracker,
+                # disable issues
+                flask.g.issues_project_disabled = True
+                flask.g.issues_enabled = False
 
         flask.g.reponame = get_repo_path(flask.g.repo)
         flask.g.repo_obj = pygit2.Repository(flask.g.reponame)

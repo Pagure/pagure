@@ -55,7 +55,7 @@ var view_commits_url = "{{ url_for('ui_ns.view_commits',
                     username=username,
                     namespace=repo.namespace,
                     author='---') }}";
-{% if config.get('ENABLE_TICKETS', True) %}
+{% if g.issues_enabled %}
 issues_history_stats_plot_call = function() {
   var _stats_url = "{{ url_for(
     'api_ns.api_view_issues_history_stats',
@@ -138,7 +138,7 @@ $(document).ready(function() {
     _b.hide();
     $('.stats_btn').removeClass('active');
     if ($(this).attr('name') == 'issues') {
-      {% if config.get('ENABLE_TICKETS', True) %}
+      {% if g.issues_enabled %}
       issues_history_stats_plot_call();
       $(this).addClass('active');
       window.location.hash = 'issues'
@@ -155,7 +155,7 @@ $(document).ready(function() {
   });
   window.onhashchange = function () {
       if (window.location.hash == 'issues') {
-        {% if config.get('ENABLE_TICKETS', True) %}
+        {% if g.issues_enabled %}
         issues_history_stats_plot_call();
         {% endif %}
       } else if (window.location.hash == 'authors') {

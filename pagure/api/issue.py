@@ -67,7 +67,12 @@ def _check_issue_tracker(repo):
     :param repo: repository
     :raises pagure.exceptions.APIError: when issue tracker is disabled
     """
-    if not repo.settings.get("issue_tracker", True):
+    ticket_namespaces = pagure_config.get("ENABLE_TICKETS_NAMESPACE")
+    if (
+        ticket_namespaces
+        and repo.namespace
+        and repo.namespace not in ticket_namespaces
+    ) or not repo.settings.get("issue_tracker", True):
         raise pagure.exceptions.APIError(
             404, error_code=APIERROR.ETRACKERDISABLED
         )

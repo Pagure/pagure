@@ -9,7 +9,7 @@ Project Options
     username=username,
     namespace=repo.namespace) }}" method="post">
     {% for key in repo.settings | sort %}
-    {% if not config.get('ENABLE_TICKETS', True) and key in ['issue_tracker', 'issues_default_to_private'] %}
+    {% if not g.issues_enabled and not g.issues_project_disabled and key in ['issue_tracker', 'issues_default_to_private'] %}
     {% elif not config.get('DOC_APP_URL') and key in ['project_documentation'] %}
     {% elif not config.get('WEBHOOK') and key in ['Web-hooks'] %}
     {% else %}

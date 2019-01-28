@@ -1419,7 +1419,7 @@ $(document).ready(function () {
   });
 
   $.when(
-    {%- if config.get('ENABLE_TICKETS', True) and repo.settings.get('issue_tracker', True) %}
+    {%- if g.issues_enabled %}
     $.get("{{ url_for('api_ns.api_view_issues',
                 repo=repo.name,
                 username=username,
