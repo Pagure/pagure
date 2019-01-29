@@ -3025,6 +3025,69 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output_text.count(
                 '<p>We should work on this</p>'), 1)
 
+    @patch('pagure.lib.git.update_git', MagicMock(return_value=True))
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_edit_tag_issue_disabled(self):
+        """ Test the edit_tag endpoint when issues are disabled. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'))
+
+        # disable issue tracker
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        repo.settings = {'issue_tracker': False}
+        self.session.add(repo)
+        self.session.commit()
+
+        # Create issues to play with
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue')
+
+        # Add a tag to the issue
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
+        msg = pagure.lib.query.add_tag_obj(
+            session=self.session,
+            obj=issue,
+            tags='tag1',
+            user='pingou',
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Issue tagged with: tag1')
+
+        # Before edit, list tags
+        tags = pagure.lib.query.get_tags_of_project(self.session, repo)
+        self.assertEqual([tag.tag for tag in tags], ['tag1'])
+
+        # Edit tag
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(self.app.application, user):
+
+            output = self.app.get('/test/tag/tag1/edit')
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<strong>Edit tag: tag1</strong>' in output.get_data(as_text=True))
+
+            csrf_token = self.get_csrf(output=output)
+
+            data = {'tag': 'tag2',
+                    'tag_description': 'lorem ipsum',
+                    'tag_color': 'DeepSkyBlue'}
+
+            output = self.app.post('/test/tag/tag1/edit', data=data)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<strong>Edit tag: tag1</strong>' in output.get_data(as_text=True))
+
+        # After edit, list tags
+        self.session.commit()
+        tags = pagure.lib.query.get_tags_of_project(self.session, repo)
+        self.assertEqual([tag.tag for tag in tags], ['tag1'])
+
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
     def test_edit_tag(self, p_send_email, p_ugt):
@@ -3128,6 +3191,63 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.session.commit()
         tags = pagure.lib.query.get_tags_of_project(self.session, repo)
         self.assertEqual([tag.tag for tag in tags], ['tag2'])
+
+    @patch('pagure.lib.git.update_git', MagicMock(return_value=True))
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_remove_tag_issue_disabled(self):
+        """ Test the remove_tag endpoint. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'))
+
+        # disable issue tracker
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        repo.settings = {'issue_tracker': False}
+        self.session.add(repo)
+        self.session.commit()
+
+        # Create issues to play with
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue')
+
+        # Add a tag to the issue
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
+        msg = pagure.lib.query.add_tag_obj(
+            session=self.session,
+            obj=issue,
+            tags='tag1',
+            user='pingou',
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Issue tagged with: tag1')
+
+        # Before edit, list tags
+        tags = pagure.lib.query.get_tags_of_project(self.session, repo)
+        self.assertEqual([tag.tag for tag in tags], ['tag1'])
+
+        # Edit tag
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(self.app.application, user):
+            data = {
+                'tag': 'tag1',
+                'csrf_token': self.get_csrf(),
+            }
+            output = self.app.post(
+                '/test/droptag/', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">Project '
+                'Settings</h5>', output_text)
+            self.assertIn(
+                'Tag: tag1 has been deleted', output_text)
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
@@ -3602,6 +3722,71 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertIn(
                 'value="ssh://git@localhost.localdomain/tickets/test.git',
                 output_text)
+
+    @patch('pagure.lib.git.update_git', MagicMock(return_value=True))
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_update_tags_issue_disabled(self):
+        """ Test the update_tags endpoint. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'))
+
+        # disable issue tracker
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        repo.settings = {'issue_tracker': False}
+        self.session.add(repo)
+        self.session.commit()
+
+        # Create issues to play with
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue')
+
+         # Before update, list tags
+        tags = pagure.lib.query.get_tags_of_project(self.session, repo)
+        self.assertEqual([tag.tag for tag in tags], [])
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(self.app.application, user):
+            csrf_token = self.get_csrf()
+            # Valid query
+            data = {
+                'tag': ['red1', 'green'],
+                'tag_description': ['lorem ipsum', 'sample description'],
+                'tag_color': ['#ff0000', '#00ff00'],
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/test/update/tags', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn(
+                '<span class="badge badge-info" '
+                'style="background-color:#00ff00">green</span>\n'
+                '                          &nbsp;'
+                '<span class="text-muted">sample description</span>', output_text)
+            self.assertIn(
+                '<input type="hidden" value="green" name="tag" />',
+                output_text)
+            self.assertIn(
+                '<span class="badge badge-info" '
+                'style="background-color:#ff0000">red1</span>\n'
+                '                          &nbsp;'
+                '<span class="text-muted">lorem ipsum</span>', output_text)
+
+        # After update, list tags
+        tags = pagure.lib.query.get_tags_of_project(self.session, repo)
+        self.assertEqual(
+            sorted([tag.tag for tag in tags]),
+            ['green', 'red1'])
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
