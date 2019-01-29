@@ -2295,7 +2295,7 @@ class PullRequestFlag(BASE):
     token_id = sa.Column(
         sa.String(64),
         sa.ForeignKey("tokens.id", ondelete="CASCADE", onupdate="CASCADE"),
-        nullable=True
+        nullable=True,
     )
     status = sa.Column(sa.String(32), nullable=False)
     user_id = sa.Column(
@@ -3008,7 +3008,10 @@ class Token(BASE):
         """ Return a string representation of this object. """
 
         return "Token: %s - name %s - expiration: %s" % (
-            self.id, self.description, self.expiration)
+            self.id,
+            self.description,
+            self.expiration,
+        )
 
     @property
     def expired(self):
