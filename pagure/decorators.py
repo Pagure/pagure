@@ -58,6 +58,27 @@ def has_pr_enabled(function):
     return check_trackers
 
 
+def has_issue_or_pr_enabled(function):
+    """
+    Decorator that checks if the current pagure project has either their
+    issue tracker or their PR active. If both of them are disabled, it
+    returns a 404 page.
+    """
+
+    @wraps(function)
+    def check_issue_pr_trackers(*args, **kwargs):
+        repo = flask.g.repo
+        if not flask.g.issues_enabled and not repo.settings.get(
+            "pull_requests", True
+        ):
+            flask.abort(
+                404, "Issue tracker and Pull-Request disabled for this project"
+            )
+        return function(*args, **kwargs)
+
+    return check_issue_pr_trackers
+
+
 def is_repo_admin(function):
     """
     Decorator that checks if the current user is the admin of

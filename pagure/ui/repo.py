@@ -60,6 +60,7 @@ from pagure.decorators import (
     is_repo_admin,
     is_admin_sess_timedout,
     has_issue_tracker,
+    has_issue_or_pr_enabled,
     has_pr_enabled,
 )
 
@@ -3134,8 +3135,7 @@ def view_stats(repo, username=None, namespace=None):
 @UI_NS.route("/<namespace>/<repo>/update/tags", methods=["POST"])
 @login_required
 @is_repo_admin
-@has_issue_tracker
-@has_pr_enabled
+@has_issue_or_pr_enabled
 def update_tags(repo, username=None, namespace=None):
     """ Update the tags of a project.
     """
@@ -3240,8 +3240,7 @@ def update_tags(repo, username=None, namespace=None):
 @UI_NS.route("/fork/<username>/<namespace>/<repo>/droptag/", methods=["POST"])
 @login_required
 @is_repo_admin
-@has_issue_tracker
-@has_pr_enabled
+@has_issue_or_pr_enabled
 def remove_tag(repo, username=None, namespace=None):
     """ Remove the specified tag, associated with the issues, from the project.
     """
@@ -3294,8 +3293,7 @@ def remove_tag(repo, username=None, namespace=None):
 )
 @login_required
 @is_repo_admin
-@has_issue_tracker
-@has_pr_enabled
+@has_issue_or_pr_enabled
 def edit_tag(repo, tag, username=None, namespace=None):
     """ Edit the specified tag associated with the issues of a project.
     """
