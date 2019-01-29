@@ -1687,13 +1687,13 @@ def api_modify_acls(repo, namespace=None, username=None):
 
     ::
 
-        POST /api/0/<repo>/modifyacls/flag
-        POST /api/0/<namespace>/<repo>/modifyacls/flag
+        POST /api/0/<repo>/git/modifyacls
+        POST /api/0/<namespace>/<repo>/git/modifyacls
 
     ::
 
-        POST /api/0/fork/<username>/<repo>/modifyacls/flag
-        POST /api/0/fork/<username>/<namespace>/<repo>/modifyacls/flag
+        POST /api/0/fork/<username>/<repo>/git/modifyacls
+        POST /api/0/fork/<username>/<namespace>/<repo>/git/modifyacls
 
 
     Input
