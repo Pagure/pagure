@@ -41,23 +41,25 @@ add_comment = function(data, username) {
     + '      <a href="/user/' + data.comment_user + '"'
     + '        class="notblue font-weight-bold">'+data.comment_user+'</a>'
     + '      <a class="notblue" title="Permalink to this headline"'
-    + '          href="#comment-' + data.comment_id + '">'
-    + '        <span>commented seconds ago</span>'
+    if (data.comment_id) {
+      _data += ' href="#comment-' + data.comment_id + '"';
+    }
+    _data += '><span>commented seconds ago</span>'
     + '      </a>'
     + '    </div>';
 
-    if ( data.comment_user == username && data.comment_id !== 'undefined') {
-        _data = _data
-    + '    <div class="issue_actions ml-auto">'
-    + '      <a href="/' + data.project + '/pull-request/' + data.request_id + '/comment/' + data.comment_id + '/edit"'
-    + '         class="btn btn-outline-primary border-0" data-comment="' + data.comment_id + '" data-objid="' + data.request_id + '">'
-    + '        <i class="fa fa-pencil"  title="Edit comment"></i>'
-    + '      </a>'
-    + '      <button class="btn btn-outline-primary border-0" title="Remove comment" name="drop_comment" '
-    + '         value="' + data.comment_id + '" type="submit" onclick="return confirm(\'Do you really want to remove this comment?\');" >'
-    + '        <i class="fa fa-trash"></i>'
-    + '      </button>'
-    + '    </div>'
+    if ( data.comment_user == username && data.comment_id !== undefined) {
+      _data = _data
+      + '    <div class="issue_actions ml-auto">'
+      + '      <a href="/' + data.project + '/pull-request/' + data.request_id + '/comment/' + data.comment_id + '/edit"'
+      + '         class="btn btn-outline-primary border-0" data-comment="' + data.comment_id + '" data-objid="' + data.request_id + '">'
+      + '        <i class="fa fa-pencil"  title="Edit comment"></i>'
+      + '      </a>'
+      + '      <button class="btn btn-outline-primary border-0" title="Remove comment" name="drop_comment" '
+      + '         value="' + data.comment_id + '" type="submit" onclick="return confirm(\'Do you really want to remove this comment?\');" >'
+      + '        <i class="fa fa-trash"></i>'
+      + '      </button>'
+      + '    </div>';
     }
 
     _data = _data
