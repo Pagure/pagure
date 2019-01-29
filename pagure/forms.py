@@ -34,7 +34,7 @@ from pagure.config import config as pagure_config
 from pagure.utils import urlpattern, is_admin
 
 STRICT_REGEX = "^[a-zA-Z0-9-_]+$"
-TAGS_REGEX = "^[a-zA-Z0-9-_, .:]+$"
+TAGS_REGEX = "^[a-zA-Z0-9-_ .:]+$"
 FALSE_VALUES = ("false", "", False, "False", 0, "0")
 
 WTF_VERSION = tuple()
