@@ -237,7 +237,15 @@
                     <i class="fa fa-users fa-fw"></i>
                     <span>Members</span>
                   </a>
-                  <span class="btn btn-sm btn-primary font-weight-bold">{{ repo.contributors|length+1 }}</span>
+                  {# the +1 here is for the main admin that is not listed in repo.contributors #}
+                  {% set memberstotal = repo.contributors['admin']|length +
+                                        repo.contributors['commit']|length +
+                                        repo.contributors['ticket']|length +
+                                        repo.contributor_groups['admin']|length +
+                                        repo.contributor_groups['commit']|length +
+                                        repo.contributor_groups['ticket']|length + 1 %}
+                  <span class="btn btn-sm btn-primary font-weight-bold">{{ memberstotal }}</span>
+
                   <div class="dropdown-menu dropdown-menu-right" style="width:500px">
                     <div>
                       <div class="media p-2">
