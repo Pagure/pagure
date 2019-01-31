@@ -65,7 +65,7 @@ def fedmsg_publish(*args, **kwargs):  # pragma: no cover
 
 
 def fedora_messaging_publish(topic, message):  # pragma: no cover
-    """ Try to publish a message on AMPQ using fedora-messaging. """
+    """ Try to publish a message on AMQP using fedora-messaging. """
     if not pagure_config.get("FEDORA_MESSAGING_NOTIFICATIONS", False):
         return
 
@@ -74,14 +74,12 @@ def fedora_messaging_publish(topic, message):  # pragma: no cover
         import fedora_messaging.exceptions
 
         msg = fedora_messaging.api.Message(
-            topic="pagure.{}".format(topic),
-            body=message,
+            topic="pagure.{}".format(topic), body=message
         )
         fedora_messaging.api.publish(msg)
-    except Pfedora_messaging.exceptions.ublishReturned as e:
+    except fedora_messaging.exceptions.PublishReturned as e:
         log.warning(
-            "Fedora Messaging broker rejected message %s: %s",
-            msg.id, e
+            "Fedora Messaging broker rejected message %s: %s", msg.id, e
         )
     except fedora_messaging.exceptions.ConnectionException as e:
         log.warning("Error sending message %s: %s", msg.id, e)
@@ -94,7 +92,7 @@ stomp_conn = None
 
 def stomp_publish(topic, message):
     """ Try to publish a message on a Stomp-compliant message bus. """
-    if not pagure_config.get("STOMP_NOTIFICATIONS", True):
+    if not pagure_config.get("STOMP_NOTIFICATIONS", False):
         return
     # We catch Exception if we want :-p
     # pylint: disable=broad-except
