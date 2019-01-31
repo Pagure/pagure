@@ -48,8 +48,8 @@ Vagrantfile
 *.retry
 .vagrant
 
-#Ignore generated dockerfile
-dev/docker/test_env
+# Ignore generated dockerfile
+dev/containers/test_env
 
 # Tox virtualenvs
 .tox

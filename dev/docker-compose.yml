@@ -4,7 +4,7 @@ volumes:
 services:
   web:
     build:
-      context: ./docker
+      context: ./containers
       dockerfile: web
     depends_on:
       - redis
@@ -22,7 +22,7 @@ services:
       - PAGURE_CONFIG=/code/dev/openshift.cfg
   worker:
     build:
-      context: ./docker
+      context: ./containers
       dockerfile: worker
     depends_on:
       - redis
@@ -37,7 +37,7 @@ services:
       - PAGURE_CONFIG=/code/dev/openshift.cfg
   logcom:
     build:
-      context: ./docker
+      context: ./containers
       dockerfile: logcom
     depends_on:
       - redis
@@ -52,7 +52,7 @@ services:
       - PAGURE_CONFIG=/code/dev/openshift.cfg
   ev:
     build:
-      context: ./docker
+      context: ./containers
       dockerfile: ev
     depends_on:
       - redis
