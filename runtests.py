@@ -31,6 +31,7 @@ NUMPROCS = multiprocessing.cpu_count() - 1
 if os.environ.get('BUILD_ID'):
     NUMPROCS = multiprocessing.cpu_count()
 
+HERE = os.path.join(os.path.dirname(os.path.abspath(__file__)))
 LOG = logging.getLogger(__name__)
 
 def setup_parser():
@@ -310,7 +311,7 @@ def do_run(args):
         try:
             with open(failed_tests_fullpath, "r") as ffile:
                 suites = json.loads(ffile.read())
-        except json.decoder.JSONDecodeError:
+        except:
             bname = os.path.basename(args.failed_tests)
             if bname.endswith(".py") and bname.startswith("test_"):
                 suites.append(bname.replace(".py", ""))
@@ -422,6 +423,26 @@ def _run_test_suites(args, suites):
     if not pyvers:
         return 1
 
+    if len(pyvers) == 1:
+        if pyvers[0] == 2:
+            subprocess.check_call([
+                "sed", "-i", "-e", "s|python|python2|",
+                "pagure/hooks/files/hookrunner"
+            ])
+            subprocess.check_call([
+                "sed", "-i", "-e", "s|['alembic',|['alembic-2',|",
+                "tests/test_alembic.py"
+            ])
+        elif pyvers[0] == 3:
+            subprocess.check_call([
+                "sed", "-i", "-e", "s|python|python3|",
+                "pagure/hooks/files/hookrunner"
+            ], cwd=HERE)
+            subprocess.check_call([
+                "sed", "-i", "-e", "s|\['alembic',|\['alembic-3',|",
+                "tests/test_alembic.py"
+            ], cwd=HERE)
+
     for suite in suites:
         for pyver in pyvers:
             NUMREMAINING += 1
@@ -442,6 +463,13 @@ def _run_test_suites(args, suites):
     print_running()
     print()
     print("All work done")
+
+    subprocess.check_call([
+        "git",
+        "checkout",
+        "pagure/hooks/files/hookrunner",
+        "tests/test_alembic.py"
+    ])
 
     # Gather results
     print()
