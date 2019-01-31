@@ -64,6 +64,31 @@ def fedmsg_publish(*args, **kwargs):  # pragma: no cover
         _log.exception("Error sending fedmsg")
 
 
+def fedora_messaging_publish(topic, message):  # pragma: no cover
+    """ Try to publish a message on AMPQ using fedora-messaging. """
+    if not pagure_config.get("FEDORA_MESSAGING_NOTIFICATIONS", False):
+        return
+
+    try:
+        import fedora_messaging.api
+        import fedora_messaging.exceptions
+
+        msg = fedora_messaging.api.Message(
+            topic="pagure.{}".format(topic),
+            body=message,
+        )
+        fedora_messaging.api.publish(msg)
+    except Pfedora_messaging.exceptions.ublishReturned as e:
+        log.warning(
+            "Fedora Messaging broker rejected message %s: %s",
+            msg.id, e
+        )
+    except fedora_messaging.exceptions.ConnectionException as e:
+        log.warning("Error sending message %s: %s", msg.id, e)
+    except Exception:
+        _log.exception("Error sending fedora-messaging message")
+
+
 stomp_conn = None
 
 
@@ -165,6 +190,7 @@ def log(project, topic, msg, webhook=True):
         and not project.private
     ):
         fedmsg_publish(topic, msg)
+        fedora_messaging_publish(topic, msg)
 
     # Send stomp notification (if stomp is there and set-up)
     if not project or (

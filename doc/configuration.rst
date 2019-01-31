@@ -1069,6 +1069,15 @@ This configuration key allows to turn on or off notifications via `fedmsg
 Defaults to: ``False``.
 
 
+FEDORA_MESSAGING_NOTIFICATIONS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This configuration key allows to turn on or off sending notifications via
+`fedora-messaging <>`_.
+
+Defaults to: ``False``.
+
+
 ALWAYS_FEDMSG_ON_COMMITS
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
