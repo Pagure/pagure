@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014-2018 - Copyright Red Hat Inc
+ (c) 2014-2019 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -30,6 +30,7 @@ import hashlib
 import logging
 import os
 import tempfile
+import shutil
 import subprocess
 import uuid
 import markdown
@@ -208,15 +209,19 @@ def is_valid_ssh_key(key, fp_hash="SHA256"):
     key = key.strip()
     if not key:
         return None
-    with tempfile.TemporaryFile() as f:
-        f.write(key.encode("utf-8"))
-        f.seek(0)
-        cmd = ["/usr/bin/ssh-keygen", "-l", "-f", "/dev/stdin", "-E", fp_hash]
-        proc = subprocess.Popen(
-            cmd, stdin=f, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-        )
+    tmpdirname = tempfile.mkdtemp()
+    filename = os.path.join(tmpdirname, "key")
+    with open(filename, "w") as stream:
+        stream.write(key)
+    cmd = ["/usr/bin/ssh-keygen", "-l", "-f", filename, "-E", fp_hash]
+    proc = subprocess.Popen(
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
     stdout, stderr = proc.communicate()
+    shutil.rmtree(tmpdirname)
     if proc.returncode != 0:
+        _log.warning("STDOUT: %s", stdout)
+        _log.warning("STDERR: %s", stderr)
         return False
     stdout = stdout.decode("utf-8")
 
