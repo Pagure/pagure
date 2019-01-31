@@ -1,32 +1,40 @@
 FROM centos:7
 
 RUN yum -y install \
-    epel-release \
+    epel-release
+
+RUN yum -y install \
     yum-utils \
     rpm-build \
     python-setuptools \
     python-coverage \
     python-nose \
-    python2-mock \
+    python-mock \
     python-docutils \
     python-enum \
     python-flask \
+    python2-flake8 \
     redis \
     which
-ADD ./fedora-infra-tags.repo /etc/yum.repos.d/infra-tags.repo
-
 
 RUN cd /pagure && \
-    yum install -y `grep "Requires:" /pagure/files/pagure.spec | \
+    yum install --enablerepo=epel-testing -y \
+    `grep "Requires:" /pagure/files/pagure.spec | \
     awk '{split($0, a, " "); print a[2]}' |grep -v "%{name}" | \
     sed -e "s|%{python_pkgversion}||"` && \
+    yum clean all && \
     localedef -i en_US -f UTF-8 en_US.UTF-8
 
-#RUN yum -y install python2-mock redis
-#    yum clean all &&\
+RUN \
+    sed -i -e "s|;python_version<\"3.4\"||" /pagure/requirements.txt && \
+    sed -i -e "s|;python_version<=\"2.7\"||" /pagure/requirements.txt && \
+    sed -i -e "s|python3-openid;python_version>=\"3.0\"||" \
+       /pagure/requirements.txt && \
+    cd /pagure && python setup.py build
+
 
 #ENV LC_ALL=C.UTF-8 LANG=C.UTF-8
 WORKDIR /pagure
-ENTRYPOINT ["python2", "/pagure/runtests.py", "run", "-f"]
+ENTRYPOINT ["python2", "/pagure/runtests.py", "run", "-f", "--py2"]
 #ENTRYPOINT ["py.test", "-x", "tests/"]
 CMD []
