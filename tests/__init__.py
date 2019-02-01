@@ -502,6 +502,9 @@ class Modeltests(SimplePagureTest):
         self.app.get = create_maybe_waiter(self.app.get, self.app.get)
         self.app.post = create_maybe_waiter(self.app.post, self.app.get)
 
+        # Refresh the DB session
+        self.session = pagure.lib.query.create_session(self.dbpath)
+
     def tearDown(self):     # pylint: disable=invalid-name
         """ Remove the test.db database if there is one. """
         tests_state["broker_client"].flushall()
