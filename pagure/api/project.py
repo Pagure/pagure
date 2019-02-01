@@ -1973,7 +1973,7 @@ def api_get_project_connector(repo, username=None, namespace=None):
     """
     Get project connector
     ---------------------
-    Allow project owner and admins to retrieve connector tokens.
+    Allow project owners and admins to retrieve their own connector tokens.
     Connector tokens are the API tokens and the Web Hook token
     of the project. Connector tokens make possible for an external
     application to listen and verify project notifications and act
@@ -1998,8 +1998,12 @@ def api_get_project_connector(repo, username=None, namespace=None):
           "connector": {
               "hook_token": "aaabbbccc",
               "api_token": [
-                  {'name': 'foo token', 'id': "abcdefoo"}
-                  {'name': 'bar token', 'id': "abcdebar"}
+                  {'name': 'foo token',
+                   'id': "abcdefoo",
+                   'expired': True}
+                  {'name': 'bar token',
+                   'id': "abcdebar",
+                   'expired': False}
               ]
           },
           "status": "ok"

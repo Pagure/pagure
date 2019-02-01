@@ -4125,6 +4125,7 @@ class PagureFlaskApiProjectConnectorTests(tests.Modeltests):
             username='pingou')
         ctokens = pagure.lib.query.search_token(
             self.session, ['pull_request_merge'], user='pingou')
+        self.assertEqual(len(ctokens), 1)
 
         # Call the connector with pingou user token and verify content
         headers = {'Authorization': 'token aaabbbcccddd'}
@@ -4175,6 +4176,7 @@ class PagureFlaskApiProjectConnectorTests(tests.Modeltests):
             username='foo')
         ctokens = pagure.lib.query.search_token(
             self.session, ['pull_request_merge'], user='foo')
+        self.assertEqual(len(ctokens), 1)
 
         # Call the connector with foo user token and verify content
         headers = {'Authorization': 'token %s' % mtoken.id}
