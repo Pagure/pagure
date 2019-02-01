@@ -23,27 +23,28 @@ try:
 except ImportError:  # pragma: no cover
     import json
 
+import copy
 import datetime
 import fnmatch
 import functools
 import hashlib
 import logging
 import os
-import tempfile
 import shutil
 import subprocess
+import tempfile
 import uuid
-import markdown
-import werkzeug
+
 from collections import Counter
 from math import ceil
-import copy
 
 import bleach
+import markdown
 import redis
 import six
 import sqlalchemy
 import sqlalchemy.schema
+import werkzeug
 
 from six.moves.urllib_parse import urlparse, urlencode, parse_qsl
 from sqlalchemy import func
