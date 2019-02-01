@@ -779,9 +779,9 @@ def add_content_git_repo(folder, branch='master', append=None):
     with open(os.path.join(newfolder, subfolder, 'file'), 'w') as stream:
         stream.write('foo\n bar\nbaz')
     repo.index.add(os.path.join(subfolder, 'file'))
-    with open(os.path.join(newfolder, subfolder, 'fileŠ'), 'w') as stream:
+    with open(os.path.join(newfolder, subfolder, u'fileŠ'), 'w') as stream:
         stream.write('foo\n bar\nbaz')
-    repo.index.add(os.path.join(subfolder, 'fileŠ'))
+    repo.index.add(os.path.join(subfolder, u'fileŠ'))
     repo.index.write()
 
     # Commits the files added
