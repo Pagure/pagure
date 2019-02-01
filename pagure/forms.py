@@ -407,7 +407,7 @@ class MilestoneForm(PagureForm):
 
 
 class NewTokenForm(PagureForm):
-    """ Form to add/change the status of an issue. """
+    """ Form to add a new token. """
 
     description = wtforms.StringField(
         "description", [wtforms.validators.Optional()]
@@ -426,6 +426,9 @@ class NewTokenForm(PagureForm):
             self.acls.choices = [
                 (acl.name, acl.name) for acl in kwargs["acls"]
             ]
+        if "sacls" in kwargs:
+            self.acls.choices = [
+                (acl, acl) for acl in kwargs['sacls']]
 
 
 class UpdateIssueForm(PagureForm):

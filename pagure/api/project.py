@@ -2168,12 +2168,11 @@ def api_project_create_api_token(repo, namespace=None, username=None):
     +------------------+---------+---------------+---------------------------+
     | Key              | Type    | Optionality   | Description               |
     +==================+=========+===============+===========================+
-    | ``desc``         | String  | Mandatory     | A string to specify the   |
+    | ``description``  | String  | optional      | A string to specify the   |
     |                  |         |               | description of the token  |
     |                  |         |               |                           |
     +------------------+---------+---------------+---------------------------+
-    | ``acl``          | String  | Mandatory     | The ACL as a comma        |
-    |                  |         |               | string                    |
+    | ``acls``         | List    | Mandatory     | The ACLs                  |
     |                  |         |               |                           |
     +------------------+---------+---------------+---------------------------+
 
@@ -2208,26 +2207,21 @@ def api_project_create_api_token(repo, namespace=None, username=None):
         raise pagure.exceptions.APIError(
             401, error_code=APIERROR.ENOTHIGHENOUGH)
 
-    form = flask.request.form
-    valid_form = True
-    description = form.get('description')
-    acl = form.get('acl')
-    if not isinstance(description, str) or not isinstance(acl, str):
-        valid_form = False
-    acl_list = acl.split(',')
-    for ac in acl_list:
-        if ac not in pagure_config.get("ACLS", []):
-            valid_form = False
-            break
-    if not valid_form:
+    authorized_acls = pagure_config.get("ACLS", {}).keys()
+    form = pagure.forms.NewTokenForm(
+        csrf_enabled=False, sacls=authorized_acls)
+    if form.validate_on_submit():
+        acls = form.acls.data
+        description = form.description.data
+    else:
         raise pagure.exceptions.APIError(
-            400, error_code=APIERROR.EINVALIDREQ)
+            400, error_code=APIERROR.EINVALIDREQ, errors=form.errors)
 
     pagure.lib.query.add_token_to_user(
-        flask.g.session, project, acl.split(','), flask.g.fas_user.user,
+        flask.g.session, project, acls, flask.g.fas_user.user,
         description)
     token_id = pagure.lib.query.search_token(
-        flask.g.session, None, user=flask.g.fas_user.user,
+        flask.g.session, acls=None, user=flask.g.fas_user.user,
         description=description)[0].id
     output = {
         'token': {

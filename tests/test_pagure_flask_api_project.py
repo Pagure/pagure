@@ -4111,7 +4111,7 @@ class PagureFlaskApiProjectCreateAPITokenTests(tests.Modeltests):
             self.session, 'aaabbbcccddd', 'modify_project')
 
     def test_api_createapitoken_as_owner(self):
-        """ Test accessing api_project_createapitoken as owner. """
+        """ Test accessing api_project_create_token as owner. """
 
         headers = {'Authorization': 'token aaabbbcccddd'}
         project = pagure.lib.query._get_project(self.session, 'test')
@@ -4120,7 +4120,7 @@ class PagureFlaskApiProjectCreateAPITokenTests(tests.Modeltests):
         # Call the api with pingou user token and verify content
         data = {
             'description': tdescription,
-            'acl': 'pull_request_merge,pull_request_comment'
+            'acls': ['pull_request_merge', 'pull_request_comment']
         }
         output = self.app.post('/api/0/test/token/create',
             headers=headers, data=data)
@@ -4140,14 +4140,14 @@ class PagureFlaskApiProjectCreateAPITokenTests(tests.Modeltests):
         # Call the api with pingou user token and error code
         data = {
             'description': tdescription,
-            'acl': 'foo,bar'
+            'acl': ['foo', 'bar']
         }
         output = self.app.post('/api/0/test/token/create',
             headers=headers, data=data)
         self.assertEqual(output.status_code, 400)
 
     def test_api_createapitoken_as_admin(self):
-        """ Test accessing api_project_createapitoken as admin. """
+        """ Test accessing api_project_create_token as admin. """
 
         project = pagure.lib.query._get_project(self.session, 'test')
 
@@ -4176,7 +4176,7 @@ class PagureFlaskApiProjectCreateAPITokenTests(tests.Modeltests):
         # Call the api with pingou user token and verify content
         data = {
             'description': tdescription,
-            'acl': 'pull_request_merge,pull_request_comment'
+            'acls': ['pull_request_merge', 'pull_request_comment']
         }
         output = self.app.post('/api/0/test/token/create',
             headers=headers, data=data)
@@ -4194,7 +4194,7 @@ class PagureFlaskApiProjectCreateAPITokenTests(tests.Modeltests):
         )
 
     def test_api_createapitoken_as_unauthorized(self):
-        """ Test accessing api_project_createapitoken as project admin
+        """ Test accessing api_project_create_token as project admin
         but with unauthorized token ACL.
         """
 
@@ -4225,14 +4225,14 @@ class PagureFlaskApiProjectCreateAPITokenTests(tests.Modeltests):
         # Call the api with pingou user token and verify content
         data = {
             'description': tdescription,
-            'acl': 'pull_request_merge,pull_request_comment'
+            'acls': ['pull_request_merge', 'pull_request_comment']
         }
         output = self.app.post('/api/0/test/token/create',
             headers=headers, data=data)
         self.assertEqual(output.status_code, 401)
 
     def test_api_createapitoken_as_unauthorized_2(self):
-        """ Test accessing api_project_createapitoken as project user
+        """ Test accessing api_project_create_token as project user
         with unauthorized token ACL.
         """
 
@@ -4263,7 +4263,7 @@ class PagureFlaskApiProjectCreateAPITokenTests(tests.Modeltests):
         # Call the api with pingou user token and verify content
         data = {
             'description': tdescription,
-            'acl': 'pull_request_merge,pull_request_comment'
+            'acls': ['pull_request_merge', 'pull_request_comment']
         }
         output = self.app.post('/api/0/test/token/create',
             headers=headers, data=data)
