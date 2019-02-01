@@ -4176,7 +4176,7 @@ def add_token_to_user(session, project, acls, username, description=None):
 
     session.commit()
 
-    return "Token created"
+    return token
 
 
 def _convert_markdown(md_processor, text):

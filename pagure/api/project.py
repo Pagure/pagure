@@ -2207,7 +2207,7 @@ def api_project_create_api_token(repo, namespace=None, username=None):
         raise pagure.exceptions.APIError(
             401, error_code=APIERROR.ENOTHIGHENOUGH)
 
-    authorized_acls = pagure_config.get("ACLS", {}).keys()
+    authorized_acls = pagure_config.get("USER_ACLS", [])
     form = pagure.forms.NewTokenForm(
         csrf_enabled=False, sacls=authorized_acls)
     if form.validate_on_submit():
@@ -2217,16 +2217,13 @@ def api_project_create_api_token(repo, namespace=None, username=None):
         raise pagure.exceptions.APIError(
             400, error_code=APIERROR.EINVALIDREQ, errors=form.errors)
 
-    pagure.lib.query.add_token_to_user(
+    token = pagure.lib.query.add_token_to_user(
         flask.g.session, project, acls, flask.g.fas_user.user,
         description)
-    token_id = pagure.lib.query.search_token(
-        flask.g.session, acls=None, user=flask.g.fas_user.user,
-        description=description)[0].id
     output = {
         'token': {
-            'description': description,
-            'id': token_id
+            'description': token.description,
+            'id': token.id
         }
     }
 

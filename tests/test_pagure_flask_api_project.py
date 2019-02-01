@@ -4161,16 +4161,14 @@ class PagureFlaskApiProjectCreateAPITokenTests(tests.Modeltests):
         self.session.commit()
 
         # Create modify_project token for foo user
-        pagure.lib.query.add_token_to_user(
+        token = pagure.lib.query.add_token_to_user(
             self.session,
             project=None,
             acls=['modify_project'],
             username='foo')
-        mtoken = pagure.lib.query.search_token(
-            self.session, ['modify_project'], user='foo')[0]
 
         # Call the connector with foo user token and verify content
-        headers = {'Authorization': 'token %s' % mtoken.id}
+        headers = {'Authorization': 'token %s' % token.id}
         tdescription = 'my new token'
 
         # Call the api with pingou user token and verify content
