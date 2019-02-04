@@ -1,12 +1,24 @@
 set -x
 
+echo "Installing Fedora Infra Tags repo"
+cat >/etc/yum.repos.d/infra-tags.repo << 'EOF'
+[infrastructure-tags]
+name=Fedora Infrastructure tag $releasever - $basearch
+baseurl=https://kojipkgs.fedoraproject.org/repos-dist/epel$releasever-infra/latest/$basearch/
+enabled=1
+gpgcheck=1
+gpgkey=https://infrastructure.fedoraproject.org/repo/infra/RPM-GPG-KEY-INFRA-TAGS
+EOF
+
+
 yum install -y python-virtualenv python34 python34-devel \
                gcc python-cryptography python34-cryptography \
                libgit2 libgit2-devel python-pygit2 \
                redis swig openssl-devel m2crypto \
                python2-fedmsg python34-fedmsg-core fedmsg \
                python-tox python-pip python34-pip \
-               parallel zeromq-devel python-Cython
+               parallel zeromq-devel python-Cython \
+               repoSpanner repoSpanner-bridge
 
 sysctl -w fs.file-max=2048
 
