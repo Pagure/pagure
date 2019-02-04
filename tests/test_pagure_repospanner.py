@@ -204,24 +204,36 @@ class PagureRepoSpannerTests(tests.Modeltests):
                 stdout=self.repospanner_runlog,
                 stderr=subprocess.STDOUT,
             )
-
-            # Wait for the instance to become available
-            resp = requests.get(
-                'https://nodea.regiona.repospanner.local:%d/'
-                % configvals['gitport'],
-                verify=os.path.join(self.path, 'repospanner', 'pki', 'ca.crt'),
-                cert=(
-                    os.path.join(self.path, 'repospanner', 'pki', 'pagure.crt'),
-                    os.path.join(self.path, 'repospanner', 'pki', 'pagure.key'),
-                )
-            )
-            resp.raise_for_status()
-
-            print('repoSpanner identification: %s' % resp.text)
         except:
             # Make sure to clean up repoSpanner, since we did start it
             self.tearDown()
             raise
+
+        attempts = 0
+        while True:
+            try:
+                # Wait for the instance to become available
+                resp = requests.get(
+                    'https://nodea.regiona.repospanner.local:%d/'
+                    % configvals['gitport'],
+                    verify=os.path.join(self.path, 'repospanner', 'pki', 'ca.crt'),
+                    cert=(
+                        os.path.join(self.path, 'repospanner', 'pki', 'pagure.crt'),
+                        os.path.join(self.path, 'repospanner', 'pki', 'pagure.key'),
+                    )
+                )
+                resp.raise_for_status()
+
+                print('repoSpanner identification: %s' % resp.text)
+                break
+            except:
+                if attempts < 5:
+                    attempts += 1
+                    time.sleep(1)
+                    continue
+                # Make sure to clean up repoSpanner, since we did start it
+                self.tearDown()
+                raise
 
     def tearDown(self):
         """ Tear down the repoSpanner instance. """
