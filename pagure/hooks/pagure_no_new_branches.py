@@ -70,6 +70,10 @@ class PagureNoNewBranchRunner(BaseRunner):
             return
 
         for refname in changes:
+            if refname.startswith("refs/tags/"):
+                # Allow creating new tags
+                continue
+
             (oldrev, newrev) = changes[refname]
 
             if set(oldrev) == set(["0"]):
