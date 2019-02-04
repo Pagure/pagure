@@ -409,6 +409,9 @@ class SimplePagureTest(unittest.TestCase):
         gr_mock = self.gr_patcher.start()
         gr_mock.side_effect = lambda tid: tests_state["results"][tid]
 
+        # Refresh the DB session
+        self.session = pagure.lib.query.create_session(self.dbpath)
+
     def tearDown(self):
         self.gr_patcher.stop()
         self.session.rollback()
