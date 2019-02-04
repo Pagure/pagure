@@ -963,6 +963,7 @@ class TemporaryClone(object):
                     env=environ,
                 )
             self.repo = pygit2.Repository(self.repopath)
+            self._origrepo = self.repo
 
         # Make sure that all remote refs are mapped to local ones.
         headname = None
