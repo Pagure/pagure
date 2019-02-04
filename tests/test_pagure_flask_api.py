@@ -58,7 +58,8 @@ class PagureFlaskApitests(tests.SimplePagureTest):
         # test_request_context doesn't set flask.g, but some teardown
         # functions try to use that, so let's exclude them
         self._app.teardown_request_funcs = {}
-        with self._app.test_request_context('/api/0/version', data=data):
+        with self._app.test_request_context(
+                '/api/0/version', method="POST", data=data):
             self.assertEqual(pagure.api.get_request_data()['foo'], 'bar')
         data = json.dumps(data)
         with self._app.test_request_context('/api/0/version', data=data,
