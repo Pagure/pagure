@@ -38,6 +38,21 @@ class TestStyle(unittest.TestCase):
             sys.executable, '-m', 'flake8', '--ignore=E712,W503,E203',
             REPO_PATH
         ]
+
+        # check if we have an old flake8 or not
+        import flake8
+        flake8_v = flake8.__version__.split('.')
+        for idx, val in enumerate(flake8_v):
+            try:
+                val = int(val)
+            except ValueError:
+                pass
+            flake8_v[idx] = val
+        old_flake = tuple(flake8_v) < (3, 0)
+
+        if old_flake:
+            raise unittest.SkipTest("Flake8 version too old to be useful")
+
         proc = subprocess.Popen(
             flake8_command,
             stdout=subprocess.PIPE,
