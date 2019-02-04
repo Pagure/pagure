@@ -1,0 +1,15 @@
+# Example configuraton for Fedora Messaging
+# More information on how to use it or what to do with it at:
+# https://fedora-messaging.readthedocs.io/en/stable/configuration.html
+
+# Broker address
+amqp_url = "amqp://"
+
+# Authentication is TLS-based
+[tls]
+ca_cert = "/etc/pki/tls/certs/ca-bundle.crt"
+keyfile = "/my/client/key.pem"
+certfile = "/my/client/cert.pem"
+
+[client_properties]
+app = "pagure"
