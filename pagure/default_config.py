@@ -20,7 +20,7 @@ from pagure.mail_logging import ContextInjector, MSG_FORMAT
 ADMIN_SESSION_LIFETIME = timedelta(minutes=20)
 
 # secret key used to generate unique csrf token
-SECRET_KEY = "<insert here your own key>"
+SECRET_KEY = str("<insert here your own key>")
 
 # url to the database server:
 DB_URL = "sqlite:////var/tmp/pagure_dev.sqlite"
