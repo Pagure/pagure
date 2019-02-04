@@ -105,10 +105,10 @@ class PagureLibGitAuthtests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 "Remote hook declined the push: "
-                "Denied push for ref &#39;refs/heads/master&#39; for user &#39;pingou&#39;\n"
-                "All changes have been rejected",
+                "Denied push for ref &#39;refs/heads/master&#39; for user &#39;pingou&#39;",
                 output_text
             )
+            self.assertIn("All changes have been rejected", output_text)
 
             # Check file after the commit:
             output = self.app.get('/hooktest/raw/master/f/sources')
@@ -144,10 +144,10 @@ class PagureLibGitAuthtests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 "Remote hook declined the push: "
-                "Denied push for ref &#39;refs/heads/master&#39; for user &#39;pingou&#39;\n"
-                "All changes have been rejected",
+                "Denied push for ref &#39;refs/heads/master&#39; for user &#39;pingou&#39;",
                 output_text
             )
+            self.assertIn("All changes have been rejected", output_text)
 
             # Change something in the "source" branch
             data = {
