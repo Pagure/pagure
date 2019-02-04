@@ -4118,6 +4118,11 @@ class PagureLibtests(tests.Modeltests):
                 pass
             bleach_v[idx] = val
 
+        # old markdown generate other html
+        import markdown
+        markdown_v = markdown.__version__.version_info
+        old_markdown = markdown_v < (2, 6, 0)
+
         texts = [
             'foo bar test#1 see?',
             'foo bar pingou/test#2 I mean, really',
@@ -4245,17 +4250,34 @@ class PagureLibtests(tests.Modeltests):
             '<p><a href="http://localhost.localdomain/user/pingou">@pingou</a> at start of line</p>',
             # 'but not someone@pingou.com',
             '<p>but not someone@pingou.com</p>',
-            # '[![Fedora_infinity_small.png]'
-            # '(/test/issue/raw/Fedora_infinity_small.png)]'
-            # '(/test/issue/raw/Fedora_infinity_small.png)',
-            '<p><a href="/test/issue/raw/Fedora_infinity_small.png"><span>'
-            '<img alt="Fedora_infinity_small.png" class="lazyload" '
-            'data-src="/test/issue/raw/Fedora_infinity_small.png" src="">'
-            '<noscript>'
-            '<img alt="Fedora_infinity_small.png" '
-            'src="/test/issue/raw/Fedora_infinity_small.png">'
-            '</noscript></span></a></p>',
         ]
+
+        if old_markdown:
+            expected.append(
+                # '[![Fedora_infinity_small.png]'
+                # '(/test/issue/raw/Fedora_infinity_small.png)]'
+                # '(/test/issue/raw/Fedora_infinity_small.png)',
+                '<p><a href="/test/issue/raw/Fedora_infinity_small.png"><span>'
+                '<img alt="Fedora_infinity_small.png" class="lazyload" '
+                'data-src="/test/issue/raw/Fedora_infinity_small.png" src="">'
+                '<noscript>'
+                '<img alt="Fedora_infinity_small.png" '
+                'src="/test/issue/raw/Fedora_infinity_small.png" />'
+                '</noscript></span></a></p>'
+            )
+        else:
+            expected.append(
+                # '[![Fedora_infinity_small.png]'
+                # '(/test/issue/raw/Fedora_infinity_small.png)]'
+                # '(/test/issue/raw/Fedora_infinity_small.png)',
+                '<p><a href="/test/issue/raw/Fedora_infinity_small.png"><span>'
+                '<img alt="Fedora_infinity_small.png" class="lazyload" '
+                'data-src="/test/issue/raw/Fedora_infinity_small.png" src="">'
+                '<noscript>'
+                '<img alt="Fedora_infinity_small.png" '
+                'src="/test/issue/raw/Fedora_infinity_small.png">'
+                '</noscript></span></a></p>'
+            )
 
         with self.app.application.app_context():
             g.session = self.session
