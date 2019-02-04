@@ -35,7 +35,7 @@ fi
 # https://github.com/requests/requests/commit/991e8b76b7a9d21f698b24fa
 # and only in py3 we're having a version that is too old (2.1)
 pip3 install --upgrade "idna<2.8"
-pip install --upgrade tox trollius coverage
+pip install --upgrade "tox<3.7.0" trollius coverage
 pip install --upgrade --force-reinstall chardet
 pip3 install "pygit2 <= `rpm -q libgit2 --queryformat='%{version}'`"
 tox --sitepackages -e 'py27-flask011-ci' -- --results=results-py2-flask011
