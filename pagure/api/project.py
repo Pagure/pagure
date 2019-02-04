@@ -2021,24 +2021,26 @@ def api_get_project_connector(repo, username=None, namespace=None):
 
     authorized_users = [project.user.username]
     authorized_users.extend(
-        [user.user for user in project.access_users['admin']])
+        [user.user for user in project.access_users["admin"]]
+    )
     if flask.g.fas_user.user not in authorized_users:
         raise pagure.exceptions.APIError(
-            401, error_code=APIERROR.ENOTHIGHENOUGH)
+            401, error_code=APIERROR.ENOTHIGHENOUGH
+        )
 
     user_obj = pagure.lib.query.search_user(
-        flask.g.session, username=flask.g.fas_user.user)
+        flask.g.session, username=flask.g.fas_user.user
+    )
     user_project_tokens = [
-        token for token in user_obj.tokens if token.project_id == project.id]
+        token for token in user_obj.tokens if token.project_id == project.id
+    ]
 
     connector = {
-        'hook_token': project.hook_token,
-        'api_tokens': [
-            {'description': t.description,
-             'id': t.id,
-             'expired': t.expired
-             } for t in user_project_tokens
-        ]
+        "hook_token": project.hook_token,
+        "api_tokens": [
+            {"description": t.description, "id": t.id, "expired": t.expired}
+            for t in user_project_tokens
+        ],
     }
 
     return flask.jsonify({"connector": connector, "status": "ok"})

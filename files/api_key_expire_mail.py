@@ -27,8 +27,13 @@ def main(check=False, debug=False):
 
     current_time = datetime.utcnow()
     day_diff_for_mail = [10, 5, 1]
-    email_dates = [email_day.date() for email_day in \
-            [current_time + timedelta(days=i) for i in day_diff_for_mail]]
+    email_dates = [
+        email_day.date()
+        for email_day in [
+            current_time + timedelta(days=i)
+                   for i in day_diff_for_mail
+        ]
+    ]
 
     session = pagure.lib.model_base.create_session(_config['DB_URL'])
     tokens = session.query(model.Token).all()
@@ -50,19 +55,27 @@ will expire in %s day(s).
 Please get a new key for non-interrupted service.
 
 Thanks,
-Your Pagure Admin. ''' % (username, api_key[:5], token.project.fullname, days_left)
+Your Pagure Admin. ''' % (
+                    username,
+                    api_key[:5],
+                    token.project.fullname,
+                    days_left
+                )
             else:
                 text = '''Hi %s,
 Your Pagure API key %s will expire in %s day(s).
 Please get a new key for non-interrupted service.
 
 Thanks,
-Your Pagure Admin. ''' % (username, api_key[:5], days_left)
+Your Pagure Admin. ''' % (
+                    username,
+                    api_key[:5],
+                    days_left)
             if not check:
                 msg = pagure.lib.notify.send_email(text, subject, user_email)
             else:
                 print('Sending email to %s (%s) about key: %s' % (
-                    username, user_emailk, token.id))
+                    username, user_email, token.id))
             if debug:
                 print('Sent mail to %s' % username)
 
