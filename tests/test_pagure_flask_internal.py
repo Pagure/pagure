@@ -3002,9 +3002,15 @@ class PagureFlaskInternaltests(tests.Modeltests):
         self.assertEqual(result['username'], 'deploykey_test_2')
         self.assertEqual(result['public_key'], project_key)
 
+    @patch.dict('pagure.config.config',
+                {'REPOSPANNER_REGIONS': {'region': {'repo_prefix': 'prefix'}}})
     def test_check_ssh_access(self):
         """ Test the SSH access check endpoint. """
         tests.create_projects(self.session)
+        self.session.query(pagure.lib.model.Project).\
+                filter(pagure.lib.model.Project.name == 'test2').\
+                update({pagure.lib.model.Project.repospanner_region: 'region'})
+        self.session.commit()
 
         url = '/pv/ssh/checkaccess/'
         def runtest(project, username, access):
@@ -3024,9 +3030,11 @@ class PagureFlaskInternaltests(tests.Modeltests):
         i1 = runtest('test.git', 'pingou', True)
         i2 = runtest('test.git', 'foo', True)
         i3 = runtest('tickets/test.git', 'pingou', True)
+        i4 = runtest('test2.git', 'pingou', True)
         runtest('tickets/test.git', 'foo', False)
 
         self.assertEqual(i1['reponame'], 'test.git')
+        self.assertEqual(i1['repospanner_reponame'], None)
         self.assertEqual(i1['repotype'], 'main')
         self.assertEqual(i1['region'], None)
         self.assertEqual(i1['project_name'], 'test')
@@ -3034,11 +3042,14 @@ class PagureFlaskInternaltests(tests.Modeltests):
         self.assertEqual(i1['project_namespace'], None)
         self.assertEqual(i1, i2)
         self.assertEqual(i3['reponame'], 'tickets/test.git')
+        self.assertEqual(i3['repospanner_reponame'], None)
         self.assertEqual(i3['repotype'], 'tickets')
         self.assertEqual(i3['region'], None)
         self.assertEqual(i3['project_name'], 'test')
         self.assertEqual(i3['project_user'], None)
         self.assertEqual(i3['project_namespace'], None)
+        self.assertEqual(i4['repospanner_reponame'], 'prefix/main/test2')
+        self.assertEqual(i4['region'], 'region')
 
 
 if __name__ == '__main__':

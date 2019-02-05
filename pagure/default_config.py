@@ -595,7 +595,7 @@ SSH_COMMAND_REPOSPANNER = (
         "project_namespace",
         "%(project_namespace)s",
         "%(cmd)s",
-        "'%(reponame)s'",
+        "'%(repospanner_reponame)s'",
     ],
     {"REPOBRIDGE_CONFIG": "/etc/repospanner/bridge_%(region)s.json"},
 )
