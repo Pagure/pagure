@@ -293,9 +293,17 @@ def do_run(args):
             )
             return 1
         else:
-            shutil.rmtree(args.results)
-
-    os.mkdir(args.results)
+            try:
+                shutil.rmtree(args.results)
+                os.mkdir(args.results)
+            except:
+                print(
+                    "Could not delete the %s directory, it will be "
+                    "wiped clean" % args.results)
+                for content in os.listdir(args.results):
+                   os.remove(content)
+    else:
+        os.mkdir(args.results)
 
     print("Pre-flight checks passed")
 
