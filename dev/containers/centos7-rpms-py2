@@ -1,0 +1,53 @@
+FROM centos:7
+
+RUN yum -y install \
+    epel-release
+
+ADD ./fedora-infra-tags.repo /etc/yum.repos.d/infra-tags.repo
+
+RUN yum -y install \
+    yum-utils \
+    rpm-build \
+    python-setuptools \
+    python-coverage \
+    python-nose \
+    python-mock \
+    python-docutils \
+    python-enum \
+    python-flask \
+    python-flake8 \
+    redis \
+    which \
+    git \
+    repoSpanner \
+    repoSpanner-bridge
+
+RUN yum install -y https://kojipkgs.fedoraproject.org//work/tasks/5657/32535657/python-werkzeug-0.9.6-1.el7.noarch.rpm
+
+RUN cd / \
+    && git clone https://pagure.io/pagure.git \
+    && chmod +x /pagure/dev/containers/runtests_py2.sh
+
+# Install all the requirements from the spec file and replace the macro
+# %{python_pkgversion} by empty string which thus installs all the py2
+# version of the dependencies.
+RUN cd /pagure && \
+    yum install --enablerepo=epel-testing -y \
+    `rpmspec -q --requires /pagure/files/pagure.spec | \
+    sed -e "s|%{python_pkgversion}||"` && \
+    yum clean all && \
+    localedef -i en_US -f UTF-8 en_US.UTF-8
+
+# The old version of setuptools in CentOS7 does not support restrictions on
+# the requirements file, so drop them
+RUN \
+    sed -i -e "s|;python_version<\"3.4\"||" /pagure/requirements.txt && \
+    sed -i -e "s|;python_version<=\"2.7\"||" /pagure/requirements.txt && \
+    sed -i -e "s|python3-openid;python_version>=\"3.0\"||" \
+       /pagure/requirements.txt && \
+    cd /pagure && python setup.py build
+
+
+WORKDIR /pagure
+ENTRYPOINT ["/pagure/dev/containers/runtests_py2.sh"]
+CMD []

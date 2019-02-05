@@ -1,0 +1,31 @@
+FROM fedora:29
+
+RUN dnf -y install \
+    python3-setuptools \
+    python3-coverage \
+    python3-nose \
+    python3-mock \
+    python3-docutils \
+    python3-black \
+    python3-flake8 \
+    redis \
+    which \
+    git
+
+RUN cd / \
+    && git clone https://pagure.io/pagure.git \
+    && chmod +x /pagure/dev/containers/runtests_py3.sh
+
+# Install all the requirements from the spec file and replace the macro
+# %{python_pkgversion} by '3' which thus installs all the py3 version of
+# the dependencies.
+RUN dnf install -y `grep "Requires:" /pagure/files/pagure.spec | \
+    awk '{split($0, a, " "); print a[2]}' |grep -v "%{name}" | \
+    sed -e "s|%{python_pkgversion}|3|"` && \
+    dnf clean all && \
+    cd /pagure && python setup.py build
+
+
+WORKDIR /pagure
+ENTRYPOINT ["/pagure/dev/containers/runtests_py3.sh"]
+CMD []

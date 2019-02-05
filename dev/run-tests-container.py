@@ -1,21 +1,8 @@
-#! /usr/bin/python3
+#! /usr/bin/env python
+
 import argparse
 import os
 import subprocess as sp
-from string import Template
-
-TEMPLATE = "dev/docker/test_env_template"
-
-PKG_LIST = "python3-alembic python3-arrow python3-binaryornot \
-            python3-bleach python3-blinker python3-chardet python3-cryptography \
-            python3-docutils python3-flask python3-fedora-flask \
-            python3-flask-wtf python3-bcrypt python3-jinja2 \
-            python3-markdown python3-munch python3-openid-cla \
-            python3-openid-teams python3-psutil python3-pygit2 python3-pillow \
-            python3-sqlalchemy python3-straight-plugin python3-wtforms \
-            python3-nose python3-coverage python3-mock python3-mock \
-            python3-eventlet python3-flask-oidc python3-flake8 python3-celery \
-            python3-redis python3-trololio python3-beautifulsoup4 python3-black redis vim git"
 
 
 def setup_parser():
@@ -56,69 +43,38 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.centos is True:
-        base_image = "centos:7"
-        pkg_mgr = "yum"
-        epel_pkg = "RUN yum -y install epel-release"
-        infra_repo = (
-            "ADD ./fedora-infra-tags.repo /etc/yum.repos.d/infra-tags.repo"
-        )
-        container_name = "pagure-test-centos"
-        PKG_LIST += "python34 python34-coverage"
+        container_names = ["pagure-c7-rpms-py2"]
+        container_files = ["centos7-rpms-py2"]
+    elif args.fedora is True:
+        container_names = ["pagure-f29-rpms-py3"]
+        container_files = ["f29-rpms-py3"]
     else:
-        base_image = "registry.fedoraproject.org/fedora:latest"
-        pkg_mgr = "dnf"
-        container_name = "pagure-test-fedora"
-        epel_pkg = ""
-        infra_repo = ""
+        container_names = ["pagure-f29-rpms-py3", "pagure-c7-rpms-py2"]
+        container_files = ["f29-rpms-py3", "centos7-rpms-py2"]
 
-    with open(TEMPLATE, "r") as fp:
-        t = Template(fp.read())
-    with open("dev/docker/test_env", "w") as fp:
-        fp.write(
-            t.substitute(
-                base_image=base_image,
-                pkg_list=PKG_LIST,
-                pkg_mgr=pkg_mgr,
-                epel_pkg=epel_pkg,
-                infra_repo=infra_repo,
+    for idx, container_name in enumerate(container_names):
+        if args.skip_build is not False:
+            print("------ Building Container Image -----")
+            sp.call(
+                [
+                    "podman",
+                    "build",
+                    "--rm",
+                    "-t",
+                    container_name,
+                    "-f",
+                    "dev/containers/%s" % container_files[idx],
+                    "dev/containers",
+                ]
             )
-        )
 
-    if args.skip_build is not False:
-        print("------ Building Docker Image -----")
-        sp.run(
-            [
-                "podman",
-                "build",
-                "--rm",
-                "-t",
-                container_name,
-                "-f",
-                "dev/docker/test_env",
-                "dev/docker",
-            ]
-        )
-    if args.shell:
-        print("--------- Shelling in the container --------------")
-        command = [
-            "podman",
-            "run",
-            "-it",
-            "--rm",
-            "--name",
-            container_name,
-            "-v",
-            "{}:/pagure".format(os.getcwd()),
-            "--entrypoint=/bin/bash",
-            container_name,
-        ]
-        sp.run(command)
+        result_path = "{}/results_{}".format(os.getcwd(), container_files[idx])
+        if not os.path.exists(result_path):
+            os.mkdir(result_path)
 
-    else:
-
-        print("--------- Running Test --------------")
-        sp.run(
-            [
+        if args.shell:
+            print("--------- Shelling in the container --------------")
+            command = [
                 "podman",
                 "run",
                 "-it",
@@ -126,8 +82,34 @@ if __name__ == "__main__":
                 "--name",
                 container_name,
                 "-v",
-                "{}:/pagure".format(os.getcwd()),
+                "{}/results_{}:/pagure/results".format(
+                    os.getcwd(), container_files[idx]),
+                "-e",
+                "BRANCH=$BRANCH",
+                "-e",
+                "REPO=$REPO",
+                "--entrypoint=/bin/bash",
                 container_name,
-                args.test_case,
             ]
-        )
+            sp.call(command)
+        else:
+            print("--------- Running Test --------------")
+            sp.call(
+                [
+                    "podman",
+                    "run",
+                    "-it",
+                    "--rm",
+                    "--name",
+                    container_name,
+                    "-v",
+                    "{}/results_{}:/pagure/results".format(
+                        os.getcwd(), container_files[idx]),
+                    "-e",
+                    "BRANCH={}".format(os.environ.get("BRANCH") or ""),
+                    "-e",
+                    "REPO={}".format(os.environ.get("REPO") or ""),
+                    container_name,
+                    args.test_case,
+                ]
+            )
