@@ -45,7 +45,6 @@ def main(check=False, debug=False):
             user = token.user
             username = user.fullname or user.username
             user_email = user.default_email
-            api_key = token.id
             days_left = (token.expiration - datetime.utcnow()).days
             subject = 'Pagure API key expiration date is near!'
             if token.project:
@@ -57,7 +56,7 @@ Please get a new key for non-interrupted service.
 Thanks,
 Your Pagure Admin. ''' % (
                     username,
-                    api_key[:5],
+                    token.description,
                     token.project.fullname,
                     days_left
                 )
@@ -69,7 +68,7 @@ Please get a new key for non-interrupted service.
 Thanks,
 Your Pagure Admin. ''' % (
                     username,
-                    api_key[:5],
+                    token.description,
                     days_left)
             if not check:
                 msg = pagure.lib.notify.send_email(text, subject, user_email)
