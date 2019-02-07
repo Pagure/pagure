@@ -22,6 +22,11 @@ def setup_parser():
         help="Run the tests in centos environment",
     )
     parser.add_argument(
+        "--pip",
+        action="store_true",
+        help="Run the tests in a venv on a Fedora host",
+    )
+    parser.add_argument(
         "--skip-build",
         dest="skip_build",
         action="store_false",
@@ -48,9 +53,18 @@ if __name__ == "__main__":
     elif args.fedora is True:
         container_names = ["pagure-f29-rpms-py3"]
         container_files = ["f29-rpms-py3"]
+    elif args.pip is True:
+        container_names = ["pagure-fedora-pip-py3"]
+        container_files = ["fedora-pip-py3"]
     else:
-        container_names = ["pagure-f29-rpms-py3", "pagure-c7-rpms-py2"]
-        container_files = ["f29-rpms-py3", "centos7-rpms-py2"]
+        container_names = [
+            "pagure-f29-rpms-py3", "pagure-c7-rpms-py2",
+            "pagure-fedora-pip-py3"
+        ]
+        container_files = [
+            "f29-rpms-py3", "centos7-rpms-py2",
+            "fedora-pip-py3"
+        ]
 
     for idx, container_name in enumerate(container_names):
         if args.skip_build is not False:

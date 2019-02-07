@@ -1,0 +1,27 @@
+FROM fedora:latest
+
+RUN dnf -y install \
+    python3-setuptools \
+    redhat-rpm-config \
+    python3-devel \
+    libgit2-devel \
+    python3-tox
+    libffi-devel \
+    m2crypto \
+    zeromq-devel \
+    gcc \
+    redis \
+    which \
+    git
+
+RUN cd / \
+    && git clone https://pagure.io/pagure.git
+
+# Install pygit2 manually, outside of the virtualenv since it is tightly coupled
+# which the version of libgit2 installed on the system.
+RUN pip3 install "pygit2 <= `rpm -q libgit2 --queryformat='%{version}'`" && \
+    cd /pagure
+
+WORKDIR /pagure
+ENTRYPOINT ["/pagure/dev/containers/tox_py3.sh"]
+CMD []
