@@ -4120,7 +4120,10 @@ class PagureLibtests(tests.Modeltests):
 
         # old markdown generate other html
         import markdown
-        markdown_v = markdown.__version__.version_info
+        try:
+            markdown_v = markdown.__version__.version_info
+        except AttributeError:  # pragma: no cover
+            markdown_v = markdown.__version_info__
         old_markdown = markdown_v < (2, 6, 0)
 
         texts = [
