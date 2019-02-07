@@ -67,7 +67,7 @@ class PagureFlaskNoMasterBranchtests(tests.SimplePagureTest):
         )
 
         feature_branch = clone_repo.lookup_branch('feature')
-        first_commit = feature_branch.get_object().hex
+        first_commit = feature_branch.peel().hex
 
         # Second commit
         with open(os.path.join(repopath, '.gitignore'), 'w') as stream:

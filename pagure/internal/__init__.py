@@ -550,13 +550,13 @@ def get_branches_of_commit():
 
             if compare_branch:
                 merge_commit_obj = repo_obj.merge_base(
-                    compare_branch.get_object().hex, branch.get_object().hex
+                    compare_branch.peel().hex, branch.peel().hex
                 )
 
                 if merge_commit_obj:
                     merge_commit = merge_commit_obj.hex
 
-            repo_commit = repo_obj[branch.get_object().hex]
+            repo_commit = repo_obj[branch.peel().hex]
 
             for commit in repo_obj.walk(
                 repo_commit.oid.hex, pygit2.GIT_SORT_NONE
@@ -634,7 +634,7 @@ def get_branches_head():
     if not repo_obj.is_empty and len(repo_obj.listall_branches()) > 1:
         for branchname in repo_obj.listall_branches():
             branch = repo_obj.lookup_branch(branchname)
-            branches[branchname] = branch.get_object().hex
+            branches[branchname] = branch.peel().hex
 
     # invert the dict
     heads = collections.defaultdict(list)

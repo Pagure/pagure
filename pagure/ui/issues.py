@@ -1436,7 +1436,7 @@ def view_issue_raw_file(repo, filename=None, username=None, namespace=None):
             flask.abort(404, "Empty repo cannot have a file")
 
         branch = repo_obj.lookup_branch("master")
-        commit = branch.get_object()
+        commit = branch.peel()
 
         content = __get_file_in_tree(
             repo_obj, commit.tree, ["files", filename], bail_on_tree=True

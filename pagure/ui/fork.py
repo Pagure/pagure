@@ -432,7 +432,7 @@ def request_pull_to_diff_or_patch(
     branch = repo_obj.lookup_branch(request.branch_from)
     commitid = None
     if branch:
-        commitid = branch.get_object().hex
+        commitid = branch.peel().hex
 
     diff_commits = []
     if request.status != "Open":

@@ -70,7 +70,7 @@ class PagureFlaskSlashInBranchtests(tests.SimplePagureTest):
         PagureRepo.push(ori_remote, refname)
 
         master_branch = clone_repo.lookup_branch('master')
-        first_commit = master_branch.get_object().hex
+        first_commit = master_branch.peel().hex
 
         # Second commit
         with open(os.path.join(repopath, '.gitignore'), 'w') as stream:

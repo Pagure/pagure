@@ -2627,7 +2627,7 @@ index 0000000..60f7480
         # Case 4, get revs between two commits on two different branches
         newgitrepo = tempfile.mkdtemp(prefix='pagure-')
         newrepo = pygit2.clone_repository(gitrepo, newgitrepo)
-        newrepo.create_branch('feature', newrepo.head.get_object())
+        newrepo.create_branch('feature', newrepo.head.peel())
 
         with open(os.path.join(newgitrepo, 'sources'), 'w') as stream:
             stream.write('foo\n bar')
@@ -3039,19 +3039,19 @@ index 0000000..60f7480
 
         # make sure that creating works the first time
         pagure.lib.git.update_pull_ref(fake_pr, fork)
-        oldhex = fork.references["refs/heads/master"].get_object().hex
+        oldhex = fork.references["refs/heads/master"].peel().hex
         self.assertEqual(
-            orig.references["refs/pull/6/head"].get_object().hex,
+            orig.references["refs/pull/6/head"].peel().hex,
             oldhex,
         )
 
         # make sure that updating works correctly
         tests.add_content_git_repo(projects[1], append="foobar")
-        newhex = fork.references["refs/heads/master"].get_object().hex
+        newhex = fork.references["refs/heads/master"].peel().hex
         self.assertNotEqual(oldhex, newhex)
         pagure.lib.git.update_pull_ref(fake_pr, fork)
         self.assertEqual(
-            orig.references["refs/pull/6/head"].get_object().hex,
+            orig.references["refs/pull/6/head"].peel().hex,
             newhex,
         )
 
@@ -3061,11 +3061,11 @@ index 0000000..60f7480
             pagure.lib.git.update_pull_ref(fake_pr, fork)
         self.assertIsNotNone(fork.remotes["pingou_1234567"])
         tests.add_content_git_repo(projects[1], append="foobarbaz")
-        newesthex = fork.references["refs/heads/master"].get_object().hex
+        newesthex = fork.references["refs/heads/master"].peel().hex
         self.assertNotEqual(newhex, newesthex)
         pagure.lib.git.update_pull_ref(fake_pr, fork)
         self.assertEqual(
-            orig.references["refs/pull/6/head"].get_object().hex,
+            orig.references["refs/pull/6/head"].peel().hex,
             newesthex,
         )
 

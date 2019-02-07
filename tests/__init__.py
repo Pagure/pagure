@@ -728,7 +728,7 @@ def _clone_and_top_commits(folder, branch, branch_ref=False):
     commit = None
     try:
         if branch_ref_obj:
-            commit = repo[branch_ref_obj.get_object().hex]
+            commit = repo[branch_ref_obj.peel().hex]
         else:
             commit = repo.revparse_single('HEAD')
     except KeyError:
@@ -894,7 +894,7 @@ def add_commit_git_repo(folder, ncommits=10, filename='sources',
         commit = None
         try:
             if branch_ref_obj:
-                commit = repo[branch_ref_obj.get_object().hex]
+                commit = repo[branch_ref_obj.peel().hex]
             else:
                 commit = repo.revparse_single('HEAD')
         except (KeyError, AttributeError):
@@ -945,7 +945,7 @@ def add_content_to_git(
     commit = None
     try:
         if branch_ref_obj:
-            commit = repo[branch_ref_obj.get_object().hex]
+            commit = repo[branch_ref_obj.peel().hex]
         else:
             commit = repo.revparse_single('HEAD')
     except (KeyError, AttributeError):

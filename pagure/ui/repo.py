@@ -209,7 +209,7 @@ def view_repo_branch(repo, branchname, username=None, namespace=None):
         head = None
     cnt = 0
     last_commits = []
-    for commit in repo_obj.walk(branch.get_object().hex, pygit2.GIT_SORT_NONE):
+    for commit in repo_obj.walk(branch.peel().hex, pygit2.GIT_SORT_NONE):
         last_commits.append(commit)
         cnt += 1
         if cnt == 3:
@@ -240,11 +240,11 @@ def view_repo_branch(repo, branchname, username=None, namespace=None):
             commit_list = [
                 commit.oid.hex
                 for commit in orig_repo.walk(
-                    compare_branch.get_object().hex,
+                    compare_branch.peel().hex,
                     pygit2.GIT_SORT_NONE)
             ]
 
-        repo_commit = repo_obj[branch.get_object().hex]
+        repo_commit = repo_obj[branch.peel().hex]
 
         for commit in repo_obj.walk(
                 repo_commit.oid.hex, pygit2.GIT_SORT_NONE):
@@ -305,7 +305,7 @@ def view_commits(repo, branchname=None, username=None, namespace=None):
     branch = None
     if branchname and branchname in repo_obj.listall_branches():
         branch = repo_obj.lookup_branch(branchname)
-        commit = branch.get_object()
+        commit = branch.peel()
     elif branchname:
         try:
             commit = repo_obj.get(branchname)
@@ -314,16 +314,16 @@ def view_commits(repo, branchname=None, username=None, namespace=None):
 
         if "refs/tags/%s" % branchname in list(repo_obj.references):
             ref = repo_obj.lookup_reference("refs/tags/%s" % branchname)
-            commit = ref.get_object()
+            commit = ref.peel()
 
         # If we're arriving here from the release page, we may have a Tag
         # where we expected a commit, in this case, get the actual commit
         if isinstance(commit, pygit2.Tag):
-            commit = commit.get_object()
+            commit = commit.peel()
             branchname = commit.oid.hex
     elif not repo_obj.is_empty and not repo_obj.head_is_unborn:
         branch = repo_obj.lookup_branch(repo_obj.head.shorthand)
-        commit = branch.get_object()
+        commit = branch.peel()
         branchname = branch.branch_name
 
     if not repo_obj.is_empty and not repo_obj.head_is_unborn:
@@ -515,7 +515,7 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
     if identifier in repo_obj.listall_branches():
         branchname = identifier
         branch = repo_obj.lookup_branch(identifier)
-        commit = branch.get_object()
+        commit = branch.peel()
     else:
         try:
             commit = repo_obj.get(identifier)
@@ -528,7 +528,7 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
             branchname = "master"
 
     if isinstance(commit, pygit2.Tag):
-        commit = commit.get_object()
+        commit = commit.peel()
 
     tree = None
     if isinstance(commit, pygit2.Tree):
@@ -679,7 +679,7 @@ def view_raw_file(
 
     if identifier in repo_obj.listall_branches():
         branch = repo_obj.lookup_branch(identifier)
-        commit = branch.get_object()
+        commit = branch.peel()
     else:
         try:
             commit = repo_obj.get(identifier)
@@ -693,7 +693,7 @@ def view_raw_file(
         flask.abort(404, "Commit %s not found" % (identifier))
 
     if isinstance(commit, pygit2.Tag):
-        commit = commit.get_object()
+        commit = commit.peel()
 
     if filename:
         if isinstance(commit, pygit2.Blob):
@@ -743,7 +743,7 @@ def view_blame_file(repo, filename, username=None, namespace=None):
 
     if branchname in repo_obj.listall_branches():
         branch = repo_obj.lookup_branch(branchname)
-        commit = branch.get_object()
+        commit = branch.peel()
     else:
         try:
             commit = repo_obj[branchname]
@@ -751,7 +751,7 @@ def view_blame_file(repo, filename, username=None, namespace=None):
             commit = repo_obj[repo_obj.head.target]
 
     if isinstance(commit, pygit2.Tag):
-        commit = commit.get_object()
+        commit = commit.peel()
 
     content = __get_file_in_tree(
         repo_obj, commit.tree, filename.split("/"), bail_on_tree=True
@@ -952,7 +952,7 @@ def view_tree(repo, identifier=None, username=None, namespace=None):
         if identifier in repo_obj.listall_branches():
             branchname = identifier
             branch = repo_obj.lookup_branch(identifier)
-            commit = branch.get_object()
+            commit = branch.peel()
         else:
             try:
                 commit = repo_obj.get(identifier)
@@ -971,7 +971,7 @@ def view_tree(repo, identifier=None, username=None, namespace=None):
         # If we're arriving here from the release page, we may have a Tag
         # where we expected a commit, in this case, get the actual commit
         if isinstance(commit, pygit2.Tag):
-            commit = commit.get_object()
+            commit = commit.peel()
             branchname = commit.oid.hex
 
         if commit and not isinstance(commit, pygit2.Blob):
@@ -2450,7 +2450,7 @@ def edit_file(repo, branchname, filename, username=None, namespace=None):
     branch = None
     if branchname in repo_obj.listall_branches():
         branch = repo_obj.lookup_branch(branchname)
-        commit = branch.get_object()
+        commit = branch.peel()
     else:
         flask.abort(400, "Invalid branch specified")
 
@@ -3447,7 +3447,7 @@ def generate_project_archive(
         tag = repo_obj[reference.target]
         if not isinstance(tag, pygit2.Tag):
             flask.abort(400, "Invalid reference provided")
-        commit = tag.get_object()
+        commit = tag.peel(pygit2.Commit)
     else:
         try:
             commit = repo_obj.get(ref)

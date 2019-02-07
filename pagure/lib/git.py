@@ -268,7 +268,7 @@ def _update_git(obj, repo):
         # See if there is a parent to this commit
         parent = None
         try:
-            parent = new_repo.head.get_object().oid
+            parent = new_repo.head.peel().oid
         except pygit2.GitError:
             pass
 
@@ -341,7 +341,7 @@ def _clean_git(repo, obj_repotype, obj_uid):
         # See if there is a parent to this commit
         parent = None
         if not new_repo.is_empty:
-            parent = new_repo.head.get_object().oid
+            parent = new_repo.head.peel().oid
 
         parents = []
         if parent:
@@ -838,7 +838,7 @@ def _add_file_to_git(repo, issue, attachmentfolder, user, filename):
         # See if there is a parent to this commit
         parent = None
         try:
-            parent = new_repo.head.get_object().oid
+            parent = new_repo.head.peel().oid
         except pygit2.GitError:
             pass
 
@@ -978,12 +978,10 @@ class TemporaryClone(object):
                     # This gets checked out by default
                     continue
                 branch = self.repo.branches.remote.get("origin/%s" % localname)
-                self.repo.branches.local.create(localname, branch.get_object())
+                self.repo.branches.local.create(localname, branch.peel())
             elif ref.startswith("refs/pull/"):
                 reference = self._origrepo.references.get(ref)
-                self.repo.references.create(
-                    ref, reference.get_object().oid.hex
-                )
+                self.repo.references.create(ref, reference.peel().oid.hex)
 
         return self
 
@@ -1144,7 +1142,7 @@ def _update_file_in_git(
 
         # See if there is a parent to this commit
         branch_ref = get_branch_ref(new_repo, branch)
-        parent = branch_ref.get_object()
+        parent = branch_ref.peel()
 
         # See if we need to create the branch
         nbranch_ref = None
@@ -1566,8 +1564,8 @@ def merge_pull_request(session, request, username, domerge=True):
             # Fetch the commits
             remote.fetch()
 
-            # repo_commit = fork_obj[branch.get_object().hex]
-            repo_commit = new_repo[branch.get_object().hex]
+            # repo_commit = fork_obj[branch.peel().hex]
+            repo_commit = new_repo[branch.peel().hex]
 
             # Checkout the correct branch
             if new_repo.is_empty or new_repo.head_is_unborn:
@@ -1677,7 +1675,7 @@ def merge_pull_request(session, request, username, domerge=True):
 
             if domerge:
                 _log.info("  PR merged using fast-forward")
-                head = new_repo.lookup_reference("HEAD").get_object()
+                head = new_repo.lookup_reference("HEAD").peel()
                 if not request.project.settings.get("always_merge", False):
                     if merge is not None:
                         # This is depending on the pygit2 version
@@ -1754,7 +1752,7 @@ def merge_pull_request(session, request, username, domerge=True):
                     _log.info("  Merge non-FF PR is disabled for this project")
                     return "MERGE"
                 _log.info("  Writing down merge commit")
-                head = new_repo.lookup_reference("HEAD").get_object()
+                head = new_repo.lookup_reference("HEAD").peel()
                 _log.info(
                     "  Basing on: %s - %s", head.hex, repo_commit.oid.hex
                 )
@@ -1972,7 +1970,7 @@ def get_diff_info(repo_obj, orig_repo, branch_from, branch_to, prid=None):
 
     commitid = None
     if frombranch:
-        commitid = frombranch.get_object().hex
+        commitid = frombranch.peel().hex
     elif prid is not None:
         # If there is not branch found but there is a PR open, use the ref
         # of that PR in the main repo
@@ -2000,7 +1998,7 @@ def get_diff_info(repo_obj, orig_repo, branch_from, branch_to, prid=None):
             "pagure.lib.git.get_diff_info: Pulling into a non-empty repo"
         )
         if branch:
-            orig_commit = orig_repo[branch.get_object().hex]
+            orig_commit = orig_repo[branch.peel().hex]
             main_walker = orig_repo.walk(
                 orig_commit.oid.hex, pygit2.GIT_SORT_NONE
             )
@@ -2067,7 +2065,7 @@ def get_diff_info(repo_obj, orig_repo, branch_from, branch_to, prid=None):
             repo_commit = repo_obj[repo_obj.head.target]
         else:
             branch = repo_obj.lookup_branch(branch_from)
-            repo_commit = branch.get_object()
+            repo_commit = branch.peel()
 
         for commit in repo_obj.walk(repo_commit.oid.hex, pygit2.GIT_SORT_NONE):
             diff_commits.append(commit)
@@ -2252,7 +2250,7 @@ def get_git_tags(project, with_commits=False):
             if tag.startswith("refs/tags/"):
                 ref = repo_obj.lookup_reference(tag)
                 if ref:
-                    com = ref.get_object()
+                    com = ref.peel()
                     if com:
                         tags[tag.split("refs/tags/")[1]] = com.oid.hex
     else:
@@ -2281,9 +2279,7 @@ def get_git_tags_objects(project):
                 theobject = None
             objecttype = ""
             if isinstance(theobject, pygit2.Tag):
-                underlying_obj = theobject.get_object()
-                if isinstance(underlying_obj, pygit2.Tree):
-                    continue
+                underlying_obj = theobject.peel(pygit2.Commit)
                 commit_time = underlying_obj.commit_time
                 objecttype = "tag"
             elif isinstance(theobject, pygit2.Commit):
@@ -2396,7 +2392,7 @@ def new_git_branch(
                 raise pagure.exceptions.PagureException(
                     'The "{0}" branch does not exist'.format(from_branch)
                 )
-            parent = get_branch_ref(repo_obj, from_branch).get_object()
+            parent = get_branch_ref(repo_obj, from_branch).peel()
         else:
             if from_commit not in repo_obj:
                 raise pagure.exceptions.PagureException(

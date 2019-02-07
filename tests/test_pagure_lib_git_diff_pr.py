@@ -310,7 +310,7 @@ class PagureFlaskForkPrtests(tests.Modeltests):
         self.assertTrue(cnt < 60)
 
         pr_ref = repo.lookup_reference('refs/pull/1/head')
-        commit = pr_ref.get_object()
+        commit = pr_ref.peel()
         self.assertEqual(
             commit.oid.hex,
             diff_commits[0].oid.hex
@@ -350,7 +350,7 @@ class PagureFlaskForkPrtests(tests.Modeltests):
         self.assertTrue(cnt < 60)
 
         pr_ref = repo.lookup_reference('refs/pull/1/head')
-        commit = pr_ref.get_object()
+        commit = pr_ref.peel()
         self.assertEqual(
             commit.oid.hex,
             diff_commits[0].oid.hex
@@ -366,7 +366,7 @@ class PagureFlaskForkPrtests(tests.Modeltests):
         clone_repo.index.add('sources')
         clone_repo.index.write()
 
-        last_commit = clone_repo.lookup_branch('feature_foo').get_object()
+        last_commit = clone_repo.lookup_branch('feature_foo').peel()
 
         # Commits the files added
         tree = clone_repo.index.write_tree()
@@ -413,7 +413,7 @@ class PagureFlaskForkPrtests(tests.Modeltests):
         self.assertTrue(cnt < 60)
 
         pr_ref = repo.lookup_reference('refs/pull/1/head')
-        commit2 = pr_ref.get_object()
+        commit2 = pr_ref.peel()
         self.assertEqual(
             commit2.oid.hex,
             diff_commits[0].oid.hex
@@ -457,7 +457,7 @@ class PagureFlaskForkPrtests(tests.Modeltests):
         self.assertTrue(cnt < 60)
 
         pr_ref = repo.lookup_reference('refs/pull/1/head')
-        commit = pr_ref.get_object()
+        commit = pr_ref.peel()
         self.assertEqual(
             commit.oid.hex,
             diff_commits[0].oid.hex
@@ -489,7 +489,7 @@ class PagureFlaskForkPrtests(tests.Modeltests):
         self.assertTrue(cnt < 60)
 
         pr_ref = repo.lookup_reference('refs/pull/1/head')
-        commit2 = pr_ref.get_object()
+        commit2 = pr_ref.peel()
         self.assertEqual(
             commit2.oid.hex,
             diff_commits[0].oid.hex

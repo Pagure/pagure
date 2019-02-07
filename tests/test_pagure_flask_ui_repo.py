@@ -4815,7 +4815,7 @@ index 0000000..fb7093d
                 # list of binary strings representing parents of the new commit
                 []
             )
-            repo_obj.create_branch("feature",repo_obj.head.get_object())
+            repo_obj.create_branch("feature",repo_obj.head.peel())
 
             data = {
                 'branches': 'feature',
@@ -5386,7 +5386,7 @@ index 0000000..fb7093d
             path = os.path.join(self.path, 'repos', 'test.git')
             tests.add_content_git_repo(path)
             repo = pygit2.Repository(path)
-            repo.create_branch('foo', repo.head.get_object())
+            repo.create_branch('foo', repo.head.peel())
 
             # Check before deletion
             output = self.app.get('/test')
@@ -5409,7 +5409,7 @@ index 0000000..fb7093d
             path = os.path.join(self.path, 'repos', 'test.git')
             tests.add_content_git_repo(path)
             repo = pygit2.Repository(path)
-            repo.create_branch('feature/foo', repo.head.get_object())
+            repo.create_branch('feature/foo', repo.head.peel())
 
             # Check before deletion
             output = self.app.get('/test')
@@ -5440,7 +5440,7 @@ index 0000000..fb7093d
         path = os.path.join(self.path, 'repos', 'test.git')
         tests.add_content_git_repo(path)
         repo = pygit2.Repository(path)
-        repo.create_branch('foo', repo.head.get_object())
+        repo.create_branch('foo', repo.head.peel())
 
         user = tests.FakeUser(username = 'pingou')
         with tests.user_set(self.app.application, user):
@@ -5464,7 +5464,7 @@ index 0000000..fb7093d
         path = os.path.join(self.path, 'repos', 'test.git')
         tests.add_content_git_repo(path)
         repo = pygit2.Repository(path)
-        repo.create_branch('foo', repo.head.get_object())
+        repo.create_branch('foo', repo.head.peel())
 
         user = tests.FakeUser(username = 'pingou')
         with tests.user_set(self.app.application, user):
@@ -5503,7 +5503,7 @@ index 0000000..fb7093d
         path = os.path.join(self.path, 'repos', 'forks', 'foo', 'test.git')
         tests.add_content_git_repo(path)
         repo = pygit2.Repository(path)
-        repo.create_branch('foo', repo.head.get_object())
+        repo.create_branch('foo', repo.head.peel())
 
         user = tests.FakeUser(username = 'foo')
         with tests.user_set(self.app.application, user):

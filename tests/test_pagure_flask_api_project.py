@@ -126,7 +126,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
         # Create two other branches based on master
         for branch in ['pats-win-49', 'pats-win-51']:
-            clone_repo.create_branch(branch, clone_repo.head.get_object())
+            clone_repo.create_branch(branch, clone_repo.head.peel())
             refname = 'refs/heads/{0}:refs/heads/{0}'.format(branch)
             PagureRepo.push(clone_repo.remotes[0], refname)
 
@@ -2841,7 +2841,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             self.session, 'aaabbbcccddd', 'create_branch')
         git_path = os.path.join(self.path, 'repos', 'test.git')
         repo_obj = pygit2.Repository(git_path)
-        parent = pagure.lib.git.get_branch_ref(repo_obj, 'master').get_object()
+        parent = pagure.lib.git.get_branch_ref(repo_obj, 'master').peel()
         repo_obj.create_branch('dev123', parent)
         headers = {'Authorization': 'token aaabbbcccddd'}
         args = {'branch': 'test123', 'from_branch': 'dev123'}

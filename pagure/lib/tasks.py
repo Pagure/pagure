@@ -947,7 +947,7 @@ def commits_author_stats(self, session, repopath):
     number_of_commits = 0
     authors_email = set()
     for commit in repo_obj.walk(
-        repo_obj.head.get_object().oid.hex, pygit2.GIT_SORT_NONE
+        repo_obj.head.peel().oid.hex, pygit2.GIT_SORT_NONE
     ):
         # For each commit record how many times each combination of name and
         # e-mail appears in the git history.
@@ -1008,7 +1008,7 @@ def commits_history_stats(self, session, repopath):
 
     dates = collections.defaultdict(int)
     for commit in repo_obj.walk(
-        repo_obj.head.get_object().oid.hex, pygit2.GIT_SORT_NONE
+        repo_obj.head.peel().oid.hex, pygit2.GIT_SORT_NONE
     ):
         delta = (
             datetime.datetime.utcnow() - arrow.get(commit.commit_time).naive

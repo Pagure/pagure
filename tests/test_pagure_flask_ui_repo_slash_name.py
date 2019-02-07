@@ -229,7 +229,7 @@ class PagureFlaskSlashInNametests(tests.SimplePagureTest):
         gitrepo = os.path.join(self.path, 'repos', 'forks/test.git')
         repo = pygit2.Repository(gitrepo)
         master_branch = repo.lookup_branch('master')
-        first_commit = master_branch.get_object().hex
+        first_commit = master_branch.peel().hex
 
         output = self.app.get('/forks/test/commits')
         self.assertEqual(output.status_code, 200)
