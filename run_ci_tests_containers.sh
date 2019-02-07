@@ -17,7 +17,7 @@ if [ ! -d `pwd`/results_f29-rpms-py3 ]; then
 fi
 
 podman run --rm -it --name pagure-f29-rpms-py3 \
-    -v `pwd`/results_f29-rpms-py3:/pagure/results \
+    -v `pwd`/results_f29-rpms-py3:/pagure/results:z \
     -e BRANCH=$BRANCH \
     -e REPO=$REPO \
     pagure-f29-rpms-py3
@@ -32,7 +32,7 @@ if [ ! -d `pwd`/results_centos7-rpms-py2 ]; then
 fi
 
 podman run --rm -it --name pagure-c7-rpms-py2 \
-    -v `pwd`/results_centos7-rpms-py2:/pagure/results \
+    -v `pwd`/results_centos7-rpms-py2:/pagure/results:z \
     -e BRANCH=$BRANCH \
     -e REPO=$REPO \
     pagure-c7-rpms-py2

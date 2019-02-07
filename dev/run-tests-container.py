@@ -82,7 +82,7 @@ if __name__ == "__main__":
                 "--name",
                 container_name,
                 "-v",
-                "{}/results_{}:/pagure/results".format(
+                "{}/results_{}:/pagure/results:z".format(
                     os.getcwd(), container_files[idx]),
                 "-e",
                 "BRANCH=$BRANCH",
@@ -103,7 +103,7 @@ if __name__ == "__main__":
                     "--name",
                     container_name,
                     "-v",
-                    "{}/results_{}:/pagure/results".format(
+                    "{}/results_{}:/pagure/results:z".format(
                         os.getcwd(), container_files[idx]),
                     "-e",
                     "BRANCH={}".format(os.environ.get("BRANCH") or ""),
