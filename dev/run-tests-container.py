@@ -66,10 +66,11 @@ if __name__ == "__main__":
             "fedora-pip-py3"
         ]
 
+    failed = []
     for idx, container_name in enumerate(container_names):
         if args.skip_build is not False:
             print("------ Building Container Image -----")
-            sp.call(
+            output_code = sp.call(
                 [
                     "podman",
                     "build",
@@ -81,6 +82,9 @@ if __name__ == "__main__":
                     "dev/containers",
                 ]
             )
+            if output_code:
+                print("Failed building: %s", container_name)
+                break
 
         result_path = "{}/results_{}".format(os.getcwd(), container_files[idx])
         if not os.path.exists(result_path):
@@ -108,22 +112,33 @@ if __name__ == "__main__":
             sp.call(command)
         else:
             print("--------- Running Test --------------")
-            sp.call(
-                [
-                    "podman",
-                    "run",
-                    "-it",
-                    "--rm",
-                    "--name",
-                    container_name,
-                    "-v",
-                    "{}/results_{}:/pagure/results:z".format(
-                        os.getcwd(), container_files[idx]),
-                    "-e",
-                    "BRANCH={}".format(os.environ.get("BRANCH") or ""),
-                    "-e",
-                    "REPO={}".format(os.environ.get("REPO") or ""),
-                    container_name,
-                    args.test_case,
-                ]
-            )
+            command = [
+                "podman",
+                "run",
+                "-it",
+                "--rm",
+                "--name",
+                container_name,
+                "-v",
+                "{}/results_{}:/pagure/results:z".format(
+                    os.getcwd(), container_files[idx]),
+                "-e",
+                "BRANCH={}".format(os.environ.get("BRANCH") or ""),
+                "-e",
+                "REPO={}".format(os.environ.get("REPO") or ""),
+                container_name,
+                args.test_case,
+            ]
+
+            output_code = sp.call(command)
+            if output_code:
+                failed.append(container_name)
+
+    if not args.shell:
+        print("\nSummary:")
+        if not failed:
+            print("  ALL TESTS PASSED")
+        else:
+            print("  %s TESTS FAILED:" % len(failed))
+            for fail in failed:
+                print("    - %s" % fail)
