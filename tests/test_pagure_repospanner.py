@@ -188,7 +188,8 @@ class PagureRepoSpannerTests(tests.Modeltests):
         with open(os.path.join(self.path, 'repospanner', 'keylog'),
                   'w') as keylog:
             # Create the CA
-            self.run_cacmd(keylog, 'init', 'repospanner.local')
+            self.run_cacmd(keylog, 'init', 'repospanner.local',
+                           '--no-name-constraint')
             # Create the node cert
             self.run_cacmd(keylog, 'node', 'regiona', 'nodea')
             # Create the admin cert
