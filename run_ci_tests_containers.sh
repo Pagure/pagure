@@ -36,3 +36,18 @@ podman run --rm -it --name pagure-c7-rpms-py2 \
     -e BRANCH=$BRANCH \
     -e REPO=$REPO \
     pagure-c7-rpms-py2
+
+
+podman build --rm -t pagure-fedora-pip-py3 \
+    -f dev/containers/fedora-pip-py3 \
+    dev/containers
+
+if [ ! -d `pwd`/results_fedora-pip-py3 ]; then
+  mkdir `pwd`/results_fedora-pip-py3;
+fi
+
+podman run --rm -it --name pagure-fedora-pip-py3 \
+    -v `pwd`/results_fedora-pip-py3:/pagure/results:z \
+    -e BRANCH=$BRANCH \
+    -e REPO=$REPO \
+    pagure-fedora-pip-py3
