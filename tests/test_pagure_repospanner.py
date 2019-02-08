@@ -131,13 +131,30 @@ class PagureRepoSpannerTests(tests.Modeltests):
         if not self.repospanner_binary:
             raise unittest.SkipTest('repoSpanner not found')
 
-        hookrunbin = os.path.join(os.path.dirname(self.repospanner_binary),
-                                  'repohookrunner')
-        if not os.path.exists(hookrunbin):
+        hookrunbins = [
+            os.path.join(
+                os.path.dirname(self.repospanner_binary), 'repohookrunner'),
+            os.path.join('/usr', 'libexec','repohookrunner'),
+        ]
+        found = False
+        for hookrunbin in hookrunbins:
+            if os.path.exists(hookrunbin):
+                found = True
+                break
+        if not found:
             raise Exception('repoSpanner found, but repohookrunner not')
-        repobridgebin = os.path.join(os.path.dirname(self.repospanner_binary),
-                                     'repobridge')
-        if not os.path.exists(repobridgebin):
+
+        repobridgebins = [
+            os.path.join(
+                os.path.dirname(self.repospanner_binary), 'repobridge'),
+            os.path.join('/usr', 'libexec','repobridge'),
+        ]
+        found = False
+        for repobridgebin in repobridgebins:
+            if os.path.exists(repobridgebin):
+                found = True
+                break
+        if not found:
             raise Exception('repoSpanner found, but repobridge not')
 
         self.config_values['repobridge_binary'] = repobridgebin
