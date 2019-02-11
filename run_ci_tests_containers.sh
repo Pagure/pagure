@@ -2,8 +2,6 @@ set -x
 
 yum install -y podman
 
-sysctl -w fs.file-max=2048
-
 set -e
 
 echo $BRANCH $REPO
