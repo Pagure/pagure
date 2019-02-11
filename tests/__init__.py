@@ -103,7 +103,7 @@ REPOSPANNER_NEW_REPO_ADMIN_OVERRIDE = %(repospanner_admin_override)s
 REPOSPANNER_NEW_FORK = %(repospanner_new_fork)s
 REPOSPANNER_ADMIN_MIGRATION = %(repospanner_admin_migration)s
 REPOSPANNER_REGIONS = {
-    'default': {'url': 'https://nodea.regiona.repospanner.local:%(repospanner_gitport)s',
+    'default': {'url': 'https://repospanner.localhost.localdomain:%(repospanner_gitport)s',
                 'repo_prefix': 'pagure/',
                 'hook': None,
                 'ca': '%(path)s/repospanner/pki/ca.crt',

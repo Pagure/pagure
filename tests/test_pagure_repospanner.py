@@ -41,7 +41,7 @@ REPOSPANNER_CONFIG_TEMPLATE = """
 ca:
   path: %(path)s/repospanner/pki
 admin:
-  url:  https://nodea.regiona.repospanner.local:%(gitport)s/
+  url:  https://localhost.localdomain:%(gitport)s/
   ca:   %(path)s/repospanner/pki/ca.crt
   cert: %(path)s/repospanner/pki/admin.crt
   key:  %(path)s/repospanner/pki/admin.key
@@ -57,12 +57,12 @@ listen:
 certificates:
   ca: %(path)s/repospanner/pki/ca.crt
   client:
-    cert: %(path)s/repospanner/pki/nodea.regiona.crt
-    key:  %(path)s/repospanner/pki/nodea.regiona.key
+    cert: %(path)s/repospanner/pki/repospanner.localhost.crt
+    key:  %(path)s/repospanner/pki/repospanner.localhost.key
   server:
     default:
-      cert: %(path)s/repospanner/pki/nodea.regiona.crt
-      key:  %(path)s/repospanner/pki/nodea.regiona.key
+      cert: %(path)s/repospanner/pki/repospanner.localhost.crt
+      key:  %(path)s/repospanner/pki/repospanner.localhost.key
 hooks:
   bubblewrap:
     enabled: true
@@ -188,10 +188,10 @@ class PagureRepoSpannerTests(tests.Modeltests):
         with open(os.path.join(self.path, 'repospanner', 'keylog'),
                   'w') as keylog:
             # Create the CA
-            self.run_cacmd(keylog, 'init', 'repospanner.local',
+            self.run_cacmd(keylog, 'init', 'localdomain',
                            '--no-name-constraint')
             # Create the node cert
-            self.run_cacmd(keylog, 'node', 'regiona', 'nodea')
+            self.run_cacmd(keylog, 'node', 'localhost', 'repospanner')
             # Create the admin cert
             self.run_cacmd(keylog, 'leaf', 'admin',
                            '--admin', '--region', '*', '--repo', '*')
@@ -232,7 +232,7 @@ class PagureRepoSpannerTests(tests.Modeltests):
             try:
                 # Wait for the instance to become available
                 resp = requests.get(
-                    'https://nodea.regiona.repospanner.local:%d/'
+                    'https://repospanner.localhost.localdomain:%d/'
                     % configvals['gitport'],
                     verify=os.path.join(self.path, 'repospanner', 'pki', 'ca.crt'),
                     cert=(
