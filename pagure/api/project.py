@@ -2138,9 +2138,7 @@ def api_modify_project_options(repo, username=None, namespace=None):
 @API.route("/<repo>/token/new", methods=["POST"])
 @API.route("/<namespace>/<repo>/token/new", methods=["POST"])
 @API.route("/fork/<username>/<repo>/token/new", methods=["POST"])
-@API.route(
-    "/fork/<username>/<namespace>/<repo>/token/new", methods=["POST"]
-)
+@API.route("/fork/<username>/<namespace>/<repo>/token/new", methods=["POST"])
 @api_login_required(acls=["modify_project"])
 @api_method
 def api_project_create_api_token(repo, namespace=None, username=None):
