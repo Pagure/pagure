@@ -19,7 +19,7 @@ git merge --no-ff "proposed/$BRANCH" -m "Merge PR"
 
 echo "Running tests for branch $BRANCH of repo $REPO"
 echo "Last commits:"
-git log -2
+git --no-pager log -2
 fi
 
 tox -v --sitepackages -e 'py34-flask100-ci' -- --results=results
