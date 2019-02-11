@@ -1489,7 +1489,7 @@ def add_api_user_token():
 
     if form.validate_on_submit():
         try:
-            msg = pagure.lib.query.add_token_to_user(
+            pagure.lib.query.add_token_to_user(
                 flask.g.session,
                 project=None,
                 description=form.description.data.strip() or None,
@@ -1497,7 +1497,7 @@ def add_api_user_token():
                 username=user.username,
             )
             flask.g.session.commit()
-            flask.flash(msg)
+            flask.flash("Token created")
             return flask.redirect(
                 flask.url_for("ui_ns.user_settings") + "#nav-api-tab"
             )

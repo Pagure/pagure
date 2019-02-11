@@ -2255,7 +2255,7 @@ def add_token(repo, username=None, namespace=None):
 
     if form.validate_on_submit():
         try:
-            msg = pagure.lib.query.add_token_to_user(
+            pagure.lib.query.add_token_to_user(
                 flask.g.session,
                 repo,
                 description=form.description.data.strip() or None,
@@ -2263,7 +2263,7 @@ def add_token(repo, username=None, namespace=None):
                 username=flask.g.fas_user.username,
             )
             flask.g.session.commit()
-            flask.flash(msg)
+            flask.flash("Token created")
             return flask.redirect(
                 flask.url_for(
                     "ui_ns.view_settings",
@@ -2324,7 +2324,7 @@ def renew_api_token(repo, token_id, username=None, namespace=None):
     if form.validate_on_submit():
         acls = [acl.name for acl in token.acls]
         try:
-            msg = pagure.lib.query.add_token_to_user(
+            pagure.lib.query.add_token_to_user(
                 flask.g.session,
                 repo,
                 description=token.description or None,
@@ -2332,7 +2332,7 @@ def renew_api_token(repo, token_id, username=None, namespace=None):
                 username=flask.g.fas_user.username,
             )
             flask.g.session.commit()
-            flask.flash(msg)
+            flask.flash("Token created")
             return flask.redirect(
                 flask.url_for(
                     "ui_ns.view_settings",
