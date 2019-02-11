@@ -4122,7 +4122,7 @@ class PagureFlaskApiProjectCreateAPITokenTests(tests.Modeltests):
             'description': tdescription,
             'acls': ['pull_request_merge', 'pull_request_comment']
         }
-        output = self.app.post('/api/0/test/token/create',
+        output = self.app.post('/api/0/test/token/new',
             headers=headers, data=data)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
@@ -4142,7 +4142,7 @@ class PagureFlaskApiProjectCreateAPITokenTests(tests.Modeltests):
             'description': tdescription,
             'acl': ['foo', 'bar']
         }
-        output = self.app.post('/api/0/test/token/create',
+        output = self.app.post('/api/0/test/token/new',
             headers=headers, data=data)
         self.assertEqual(output.status_code, 400)
 
@@ -4176,7 +4176,7 @@ class PagureFlaskApiProjectCreateAPITokenTests(tests.Modeltests):
             'description': tdescription,
             'acls': ['pull_request_merge', 'pull_request_comment']
         }
-        output = self.app.post('/api/0/test/token/create',
+        output = self.app.post('/api/0/test/token/new',
             headers=headers, data=data)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
@@ -4225,7 +4225,7 @@ class PagureFlaskApiProjectCreateAPITokenTests(tests.Modeltests):
             'description': tdescription,
             'acls': ['pull_request_merge', 'pull_request_comment']
         }
-        output = self.app.post('/api/0/test/token/create',
+        output = self.app.post('/api/0/test/token/new',
             headers=headers, data=data)
         self.assertEqual(output.status_code, 401)
 
@@ -4263,7 +4263,7 @@ class PagureFlaskApiProjectCreateAPITokenTests(tests.Modeltests):
             'description': tdescription,
             'acls': ['pull_request_merge', 'pull_request_comment']
         }
-        output = self.app.post('/api/0/test/token/create',
+        output = self.app.post('/api/0/test/token/new',
             headers=headers, data=data)
         self.assertEqual(output.status_code, 401)
 

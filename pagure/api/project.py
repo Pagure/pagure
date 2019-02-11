@@ -2135,11 +2135,11 @@ def api_modify_project_options(repo, username=None, namespace=None):
     return flask.jsonify({"message": message, "status": "ok"})
 
 
-@API.route("/<repo>/token/create", methods=["POST"])
-@API.route("/<namespace>/<repo>/token/create", methods=["POST"])
-@API.route("/fork/<username>/<repo>/token/create", methods=["POST"])
+@API.route("/<repo>/token/new", methods=["POST"])
+@API.route("/<namespace>/<repo>/token/new", methods=["POST"])
+@API.route("/fork/<username>/<repo>/token/new", methods=["POST"])
 @API.route(
-    "/fork/<username>/<namespace>/<repo>/token/create", methods=["POST"]
+    "/fork/<username>/<namespace>/<repo>/token/new", methods=["POST"]
 )
 @api_login_required(acls=["modify_project"])
 @api_method
@@ -2153,13 +2153,13 @@ def api_project_create_api_token(repo, namespace=None, username=None):
 
     ::
 
-        POST /api/0/<repo>/token/create
-        POST /api/0/<namespace>/<repo>/token/create
+        POST /api/0/<repo>/token/new
+        POST /api/0/<namespace>/<repo>/token/new
 
     ::
 
-        POST /api/0/fork/<username>/<repo>/token/create
-        POST /api/0/fork/<username>/<namespace>/<repo>/token/create
+        POST /api/0/fork/<username>/<repo>/token/new
+        POST /api/0/fork/<username>/<namespace>/<repo>/token/new
 
 
     Input
