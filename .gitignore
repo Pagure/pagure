@@ -27,6 +27,7 @@ worker.log
 
 _build/
 results/
+results_*/
 
 # Just a local folder I use for testing
 clones/
