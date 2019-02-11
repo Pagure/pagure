@@ -22,7 +22,7 @@ RUN yum -y install \
     repoSpanner \
     repoSpanner-bridge
 
-RUN yum install -y https://kojipkgs.fedoraproject.org//work/tasks/5657/32535657/python-werkzeug-0.9.6-1.el7.noarch.rpm
+RUN yum install -y https://pingou.fedorapeople.org/RPMs/python-werkzeug-0.9.6-1.el7.noarch.rpm
 
 RUN cd / \
     && git clone https://pagure.io/pagure.git \
