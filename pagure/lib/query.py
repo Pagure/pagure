@@ -5205,8 +5205,14 @@ def get_obj_access(session, project_obj, obj):
 
 
 def search_token(
-    session, acls, user=None, token=None, active=False, expired=False,
-        description=None):
+    session,
+    acls,
+    user=None,
+    token=None,
+    active=False,
+    expired=False,
+    description=None,
+):
     """ Searches the API tokens corresponding to the criterias specified.
 
     :arg session: the session to use to connect to the database.

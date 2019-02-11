@@ -427,8 +427,7 @@ class NewTokenForm(PagureForm):
                 (acl.name, acl.name) for acl in kwargs["acls"]
             ]
         if "sacls" in kwargs:
-            self.acls.choices = [
-                (acl, acl) for acl in kwargs['sacls']]
+            self.acls.choices = [(acl, acl) for acl in kwargs["sacls"]]
 
 
 class UpdateIssueForm(PagureForm):

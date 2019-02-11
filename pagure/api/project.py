@@ -2202,30 +2202,27 @@ def api_project_create_api_token(repo, namespace=None, username=None):
 
     authorized_users = [project.user.username]
     authorized_users.extend(
-        [user.user for user in project.access_users['admin']])
+        [user.user for user in project.access_users["admin"]]
+    )
     if flask.g.fas_user.user not in authorized_users:
         raise pagure.exceptions.APIError(
-            401, error_code=APIERROR.ENOTHIGHENOUGH)
+            401, error_code=APIERROR.ENOTHIGHENOUGH
+        )
 
     authorized_acls = pagure_config.get("USER_ACLS", [])
-    form = pagure.forms.NewTokenForm(
-        csrf_enabled=False, sacls=authorized_acls)
+    form = pagure.forms.NewTokenForm(csrf_enabled=False, sacls=authorized_acls)
     if form.validate_on_submit():
         acls = form.acls.data
         description = form.description.data
     else:
         raise pagure.exceptions.APIError(
-            400, error_code=APIERROR.EINVALIDREQ, errors=form.errors)
+            400, error_code=APIERROR.EINVALIDREQ, errors=form.errors
+        )
 
     token = pagure.lib.query.add_token_to_user(
-        flask.g.session, project, acls, flask.g.fas_user.user,
-        description)
-    output = {
-        'token': {
-            'description': token.description,
-            'id': token.id
-        }
-    }
+        flask.g.session, project, acls, flask.g.fas_user.user, description
+    )
+    output = {"token": {"description": token.description, "id": token.id}}
 
     jsonout = flask.jsonify(output)
     return jsonout
