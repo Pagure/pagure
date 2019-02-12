@@ -23,7 +23,7 @@ REPO_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 import tests  # noqa
 
 
-class TestDevData(tests.SimplePagureTest):
+class TestDevData(tests.Modeltests):
     """This test class contains tests pertaining to the dev-data utility
     script."""
 
@@ -36,7 +36,12 @@ class TestDevData(tests.SimplePagureTest):
 
         config_path = os.path.join(self.path, "config")
         with open(config_path, "w") as f:
-            f.write("DB_URL = 'sqlite:///%s/db_dev_data.sqlite'" % self.path)
+            f.write("DB_URL = 'sqlite:///%s/db_dev_data.sqlite'\n" % self.path)
+            f.write("GIT_FOLDER = '%s/repos'\n" % self.path)
+            f.write(
+                "BROKER_URL = 'redis+socket://%(global_path)s/broker'\n" % \
+                    self.config_values)
+            f.write("CELERY_CONFIG = {'task_always_eager': True}\n")
 
         env = {
             "USER_NAME": "testuser",
