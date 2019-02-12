@@ -390,10 +390,11 @@ class SimplePagureTest(unittest.TestCase):
             'repospanner_admin_migration': 'False',
         }
         config_values.update(self.config_values)
+        self.config_values = config_values
         config_path = os.path.join(self.path, 'config')
         if not os.path.exists(config_path):
             with open(config_path, 'w') as f:
-                f.write(CONFIG_TEMPLATE % config_values)
+                f.write(CONFIG_TEMPLATE % self.config_values)
         os.environ["PAGURE_CONFIG"] = config_path
         pagure_config.update(reload_config())
 
