@@ -65,7 +65,7 @@ certificates:
       key:  %(path)s/repospanner/pki/repospanner.localhost.key
 hooks:
   bubblewrap:
-    enabled: true
+    enabled: false
     unshare:
     - net
     - ipc
