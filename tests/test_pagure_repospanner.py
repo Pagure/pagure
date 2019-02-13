@@ -189,7 +189,7 @@ class PagureRepoSpannerTests(tests.Modeltests):
                   'w') as keylog:
             # Create the CA
             self.run_cacmd(keylog, 'init', 'localdomain',
-                           '--no-name-constraint')
+                           '--no-name-constraint', '--random-cn')
             # Create the node cert
             self.run_cacmd(keylog, 'node', 'localhost', 'repospanner')
             # Create the admin cert
