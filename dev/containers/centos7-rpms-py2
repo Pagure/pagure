@@ -4,6 +4,7 @@ RUN yum -y install \
     epel-release
 
 ADD ./fedora-infra-tags.repo /etc/yum.repos.d/infra-tags.repo
+ADD ./fedora-infra-tags-stg.repo /etc/yum.repos.d/infra-tags-stg.repo
 
 RUN yum -y install \
     yum-utils \

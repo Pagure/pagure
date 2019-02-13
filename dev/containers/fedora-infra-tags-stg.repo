@@ -1,0 +1,6 @@
+[infrastructure-tags-stg]
+name=Fedora Infrastructure tag $releasever - $basearch
+baseurl=https://kojipkgs.fedoraproject.org/repos-dist/epel$releasever-infra-stg/latest/$basearch/
+enabled=1
+gpgcheck=1
+gpgkey=https://infrastructure.fedoraproject.org/repo/infra/RPM-GPG-KEY-INFRA-TAGS
