@@ -19,7 +19,7 @@ PYPATH = "${pypath}"
 
 # Prepare code imports
 if PYPATH:
-    sys.path.append(PYPATH)
+    sys.path.insert(0, PYPATH)
 
 import pagure
 import pagure.lib.model_base
