@@ -403,8 +403,6 @@ class SimplePagureTest(unittest.TestCase):
         imp.reload(pagure.lib.tasks_services)
 
         self._app = pagure.flask_app.create_app({'DB_URL': self.dbpath})
-        # Remove the log handlers for the tests
-        self._app.logger.handlers = []
 
         self.app = self._app.test_client()
         self.gr_patcher = mock.patch('pagure.lib.tasks.get_result')
