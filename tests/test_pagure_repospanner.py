@@ -465,8 +465,7 @@ class PagureRepoSpannerTestsNewRepoDefault(PagureRepoSpannerTests):
                 output_text
             )
             self.assertIn(
-                "Denied push for ref &#39;refs/heads/master&#39; for user &#39;foo&#39;\n"
-                "All changes have been rejected",
+                "Denied push for ref &#39;refs/heads/master&#39; for user &#39;foo&#39;",
                 output_text
             )
 
