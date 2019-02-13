@@ -931,6 +931,27 @@ def add_commit_git_repo(folder, ncommits=10, filename='sources',
     shutil.rmtree(newfolder)
 
 
+def add_tag_git_repo(folder, tagname, obj_hash, message):
+    """ Add a tag to the given object of the given repo annotated by given message. """
+    repo, newfolder, branch_ref_obj = _clone_and_top_commits(
+        folder, 'master', branch_ref=True)
+
+    tag_sha = repo.create_tag(
+        tagname,
+        obj_hash,
+        repo.get(obj_hash).type,
+        pygit2.Signature('Alice Author', 'alice@authors.tld'),
+        message,
+    )
+
+    # Push to origin
+    ori_remote = repo.remotes[0]
+    PagureRepo.push(ori_remote, 'refs/tags/%s:refs/tags/%s' % (tagname, tagname))
+
+    shutil.rmtree(newfolder)
+    return tag_sha
+
+
 def add_content_to_git(
         folder, branch='master', filename='sources', content='foo',
         message=None):

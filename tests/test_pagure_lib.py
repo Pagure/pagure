@@ -16,6 +16,7 @@ import shutil
 import sys
 import os
 
+import pygit2
 import markdown
 from mock import patch, MagicMock
 
@@ -2303,6 +2304,76 @@ class PagureLibtests(tests.Modeltests):
             sorted(pagure.lib.git.get_git_branches(project)),
             ['feature1', 'feature2', 'master']
         )
+
+    def test_fork_project_preserves_tags(self):
+        """ Test the fork_project of pagure.lib.query pushes tags to the fork. """
+        gitfolder = os.path.join(self.path, 'repos')
+        docfolder = os.path.join(gitfolder, 'docs')
+        ticketfolder = os.path.join(gitfolder, 'tickets')
+        requestfolder = os.path.join(gitfolder, 'requests')
+        pagure.config.config['GIT_FOLDER'] = gitfolder
+
+        projects = pagure.lib.query.search_projects(self.session)
+        self.assertEqual(len(projects), 0)
+
+        # Create a new project
+        task = pagure.lib.query.new_project(
+            session=self.session,
+            user='pingou',
+            name='testproject',
+            repospanner_region=None,
+            blacklist=[],
+            allowed_prefix=[],
+            description='description for testproject',
+            parent_id=None,
+        )
+        self.session.commit()
+        self.assertEqual(
+            task.get(),
+            {'endpoint': 'ui_ns.view_repo',
+             'repo': 'testproject',
+             'namespace': None})
+
+        projects = pagure.lib.query.search_projects(self.session)
+        self.assertEqual(len(projects), 1)
+
+        project = pagure.lib.query._get_project(self.session, 'testproject')
+        gitrepo = os.path.join(gitfolder, project.path)
+        docrepo = os.path.join(docfolder, project.path)
+        ticketrepo = os.path.join(ticketfolder, project.path)
+        requestrepo = os.path.join(requestfolder, project.path)
+
+        # Add content to the main repo into three branches
+        tests.add_content_git_repo(gitrepo, 'master')
+
+        # Add a tag
+        tagged_commit = pygit2.Repository(gitrepo).revparse_single('master').hex
+        tag_sha = tests.add_tag_git_repo(gitrepo, '1.2.3', tagged_commit, 'release 1.2.3')
+
+        # Fork
+        task = pagure.lib.query.fork_project(
+            session=self.session,
+            user='foo',
+            repo=project,
+        )
+        self.session.commit()
+        self.assertEqual(
+            task.get(),
+            {'endpoint': 'ui_ns.view_repo',
+             'repo': 'testproject',
+             'namespace': None,
+             'username': 'foo'})
+
+        projects = pagure.lib.query.search_projects(self.session)
+        self.assertEqual(len(projects), 2)
+
+        project = pagure.lib.query._get_project(
+            self.session, 'testproject', user='foo')
+        # Check the tag is there
+        fork_obj = pygit2.Repository(project.repopath('main'))
+        tag = fork_obj.get(tag_sha)
+        self.assertEqual(fork_obj[tag.target].hex, tagged_commit)
+        self.assertEqual(tag.message, 'release 1.2.3')
 
     def test_fork_project_namespaced(self):
         """ Test the fork_project of pagure.lib on a namespaced project. """

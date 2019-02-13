@@ -1059,6 +1059,8 @@ class TemporaryClone(object):
                 command.append("--force")
             environ = {}
 
+        command.append("--follow-tags")
+
         try:
             _log.debug(
                 "Running a git push of %s to %s"
