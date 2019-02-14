@@ -632,7 +632,6 @@ def create_projects(session, is_fork=False, user_id=1, hook_token_suffix=''):
     session.add(item)
     session.flush()
     create_locks(session, item)
-
     session.commit()
 
 
@@ -646,7 +645,6 @@ def create_projects_git(folder, bare=False):
         if not os.path.exists(repo_path):
             os.makedirs(repo_path)
         pygit2.init_repository(repo_path, bare=bare)
-
     return repos
 
 
@@ -675,7 +673,6 @@ def create_tokens(session, user_id=1, project_id=1):
         expiration=datetime.utcnow() - timedelta(days=1)
     )
     session.add(item)
-
     session.commit()
 
 

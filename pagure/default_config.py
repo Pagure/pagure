@@ -368,6 +368,7 @@ CROSS_PROJECT_ACLS = [
     "fork_project",
     "modify_project",
     "update_watch_status",
+    "pull_request_create",
 ]
 
 # ACLs with which admins are allowed to create project-less API tokens

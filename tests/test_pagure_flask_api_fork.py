@@ -23,6 +23,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
 import pagure.lib.query
+import pagure.default_config
 import tests
 
 
@@ -2644,6 +2645,121 @@ class PagureFlaskApiForktests(tests.Modeltests):
                     'target repo'
             }
         )
+
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_api_pull_request_open_project_token_different_project(self):
+        """Test the api_pull_request_create method with the project token
+        of a different project - fails"""
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+        tests.create_projects_git(os.path.join(self.path, 'requests'),
+                bare=True)
+        tests.add_readme_git_repo(os.path.join(self.path, 'repos', 'test.git'))
+        tests.add_commit_git_repo(os.path.join(self.path, 'repos', 'test.git'),
+                branch='test')
+        tests.create_tokens(self.session, project_id=2)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token foo_token'}
+        data = {
+            'title': 'Test of PR',
+            'inicial comment': 'Some readme adjustment',
+            'branch_to': 'master',
+            'branch_from': 'test'
+        }
+
+        output = self.app.post(
+                '/api/0/test/pull-request/new', headers=headers, data=data)
+        self.assertEqual(output.status_code, 401)
+
+
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_api_pull_request_open_user_token_invalid_acls(self):
+        """Test the api_pull_request_create method with the user token, but with
+        no acls for opening pull request - fails"""
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+        tests.create_projects_git(os.path.join(self.path, 'requests'),
+                                  bare=True)
+        tests.add_readme_git_repo(os.path.join(self.path, 'repos', 'test.git'))
+        tests.add_commit_git_repo(os.path.join(self.path, 'repos', 'test.git'),
+                                  branch='test')
+        tests.create_tokens(self.session, project_id=None)
+        for acl in ("create_project", "fork_project", "modify_project",
+                    "update_watch_status"):
+            tests.create_tokens_acl(self.session, acl_name=acl)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        data = {
+            'title': 'Test of PR',
+            'initial_comment': 'Some readme adjustment',
+            'branch_to': 'master',
+            'branch_from': 'test',
+            }
+
+        output = self.app.post(
+            '/api/0/test/pull-request/new', headers=headers, data=data)
+        self.assertEqual(output.status_code, 401)
+
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_api_pull_request_open_from_branch_to_origin(self):
+        """Test the api_pull_request_create method from a fork to a master,
+       with project token of a origin with all the acls"""
+
+        tests.create_projects(self.session)
+        tests.create_projects(self.session, is_fork=True, hook_token_suffix='foo')
+        project_query = self.session.query(pagure.lib.model.Project)
+        for project in project_query.filter_by(name='test').all():
+            if project.parent_id == None:
+                parent = project
+            else:
+                child = project
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+        tests.create_projects_git(os.path.join(self.path, 'requests'),
+                                    bare=True)
+        tests.add_readme_git_repo(os.path.join(self.path, 'repos', 'forks',
+            'pingou', 'test.git'), branch='branch')
+        tests.add_commit_git_repo(os.path.join(self.path, 'repos', 'forks',
+            'pingou', 'test.git'), branch='branch')
+
+        # Create tokens
+        parent_token = pagure.lib.model.Token(
+            id='iamparenttoken',
+            user_id=parent.user_id,
+            project_id=parent.id,
+            expiration=datetime.datetime.utcnow() + datetime.timedelta(days=30)
+        )
+        self.session.add(parent_token)
+
+        fork_token = pagure.lib.model.Token(
+            id='iamforktoken',
+            user_id=child.user_id,
+            project_id=child.id,
+            expiration=datetime.datetime.utcnow() + datetime.timedelta(days=30)
+        )
+        self.session.add(fork_token)
+        self.session.commit()
+
+        tests.create_tokens_acl(self.session, token_id='iamparenttoken')
+        for acl in pagure.default_config.CROSS_PROJECT_ACLS:
+            tests.create_tokens_acl(self.session, token_id='iamforktoken',
+                    acl_name=acl)
+
+        headers = {'Authorization': 'token iamforktoken'}
+
+        data = {
+            'title': 'war of tomatoes',
+            'initial_comment': 'the manifest',
+            'branch_to': 'master',
+            'branch_from': 'branch',
+            }
+
+        output = self.app.post('/api/0/fork/pingou/test/pull-request/new',
+                headers=headers, data=data)
+        self.assertEqual(output.status_code, 200)
+
 
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
     def test_api_pull_request_open(self):
