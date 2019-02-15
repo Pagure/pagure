@@ -64,6 +64,7 @@ certificates:
       cert: %(path)s/repospanner/pki/repospanner.localhost.crt
       key:  %(path)s/repospanner/pki/repospanner.localhost.key
 hooks:
+  debug: true
   bubblewrap:
     enabled: false
     unshare:
