@@ -3,8 +3,60 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
+5.3 (2019-02-18)
+----------------
+
+.. warning:: This release contains a security fix for CVE-2019-762
+
+- Change "created by" to "maintained by" in repo info (Ryan Lerch)
+- Fix showing an input box if the minimum score for PR is set to 0
+- Fix the output of the merge PR API endpoint when the PR conflicts
+- Add some documentation on our magic keywords
+- Allow filtering user's PR by time information
+- Add the possibility to filter the user's issues by dates
+- Add support for the `resolve` keyword among our magic words
+- Allow any username to be searched in issues filters (Ryan Lerch)
+- Allow using Pagure with python-redis >= 3.0.0 (Neal Gompa)
+- Fix Markdown usage to work with Markdown 3.0+ (Neal Gompa)
+- Decode the output from the shell commands if they are not already unicode
+- Add THEME option docs to configuration documentation (Ryan Lerch)
+- Fix updating the date_modified when giving the project to someone
+- Don't try mirroring if we failed generating private key
+- Change couple of log entries from info to warning
+- Cascade deleting flags when tokens are deleted
+- Ensure there are admin groups before adding them to the list of groups
+- Move the create_session function into pagure.lib.model_base
+- Make the button to show/hide the URL to checkout locally a PR more visible
+- Fixup documentation about modifyacls (Igor Gnatenko)
+- Force highlight.js to use certain highlighting schemes in file view
+  (Ryan Lerch)
+- Fix the total number of members on the repo info page
+- Fix not showing the edit and delete buttons when they won't work
+- Add project connector api endpoint (Fabien Boucher)
+- Api: project connector endpoint: complete returned data (Fabien Boucher)
+- Fix repoSpanner integration (Patrick Uiterwijk)
+- Make sure repoSpanner tests run in CentOS CI (Patrick Uiterwijk)
+- Only block new branches in hooks (Lubomír Sedlář)
+- Add support for fedora-messaging in pagure
+- Fix calculation of days until API key expires in the emails (Karsten Hopp)
+- Move to container-based testing on jenkins testing the following environment
+  - F29 using python3 with dependencies installed as RPMs
+  - F29 using python3 with dependencies installed via pip
+  - CentOS7 using python2 with dependencies installed as RPMs
+- Add project createapitoken endpoint (Fabien Boucher)
+- CVE-2019-7628: Do not leak partial API keys. (Randy Barlow)
+- Provide full repospanner reponame for aclchecker/repobridge (Slavek Kabrda)
+- Allow turning on issue tracking for only some namespaces
+- Do not allow `,` in tags
+- Ensure we can add/edit/delete tags even when issues are off but PRs aren't
+- Fix cancelling a rebase
+- Add options to send notifications on all the message bus we support on all
+  commits
+
+
 5.2 (2019-01-07)
 ----------------
+
 - Add support for the MQTT protocol (jingjing)
 - Add support for mirroring in git repositories from outside sources
 - Add the possibility to give a group away

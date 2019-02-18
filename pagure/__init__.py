@@ -11,5 +11,5 @@
 from __future__ import unicode_literals, absolute_import
 
 
-__version__ = "5.2"
-__api_version__ = "0.25"
+__version__ = "5.3"
+__api_version__ = "0.26"

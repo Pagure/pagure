@@ -1,7 +1,30 @@
 Upgrading Pagure
 ================
 
-From 5.2 to 5.1.x
+From 5.2 to 5.3
+---------------
+
+The 5.3 release contains a database schema updates, so:
+
+* Update the data schema using alembic: ``alembic upgrade head``
+
+(As usual, do your backups before).
+
+While working on pagure 5.3, we found that the version of python werkzeug
+available in CentOS 7 is too old and makes some of pagure's tests fail. We
+recomment it to be upgrade to at least 0.9.6.
+
+New configuration keys have been added:
+
+* ENABLE_TICKETS_NAMESPACE
+* FEDORA_MESSAGING_NOTIFICATIONS
+* SYNTAX_ALIAS_OVERRIDES
+* ALWAYS_STOMP_ON_COMMITS
+* ALWAYS_MQTT_ON_COMMITS
+* MQTT_TOPIC_PREFIX
+
+
+From 5.1.x to 5.2
 -----------------
 
 The 5.2 release contains a database schema updates, so:
