@@ -196,7 +196,6 @@
                   {% endif %}
                 </form>
                 <button id="rebase_btn" type="submit"
-                  onclick="return confirm('Confirm rebasing this pull-request');"
                   class="btn btn-block my-2">Rebase</button>
               {% else %}
               <small id="merge-alert-message"></small>
@@ -886,6 +885,10 @@ function show_merge_status(){
 $(document).ready(function() {
 
   $('#rebase_btn').click(function(){
+    var _conf = confirm('Confirm rebasing this pull-request');
+    if (_conf === false){
+        return false;
+    }
     $('#merge_dropdown_btn span.fa').removeClass(
       "fa-circle-o-notch fa-times fa-check").addClass(
       "fa-circle-o-notch fa-fw");
