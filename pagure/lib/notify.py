@@ -49,6 +49,12 @@ def fedmsg_publish(*args, **kwargs):  # pragma: no cover
     if not pagure_config.get("FEDMSG_NOTIFICATIONS", True):
         return
 
+    _log.warning(
+        "fedmsg support is being deprecated in favor of fedora-messaging "
+        "you likely want to stop relying on it as it will disapear in the "
+        "future, most likely in the 6.0 release"
+    )
+
     # We catch Exception if we want :-p
     # pylint: disable=broad-except
     # Ignore message about fedmsg import
