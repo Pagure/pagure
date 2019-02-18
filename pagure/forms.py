@@ -210,7 +210,7 @@ class ProjectForm(ProjectFormSimplified):
         super(ProjectForm, self).__init__(*args, **kwargs)
         # set the name validator
         regex = pagure_config.get(
-            "PROJECT_NAME_REGEX", "^[a-zA-z0-9_][a-zA-Z0-9-_]*$"
+            "PROJECT_NAME_REGEX", "^[a-zA-z0-9_][a-zA-Z0-9-_.+]*$"
         )
         self.name.validators = [
             wtforms.validators.DataRequired(),

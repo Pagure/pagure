@@ -221,6 +221,66 @@ class PagureFlaskApptests(tests.Modeltests):
                 'title="Create New Project" aria-hidden="true">',
                 output_text)
 
+    def test_new_project_with_dot(self):
+        """ Test the new_project endpoint when new project contains a dot.
+        """
+        # Before
+        projects = pagure.lib.query.search_projects(self.session)
+        self.assertEqual(len(projects), 0)
+
+        user = tests.FakeUser(username="foo")
+        with tests.user_set(self.app.application, user):
+            csrf_token = self.get_csrf()
+
+            data = {
+                'description': 'Project #1.',
+                'name': 'project.1',
+                'csrf_token':  csrf_token
+            }
+            output = self.app.post('/new/', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>Overview - project.1 - Pagure</title>', output_text)
+            self.assertIn(
+                '<a href="/project.1"><strong>project.1</strong></a>',
+                output_text
+            )
+
+        #After
+        projects = pagure.lib.query.search_projects(self.session)
+        self.assertEqual(len(projects), 1)
+
+    def test_new_project_with_plus(self):
+        """ Test the new_project endpoint when new project contains a plus sign.
+        """
+        # Before
+        projects = pagure.lib.query.search_projects(self.session)
+        self.assertEqual(len(projects), 0)
+
+        user = tests.FakeUser(username="foo")
+        with tests.user_set(self.app.application, user):
+            csrf_token = self.get_csrf()
+
+            data = {
+                'description': 'Project #1.',
+                'name': 'project+1',
+                'csrf_token':  csrf_token
+            }
+            output = self.app.post('/new/', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>Overview - project+1 - Pagure</title>', output_text)
+            self.assertIn(
+                '<a href="/project+1"><strong>project+1</strong></a>',
+                output_text
+            )
+
+        #After
+        projects = pagure.lib.query.search_projects(self.session)
+        self.assertEqual(len(projects), 1)
+
     def test_new_project_when_turned_off(self):
         """ Test the new_project endpoint when new project creation is
         not allowed in the pagure instance. """
