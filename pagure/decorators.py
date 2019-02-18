@@ -68,12 +68,15 @@ def has_issue_or_pr_enabled(function):
     @wraps(function)
     def check_issue_pr_trackers(*args, **kwargs):
         repo = flask.g.repo
-        if not flask.g.issues_enabled and not repo.settings.get(
-            "pull_requests", True
-        ):
+        issue_enabled = flask.g.issues_enabled
+        issue_ro = repo.settings.get("issue_tracker_read_only", False)
+        pr_enabled = repo.settings.get("pull_requests", True)
+        if not issue_enabled and not pr_enabled:
             flask.abort(
                 404, "Issue tracker and Pull-Request disabled for this project"
             )
+        elif flask.request.method == "POST" and not pr_enabled and issue_ro:
+            flask.abort(401, "The issue tracker for this project is read-only")
         return function(*args, **kwargs)
 
     return check_issue_pr_trackers
