@@ -11,10 +11,11 @@
 from __future__ import unicode_literals, absolute_import
 
 import datetime
-import unittest
+import os
+import pytz
 import shutil
 import sys
-import os
+import unittest
 
 import json
 from mock import patch
@@ -468,18 +469,36 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         """Test api_view_user_activity{_stats,_date} with the America/
         New York timezone, which is 5 hours behind UTC in winter and
         4 hours behind UTC in summer (daylight savings). The events
-        will occur on 2018-02-15 in UTC, but on 2018-02-14 local.
+        will occur on XXXX-02-15 in UTC, but on XXXX-02-14 local.
         """
         tests.create_projects(self.session)
         repo = pagure.lib.query._get_project(self.session, 'test')
 
-        dateobj = datetime.datetime(2018, 2, 15, 3, 30)
-        utcdate = '2018-02-15'
-        # the Unix timestamp for 2018-02-15 12:00 UTC
-        utcts = '1518696000'
-        localdate = '2018-02-14'
-        # the Unix timestamp for 2018-02-14 12:00 America/New_York
-        localts = '1518627600'
+        today = datetime.datetime.utcnow().date()
+        year = today.year
+        if today.year == 2 and today.date <=15:
+            year = year - 1
+        elif today.year < 2:
+            year = year - 1
+        dateobj = datetime.datetime(year, 2, 15, 3, 30)
+        utcdate = '%s-02-15' % year
+        # the Unix timestamp for YYYY-02-15 12:00 UTC
+        utcts = str(int(
+            (
+                datetime.datetime(year, 2, 15, 12, 0, tzinfo=pytz.UTC)
+                - datetime.datetime(1970, 1, 1, tzinfo=pytz.UTC)
+            ).total_seconds()
+        ))
+        localdate = '%s-02-14' % today.year
+        # the Unix timestamp for YYYY-02-15 18:00 America/New_York
+        localts = str(int(
+            (
+                datetime.datetime(
+                    year, 2, 14, 17, 0, tzinfo=pytz.timezone('America/New_York'))
+                - datetime.datetime(
+                    1970, 1, 1 , tzinfo=pytz.timezone('America/New_York'))
+            ).total_seconds()
+        ))
         # Create a single commit log
         log = model.PagureLog(
             user_id=1,
@@ -546,18 +565,36 @@ class PagureFlaskApiUSertests(tests.Modeltests):
     def test_api_view_user_activity_timezone_positive(self, mockemail):
         """Test api_view_user_activity{_stats,_date} with the Asia/
         Dubai timezone, which is 4 hours ahead of UTC. The events will
-        occur on 2018-02-15 in UTC, but on 2018-02-16 in local time.
+        occur on XXXX-02-15 in UTC, but on XXXX-02-16 in local time.
         """
         tests.create_projects(self.session)
         repo = pagure.lib.query._get_project(self.session, 'test')
 
-        dateobj = datetime.datetime(2018, 2, 15, 22, 30)
-        utcdate = '2018-02-15'
-        # the Unix timestamp for 2018-02-15 12:00 UTC
-        utcts = '1518696000'
-        localdate = '2018-02-16'
-        # the Unix timestamp for 2018-02-16 12:00 Asia/Dubai
-        localts = '1518768000'
+        today = datetime.datetime.utcnow().date()
+        year = today.year
+        if today.year == 2 and today.date <=15:
+            year = year - 1
+        elif today.year < 2:
+            year = year - 1
+        dateobj = datetime.datetime(year, 2, 15, 22, 30)
+        utcdate = '%s-02-15' % year
+        # the Unix timestamp for YYYY-02-15 12:00 UTC
+        utcts = str(int(
+            (
+                datetime.datetime(year, 2, 15, 12, 0, tzinfo=pytz.UTC)
+                - datetime.datetime(1970, 1, 1, tzinfo=pytz.UTC)
+            ).total_seconds()
+        ))
+        localdate = '%s-02-16' % year
+        # the Unix timestamp for YYYY-02-16 9:00 Asia/Dubai
+        localts = str(int(
+            (
+                datetime.datetime(
+                    year, 2, 16, 8, 0, tzinfo=pytz.timezone('Asia/Dubai'))
+                - datetime.datetime(
+                    1970, 1, 1 , tzinfo=pytz.timezone('Asia/Dubai'))
+            ).total_seconds()
+        ))
         # Create a single commit log
         log = model.PagureLog(
             user_id=1,
