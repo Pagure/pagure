@@ -983,7 +983,9 @@ function take_issue(){
       $('#assignee').val("{{ g.fas_user.username }}");
       setup_btn_take_drop();
     }
-  )
+  ).fail(function() {
+    alert( "An error occured, could not assign this ticket to you." );
+  })
   return false;
 }
 {% endif %}
@@ -1005,7 +1007,9 @@ function drop_issue(){
       $('#assignee').val("");
       setup_btn_take_drop();
     }
-  )
+  ).fail(function() {
+    alert( "An error occured, could not drop the current assignee." );
+  })
   return false;
 }
 {% endif %}
