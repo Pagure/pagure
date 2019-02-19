@@ -2388,6 +2388,192 @@ More information</textarea>
             self.assertNotIn('<div id="comment-', output_text)
 
     @patch('pagure.lib.notify.send_email')
+    def test_new_request_pull_filename_unicode(self, send_email):
+        """ Test the new_request_pull endpoint. """
+        send_email.return_value = True
+
+        # Create the main project in the DB
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test',
+            description='test project #1',
+            hook_token='aaabbbccc',
+        )
+        item.close_status = [
+            'Invalid', 'Insufficient data', 'Fixed', 'Duplicate']
+        self.session.add(item)
+        self.session.commit()
+
+        # Create the fork
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test',
+            description='test project #1',
+            hook_token='aaabbbcccdd',
+            parent_id=1,
+            is_fork=True,
+        )
+        item.close_status = [
+            'Invalid', 'Insufficient data', 'Fixed', 'Duplicate']
+        self.session.add(item)
+        self.session.commit()
+
+        # Create two git repos, one has 6 commits, the other 4 of which only
+        # 1 isn't present in the first repo
+        gitrepo = os.path.join(self.path, 'repos', 'test.git')
+        pygit2.init_repository(gitrepo, bare=True)
+
+        gitrepo2 = os.path.join(
+            self.path, 'repos', 'forks', 'pingou', 'test.git')
+        pygit2.init_repository(gitrepo2, bare=True)
+
+        newpath = tempfile.mkdtemp(prefix='pagure-fork-test')
+        repopath = os.path.join(newpath, 'test')
+        clone_repo = pygit2.clone_repository(gitrepo, repopath)
+
+        # Do 2 commits to the main repo
+        for i in range(2):
+            with open(os.path.join(repopath, 'sources'), 'w') as stream:
+                stream.write('foo%s\n bar%s\n' % (i, i))
+            clone_repo.index.add('sources')
+            clone_repo.index.write()
+
+            parents = []
+            try:
+                last_commit = clone_repo.revparse_single('HEAD')
+                parents = [last_commit.oid.hex]
+            except KeyError:
+                pass
+
+            # Commits the files added
+            tree = clone_repo.index.write_tree()
+            author = pygit2.Signature(
+                'Alice Author', 'alice@authors.tld')
+            committer = pygit2.Signature(
+                'Cecil Committer', 'cecil@committers.tld')
+            clone_repo.create_commit(
+                'refs/heads/master',  # the name of the reference to update
+                author,
+                committer,
+                'Editing the file sources for testing #%s' % i,
+                # binary string representing the tree object ID
+                tree,
+                # list of binary strings representing parents of the new commit
+                parents
+            )
+
+        # Push to the main repo
+        refname = 'refs/heads/master:refs/heads/master'
+        ori_remote = clone_repo.remotes[0]
+        PagureRepo.push(ori_remote, refname)
+
+        # Push to the fork repo
+        remote = clone_repo.create_remote('pingou_fork', gitrepo2)
+        PagureRepo.push(remote, refname)
+
+        # Add 1 commits to the fork repo
+        repopath = os.path.join(newpath, 'pingou_test')
+        clone_repo = pygit2.clone_repository(gitrepo2, repopath)
+
+        with open(os.path.join(repopath, 'soürces'), 'w') as stream:
+                stream.write('foo\n bar\n')
+        clone_repo.index.add('soürces')
+        clone_repo.index.write()
+        with open(os.path.join(repopath, 'fóß'), 'w') as stream:
+                stream.write('foo\n bar\n')
+        clone_repo.index.add('fóß')
+        clone_repo.index.write()
+
+        last_commit = clone_repo.revparse_single('HEAD')
+
+        # Commits the files added
+        tree = clone_repo.index.write_tree()
+        author = pygit2.Signature(
+            'Alice Author', 'alice@authors.tld')
+        committer = pygit2.Signature(
+            'Cecil Committer', 'cecil@committers.tld')
+        last_commit = clone_repo.create_commit(
+            'refs/heads/feature_foo',  # the name of the reference to update
+            author,
+            committer,
+            'New edition on side branch of the file sources for testing',
+            # binary string representing the tree object ID
+            tree,
+            # list of binary strings representing parents of the new commit
+            [last_commit.oid.hex]
+        )
+
+        # Push to the fork repo
+        ori_remote = clone_repo.remotes[0]
+        refname = 'refs/heads/feature_foo:refs/heads/feature_foo'
+        PagureRepo.push(ori_remote, refname)
+
+        shutil.rmtree(newpath)
+
+        # Create the PR between the two repos
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.lib.query.get_authorized_project(
+            self.session, 'test', user='pingou')
+
+        req = pagure.lib.query.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='feature_foo',
+            repo_to=repo,
+            branch_to='master',
+            title='test pull-request',
+            user='pingou',
+        )
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'test pull-request')
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(self.app.application, user):
+            output = self.app.get('/fork/pingou/test/diff/master..feature_foo')
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>Create new Pull Request for master - fork/pingou/test\n - '
+                'Pagure</title>', output_text)
+            self.assertIn(
+                '<input type="submit" class="btn btn-primary" value="Create Pull Request">\n',
+                output_text)
+            # Check that we prefilled the input fields as expected:
+            self.assertIn(
+                '<input class="form-control" id="title" name="title" '
+                'placeholder="Pull Request Title" required="required" '
+                'type="text" value="New edition on side branch of the file '
+                'sources for testing">', output_text)
+            self.assertIn(
+                '<a href="javascript:void(0)" class="dropdown-item '
+                'branch_from_item" data-value="master"><span '
+                'class="fa fa-random"></span> master</a>',
+                output_text)
+
+            csrf_token = self.get_csrf(output=output)
+
+            # Case 1 - Add an initial comment
+            data = {
+                'csrf_token': csrf_token,
+                'title': 'foo bar PR',
+                'initial_comment': 'Test Initial Comment',
+            }
+
+            output = self.app.post(
+                '/fork/pingou/test/diff/master..feature_foo',
+                data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>PR#2: foo bar PR - test\n - Pagure</title>',
+                output_text)
+            self.assertIn('<p>Test Initial Comment</p>',
+                          output_text)
+            self.assertEqual(
+                output_text.count('title="PY C (pingou)"'),
+                2)
+
+    @patch('pagure.lib.notify.send_email')
     def test_new_request_pull_req_sign_off_view(self, send_email):
         """ Test the new_request_pull endpoint. """
         send_email.return_value = True
