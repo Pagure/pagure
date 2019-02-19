@@ -4274,7 +4274,7 @@ def clean_input(text, ignore=None):
     attrs = bleach.ALLOWED_ATTRIBUTES.copy()
     attrs["table"] = ["class"]
     attrs["span"] = ["class", "id"]
-    attrs["div"] = ["class"]
+    attrs["div"] = ["class", "id"]
     attrs["td"] = ["align"]
     attrs["th"] = ["align"]
     if not ignore or "img" not in ignore:
