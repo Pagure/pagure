@@ -30,7 +30,7 @@ def upgrade():
     )
     op.execute('UPDATE commit_flags SET date_updated=date_created')
     op.alter_column(
-        'commit_flags', 'date_updated',
+        'commit_flags', 'date_updated', existing_type=sa.DateTime,
         nullable=False, existing_nullable=True)
 
 

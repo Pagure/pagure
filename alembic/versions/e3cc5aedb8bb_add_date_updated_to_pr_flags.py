@@ -29,7 +29,7 @@ def upgrade():
     )
     op.execute('UPDATE pull_request_flags SET date_updated=date_created')
     op.alter_column(
-        'pull_request_flags', 'date_updated',
+        'pull_request_flags', 'date_updated', existing_type=sa.DateTime,
         nullable=False, existing_nullable=True)
 
 

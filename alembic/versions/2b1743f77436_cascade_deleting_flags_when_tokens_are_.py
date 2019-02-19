@@ -20,7 +20,9 @@ def upgrade():
     re-create it with CASCADE on delete and update.
     """
     # alter the constraints
-    op.drop_constraint('pull_request_flags_token_id_fkey', 'pull_request_flags')
+    op.drop_constraint(
+        'pull_request_flags_token_id_fkey', 'pull_request_flags',
+        type_='foreignkey')
     op.create_foreign_key(
         u'pull_request_flags_token_id_fkey',
         'pull_request_flags',
@@ -36,7 +38,9 @@ def downgrade():
     """ Remove the existing foreign key in pull_request_flags.token_id and
     re-create it with without specifying the behavior on delete and update.
     """
-    op.drop_constraint('pull_request_flags_token_id_fkey', 'pull_request_flags')
+    op.drop_constraint(
+        'pull_request_flags_token_id_fkey', 'pull_request_flags',
+        type_='foreignkey')
     op.create_foreign_key(
         u'pull_request_flags_token_id_fkey',
         'pull_request_flags',

@@ -17,8 +17,8 @@ down_revision = '9cb4580e269a'
 def upgrade():
     """ Insert the new ACL into the database. """
     op.execute(
-        'INSERT INTO acls ("name", "description", "created") '
-        "VALUES ('internal_access', 'Access Pagure''s internal APIs', NOW());"
+        'INSERT INTO acls (name, description, created) '
+        'VALUES ("internal_access", "Access Pagure internal APIs", NOW());'
     )
 
 
