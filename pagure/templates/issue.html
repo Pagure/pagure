@@ -1092,6 +1092,22 @@ $(".comment_and_close_action").click(function(event){
     }
   );
 
+  function _get_issues(url, callback){
+    $.getJSON(
+        url,
+        function( data ) {
+          issues = data.issues.filter(function(el) {
+            return el.id !== {{issue.id}};
+          });
+          callback(issues);
+          if (data.pagination.next){
+            _get_issues(data.pagination.next, callback)
+          }
+        }
+      );
+  }
+
+  var _block_loaded = false;
   $('.mainform #blocking').selectize({
     plugins: ['remove_button'],
     valueField: 'id',
@@ -1108,21 +1124,20 @@ $(".comment_and_close_action").click(function(event){
     },
     create: false,
     load: function(query, callback) {
-      $.getJSON(
-        "{{ url_for('api_ns.api_view_issues',
-                    repo=repo.name,
-                    username=username,
-                    namespace=repo.namespace) }}",
-        function( data ) {
-          issues = data.issues.filter(function(el) {
-            return el.id !== {{issue.id}};
-          });
-          callback(issues);
-        }
-      );
+      if (_block_loaded){
+        callback();
+        return;
+      };
+      var _url = "{{ url_for('api_ns.api_view_issues',
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace) }}";
+      _get_issues(_url, callback);
+      _block_loaded = true;
     }
   });
 
+  var _dep_loaded = false;
   $('.mainform #depending').selectize({
     plugins: ['remove_button'],
     valueField: 'id',
@@ -1139,18 +1154,16 @@ $(".comment_and_close_action").click(function(event){
     },
     create: false,
     load: function(query, callback) {
-      $.getJSON(
-        "{{ url_for('api_ns.api_view_issues',
-                    repo=repo.name,
-                    username=username,
-                    namespace=repo.namespace) }}",
-        function( data ) {
-          issues = data.issues.filter(function(el) {
-            return el.id !== {{issue.id}};
-          });
-          callback(issues);
-        }
-      );
+      if (_dep_loaded){
+        callback();
+        return;
+      };
+      var _url = "{{ url_for('api_ns.api_view_issues',
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace) }}";
+      _get_issues(_url, callback);
+      _dep_loaded = true;
     }
   });
 
