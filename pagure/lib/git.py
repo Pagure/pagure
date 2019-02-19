@@ -788,6 +788,13 @@ def update_request_from_git(
                 user=user.username,
                 notify=False,
             )
+
+    # Add/update tags:
+    tags = json_data.get("tags") or []
+    if tags:
+        user = get_user_from_json(session, json_data)
+        pagure.lib.query.add_tag_obj(session, request, tags, user.username)
+
     session.commit()
 
 

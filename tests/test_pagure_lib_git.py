@@ -1696,7 +1696,7 @@ new file mode 100644
 index 0000000..60f7480
 --- /dev/null
 +++ b/456
-@@ -0,0 +1,146 @@
+@@ -0,0 +1,147 @@
 +{
 +    "assignee": null,
 +    "branch": "master",
@@ -1829,6 +1829,7 @@ index 0000000..60f7480
 +        }
 +    },
 +    "status": "Open",
++    "tags": [],
 +    "threshold_reached": null,
 +    "title": "test PR",
 +    "uid": "foobar",
@@ -2572,6 +2573,124 @@ index 0000000..60f7480
             namespaced_repo.requests[0].title,
             'test request to namespaced repo'
         )
+
+    def test_update_request_from_git(self):
+        """ Test the update_request_from_git method from pagure.lib.git. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'))
+
+        repo = pagure.lib.query._get_project(self.session, 'test')
+        namespaced_repo = pagure.lib.query._get_project(self.session, 'test3', namespace='somenamespace')
+
+        # Before
+        self.assertEqual(len(repo.requests), 0)
+        self.assertEqual(repo.requests, [])
+        self.assertEqual(len(namespaced_repo.requests), 0)
+        self.assertEqual(namespaced_repo.requests, [])
+
+        data = {
+            "status": True,
+            "uid": "d4182a2ac2d541d884742d3037c26e57",
+            "project": {
+                "parent": None,
+                "name": "test",
+                "custom_keys": [],
+                "date_created": "1426500194",
+                "tags": [],
+                "user": {
+                    "fullname": "Pierre-YvesChibon",
+                    "name": "pingou",
+                    "default_email": "pingou@fedoraproject.org",
+                    "emails": [
+                        "pingou@fedoraproject.org"
+                    ]
+                },
+                "settings": {
+                    "issue_tracker": True,
+                    "project_documentation": True,
+                    "pull_requests": True,
+                },
+                "id": 1,
+                "description": "test project"
+            },
+            "commit_stop": "eface8e13bc2a08a3fb22af9a72a8c90e36b8b89",
+            "user": {
+                "fullname": "Pierre-YvesChibon",
+                "name": "pingou",
+                "default_email": "pingou@fedoraproject.org",
+                "emails": ["pingou@fedoraproject.org"]
+            },
+            "id": 4,
+            "comments": [],
+            "branch_from": "master",
+            "title": "test request #2",
+            "commit_start": "788efeaaf86bde8618f594a8181abb402e1dd904",
+            "repo_from": {
+                "parent": {
+                    "parent": None,
+                    "name": "test",
+                    "custom_keys": [],
+                    "date_created": "1426500194",
+                    "tags": [],
+                    "user": {
+                        "fullname": "Pierre-YvesChibon",
+                        "name": "pingou",
+                        "default_email": "pingou@fedoraproject.org",
+                        "emails": [
+                            "pingou@fedoraproject.org"
+                        ]
+                    },
+                    "settings": {
+                        "issue_tracker": True,
+                        "project_documentation": True,
+                        "pull_requests": True,
+                    },
+                    "id": 1,
+                    "description": "test project"
+                },
+                "settings": {
+                    "issue_tracker": True,
+                    "project_documentation": True,
+                    "pull_requests": True,
+                },
+                "name": "test",
+                "date_created": "1426843440",
+                "custom_keys": [],
+                "tags": [],
+                "user": {
+                    "fullname": "fake user",
+                    "name": "fake",
+                    "default_email": "fake@fedoraproject.org",
+                    "emails": [
+                        "fake@fedoraproject.org"
+                    ]
+                },
+                "project_docs": True,
+                "id": 6,
+                "description": "test project"
+            },
+            "branch": "master",
+            "date_created": "1426843745",
+            "tags": ["WIP", "core"],
+        }
+
+        pagure.lib.git.update_request_from_git(
+            self.session,
+            reponame='test',
+            namespace=None,
+            username=None,
+            request_uid='d4182a2ac2d541d884742d3037c26e57',
+            json_data=data,
+        )
+        self.session.commit()
+
+        # After insertion
+        self.assertEqual(repo.requests[0].id, 4)
+        self.assertEqual(
+            repo.requests[0].uid, 'd4182a2ac2d541d884742d3037c26e57')
+        self.assertEqual(repo.requests[0].title, 'test request #2')
+        self.assertEqual(len(repo.requests[0].comments), 0)
+        self.assertEqual(repo.requests[0].tags_text, ['WIP', 'core'])
 
     def test_read_git_lines(self):
         """ Test the read_git_lines method of pagure.lib.git. """

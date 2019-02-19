@@ -2144,6 +2144,7 @@ class PullRequest(BASE):
             "initial_comment": self.initial_comment,
             "cached_merge_status": self.merge_status or "unknown",
             "threshold_reached": self.threshold_reached,
+            "tags": self.tags_text,
         }
 
         comments = []
