@@ -566,6 +566,14 @@ Password for decoding ``STOMP_CERT_FILE`` and ``STOMP_KEY_FILE``. Only
 required if ``STOMP_SSL`` is set to ``True`` and credentials files are
 password-encoded.
 
+ALWAYS_STOMP_ON_COMMITS
+~~~~~~~~~~~~~~~~~~~~~~~
+
+This configuration key allows to enforce `stomp <https://stomp.github.io/>`_
+notifications on commits made on all projects in a pagure instance.
+
+Defaults to: ``False``.
+
 
 API token ACLs
 --------------
@@ -1895,6 +1903,15 @@ When using SSL-based authentication to the MQTT server, use this
 configuration key to specify the ciphers.
 
 Defaults to: ``None``
+
+ALWAYS_MQTT_ON_COMMITS
+~~~~~~~~~~~~~~~~~~~~~~
+
+This configuration key allows to enforce `mqtt <https://mqtt.org/>`_
+notifications on commits made on all projects in a pagure instance.
+
+Defaults to: ``False``.
+
 
 
 Deprecated configuration keys

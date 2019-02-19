@@ -39,12 +39,7 @@ def send_fedmsg_notifications(project, topic, msg):
     config["endpoints"]["relay_inbound"] = config["relay_inbound"]
     fedmsg.init(name="relay_inbound", **config)
 
-    pagure.lib.notify.log(
-        project=project,
-        topic=topic,
-        msg=msg,
-        webhook=False,  # web-hook notification are handled separately
-    )
+    pagure.lib.notify.fedmsg_publish(topic=topic, msg=msg)
 
 
 def send_webhook_notifications(project, topic, msg):
@@ -102,6 +97,8 @@ def send_notifications(session, project, repodir, user, refname, revs, forced):
 
         always_fedmsg = _config.get("ALWAYS_FEDMSG_ON_COMMITS") or None
 
+        # Send fedmsg and fedora-messaging notification
+        # (if fedmsg and fedora-messaging are there and set-up)
         if always_fedmsg or (
             project.fedmsg_hook and project.fedmsg_hook.active
         ):
@@ -112,6 +109,43 @@ def send_notifications(session, project, repodir, user, refname, revs, forced):
                 _log.exception(
                     "Error sending fedmsg notifications on commit push"
                 )
+
+            try:
+                print("  - to fedora-message")
+                pagure.lib.notify.fedora_messaging_publish(topic, msg)
+            except Exception:
+                _log.exception(
+                    "Error sending fedora-messaging notifications on "
+                    "commit push"
+                )
+
+        always_stomp = _config.get("ALWAYS_STOMP_ON_COMMITS") or None
+        # Send stomp notification (if stomp is there and set-up)
+        if always_stomp or (
+            project.fedmsg_hook and project.fedmsg_hook.active
+        ):
+            try:
+                print("  - to stomp")
+                pagure.lib.notify.stomp_publish(topic, msg)
+            except Exception:
+                _log.exception(
+                    "Error sending stomp notifications on commit push"
+                )
+
+        always_mqtt = _config.get("ALWAYS_MQTT_ON_COMMITS") or None
+        # Send mqtt notification (if mqtt is there and set-up)
+        if always_mqtt or (project.fedmsg_hook and project.fedmsg_hook.active):
+            try:
+                print("  - to mqtt")
+                pagure.lib.notify.mqtt_publish(topic, msg)
+            except Exception:
+                _log.exception(
+                    "Error sending stomp notifications on commit push"
+                )
+
+        # Send blink notification to any 3rd party plugins, if there are any
+        pagure.lib.notify.blinker_publish(topic, msg)
+
         if project.settings.get("Web-hooks") and not project.private:
             try:
                 print("  - to web-hooks")
