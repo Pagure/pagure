@@ -4347,6 +4347,51 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
+    def test_view_issue_comment_and_close(self, p_send_email, p_ugt):
+        """ Test if the comment and close button shows up on a ticket opened
+        by the user
+        """
+        # Create the project ns/test
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test3',
+            namespace='ns',
+            description='test project #3',
+            hook_token='aaabbbcccdd',
+        )
+        self.session.add(item)
+        self.session.commit()
+        self.assertEqual(item.fullname, 'ns/test3')
+        pygit2.init_repository(
+            os.path.join(self.path, 'repos', 'ns', 'test3.git'),
+            bare=True)
+
+        # Create 1 issue
+        iss = pagure.lib.query.new_issue(
+            issue_id=1,
+            session=self.session,
+            repo=item,
+            title='test issue2',
+            content='content test issue2',
+            user='foo',
+        )
+        self.session.commit()
+        self.assertEqual(iss.id, 1)
+        self.assertEqual(iss.title, 'test issue2')
+        self.assertEqual(iss.project.fullname, 'ns/test3')
+
+        user = tests.FakeUser(username='foo')
+        with tests.user_set(self.app.application, user):
+            output = self.app.get('/ns/test3/issue/1')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<a class="btn btn-outline-primary comment_and_close_action" '
+                'data-value="" href="javascript:void(0)">\n'
+                '                        Comment &amp; Close\n',
+                output.get_data(as_text=True))
+
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
     def test_view_issue_forked_namespace_comment(self, p_send_email, p_ugt):
         """ Test comment on the view_issue endpoint on namespaced project.
         """

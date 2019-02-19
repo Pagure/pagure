@@ -225,7 +225,7 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
                  target="_blank" rel="noopener noreferrer" class="notblue">Markdown Syntax</a></small>
               <div class="ml-auto">
                 <div class="btn-group">
-                  {% if g.authenticated and g.repo_user %}
+                  {% if g.authenticated and (g.repo_user or open_access or g.fas_user.username == issue.user.user) %}
                   {% if issue.status == 'Open' %}
                     {% if repo.close_status %}
                     <div class="btn-group">
