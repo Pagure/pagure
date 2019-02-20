@@ -1107,7 +1107,6 @@ $(".comment_and_close_action").click(function(event){
       );
   }
 
-  var _block_loaded = false;
   $('.mainform #blocking').selectize({
     plugins: ['remove_button'],
     valueField: 'id',
@@ -1124,20 +1123,18 @@ $(".comment_and_close_action").click(function(event){
     },
     create: false,
     load: function(query, callback) {
-      if (_block_loaded){
+      if (!query){
         callback();
         return;
       };
       var _url = "{{ url_for('api_ns.api_view_issues',
             repo=repo.name,
             username=username,
-            namespace=repo.namespace) }}";
+            namespace=repo.namespace) }}" + "?query_id=" + query;
       _get_issues(_url, callback);
-      _block_loaded = true;
     }
   });
 
-  var _dep_loaded = false;
   $('.mainform #depending').selectize({
     plugins: ['remove_button'],
     valueField: 'id',
@@ -1154,16 +1151,15 @@ $(".comment_and_close_action").click(function(event){
     },
     create: false,
     load: function(query, callback) {
-      if (_dep_loaded){
+      if (!query){
         callback();
         return;
       };
       var _url = "{{ url_for('api_ns.api_view_issues',
             repo=repo.name,
             username=username,
-            namespace=repo.namespace) }}";
+            namespace=repo.namespace) }}" + "?query_id=" + query;
       _get_issues(_url, callback);
-      _dep_loaded = true;
     }
   });
 

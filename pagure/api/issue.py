@@ -521,6 +521,7 @@ def api_view_issues(repo, username=None, namespace=None):
     status = flask.request.args.get("status", None)
     tags = flask.request.args.getlist("tags")
     tags = [tag.strip() for tag in tags if tag.strip()]
+    search_id = flask.request.args.get("query_id", None)
 
     priority_key = None
     if priority:
@@ -560,6 +561,7 @@ def api_view_issues(repo, username=None, namespace=None):
         "priority": priority_key,
         "order": order,
         "no_milestones": no_stones,
+        "search_id": search_id,
     }
 
     if status is not None:
