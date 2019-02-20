@@ -47,8 +47,7 @@ import sqlalchemy.schema
 import werkzeug
 
 from six.moves.urllib_parse import urlparse, urlencode, parse_qsl
-from sqlalchemy import func
-from sqlalchemy import asc, desc
+from sqlalchemy import asc, desc, func, cast, Text
 from sqlalchemy.orm import aliased
 from flask import url_for
 
@@ -2728,6 +2727,7 @@ def search_issues(
     count=False,
     offset=None,
     limit=None,
+    search_id=None,
     search_pattern=None,
     search_content=None,
     custom_search=None,
@@ -2788,6 +2788,8 @@ def search_issues(
     :kwarg count: a boolean to specify if the method should return the list
         of Issues or just do a COUNT query.
     :type count: boolean
+    :kwarg search_id: an integer to search in issues identifier
+    :type search_id: int or None
     :kwarg search_pattern: a string to search in issues title
     :type search_pattern: str or None
     :kwarg search_content: a string to search in the issues comments
@@ -3019,6 +3021,11 @@ def search_issues(
     if search_pattern is not None:
         query = query.filter(
             model.Issue.title.ilike("%%%s%%" % search_pattern)
+        )
+
+    if search_id is not None:
+        query = query.filter(
+            cast(model.Issue.id, Text).ilike("%%%s%%" % search_id)
         )
 
     column = model.Issue.date_created
