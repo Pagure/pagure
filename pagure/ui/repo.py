@@ -3443,9 +3443,13 @@ def generate_project_archive(
     if ref_string in repo_obj.listall_references():
         reference = repo_obj.lookup_reference(ref_string)
         tag = repo_obj[reference.target]
-        if not isinstance(tag, pygit2.Tag):
+        if isinstance(tag, pygit2.Tag):
+            commit = tag.peel(pygit2.Commit)
+        elif isinstance(tag, pygit2.Commit):
+            commit = tag
+        else:
+            _log.debug("Found %s instead of a tag", tag)
             flask.abort(400, "Invalid reference provided")
-        commit = tag.peel(pygit2.Commit)
     else:
         try:
             commit = repo_obj.get(ref)

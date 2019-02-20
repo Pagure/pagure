@@ -2729,6 +2729,7 @@ def generate_archive(project, commit, tag, name, archive_fmt):
             archive_folder, project.fullname, tag_path, commit
         )
         if not os.path.exists(target_path):
+            _log.info("Creating folder: %s", target_path)
             os.makedirs(target_path)
         fullpath = os.path.join(target_path, name)
 
