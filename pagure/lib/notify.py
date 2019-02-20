@@ -150,6 +150,10 @@ def mqtt_publish(topic, message):
     )
     mqtt_ciphers = pagure_config.get("MQTT_CIPHERS")
 
+    mqtt_topic_prefix = pagure_config.get("MQTT_TOPIC_PREFIX") or None
+    if mqtt_topic_prefix:
+        topic = "/".join([mqtt_topic_prefix.rstrip("/"), topic])
+
     # We catch Exception if we want :-p
     # pylint: disable=broad-except
     # Ignore message about mqtt import

@@ -1904,6 +1904,17 @@ configuration key to specify the ciphers.
 
 Defaults to: ``None``
 
+
+MQTT_TOPIC_PREFIX
+~~~~~~~~~~~~~~~~~
+
+This configuration key allows to specify a prefix to the mqtt messages sent.
+This prefix will be added to the topic used by pagure thus allowing the mqtt
+admins to specify a parent topic for all pagure-related messages.
+
+Defaults to: ``None``
+
+
 ALWAYS_MQTT_ON_COMMITS
 ~~~~~~~~~~~~~~~~~~~~~~
 
