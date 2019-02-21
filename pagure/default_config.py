@@ -422,8 +422,6 @@ MQTT_PASSWORD = None
 MQTT_CA_CERTS = None
 MQTT_CERTFILE = None
 MQTT_KEYFILE = None
-MQTT_CERT_REQS = None
-MQTT_TLS_VERSION = None
 MQTT_CIPHERS = None
 
 # Settings for Stomp message sending
