@@ -41,27 +41,31 @@ def send_fedmsg_notifications(project, topic, msg):
     # Send fedmsg and fedora-messaging notification
     # (if fedmsg and fedora-messaging are there and set-up)
     if always_fedmsg or (project.fedmsg_hook and project.fedmsg_hook.active):
-        try:
-            print("  - to fedmsg")
-            import fedmsg
+        if _config.get("FEDMSG_NOTIFICATIONS", True):
+            try:
+                print("  - to fedmsg")
+                import fedmsg
 
-            config = fedmsg.config.load_config([], None)
-            config["active"] = True
-            config["endpoints"]["relay_inbound"] = config["relay_inbound"]
-            fedmsg.init(name="relay_inbound", **config)
+                config = fedmsg.config.load_config([], None)
+                config["active"] = True
+                config["endpoints"]["relay_inbound"] = config["relay_inbound"]
+                fedmsg.init(name="relay_inbound", **config)
 
-            pagure.lib.notify.fedmsg_publish(topic=topic, msg=msg)
-        except Exception:
-            _log.exception("Error sending fedmsg notifications on commit push")
+                pagure.lib.notify.fedmsg_publish(topic=topic, msg=msg)
+            except Exception:
+                _log.exception(
+                    "Error sending fedmsg notifications on commit push"
+                )
 
-        try:
-            print("  - to fedora-message")
-            pagure.lib.notify.fedora_messaging_publish(topic, msg)
-        except Exception:
-            _log.exception(
-                "Error sending fedora-messaging notifications on "
-                "commit push"
-            )
+        if _config.get("FEDORA_MESSAGING_NOTIFICATIONS", False):
+            try:
+                print("  - to fedora-message")
+                pagure.lib.notify.fedora_messaging_publish(topic, msg)
+            except Exception:
+                _log.exception(
+                    "Error sending fedora-messaging notifications on "
+                    "commit push"
+                )
 
 
 def send_stomp_notifications(project, topic, msg):
