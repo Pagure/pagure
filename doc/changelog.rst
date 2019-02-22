@@ -3,7 +3,7 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
-5.3 (2019-02-18)
+5.3 (2019-02-22)
 ----------------
 
 .. warning:: This release contains a security fix for CVE-2019-762
