@@ -34,7 +34,12 @@ from pagure.config import config as pagure_config
 from pagure.utils import urlpattern, is_admin
 
 STRICT_REGEX = "^[a-zA-Z0-9-_]+$"
+# This regex is used when creating tags, there we do not want to allow ','
+# as otherwise it breaks the UI.
 TAGS_REGEX = "^[a-zA-Z0-9-_ .:]+$"
+# In the issue page tags are sent as a comma-separated list, so in order to
+# allow having multiple tags in an issue, we need to allow ',' in them.
+TAGS_REGEX_MULTI = "^[a-zA-Z0-9-_, .:]+$"
 FALSE_VALUES = ("false", "", False, "False", 0, "0")
 
 WTF_VERSION = tuple()
@@ -437,7 +442,7 @@ class UpdateIssueForm(PagureForm):
         "tag",
         [
             wtforms.validators.Optional(),
-            wtforms.validators.Regexp(TAGS_REGEX, flags=re.IGNORECASE),
+            wtforms.validators.Regexp(TAGS_REGEX_MULTI, flags=re.IGNORECASE),
             wtforms.validators.Length(max=255),
         ],
     )

@@ -1816,6 +1816,84 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
+    def test_update_issue_add_tags(self, p_send_email, p_ugt):
+        """ Test the update_issue endpoint. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos'), bare=True)
+
+        # Create issues to play with
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue')
+
+        # Before update, list tags
+        tags = pagure.lib.query.get_tags_of_project(self.session, repo)
+        self.assertEqual([tag.tag for tag in tags], [])
+        self.assertEqual(repo.issues[0].tags_text, [])
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(self.app.application, user):
+            csrf_token = self.get_csrf()
+
+            # Add two tags to the project
+            data = {
+                'tag': 'green',
+                'tag_description': 'lorem ipsum',
+                'tag_color': '#fff',
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/test/update/tags', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+
+            data = {
+                'tag': 'red',
+                'tag_description': 'lorem ipsum',
+                'tag_color': '#rrr',
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/test/update/tags', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+
+            # Add two tags to the issue
+            data = {
+                'csrf_token': csrf_token,
+                'tag': 'red,green',
+            }
+            output = self.app.post(
+                '/test/issue/1/update', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>Issue #1: Test issue - test - Pagure</title>',
+                output_text)
+            self.assertIn(
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                 ' href="/test/issue/1/edit" title="Edit this issue">',
+                output_text)
+            self.assertIn(
+                '</i> Issue tagged with: green, red</div>', output_text)
+
+        # After update, list tags
+        tags = pagure.lib.query.get_tags_of_project(self.session, repo)
+        self.assertEqual([tag.tag for tag in tags], ['green', 'red'])
+        self.assertEqual(repo.issues[0].tags_text, [])
+
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
     def test_update_issue(self, p_send_email, p_ugt):
         """ Test the update_issue endpoint. """
         p_send_email.return_value = True
@@ -4146,6 +4224,62 @@ class PagureFlaskIssuestests(tests.Modeltests):
         # After update, list tags
         tags = pagure.lib.query.get_tags_of_project(self.session, repo)
         self.assertEqual(sorted([tag.tag for tag in tags]), ['is:red2'])
+
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
+    def test_update_tags_with_coma(self, p_send_email, p_ugt):
+        """ Test the update_tags endpoint with a tag containing a coma. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'))
+
+        # Create issues to play with
+        repo = pagure.lib.query.get_authorized_project(self.session, 'test')
+        msg = pagure.lib.query.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue')
+
+         # Before update, list tags
+        tags = pagure.lib.query.get_tags_of_project(self.session, repo)
+        self.assertEqual([tag.tag for tag in tags], [])
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(self.app.application, user):
+
+            csrf_token = self.get_csrf()
+
+            # Tag with a colon ':'
+            data = {
+                'tag': ['green,red2'],
+                'tag_color': ['#000'],
+                'tag_description': [''],
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/test/update/tags', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">Project '
+                'Settings</h5>', output_text)
+            self.assertIn(
+                '</i> Tag: green,red2 contains one or more invalid '
+                'characters</div>\n', output_text)
+
+        # After update, list tags
+        tags = pagure.lib.query.get_tags_of_project(self.session, repo)
+        self.assertEqual(sorted([tag.tag for tag in tags]), [])
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
