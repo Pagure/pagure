@@ -3,6 +3,12 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
+5.3.1 (2019-02-25)
+------------------
+
+- Fix adding multiple tags to an issue
+
+
 5.3 (2019-02-22)
 ----------------
 
