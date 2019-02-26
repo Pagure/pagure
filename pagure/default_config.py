@@ -345,6 +345,10 @@ ACLS = {
     "pull_request_subscribe": (
         "Subscribe the user with this token to a pull-request"
     ),
+    "pull_request_assign": "Assign someone to a pull-request",
+    "pull_request_update": (
+        "Update a pull-request (title, description, assignee...)"
+    ),
     "update_watch_status": "Update the watch status on a project",
     "pull_request_rebase": "Rebase a pull-request",
 }

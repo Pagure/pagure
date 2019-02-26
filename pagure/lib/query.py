@@ -646,7 +646,7 @@ def add_pull_request_assignee(session, request, assignee, user):
             ),
         )
 
-        return "Request reset"
+        return "Request assignee reset"
     elif assignee is None and request.assignee is None:
         return
 

@@ -1439,3 +1439,98 @@ def api_pull_request_diffstats(repo, requestid, username=None, namespace=None):
 
     jsonout = flask.jsonify(output)
     return jsonout
+
+
+@API.route("/<repo>/pull-request/<int:requestid>/assign", methods=["POST"])
+@API.route(
+    "/<namespace>/<repo>/pull-request/<int:requestid>/assign", methods=["POST"]
+)
+@API.route(
+    "/fork/<username>/<repo>/pull-request/<int:requestid>/assign",
+    methods=["POST"],
+)
+@API.route(
+    "/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/assign",
+    methods=["POST"],
+)
+@api_login_required(acls=["pull_request_assign", "pull_request_update"])
+@api_method
+def api_pull_request_assign(repo, requestid, username=None, namespace=None):
+    """
+    Assign a pull-request
+    ---------------------
+    Assign a pull-request to someone.
+
+    ::
+
+        POST /api/0/<repo>/pull-request/<issue id>/assign
+        POST /api/0/<namespace>/<repo>/pull-request/<issue id>/assign
+
+    ::
+
+        POST /api/0/fork/<username>/<repo>/pull-request/<issue id>/assign
+        POST /api/0/fork/<username>/<namespace>/<repo>/pull-request/<issue id>/assign
+
+    Input
+    ^^^^^
+
+    +--------------+----------+---------------+---------------------------+
+    | Key          | Type     | Optionality   | Description               |
+    +==============+==========+===============+===========================+
+    | ``assignee`` | string   | Mandatory     | | The username of the user|
+    |              |          |               |   to assign the PR to.    |
+    +--------------+----------+---------------+---------------------------+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "message": "pull-request assigned"
+        }
+
+    """  # noqa
+    output = {}
+    repo = _get_repo(repo, username, namespace)
+
+    _check_pull_request(repo)
+    _check_token(repo)
+
+    request = _get_request(repo, requestid)
+    _check_pull_request_access(request, assignee=True)
+
+    form = pagure.forms.AssignIssueForm(csrf_enabled=False)
+    if form.validate_on_submit():
+        assignee = form.assignee.data or None
+        # Create our metadata comment object
+        try:
+            # New comment
+            message = pagure.lib.query.add_pull_request_assignee(
+                flask.g.session,
+                request=request,
+                assignee=assignee,
+                user=flask.g.fas_user.username,
+            )
+            flask.g.session.commit()
+            if message:
+                pagure.lib.query.add_metadata_update_notif(
+                    session=flask.g.session,
+                    obj=request,
+                    messages=message,
+                    user=flask.g.fas_user.username,
+                )
+                output["message"] = message
+            else:
+                output["message"] = "Nothing to change"
+        except pagure.exceptions.PagureException as err:  # pragma: no cover
+            raise pagure.exceptions.APIError(
+                400, error_code=APIERROR.ENOCODE, error=str(err)
+            )
+        except SQLAlchemyError as err:  # pragma: no cover
+            flask.g.session.rollback()
+            _log.exception(err)
+            raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
+
+    jsonout = flask.jsonify(output)
+    return jsonout

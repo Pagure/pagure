@@ -2998,7 +2998,7 @@ class PagureLibtests(tests.Modeltests):
             assignee=None,
             user='foo',
         )
-        self.assertEqual(msg, 'Request reset')
+        self.assertEqual(msg, 'Request assignee reset')
 
         # Try resetting again
         msg = pagure.lib.query.add_pull_request_assignee(
@@ -5534,6 +5534,7 @@ foo bar
                 'issue_update_custom_fields',
                 'issue_update_milestone',
                 'modify_project',
+                'pull_request_assign',
                 'pull_request_close',
                 'pull_request_comment',
                 'pull_request_create',
@@ -5541,6 +5542,7 @@ foo bar
                 'pull_request_merge',
                 'pull_request_rebase',
                 'pull_request_subscribe',
+                'pull_request_update',
                 'update_watch_status',
             ]
         )
