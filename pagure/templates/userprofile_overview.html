@@ -35,7 +35,9 @@
       </div>
       <div class="row">
         <div class="col align-self-end text-right">
-          <a href="#">view all {{repos_length}} {{projectstring(plural=True)}}</a>
+          <a href="{{
+            url_for('ui_ns.userprofile_projects', username=username)
+          }}">view all {{repos_length}} {{projectstring(plural=True)}}</a>
         </div>
       </div>
       {% endif %}
