@@ -31,11 +31,13 @@ from pagure.api import (
     get_per_page,
 )
 from pagure.config import config as pagure_config
-from pagure.utils import (
-    authenticated,
-    is_repo_committer,
-    is_true,
-    api_authenticated,
+from pagure.utils import is_repo_committer, is_true
+from pagure.api.utils import (
+    _get_repo,
+    _check_token,
+    _get_request,
+    _check_pull_request,
+    _check_pull_request_access,
 )
 
 
@@ -146,17 +148,8 @@ def api_pull_request_views(repo, username=None, namespace=None):
 
     """
 
-    repo = get_authorized_api_project(
-        flask.g.session, repo, user=username, namespace=namespace
-    )
-
-    if repo is None:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
-
-    if not repo.settings.get("pull_requests", True):
-        raise pagure.exceptions.APIError(
-            404, error_code=APIERROR.EPULLREQUESTSDISABLED
-        )
+    repo = _get_repo(repo, username, namespace)
+    _check_pull_request(repo)
 
     status = flask.request.args.get("status", True)
     assignee = flask.request.args.get("assignee", None)
@@ -280,9 +273,8 @@ def api_pull_request_by_uid_view(uid):
         }
 
     """
-    request = pagure.lib.query.get_request_by_uid(flask.g.session, uid)
-    if not request:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
+
+    request = _get_request(requestuid=uid)
 
     # we don't really need the repo, but we need to make sure
     # that we're allowed to access it
@@ -378,24 +370,9 @@ def api_pull_request_view(repo, requestid, username=None, namespace=None):
 
     """
 
-    repo = get_authorized_api_project(
-        flask.g.session, repo, user=username, namespace=namespace
-    )
-
-    if repo is None:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
-
-    if not repo.settings.get("pull_requests", True):
-        raise pagure.exceptions.APIError(
-            404, error_code=APIERROR.EPULLREQUESTSDISABLED
-        )
-
-    request = pagure.lib.query.search_pull_requests(
-        flask.g.session, project_id=repo.id, requestid=requestid
-    )
-
-    if not request:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
+    repo = _get_repo(repo, username, namespace)
+    _check_pull_request(repo)
+    request = _get_request(repo, requestid)
 
     jsonout = flask.jsonify(request.to_json(public=True, api=True))
     return jsonout
@@ -452,27 +429,10 @@ def api_pull_request_merge(repo, requestid, username=None, namespace=None):
     """  # noqa
     output = {}
 
-    repo = get_authorized_api_project(
-        flask.g.session, repo, user=username, namespace=namespace
-    )
-
-    if repo is None:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
-
-    if not repo.settings.get("pull_requests", True):
-        raise pagure.exceptions.APIError(
-            404, error_code=APIERROR.EPULLREQUESTSDISABLED
-        )
-
-    if flask.g.token.project and repo != flask.g.token.project:
-        raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
-
-    request = pagure.lib.query.search_pull_requests(
-        flask.g.session, project_id=repo.id, requestid=requestid
-    )
-
-    if not request:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
+    repo = _get_repo(repo, username, namespace)
+    _check_pull_request(repo)
+    _check_token(repo, project_token=False)
+    request = _get_request(repo, requestid)
 
     if not is_repo_committer(repo):
         raise pagure.exceptions.APIError(403, error_code=APIERROR.ENOPRCLOSE)
@@ -561,29 +521,10 @@ def api_pull_request_rebase(repo, requestid, username=None, namespace=None):
     """  # noqa
     output = {}
 
-    repo = get_authorized_api_project(
-        flask.g.session, repo, user=username, namespace=namespace
-    )
-
-    if repo is None:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
-
-    if not repo.settings.get("pull_requests", True):
-        raise pagure.exceptions.APIError(
-            404, error_code=APIERROR.EPULLREQUESTSDISABLED
-        )
-
-    if (
-        api_authenticated() and flask.g.token and repo != flask.g.token.project
-    ) or not authenticated():
-        raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
-
-    request = pagure.lib.query.search_pull_requests(
-        flask.g.session, project_id=repo.id, requestid=requestid
-    )
-
-    if not request:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
+    repo = _get_repo(repo, username, namespace)
+    _check_pull_request(repo)
+    _check_token(repo)
+    _get_request(repo, requestid)
 
     if not is_repo_committer(repo):
         raise pagure.exceptions.APIError(403, error_code=APIERROR.ENOPRCLOSE)
@@ -648,27 +589,10 @@ def api_pull_request_close(repo, requestid, username=None, namespace=None):
     """  # noqa
     output = {}
 
-    repo = get_authorized_api_project(
-        flask.g.session, repo, user=username, namespace=namespace
-    )
-
-    if repo is None:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
-
-    if not repo.settings.get("pull_requests", True):
-        raise pagure.exceptions.APIError(
-            404, error_code=APIERROR.EPULLREQUESTSDISABLED
-        )
-
-    if repo != flask.g.token.project:
-        raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
-
-    request = pagure.lib.query.search_pull_requests(
-        flask.g.session, project_id=repo.id, requestid=requestid
-    )
-
-    if not request:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
+    repo = _get_repo(repo, username, namespace)
+    _check_pull_request(repo)
+    _check_token(repo)
+    request = _get_request(repo, requestid)
 
     if not is_repo_committer(repo):
         raise pagure.exceptions.APIError(403, error_code=APIERROR.ENOPRCLOSE)
@@ -758,29 +682,13 @@ def api_pull_request_add_comment(
         }
 
     """  # noqa
-    repo = get_authorized_api_project(
-        flask.g.session, repo, user=username, namespace=namespace
-    )
 
     output = {}
 
-    if repo is None:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
-
-    if not repo.settings.get("pull_requests", True):
-        raise pagure.exceptions.APIError(
-            404, error_code=APIERROR.EPULLREQUESTSDISABLED
-        )
-
-    if flask.g.token.project and repo != flask.g.token.project:
-        raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
-
-    request = pagure.lib.query.search_pull_requests(
-        flask.g.session, project_id=repo.id, requestid=requestid
-    )
-
-    if not request:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
+    repo = _get_repo(repo, username, namespace)
+    _check_pull_request(repo)
+    _check_token(repo, project_token=False)
+    request = _get_request(repo, requestid)
 
     form = pagure.forms.AddPullRequestCommentForm(csrf_enabled=False)
     if form.validate_on_submit():
@@ -947,29 +855,13 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
         }
 
     """  # noqa
-    repo = get_authorized_api_project(
-        flask.g.session, repo, user=username, namespace=namespace
-    )
 
     output = {}
 
-    if repo is None:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
-
-    if not repo.settings.get("pull_requests", True):
-        raise pagure.exceptions.APIError(
-            404, error_code=APIERROR.EPULLREQUESTSDISABLED
-        )
-
-    if flask.g.token.project and repo != flask.g.token.project:
-        raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
-
-    request = pagure.lib.query.search_pull_requests(
-        flask.g.session, project_id=repo.id, requestid=requestid
-    )
-
-    if not request:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
+    repo = _get_repo(repo, username, namespace)
+    _check_pull_request(repo)
+    _check_token(repo, project_token=False)
+    request = _get_request(repo, requestid)
 
     if "status" in get_request_data():
         form = pagure.forms.AddPullRequestFlagForm(csrf_enabled=False)
@@ -1104,26 +996,12 @@ def api_pull_request_get_flag(repo, requestid, username=None, namespace=None):
         }
 
     """  # noqa
-    repo = get_authorized_api_project(
-        flask.g.session, repo, user=username, namespace=namespace
-    )
 
     output = {}
 
-    if repo is None:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
-
-    if not repo.settings.get("pull_requests", True):
-        raise pagure.exceptions.APIError(
-            404, error_code=APIERROR.EPULLREQUESTSDISABLED
-        )
-
-    request = pagure.lib.query.search_pull_requests(
-        flask.g.session, project_id=repo.id, requestid=requestid
-    )
-
-    if not request:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
+    repo = _get_repo(repo, username, namespace)
+    _check_pull_request(repo)
+    request = _get_request(repo, requestid)
 
     output = {"flags": []}
 
@@ -1192,34 +1070,12 @@ def api_subscribe_pull_request(repo, requestid, username=None, namespace=None):
 
     """  # noqa
 
-    repo = get_authorized_api_project(
-        flask.g.session, repo, user=username, namespace=namespace
-    )
-
     output = {}
 
-    if repo is None:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
-
-    if not repo.settings.get("pull_requests", True):
-        raise pagure.exceptions.APIError(
-            404, error_code=APIERROR.EPULLREQUESTSDISABLED
-        )
-
-    if (
-        api_authenticated()
-        and flask.g.token
-        and flask.g.token.project
-        and repo != flask.g.token.project
-    ) or not authenticated():
-        raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
-
-    request = pagure.lib.query.search_pull_requests(
-        flask.g.session, project_id=repo.id, requestid=requestid
-    )
-
-    if not request:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
+    repo = _get_repo(repo, username, namespace)
+    _check_pull_request(repo)
+    _check_token(repo)
+    request = _get_request(repo, requestid)
 
     form = pagure.forms.SubscribtionForm(csrf_enabled=False)
     if form.validate_on_submit():
@@ -1350,15 +1206,9 @@ def api_pull_request_create(repo, username=None, namespace=None):
 
     """
 
-    repo = get_authorized_api_project(
-        flask.g.session, repo, user=username, namespace=namespace
-    )
-
-    if repo is None:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
-
-    if flask.g.token.project and repo != flask.g.token.project:
-        raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
+    repo = _get_repo(repo, username, namespace)
+    _check_pull_request(repo)
+    _check_token(repo)
 
     form = pagure.forms.RequestPullForm(csrf_enabled=False)
     if not form.validate_on_submit():
@@ -1511,24 +1361,9 @@ def api_pull_request_diffstats(repo, requestid, username=None, namespace=None):
 
     """  # noqa
 
-    repo = get_authorized_api_project(
-        flask.g.session, repo, user=username, namespace=namespace
-    )
-
-    if repo is None:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
-
-    if not repo.settings.get("pull_requests", True):
-        raise pagure.exceptions.APIError(
-            404, error_code=APIERROR.EPULLREQUESTSDISABLED
-        )
-
-    request = pagure.lib.query.search_pull_requests(
-        flask.g.session, project_id=repo.id, requestid=requestid
-    )
-
-    if not request:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
+    repo = _get_repo(repo, username, namespace)
+    _check_pull_request(repo)
+    request = _get_request(repo, requestid)
 
     repopath = None
     parentpath = pagure.utils.get_repo_path(request.project)

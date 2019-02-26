@@ -236,22 +236,45 @@ class PagureFlaskApitests(tests.SimplePagureTest):
         output = self.app.get('/api/0/-/error_codes')
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
-        self.assertEqual(len(data), 34)
+        self.assertEqual(len(data), 35)
         self.assertEqual(
             sorted(data.keys()),
             [
-                u'EDATETIME', u'EDBERROR', u'EGITERROR',
-                u'EINVALIDISSUEFIELD', u'EINVALIDISSUEFIELD_LINK',
-                u'EINVALIDPERPAGEVALUE', u'EINVALIDPRIORITY', u'EINVALIDREQ',
-                u'EINVALIDTOK', u'EISSUENOTALLOWED',
-                u'EMODIFYPROJECTNOTALLOWED', u'ENEWPROJECTDISABLED',
-                u'ENOCODE', u'ENOCOMMENT', u'ENOCOMMIT', u'ENOGROUP',
-                u'ENOISSUE', u'ENOPRCLOSE', u'ENOPROJECT', u'ENOPROJECTS',
-                u'ENOPRSTATS', u'ENOREQ', u'ENOSIGNEDOFF', u'ENOTASSIGNED',
-                u'ENOTASSIGNEE', u'ENOTHIGHENOUGH', u'ENOTMAINADMIN',
-                u'ENOUSER', u'EPRCONFLICTS', u'EPRSCORE',
-                u'EPULLREQUESTSDISABLED', u'ETIMESTAMP', u'ETRACKERDISABLED',
-                u'ETRACKERREADONLY'
+                'EDATETIME',
+                'EDBERROR',
+                'EGITERROR',
+                'EINVALIDISSUEFIELD',
+                'EINVALIDISSUEFIELD_LINK',
+                'EINVALIDPERPAGEVALUE',
+                'EINVALIDPRIORITY',
+                'EINVALIDREQ',
+                'EINVALIDTOK',
+                'EISSUENOTALLOWED',
+                'EMODIFYPROJECTNOTALLOWED',
+                'ENEWPROJECTDISABLED',
+                'ENOCODE',
+                'ENOCOMMENT',
+                'ENOCOMMIT',
+                'ENOGROUP',
+                'ENOISSUE',
+                'ENOPRCLOSE',
+                'ENOPROJECT',
+                'ENOPROJECTS',
+                'ENOPRSTATS',
+                'ENOREQ',
+                'ENOSIGNEDOFF',
+                'ENOTASSIGNED',
+                'ENOTASSIGNEE',
+                'ENOTHIGHENOUGH',
+                'ENOTMAINADMIN',
+                'ENOUSER',
+                'EPRCONFLICTS',
+                'EPRNOTALLOWED',
+                'EPRSCORE',
+                'EPULLREQUESTSDISABLED',
+                'ETIMESTAMP',
+                'ETRACKERDISABLED',
+                'ETRACKERREADONLY',
             ]
         )
 

@@ -25,7 +25,6 @@ from pagure.api import (
     api_login_required,
     api_login_optional,
     APIERROR,
-    get_authorized_api_project,
     get_request_data,
     get_page,
     get_per_page,
@@ -34,140 +33,19 @@ from pagure.config import config as pagure_config
 from pagure.utils import (
     api_authenticated,
     is_repo_committer,
-    is_repo_user,
     urlpattern,
     is_true,
 )
-
+from pagure.api.utils import (
+    _get_repo,
+    _check_token,
+    _get_issue,
+    _check_issue_tracker,
+    _check_ticket_access,
+    _check_private_issue_access,
+)
 
 _log = logging.getLogger(__name__)
-
-
-def _get_repo(repo_name, username=None, namespace=None):
-    """Check if repository exists and get repository name
-    :param repo_name: name of repository
-    :param username:
-    :param namespace:
-    :raises pagure.exceptions.APIError: when repository doesn't exist or
-        is disabled
-    :return: repository name
-    """
-    repo = get_authorized_api_project(
-        flask.g.session, repo_name, user=username, namespace=namespace
-    )
-
-    if repo is None:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
-
-    return repo
-
-
-def _check_issue_tracker(repo):
-    """Check if issue tracker is enabled for repository
-    :param repo: repository
-    :raises pagure.exceptions.APIError: when issue tracker is disabled
-    """
-    ticket_namespaces = pagure_config.get("ENABLE_TICKETS_NAMESPACE")
-    if (
-        ticket_namespaces
-        and repo.namespace
-        and repo.namespace not in ticket_namespaces
-    ) or not repo.settings.get("issue_tracker", True):
-        raise pagure.exceptions.APIError(
-            404, error_code=APIERROR.ETRACKERDISABLED
-        )
-
-    # forbid all POST requests if the issue tracker is made read-only
-    if flask.request.method == "POST" and repo.settings.get(
-        "issue_tracker_read_only", False
-    ):
-        raise pagure.exceptions.APIError(
-            401, error_code=APIERROR.ETRACKERREADONLY
-        )
-
-
-def _check_token(repo, project_token=True):
-    """Check if token is valid for the repo
-    :param repo: repository name
-    :param project_token: set True when project token is required,
-        otherwise any token can be used
-    :raises pagure.exceptions.APIError: when token is not valid for repo
-    """
-    if api_authenticated():
-        # if there is a project associated with the token, check it
-        # if there is no project associated, check if it is required
-        if (
-            flask.g.token.project is not None and repo != flask.g.token.project
-        ) or (flask.g.token.project is None and project_token):
-            raise pagure.exceptions.APIError(
-                401, error_code=APIERROR.EINVALIDTOK
-            )
-
-
-def _get_issue(repo, issueid, issueuid=None):
-    """Get issue and check permissions
-    :param repo: repository name
-    :param issueid: issue ID
-    :param issueuid: issue Unique ID
-    :raises pagure.exceptions.APIError: when issues doesn't exists
-    :return: issue
-    """
-    issue = pagure.lib.query.search_issues(
-        flask.g.session, repo, issueid=issueid, issueuid=issueuid
-    )
-
-    if issue is None or issue.project != repo:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOISSUE)
-
-    return issue
-
-
-def _check_private_issue_access(issue):
-    """Check if user can access issue. Must be repo committer
-    or author to see private issues.
-    :param issue: issue object
-    :raises pagure.exceptions.APIError: when access denied
-    """
-    if (
-        issue.private
-        and not is_repo_committer(issue.project)
-        and (
-            not api_authenticated()
-            or not issue.user.user == flask.g.fas_user.username
-        )
-    ):
-        raise pagure.exceptions.APIError(
-            403, error_code=APIERROR.EISSUENOTALLOWED
-        )
-
-
-def _check_ticket_access(issue, assignee=False, open_access=False):
-    """Check if user can access issue. Must be repo committer
-    or author to see private issues.
-    :param issue: issue object
-    :param assignee: a boolean specifying whether to allow the assignee or not
-        defaults to False
-    :raises pagure.exceptions.APIError: when access denied
-    """
-    # Private tickets require commit access
-    _check_private_issue_access(issue)
-
-    error = False
-    if not open_access:
-        # Public tickets require ticket access
-        error = not is_repo_user(issue.project)
-
-    if assignee:
-        if (
-            issue.assignee is not None
-            and issue.assignee.user == flask.g.fas_user.username
-        ):
-            error = False
-
-    if error:
-        raise pagure.exceptions.APIError(
-            403, error_code=APIERROR.EISSUENOTALLOWED
-        )
 
 
 def _check_link_custom_field(field, links):
