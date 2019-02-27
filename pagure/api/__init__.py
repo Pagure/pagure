@@ -567,6 +567,7 @@ def api():
     )
     api_pull_request_add_flag_doc = load_doc(fork.api_pull_request_add_flag)
     api_pull_request_assign_doc = load_doc(fork.api_pull_request_assign)
+    api_pull_request_update_doc = load_doc(fork.api_pull_request_update)
 
     api_version_doc = load_doc(api_version)
     api_whoami_doc = load_doc(api_whoami)
@@ -633,6 +634,7 @@ def api():
             api_pull_request_add_comment_doc,
             api_pull_request_add_flag_doc,
             api_pull_request_assign_doc,
+            api_pull_request_update_doc,
         ],
         users=[
             api_users_doc,

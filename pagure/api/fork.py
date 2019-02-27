@@ -378,6 +378,131 @@ def api_pull_request_view(repo, requestid, username=None, namespace=None):
     return jsonout
 
 
+@API.route("/<repo>/pull-request/<int:requestid>", methods=["POST"])
+@API.route(
+    "/<namespace>/<repo>/pull-request/<int:requestid>", methods=["POST"]
+)
+@API.route(
+    "/fork/<username>/<repo>/pull-request/<int:requestid>", methods=["POST"]
+)
+@API.route(
+    "/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>",
+    methods=["POST"],
+)
+@api_login_required(acls=["pull_request_update"])
+@api_method
+def api_pull_request_update(repo, requestid, username=None, namespace=None):
+    """
+    Update pull-request information
+    -------------------------------
+    Update the title and initial comment of an existing pull-request.
+
+    ::
+
+        POST /api/0/<repo>/pull-request/<request id>
+        POST /api/0/<namespace>/<repo>/pull-request/<request id>
+
+    ::
+
+        POST /api/0/fork/<username>/<repo>/pull-request/<request id>
+        POST /api/0/fork/<username>/<namespace>/<repo>/pull-request/<request id>
+
+
+    Input
+    ^^^^^
+
+    +---------------------+--------+-------------+-----------------------------+
+    | Key                 | Type   | Optionality | Description                 |
+    +=====================+========+=============+=============================+
+    | ``title``           | string | Mandatory   | | The title to give to the  |
+    |                     |        |             |   pull-request              |
+    +---------------------+--------+-------------+-----------------------------+
+    | ``initial_comment`` | string | Optional    | | The initial comment or    |
+    |                     |        |             |   description of the        |
+    |                     |        |             |   pull-request              |
+    +---------------------+--------+-------------+-----------------------------+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "assignee": null,
+          "branch": "master",
+          "branch_from": "master",
+          "closed_at": null,
+          "closed_by": null,
+          "comments": [],
+          "commit_start": null,
+          "commit_stop": null,
+          "date_created": "1431414800",
+          "id": 1,
+          "project": {
+            "close_status": [],
+            "custom_keys": [],
+            "date_created": "1431414800",
+            "description": "test project #1",
+            "id": 1,
+            "name": "test",
+            "parent": null,
+            "user": {
+              "fullname": "PY C",
+              "name": "pingou"
+            }
+          },
+          "repo_from": {
+            "date_created": "1431414800",
+            "description": "test project #1",
+            "id": 1,
+            "name": "test",
+            "parent": null,
+            "user": {
+              "fullname": "PY C",
+              "name": "pingou"
+            }
+          },
+          "status": "Open",
+          "title": "test pull-request",
+          "uid": "1431414800",
+          "updated_on": "1431414800",
+          "user": {
+            "fullname": "PY C",
+            "name": "pingou"
+          }
+        }
+
+    """  # noqa
+
+    repo = _get_repo(repo, username, namespace)
+
+    _check_pull_request(repo)
+    _check_token(repo)
+
+    request = _get_request(repo, requestid)
+    _check_pull_request_access(request, assignee=True)
+
+    form = pagure.forms.RequestPullForm(csrf_enabled=False)
+    if not form.validate_on_submit():
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.EINVALIDREQ, errors=form.errors
+        )
+    else:
+        request.title = form.title.data.strip()
+        request.initial_comment = form.initial_comment.data.strip()
+        flask.g.session.add(request)
+        try:
+            flask.g.session.commit()
+        except SQLAlchemyError as err:  # pragma: no cover
+            flask.g.session.rollback()
+            _log.exception(err)
+            raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
+
+    request = _get_request(repo, requestid)
+    jsonout = flask.jsonify(request.to_json(public=True, api=True))
+    return jsonout
+
+
 @API.route("/<repo>/pull-request/<int:requestid>/merge", methods=["POST"])
 @API.route(
     "/<namespace>/<repo>/pull-request/<int:requestid>/merge", methods=["POST"]
