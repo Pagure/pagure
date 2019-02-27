@@ -509,13 +509,39 @@
               </fieldset>
         {% endif %}
         <fieldset class="form-group issue-metadata-display ml-1">
-          <label class="mb-0"><strong>Assignee</strong></label>
-          <div class="ml-2" title="{{ pull_request.assignee.html_title if pull_request.assignee else '' }}">
+          <label class="mb-1 pl-1"> <i class="fa fa-fw fa-user-plus"></i> <strong>Assignee</strong></label>
+          <div id="assignee_plain">
+            <div class="ml-2" title="{{ pull_request.assignee.html_title if pull_request.assignee else '' }}">
             {% if pull_request.assignee.username %}
-              <div class="mt-1">{{pull_request.assignee.username| avatar(size=24) | safe}} {{ pull_request.assignee.username }}</div>
+                <div class="mt-1">{{pull_request.assignee.username| avatar(size=24) | safe}}
+                  <a href="{{ url_for(
+                    'ui_ns.request_pulls',
+                    repo=repo.name,
+                    username=username,
+                    namespace=repo.namespace,
+                    assignee=pull_request.assignee.username)
+                    }}" title="{{ pull_request.assignee.html_title }}">
+                    {{ pull_request.assignee.username }}
+                  </a>
+                  {% if g.authenticated and (pull_request.assignee.username == g.fas_user.username) %}
+                  &mdash; <a href="javascript:void(0)" id="drop-btn"
+                      title="drop the assignment of this pull-request">
+                    Drop
+                  </a>
+                {% endif %}
+              </div>
             {% else %}
-              <span class="text-muted">None</span>
+              <div class="text-muted">
+                <span class="text-muted">None</span>
+                  {% if g.authenticated and (g.repo_user or g.fas_user.username == pull_request.user.user) and pull_request.status|lower == 'open'
+                    and (not pull_request.assignee or pull_request.assignee.username != g.fas_user.username)
+                    and not repo.settings.get('pull_request_tracker_read_only', False) %}
+                    &mdash; <a href="javascript:void(0)" id="take-btn"
+                    title="assign this pull_request to you"> Take </a>
+                  {% endif %}
+                </div>
             {% endif %}
+            </div>
           </div>
         </fieldset>
 
@@ -523,7 +549,7 @@
             g.repo_user
             or g.fas_user.username == pull_request.user.user) %}
         <fieldset class="form-group issue-metadata-form hidden">
-          <label for="tag"><strong>Tags</strong></label>
+          <label class="mb-1"><i class="fa fa-fw fa-tag"></i> <strong>Tags</strong></label>
            <input id="tag" type="text" placeholder="tag1, tag2" name="tag"
               title="comma separated list of tags"
               value="{{ pull_request.tags_text | join(',') }}" />
@@ -1522,6 +1548,74 @@ $(document).on("mouseenter", "td.cell2", function(){
 $(document).on("mouseleave", "td.cell2", function() {
   $(this).find("a.open_changed_file_icon_wrap").css('visibility', 'hidden');
 });
+
+{% if g.authenticated and (g.repo_user or pull_request.user.user == g.fas_user.username or open_access) %}
+function take_issue(){
+  var _url = "{{ url_for('api_ns.api_pull_request_assign',
+            repo=repo.name, namespace=repo.namespace, username=username,
+            requestid=requestid) }}";
+  var _data = {assignee: "{{ g.fas_user.username }}"};
+  $.post (_url, _data ).done(
+    function(data) {
+      var _user_url = '\n<div class="ml-2"><div class="mt-1">{{g.fas_user.username| avatar(size=24) | safe}} '
+        + '<a href="{{ url_for("ui_ns.request_pulls", repo=repo.name, username=username, namespace=repo.namespace) }}'
+        + '?assignee={{ g.fas_user.username }}">'
+        + '{{ g.fas_user.username }}</a>'
+        + ' &mdash; <a href="javascript:void(0)" id="drop-btn" title="drop the assignment of this pull-request">Drop</a></div></div>';
+      $('#assignee_plain').html(_user_url);
+      $('#assignee').val("{{ g.fas_user.username }}");
+      setup_btn_take_drop();
+    }
+  ).fail(function() {
+    alert( "An error occured, could not assign this pull-request to you." );
+  })
+  return false;
+}
+{% endif %}
+
+{% if g.authenticated and (
+    g.repo_user
+    or pull_request.user.user == g.fas_user.username
+    or pull_request.assignee.user == g.fas_user.username) %}
+function drop_issue(){
+  var _url = "{{ url_for('api_ns.api_pull_request_assign',
+            repo=repo.name, namespace=repo.namespace, username=username,
+            requestid=requestid) }}";
+  var _data = {assignee: ""};
+  $.post( _url, _data ).done(
+    function(data) {
+      var _user_url = '<div class="ml-2">\n<span class="text-muted">None</span>'
+        + ' &mdash; <a href="javascript:void(0)" id="take-btn" title="assign this pull-request to you">Take</a></div>';
+      $('#assignee_plain').html(_user_url);
+      $('#assignee').val("");
+      setup_btn_take_drop();
+    }
+  ).fail(function() {
+    alert( "An error occured, could not drop the current assignee." );
+  })
+  return false;
+}
+{% endif %}
+
+function setup_btn_take_drop(){
+  {% if g.authenticated and g.repo_user %}
+  $("#take-btn").click(take_issue)
+  {% endif %}
+  {% if g.authenticated and (
+    g.repo_user
+    or pull_request.user.user == g.fas_user.username
+    or pull_request.assignee.user == g.fas_user.username) %}
+  $("#drop-btn").click(drop_issue);
+  {% endif %}
+}
+
+{% if g.authenticated and (
+    g.repo_user
+    or pull_request.user.user == g.fas_user.username
+    or pull_request.assignee.user == g.fas_user.username) %}
+setup_btn_take_drop();
+{% endif %}
+
 </script>
 
 
