@@ -975,7 +975,7 @@ function take_issue(){
   $.post (_url, _data ).done(
     function(data) {
       var _user_url = '\n<div class="ml-2"><div class="mt-1">{{g.fas_user.username| avatar(size=24) | safe}} '
-        + '<a href="{{ url_for("ui_ns.view_issues", repo=repo.name, username=username) }}'
+        + '<a href="{{ url_for("ui_ns.view_issues", repo=repo.name, username=username, namespace=repo.namespace) }}'
         + '?assignee={{ g.fas_user.username }}">'
         + '{{ g.fas_user.username }}</a>'
         + ' &mdash; <a href="javascript:void(0)" id="drop-btn" title="drop the assignment of this issue">Drop</a></div></div>';
