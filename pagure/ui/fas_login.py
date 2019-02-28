@@ -61,14 +61,21 @@ def set_user(return_url):
             return flask.redirect(return_url)
 
     try:
-        pagure.lib.query.set_up_user(
-            session=flask.g.session,
-            username=flask.g.fas_user.username,
-            fullname=flask.g.fas_user.fullname,
-            default_email=flask.g.fas_user.email,
-            ssh_key=flask.g.fas_user.get("ssh_key"),
-            keydir=pagure_config.get("GITOLITE_KEYDIR", None),
-        )
+        try:
+            pagure.lib.query.set_up_user(
+                session=flask.g.session,
+                username=flask.g.fas_user.username,
+                fullname=flask.g.fas_user.fullname,
+                default_email=flask.g.fas_user.email,
+                ssh_key=flask.g.fas_user.get("ssh_key"),
+                keydir=pagure_config.get("GITOLITE_KEYDIR", None),
+            )
+        except pagure.exceptions.PagureException as err:
+            message = str(err)
+            if message == "SSH key invalid.":
+                flask.flash(message, "error")
+            else:
+                raise
 
         # If groups are managed outside pagure, set up the user at login
         if not pagure_config.get("ENABLE_GROUP_MNGT", False):
@@ -124,4 +131,7 @@ def set_user(return_url):
         # Ensure the user is logged out if we cannot set them up
         # correctly
         logout()
+    except pagure.exceptions.PagureException as err:
+        flask.flash(str(err), "error")
+
     return flask.redirect(return_url)
