@@ -20,6 +20,7 @@ from kitchen.text.converters import to_bytes
 import pagure
 import pagure.exceptions
 import pagure.lib.query
+import pagure.lib.plugins
 import pagure.lib.lib_ci as lib_ci
 from pagure.api import API, APIERROR, api_method
 
@@ -66,6 +67,9 @@ def jenkins_ci_notification(
     flask.g.repo = project
     if not project:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
+
+    ci_hook = pagure.lib.plugins.get_plugin("Pagure CI")
+    ci_hook.db_object()
 
     if not constant_time.bytes_eq(
         to_bytes(pagure_ci_token), to_bytes(project.ci_hook.pagure_ci_token)
