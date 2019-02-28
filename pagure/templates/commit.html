@@ -16,6 +16,8 @@
 {% endblock %}
 {% block repo %}
 {% set splitted_message = commit.message.split('\n') %}
+{# we recognize non-executable file, executable file and symlink #}
+{% set expected_modes = [33188, 33261, 40960] %}
 <div class="row">
   <div class="col">
       {% block overviewtabs %}{{ super() }}{% endblock %}
@@ -189,13 +191,13 @@
                       {%- elif patch | hasattr('delta') -%}
                         {%- if patch.delta.new_file.path == patch.delta.old_file.path -%}
                           {%- if patch.delta.new_file.mode == 0
-                              and patch.delta.old_file.mode in [33188, 33261] -%}
+                              and patch.delta.old_file.mode in expected_modes -%}
                             {{ changesdeletedfile(patch.delta.new_file.path, linesadded, linesremoved, loop.index) }}
-                          {%- elif patch.delta.new_file.mode in [33188, 33261]
+                          {%- elif patch.delta.new_file.mode in expected_modes
                                and patch.delta.old_file.mode == 0 -%}
                             {{ changesaddedfile( patch.delta.new_file.path, linesadded, linesremoved, loop.index) }}
-                          {%- elif patch.delta.new_file.mode in [33188, 33261]
-                               and patch.delta.old_file.mode in [33188, 33261] -%}
+                          {%- elif patch.delta.new_file.mode in expected_modes
+                               and patch.delta.old_file.mode in expected_modes -%}
                             {{ changeschangedfile(patch.delta.new_file.path, linesadded, linesremoved, loop.index) }}
                           {%-endif-%}
                         {%- else -%}
@@ -397,7 +399,7 @@
               {%- elif patch | hasattr('delta') -%}
                 {%- if patch.delta.new_file.path == patch.delta.old_file.path -%}
                   {%- if patch.delta.new_file.mode == 0
-                      and patch.delta.old_file.mode in [33188, 33261] -%}
+                      and patch.delta.old_file.mode in expected_modes -%}
                     {% set patchtype = "removed"%}
                     <div>
                         {{ viewfilelink(patch.delta.new_file.path) }}
@@ -408,7 +410,7 @@
                       {{ viewfilelinkbutton(patch.delta.new_file.path, disabled=True) }}
                       {{ diffcollapsebtn() }}
                     </div>
-                  {%-elif patch.delta.new_file.mode in [33188, 33261]
+                  {%-elif patch.delta.new_file.mode in expected_modes
                       and patch.delta.old_file.mode == 0 -%}
                     {% set patchtype = "added"%}
                       <div>
@@ -422,8 +424,8 @@
                           {{ diffcollapsebtn() }}
                         {% endif %}
                       </div>
-                  {%-elif patch.delta.new_file.mode in [33188, 33261]
-                      and patch.delta.old_file.mode in [33188, 33261] -%}
+                  {%-elif patch.delta.new_file.mode in expected_modes
+                      and patch.delta.old_file.mode in expected_modes -%}
                     {% set patchtype = "changed"%}
                     <div>
                         {{ viewfilelink(patch.delta.new_file.path) }}

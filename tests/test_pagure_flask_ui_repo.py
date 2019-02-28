@@ -2163,6 +2163,20 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '<div class="btn btn-outline-danger disabled opacity-100 border-0 font-weight-bold">\n'
                 '    file removed\n', output_text)
 
+        def compare_with_symlink(c3, c4):
+            # View comparison of commits with symlink
+            # we only test that the patch itself renders correctly,
+            # the rest of the logic is already tested in the other functions
+            output = self.app.get('/test/c/%s..%s' % (c3.oid.hex, c4.oid.hex))
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            print(output_text)
+            self.assertIn(
+                '<title>Diff from %s to %s - test\n - Pagure</title>'
+                % (c3.oid.hex, c4.oid.hex),
+                output_text)
+            self.assertIn('<pre class="alert-success"><code>+ Source </code></pre>', output_text)
+
         output = self.app.get('/foo/bar')
         # No project registered in the DB
         self.assertEqual(output.status_code, 404)
@@ -2196,14 +2210,22 @@ class PagureFlaskRepotests(tests.Modeltests):
             ncommits=1, filename='Šource')
         c3 = repo.revparse_single('HEAD')
 
+        tests.add_commit_git_repo(
+            os.path.join(self.path, 'repos', 'test.git'),
+            ncommits=1, filename='Source-sl', symlink_to='Source'
+        )
+        c4 = repo.revparse_single('HEAD')
+
         compare_first_two(c1, c2)
         compare_all(c1, c3)
+        compare_with_symlink(c3, c4)
 
         user = tests.FakeUser()
         # Set user logged in
         with tests.user_set(self.app.application, user):
             compare_first_two(c1, c2)
             compare_all(c1, c3)
+            compare_with_symlink(c3, c4)
 
     def test_view_file(self):
         """ Test the view_file endpoint. """
@@ -2780,6 +2802,12 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         repo = pygit2.Repository(os.path.join(self.path, 'repos', 'test.git'))
         commit = repo.revparse_single('HEAD')
+        # Add a symlink to test that it displays correctly
+        tests.add_commit_git_repo(
+            os.path.join(self.path, 'repos', 'test.git'),
+            ncommits=1, filename='sources-sl', symlink_to='sources'
+        )
+        commit_sl = repo.revparse_single('HEAD')
 
         # View another commit
         output = self.app.get('/test/c/%s' % commit.oid.hex)
@@ -2790,6 +2818,16 @@ class PagureFlaskRepotests(tests.Modeltests):
             output_text)
         self.assertIn('Authored by Alice Author', output_text)
         self.assertIn('Committed by Cecil Committer', output_text)
+
+        # Make sure that diff containing symlink displays the header correctly
+        output = self.app.get('/test/c/%s' % commit_sl.oid.hex)
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        # check the link to the file
+        self.assertIn('>sources-sl</a>', output_text)
+        # check that the header contains "file added" and a +1 for one added line
+        self.assertIn('>file added</span>', output_text)
+        self.assertIn('>+1</span>', output_text)
 
         #View the commit when branch name is provided
         output = self.app.get('/test/c/%s?branch=master' % commit.oid.hex)

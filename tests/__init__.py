@@ -878,15 +878,21 @@ that should never get displayed on the website if there is a README.rst in the r
 
 
 def add_commit_git_repo(folder, ncommits=10, filename='sources',
-                        branch='master'):
+                        branch='master', symlink_to=None):
     """ Create some more commits for the specified git repo. """
     repo, newfolder, branch_ref_obj = _clone_and_top_commits(
         folder, branch, branch_ref=True)
 
     for index in range(ncommits):
         # Create a file in that git repo
-        with open(os.path.join(newfolder, filename), 'a') as stream:
-            stream.write('Row %s\n' % index)
+        if symlink_to:
+            os.symlink(
+                symlink_to,
+                os.path.join(newfolder, filename),
+            )
+        else:
+            with open(os.path.join(newfolder, filename), 'a') as stream:
+                stream.write('Row %s\n' % index)
         repo.index.add(filename)
         repo.index.write()
 

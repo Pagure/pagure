@@ -2664,20 +2664,22 @@ def get_stats_patch(patch):
         output["old_id"] = str(patch.old_id)
     elif hasattr(patch, "delta"):
         # Newer pygit2
-        if patch.delta.new_file.mode == 0 and patch.delta.old_file.mode in [
-            33188,
-            33261,
-        ]:
+        # we recognize non-executable file, executable file and symlink
+        expected_modes = [33188, 33261, 40960]
+        if (
+            patch.delta.new_file.mode == 0
+            and patch.delta.old_file.mode in expected_modes
+        ):
             status = "D"
         elif (
-            patch.delta.new_file.mode in [33188, 33261]
+            patch.delta.new_file.mode in expected_modes
             and patch.delta.old_file.mode == 0
         ):
             status = "A"
-        elif patch.delta.new_file.mode in [
-            33188,
-            33261,
-        ] and patch.delta.old_file.mode in [33188, 33261]:
+        elif (
+            patch.delta.new_file.mode in expected_modes
+            and patch.delta.old_file.mode in expected_modes
+        ):
             status = "M"
         if patch.delta.new_file.path != patch.delta.old_file.path:
             status = "R"
