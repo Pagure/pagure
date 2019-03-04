@@ -2663,6 +2663,7 @@ def get_stats_patch(patch):
         output["new_id"] = str(patch.new_id)
         output["old_id"] = str(patch.old_id)
     elif hasattr(patch, "delta"):
+        status = None
         # Newer pygit2
         # we recognize non-executable file, executable file and symlink
         expected_modes = [33188, 33261, 40960]
