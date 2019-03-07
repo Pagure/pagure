@@ -84,11 +84,11 @@ def fedora_messaging_publish(topic, message):  # pragma: no cover
         )
         fedora_messaging.api.publish(msg)
     except fedora_messaging.exceptions.PublishReturned as e:
-        log.warning(
+        _log.warning(
             "Fedora Messaging broker rejected message %s: %s", msg.id, e
         )
     except fedora_messaging.exceptions.ConnectionException as e:
-        log.warning("Error sending message %s: %s", msg.id, e)
+        _log.warning("Error sending message %s: %s", msg.id, e)
     except Exception:
         _log.exception("Error sending fedora-messaging message")
 
