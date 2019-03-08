@@ -86,9 +86,10 @@
                   </div>
               </div>
             {% endfor %}
-            {% if repos_length and repos_length > 1 %}
+            {% if total_fork_page > 1 %}
             {{ pagination_link('forkpage', forkpage, total_fork_page, repopage=repopage) }}
             {% endif %}
+
             </div>
         {% else %}
           <div class="card-body">
