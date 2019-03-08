@@ -3,6 +3,34 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
+5.4 (2019-03-..)
+----------------
+
+- Allow by default the ACL "pull_request_create" on project-less API token
+  (Lenka Segura)
+- Implement Pagure Git Auth (Patrick Uiterwijk)
+- Add a upper limit to sqlalchemy as 1.3.0 breaks our tests
+- Add a new API endpoint allowing to update an existing PR
+- If the user doesn't have a valid ssh key inform but let them log in
+- Fix displaying diffs that contain symlinks (Slavek Kabrda)
+- Add missing namespace on the link to see the user's issues when they become
+  assignee of a ticket
+- Add a button to take/drop a pull-request (assignee field)
+- Add a new API endpoint to assign pull-request to someone
+- Fix the link to view all the user's projects on the dashboard
+- Allow dots and plus signs in project names
+- When loading blocking or depending tickets restricts the list of tickets based
+  on the user's input
+- Fix seeing releases when the reference prodived returned a commit
+- Allow div element to have id tags
+- Include the PR tags in their JSON representation
+- Inform the user when changing the assignee failed because of an ajax error
+- Ensure the comment & close button shows up for the author
+- Deprecate fedmsg
+- Stream the repoSpanner proxy responses (Patrick Uiterwijk)
+- Ensure that forking does not run the hook (Patrick Uiterwijk)
+
+
 5.3 (2019-02-22)
 ----------------
 
