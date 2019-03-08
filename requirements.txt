@@ -26,7 +26,12 @@ python-openid-teams
 redis
 requests
 six
-sqlalchemy >= 0.8
+# sqlalchemy minimum 0.8
+# sqlalchemy 1.3.0 is causing issues on the pip container leading
+# test_pagure_lib.py to raise a:
+# "(sqlite3.OperationalError) no such column: users.user"
+# in test_search_projects_private line 319
+sqlalchemy < 1.3.0
 # 1.4.0 is broken, 1.4.0-post-1 works but gives odd results on newer setuptools
 # the latest version 1.5.0 is also known to work
 straight.plugin
