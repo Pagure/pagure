@@ -13,8 +13,8 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - ../lcl/repos:/repos
-      - ../lcl/attachments:/attachments
+      - ../lcl/repos:/repos:z
+      - ../lcl/attachments:/attachments:z
       - ..:/code:z
     environment:
       - GL_USER=root
@@ -29,7 +29,7 @@ services:
       - postgresql
     image: pagure-worker:latest
     volumes:
-      - ../lcl/repos:/repos
+      - ../lcl/repos:/repos:z
       - ../lcl/attachments:/attachments:ro
       - ..:/code:z
     environment:
@@ -44,7 +44,7 @@ services:
       - postgresql
     image: pagure-logcom:latest
     volumes:
-      - ../lcl/repos:/repos
+      - ../lcl/repos:/repos:z
       - ../lcl/attachments:/attachments:ro
       - ..:/code:z
     environment:
