@@ -17,6 +17,8 @@ RUN dnf install -y python3-devel python3-setuptools python3-nose python3-bcrypt 
 
 RUN dnf install -y python3-celery
 
+RUN ln -sf /usr/bin/python3 /usr/bin/python
+
 WORKDIR /code
 ENTRYPOINT ["/usr/bin/celery-3", "-A", "pagure.lib.tasks", "worker", "--loglevel", "info"]
 
