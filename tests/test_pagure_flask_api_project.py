@@ -2112,11 +2112,14 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         output = self.app.post('/api/0/new', headers=headers)
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.get_data(as_text=True))
-        self.assertEqual(sorted(data.keys()), ['error', 'error_code'])
+        self.assertEqual(sorted(data.keys()), [
+            'error', 'error_code', "errors"])
         self.assertEqual(
             pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
         self.assertEqual(
             pagure.api.APIERROR.EINVALIDTOK.name, data['error_code'])
+        self.assertEqual(
+            data['errors'], "Missing ACLs: create_project")
 
         headers = {'Authorization': 'token aaabbbcccddd'}
 
@@ -2353,11 +2356,14 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         output = self.app.post('/api/0/new', headers=headers)
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.get_data(as_text=True))
-        self.assertEqual(sorted(data.keys()), ['error', 'error_code'])
+        self.assertEqual(sorted(data.keys()), [
+            'error', 'error_code', "errors"])
         self.assertEqual(
             pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
         self.assertEqual(
             pagure.api.APIERROR.EINVALIDTOK.name, data['error_code'])
+        self.assertEqual(
+            data['errors'], "Missing ACLs: create_project")
 
         headers = {'Authorization': 'token aaabbbcccddd'}
 
@@ -2529,11 +2535,14 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         output = self.app.post('/api/0/fork', headers=headers)
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.get_data(as_text=True))
-        self.assertEqual(sorted(data.keys()), ['error', 'error_code'])
+        self.assertEqual(sorted(data.keys()), [
+            'error', 'error_code', "errors"])
         self.assertEqual(
             pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
         self.assertEqual(
             pagure.api.APIERROR.EINVALIDTOK.name, data['error_code'])
+        self.assertEqual(
+            data['errors'], "Missing ACLs: fork_project")
 
         headers = {'Authorization': 'token aaabbbcccddd'}
 
@@ -2652,11 +2661,14 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         output = self.app.post('/api/0/fork', headers=headers)
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.get_data(as_text=True))
-        self.assertEqual(sorted(data.keys()), ['error', 'error_code'])
+        self.assertEqual(sorted(data.keys()), [
+            'error', 'error_code', "errors"])
         self.assertEqual(
             pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
         self.assertEqual(
             pagure.api.APIERROR.EINVALIDTOK.name, data['error_code'])
+        self.assertEqual(
+            data['errors'], "Missing ACLs: fork_project")
 
         headers = {'Authorization': 'token aaabbbcccddd'}
 
@@ -3123,11 +3135,14 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
             headers=headers, data=data)
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.get_data(as_text=True))
-        self.assertEqual(sorted(data.keys()), ['error', 'error_code'])
+        self.assertEqual(sorted(data.keys()), [
+            'error', 'error_code', "errors"])
         self.assertEqual(
             pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
         self.assertEqual(
             pagure.api.APIERROR.EINVALIDTOK.name, data['error_code'])
+        self.assertEqual(
+            data['errors'], "Invalid token")
 
     def test_flag_commit_invalid_status(self):
         """ Test flagging a commit with an invalid status. """
@@ -3986,7 +4001,8 @@ class PagureFlaskApiProjectOptionsTests(tests.Modeltests):
                 u'error': u'Invalid or expired token. Please visit '
                     'http://localhost.localdomain/settings#api-keys to get '
                     'or renew your API token.',
-                u'error_code': u'EINVALIDTOK'
+                u'error_code': u'EINVALIDTOK',
+                u'errors': u'Invalid token',
             }
         )
 
@@ -4049,7 +4065,8 @@ class PagureFlaskApiProjectOptionsTests(tests.Modeltests):
                 u'error': u'Invalid or expired token. Please visit '
                     'http://localhost.localdomain/settings#api-keys to get '
                     'or renew your API token.',
-                u'error_code': u'EINVALIDTOK'
+                u'error_code': u'EINVALIDTOK',
+                u'errors': u'Invalid token',
             }
         )
 

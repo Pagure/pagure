@@ -86,33 +86,58 @@ def check_api_acls(acls, optional=False):
             token_str = authorization.split("token", 1)[1].strip()
 
     token_auth = False
+    error_msg = None
     if token_str:
         token = pagure.lib.query.get_api_token(flask.g.session, token_str)
-        if token and not token.expired:
-            flask.g.authenticated = True
-            if acls and set(token.acls_list).intersection(set(acls)):
-                token_auth = True
-                flask.g.fas_user = token.user
-                # To get a token, in the `fas` auth user must have signed
-                # the CLA, so just set it to True
-                flask.g.fas_user.cla_done = True
-                flask.g.token = token
+        if token:
+            if token.expired:
+                error_msg = "Expired token"
+            else:
                 flask.g.authenticated = True
-            elif not acls and optional:
-                token_auth = True
-                flask.g.fas_user = token.user
-                # To get a token, in the `fas` auth user must have signed
-                # the CLA, so just set it to True
-                flask.g.fas_user.cla_done = True
-                flask.g.token = token
-                flask.g.authenticated = True
+
+                # Some ACLs are required
+                if acls:
+                    token_acls_set = set(token.acls_list)
+                    needed_acls_set = set(acls or [])
+                    overlap = token_acls_set.intersection(needed_acls_set)
+                    # Our token has some of the required ACLs:  auth successful
+                    if overlap:
+                        token_auth = True
+                        flask.g.fas_user = token.user
+                        # To get a token, in the `fas` auth user must have
+                        # signed the CLA, so just set it to True
+                        flask.g.fas_user.cla_done = True
+                        flask.g.token = token
+                        flask.g.authenticated = True
+                    # Our token has none of the required ACLs -> auth fail
+                    else:
+                        error_msg = "Missing ACLs: %s" % ", ".join(
+                            sorted(set(acls) - set(token.acls_list))
+                        )
+                # No ACL required
+                else:
+                    if optional:
+                        token_auth = True
+                        flask.g.fas_user = token.user
+                        # To get a token, in the `fas` auth user must have
+                        # signed the CLA, so just set it to True
+                        flask.g.fas_user.cla_done = True
+                        flask.g.token = token
+                        flask.g.authenticated = True
+        else:
+            error_msg = "Invalid token"
+
     elif optional:
         return
+
+    else:
+        error_msg = "Invalid token"
 
     if not token_auth:
         output = {
             "error_code": pagure.api.APIERROR.EINVALIDTOK.name,
             "error": pagure.api.APIERROR.EINVALIDTOK.value,
+            "errors": error_msg,
         }
         jsonout = flask.jsonify(output)
         jsonout.status_code = 401

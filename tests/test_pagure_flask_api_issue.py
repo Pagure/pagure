@@ -2490,11 +2490,12 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         output = self.app.get('/api/0/test/issue/2', headers=headers)
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.get_data(as_text=True))
-        self.assertEqual(sorted(data.keys()), ['error', 'error_code'])
+        self.assertEqual(sorted(data.keys()), ['error', 'error_code', 'errors'])
         self.assertEqual(
             pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
         self.assertEqual(
             pagure.api.APIERROR.EINVALIDTOK.name, data['error_code'])
+        self.assertEqual(data['errors'], 'Invalid token')
 
         # Create a new token for another user
         item = pagure.lib.model.Token(
@@ -3047,11 +3048,12 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             '/api/0/foo/issue/1/milestone', data={}, headers=headers)
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.get_data(as_text=True))
-        self.assertEqual(sorted(data.keys()), ['error', 'error_code'])
+        self.assertEqual(sorted(data.keys()), ['error', 'error_code', 'errors'])
         self.assertEqual(
             pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
         self.assertEqual(
             pagure.api.APIERROR.EINVALIDTOK.name, data['error_code'])
+        self.assertEqual(data['errors'], 'Invalid token')
 
     @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
     @patch(
@@ -3561,11 +3563,13 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             '/api/0/foo/issue/1/assign', data=data, headers=headers)
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.get_data(as_text=True))
-        self.assertEqual(sorted(data.keys()), ['error', 'error_code'])
+        self.assertEqual(sorted(data.keys()), ['error', 'error_code', 'errors'])
         self.assertEqual(
             pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
         self.assertEqual(
             pagure.api.APIERROR.EINVALIDTOK.name, data['error_code'])
+        self.assertEqual(
+            data['errors'], 'Missing ACLs: issue_assign, issue_update')
 
         # No comment added
         repo = pagure.lib.query.get_authorized_project(self.session, 'foo')
@@ -3938,11 +3942,12 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             '/api/0/test/issue/1/custom/bugzilla', headers=headers)
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.get_data(as_text=True))
-        self.assertEqual(sorted(data.keys()), ['error', 'error_code'])
+        self.assertEqual(sorted(data.keys()), ['error', 'error_code', 'errors'])
         self.assertEqual(
             pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
         self.assertEqual(
             pagure.api.APIERROR.EINVALIDTOK.name, data['error_code'])
+        self.assertEqual(data['errors'], 'Invalid token')
 
         headers = {'Authorization': 'token aaabbbcccddd'}
 

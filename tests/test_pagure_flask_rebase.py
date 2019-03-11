@@ -283,7 +283,8 @@ class PagureRebasetests(tests.Modeltests):
                 u'error': u'Invalid or expired token. Please visit '
                     'http://localhost.localdomain/settings#api-keys to get '
                     'or renew your API token.',
-                u'error_code': u'EINVALIDTOK'
+                u'error_code': u'EINVALIDTOK',
+                u'errors': 'Invalid token',
             }
         )
 
