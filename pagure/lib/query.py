@@ -1347,6 +1347,7 @@ def add_pull_request_comment(
             pr_uid=request.uid,
             cause=request.id,
             branch=request.branch_from,
+            branch_to=request.branch,
             ci_type=request.project.ci_hook.ci_type,
         )
         ci_triggered = True
@@ -1371,6 +1372,7 @@ def add_pull_request_comment(
             pr_uid=request.uid,
             cause=request.id,
             branch=request.branch_from,
+            branch_to=request.branch,
             ci_type=request.project.ci_hook.ci_type,
         )
 
@@ -1909,6 +1911,7 @@ def new_pull_request(
             pr_uid=request.uid,
             cause=request.id,
             branch=request.branch_from,
+            branch_to=request.branch,
             ci_type=request.project.ci_hook.ci_type,
         )
 

@@ -172,6 +172,7 @@ def send_notifications(session, project, repodir, user, refname, revs, forced):
                 cause=revs[-1],
                 branch=refname,
                 ci_type=project.ci_hook.ci_type,
+                branch_to=None,
             )
 
 

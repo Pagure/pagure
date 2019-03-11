@@ -122,6 +122,7 @@ class PagureLibTaskServicestests(tests.Modeltests):
             project_name='invalid',
             cause='PR#ID',
             branch='feature',
+            branch_to='master',
             ci_type='jenkins')
         self.assertIsNone(output)
         trigger_jenk.assert_not_called()
@@ -135,6 +136,7 @@ class PagureLibTaskServicestests(tests.Modeltests):
             project_name='test',
             cause='PR#ID',
             branch='feature',
+            branch_to='master',
             ci_type='jenkins')
         trigger_jenk.assert_not_called()
 
@@ -147,6 +149,7 @@ class PagureLibTaskServicestests(tests.Modeltests):
             project_name='forks/foo/test',
             cause='PR#ID',
             branch='feature',
+            branch_to='master',
             ci_type='jenkins')
         trigger_jenk.assert_not_called()
 
@@ -554,6 +557,7 @@ class PagureLibTaskServicesJenkinsCItests(tests.Modeltests):
             project_name='test',
             cause='PR#ID',
             branch='feature',
+            branch_to='master',
             ci_type='travis')
         self.assertIsNone(output)
         trigger_jenk.assert_not_called()
@@ -565,6 +569,7 @@ class PagureLibTaskServicesJenkinsCItests(tests.Modeltests):
             project_name='forks/foo/test',
             cause='PR#ID',
             branch='feature',
+            branch_to='master',
             ci_type='travis')
         self.assertIsNone(output)
         trigger_jenk.assert_not_called()
@@ -576,6 +581,7 @@ class PagureLibTaskServicesJenkinsCItests(tests.Modeltests):
             project_name='test',
             cause='PR#ID',
             branch='feature',
+            branch_to='master',
             ci_type='jenkins')
         self.assertIsNone(output)
         trigger_jenk.assert_called_once_with(
@@ -584,7 +590,8 @@ class PagureLibTaskServicesJenkinsCItests(tests.Modeltests):
            job=u'pagure',
            project_path=u'test.git',
            token=u'random_token',
-           url=u'https://ci.server.org/'
+           url=u'https://ci.server.org/',
+           branch_to='master',
         )
 
     @patch('pagure.lib.tasks_services.trigger_jenkins_build')
@@ -594,6 +601,7 @@ class PagureLibTaskServicesJenkinsCItests(tests.Modeltests):
             project_name='forks/foo/test',
             cause='PR#ID',
             branch='feature',
+            branch_to='master',
             ci_type='jenkins')
         self.assertIsNone(output)
         trigger_jenk.assert_called_once_with(
@@ -602,7 +610,8 @@ class PagureLibTaskServicesJenkinsCItests(tests.Modeltests):
            job=u'pagure',
            project_path=u'forks/foo/test.git',
            token=u'random_token',
-           url=u'https://ci.server.org/'
+           url=u'https://ci.server.org/',
+           branch_to='master',
         )
 
 
