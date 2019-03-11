@@ -2271,7 +2271,14 @@ def search_projects(
             "as parameters in the `search_projects` function"
         )
     elif owner is not None:
-        projects = projects.join(model.User).filter(model.User.user == owner)
+        if owner.startswith("!"):
+            projects = projects.join(model.User).filter(
+                model.User.user != owner[1:]
+            )
+        else:
+            projects = projects.join(model.User).filter(
+                model.User.user == owner
+            )
     elif username is not None:
         projects = projects.filter(
             # User created the project

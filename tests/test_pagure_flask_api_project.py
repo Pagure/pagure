@@ -362,6 +362,77 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.maxDiff = None
         self.assertDictEqual(data, expected_data)
 
+    def test_api_projects_owner(self):
+        """ Test the api_projects method of the flask api. """
+        tests.create_projects(self.session)
+
+        output = self.app.get('/api/0/projects?owner=foo')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        del data['pagination']
+        expected_data = {
+          "args": {
+            "fork": None,
+            "namespace": None,
+            "owner": "foo",
+            "page": 1,
+            "pattern": None,
+            "per_page": 20,
+            "short": False,
+            "tags": [],
+            "username": None
+          },
+          "projects": [],
+          "total_projects": 0
+        }
+        self.maxDiff = None
+        self.assertDictEqual(data, expected_data)
+
+    def test_api_projects_not_owner(self):
+        """ Test the api_projects method of the flask api. """
+        tests.create_projects(self.session)
+
+        output = self.app.get('/api/0/projects?owner=!foo&short=1')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        del data['pagination']
+        expected_data = {
+          "args": {
+            "fork": None,
+            "namespace": None,
+            "owner": "!foo",
+            "page": 1,
+            "pattern": None,
+            "per_page": 20,
+            "short": True,
+            "tags": [],
+            "username": None
+          },
+          "projects": [
+            {
+              "description": "test project #1",
+              "fullname": "test",
+              "name": "test",
+              "namespace": None
+            },
+            {
+              "description": "test project #2",
+              "fullname": "test2",
+              "name": "test2",
+              "namespace": None
+            },
+            {
+              "description": "namespaced test project",
+              "fullname": "somenamespace/test3",
+              "name": "test3",
+              "namespace": "somenamespace"
+            }
+          ],
+          "total_projects": 3
+        }
+        self.maxDiff = None
+        self.assertDictEqual(data, expected_data)
+
     def test_api_projects(self):
         """ Test the api_projects method of the flask api. """
         tests.create_projects(self.session)
