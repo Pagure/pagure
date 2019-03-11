@@ -163,6 +163,82 @@ $(function() {
   {% endif %}
 
   {% if g.authenticated and g.repo_committer %}
+  var _cnt = 0;
+
+  function set_up_branch_pr_info(res) {
+    for (branch in res.new_branch){
+      var nb_commits = res.new_branch[branch]['commits']
+      var nb_target = res.new_branch[branch]['target_branch']
+      var url = "{{ url_for(
+        'ui_ns.new_request_pull',
+        repo=repo.name,
+        username=repo.user.user if repo.is_fork else None,
+        namespace=repo.namespace,
+        branch_to='.',
+        branch_from='.') }}";
+      url = url.slice(0, -4) + nb_target + '..' + branch
+
+      {% if repo.is_fork %}
+      html2 = ' \
+            <a class="btn btn-outline-primary border-white" data-toggle="tooltip" \
+            href="' + url + '" title="' + branch +' contains '
+             + nb_commits + ' commit not in the upstream project '
+             + nb_target + ' branch. Click to create new PR now.'
+             + '"><i class="fa fa-fw fa-arrow-circle-down"></i> Open Pull Request</a> \
+            </div>';
+      {% else %}
+      html2 = ' \
+            <a class="btn btn-outline-primary border-white" data-toggle="tooltip" \
+            href="' + url + '" title="' + branch +' contains '
+             + nb_commits + ' commit not in the ' + nb_target
+             + ' branch. Click to create new PR now.'
+             + '"><i class="fa fa-fw fa-arrow-circle-down"></i> Open Pull Request</a> \
+            </div>';
+      {%endif%}
+      var _b = branch.replace(/\./g, '\\.').replace('/', '__').replace('\+', '\\+');
+      $('#branch-' + _b + ' .branch_del').prepend(html2);
+      $('[data-toggle="tooltip"]').tooltip({placement : 'bottom'});
+      var commits_string = (nb_commits > 1) ? " commits" : " commit"
+      $('#branch-' + _b + ' .commits_ahead_label').append(nb_commits + commits_string + ' ahead');
+    }
+
+    for (branch in res.branch_w_pr){
+      var html = ' \
+          <a class="btn btn-outline-success border-white" data-toggle="tooltip" '
+           + 'href="{{ request.url_root }}' + res.branch_w_pr[branch]
+           + '"title="' + branch +' is already in an opened pull-request">'
+           + '<i class="fa fa-fw fa-arrow-circle-down"></i> Pull Request #' + res.branch_w_pr[branch].split('/').slice(-1)[0]  + ' </a> \
+          </div>';
+      $('#branch-' + branch.replace(/\./g, '\\.').replace('/', '__')
+        + ' .branch_del').prepend(html);
+      $('[data-toggle="tooltip"]').tooltip({placement : 'bottom'});
+    }
+  }
+
+  function process_task_results(_data, callback) {
+    var _url = '{{ url_for("internal_ns.task_info", taskid='') }}' + _data.task;
+    $.ajax({
+      url: _url ,
+      type: 'GET',
+      data: {
+        js: 1,
+        count: _cnt,
+      },
+      dataType: 'JSON',
+      success: function(res) {
+        callback(res.results);
+        $("#spinnergif").hide();
+      },
+      error: function(res) {
+        _cnt += 1;
+        if (_cnt < 600) {
+          window.setTimeout(process_task_results, 1000, _data, callback);
+        }
+      }
+    });
+  }
+
+
   $.ajax({
     url: '{{ url_for("internal_ns.get_pull_request_ready_branch") }}' ,
     type: 'POST',
@@ -175,55 +251,7 @@ $(function() {
     dataType: 'json',
     success: function(res) {
       if (res.code == 'OK'){
-        console.log(res.message);
-        for (branch in res.message.new_branch){
-          var nb_commits = res.message.new_branch[branch]['commits']
-          var nb_target = res.message.new_branch[branch]['target_branch']
-          var url = "{{ url_for(
-            'ui_ns.new_request_pull',
-            repo=repo.name,
-            username=repo.user.user if repo.is_fork else None,
-            namespace=repo.namespace,
-            branch_to='',
-            branch_from='') }}";
-          url = url.slice(0, -2) + nb_target + '..' + branch
-
-          {% if repo.is_fork %}
-          html2 = ' \
-                <a class="btn btn-outline-primary border-white" data-toggle="tooltip" \
-                href="' + url + '" title="' + branch +' contains '
-                 + nb_commits.length + ' commit not in the upstream project '
-                 + nb_target + ' branch. Click to create new PR now.'
-                 + '"><i class="fa fa-fw fa-arrow-circle-down"></i> Open Pull Request</a> \
-                </div>';
-          {% else %}
-          html2 = ' \
-                <a class="btn btn-outline-primary border-white" data-toggle="tooltip" \
-                href="' + url + '" title="' + branch +' contains '
-                 + nb_commits.length + ' commit not in the ' + nb_target
-                 + ' branch. Click to create new PR now.'
-                 + '"><i class="fa fa-fw fa-arrow-circle-down"></i> Open Pull Request</a> \
-                </div>';
-          {%endif%}
-          var _b = branch.replace(/\./g, '\\.').replace('/', '__').replace('\+', '\\+');
-          $('#branch-' + _b + ' .branch_del').prepend(html2);
-          $('[data-toggle="tooltip"]').tooltip({placement : 'bottom'});
-          var commits_string = (nb_commits.length > 1) ? " commits" : " commit"
-          $('#branch-' + _b + ' .commits_ahead_label').append(nb_commits.length + commits_string + ' ahead');
-
-
-        }
-        for (branch in res.message.branch_w_pr){
-          var html = ' \
-              <a class="btn btn-outline-success border-white" data-toggle="tooltip" '
-               + 'href="{{ request.url_root }}' + res.message.branch_w_pr[branch]
-               + '"title="' + branch +' is already in an opened pull-request">'
-               + '<i class="fa fa-fw fa-arrow-circle-down"></i> Pull Request #' + res.message.branch_w_pr[branch].split('/').slice(-1)[0]  + ' </a> \
-              </div>';
-          $('#branch-' + branch.replace(/\./g, '\\.').replace('/', '__')
-            + ' .branch_del').prepend(html);
-          $('[data-toggle="tooltip"]').tooltip({placement : 'bottom'});
-        }
+        process_task_results(res, set_up_branch_pr_info)
       }
     }
   });
