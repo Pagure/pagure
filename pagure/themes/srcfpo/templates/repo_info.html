@@ -23,23 +23,23 @@
 <style>
   a.koji button {
     padding-left: 20px;
-    background: url(https://fedoraproject.org/static/images/icons/fedora-infra-icon_koji.png) 0 50% no-repeat;
+    background: url({{ url_for('theme.static', filename='icons/koji.png')}}?version={{ g.version}}) 0 50% no-repeat;
   }
   a.bodhi button {
     padding-left: 20px;
-    background: url(https://fedoraproject.org/static/images/icons/fedora-infra-icon_bodhi.png) 0 50% no-repeat;
+    background: url({{ url_for('theme.static', filename='icons/bodhi.png')}}?version={{ g.version}}) 0 50% no-repeat;
   }
   a.bugz button {
     padding-left: 20px;
-    background: url(https://fedoraproject.org/static/images/icons/fedora-infra-icon_bugzilla.png) 0 50% no-repeat;
+    background: url({{ url_for('theme.static', filename='icons/bugzilla.png')}}?version={{ g.version}}) 0 50% no-repeat;
   }
   a.community button {
     padding-left: 20px;
-    background: url(https://apps.fedoraproject.org/tagger/images/favicons/16_beefy.png) 0 50% no-repeat;
+    background: url({{ url_for('theme.static', filename='icons/community.png')}}?version={{ g.version}}) 0 50% no-repeat;
   }
   a.koschei button {
     padding-left: 33px;
-    background: url(https://apps.fedoraproject.org/img/icons/koschei-24.png) 0 50% no-repeat;
+    background: url({{ url_for('theme.static', filename='icons/koschei.png')}}?version={{ g.version}}) 0 50% no-repeat;
   }
   .projectinfo {
     white-space: pre-wrap;
