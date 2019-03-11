@@ -160,12 +160,25 @@ def proxy_repospanner(project, service):
     regionurl, regioninfo = project.repospanner_repo_info("main")
     url = "%s/%s" % (regionurl, oper)
 
+    # Older flask/werkzeug versions don't support both an input and output
+    #  stream: this results in a blank upload.
+    # So, we optimize for the direction the majority of the data will likely
+    #  flow.
+    streamargs = {}
+    if service == "git-receive-pack":
+        # This is a Push operation, optimize for data from the client
+        streamargs["data"] = flask.request.stream
+        streamargs["stream"] = False
+    else:
+        # This is a Pull operation, optimize for data from the server
+        streamargs["data"] = flask.request.data
+        streamargs["stream"] = True
+
     resp = requests.request(
         flask.request.method,
         url,
         verify=regioninfo["ca"],
         cert=(regioninfo["push_cert"]["cert"], regioninfo["push_cert"]["key"]),
-        data=flask.request.stream,
         headers={
             "Content-Encoding": flask.request.content_encoding,
             "Content-Type": flask.request.content_type,
@@ -175,6 +188,7 @@ def proxy_repospanner(project, service):
             "x-Extra-project_user": project.user if project.is_fork else "",
             "X-Extra-project_namespace": project.namespace,
         },
+        **streamargs
     )
 
     # Strip out any headers that cause problems
@@ -186,6 +200,7 @@ def proxy_repospanner(project, service):
         resp.iter_content(chunk_size=128),
         status=resp.status_code,
         headers=dict(resp.headers),
+        direct_passthrough=True,
     )
 
 
