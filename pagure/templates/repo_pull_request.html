@@ -1172,7 +1172,7 @@ function try_async_comment(form, inline) {
 
   /* Keep some variable in memory before sending them in case the SSE is down */
   var _update = false;
-  var _comment = $(form).find('#comment').val();
+  var _comment = inline ? $(form).find('#inline-comment').val() : $(form).find('#comment').val();
   var _comment_id = null;
   if (!_comment && form.update_comment) {
     _update = true;
