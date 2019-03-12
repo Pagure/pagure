@@ -6,6 +6,35 @@ integrated with pagure.
 
 This document describe the steps needed to make it work.
 
+How does it work?
+-----------------
+
+The principal is:
+* pagure will trigger a build on jenkins when a pull-request is created,
+  updated or when someone explicitely asks pagure to do so or when a new commit
+  is pushed (if pagure-ci is configured to trigger on commit).
+
+* pagure will send a few information to jenkins when triggering a build:
+  ``REPO``, ``BRANCH``, ``BRANCH_TO``, ``cause``.
+
+* jenkins will do its work and, using webhook, report to pagure that it has
+  finished its task
+
+* pagure will query jenkins to know the outcome of the task and flag the PR
+  accordingly
+
+``REPO`` corresponds to the url of the repository the pull-request originates
+from (so most often it will be a fork of the main repository).
+
+``BRANCH`` corresponds to the branch the pull-request originates from (the
+branch of the fork).
+
+``BRANCH_TO`` corresponds to the targeted branch in the main repository (the
+branch of the main project in which the PR is to be merged).
+
+``cause`` is the reason the build was triggered (ie: the pull-request id or the
+commit hash).
+
 
 How to enable Pagure CI
 -----------------------
