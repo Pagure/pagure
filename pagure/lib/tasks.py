@@ -33,6 +33,7 @@ import pagure.lib.git
 import pagure.lib.git_auth
 import pagure.lib.link
 import pagure.lib.query
+import pagure.lib.model
 import pagure.lib.repo
 import pagure.utils
 from pagure.lib.tasks_utils import pagure_task
@@ -1050,6 +1051,13 @@ def link_pr_to_ticket(self, session, pr_uid):
         )
         return
 
+    # Drop the existing commit-based relations
+    session.query(pagure.lib.model.PrToIssue).filter(
+        pagure.lib.model.PrToIssue.pull_request_uid == request.uid
+    ).filter(pagure.lib.model.PrToIssue.origin == "intial_comment_pr").delete(
+        synchronize_session="fetch"
+    )
+
     repo_obj = pygit2.Repository(repopath)
     orig_repo = pygit2.Repository(parentpath)
 
@@ -1078,7 +1086,9 @@ def link_pr_to_ticket(self, session, pr_uid):
                 "LINK_PR_TO_TICKET: Link ticket %s to PRs %s"
                 % (issue, request)
             )
-            pagure.lib.query.link_pr_issue(session, issue, request)
+            pagure.lib.query.link_pr_issue(
+                session, issue, request, origin="commit"
+            )
 
         for issue in pagure.lib.link.get_relation(
             session, name, user, namespace, line, "relates"
@@ -1087,7 +1097,9 @@ def link_pr_to_ticket(self, session, pr_uid):
                 "LINK_PR_TO_TICKET: Link ticket %s to PRs %s"
                 % (issue, request)
             )
-            pagure.lib.query.link_pr_issue(session, issue, request)
+            pagure.lib.query.link_pr_issue(
+                session, issue, request, origin="commit"
+            )
 
     try:
         session.commit()

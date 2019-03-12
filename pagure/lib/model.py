@@ -1506,6 +1506,7 @@ class PrToIssue(BASE):
         sa.ForeignKey("issues.uid", ondelete="CASCADE", onupdate="CASCADE"),
         primary_key=True,
     )
+    origin = sa.Column(sa.String(32), index=True)
 
 
 class IssueComment(BASE):

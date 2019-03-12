@@ -457,5 +457,155 @@ class PagureFlaskApiForkUpdatetests(tests.SimplePagureTest):
             }
         )
 
+    def test_api_pull_request_update_edited_linked(self):
+        """ Test api_assign_pull_request method when with valid input
+        """
+        project = pagure.lib.query.get_authorized_project(
+            self.session, 'test')
+        self.assertEqual(len(project.requests), 1)
+        self.assertEqual(len(project.requests[0].related_issues), 0)
+        self.assertEqual(len(project.issues), 0)
+
+        # Create issues to link to
+        msg = pagure.lib.query.new_issue(
+            session=self.session,
+            repo=project,
+            title='tést íssüé',
+            content='We should work on this',
+            user='pingou',
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'tést íssüé')
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        data = {
+            'title': 'edited test PR',
+            'initial_comment': 'Edited initial comment\n\n'
+                'this PR fixes #2 \n\nThanks',
+        }
+
+        # Valid request
+        output = self.app.post(
+            '/api/0/test/pull-request/1', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        # Hard-code all the values that will change from a test to another
+        # because either random or time-based
+        data['date_created'] = '1551276260'
+        data['last_updated'] = '1551276261'
+        data['updated_on'] = '1551276260'
+        data['commit_start'] = '5f5d609db65d447f77ba00e25afd17ba5053344b'
+        data['commit_stop'] = '5f5d609db65d447f77ba00e25afd17ba5053344b'
+        data['project']['date_created'] = '1551276259'
+        data['project']['date_modified'] = '1551276259'
+        data['repo_from']['date_created'] = '1551276259'
+        data['repo_from']['date_modified'] = '1551276259'
+        data['repo_from']['parent']['date_created'] = '1551276259'
+        data['repo_from']['parent']['date_modified'] = '1551276259'
+        data['uid'] = 'a2bddecc8ea548e88c22a0df77670092'
+        self.assertDictEqual(
+            data,
+            {
+                'assignee': None,
+                'branch': 'master',
+                'branch_from': 'master',
+                'cached_merge_status': 'unknown',
+                'closed_at': None,
+                'closed_by': None,
+                'comments': [],
+                'commit_start': '5f5d609db65d447f77ba00e25afd17ba5053344b',
+                'commit_stop': '5f5d609db65d447f77ba00e25afd17ba5053344b',
+                'date_created': '1551276260',
+                'id': 1,
+                'initial_comment': 'Edited initial comment\n\nthis PR '
+                    'fixes #2 \n\nThanks',
+                'last_updated': '1551276261',
+                'project': {'access_groups': {'admin': [], 'commit': [], 'ticket': []},
+                         'access_users': {'admin': [],
+                                          'commit': [],
+                                          'owner': ['pingou'],
+                                          'ticket': []},
+                         'close_status': ['Invalid',
+                                          'Insufficient data',
+                                          'Fixed',
+                                          'Duplicate'],
+                         'custom_keys': [],
+                         'date_created': '1551276259',
+                         'date_modified': '1551276259',
+                         'description': 'test project #1',
+                         'fullname': 'test',
+                         'id': 1,
+                         'milestones': {},
+                         'name': 'test',
+                         'namespace': None,
+                         'parent': None,
+                         'priorities': {},
+                         'tags': [],
+                         'url_path': 'test',
+                         'user': {'fullname': 'PY C', 'name': 'pingou'}},
+                'remote_git': None,
+                'repo_from': {'access_groups': {'admin': [], 'commit': [], 'ticket': []},
+                           'access_users': {'admin': [],
+                                            'commit': [],
+                                            'owner': ['pingou'],
+                                            'ticket': []},
+                           'close_status': [],
+                           'custom_keys': [],
+                           'date_created': '1551276259',
+                           'date_modified': '1551276259',
+                           'description': 'test project #1',
+                           'fullname': 'forks/pingou/test',
+                           'id': 4,
+                           'milestones': {},
+                           'name': 'test',
+                           'namespace': None,
+                           'parent': {'access_groups': {'admin': [],
+                                                        'commit': [],
+                                                        'ticket': []},
+                                      'access_users': {'admin': [],
+                                                       'commit': [],
+                                                       'owner': ['pingou'],
+                                                       'ticket': []},
+                                      'close_status': ['Invalid',
+                                                       'Insufficient data',
+                                                       'Fixed',
+                                                       'Duplicate'],
+                                      'custom_keys': [],
+                                      'date_created': '1551276259',
+                                      'date_modified': '1551276259',
+                                      'description': 'test project #1',
+                                      'fullname': 'test',
+                                      'id': 1,
+                                      'milestones': {},
+                                      'name': 'test',
+                                      'namespace': None,
+                                      'parent': None,
+                                      'priorities': {},
+                                      'tags': [],
+                                      'url_path': 'test',
+                                      'user': {'fullname': 'PY C', 'name': 'pingou'}},
+                           'priorities': {},
+                           'tags': [],
+                           'url_path': 'fork/pingou/test',
+                           'user': {'fullname': 'PY C', 'name': 'pingou'}},
+                'status': 'Open',
+                'tags': [],
+                'threshold_reached': None,
+                'title': 'edited test PR',
+                'uid': 'a2bddecc8ea548e88c22a0df77670092',
+                'updated_on': '1551276260',
+                'user': {'fullname': 'PY C', 'name': 'pingou'}
+            }
+        )
+
+        project = pagure.lib.query.get_authorized_project(
+            self.session, 'test')
+        self.assertEqual(len(project.requests), 1)
+        self.assertEqual(len(project.requests[0].related_issues), 1)
+        self.assertEqual(len(project.issues), 1)
+        self.assertEqual(len(project.issues[0].related_prs), 1)
+
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)

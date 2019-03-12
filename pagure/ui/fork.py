@@ -537,6 +537,10 @@ def request_pull_edit(repo, requestid, username=None, namespace=None):
         request.initial_comment = form.initial_comment.data.strip()
         flask.g.session.add(request)
         try:
+            # Link the PR to issue(s) if there is such link
+            pagure.lib.query.link_pr_to_issue_on_description(
+                flask.g.session, request
+            )
             flask.g.session.commit()
             flask.flash("Pull request edited!")
         except SQLAlchemyError as err:  # pragma: no cover

@@ -54,6 +54,7 @@ from flask import url_for
 import pagure.exceptions
 import pagure.lib.git
 import pagure.lib.git_auth
+import pagure.lib.link
 import pagure.lib.login
 import pagure.lib.notify
 import pagure.lib.plugins
@@ -1878,6 +1879,9 @@ def new_pull_request(
     request.updated_on = datetime.datetime.utcnow()
 
     session.add(request)
+    # Link the PR to issue(s) if there is such link
+    link_pr_to_issue_on_description(session, request)
+
     # Make sure we won't have SQLAlchemy error before we create the request
     session.flush()
 
@@ -1924,6 +1928,59 @@ def new_pull_request(
     )
 
     return request
+
+
+def link_pr_to_issue_on_description(session, request):
+    """ Link the given request to issues it may be referring to in its
+    description if there is a description and such link in it.
+    """
+    _log.debug("Drop the existing relations")
+    # Drop the existing initial_comment_pr-based relations
+    session.query(model.PrToIssue).filter(
+        model.PrToIssue.pull_request_uid == request.uid
+    ).filter(model.PrToIssue.origin == "intial_comment_pr").delete(
+        synchronize_session="fetch"
+    )
+
+    # Rebuild the relations from the initial comment
+    if request.initial_comment:
+        _log.debug("Checking the initial comment for relations")
+        for line in request.initial_comment.split("\n"):
+            for issue in pagure.lib.link.get_relation(
+                session,
+                request.project.name,
+                request.project.user.user if request.project.is_fork else None,
+                request.project.namespace,
+                line,
+                "fixes",
+                include_prs=False,
+            ):
+                _log.debug(
+                    "Link (fix) request %s to issue: %s (project: %s)"
+                    % (request.id, issue.id, request.project.fullname)
+                )
+                pagure.lib.query.link_pr_issue(
+                    session, issue, request, origin="initial_comment_pr"
+                )
+
+            for issue in pagure.lib.link.get_relation(
+                session,
+                request.project.name,
+                request.project.user.user if request.project.is_fork else None,
+                request.project.namespace,
+                line,
+                "relates",
+                include_prs=False,
+            ):
+                _log.debug(
+                    "Link (relate) request %s to issue: %s (project: %s)"
+                    % (request.id, issue.id, request.project.fullname)
+                )
+                pagure.lib.query.link_pr_issue(
+                    session, issue, request, origin="initial_comment_pr"
+                )
+    else:
+        _log.debug("No initial comment, no need to continue")
 
 
 def new_tag(session, tag_name, tag_description, tag_color, project_id):
@@ -5609,7 +5666,7 @@ def get_project_family(session, project):
     return [parent] + query.all()
 
 
-def link_pr_issue(session, issue, request):
+def link_pr_issue(session, issue, request, origin="commit"):
     """ Associate the specified issue with the specified pull-requets.
 
     :arg session: The SQLAlchemy session to use
@@ -5625,7 +5682,7 @@ def link_pr_issue(session, issue, request):
     associated_issues = [iss.uid for iss in request.related_issues]
     if issue.uid not in associated_issues:
         obj = model.PrToIssue(
-            pull_request_uid=request.uid, issue_uid=issue.uid
+            pull_request_uid=request.uid, issue_uid=issue.uid, origin=origin
         )
         session.add(obj)
         session.flush()
