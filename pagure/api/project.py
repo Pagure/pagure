@@ -344,7 +344,12 @@ def api_projects():
     |               |          |               |   to it                  |
     +---------------+----------+---------------+--------------------------+
     | ``owner``     | string   | Optional      | | Filters the projects   |
-    |               |          |               |   by ownership           |
+    |               |          |               |   by ownership.          |
+    |               |          |               |   If the argument is of  |
+    |               |          |               |   the form <!owner> then |
+    |               |          |               |   the project returned   |
+    |               |          |               |   are the ones *not*     |
+    |               |          |               |   owned by this user.    |
     +---------------+----------+---------------+--------------------------+
     | ``namespace`` | string   | Optional      | | Filters the projects   |
     |               |          |               |   by namespace           |
