@@ -356,8 +356,11 @@ class PagureRepoSpannerTestsNewRepoDefault(PagureRepoSpannerTests):
         # run on a TCP port, which the test environment doesn't do.
         output = self.app.get('/clonetest.git/info/refs?service=git-upload-pack')
         self.assertEqual(output.status_code, 200)
+        self.assertEqual(output.content_type,
+                         "application/x-git-upload-pack-advertisement")
         output_text = output.get_data(as_text=True)
         self.assertIn("# service=git-upload-pack", output_text)
+        self.assertIn("agent=repoSpanner", output_text)
         self.assertIn("symref=HEAD:refs/heads/master", output_text)
         self.assertIn(" refs/heads/master\x00", output_text)
 
@@ -388,12 +391,15 @@ class PagureRepoSpannerTestsNewRepoDefault(PagureRepoSpannerTests):
         # Unfortunately, actually testing a git clone would need the app to
         # run on a TCP port, which the test environment doesn't do.
         output = self.app.get(
-            '/clonetest.git/info/refs?service=git-upload-pack',
+            '/clonetest.git/info/refs?service=git-receive-pack',
             environ_overrides={'REMOTE_USER': 'pingou'},
         )
         self.assertEqual(output.status_code, 200)
+        self.assertEqual(output.content_type,
+                         "application/x-git-receive-pack-advertisement")
         output_text = output.get_data(as_text=True)
-        self.assertIn("# service=git-upload-pack", output_text)
+        self.assertIn("# service=git-receive-pack", output_text)
+        self.assertIn("agent=repoSpanner", output_text)
         self.assertIn("symref=HEAD:refs/heads/master", output_text)
         self.assertIn(" refs/heads/master\x00", output_text)
 
