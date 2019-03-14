@@ -26,7 +26,7 @@ import os
 
 
 import redis
-from trololio import asyncio as trololio
+import trololio
 
 from six.moves.urllib.parse import urlparse
 
@@ -137,7 +137,7 @@ def handle_client(client_reader, client_writer):
     data = None
     while True:
         # give client a chance to respond, timeout after 10 seconds
-        line = yield trololio.From(trololio.wait_for(
+        line = yield trololio.From(trololio.asyncio.wait_for(
             client_reader.readline(),
             timeout=10.0))
         if not line.decode().strip():
@@ -199,7 +199,7 @@ def handle_client(client_reader, client_writer):
                     oncall = 0
                 oncall += 1
                 yield trololio.From(client_writer.drain())
-                yield trololio.From(trololio.sleep(1))
+                yield trololio.From(trololio.asyncio.sleep(1))
             else:
                 log.info("Sending %s", msg['data'])
                 client_writer.write(('data: %s\n\n' % msg['data']).encode())
@@ -243,8 +243,8 @@ def main():
     _get_session()
 
     try:
-        loop = trololio.get_event_loop()
-        coro = trololio.start_server(
+        loop = trololio.asyncio.get_event_loop()
+        coro = trololio.asyncio.start_server(
             handle_client,
             host=None,
             port=pagure.config.config['EVENTSOURCE_PORT'],
@@ -253,7 +253,7 @@ def main():
         log.info(
             'Serving server at {}'.format(SERVER.sockets[0].getsockname()))
         if pagure.config.config.get('EV_STATS_PORT'):
-            stats_coro = trololio.start_server(
+            stats_coro = trololio.asyncio.start_server(
                 stats,
                 host=None,
                 port=pagure.config.config.get('EV_STATS_PORT'),
