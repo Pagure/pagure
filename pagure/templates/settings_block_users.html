@@ -1,0 +1,58 @@
+
+<h3 class="font-weight-bold mb-3">
+    Block users
+</h3>
+<p>
+  You can block any users from interacting with your project. They will be able
+  to view but nothing more.
+</p>
+<form action="{{ url_for(
+  'api_ns.api_project_block_user',
+  repo=repo.name,
+  username=username,
+  namespace=repo.namespace) }}"
+    method="post" class="icon">
+    <div class="row">
+      <div class="col-sm-12">
+        <strong>Users</strong>
+      </div>
+    </div>
+  <div class="form-group settings-field-rows" id="blockusers-list">
+    <div class="row hidden blank-field">
+      <div class="col-sm-11" >
+        <input type="text" name="username"
+                value="" class="form-control"/>
+      </div>
+
+      <div class="col-sm-1">
+        <a href="javascript:void(0)" class="btn btn-outline-danger remove-settings-field-row"><i class="fa fa-trash"></i></a>
+      </div>
+    </div>
+    {% for user in repo.block_users | sort %}
+      <div class="row {{'hidden blank-field' if status == ''}}">
+        <div class="col-sm-11" >
+          <input type="text" name="username"
+                 value="{{ user }}" class="form-control"/>
+        </div>
+
+        <div class="col-sm-1">
+          <a href="javascript:void(0)" class="btn btn-outline-danger remove-settings-field-row"><i class="fa fa-trash"></i></a>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+  <a href="javascript:void(0)" class="btn btn-secondary pt-2 btn-sm btn-block add-settings-field-row" data-target="#blockusers-list">
+      <i class="fa fa-plus"></i> Add new user
+  </a>
+
+  <div class="row p-t-1">
+  </div>
+  <div class="row p-t-1">
+    <div class="col-sm-12">
+      <button class="btn btn-primary float-right mt-3 ajaxed" type="submit"
+          title="Update the blocked user">
+        Update
+      </button>
+    </div>
+  </div>
+</form>

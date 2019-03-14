@@ -79,6 +79,11 @@
           <a class="nav-item nav-link" id="regen" data-toggle="tab"
                 href="#regen-tab" role="tab" aria-controls="regen">Regenerate Repos</a>
 
+          {% if repo.user.user == g.fas_user.username or pagure_admin %}
+          <a class="nav-item nav-link" id="blockusers" data-toggle="tab"
+            href="#blockusers-tab" role="tab" aria-controls="blockusers">Block Users</a>
+          {% endif %}
+
           {% if config.get('ENABLE_GIVE_PROJECTS', True)
             and (repo.user.user == g.fas_user.username or pagure_admin)
             and not repo.is_fork %}
@@ -1034,6 +1039,10 @@
               </div>
           </div>
 
+          <div class="tab-pane fade" id="blockusers-tab" role="tabpanel" aria-labelledby="blockusers-tab">
+            {% include 'settings_block_users.html' %}
+          </div>
+
           {% if config.get('ENABLE_GIVE_PROJECTS', True)
           and (repo.user.user == g.fas_user.username or pagure_admin)
           and not repo.is_fork %}
@@ -1418,6 +1427,39 @@ $('#user').selectize({
   }
 });
 {% endif %}
+
+$('.ajaxed').click(function(e) {
+  _form = $(this).closest('form')
+  $.ajax({
+      url: _form.prop('action') ,
+      type: 'POST',
+      data: _form.serialize(),
+      dataType: 'json',
+      success: function(res) {
+        console.log(res);
+        if ( res.message ) {
+          var _html = '<div class="container pt-2">'
+              + '  <div class="alert alert-info border border-secondary bg-white alert-dismissible" role="alert">'
+              + '      <button type="button" class="close" data-dismiss="alert" aria-label="Close">'
+              + '      <span aria-hidden="true">×</span>'
+              + '      <span class="sr-only">Close</span>'
+              + '    </button>'
+              + '    <div class="text-info font-weight-bold">'
+              + '      <i class="fa fa-fw fa-info-circle"></i>' + res.message
+              + '    </div>'
+              + '  </div>'
+              + '</div>';
+          $('.bodycontent').prepend(_html)
+        }
+      },
+      error: function(res) {
+        console.log(res);
+        alert('Request failed');
+      }
+  });
+  return false;
+});
+
 </script>
 
 <script type="text/javascript">
