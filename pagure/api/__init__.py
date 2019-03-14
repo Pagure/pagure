@@ -531,6 +531,7 @@ def api():
     api_modify_project_options_doc = load_doc(
         project.api_modify_project_options
     )
+    api_project_block_user_doc = load_doc(project.api_project_block_user)
 
     issues = []
     if pagure_config.get("ENABLE_TICKETS", True):
@@ -620,6 +621,7 @@ def api():
             api_update_project_watchers_doc,
             api_get_project_options_doc,
             api_modify_project_options_doc,
+            api_project_block_user_doc,
         ],
         issues=issues,
         requests=[

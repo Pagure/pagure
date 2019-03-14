@@ -2146,3 +2146,91 @@ def api_project_create_api_token(repo, namespace=None, username=None):
 
     jsonout = flask.jsonify(output)
     return jsonout
+
+
+@API.route("/<repo>/blockuser", methods=["POST"])
+@API.route("/<namespace>/<repo>/blockuser", methods=["POST"])
+@API.route("/fork/<username>/<repo>/blockuser", methods=["POST"])
+@API.route("/fork/<username>/<namespace>/<repo>/blockuser", methods=["POST"])
+@api_login_required(acls=["modify_project"])
+@api_method
+def api_project_block_user(repo, namespace=None, username=None):
+    """
+    Block an user from a project
+    ----------------------------
+    Block an user from interacting with the project
+
+    This is restricted to project admins.
+
+    ::
+
+        POST /api/0/<repo>/blockuser
+        POST /api/0/<namespace>/<repo>/blockuser
+
+    ::
+
+        POST /api/0/fork/<username>/<repo>/blockuser
+        POST /api/0/fork/<username>/<namespace>/<repo>/blockuser
+
+
+    Input
+    ^^^^^
+
+    +------------------+---------+---------------+---------------------------+
+    | Key              | Type    | Optionality   | Description               |
+    +==================+=========+===============+===========================+
+    | ``username``     | String  | optional      | The username of the user  |
+    |                  |         |               | to block on this project  |
+    +------------------+---------+---------------+---------------------------+
+
+    Beware that this API endpoint updates **all** the users blocked in the
+    project, so if you are updating this list, do not submit just one username,
+    submit the updated list.
+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {"message": "User(s) blocked"}
+
+    """
+    output = {}
+
+    project = _get_repo(repo, username, namespace)
+    _check_token(project)
+
+    authorized_users = [project.user.username]
+    authorized_users.extend(
+        [user.user for user in project.access_users["admin"]]
+    )
+    if flask.g.fas_user.username not in authorized_users:
+        raise pagure.exceptions.APIError(
+            401, error_code=APIERROR.ENOTHIGHENOUGH
+        )
+
+    usernames = flask.request.form.getlist("username")
+
+    try:
+        users = set()
+        for user in usernames:
+            user = user.strip()
+            if user:
+                pagure.lib.query.get_user(flask.g.session, user)
+                users.add(user)
+        project.block_users = list(users)
+        flask.g.session.add(project)
+        flask.g.session.commit()
+        output = {"message": "User(s) blocked"}
+    except pagure.exceptions.PagureException as err:
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.ENOCODE, error=str(err)
+        )
+    except SQLAlchemyError as err:  # pragma: no cover
+        flask.g.session.rollback()
+        _log.exception(err)
+        raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
+
+    jsonout = flask.jsonify(output)
+    return jsonout
