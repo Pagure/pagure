@@ -11,7 +11,7 @@
         <div class="d-flex align-items-center mb-3">
           <h4 class="font-weight-bold mb-0">Starred {{ projectstring(plural=True) }}</h4>
           <span class="btn btn-outline-secondary disabled opacity-100 border-0 ml-auto font-weight-bold">{{
-              user.stars | length }} {{ projectstring(plural=(user.stars | length > 1)) }}s</span>
+              user.stars | length }} {{ projectstring(plural=(user.stars | length > 1)) }}</span>
         </div>
           {% if repos %}
             {{ render_repo_listing(repos)}}
