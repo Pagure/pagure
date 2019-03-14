@@ -45,6 +45,8 @@ class PagureFlaskApiProjectBlockuserTests(tests.SimplePagureTest):
         super(PagureFlaskApiProjectBlockuserTests, self).setUp()
 
         tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'repos'), bare=True)
         tests.create_tokens(self.session)
         tests.create_tokens_acl(self.session)
 
@@ -61,11 +63,17 @@ class PagureFlaskApiProjectBlockuserTests(tests.SimplePagureTest):
 
         project = pagure.lib.query.get_authorized_project(self.session, "test")
         self.assertEqual(project.block_users, [])
+        self.blocked_users = []
+
+        project = pagure.lib.query.get_authorized_project(self.session, "test2")
+        project.block_users = ["foo"]
+        self.session.add(project)
+        self.session.commit()
 
     def tearDown(self):
         """ Tears down the environment at the end of the tests. """
         project = pagure.lib.query.get_authorized_project(self.session, "test")
-        self.assertEqual(project.block_users, [])
+        self.assertEqual(project.block_users, self.blocked_users)
 
         super(PagureFlaskApiProjectBlockuserTests, self).tearDown()
 
@@ -162,46 +170,94 @@ class PagureFlaskApiProjectBlockuserTests(tests.SimplePagureTest):
             },
         )
 
-
-class PagureFlaskApiProjectBlockuserFilledTests(tests.SimplePagureTest):
-    """ Tests for the flask API of pagure for assigning a PR """
-
-    maxDiff = None
-
-    @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
-    @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
-    def setUp(self):
-        """ Set up the environnment, ran before every tests. """
-        super(PagureFlaskApiProjectBlockuserFilledTests, self).setUp()
-
-        tests.create_projects(self.session)
-        tests.create_tokens(self.session)
-        tests.create_tokens_acl(self.session)
-
-        project = pagure.lib.query.get_authorized_project(self.session, "test")
-        self.assertEqual(project.block_users, [])
-
-    def tearDown(self):
-        """ Tears down the environment at the end of the tests. """
-        project = pagure.lib.query.get_authorized_project(self.session, "test")
-        self.assertEqual(project.block_users, ["foo"])
-
-        super(PagureFlaskApiProjectBlockuserFilledTests, self).tearDown()
-
     def test_api_blockuser_with_data(self):
-        """ Test api_project_block_user method to block users.
+        """ Test api_pull_request_assign method when the project doesn't exist.
         """
+        self.blocked_users = ["foo"]
 
         headers = {"Authorization": "token aaabbbcccddd"}
         data = {"username": ["foo"]}
 
-        # No user blocked
+        # user blocked
         output = self.app.post(
             "/api/0/test/blockuser", headers=headers, data=data
         )
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(data, {"message": "User(s) blocked"})
+
+        # Second request, no changes
+        headers = {"Authorization": "token aaabbbcccddd"}
+        data = {"username": ["foo"]}
+
+        output = self.app.post(
+            "/api/0/test/blockuser", headers=headers, data=data
+        )
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(data, {"message": "User(s) blocked"})
+
+    def test_api_blockeduser_api(self):
+        """ Test doing a POST request to the API when the user is blocked.
+        """
+        self.blocked_users = ["pingou"]
+
+        headers = {"Authorization": "token aaabbbcccddd"}
+        data = {"username": ["pingou"]}
+
+        # user blocked
+        output = self.app.post(
+            "/api/0/test/blockuser", headers=headers, data=data
+        )
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(data, {"message": "User(s) blocked"})
+
+        # Second request, but user is blocked
+        headers = {"Authorization": "token aaabbbcccddd"}
+        data = {"username": ["foo"]}
+
+        output = self.app.post(
+            "/api/0/test/blockuser", headers=headers, data=data
+        )
+        self.assertEqual(output.status_code, 403)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                "error":"You have been blocked from this project",
+                "error_code":"EUBLOCKED"
+            }
+        )
+
+    def test_ui_new_issue_user_blocked(self):
+        """ Test doing a POST request to the UI when the user is blocked.
+        """
+
+        user = tests.FakeUser(username="foo")
+        with tests.user_set(self.app.application, user):
+
+            output = self.app.get('/test2/new_issue')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                'New Issue',
+                output.get_data(as_text=True))
+
+            csrf_token = self.get_csrf(output=output)
+
+            data = {
+                'title': 'Test issue',
+                'issue_content': 'We really should improve on this issue',
+                'status': 'Open',
+                'csrf_token': csrf_token,
+            }
+
+            output = self.app.post('/test2/new_issue', data=data)
+            self.assertEqual(output.status_code, 403)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<p>You have been blocked from this project</p>',
+                output_text)
 
 
 if __name__ == "__main__":

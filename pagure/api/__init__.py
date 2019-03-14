@@ -121,6 +121,7 @@ class APIERROR(enum.Enum):
     )
     ETRACKERREADONLY = "The issue tracker of this project is read-only"
     ENOPRSTATS = "No statistics could be computed for this PR"
+    EUBLOCKED = "You have been blocked from this project"
 
 
 def get_authorized_api_project(session, repo, user=None, namespace=None):
@@ -151,6 +152,37 @@ def api_login_required(acls=None):
             response = check_api_acls(acls)
             if response:
                 return response
+
+            # Block all POST request from blocked users
+            if flask.request.method == "POST":
+                # Retrieve the variables in the URL
+                url_args = flask.request.view_args or {}
+                # Check if there is a `repo` and an `username`
+                repo = url_args.get("repo")
+                username = url_args.get("username")
+                namespace = url_args.get("namespace")
+
+                if repo:
+                    flask.g.repo = pagure.lib.query.get_authorized_project(
+                        flask.g.session,
+                        repo,
+                        user=username,
+                        namespace=namespace,
+                    )
+
+                    if (
+                        flask.g.repo
+                        and flask.g.fas_user.username
+                        in flask.g.repo.block_users
+                    ):
+                        output = {
+                            "error": APIERROR.EUBLOCKED.value,
+                            "error_code": APIERROR.EUBLOCKED.name,
+                        }
+                        response = flask.jsonify(output)
+                        response.status_code = 403
+                        return response
+
             return function(*args, **kwargs)
 
         return decorated_function

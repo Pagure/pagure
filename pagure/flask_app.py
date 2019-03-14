@@ -305,6 +305,11 @@ def set_request():
                 flask.g.session, flask.g.repo, user=flask.g.fas_user.username
             )
 
+            # Block all POST request from blocked users
+            if flask.g.repo and flask.request.method != "GET":
+                if flask.g.fas_user.username in flask.g.repo.block_users:
+                    flask.abort(403, "You have been blocked from this project")
+
         if (
             not flask.g.repo
             and namespace
