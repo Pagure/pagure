@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2015-2018 - Copyright Red Hat Inc
+ (c) 2015-2019 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -34,6 +34,7 @@ from pagure.api import (
     get_page,
     get_per_page,
 )
+from pagure.api.utils import _get_repo, _check_token
 from pagure.config import config as pagure_config
 
 
@@ -96,11 +97,7 @@ def api_git_tags(repo, username=None, namespace=None):
         flask.request.values.get("with_commits", False)
     )
 
-    repo = get_authorized_api_project(
-        flask.g.session, repo, user=username, namespace=namespace
-    )
-    if repo is None:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
+    repo = _get_repo(repo, username, namespace)
 
     tags = pagure.lib.git.get_git_tags(repo, with_commits=with_commits)
 
@@ -144,11 +141,7 @@ def api_project_watchers(repo, username=None, namespace=None):
             }
         }
     """
-    repo = get_authorized_api_project(
-        flask.g.session, repo, user=username, namespace=namespace
-    )
-    if repo is None:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
+    repo = _get_repo(repo, username, namespace)
 
     implicit_watch_users = set([repo.user.username])
     for access_type in repo.access_users:
@@ -235,13 +228,9 @@ def api_project_git_urls(repo, username=None, namespace=None):
             }
         }
     """
-    repo = get_authorized_api_project(
-        flask.g.session, repo, user=username, namespace=namespace
-    )
-    if repo is None:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
-    git_urls = {}
+    repo = _get_repo(repo, username, namespace)
 
+    git_urls = {}
     git_url_ssh = pagure_config.get("GIT_URL_SSH")
     if pagure.utils.api_authenticated() and git_url_ssh:
         try:
@@ -293,11 +282,7 @@ def api_git_branches(repo, username=None, namespace=None):
         }
 
     """
-    repo = get_authorized_api_project(
-        flask.g.session, repo, user=username, namespace=namespace
-    )
-    if repo is None:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
+    repo = _get_repo(repo, username, namespace)
 
     branches = pagure.lib.git.get_git_branches(repo)
 
@@ -632,16 +617,11 @@ def api_project(repo, username=None, namespace=None):
         }
 
     """
-    repo = get_authorized_api_project(
-        flask.g.session, repo, user=username, namespace=namespace
-    )
+    repo = _get_repo(repo, username, namespace)
 
     expand_group = pagure.utils.is_true(
         flask.request.values.get("expand_group", False)
     )
-
-    if repo is None:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
     output = repo.to_json(api=True, public=True)
 
@@ -904,14 +884,8 @@ def api_modify_project(repo, namespace=None):
         }
 
     """
-    project = get_authorized_api_project(
-        flask.g.session, repo, namespace=namespace
-    )
-    if not project:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
-
-    if flask.g.token.project and project != flask.g.token.project:
-        raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
+    project = _get_repo(repo, namespace=namespace)
+    _check_token(project, project_token=False)
 
     is_site_admin = pagure.utils.is_admin()
     admins = [u.username for u in project.get_project_users("admin")]
@@ -1145,14 +1119,8 @@ def api_generate_acls(repo, username=None, namespace=None):
         }
 
     """
-    project = get_authorized_api_project(
-        flask.g.session, repo, namespace=namespace
-    )
-    if not project:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
-
-    if flask.g.token.project and project != flask.g.token.project:
-        raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
+    project = _get_repo(repo, username, namespace)
+    _check_token(project, project_token=False)
 
     # Check if it's JSON or form data
     if flask.request.headers.get("Content-Type") == "application/json":
@@ -1230,14 +1198,8 @@ def api_new_branch(repo, username=None, namespace=None):
         }
 
     """
-    project = get_authorized_api_project(
-        flask.g.session, repo, namespace=namespace
-    )
-    if not project:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
-
-    if flask.g.token.project and project != flask.g.token.project:
-        raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
+    project = _get_repo(repo, username, namespace)
+    _check_token(project, project_token=False)
 
     # Check if it's JSON or form data
     if flask.request.headers.get("Content-Type") == "application/json":
@@ -1341,11 +1303,7 @@ def api_commit_flags(repo, commit_hash, username=None, namespace=None):
         }
 
     """
-    repo = get_authorized_api_project(
-        flask.g.session, repo, user=username, namespace=namespace
-    )
-    if repo is None:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
+    repo = _get_repo(repo, username, namespace)
 
     reponame = pagure.utils.get_repo_path(repo)
     repo_obj = Repository(reponame)
@@ -1476,17 +1434,10 @@ def api_commit_add_flag(repo, commit_hash, username=None, namespace=None):
 
     """  # noqa
 
-    repo = get_authorized_api_project(
-        flask.g.session, repo, user=username, namespace=namespace
-    )
+    repo = _get_repo(repo, username, namespace)
+    _check_token(repo, project_token=False)
 
     output = {}
-
-    if repo is None:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
-
-    if flask.g.token.project and repo != flask.g.token.project:
-        raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
 
     reponame = pagure.utils.get_repo_path(repo)
     repo_obj = Repository(reponame)
@@ -1618,14 +1569,8 @@ def api_update_project_watchers(repo, username=None, namespace=None):
         }
     """
 
-    project = get_authorized_api_project(
-        flask.g.session, repo, namespace=namespace
-    )
-    if not project:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
-
-    if flask.g.token.project and project != flask.g.token.project:
-        raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
+    project = _get_repo(repo, username, namespace)
+    _check_token(project)
 
     # Get the input submitted
     data = get_request_data()
@@ -1773,14 +1718,9 @@ def api_modify_acls(repo, namespace=None, username=None):
 
     """
     output = {}
-    project = get_authorized_api_project(
-        flask.g.session, repo, namespace=namespace
-    )
-    if not project:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
-    if flask.g.token.project and project != flask.g.token.project:
-        raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
+    project = _get_repo(repo, username, namespace)
+    _check_token(project, project_token=False)
 
     form = pagure.forms.ModifyACLForm(csrf_enabled=False)
     if form.validate_on_submit():
@@ -1956,14 +1896,8 @@ def api_get_project_options(repo, username=None, namespace=None):
         }
 
     """
-    project = get_authorized_api_project(
-        flask.g.session, repo, namespace=namespace
-    )
-    if not project:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
-
-    if flask.g.token.project and project != flask.g.token.project:
-        raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
+    project = _get_repo(repo, username, namespace)
+    _check_token(project, project_token=False)
 
     return flask.jsonify({"settings": project.settings, "status": "ok"})
 
@@ -2015,14 +1949,8 @@ def api_get_project_connector(repo, username=None, namespace=None):
         }
 
     """
-    project = get_authorized_api_project(
-        flask.g.session, repo, namespace=namespace
-    )
-    if not project:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
-
-    if flask.g.token.project and project != flask.g.token.project:
-        raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
+    project = _get_repo(repo, username, namespace)
+    _check_token(project, project_token=False)
 
     authorized_users = [project.user.username]
     authorized_users.extend(
@@ -2105,14 +2033,8 @@ def api_modify_project_options(repo, username=None, namespace=None):
         }
 
     """
-    project = get_authorized_api_project(
-        flask.g.session, repo, namespace=namespace
-    )
-    if not project:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
-
-    if flask.g.token.project and project != flask.g.token.project:
-        raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
+    project = _get_repo(repo, username, namespace)
+    _check_token(project, project_token=False)
 
     settings = {}
     for key in flask.request.form:
@@ -2194,14 +2116,9 @@ def api_project_create_api_token(repo, namespace=None, username=None):
 
     """
     output = {}
-    project = get_authorized_api_project(
-        flask.g.session, repo, namespace=namespace
-    )
-    if not project:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
-    if flask.g.token.project and project != flask.g.token.project:
-        raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
+    project = _get_repo(repo, username, namespace)
+    _check_token(project, project_token=False)
 
     authorized_users = [project.user.username]
     authorized_users.extend(
