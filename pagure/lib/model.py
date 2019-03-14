@@ -377,6 +377,7 @@ class Project(BASE):
     _reports = sa.Column(sa.Text, nullable=True)
     _notifications = sa.Column(sa.Text, nullable=True)
     _close_status = sa.Column(sa.Text, nullable=True)
+    _block_users = sa.Column(sa.Text, nullable=True)
     mirrored_from = sa.Column(sa.Text, nullable=True)
     mirrored_from_last_log = sa.Column(sa.Text, nullable=True)
 
@@ -719,6 +720,23 @@ class Project(BASE):
     def priorities(self, priorities):
         """ Ensures the priorities are properly saved. """
         self._priorities = json.dumps(priorities)
+
+    @property
+    def block_users(self):
+        """ Return the dict stored as string in the database as an actual
+        dict object.
+        """
+        block_users = []
+
+        if self._block_users:
+            block_users = json.loads(self._block_users)
+
+        return block_users
+
+    @block_users.setter
+    def block_users(self, block_users):
+        """ Ensures the block_users are properly saved. """
+        self._block_users = json.dumps(block_users)
 
     @property
     def quick_replies(self):
