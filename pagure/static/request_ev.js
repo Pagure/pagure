@@ -91,13 +91,13 @@ add_comment = function(data, username) {
 
     //add comment to comments tab
     var cfield = $('#request_comment');
-    cfield.html(cfield.html() + _data);
+    cfield.append(_data);
 
   } else {
     // Generic comment
     console.log('generic');
     var field = $('#request_comment');
-    field.html(field.html() + _data);
+    field.append(_data);
   }
 }
 
