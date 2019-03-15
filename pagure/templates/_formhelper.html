@@ -129,7 +129,7 @@
             comment.date_created | format_datetime
             }}">commented
             {% if PRinline %}
-            on <a href="#c-{{ comment.commit_id }}-{{ comment.line }}"
+            on line <a href="#c-{{ comment.commit_id }}-{{ comment.line }}"
                         onclick="showTab()">{{
                         comment.line }} of {{ comment.filename }}</a>
             {% endif %}
