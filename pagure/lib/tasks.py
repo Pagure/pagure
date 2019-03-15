@@ -471,26 +471,22 @@ def fork(
         )
 
         with pagure.lib.git.TemporaryClone(
-            repo_to, "main", "fork"
+            repo_from, "main", "fork"
         ) as tempclone:
-            fork_repo = tempclone.repo
-
-            fork_repo.remotes.create("forkedfrom", repo_from.repopath("main"))
-            fork_repo.remotes["forkedfrom"].fetch()
-
-            for branchname in fork_repo.branches.remote:
-                if not branchname.startswith("forkedfrom/"):
-                    continue
-                localname = branchname.replace("forkedfrom/", "")
-                if localname == "HEAD":
-                    # HEAD will be created automatically as a symref
-                    continue
-                tempclone.push(
-                    "pagure",
-                    "remotes/%s" % branchname,
-                    "refs/heads/%s" % localname,
-                    internal_no_hooks="yes",
-                )
+            for branchname in tempclone.repo.branches.remote:
+                if (
+                    branchname.startswith("origin/")
+                    and branchname != "origin/HEAD"
+                ):
+                    locbranch = branchname[len("origin/") :]
+                    if locbranch in tempclone.repo.branches.local:
+                        continue
+                    branch = tempclone.repo.branches.remote.get(branchname)
+                    tempclone.repo.branches.local.create(
+                        locbranch, branch.peel()
+                    )
+            tempclone.change_project_association(repo_to)
+            tempclone.mirror("pagure", internal_no_hooks="yes")
 
         if not repo_to.is_on_repospanner and not repo_to.private:
             # Create the git-daemon-export-ok file on the clone

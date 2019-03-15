@@ -996,6 +996,36 @@ class TemporaryClone(object):
         """ Exit the context manager, removing the temorary clone. """
         shutil.rmtree(self.repopath)
 
+    def change_project_association(self, new_project):
+        """ Make this instance "belong" to another project.
+
+        This is useful when you want to create TemporaryClone of one project
+        and then push some of its content into a different project just
+        by running ``push`` or ``mirror`` methods.
+
+        Args:
+            new_project (pagure.lib.model.Project): project to associate
+                this TemporaryClone instance with
+        """
+        self._project = new_project
+        if not new_project.is_on_repospanner:
+            self.repo.remotes.set_push_url(
+                "origin", new_project.repopath("main")
+            )
+
+    def mirror(self, username, force=False, **extra):
+        """ Run ``git push --mirror`` of the repo to its origin.
+
+        Args:
+            username (string): The user on who's account this push is
+            force (bool): whether or not to use ``--force`` when pushing
+            extra (dict): Extra fields passed to the remote side. Either via
+                environment variables, or as X-Extra-<key> HTTP headers.
+        """
+        # git push --mirror fails if there are no branches
+        if len(list(self.repo.branches)) > 0:
+            self._push(username, "--mirror", force, **extra)
+
     def push(self, username, sbranch, tbranch=None, force=False, **extra):
         """ Push the repo back to its origin.
 
@@ -1003,11 +1033,23 @@ class TemporaryClone(object):
             username (string): The user on who's account this push is
             sbranch (string): Source branch to push
             tbranch (string): Target branch if different from sbranch
+            force (bool): whether or not to use ``--force`` when pushing
             extra (dict): Extra fields passed to the remote side. Either via
                 environment variables, or as X-Extra-<key> HTTP headers.
         """
         pushref = "%s:%s" % (sbranch, tbranch if tbranch else sbranch)
+        self._push(username, pushref, force, **extra)
 
+    def _push(self, username, pushref, force, **extra):
+        """ Push the repo back to its origin.
+
+        Args:
+            username (string): The user on who's account this push is
+            pushref(string): either ``<sbranch>:<tbranch>`` or ``--mirror``
+            force (bool): whether or not to use ``--force`` when pushing
+            extra (dict): Extra fields passed to the remote side. Either via
+                environment variables, or as X-Extra-<key> HTTP headers.
+        """
         if "pull_request" in extra:
             extra["pull_request_uid"] = extra["pull_request"].uid
             del extra["pull_request"]
