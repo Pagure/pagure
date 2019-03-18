@@ -42,7 +42,11 @@ def process_jenkins_build(session, project, build_id, iteration=0):
 
     # Jenkins Base URL
     _log.info("Querying jenkins at: %s", project.ci_hook.ci_url)
-    jenk = jenkins.Jenkins(project.ci_hook.ci_url)
+    jenk = jenkins.Jenkins(
+        project.ci_hook.ci_url,
+        username=project.ci_hook.ci_username or None,
+        password=project.ci_hook.ci_password or None,
+    )
     jenkins_name = project.ci_hook.ci_job
     _log.info(
         "Querying jenkins for project: %s, build: %s", jenkins_name, build_id
@@ -130,7 +134,15 @@ def process_jenkins_build(session, project, build_id, iteration=0):
 
 
 def trigger_jenkins_build(
-    project_path, url, job, token, branch, branch_to, cause
+    project_path,
+    url,
+    job,
+    token,
+    branch,
+    branch_to,
+    cause,
+    ci_username=None,
+    ci_password=None,
 ):
     """ Trigger a build on a jenkins instance."""
     try:
@@ -150,7 +162,9 @@ def trigger_jenkins_build(
         "BRANCH_TO": branch_to,
     }
 
-    server = jenkins.Jenkins(url)
+    server = jenkins.Jenkins(
+        url, username=ci_username or None, password=ci_password or None
+    )
     _log.info(
         "Pagure-CI: Triggering at: %s for: %s - data: %s", url, job, data
     )

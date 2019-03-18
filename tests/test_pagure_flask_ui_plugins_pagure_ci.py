@@ -6,6 +6,12 @@ import unittest
 import sys
 import os
 
+import mock
+
+sys.path.insert(0, os.path.join(os.path.dirname(
+    os.path.abspath(__file__)), '..'))
+
+import pagure.lib.tasks_services
 import tests
 
 
@@ -276,6 +282,101 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
             self.assertIn(
                 '<pre>\nhttp://localhost.localdomain/api/0/ci/jenkins/somenamespace/test3/',
                 output_text)
+
+    @mock.patch('pagure.lib.tasks_services.trigger_jenkins_build')
+    def test_plugin_pagure_ci_namespaced_auth(self, trigger_jenk):
+        """ Test the pagure ci plugin on/off endpoint. """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'))
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(self.app.application, user):
+            output = self.app.get('/somenamespace/test3/settings/Pagure CI')
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>Settings Pagure CI - somenamespace/test3 - '
+                'Pagure</title>', output_text)
+            self.assertIn(
+                '<label for="ci_url">URL to the project on the CI '
+                'service</label>', output_text)
+            self.assertIn(
+                '<label for="ci_job">Name of the job to trigger'
+                '</label>', output_text)
+            self.assertIn(
+                '<input class="form-check-input mt-2" id="active_pr" name="active_pr" '
+                'type="checkbox" value="y">', output_text)
+
+            csrf_token = output_text.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            # Activate hook
+            data = {
+                'active_pr': 'y',
+                'ci_url': 'https://jenkins.fedoraproject.org',
+                'ci_job': 'test/job',
+                'ci_type': 'jenkins',
+                'ci_username': 'jenkins_username',
+                'ci_password': 'jenkins_password',
+                'csrf_token': csrf_token,
+            }
+
+            # Activate hook
+            output = self.app.post(
+                '/somenamespace/test3/settings/Pagure CI', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
+            self.assertIn(
+                '<title>Settings - somenamespace/test3 - Pagure</title>',
+                output_text)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">'
+                'Project Settings</h5>\n', output_text)
+            self.assertIn(
+                'Hook Pagure CI activated',
+                output_text)
+
+            output = self.app.get('/somenamespace/test3/settings/Pagure CI')
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<title>Settings Pagure CI - somenamespace/test3 - '
+                'Pagure</title>', output_text)
+            self.assertIn(
+                '<label for="ci_url">URL to the project on the CI '
+                'service</label>', output_text)
+            self.assertIn(
+                '<label for="ci_job">Name of the job to trigger'
+                '</label>', output_text)
+            self.assertIn(
+                '<input checked class="form-check-input mt-2" id="active_pr" name="active_pr" '
+                'type="checkbox" value="y">', output_text)
+            self.assertIn(
+                '<pre>\nhttp://localhost.localdomain/api/0/ci/jenkins/somenamespace/test3/',
+                output_text)
+
+        output = pagure.lib.tasks_services.trigger_ci_build(
+            project_name='somenamespace/test3',
+            cause='PR#ID',
+            branch='feature',
+            branch_to='master',
+            ci_type='jenkins')
+        self.assertIsNone(output)
+        trigger_jenk.assert_called_once_with(
+           branch=u'feature',
+           cause=u'PR#ID',
+           ci_password="jenkins_password",
+           ci_username="jenkins_username",
+           job=u'test/job',
+           project_path=u'somenamespace/test3.git',
+           token=mock.ANY,
+           url=u'https://jenkins.fedoraproject.org',
+           branch_to='master',
+        )
 
 
 if __name__ == '__main__':

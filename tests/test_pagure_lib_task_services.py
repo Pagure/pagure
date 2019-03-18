@@ -587,6 +587,8 @@ class PagureLibTaskServicesJenkinsCItests(tests.Modeltests):
         trigger_jenk.assert_called_once_with(
            branch=u'feature',
            cause=u'PR#ID',
+           ci_password=None,
+           ci_username=None,
            job=u'pagure',
            project_path=u'test.git',
            token=u'random_token',
@@ -607,6 +609,118 @@ class PagureLibTaskServicesJenkinsCItests(tests.Modeltests):
         trigger_jenk.assert_called_once_with(
            branch=u'feature',
            cause=u'PR#ID',
+           ci_password=None,
+           ci_username=None,
+           job=u'pagure',
+           project_path=u'forks/foo/test.git',
+           token=u'random_token',
+           url=u'https://ci.server.org/',
+           branch_to='master',
+        )
+
+
+class PagureLibTaskServicesJenkinsCIAuthtests(tests.Modeltests):
+    """ Tests for pagure.lib.task_services """
+
+    maxDiff = None
+
+    def setUp(self):
+        """ Set up the environnment, ran before every tests. """
+        super(PagureLibTaskServicesJenkinsCIAuthtests, self).setUp()
+
+        pagure.config.config['REQUESTS_FOLDER'] = None
+        self.sshkeydir = os.path.join(self.path, 'sshkeys')
+        pagure.config.config['MIRROR_SSHKEYS_FOLDER'] = self.sshkeydir
+
+        tests.create_projects(self.session)
+        project = pagure.lib.query.get_authorized_project(self.session, 'test')
+
+        # Install the plugin at the DB level
+        plugin = pagure.lib.plugins.get_plugin('Pagure CI')
+        dbobj = plugin.db_object()
+        dbobj.ci_url = 'https://ci.server.org/'
+        dbobj.ci_job = 'pagure'
+        dbobj.ci_username = 'jenkins_username'
+        dbobj.ci_password = 'jenkins_password'
+        dbobj.pagure_ci_token = 'random_token'
+        dbobj.project_id = project.id
+        self.session.add(dbobj)
+        self.session.commit()
+
+        # Create a fork of test for foo
+        item = pagure.lib.model.Project(
+            user_id=2,  # foo
+            name='test',
+            is_fork=True,
+            parent_id=1,
+            description='test project #1',
+            hook_token='aaabbbccc_foo',
+        )
+        item.close_status = ['Invalid', 'Insufficient data', 'Fixed', 'Duplicate']
+        self.session.add(item)
+        self.session.commit()
+
+    @patch('pagure.lib.tasks_services.trigger_jenkins_build')
+    def test_trigger_ci_build_invalid_ci(self, trigger_jenk):
+        """ Test the trigger_ci_build method. """
+        output = pagure.lib.tasks_services.trigger_ci_build(
+            project_name='test',
+            cause='PR#ID',
+            branch='feature',
+            branch_to='master',
+            ci_type='travis')
+        self.assertIsNone(output)
+        trigger_jenk.assert_not_called()
+
+    @patch('pagure.lib.tasks_services.trigger_jenkins_build')
+    def test_trigger_ci_build_invalid_ci_fork(self, trigger_jenk):
+        """ Test the trigger_ci_build method. """
+        output = pagure.lib.tasks_services.trigger_ci_build(
+            project_name='forks/foo/test',
+            cause='PR#ID',
+            branch='feature',
+            branch_to='master',
+            ci_type='travis')
+        self.assertIsNone(output)
+        trigger_jenk.assert_not_called()
+
+    @patch('pagure.lib.tasks_services.trigger_jenkins_build')
+    def test_trigger_ci_build_valid_project(self, trigger_jenk):
+        """ Test the trigger_ci_build method. """
+        output = pagure.lib.tasks_services.trigger_ci_build(
+            project_name='test',
+            cause='PR#ID',
+            branch='feature',
+            branch_to='master',
+            ci_type='jenkins')
+        self.assertIsNone(output)
+        trigger_jenk.assert_called_once_with(
+           branch=u'feature',
+           cause=u'PR#ID',
+           ci_password="jenkins_password",
+           ci_username="jenkins_username",
+           job=u'pagure',
+           project_path=u'test.git',
+           token=u'random_token',
+           url=u'https://ci.server.org/',
+           branch_to='master',
+        )
+
+    @patch('pagure.lib.tasks_services.trigger_jenkins_build')
+    def test_trigger_ci_build_valid_project_fork(self, trigger_jenk):
+        """ Test the trigger_ci_build method. """
+        output = pagure.lib.tasks_services.trigger_ci_build(
+            project_name='forks/foo/test',
+            cause='PR#ID',
+            branch='feature',
+            branch_to='master',
+            ci_type='jenkins')
+        self.assertIsNone(output)
+        trigger_jenk.assert_called_once_with(
+           branch=u'feature',
+           cause=u'PR#ID',
+           ci_password="jenkins_password",
+           ci_username="jenkins_username",
            job=u'pagure',
            project_path=u'forks/foo/test.git',
            token=u'random_token',

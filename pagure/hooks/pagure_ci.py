@@ -46,6 +46,8 @@ class PagureCITable(BASE):
     ci_type = sa.Column(sa.String(255), nullable=True)
     ci_url = sa.Column(sa.String(255), nullable=True, unique=False)
     ci_job = sa.Column(sa.String(255), nullable=True, unique=False)
+    ci_username = sa.Column(sa.String(255), nullable=True, unique=False)
+    ci_password = sa.Column(sa.String(255), nullable=True, unique=False)
     active = sa.Column(sa.Boolean, nullable=False, default=False)
     active_commit = sa.Column(sa.Boolean, nullable=False, default=False)
     active_pr = sa.Column(sa.Boolean, nullable=False, default=False)
@@ -112,6 +114,16 @@ class PagureCiForm(FlaskForm):
             RequiredIf(["active_commit", "active_pr"]),
             wtforms.validators.Length(max=255),
         ],
+    )
+
+    ci_username = wtforms.StringField(
+        "Username to authenticate with if needed",
+        [wtforms.validators.Optional(), wtforms.validators.Length(max=255)],
+    )
+
+    ci_password = wtforms.StringField(
+        "Password to authenticate with if needed",
+        [wtforms.validators.Optional(), wtforms.validators.Length(max=255)],
     )
 
     ci_job = wtforms.StringField(

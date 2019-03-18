@@ -463,23 +463,20 @@ def trigger_ci_build(
 
     if ci_type == "jenkins":
 
+        jenk_project = project
         if project.is_fork:
-            url = project.parent.ci_hook.ci_url
-            job = project.parent.ci_hook.ci_job
-            token = project.parent.ci_hook.pagure_ci_token
-        else:
-            url = project.ci_hook.ci_url
-            job = project.ci_hook.ci_job
-            token = project.ci_hook.pagure_ci_token
+            jenk_project = project.parent
 
         trigger_jenkins_build(
             project_path=project.path,
-            url=url,
-            job=job,
-            token=token,
+            url=jenk_project.ci_hook.ci_url,
+            job=jenk_project.ci_hook.ci_job,
+            token=jenk_project.ci_hook.pagure_ci_token,
             branch=branch,
             branch_to=branch_to,
             cause=cause,
+            ci_username=jenk_project.ci_hook.ci_username,
+            ci_password=jenk_project.ci_hook.ci_password,
         )
 
     else:
