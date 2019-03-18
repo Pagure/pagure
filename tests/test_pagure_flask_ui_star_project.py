@@ -194,7 +194,7 @@ class TestStarProjectUI(tests.SimplePagureTest):
         )
         self.assertIn(
             '<span class="btn btn-outline-secondary disabled opacity-100 '
-            'border-0 ml-auto font-weight-bold">0 Projects</span>',
+            'border-0 ml-auto font-weight-bold">0 Project</span>',
             output_text)
 
         # make pingou star the project
@@ -224,7 +224,7 @@ class TestStarProjectUI(tests.SimplePagureTest):
         )
         self.assertIn(
             '<span class="btn btn-outline-secondary disabled opacity-100 '
-            'border-0 ml-auto font-weight-bold">1 Projects</span>',
+            'border-0 ml-auto font-weight-bold">1 Project</span>',
             output_text)
         self.assertEqual(
             output_text.count('class="list-group-item"'), 1)
@@ -264,7 +264,7 @@ class TestStarProjectUI(tests.SimplePagureTest):
         )
         self.assertIn(
             '<span class="btn btn-outline-secondary disabled opacity-100 '
-            'border-0 ml-auto font-weight-bold">0 Projects</span>',
+            'border-0 ml-auto font-weight-bold">0 Project</span>',
             output_text)
         self.assertEqual(
             output_text.count('class="list-group-item"'), 0)
