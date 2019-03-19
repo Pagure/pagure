@@ -35,7 +35,15 @@
           {% endif %}
           {{ render_bootstrap_field(
               form.description, field_description="Small description of this API token") }}
-          <strong><label for="acls">ACLs</label></strong>
+          <strong><label for="acls">ACLs</label></strong><br/>
+          <script type="text/javascript">
+          function toggle() {
+              var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+              for (var i = 0; i < checkboxes.length; i++) {
+                  checkboxes[i].checked = !checkboxes[i]checked;
+              }
+          }
+          </script>
           {% for acl in acls %}
           <div>
             <label class="c-input c-checkbox">
@@ -55,7 +63,7 @@
             <a class="btn btn-secondary" href="{{ url_for('ui_ns.user_settings')
                 }}#nav-api-tab">Cancel</a>
             {% endif %}
-
+            <span class="btn" onclick="toggle()">Toggle all</span>
             {{ form.csrf_token }}
           </div>
         </form>
