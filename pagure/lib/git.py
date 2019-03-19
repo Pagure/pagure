@@ -1828,7 +1828,7 @@ def rebase_pull_request(request, username):
     Raises: pagure.exceptions.PagureException
 
     """
-    _log.info("%s asked to rebased the pull-request: %s", username, request)
+    _log.info("%s asked to rebase the pull-request: %s", username, request)
 
     if request.remote:
         # Get the fork
