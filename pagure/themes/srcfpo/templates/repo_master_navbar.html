@@ -1,0 +1,130 @@
+<ul class="nav nav-tabs nav-small border-bottom-0">
+  <li class="nav-item mr-2 text-dark">
+    <a {%
+      if select in ['overview', 'commits', 'tree', 'tags', 'branches', 'forks'] %}class="nav-link active" {%
+      else %}class="nav-link" {%
+      endif %}href="{{ url_for(
+          'ui_ns.view_repo',
+          repo=repo.name,
+          username=username,
+          namespace=repo.namespace) }}">
+        <i class="fa fa-code fa-fw text-muted"></i>
+        <span class="d-none d-md-inline">Source</span>
+    </a>
+  </li>
+    {% if config['DOC_APP_URL'] and repo and repo.settings.get('project_documentation', True) %}
+    <li class="nav-item mr-2 text-dark" >
+      <a  {%
+        if select == 'docs' %}class="active nav-link" {%
+        else %}class="nav-link" {%
+        endif %}href="{{ url_for(
+            'ui_ns.view_docs',
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace) }}">
+          <i class="fa fa-book fa-fw text-muted"></i>
+          <span class="d-none d-md-inline">Docs</span>
+      </a>
+    </li>
+    {% endif %}
+
+    {% if g.issues_enabled %}
+    <li class="nav-item mr-2 text-dark">
+        <a {%
+          if select == 'issues' %}class="active nav-link" {%
+          else %}class="nav-link" {%
+          endif %}href="{{ url_for(
+              'ui_ns.view_issues',
+              repo=repo.name,
+              username=username,
+              namespace=repo.namespace) }}">
+            <i class="fa fa-fw text-muted fa-exclamation-circle"></i>
+            <span class="d-none d-md-inline">Issues&nbsp;</span>
+            <span class="badge badge-secondary py-0 d-none d-md-inline">
+              {{ repo.open_tickets if g.repo_committer else repo.open_tickets_public }}
+            </span>
+        </a>
+    </li>
+    {% endif %}
+
+    {% if repo and repo.settings.get('pull_requests', True) %}
+    <li class="nav-item mr-2 text-dark">
+      <a {%
+        if select == 'requests' %}class="active nav-link" {%
+        else %}class="nav-link" {%
+        endif %}href="{{ url_for(
+            'ui_ns.request_pulls',
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace) }}">
+          <i class="fa fa-fw text-muted fa-arrow-circle-down"></i>
+          <span class="d-none d-md-inline">Pull Requests&nbsp;</span>
+          <span class="badge badge-secondary py-0 d-none d-md-inline">
+            {{ repo.open_requests }}
+          </span>
+      </a>
+    </li>
+    {% endif %}
+
+    {% if g.issues_enabled and repo.milestones %}
+    <li class="nav-item mr-2 text-dark">
+    <a {%
+        if select == 'roadmap' %}class="active nav-link" {%
+        else %}class="nav-link" {%
+        endif %} href="{{ url_for(
+        'ui_ns.view_roadmap',
+        repo=repo.name,
+        username=username,
+        namespace=repo.namespace) }}"
+      class="btn btn-outline-dark btn-sm">
+      <i class="fa fa-fw text-muted fa-map-signs"></i>
+      <span class="d-none d-md-inline">Roadmap&nbsp;</span>
+    </a>
+    </li>
+    {% endif %}
+
+    <li class="nav-item mr-2 text-dark">
+      <a {%
+        if select == 'stats' %}class="active nav-link" {%
+        else %}class="nav-link" {%
+        endif %}href="{{ url_for(
+            'ui_ns.view_stats',
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace) }}">
+          <i class="fa fa-line-chart fa-fw text-muted"></i>
+          <span class="d-none d-md-inline">Stats</span>
+      </a>
+    </li>
+
+  {% if g.authenticated %}
+    {% if g.repo_admin %}
+      <li class="nav-item mr-2 text-dark">
+        <a title="Settings" {%
+          if select == 'settings' %}class="active nav-link" {%
+          else %}class="nav-link" {%
+          endif %}href="{{ url_for(
+              'ui_ns.view_settings',
+              repo=repo.name,
+              username=username,
+              namespace=repo.namespace) }}">
+            <i class="fa fa-cogs fa-fw text-muted"></i>
+            <span class="d-none d-md-inline">Settings</span>
+        </a>
+      </li>
+    {% endif %}
+  {% endif %}
+  {% if endpoint == 'view_docs' %}
+  <li class="nav-item pull-xs-right">
+    <a class="nav-link" href="{{ config['DOC_APP_URL'] + url_for(
+        'ui_ns.view_repo',
+        repo=repo.namespace + '.' + repo.name if repo.namespace else repo.name,
+        username=username,
+        filename=filename)
+      }}" target="_blank" title="Open to a new tab" rel="noopener noreferrer">
+      <span class="fa fa-external-link"></span>
+    </a>
+  </li>
+  {% endif %}
+
+</ul>
