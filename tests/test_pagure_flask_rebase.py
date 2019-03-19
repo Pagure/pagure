@@ -45,7 +45,10 @@ class PagureRebasetests(tests.Modeltests):
             os.path.join(self.path, 'requests'), bare=True)
         tests.add_content_to_git(
             os.path.join(self.path, 'repos', 'test.git'),
-            branch='test', content="foobar")
+            branch='master', content="foobarbaz", filename="testfile")
+        tests.add_content_to_git(
+            os.path.join(self.path, 'repos', 'test.git'),
+            branch='test', content="foobar", filename="sources")
         tests.add_readme_git_repo(
             os.path.join(self.path, 'repos', 'test.git'))
 
@@ -144,6 +147,22 @@ class PagureRebasetests(tests.Modeltests):
 
         user = tests.FakeUser(username='pingou')
         with tests.user_set(self.app.application, user):
+            # Get the merge status first so it's cached and can be refreshed
+            csrf_token = self.get_csrf()
+            data = {'requestid': self.request.uid, 'csrf_token': csrf_token}
+            output = self.app.post('/pv/pull-request/merge', data=data)
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.get_data(as_text=True))
+            self.assertEqual(
+                data,
+                {
+                    u'code': u'MERGE',
+                    u'message': u'The pull-request can be merged with '
+                        u'a merge commit',
+                    u'short_code': u'With merge'
+                }
+            )
+
             output = self.app.post('/api/0/test/pull-request/1/rebase')
             self.assertEqual(output.status_code, 200)
             data = json.loads(output.get_data(as_text=True))
@@ -152,7 +171,7 @@ class PagureRebasetests(tests.Modeltests):
                 {u'message': u'Pull-request rebased'}
             )
 
-            data = {'requestid': self.request.uid, 'csrf_token': self.get_csrf()}
+            data = {'requestid': self.request.uid, 'csrf_token': csrf_token}
             output = self.app.post('/pv/pull-request/merge', data=data)
             self.assertEqual(output.status_code, 200)
             data = json.loads(output.get_data(as_text=True))
@@ -165,6 +184,75 @@ class PagureRebasetests(tests.Modeltests):
                     u'short_code': u'Ok'
                 }
             )
+
+            output = self.app.get('/test/pull-request/1')
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('rebased onto', output_text)
+            repo = pagure.lib.query._get_project(self.session, 'test')
+            self.assertEqual(
+                repo.requests[0].comments[0].user.username, 'pingou')
+
+    def test_rebase_api_ui_logged_in_different_user(self):
+        """ Test the rebase PR API endpoint when logged in from the UI and
+        its outcome. """
+        # Add 'foo' to the project 'test' so 'foo' can rebase the PR
+        repo = pagure.lib.query._get_project(self.session, 'test')
+        msg = pagure.lib.query.add_user_to_project(
+            session=self.session,
+            project=repo,
+            new_user='foo',
+            user='pingou',
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'User added')
+
+        user = tests.FakeUser(username='foo')
+        with tests.user_set(self.app.application, user):
+            # Get the merge status first so it's cached and can be refreshed
+            csrf_token = self.get_csrf()
+            data = {'requestid': self.request.uid, 'csrf_token': csrf_token}
+            output = self.app.post('/pv/pull-request/merge', data=data)
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.get_data(as_text=True))
+            self.assertEqual(
+                data,
+                {
+                    u'code': u'MERGE',
+                    u'message': u'The pull-request can be merged with '
+                        u'a merge commit',
+                    u'short_code': u'With merge'
+                }
+            )
+
+            output = self.app.post('/api/0/test/pull-request/1/rebase')
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.get_data(as_text=True))
+            self.assertEqual(
+                data,
+                {u'message': u'Pull-request rebased'}
+            )
+
+            data = {'requestid': self.request.uid, 'csrf_token': csrf_token}
+            output = self.app.post('/pv/pull-request/merge', data=data)
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.get_data(as_text=True))
+            self.assertEqual(
+                data,
+                {
+                    u'code': u'FFORWARD',
+                    u'message': u'The pull-request can be merged and '
+                        u'fast-forwarded',
+                    u'short_code': u'Ok'
+                }
+            )
+
+            output = self.app.get('/test/pull-request/1')
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn('rebased onto', output_text)
+            repo = pagure.lib.query._get_project(self.session, 'test')
+            self.assertEqual(repo.requests[0].comments[0].user.username, 'foo')
 
     def test_rebase_api_api_logged_in(self):
         """ Test the rebase PR API endpoint when using an API token and

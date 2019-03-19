@@ -1514,7 +1514,12 @@ def merge_pull_request(session, request, username, domerge=True):
 
         # Update the start and stop commits in the DB, one last time
         diff_commits = diff_pull_request(
-            session, request, fork_obj, new_repo, with_diff=False
+            session,
+            request,
+            fork_obj,
+            new_repo,
+            with_diff=False,
+            username=username,
         )
         _log.info("  %s commit to merge", len(diff_commits))
 
@@ -2097,7 +2102,13 @@ def get_diff_info(repo_obj, orig_repo, branch_from, branch_to, prid=None):
 
 
 def diff_pull_request(
-    session, request, repo_obj, orig_repo, with_diff=True, notify=True
+    session,
+    request,
+    repo_obj,
+    orig_repo,
+    with_diff=True,
+    notify=True,
+    username=None,
 ):
     """ Returns the diff and the list of commits between the two git repos
     mentionned in the given pull-request.
@@ -2109,9 +2120,11 @@ def diff_pull_request(
     :arg orig_repo:  The pygit2.Repository object of the second git repo
     :arg with_diff: A boolean on whether to return the diff with the list
         of commits (or just the list of commits)
+    :arg username: The username of the user diffing the pull-request
 
     """
 
+    _log.debug("pagure.lib.git.diff_pull_request, started")
     diff = None
     diff_commits = []
     diff, diff_commits, _ = get_diff_info(
@@ -2121,8 +2134,10 @@ def diff_pull_request(
         request.branch,
         prid=request.id,
     )
+    _log.debug("pagure.lib.git.diff_pull_request, diff done")
 
     if request.status == "Open" and diff_commits:
+        _log.debug("pagure.lib.git.diff_pull_request, PR open and with a diff")
         first_commit = diff_commits[-1]
         # Check if we can still rely on the merge_status
         commenttext = None
@@ -2163,6 +2178,9 @@ def diff_pull_request(
         request.commit_stop = diff_commits[0].oid.hex
         session.add(request)
         session.commit()
+        _log.debug(
+            "pagure.lib.git.diff_pull_request, commenttext: %s", commenttext
+        )
 
         pagure.lib.tasks.sync_pull_ref.delay(
             request.project.name,
@@ -2185,6 +2203,12 @@ def diff_pull_request(
                             agent="pagure",
                         ),
                     )
+                _log.debug(
+                    "pagure.lib.git.diff_pull_request: adding notification: %s"
+                    "as user: %s",
+                    commenttext,
+                    username or request.user.username,
+                )
                 pagure.lib.query.add_pull_request_comment(
                     session,
                     request,
@@ -2193,7 +2217,7 @@ def diff_pull_request(
                     filename=None,
                     row=None,
                     comment="%s" % commenttext,
-                    user=request.user.username,
+                    user=username or request.user.username,
                     notify=False,
                     notification=True,
                 )

@@ -726,6 +726,7 @@ def rebase_pull_request(
         )
         pagure.lib.git.rebase_pull_request(request, user_rebaser)
 
+    update_pull_request(request.uid, username=user_rebaser)
     # Schedule refresh of all opened PRs
     pagure.lib.query.reset_status_pull_request(session, request.project)
 
@@ -870,7 +871,7 @@ def sync_pull_ref(self, session, name, namespace, user, requestid):
 
 @conn.task(queue=pagure_config.get("FAST_CELERY_QUEUE", None), bind=True)
 @pagure_task
-def update_pull_request(self, session, pr_uid):
+def update_pull_request(self, session, pr_uid, username=None):
     """ Updates a pull-request in the DB once a commit was pushed to it in
     git.
     """
@@ -886,7 +887,10 @@ def update_pull_request(self, session, pr_uid):
 
         try:
             pagure.lib.git.merge_pull_request(
-                session=session, request=request, username=None, domerge=False
+                session=session,
+                request=request,
+                username=username,
+                domerge=False,
             )
         except pagure.exceptions.PagureException as err:
             _log.debug(err)

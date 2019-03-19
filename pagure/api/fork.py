@@ -659,7 +659,11 @@ def api_pull_request_rebase(repo, requestid, username=None, namespace=None):
         raise pagure.exceptions.APIError(403, error_code=APIERROR.ENOPRCLOSE)
 
     task = pagure.lib.tasks.rebase_pull_request.delay(
-        repo.name, namespace, username, requestid, flask.g.fas_user.username
+        repo.name,
+        namespace,
+        username,
+        requestid,
+        user_rebaser=flask.g.fas_user.username,
     )
     output = {"message": "Rebasing queued", "taskid": task.id}
 
