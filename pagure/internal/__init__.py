@@ -314,11 +314,14 @@ def mergeable_request_pull():
 
     merge_status = request.merge_status
     if not merge_status or force:
+        username = None
+        if flask.g.authenticated:
+            username = flask.g.fas_user.username
         try:
             merge_status = pagure.lib.git.merge_pull_request(
                 session=flask.g.session,
                 request=request,
-                username=None,
+                username=username,
                 domerge=False,
             )
         except pygit2.GitError as err:
