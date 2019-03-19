@@ -1662,9 +1662,9 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertIn(
             '<title>Overview - test - Pagure</title>', output_text)
         self.assertIn(
-            '<a class="nav-link" href="/test/stats">\n              '
-            '<i class="fa fa-line-chart fa-fw text-muted"></i>\n              '
-            '<span class="d-none d-md-inline">Stats</span>\n          </a>',
+            '<a class="nav-link" href="/test/stats">\n          '
+            '<i class="fa fa-line-chart fa-fw text-muted"></i>\n          '
+            '<span class="d-none d-md-inline">Stats</span>\n      </a>',
             output_text)
         self.perfMaxWalks(0, 0)
         self.perfReset()
