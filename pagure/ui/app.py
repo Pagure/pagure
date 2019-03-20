@@ -925,7 +925,10 @@ def view_user_issues(username):
     """
 
     if not pagure_config.get("ENABLE_TICKETS", True):
-        flask.abort(404, "Tickets have been disabled on this pagure instance")
+        flask.abort(
+            404,
+            description="Tickets have been disabled on this pagure instance",
+        )
 
     user = _get_user(username=username)
     userprofile_common = get_userprofile_common(user)
@@ -1008,7 +1011,7 @@ def new_project():
     ) or not pagure_config.get("ENABLE_UI_NEW_PROJECTS", True):
         flask.abort(
             404,
-            "Creation of new project is not allowed on this \
+            description="Creation of new project is not allowed on this \
                 pagure instance",
         )
 
@@ -1270,7 +1273,7 @@ def markdown_preview():
     if form.validate_on_submit():
         return pagure.ui.filters.markdown_filter(flask.request.form["content"])
     else:
-        flask.abort(400, "Invalid request")
+        flask.abort(400, description="Invalid request")
 
 
 @UI_NS.route("/settings/email/drop", methods=["POST"])
@@ -1529,7 +1532,7 @@ def revoke_api_user_token(token_id):
     token = pagure.lib.query.get_api_token(flask.g.session, token_id)
 
     if not token or token.user.username != flask.g.fas_user.username:
-        flask.abort(404, "Token not found")
+        flask.abort(404, description="Token not found")
 
     form = pagure.forms.ConfirmationForm()
 

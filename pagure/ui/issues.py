@@ -99,7 +99,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
     )
 
     if issue is None or issue.project != repo:
-        flask.abort(404, "Issue not found")
+        flask.abort(404, description="Issue not found")
 
     if (
         issue.private
@@ -110,7 +110,9 @@ def update_issue(repo, issueid, username=None, namespace=None):
         )
     ):
         flask.abort(
-            403, "This issue is private and you are not allowed to view it"
+            403,
+            description="This issue is private and you are not allowed "
+            "to view it",
         )
 
     if flask.request.form.get("edit_comment"):
@@ -141,15 +143,15 @@ def update_issue(repo, issueid, username=None, namespace=None):
                 flask.g.session, issue.uid, commentid
             )
             if comment is None or comment.issue.project != repo:
-                flask.abort(404, "Comment not found")
+                flask.abort(404, description="Comment not found")
 
             if (
                 not is_author or comment.parent.status != "Open"
             ) and not flask.g.repo_committer:
                 flask.abort(
                     403,
-                    "You are not allowed to remove this comment from "
-                    "this issue",
+                    description="You are not allowed to remove this "
+                    "comment from this issue",
                 )
 
             issue.last_updated = datetime.datetime.utcnow()
@@ -295,7 +297,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
                                 if not urlpattern.match(link):
                                     flask.abort(
                                         400,
-                                        'Meta-data "link" field '
+                                        description='Meta-data "link" field '
                                         "(%s) has invalid url (%s) "
                                         % (key.name, link),
                                     )
@@ -428,11 +430,11 @@ def issue_comment_add_reaction(
     )
 
     if not issue or issue.project != repo:
-        flask.abort(404, "Comment not found")
+        flask.abort(404, description="Comment not found")
 
     form = pagure.forms.ConfirmationForm()
     if not form.validate_on_submit():
-        flask.abort(400, "CSRF token not valid")
+        flask.abort(400, description="CSRF token not valid")
 
     if (
         issue.private
@@ -442,21 +444,21 @@ def issue_comment_add_reaction(
             or not issue.user.user == flask.g.fas_user.username
         )
     ):
-        flask.abort(404, "No such issue")
+        flask.abort(404, description="No such issue")
 
     comment = pagure.lib.query.get_issue_comment(
         flask.g.session, issue.uid, commentid
     )
 
     if "reaction" not in flask.request.form:
-        flask.abort(400, "Reaction not found")
+        flask.abort(400, description="Reaction not found")
 
     reactions = comment.reactions
     r = flask.request.form["reaction"]
     if not r:
-        flask.abort(400, "Empty reaction is not acceptable")
+        flask.abort(400, description="Empty reaction is not acceptable")
     if flask.g.fas_user.username in reactions.get(r, []):
-        flask.abort(409, "Already posted this one")
+        flask.abort(409, description="Already posted this one")
 
     reactions.setdefault(r, []).append(flask.g.fas_user.username)
     comment.reactions = reactions
@@ -576,7 +578,7 @@ def view_issues(repo, username=None, namespace=None):
     if status is not None:
         if status.lower() not in ["open", "closed", "true"]:
             if status.lower() not in (s.lower() for s in repo.close_status):
-                flask.abort(404, "No status of that name")
+                flask.abort(404, description="No status of that name")
             status = status.capitalize()
             status_count = "Closed"
             other_status_count = "Open"
@@ -902,7 +904,7 @@ def new_issue(repo, username=None, namespace=None):
         except pagure.exceptions.PagureException:
             flask.abort(
                 404,
-                "No such user found in the database: %s"
+                description="No such user found in the database: %s"
                 % (flask.g.fas_user.username),
             )
 
@@ -1072,7 +1074,7 @@ def view_issue(repo, issueid, username=None, namespace=None):
     )
 
     if issue is None or issue.project != repo:
-        flask.abort(404, "Issue not found")
+        flask.abort(404, description="Issue not found")
 
     if issue.private:
         assignee = issue.assignee.user if issue.assignee else None
@@ -1081,7 +1083,7 @@ def view_issue(repo, issueid, username=None, namespace=None):
             and issue.user.user != flask.g.fas_user.username
             and assignee != flask.g.fas_user.username
         ):
-            flask.abort(404, "Issue not found")
+            flask.abort(404, description="Issue not found")
 
     status = pagure.lib.query.get_issue_statuses(flask.g.session)
     milestones = []
@@ -1149,11 +1151,13 @@ def delete_issue(repo, issueid, username=None, namespace=None):
     )
 
     if issue is None or issue.project != repo:
-        flask.abort(404, "Issue not found")
+        flask.abort(404, description="Issue not found")
 
     if not flask.g.repo_committer:
         flask.abort(
-            403, "You are not allowed to remove tickets of this project"
+            403,
+            description="You are not allowed to remove tickets of "
+            "this project",
         )
 
     form = pagure.forms.ConfirmationForm()
@@ -1223,13 +1227,16 @@ def edit_issue(repo, issueid, username=None, namespace=None):
     )
 
     if issue is None or issue.project != repo:
-        flask.abort(404, "Issue not found")
+        flask.abort(404, description="Issue not found")
 
     if not (
         flask.g.repo_committer
         or flask.g.fas_user.username == issue.user.username
     ):
-        flask.abort(403, "You are not allowed to edit issues for this project")
+        flask.abort(
+            403,
+            description="You are not allowed to edit issues for this project",
+        )
 
     status = pagure.lib.query.get_issue_statuses(flask.g.session)
     form = pagure.forms.IssueForm(status=status)
@@ -1246,7 +1253,7 @@ def edit_issue(repo, issueid, username=None, namespace=None):
         except pagure.exceptions.PagureException:
             flask.abort(
                 404,
-                "No such user found in the database: %s"
+                description="No such user found in the database: %s"
                 % (flask.g.fas_user.username),
             )
 
@@ -1357,7 +1364,7 @@ def upload_issue(repo, issueid, username=None, namespace=None):
     )
 
     if issue is None or issue.project != repo:
-        flask.abort(404, "Issue not found")
+        flask.abort(404, description="Issue not found")
 
     try:
         user_obj = pagure.lib.query.get_user(
@@ -1366,7 +1373,7 @@ def upload_issue(repo, issueid, username=None, namespace=None):
     except pagure.exceptions.PagureException:
         flask.abort(
             404,
-            "No such user found in the database: %s"
+            description="No such user found in the database: %s"
             % (flask.g.fas_user.username),
         )
 
@@ -1433,7 +1440,7 @@ def view_issue_raw_file(repo, filename=None, username=None, namespace=None):
         repo_obj = pygit2.Repository(reponame)
 
         if repo_obj.is_empty:
-            flask.abort(404, "Empty repo cannot have a file")
+            flask.abort(404, description="Empty repo cannot have a file")
 
         branch = repo_obj.lookup_branch("master")
         commit = branch.peel()
@@ -1442,12 +1449,12 @@ def view_issue_raw_file(repo, filename=None, username=None, namespace=None):
             repo_obj, commit.tree, ["files", filename], bail_on_tree=True
         )
         if not content or isinstance(content, pygit2.Tree):
-            flask.abort(404, "File not found")
+            flask.abort(404, description="File not found")
 
         data = repo_obj[content.oid].data
 
         if not data:
-            flask.abort(404, "No content found")
+            flask.abort(404, description="No content found")
 
         _log.info(
             "Migrating file %s for project %s to attachments",
@@ -1516,20 +1523,22 @@ def edit_comment_issue(
     )
 
     if issue is None or issue.project != project:
-        flask.abort(404, "Issue not found")
+        flask.abort(404, description="Issue not found")
 
     comment = pagure.lib.query.get_issue_comment(
         flask.g.session, issue.uid, commentid
     )
 
     if comment is None or comment.parent.project != project:
-        flask.abort(404, "Comment not found")
+        flask.abort(404, description="Comment not found")
 
     if (
         flask.g.fas_user.username != comment.user.username
         or comment.parent.status != "Open"
     ) and not flask.g.repo_user:
-        flask.abort(403, "You are not allowed to edit this comment")
+        flask.abort(
+            403, description="You are not allowed to edit this comment"
+        )
 
     form = pagure.forms.EditCommentForm()
 
@@ -1631,7 +1640,7 @@ def view_report(repo, report, username=None, namespace=None):
     """
     reports = flask.g.repo.reports
     if report not in reports:
-        flask.abort(404, "No such report found")
+        flask.abort(404, description="No such report found")
 
     flask.request.args = werkzeug.datastructures.ImmutableMultiDict(
         reports[report]

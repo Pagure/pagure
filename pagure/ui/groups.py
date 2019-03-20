@@ -70,7 +70,7 @@ def view_group(group):
     )
 
     if not group:
-        flask.abort(404, "Group not found")
+        flask.abort(404, description="Group not found")
 
     # Add new user to the group if asked
     form = pagure.forms.AddUserToGroupForm()
@@ -141,7 +141,7 @@ def edit_group(group):
     )
 
     if not group:
-        flask.abort(404, "Group not found")
+        flask.abort(404, description="Group not found")
 
     # Edit group info
     form = pagure.forms.EditGroupForm()
@@ -196,10 +196,12 @@ def give_group(group):
     )
 
     if not group:
-        flask.abort(404, "Group not found")
+        flask.abort(404, description="Group not found")
 
     if group.creator.user != flask.g.fas_user.username and not flask.g.admin:
-        flask.abort(403, "You are not allowed to give away this group")
+        flask.abort(
+            403, description="You are not allowed to give away this group"
+        )
 
     # Give away group
     form = pagure.forms.ConfirmationForm()
@@ -327,7 +329,7 @@ def group_delete(group):
             flask.g.session, username=flask.g.fas_user.username
         )
         if not user:
-            flask.abort(404, "User not found")
+            flask.abort(404, description="User not found")
 
         if group not in user.groups:
             flask.flash(

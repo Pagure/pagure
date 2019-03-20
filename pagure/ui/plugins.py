@@ -86,13 +86,13 @@ def view_plugin(repo, plugin, username=None, namespace=None, full=True):
     # enables us to keep the repos totally discreate and prevents from leaking
     # information outside
     if repo.private and plugin == "Pagure CI":
-        flask.abort(404, "Plugin disabled")
+        flask.abort(404, description="Plugin disabled")
 
     if plugin in pagure.config.config.get("DISABLED_PLUGINS", []):
-        flask.abort(404, "Plugin disabled")
+        flask.abort(404, description="Plugin disabled")
 
     if plugin == "default":
-        flask.abort(403, "This plugin cannot be changed")
+        flask.abort(403, description="This plugin cannot be changed")
 
     plugin = pagure.lib.plugins.get_plugin(plugin)
     fields = []
@@ -161,14 +161,14 @@ def view_plugin(repo, plugin, username=None, namespace=None, full=True):
             except FileNotFoundException as err:
                 flask.g.session.rollback()
                 _log.exception(err)
-                flask.abort(404, "No git repo found")
+                flask.abort(404, description="No git repo found")
         else:
             try:
                 plugin.remove(repo)
             except FileNotFoundException as err:
                 flask.g.session.rollback()
                 _log.exception(err)
-                flask.abort(404, "No git repo found")
+                flask.abort(404, description="No git repo found")
             flask.g.session.delete(dbobj)
             flask.flash("Hook %s deactivated" % plugin.name)
 

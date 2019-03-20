@@ -176,7 +176,7 @@ def pull_request_add_comment():
     """
     pform = pagure.forms.ProjectCommentForm(csrf_enabled=False)
     if not pform.validate_on_submit():
-        flask.abort(400, "Invalid request")
+        flask.abort(400, description="Invalid request")
 
     objid = pform.objid.data
     useremail = pform.useremail.data
@@ -186,12 +186,12 @@ def pull_request_add_comment():
     )
 
     if not request:
-        flask.abort(404, "Pull-request not found")
+        flask.abort(404, description="Pull-request not found")
 
     form = pagure.forms.AddPullRequestCommentForm(csrf_enabled=False)
 
     if not form.validate_on_submit():
-        flask.abort(400, "Invalid request")
+        flask.abort(400, description="Invalid request")
 
     commit = form.commit.data or None
     tree_id = form.tree_id.data or None
@@ -214,7 +214,9 @@ def pull_request_add_comment():
     except SQLAlchemyError as err:  # pragma: no cover
         flask.g.session.rollback()
         _log.exception(err)
-        flask.abort(500, "Error when saving the request to the database")
+        flask.abort(
+            500, description="Error when saving the request to the database"
+        )
 
     return flask.jsonify({"message": message})
 
@@ -226,7 +228,7 @@ def ticket_add_comment():
     """
     pform = pagure.forms.ProjectCommentForm(csrf_enabled=False)
     if not pform.validate_on_submit():
-        flask.abort(400, "Invalid request")
+        flask.abort(400, description="Invalid request")
 
     objid = pform.objid.data
     useremail = pform.useremail.data
@@ -234,7 +236,7 @@ def ticket_add_comment():
     issue = pagure.lib.query.get_issue_by_uid(flask.g.session, issue_uid=objid)
 
     if issue is None:
-        flask.abort(404, "Issue not found")
+        flask.abort(404, description="Issue not found")
 
     user_obj = pagure.lib.query.search_user(flask.g.session, email=useremail)
     admin = False
@@ -250,13 +252,15 @@ def ticket_add_comment():
         and not issue.user.user == user_obj.username
     ):
         flask.abort(
-            403, "This issue is private and you are not allowed to view it"
+            403,
+            description="This issue is private and you are not allowed "
+            "to view it",
         )
 
     form = pagure.forms.CommentForm(csrf_enabled=False)
 
     if not form.validate_on_submit():
-        flask.abort(400, "Invalid request")
+        flask.abort(400, description="Invalid request")
 
     comment = form.comment.data
 
@@ -272,7 +276,9 @@ def ticket_add_comment():
     except SQLAlchemyError as err:  # pragma: no cover
         flask.g.session.rollback()
         _log.exception(err)
-        flask.abort(500, "Error when saving the request to the database")
+        flask.abort(
+            500, description="Error when saving the request to the database"
+        )
 
     return flask.jsonify({"message": message})
 

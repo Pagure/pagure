@@ -581,7 +581,7 @@ def get_repo_path(repo):
     """
     repopath = repo.repopath("main")
     if not os.path.exists(repopath):
-        flask.abort(404, "No git repo found")
+        flask.abort(404, description="No git repo found")
 
     return repopath
 

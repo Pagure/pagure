@@ -118,7 +118,7 @@ def __get_tree_and_content(repo_obj, commit, path):
 
     if not repo_obj[blob_or_tree.oid]:
         # Not tested and no idea how to test it, but better safe than sorry
-        flask.abort(404, "File not found")
+        flask.abort(404, description="File not found")
 
     if isinstance(blob_or_tree, pygit2.TreeEntry):  # Returned a file
         filename = blob_or_tree.name
@@ -159,14 +159,14 @@ def view_docs(repo, username=None, namespace=None, filename=None):
     )
 
     if not repo:
-        flask.abort(404, "Project not found")
+        flask.abort(404, description="Project not found")
 
     if not repo.settings.get("project_documentation", True):
-        flask.abort(404, "This project has documentation disabled")
+        flask.abort(404, description="This project has documentation disabled")
 
     reponame = repo.repopath("docs")
     if not os.path.exists(reponame):
-        flask.abort(404, "Documentation not found")
+        flask.abort(404, description="Documentation not found")
 
     repo_obj = pygit2.Repository(reponame)
 
@@ -199,11 +199,13 @@ def view_docs(repo, username=None, namespace=None, filename=None):
             flask.flash("%s" % err, "error")
         except Exception as err:
             _log.exception(err)
-            flask.abort(500, "Unkown error encountered and reported")
+            flask.abort(
+                500, description="Unkown error encountered and reported"
+            )
 
     if not content:
         if not tree or not len(tree):
-            flask.abort(404, "No content found in the repository")
+            flask.abort(404, description="No content found in the repository")
         html = "<li>"
         for el in tree:
             name = el.name

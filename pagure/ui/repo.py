@@ -201,7 +201,7 @@ def view_repo_branch(repo, branchname, username=None, namespace=None):
     repo_obj = flask.g.repo_obj
 
     if branchname not in repo_obj.listall_branches():
-        flask.abort(404, 'Branch not found')
+        flask.abort(404, description='Branch not found')
 
     branch = repo_obj.lookup_branch(branchname)
     if not repo_obj.is_empty and not repo_obj.head_is_unborn:
@@ -448,9 +448,9 @@ def compare_commits(repo, commit1, commit2, username=None, namespace=None):
     commit1_obj = repo_obj.get(commit1)
     commit2_obj = repo_obj.get(commit2)
     if commit1_obj is None:
-        flask.abort(404, "First commit does not exist")
+        flask.abort(404, description="First commit does not exist")
     if commit2_obj is None:
-        flask.abort(404, "Last commit does not exist")
+        flask.abort(404, description="Last commit does not exist")
 
     # Get commits diff data
     diff = repo_obj.diff(commit1, commit2)
@@ -511,7 +511,7 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
     repo_obj = flask.g.repo_obj
 
     if repo_obj.is_empty:
-        flask.abort(404, "Empty repo cannot have a file")
+        flask.abort(404, description="Empty repo cannot have a file")
 
     if identifier in repo_obj.listall_branches():
         branchname = identifier
@@ -523,7 +523,7 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
             branchname = identifier
         except ValueError:
             if "master" not in repo_obj.listall_branches():
-                flask.abort(404, "Branch not found")
+                flask.abort(404, description="Branch not found")
             # If it's not a commit id then it's part of the filename
             commit = repo_obj[repo_obj.head.target]
             branchname = "master"
@@ -542,13 +542,13 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
             repo_obj, tree, filename.split("/"), bail_on_tree=True
         )
         if not content:
-            flask.abort(404, "File not found")
+            flask.abort(404, description="File not found")
         content = repo_obj[content.oid]
     else:
         content = commit
 
     if not content:
-        flask.abort(404, "File not found")
+        flask.abort(404, description="File not found")
 
     readme = None
     safe = False
@@ -611,7 +611,7 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
         else:
             output_type = "binary"
     elif isinstance(content, pygit2.Commit):
-        flask.abort(404, "File not found")
+        flask.abort(404, description="File not found")
     else:
         content = sorted(content, key=lambda x: x.filemode)
         for i in content:
@@ -676,7 +676,7 @@ def view_raw_file(
     repo_obj = flask.g.repo_obj
 
     if repo_obj.is_empty:
-        flask.abort(404, "Empty repo cannot have a file")
+        flask.abort(404, description="Empty repo cannot have a file")
 
     if identifier in repo_obj.listall_branches():
         branch = repo_obj.lookup_branch(identifier)
@@ -686,12 +686,12 @@ def view_raw_file(
             commit = repo_obj.get(identifier)
         except ValueError:
             if "master" not in repo_obj.listall_branches():
-                flask.abort(404, "Branch not found")
+                flask.abort(404, description="Branch not found")
             # If it's not a commit id then it's part of the filename
             commit = repo_obj[repo_obj.head.target]
 
     if not commit:
-        flask.abort(404, "Commit %s not found" % (identifier))
+        flask.abort(404, description="Commit %s not found" % (identifier))
 
     if isinstance(commit, pygit2.Tag):
         commit = commit.peel(pygit2.Commit)
@@ -704,7 +704,7 @@ def view_raw_file(
                 repo_obj, commit.tree, filename.split("/"), bail_on_tree=True
             )
         if not content or isinstance(content, pygit2.Tree):
-            flask.abort(404, "File not found")
+            flask.abort(404, description="File not found")
 
         data = repo_obj[content.oid].data
     else:
@@ -715,14 +715,14 @@ def view_raw_file(
                 parent = repo_obj.revparse_single("%s^" % identifier)
                 diff = repo_obj.diff(parent, commit)
             except (KeyError, ValueError):
-                flask.abort(404, "Identifier not found")
+                flask.abort(404, description="Identifier not found")
         else:
             # First commit in the repo
             diff = commit.tree.diff_to_tree(swap=True)
         data = diff.patch
 
     if not data:
-        flask.abort(404, "No content found")
+        flask.abort(404, description="No content found")
 
     return (data, 200, pagure.lib.mimetype.get_type_headers(filename, data))
 
@@ -740,7 +740,7 @@ def view_blame_file(repo, filename, username=None, namespace=None):
     branchname = flask.request.args.get("identifier", "master")
 
     if repo_obj.is_empty or repo_obj.head_is_unborn:
-        flask.abort(404, "Empty repo cannot have a file")
+        flask.abort(404, description="Empty repo cannot have a file")
 
     if branchname in repo_obj.listall_branches():
         branch = repo_obj.lookup_branch(branchname)
@@ -758,19 +758,19 @@ def view_blame_file(repo, filename, username=None, namespace=None):
         repo_obj, commit.tree, filename.split("/"), bail_on_tree=True
     )
     if not content:
-        flask.abort(404, "File not found")
+        flask.abort(404, description="File not found")
 
     if not isinstance(content, pygit2.Blob):
-        flask.abort(404, "File not found")
+        flask.abort(404, description="File not found")
     if is_binary_string(content.data):
-        flask.abort(400, "Binary files cannot be blamed")
+        flask.abort(400, description="Binary files cannot be blamed")
 
     try:
         content = encoding_utils.decode(content.data)
     except pagure.exceptions.PagureException:
         # We cannot decode the file, so bail but warn the admins
         _log.exception("File could not be decoded")
-        flask.abort(500, "File could not be decoded")
+        flask.abort(500, description="File could not be decoded")
 
     blame = repo_obj.blame(filename, newest_commit=commit.oid.hex)
 
@@ -801,7 +801,7 @@ def view_commit(repo, commitid, username=None, namespace=None):
     """
     repo = flask.g.repo
     if not repo:
-        flask.abort(404, "Project not found")
+        flask.abort(404, description="Project not found")
 
     repo_obj = flask.g.repo_obj
 
@@ -820,13 +820,13 @@ def view_commit(repo, commitid, username=None, namespace=None):
     try:
         commit = repo_obj.get(commitid)
     except ValueError:
-        flask.abort(404, "Commit not found")
+        flask.abort(404, description="Commit not found")
 
     if commit is None:
-        flask.abort(404, "Commit not found")
+        flask.abort(404, description="Commit not found")
 
     if isinstance(commit, pygit2.Blob):
-        flask.abort(404, "Commit not found")
+        flask.abort(404, description="Commit not found")
 
     if commit.parents:
         diff = repo_obj.diff(commit.parents[0], commit)
@@ -899,13 +899,13 @@ def view_commit_patch_or_diff(
         if is_js:
             return errorresponse
         else:
-            flask.abort(404, "Commit not found")
+            flask.abort(404, description="Commit not found")
 
     if commit is None:
         if is_js:
             return errorresponse
         else:
-            flask.abort(404, "Commit not found")
+            flask.abort(404, description="Commit not found")
 
     if is_js:
         patches = pagure.lib.git.commit_to_patch(
@@ -1697,7 +1697,7 @@ def new_repo_hook_token(repo, username=None, namespace=None):
 
     form = pagure.forms.ConfirmationForm()
     if not form.validate_on_submit():
-        flask.abort(400, "Invalid request")
+        flask.abort(400, description="Invalid request")
 
     try:
         repo.hook_token = pagure.lib.login.id_generator(40)
@@ -1736,7 +1736,9 @@ def remove_deploykey(repo, keyid, username=None, namespace=None):
     """
 
     if not pagure_config.get("DEPLOY_KEY", True):
-        flask.abort(404, "This pagure instance disabled deploy keys")
+        flask.abort(
+            404, description="This pagure instance disabled deploy keys"
+        )
 
     repo = flask.g.repo
 
@@ -1799,7 +1801,10 @@ def remove_user(repo, userid, username=None, namespace=None):
     """
 
     if not pagure_config.get("ENABLE_USER_MNGT", True):
-        flask.abort(404, "User management not allowed in the pagure instance")
+        flask.abort(
+            404,
+            description="User management not allowed in the pagure instance",
+        )
 
     repo = flask.g.repo
 
@@ -1865,7 +1870,9 @@ def add_deploykey(repo, username=None, namespace=None):
     """
 
     if not pagure_config.get("DEPLOY_KEY", True):
-        flask.abort(404, "This pagure instance disabled deploy keys")
+        flask.abort(
+            404, description="This pagure instance disabled deploy keys"
+        )
 
     repo = flask.g.repo
 
@@ -1931,7 +1938,9 @@ def add_user(repo, username=None, namespace=None):
 
     if not pagure_config.get("ENABLE_USER_MNGT", True):
         flask.abort(
-            404, "User management is not allowed in this pagure instance"
+            404,
+            description="User management is not allowed in this "
+            "pagure instance",
         )
 
     repo = flask.g.repo
@@ -2015,7 +2024,9 @@ def remove_group_project(repo, groupid, username=None, namespace=None):
 
     if not pagure_config.get("ENABLE_USER_MNGT", True):
         flask.abort(
-            404, "User management is not allowed in this pagure instance"
+            404,
+            description="User management is not allowed in this "
+            "pagure instance",
         )
 
     repo = flask.g.repo
@@ -2087,7 +2098,9 @@ def add_group_project(repo, username=None, namespace=None):
 
     if not pagure_config.get("ENABLE_USER_MNGT", True):
         flask.abort(
-            404, "User management is not allowed in this pagure instance"
+            404,
+            description="User management is not allowed in this "
+            "pagure instance",
         )
 
     repo = flask.g.repo
@@ -2171,7 +2184,10 @@ def regenerate_git(repo, username=None, namespace=None):
 
     regenerate = flask.request.form.get("regenerate")
     if not regenerate or regenerate.lower() not in ["tickets", "requests"]:
-        flask.abort(400, "You can only regenerate tickest or requests repos")
+        flask.abort(
+            400,
+            description="You can only regenerate tickest or requests repos",
+        )
 
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
@@ -2246,7 +2262,9 @@ def add_token(repo, username=None, namespace=None):
 
     if not flask.g.repo_committer:
         flask.abort(
-            403, "You are not allowed to change the settings for this project"
+            403,
+            description="You are not allowed to change the settings for "
+            "this project",
         )
 
     acls = pagure.lib.query.get_acls(
@@ -2318,7 +2336,7 @@ def renew_api_token(repo, token_id, username=None, namespace=None):
         or token.project.fullname != repo.fullname
         or token.user.username != flask.g.fas_user.username
     ):
-        flask.abort(404, "Token not found")
+        flask.abort(404, description="Token not found")
 
     form = pagure.forms.ConfirmationForm()
 
@@ -2384,7 +2402,7 @@ def revoke_api_token(repo, token_id, username=None, namespace=None):
         or token.project.fullname != repo.fullname
         or token.user.username != flask.g.fas_user.username
     ):
-        flask.abort(404, "Token not found")
+        flask.abort(404, description="Token not found")
 
     form = pagure.forms.ConfirmationForm()
 
@@ -2444,7 +2462,7 @@ def edit_file(repo, branchname, filename, username=None, namespace=None):
     )
 
     if repo_obj.is_empty:
-        flask.abort(404, "Empty repo cannot have a file")
+        flask.abort(404, description="Empty repo cannot have a file")
 
     form = pagure.forms.EditFileForm(emails=user.emails)
 
@@ -2453,7 +2471,7 @@ def edit_file(repo, branchname, filename, username=None, namespace=None):
         branch = repo_obj.lookup_branch(branchname)
         commit = branch.peel(pygit2.Commit)
     else:
-        flask.abort(400, "Invalid branch specified")
+        flask.abort(400, description="Invalid branch specified")
 
     if form.validate_on_submit():
         try:
@@ -2484,17 +2502,17 @@ def edit_file(repo, branchname, filename, username=None, namespace=None):
             repo_obj, commit.tree, filename.split("/")
         )
         if not content or isinstance(content, pygit2.Tree):
-            flask.abort(404, "File not found")
+            flask.abort(404, description="File not found")
 
         if is_binary_string(content.data):
-            flask.abort(400, "Cannot edit binary files")
+            flask.abort(400, description="Cannot edit binary files")
 
         try:
             data = repo_obj[content.oid].data.decode("utf-8")
         except UnicodeDecodeError:  # pragma: no cover
             # In theory we shouldn't reach here since we check if the file
             # is binary with `is_binary_string()` above
-            flask.abort(400, "Cannot edit binary files")
+            flask.abort(400, description="Cannot edit binary files")
 
     else:
         data = form.content.data
@@ -2532,20 +2550,27 @@ def delete_branch(repo, branchname, username=None, namespace=None):
     if not flask.g.repo.is_fork and not pagure_config.get(
         "ALLOW_DELETE_BRANCH", True
     ):
-        flask.abort(404, "This pagure instance does not allow branch deletion")
+        flask.abort(
+            404,
+            description="This pagure instance does not allow branch deletion",
+        )
 
     repo_obj = flask.g.repo_obj
 
     if not flask.g.repo_committer:
         flask.abort(
-            403, "You are not allowed to delete branch for this project"
+            403,
+            description="You are not allowed to delete branch for "
+            "this project",
         )
 
     if branchname == "master":
-        flask.abort(403, "You are not allowed to delete the master branch")
+        flask.abort(
+            403, description="You are not allowed to delete the master branch"
+        )
 
     if branchname not in repo_obj.listall_branches():
-        flask.abort(404, "Branch not found")
+        flask.abort(404, description="Branch not found")
 
     task = pagure.lib.tasks.delete_branch.delay(
         repo, namespace, username, branchname
@@ -2567,7 +2592,7 @@ def view_docs(repo, username=None, filename=None, namespace=None):
     repo = flask.g.repo
 
     if not pagure_config.get("DOC_APP_URL"):
-        flask.abort(404, "This pagure instance has no doc server")
+        flask.abort(404, description="This pagure instance has no doc server")
 
     return flask.render_template(
         "docs.html",
@@ -2813,7 +2838,9 @@ def update_quick_replies(repo, username=None, namespace=None):
     repo = flask.g.repo
 
     if not repo.settings.get("pull_requests", True):
-        flask.abort(404, "Pull requests are disabled for this project")
+        flask.abort(
+            404, description="Pull requests are disabled for this project"
+        )
 
     form = pagure.forms.ConfirmationForm()
 
@@ -2969,21 +2996,25 @@ def move_to_repospanner(repo, username=None, namespace=None):
 
     if not pagure.utils.is_admin():
         flask.abort(
-            403, "You are not allowed to transfer this project to repoSpanner"
+            403,
+            description="You are not allowed to transfer this project "
+            "to repoSpanner",
         )
 
     if not pagure_config.get("REPOSPANNER_ADMIN_MIGRATION"):
-        flask.abort(403, "It is not allowed to request migration of a repo")
+        flask.abort(
+            403, description="It is not allowed to request migration of a repo"
+        )
 
     form = pagure.forms.ConfirmationForm()
 
     if form.validate_on_submit():
         region = flask.request.form.get("region", "").strip()
         if not region:
-            flask.abort(404, "No target region specified")
+            flask.abort(404, description="No target region specified")
 
         if region not in pagure_config.get("REPOSPANNER_REGIONS"):
-            flask.abort(404, "Invalid region specified")
+            flask.abort(404, description="Invalid region specified")
 
         _log.info(
             "Repo %s requested to be migrated to repoSpanner region %s",
@@ -3034,19 +3065,23 @@ def give_project(repo, username=None, namespace=None):
         flask.g.fas_user.username != repo.user.user
         and not pagure.utils.is_admin()
     ):
-        flask.abort(403, "You are not allowed to give this project")
+        flask.abort(
+            403, description="You are not allowed to give this project"
+        )
 
     form = pagure.forms.ConfirmationForm()
 
     if form.validate_on_submit():
         new_username = flask.request.form.get("user", "").strip()
         if not new_username:
-            flask.abort(404, "No user specified")
+            flask.abort(404, description="No user specified")
         new_owner = pagure.lib.query.search_user(
             flask.g.session, username=new_username
         )
         if not new_owner:
-            flask.abort(404, "No such user %s found" % new_username)
+            flask.abort(
+                404, description="No such user %s found" % new_username
+            )
         try:
             old_main_admin = repo.user.user
             pagure.lib.query.set_project_owner(
@@ -3106,7 +3141,7 @@ def project_dowait(repo, username=None, namespace=None):
     should only ever be done in test instances.
     """
     if not pagure_config.get("ALLOW_PROJECT_DOWAIT", False):
-        flask.abort(401, "No")
+        flask.abort(401, description="No")
 
     task = pagure.lib.tasks.project_dowait.delay(
         name=repo, namespace=namespace, user=username
@@ -3301,12 +3336,12 @@ def edit_tag(repo, tag, username=None, namespace=None):
 
     tags = pagure.lib.query.get_tags_of_project(flask.g.session, repo)
     if not tags:
-        flask.abort(404, "Project has no tags to edit")
+        flask.abort(404, description="Project has no tags to edit")
 
     # Check the tag exists, and get its old/original color
     tagobj = pagure.lib.query.get_colored_tag(flask.g.session, tag, repo.id)
     if not tagobj:
-        flask.abort(404, "Tag %s not found in this project" % tag)
+        flask.abort(404, description="Tag %s not found in this project" % tag)
 
     form = pagure.forms.AddIssueTagForm()
     if form.validate_on_submit():
@@ -3421,16 +3456,20 @@ def generate_project_archive(
         _log.debug("No ARCHIVE_FOLDER specified in the configuration")
         flask.abort(
             404,
-            "This pagure instance isn't configured to support this feature",
+            description="This pagure instance isn't configured to support "
+            "this feature",
         )
     if not os.path.exists(archive_folder):
         _log.debug("No ARCHIVE_FOLDER could not be found on disk")
-        flask.abort(500, "Incorrect configuration, please contact your admin")
+        flask.abort(
+            500,
+            description="Incorrect configuration, please contact your admin",
+        )
 
     extensions = ["tar.gz", "tar", "zip"]
     if extension not in extensions:
         _log.debug("%s no in %s", extension, extensions)
-        flask.abort(400, "Invalid archive format specified")
+        flask.abort(400, description="Invalid archive format specified")
 
     name = werkzeug.secure_filename(name)
 
@@ -3449,15 +3488,15 @@ def generate_project_archive(
             commit = tag
         else:
             _log.debug("Found %s instead of a tag", tag)
-            flask.abort(400, "Invalid reference provided")
+            flask.abort(400, description="Invalid reference provided")
     else:
         try:
             commit = repo_obj.get(ref)
         except ValueError:
-            flask.abort(404, "Invalid commit provided")
+            flask.abort(404, description="Invalid commit provided")
 
     if not isinstance(commit, pygit2.Commit):
-        flask.abort(400, "Invalid reference specified")
+        flask.abort(400, description="Invalid reference specified")
 
     tag_path = ""
     tag_filename = None

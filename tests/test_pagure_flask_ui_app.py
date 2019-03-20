@@ -272,8 +272,11 @@ class PagureFlaskApptests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<title>Overview - project+1 - Pagure</title>', output_text)
-            self.assertIn(
-                '<a href="/project+1"><strong>project+1</strong></a>',
+            self.assertTrue(
+                '<a href="/project+1"><strong>project+1</strong></a>' in 
+                output_text 
+                or
+                '<a href="/project%2B1"><strong>project+1</strong></a>' in
                 output_text
             )
 

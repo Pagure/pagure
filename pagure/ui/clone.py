@@ -213,7 +213,7 @@ def clone_proxy(project, username=None, namespace=None):
     access to the attempted repository.
     """
     if not pagure_config["ALLOW_HTTP_PULL_PUSH"]:
-        flask.abort(403, "HTTP pull/push is not allowed")
+        flask.abort(403, description="HTTP pull/push is not allowed")
 
     service = None
     if flask.request.path.endswith("/info/refs"):
@@ -221,17 +221,17 @@ def clone_proxy(project, username=None, namespace=None):
         if not service:
             # This is a Git client older than 1.6.6, and it doesn't work with
             # the smart protocol. We do not support the old protocol via HTTP.
-            flask.abort(400, "Please switch to newer Git client")
+            flask.abort(400, description="Please switch to newer Git client")
         if service not in ("git-upload-pack", "git-receive-pack"):
-            flask.abort(400, "Unknown service requested")
+            flask.abort(400, description="Unknown service requested")
 
     if "git-receive-pack" in flask.request.full_path:
         if not pagure_config["ALLOW_HTTP_PUSH"]:
             # Pushing (git-receive-pack) over HTTP is not allowed
-            flask.abort(403, "HTTP pushing disabled")
+            flask.abort(403, description="HTTP pushing disabled")
         if not flask.request.remote_user:
             # Anonymous pushing... nope
-            flask.abort(403, "Unauthenticated push not allowed")
+            flask.abort(403, description="Unauthenticated push not allowed")
 
     project = pagure.lib.query.get_authorized_project(
         flask.g.session,
@@ -241,7 +241,7 @@ def clone_proxy(project, username=None, namespace=None):
         asuser=flask.request.remote_user,
     )
     if not project:
-        flask.abort(404, "Project not found")
+        flask.abort(404, description="Project not found")
 
     if project.is_on_repospanner:
         return proxy_repospanner(project, service)

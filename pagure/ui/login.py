@@ -303,7 +303,7 @@ def change_password():
     )
 
     if not user_obj:
-        flask.abort(404, "User not found")
+        flask.abort(404, description="User not found")
 
     if form.validate_on_submit():
 

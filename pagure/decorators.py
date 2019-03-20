@@ -29,12 +29,17 @@ def has_issue_tracker(function):
         if not flask.g.issues_enabled or not repo.settings.get(
             "issue_tracker", True
         ):
-            flask.abort(404, "No issue tracker found for this project")
+            flask.abort(
+                404, description="No issue tracker found for this project"
+            )
         # forbid all POST requests if the issue tracker is made read-only
         if flask.request.method == "POST" and repo.settings.get(
             "issue_tracker_read_only", False
         ):
-            flask.abort(401, "The issue tracker for this project is read-only")
+            flask.abort(
+                401,
+                description="The issue tracker for this project is read-only",
+            )
         return function(*args, **kwargs)
 
     return check_issue_tracker
@@ -51,7 +56,10 @@ def has_pr_enabled(function):
     def check_trackers(*args, **kwargs):
         repo = flask.g.repo
         if not repo.settings.get("pull_requests", True):
-            flask.abort(404, "Pull Requests are not enabled on this project")
+            flask.abort(
+                404,
+                description="Pull Requests are not enabled on this project",
+            )
 
         return function(*args, **kwargs)
 
@@ -73,10 +81,15 @@ def has_issue_or_pr_enabled(function):
         pr_enabled = repo.settings.get("pull_requests", True)
         if not issue_enabled and not pr_enabled:
             flask.abort(
-                404, "Issue tracker and Pull-Request disabled for this project"
+                404,
+                description="Issue tracker and Pull-Request disabled for "
+                "this project",
             )
         elif flask.request.method == "POST" and not pr_enabled and issue_ro:
-            flask.abort(401, "The issue tracker for this project is read-only")
+            flask.abort(
+                401,
+                description="The issue tracker for this project is read-only",
+            )
         return function(*args, **kwargs)
 
     return check_issue_pr_trackers
@@ -94,7 +107,7 @@ def is_repo_admin(function):
         if not flask.g.repo_admin:
             flask.abort(
                 403,
-                "You are not allowed to change the "
+                description="You are not allowed to change the "
                 "settings for this project",
             )
         return function(*args, **kwargs)

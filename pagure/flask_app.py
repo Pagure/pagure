@@ -308,7 +308,10 @@ def set_request():
             # Block all POST request from blocked users
             if flask.g.repo and flask.request.method != "GET":
                 if flask.g.fas_user.username in flask.g.repo.block_users:
-                    flask.abort(403, "You have been blocked from this project")
+                    flask.abort(
+                        403,
+                        description="You have been blocked from this project",
+                    )
 
         if (
             not flask.g.repo
@@ -327,7 +330,7 @@ def set_request():
             )
 
         if flask.g.repo is None:
-            flask.abort(404, "Project not found")
+            flask.abort(404, description="Project not found")
 
         # If issues are not globally enabled, there is no point in continuing
         if flask.g.issues_enabled:
@@ -492,4 +495,4 @@ def _get_user(username):
     try:
         return pagure.lib.query.get_user(flask.g.session, username)
     except pagure.exceptions.PagureException as e:
-        flask.abort(404, "%s" % e)
+        flask.abort(404, description="%s" % e)
