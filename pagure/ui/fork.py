@@ -1307,7 +1307,7 @@ def close_request_pull(repo, requestid, username=None, namespace=None):
         )
         try:
             flask.g.session.commit()
-            flask.flash("Pull request canceled!")
+            flask.flash("Pull request closed!")
         except SQLAlchemyError as err:  # pragma: no cover
             flask.g.session.rollback()
             _log.exception(err)

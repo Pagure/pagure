@@ -1806,7 +1806,7 @@ index 0000000..2a552bb
             self.assertIn(
                 '<title>Overview - test - Pagure</title>', output_text)
             self.assertIn(
-                'Pull request canceled!',
+                'Pull request closed!',
                 output_text)
 
     @patch('pagure.lib.notify.send_email')
