@@ -85,11 +85,10 @@
               {%- if repo.url %} &nbsp;| &nbsp;<a class="inline" href="{{ repo.url }}">{{ repo.url }}</a>{% endif %}
             </div>
             <div class="btn-group">
-                {% if not g.repo_starred %}
-                    <a href="#" class="btn btn-sm btn-outline-primary font-weight-bold"
+                {% if g.authenticated and not g.repo_starred %}
+                  <a href="#" class="btn btn-sm btn-outline-primary font-weight-bold"
                     onclick="$('#star_project').submit();">
-                      <i class="fa fa-star-o fa-fw"></i>Star
-                      <form method="POST" name="star_project" id="star_project"
+                    <form method="POST" name="star_project" id="star_project"
                       action="{{ url_for(
                       'ui_ns.star_project',
                       repo=repo.name,
@@ -98,14 +97,15 @@
                       star=1)}}">
                       {{ g.forkbuttonform.csrf_token }}
                       </form>
-                    </a>
-                      <a href="{{url_for(
-                                  'ui_ns.view_stargazers',
-                                  repo=repo.name,
-                                  username=repo.user.user if repo.is_fork else None,
-                                  namespace=repo.namespace,
-                      )}}" class="btn btn-sm btn-primary font-weight-bold">{{ repo.stargazers|length }}</a>
-                {% else %}
+                    <i class="fa fa-star-o fa-fw"></i>Star
+                  </a>
+                  <a href="{{url_for(
+                                'ui_ns.view_stargazers',
+                                repo=repo.name,
+                                username=repo.user.user if repo.is_fork else None,
+                                namespace=repo.namespace,
+                    )}}" class="btn btn-sm btn-primary font-weight-bold">{{ repo.stargazers|length }}</a>
+                {% elif g.authenticated and g.repo_starred %}
                   <a href="#" class="btn btn-sm btn-outline-primary font-weight-bold"
                     onclick="$('#unstar_project').submit();">
                     <form method="POST" name="unstar_project" id="unstar_project"
@@ -117,15 +117,28 @@
                       star=0)}}">
                       {{ g.forkbuttonform.csrf_token }}
                     </form>
-                      <span class="fa fa-star text-warning"></span> Unstar</a>
-                      <a href="{{url_for(
-                                  'ui_ns.view_stargazers',
-                                  repo=repo.name,
-                                  username=repo.user.user if repo.is_fork else None,
-                                  namespace=repo.namespace,
-                      )}}" class="btn btn-sm btn-primary font-weight-bold">{{repo.stargazers|length}}</a>
+                    <span class="fa fa-star text-warning"></span> Unstar
+                  </a>
+                  <a href="{{url_for(
+                                'ui_ns.view_stargazers',
+                                repo=repo.name,
+                                username=repo.user.user if repo.is_fork else None,
+                                namespace=repo.namespace,
+                    )}}" class="btn btn-sm btn-primary font-weight-bold">{{repo.stargazers|length}}</a>
+                {% else %}
+                  <a href="#" class="btn btn-sm btn-outline-primary font-weight-bold"
+                     title="Log in to Star the project">
+                    <span class="fa fa-star text-warning"></span> Star
+                  </a>
+                  <a href="{{url_for(
+                                'ui_ns.view_stargazers',
+                                repo=repo.name,
+                                username=repo.user.user if repo.is_fork else None,
+                                namespace=repo.namespace,
+                    )}}" class="btn btn-sm btn-primary font-weight-bold">{{repo.stargazers|length}}
+                  </a>
                 {% endif %}
-                </div>
+            </div>
 
                 <div class="btn-group">
                     <a href="#" title="{{ watch_button_title }}"
