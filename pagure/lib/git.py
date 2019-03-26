@@ -928,7 +928,7 @@ class TemporaryClone(object):
                 return None
             if not os.path.exists(self._origpath):
                 return None
-            pygit2.clone_repository(self._origpath, self.repopath)
+            PagureRepo.clone(self._origpath, self.repopath)
             # Because for whatever reason, one pygit2.Repository is not
             # equal to another.... The pygit2.Repository returned from
             # pygit2.clone_repository does not have the "branches" attribute.

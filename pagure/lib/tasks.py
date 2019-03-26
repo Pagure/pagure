@@ -543,11 +543,10 @@ def pull_remote_repo(self, session, remote_git, branch_from):
         remote_git, branch_from, ignore_non_exist=True
     )
 
-    repo = pygit2.clone_repository(
+    pagure.lib.repo.PagureRepo.clone(
         remote_git, clonepath, checkout_branch=branch_from
     )
 
-    del repo
     return clonepath
 
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2015-2017 - Copyright Red Hat Inc
+ (c) 2015-2019 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -10,6 +10,7 @@
 from __future__ import print_function, unicode_literals, absolute_import
 
 import logging
+import subprocess
 
 import pygit2
 
@@ -27,11 +28,51 @@ def get_pygit2_version():
     return tuple([int(i) for i in pygit2.__version__.split(".")])
 
 
+def run_command(command):
+    _log.info("Running command: %s", command)
+    try:
+        out = subprocess.check_output(command, stderr=subprocess.STDOUT)
+        _log.info("   command ran successfully")
+        _log.debug("Output: %s" % out)
+    except subprocess.CalledProcessError as err:
+        _log.debug(
+            "Command FAILED: {cmd} returned code {code} with the "
+            "following output: {output}".format(
+                cmd=err.cmd, code=err.returncode, output=err.output
+            )
+        )
+        raise pagure.exceptions.PagureException(
+            "Did not manage to rebase this pull-request"
+        )
+
+
 class PagureRepo(pygit2.Repository):
     """ An utility class allowing to go around pygit2's inability to be
     stable.
 
     """
+
+    @staticmethod
+    def clone(path_from, path_to, checkout_branch=None, bare=False):
+        """ Clone the git repo at the specified path to the specified location.
+
+        This method is meant to replace pygit2.clone_repository which for us
+        leaks file descriptors on large project leading to "Too many open files
+        error" which then prevent some tasks from completing.
+
+        :arg path_from: the path or url of the git repository to clone
+        :type path_from: str
+        :arg path_to: the path where the git repository should be cloned
+        :type path_to: str
+        :
+        """
+        cmd = ["git", "clone", path_from, path_to]
+        if checkout_branch:
+            cmd.extend(["-b", checkout_branch])
+        if bare:
+            cmd.append("--bare")
+
+        run_command(cmd)
 
     @staticmethod
     def push(remote, refname):
