@@ -316,6 +316,9 @@ class PagureRepoSpannerTestsNewRepoDefault(PagureRepoSpannerTests):
                 output.get_data(as_text=True))
 
         with tests.user_set(self.app.application, tests.FakeUser(username='pingou')):
+            # Verify that for forking, Git auth status is ignored (hooks should not be run)
+            self.set_auth_status(False)
+
             data = {
                 'csrf_token': self.get_csrf(),
             }
@@ -331,6 +334,7 @@ class PagureRepoSpannerTestsNewRepoDefault(PagureRepoSpannerTests):
             self.assertIn(
                 '<title>Overview - project-1 - Pagure</title>', output_text)
             self.assertIn('Added the README', output_text)
+            self.assertIn('/?next=http://localhost/fork/pingou/project-1', output_text)
 
             output = self.app.get('/fork/pingou/project-1/settings')
             self.assertIn(
