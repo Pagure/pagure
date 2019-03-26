@@ -1069,6 +1069,21 @@ the user interface of this pagure instance.
 Defaults to: ``ENABLE_DEL_PROJECTS``
 
 
+GIT_HOOK_DB_RO
+~~~~~~~~~~~~~~
+
+This configuration key specifies if the git hook have a read-only (RO) access
+to the database or not.
+Some pagure deployment provide an actual shell account on the host and thus the
+git hook called upon git push are executed under that account. If the user
+manages to by-pass git and is able to access the configuration file, they could
+have access to "private" information. So in those deployments the git hooks
+have a specific configuration file with a database access that is read-only,
+making pagure behave differently in those situations.
+
+Defaults to: ``False``
+
+
 EMAIL_SEND
 ~~~~~~~~~~
 

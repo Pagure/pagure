@@ -330,12 +330,20 @@ class DefaultRunner(BaseRunner):
 
         # Refresh of all opened PRs
         parent = project.parent or project
-        pagure.lib.tasks.refresh_pr_cache(
-            parent.name,
-            parent.namespace,
-            parent.user.user if parent.is_fork else None,
-            but_uids=pr_uids,
-        )
+        if _config.get("GIT_HOOK_DB_RO", False):
+            pagure.lib.tasks.refresh_pr_cache(
+                parent.name,
+                parent.namespace,
+                parent.user.user if parent.is_fork else None,
+                but_uids=pr_uids,
+            )
+        else:
+            pagure.lib.tasks.refresh_pr_cache.delay(
+                parent.name,
+                parent.namespace,
+                parent.user.user if parent.is_fork else None,
+                but_uids=pr_uids,
+            )
 
         if not project.is_on_repospanner and _config.get(
             "GIT_GARBAGE_COLLECT", False
