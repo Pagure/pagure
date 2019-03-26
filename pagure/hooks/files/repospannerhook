@@ -13,6 +13,12 @@ from __future__ import print_function, absolute_import
 import os
 import sys
 
+if os.environ.get("extra_internal_no_hooks", False):
+    # we do this check before any pagure machinery is imported
+    # and initialized to make sure this is very fast (used
+    # when pushing code from original repos to forks)
+    sys.exit(0)
+
 # These fields get filled in by upload-repospanner-hooks
 os.environ["PAGURE_CONFIG"] = "${config}"
 PYPATH = "${pypath}"
