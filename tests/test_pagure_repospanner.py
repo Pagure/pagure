@@ -254,6 +254,11 @@ class PagureRepoSpannerTests(tests.Modeltests):
                 self.tearDown()
                 raise
 
+        # Upload the hook script to repoSpanner
+        args = munch.Munch({'region': 'default'})
+        hookid = pagure.cli.admin.do_upload_repospanner_hooks(args)
+        pagure.config.config['REPOSPANNER_REGIONS']['default']['hook'] = hookid
+
     def tearDown(self):
         """ Tear down the repoSpanner instance. """
         if self.repospanner_proc:
@@ -409,10 +414,6 @@ class PagureRepoSpannerTestsNewRepoDefault(PagureRepoSpannerTests):
         ast.return_value = False
         pagure.cli.admin.session = self.session
 
-        # Upload the hook script to repoSpanner
-        args = munch.Munch({'region': 'default'})
-        hookid = pagure.cli.admin.do_upload_repospanner_hooks(args)
-
         user = tests.FakeUser(username='foo')
         with tests.user_set(self.app.application, user):
             data = {
@@ -442,11 +443,6 @@ class PagureRepoSpannerTestsNewRepoDefault(PagureRepoSpannerTests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertEqual(output_text, '# project-1\n\nProject #1')
-
-        # Set the hook
-        args = munch.Munch({'hook': hookid})
-        projects = pagure.cli.admin.do_ensure_project_hooks(args)
-        self.assertEqual(["project-1"], projects)
 
         with tests.user_set(self.app.application, user):
             # Set editing Denied
