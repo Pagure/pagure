@@ -11,6 +11,7 @@
 from __future__ import unicode_literals, absolute_import
 
 import datetime
+import functools
 import munch
 import unittest
 import shutil
@@ -213,7 +214,7 @@ class PagureRepoSpannerTests(tests.Modeltests):
             )
 
         self.repospanner_runlog = open(
-            os.path.join(self.path, 'repospanner', 'runlog'), 'w')
+            os.path.join(self.path, 'repospanner', 'runlog'), 'w+')
 
         try:
             self.repospanner_proc = subprocess.Popen(
@@ -274,12 +275,27 @@ class PagureRepoSpannerTests(tests.Modeltests):
         super(PagureRepoSpannerTests, self).tearDown()
 
 
+def print_repospanner_log(fn):
+    @functools.wraps(fn)
+    def wrapper(self, *args, **kwargs):
+        try:
+            return fn(self, *args, **kwargs)
+        finally:
+            if self.repospanner_runlog:
+                self.repospanner_runlog.seek(0, 0,)
+                print("repoSpanner log follows:")
+                print(self.repospanner_runlog.read())
+
+    return wrapper
+
+
 class PagureRepoSpannerTestsNewRepoDefault(PagureRepoSpannerTests):
     config_values = {
         'repospanner_new_repo': "'default'",
         'authbackend': 'test_auth',
     }
 
+    @print_repospanner_log
     @patch('pagure.ui.app.admin_session_timedout')
     def test_new_project(self, ast):
         """ Test creating a new repo by default on repoSpanner works. """
@@ -345,6 +361,7 @@ class PagureRepoSpannerTestsNewRepoDefault(PagureRepoSpannerTests):
         repodirlist = os.listdir(os.path.join(self.path, 'repos'))
         self.assertEqual(repodirlist, ['pseudo'])
 
+    @print_repospanner_log
     @patch.dict('pagure.config.config', {
         'ALLOW_HTTP_PULL_PUSH': True,
         'ALLOW_HTTP_PUSH': True,
@@ -381,6 +398,7 @@ class PagureRepoSpannerTestsNewRepoDefault(PagureRepoSpannerTests):
         output_text = output.get_data(as_text=True)
         self.assertIn("Error processing your request", output_text)
 
+    @print_repospanner_log
     @patch.dict('pagure.config.config', {
         'ALLOW_HTTP_PULL_PUSH': True,
         'ALLOW_HTTP_PUSH': True,
@@ -412,6 +430,7 @@ class PagureRepoSpannerTestsNewRepoDefault(PagureRepoSpannerTests):
         self.assertIn("symref=HEAD:refs/heads/master", output_text)
         self.assertIn(" refs/heads/master\x00", output_text)
 
+    @print_repospanner_log
     @patch('pagure.ui.app.admin_session_timedout')
     def test_hooks(self, ast):
         """ Test hook setting and running works. """
@@ -509,6 +528,7 @@ class PagureRepoSpannerTestsNewRepoDefault(PagureRepoSpannerTests):
             output_text = output.get_data(as_text=True)
             self.assertEqual(output_text, 'foo\n bar\n  baz')
 
+    @print_repospanner_log
     @patch.dict('pagure.config.config', {'PAGURE_ADMIN_USERS': ['pingou'],
                                          'ALLOW_ADMIN_IGNORE_EXISTING_REPOS': True})
     @patch('pagure.ui.app.admin_session_timedout')
