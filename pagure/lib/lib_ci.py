@@ -23,10 +23,10 @@ from pagure.config import config as pagure_config
 _log = logging.getLogger(__name__)
 
 BUILD_STATS = {
-    "SUCCESS": ("Build successful", pagure_config["FLAG_SUCCESS"], 100),
-    "FAILURE": ("Build failed", pagure_config["FLAG_FAILURE"], 0),
-    "ABORTED": ("Build aborted", "error", 0),
-    "BUILDING": ("Build in progress", pagure_config["FLAG_PENDING"], 0),
+    "SUCCESS": ("Build #%s successful", pagure_config["FLAG_SUCCESS"], 100),
+    "FAILURE": ("Build #%s failed", pagure_config["FLAG_FAILURE"], 0),
+    "ABORTED": ("Build #%s aborted", "error", 0),
+    "BUILDING": ("Build #%s in progress", pagure_config["FLAG_PENDING"], 0),
 }
 
 
@@ -103,8 +103,9 @@ def process_jenkins_build(session, project, build_id, iteration=0):
         raise pagure.exceptions.PagureException("Request not found")
 
     comment, state, percent = BUILD_STATS[result]
+    comment = comment % build_id
     # Adding build ID to the CI type
-    username = "%s #%s" % (project.ci_hook.ci_type, build_id)
+    username = "%s" % project.ci_hook.ci_type
     if request.commit_stop:
         comment += " (commit: %s)" % (request.commit_stop[:8])
 
