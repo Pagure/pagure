@@ -1,6 +1,13 @@
 Upgrading Pagure
 ================
 
+From 5.3.x to 5.4
+-----------------
+
+The 5.4 release does not contain any database schema changes, nor any new
+configuration key.
+
+
 From 5.2 to 5.3
 ---------------
 
@@ -61,6 +68,10 @@ New configuration keys have been added:
 
 One configuration key changes its default structure:
 * TRIGGER_CI
+
+Changes in dependencies:
+* Mimimal version of pygit2 version bumped to: 0.26.0
+* Minimal version of openssh set to: 7.4
 
 
 From 5.1 to 5.1.4
@@ -175,6 +186,9 @@ Note: Some configuration keys changed their default value:
 * GIT_URL_GIT
 * FEDMSG_NOTIFICATIONS
 * PAGURE_AUTH
+
+New dependencies:
+* trololio (replaces trollius that is no longer a direct dependency)
 
 
 From 3.x to 4.0
