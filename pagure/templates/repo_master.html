@@ -376,12 +376,13 @@ function generate_branch_list_fork(data) {
    _b.show();
    $("#pr-dropdown-forklist .pr-dropdown-spinner").hide();
 }
+{% endif %}
 
 $("#pr-button").one("click",
   function() {
   var _pr_url = "{{ url_for('internal_ns.get_pull_request_ready_branch') }}";
 
-
+  {% if g.repo_committer %}
   var data = {
         repo: "{{ repo.name }}",
         namespace: "{{ repo.namespace if repo.namespace }}",
@@ -402,6 +403,8 @@ $("#pr-button").one("click",
       _b.show();
       $("#pr-dropdown-mainlist .pr-dropdown-spinner").hide();
   })
+  {% endif %}
+
   var data = {
         repo: "{{ repo.name }}",
         namespace: "{{ repo.namespace if repo.namespace }}",
@@ -424,7 +427,6 @@ $("#pr-button").one("click",
   })
   }
 );
-{% endif %}
 
 {% endif %}
 </script>
