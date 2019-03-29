@@ -719,7 +719,7 @@ def rebase_pull_request(
             request.id,
             request.uid,
         )
-        pagure.lib.git.rebase_pull_request(request, user_rebaser)
+        pagure.lib.git.rebase_pull_request(session, request, user_rebaser)
 
     update_pull_request(request.uid, username=user_rebaser)
     # Schedule refresh of all opened PRs

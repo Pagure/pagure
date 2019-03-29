@@ -1856,7 +1856,7 @@ def merge_pull_request(session, request, username, domerge=True):
     return "Changes merged!"
 
 
-def rebase_pull_request(request, username):
+def rebase_pull_request(session, request, username):
     """ Rebase the specified pull-request.
 
     Args:
@@ -1871,6 +1871,7 @@ def rebase_pull_request(request, username):
 
     """
     _log.info("%s asked to rebase the pull-request: %s", username, request)
+    user = pagure.lib.query.get_user(session, username)
 
     if request.remote:
         # Get the fork
@@ -1941,7 +1942,7 @@ def rebase_pull_request(request, username):
         # Configure git for that user
         command = ["git", "config", "user.name", username]
         _run_command(command)
-        command = ["git", "config", "user.email", "%s@pagure" % username]
+        command = ["git", "config", "user.email", user.default_email]
         _run_command(command)
 
         # Do the rebase
