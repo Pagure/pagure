@@ -3,6 +3,39 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
+5.5 (2019-04-08)
+----------------
+- themes/srcfpo: move icons to the theme instead of linking them from other apps
+  (Julen Landa Alustiza)
+- Add support for !owner to the API listing projects
+- Make sure that TemporaryClone.push also pushes tags (Slavek Kabrda)
+- Add missing "line" in comments links (Tim Landscheidt)
+- Include the target branch of the PR when triggering jenkins
+- Provide more information about invalid tokens
+- Fix the pagination on the fork page of the dashboard
+- Fix opening/viewings PRs from the branch pages on the srcfpo theme
+- Allow linking issues to PRs in the initial comment of a PR
+- Allow blocking an user on a project
+- Add support for username and password based authentication for pagure-ci
+- Remove extra "s" character from the starred repos page (Michael Watters)
+- Link to bugzilla for rpms, modules and container in the srcfpo theme
+- Add a button to select/unselect all the ACLs (Lenka Segura)
+- Fix the user in the notification about rebased PR
+- pagure/ui/fork: fix pull request closing flash message
+- Do not link on the "Star" button if the user is not authenticated
+- Replace calls to pygit2.clone_repository by calls to git clone directly
+- Support deployments where git hook have a read-only access to the db
+- Make fork more performant by using 'git push --mirror' (Slavek Kabrda)
+- Move the build ID from the title to the comment of the flag
+- Fix the new PR drop-down button
+- User the user's default email when rebasing
+- Fix a bug that preventing properly cleaning up a project in the DB if we
+  failed to create its repositories on disk
+- Fix showing branches having unicode characters in their names
+- Make the hook mechanism support utf-8 branch names
+- Include some shortcuts to the different namespaces in the srcfpo theme
+
+
 5.4 (2019-03-28)
 ----------------
 

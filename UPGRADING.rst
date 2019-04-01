@@ -1,6 +1,19 @@
 Upgrading Pagure
 ================
 
+
+From 5.4 to 5.5
+---------------
+
+The 5.5 release contains a database schema updates, so:
+
+* Update the data schema using alembic: ``alembic upgrade head``
+
+New configuration key added:
+
+* GIT_HOOK_DB_RO
+
+
 From 5.3.x to 5.4
 -----------------
 
