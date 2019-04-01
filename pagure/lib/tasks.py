@@ -267,7 +267,7 @@ def create_project(
                 templ,
                 ignore_existing_repo,
             )
-    except pagure.exceptions.RepoExistsException:
+    except Exception:
         session.delete(project)
         session.commit()
         raise
