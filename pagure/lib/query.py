@@ -1938,7 +1938,7 @@ def link_pr_to_issue_on_description(session, request):
     # Drop the existing initial_comment_pr-based relations
     session.query(model.PrToIssue).filter(
         model.PrToIssue.pull_request_uid == request.uid
-    ).filter(model.PrToIssue.origin == "intial_comment_pr").delete(
+    ).filter(model.PrToIssue.origin == "initial_comment_pr").delete(
         synchronize_session="fetch"
     )
 
