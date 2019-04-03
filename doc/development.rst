@@ -317,6 +317,7 @@ Use the following command to run the tests ::
 
 This command will build a fedora based container and execute the test suite. You can also
 limit the tests to unit-test files or single tests similar to the ``python runtests.py``
-options described above.
+options described above. You need set the environment variables REPO and BRANCH if the
+tests are not yet available in the upstream pagure master branch.
 
 

@@ -18,7 +18,6 @@ RUN dnf -y install \
     which \
     git
 
-# FIXME: this should use $REPO and $BRANCH:
 RUN cd / \
     && git clone -b $BRANCH $REPO \
     && chmod +x /pagure/dev/containers/runtests_py3.sh
