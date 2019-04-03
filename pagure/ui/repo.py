@@ -2564,6 +2564,9 @@ def delete_branch(repo, branchname, username=None, namespace=None):
             "this project",
         )
 
+    if six.PY2:
+        branchname = branchname.encode("utf-8")
+
     if branchname == "master":
         flask.abort(
             403, description="You are not allowed to delete the master branch"

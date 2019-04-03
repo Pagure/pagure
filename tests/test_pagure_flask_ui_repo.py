@@ -21,6 +21,7 @@ import time
 import os
 
 import pygit2
+import six
 from mock import ANY, patch, MagicMock
 
 sys.path.insert(0, os.path.join(os.path.dirname(
@@ -5466,6 +5467,42 @@ index 0000000..fb7093d
             output_text = output.get_data(as_text=True)
             self.assertNotIn(
                 '<form id="delete_branch_form-feature__foo"', output_text)
+
+    def test_delete_branch_unicode(self):
+        """ Test the delete_branch endpoint with an unicode branch. """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(self.app.application, user):
+
+            # Add a branch that we can delete
+            path = os.path.join(self.path, 'repos', 'test.git')
+            tests.add_content_git_repo(path)
+            repo = pygit2.Repository(path)
+            branchname = '☃️'
+            if six.PY2:
+                branchname = branchname.encode("utf-8")
+            repo.create_branch(branchname, repo.head.peel())
+
+            # Check before deletion
+            output = self.app.get('/test')
+            self.assertEqual(output.status_code, 200)
+
+            output = self.app.get('/test/branches')
+            output_text = output.get_data(as_text=True)
+            self.assertIn('<form id="delete_branch_form-☃️"', output_text)
+
+            # Delete the branch
+            output = self.app.post('/test/b/☃️/delete', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+
+            # Check after deletion
+            output = self.app.get('/test/branches')
+            output_text = output.get_data(as_text=True)
+            self.assertNotIn(
+                '<form id="delete_branch_form-☃️"', output_text)
 
     @patch.dict('pagure.config.config', {'ALLOW_DELETE_BRANCH': False})
     def test_delete_branch_disabled_in_ui(self):

@@ -88,7 +88,7 @@
                     }}" method="post" class="icon d-inline"
                     onsubmit="return confirm('Are you sure you want to remove the branch: {{ branch | unicode }}?\nThis cannot be un-done!');">
                     {{ g.confirmationform.csrf_token }}
-                    <a title="Remove branch {{ branch }}" href="#"
+                    <a title="Remove branch {{ branch | unicode }}" href="#"
                       class="btn btn-outline-danger"
                       onclick="$('#delete_branch_form-{{
                         branch | unicode | replace('/', '__') | replace('.', '\\\\.')
