@@ -39,7 +39,7 @@
         {% endif %}
 
         {% for branch in g.branches if branch != head %}
-          <div id="branch-{{ branch | replace('/', '__')}}" class="list-group-item">
+          <div id="branch-{{ branch | unicode | replace('/', '__')}}" class="list-group-item">
             <div class="row align-items-center">
               <div class="col">
                 <span class="fa fa-random fa-fw text-muted"></span>
@@ -48,7 +48,7 @@
                   username=username,
                   namespace=repo.namespace,
                   identifier=branch) }}"
-                  title="{{ branch }}" data-toggle="tooltip">{{ branch }}
+                  title="{{ branch | unicode }}" data-toggle="tooltip">{{ branch | unicode }}
                 </a>
                 <small class="text-muted commits_ahead_label"></small>
               </div>
@@ -78,7 +78,7 @@
                           config.get('ALLOW_DELETE_BRANCH', True)
                           or repo.is_fork) %}
                     <form id="delete_branch_form-{{
-                        branch | replace('/', '__') | replace('+', '___')
+                        branch | unicode | replace('/', '__') | replace('+', '___')
                       }}" action="{{
                       url_for('ui_ns.delete_branch',
                               repo=repo.name,
@@ -86,12 +86,12 @@
                               namespace=repo.namespace,
                               branchname=branch)
                       }}" method="post" class="icon d-inline"
-                      onsubmit="return confirm('Are you sure you want to remove the branch: {{ branch }}?\nThis cannot be un-done!');">
+                      onsubmit="return confirm('Are you sure you want to remove the branch: {{ branch | unicode }}?\nThis cannot be un-done!');">
                       {{ g.confirmationform.csrf_token }}
                       <a title="Remove branch {{ branch }}" href="#"
                         class="btn btn-outline-danger"
                         onclick="$('#delete_branch_form-{{
-                          branch | replace('/', '__') | replace('.', '\\\\.')
+                          branch | unicode | replace('/', '__') | replace('.', '\\\\.')
                           | replace('+', '___')
                           }}').submit();">
                         <i class="fa fa-trash"></i>
