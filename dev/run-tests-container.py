@@ -126,10 +126,10 @@ if __name__ == "__main__":
                 "BRANCH={}".format(os.environ.get("BRANCH") or ""),
                 "-e",
                 "REPO={}".format(os.environ.get("REPO") or ""),
+                "-e",
+                "TESTCASE={}".format(args.test_case or ""),
                 container_name,
-                args.test_case,
             ]
-
             output_code = sp.call(command)
             if output_code:
                 failed.append(container_name)

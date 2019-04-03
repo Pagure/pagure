@@ -22,4 +22,4 @@ echo "Last commits:"
 git --no-pager log -2
 fi
 
-python2 /pagure/runtests.py run -f --py2
+python2 /pagure/runtests.py run -f --py2 $TESTCASE

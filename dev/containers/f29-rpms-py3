@@ -12,6 +12,7 @@ RUN dnf -y install \
     which \
     git
 
+# FIXME: this should use $REPO and $BRANCH:
 RUN cd / \
     && git clone https://pagure.io/pagure.git \
     && chmod +x /pagure/dev/containers/runtests_py3.sh
@@ -24,7 +25,6 @@ RUN dnf install -y `grep "Requires:" /pagure/files/pagure.spec | \
     sed -e "s|%{python_pkgversion}|3|"` && \
     dnf clean all && \
     cd /pagure && python setup.py build
-
 
 WORKDIR /pagure
 ENTRYPOINT ["/pagure/dev/containers/runtests_py3.sh"]
