@@ -1,5 +1,11 @@
 FROM fedora:29
 
+ARG repo
+ARG branch
+
+ENV REPO=$repo
+ENV BRANCH=$branch
+
 RUN dnf -y install \
     python3-setuptools \
     python3-coverage \
@@ -14,7 +20,7 @@ RUN dnf -y install \
 
 # FIXME: this should use $REPO and $BRANCH:
 RUN cd / \
-    && git clone https://pagure.io/pagure.git \
+    && git clone -b $BRANCH $REPO \
     && chmod +x /pagure/dev/containers/runtests_py3.sh
 
 # Install all the requirements from the spec file and replace the macro

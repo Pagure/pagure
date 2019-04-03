@@ -74,6 +74,10 @@ if __name__ == "__main__":
                 [
                     "podman",
                     "build",
+                    "--build-arg",
+                    "branch={}".format(os.environ.get("BRANCH") or "master"),
+                    "--build-arg",
+                    "repo={}".format(os.environ.get("REPO") or "https://pagure.io/pagure.git"),
                     "--rm",
                     "-t",
                     container_name,
@@ -103,9 +107,9 @@ if __name__ == "__main__":
                 "{}/results_{}:/pagure/results:z".format(
                     os.getcwd(), container_files[idx]),
                 "-e",
-                "BRANCH=$BRANCH",
+                "BRANCH={}".format(os.environ.get("BRANCH") or "master"),
                 "-e",
-                "REPO=$REPO",
+                "REPO={}".format(os.environ.get("REPO") or "https://pagure.io/pagure.git"),
                 "--entrypoint=/bin/bash",
                 container_name,
             ]
@@ -123,9 +127,9 @@ if __name__ == "__main__":
                 "{}/results_{}:/pagure/results:z".format(
                     os.getcwd(), container_files[idx]),
                 "-e",
-                "BRANCH={}".format(os.environ.get("BRANCH") or ""),
+                "BRANCH={}".format(os.environ.get("BRANCH") or "master"),
                 "-e",
-                "REPO={}".format(os.environ.get("REPO") or ""),
+                "REPO={}".format(os.environ.get("REPO") or "https://pagure.io/pagure.git"),
                 "-e",
                 "TESTCASE={}".format(args.test_case or ""),
                 container_name,

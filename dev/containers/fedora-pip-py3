@@ -1,5 +1,11 @@
 FROM fedora:latest
 
+ARG repo
+ARG branch
+
+ENV REPO=$repo
+ENV BRANCH=$branch
+
 RUN dnf -y install \
     python3-setuptools \
     redhat-rpm-config \
@@ -15,7 +21,7 @@ RUN dnf -y install \
     git
 
 RUN cd / \
-    && git clone https://pagure.io/pagure.git \
+    && git clone -b $BRANCH $REPO \
     && chmod +x /pagure/dev/containers/tox_py3.sh
 
 # Install pygit2 manually, outside of the virtualenv since it is tightly coupled

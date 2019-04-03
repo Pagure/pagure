@@ -1,5 +1,11 @@
 FROM centos:7
 
+ARG repo
+ARG branch
+
+ENV REPO=$repo
+ENV BRANCH=$branch
+
 RUN yum -y install \
     epel-release
 
@@ -26,7 +32,7 @@ RUN yum -y install \
 RUN yum install -y https://pingou.fedorapeople.org/RPMs/python-werkzeug-0.9.6-1.el7.noarch.rpm
 
 RUN cd / \
-    && git clone https://pagure.io/pagure.git \
+    && git clone -b $BRANCH $REPO \
     && chmod +x /pagure/dev/containers/runtests_py2.sh
 
 # Install all the requirements from the spec file and replace the macro
