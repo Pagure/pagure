@@ -480,10 +480,14 @@ def extract_changes(from_stdin):
     changes = {}
     if from_stdin:
         for line in sys.stdin:
-            (oldrev, newrev, refname) = line.strip().split(" ", 2)
+            (oldrev, newrev, refname) = str(line).strip().split(str(" "), 2)
+            if six.PY2:
+                refname = refname.decode("utf-8")
             changes[refname] = (oldrev, newrev)
     else:
         (refname, oldrev, newrev) = sys.argv[1:]
+        if six.PY2:
+            refname = refname.decode("utf-8")
         changes[refname] = (oldrev, newrev)
     return changes
 
