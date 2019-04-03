@@ -294,7 +294,7 @@ by alone, allowing easier debugging of the tests. For example:
 
 ::
 
-  python tests/test_pagure_lib.py
+  python runtests.py run tests/test_pagure_lib.py
 
 
 .. note:: In order to have coverage information you might have to install
@@ -313,7 +313,7 @@ by alone, allowing easier debugging of the tests. For example:
 To run the unit-tests, there is also a container available with all the dependencies needed.
 Use the following command to run the tests ::
 
-    $ ./dev/run-tests-docker.py
+    $ ./dev/run-tests-container.py
 
 This command will build a fedora based container and execute the test suite. You can also
 limit the tests to unit-test files or single tests similar to the ``python runtests.py``
