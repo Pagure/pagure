@@ -1,7 +1,7 @@
 FROM fedora:latest
 
-ARG repo
-ARG branch
+ARG repo=https://pagure.io/pagure.git
+ARG branch=master
 
 ENV REPO=$repo
 ENV BRANCH=$branch
