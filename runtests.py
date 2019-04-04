@@ -438,7 +438,7 @@ def _run_test_suites(args, suites):
                 "pagure/hooks/files/hookrunner"
             ])
             subprocess.check_call([
-                "sed", "-i", "-e", "s|['alembic',|['alembic-2',|",
+                "sed", "-i", "-e", "s|\['alembic',|\['alembic-2',|",
                 "tests/test_alembic.py"
             ])
         elif pyvers[0] == 3:
