@@ -22,4 +22,4 @@ echo "Last commits:"
 git --no-pager log -2
 fi
 
-tox -v --sitepackages -e 'py34-flask100-ci' -- --results=results
+tox -v --sitepackages -e 'py35-flask100-ci' -- --results=results
