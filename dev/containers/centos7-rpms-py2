@@ -29,8 +29,6 @@ RUN yum -y install \
     repoSpanner \
     repoSpanner-bridge
 
-RUN yum install -y https://pingou.fedorapeople.org/RPMs/python-werkzeug-0.9.6-1.el7.noarch.rpm
-
 RUN cd / \
     && git clone -b $BRANCH $REPO \
     && chmod +x /pagure/dev/containers/runtests_py2.sh
