@@ -2846,6 +2846,9 @@ def generate_archive(project, commit, tag, name, archive_fmt):
 def mirror_pull_project(session, project, debug=False):
     """ Mirror locally a project from a remote URL. """
     remote = project.mirrored_from
+    if not remote:
+        _log.info("No remote found, ignoring")
+        return
     repopath = tempfile.mkdtemp(prefix="pagure-mirror_in-")
     lclrepopath = pagure.utils.get_repo_path(project)
 

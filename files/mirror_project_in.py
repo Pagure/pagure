@@ -34,7 +34,10 @@ def main(check=False, debug=False):
     for project in projects:
         if debug:
             print("Mirrorring %s" % project.fullname)
-        pagure.lib.git.mirror_pull_project(session, project, debug=debug)
+        try:
+            pagure.lib.git.mirror_pull_project(session, project, debug=debug)
+        except Exception as err:
+            print("ERROR: %s" % err)
 
     session.remove()
     if debug:
