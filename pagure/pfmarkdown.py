@@ -528,9 +528,9 @@ def _get_ns_repo_user():
     root = flask.request.url_root
     url = flask.request.url
 
-    user = flask.request.args.get("user")
-    namespace = flask.request.args.get("namespace")
-    repo = flask.request.args.get("repo")
+    user = flask.request.args.get("user") or None
+    namespace = flask.request.args.get("namespace") or None
+    repo = flask.request.args.get("repo") or None
 
     if not user and not repo:
         if "fork/" in url:
