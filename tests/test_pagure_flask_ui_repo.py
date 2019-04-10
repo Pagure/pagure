@@ -2835,20 +2835,20 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<a class=\n      "nav-link nowrap\n active"\n      '
-            'href="/test/commits/master">\n      <i class="fa fa-list-alt '
+            '<a class=\n    "nav-link nowrap\n active"\n    '
+            'href="/test/commits/master">\n    <i class="fa fa-list-alt '
             'text-muted fa-fw" data-glyph="spreadsheet"></i>&nbsp;Commits'
-            '\n    </a>', output_text)
+            '\n  </a>', output_text)
 
         #View the commit when branch name is wrong, show the commit
         output = self.app.get('/test/c/%s?branch=abcxyz' % commit.oid.hex)
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<a class=\n      "nav-link nowrap\n active"\n      '
-            'href="/test/commits">\n      <i class="fa fa-list-alt '
+            '<a class=\n    "nav-link nowrap\n active"\n    '
+            'href="/test/commits">\n    <i class="fa fa-list-alt '
             'text-muted fa-fw" data-glyph="spreadsheet"></i>&nbsp;Commits'
-            '\n    </a>', output_text)
+            '\n  </a>\n', output_text)
 
         # Add a fork of a fork
         item = pagure.lib.model.Project(
@@ -2899,21 +2899,21 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<a class=\n      "nav-link nowrap\n active"\n      '
-            'href="/fork/pingou/test3/commits/master">\n      '
+            '<a class=\n    "nav-link nowrap\n active"\n    '
+            'href="/fork/pingou/test3/commits/master">\n    '
             '<i class="fa fa-list-alt '
             'text-muted fa-fw" data-glyph="spreadsheet"></i>&nbsp;Commits'
-            '\n    </a>', output_text)
+            '\n  </a>\n', output_text)
 
         #View the commit of the fork when branch name is wrong
         output = self.app.get('/fork/pingou/test3/c/%s?branch=abcxyz' % commit.oid.hex)
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<a class=\n      "nav-link nowrap\n active"\n      '
-            'href="/fork/pingou/test3/commits">\n      <i class="fa fa-list-alt '
+            '<a class=\n    "nav-link nowrap\n active"\n    '
+            'href="/fork/pingou/test3/commits">\n    <i class="fa fa-list-alt '
             'text-muted fa-fw" data-glyph="spreadsheet"></i>&nbsp;Commits'
-            '\n    </a>', output_text)
+            '\n  </a>', output_text)
 
     def test_view_commit_with_full_link(self):
         """ Test the view_commit endpoint when the commit message includes
