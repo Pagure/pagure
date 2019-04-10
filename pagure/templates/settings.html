@@ -105,8 +105,7 @@
           {% endif %}
 
           {% for blueprint in main_app.blueprints %}
-            {% if blueprint not in [
-                    'api_ns', 'ui_ns', 'internal_ns', 'theme'] %}
+            {% if blueprint | hasattr('settings') %}
               <a class="nav-item nav-link thirdparty_settings"
                 id="{{ blueprint.name }}" data-name="{{ blueprint.name }}"
                 data-url="{{ url_for(
