@@ -241,6 +241,7 @@ def set_request():
             flask.current_app.config["DB_URL"]
         )
 
+    flask.g.main_app = flask.current_app
     flask.g.version = pagure.__version__
     flask.g.confirmationform = pagure.forms.ConfirmationForm()
 

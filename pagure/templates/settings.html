@@ -104,7 +104,7 @@
             href="#deleteproject-tab" role="tab" aria-controls="deleteproject">Delete Project</a>
           {% endif %}
 
-          {% for blueprint in main_app.blueprints %}
+          {% for blueprint in g.main_app.blueprints %}
             {% if blueprint | hasattr('settings') %}
               <a class="nav-item nav-link thirdparty_settings"
                 id="{{ blueprint.name }}" data-name="{{ blueprint.name }}"
