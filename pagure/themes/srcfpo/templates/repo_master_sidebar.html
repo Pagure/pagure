@@ -1,0 +1,172 @@
+<nav class="nav nav-tabs nav-sidetabs flex-column">
+  <a class=
+      "nav-link nowrap
+      {%if select == 'overview' %} active{% endif %}"
+      href="{{ url_for(
+        'ui_ns.view_repo',
+        repo=repo.name,
+        username=username,
+        namespace=repo.namespace) }}">
+      <i class="fa fa-home text-muted fa-fw"></i>&nbsp;<span class="d-none d-md-inline">Overview</span>
+  </a>
+  <a class=
+    "nav-link nowrap
+    {%if g.repo_obj and g.repo_obj.is_empty %} disabled{% endif %}
+    {%if select == 'tree' %} active{% endif %}"
+    href="{{ url_for(
+    'ui_ns.view_tree',
+    repo=repo.name,
+    username=username,
+    namespace=repo.namespace,
+    identifier=branchname) }}">
+    <i class="fa fa-file-code-o text-muted fa-fw"></i>&nbsp;Files
+  </a>
+  <a class=
+    "nav-link nowrap
+    {%if g.repo_obj and g.repo_obj.is_empty %} disabled{% endif %}
+    {%if select == 'commits' %} active{% endif %}"
+    href="{{ url_for(
+    'ui_ns.view_commits',
+    repo=repo.name,
+    username=username,
+    namespace=repo.namespace,
+    branchname=branchname) }}">
+    <i class="fa fa-list-alt text-muted fa-fw" data-glyph="spreadsheet"></i>&nbsp;Commits
+  </a>
+  <a class=
+    "nav-link nowrap
+    {%if select == 'branches' %} active{% endif %}"
+    href="{{ url_for(
+    'ui_ns.view_branches',
+    repo=repo.name,
+    username=username,
+    namespace=repo.namespace,
+    branchname=branchname) }}">
+    <i class="fa fa-random text-muted fa-fw"></i>&nbsp;Branches
+  </a>
+  <a class=
+    "nav-link nowrap
+    {%if select == 'forks' %} active{% endif %}"
+    href="{{ url_for(
+    'ui_ns.view_forks',
+    repo=repo.name,
+    username=username,
+    namespace=repo.namespace) }}">
+    <i class="fa fa-code-fork text-muted fa-fw"></i>&nbsp;Forks
+  </a>
+  <a class=
+    "nav-link nowrap
+    {%if select == 'tags' %} active{% endif %}"
+    href="{{ url_for(
+    'ui_ns.view_tags',
+    repo=repo.name,
+    username=username,
+    namespace=repo.namespace) }}">
+    <i class="fa fa-tags text-muted fa-fw"></i>&nbsp;Releases
+  </a>
+
+  {% if 'distgit_ns' in main_app.blueprints and not repo.is_fork %}
+  <div class="col-xs-2" style="height:1em;"></div>
+  <p>Monitoring status:</p>
+  <div class="btn-group">
+    <a href="#" title="Monitoring status"
+        class="btn btn-sm dropdown-toggle btn-outline-primary"
+        data-toggle="dropdown" id="monitoring-button">
+      <i id="monitoring-icon" class="fa fa-fw fa-eye"></i>
+      <span id="monitoring-label" class="fa fa-circle-o-notch fa-spin fa-1x fa-fw"></span>
+    </a>
+    <div class="dropdown-menu dropdown-menu-right monitoring-menu">
+      <a class="dropdown-item pl-2" id="no_monitoring_option_button">
+        <div class="media">
+          <div class="align-self-center check-icon pr-2">
+              <span class="fa fa-fw"></span>
+          </div>
+          <div class="media-body">
+              No-Monitoring
+          </div>
+        </div>
+      </a>
+      <a class="dropdown-item pl-2" id="monitoring_option_button">
+        <div class="media">
+            <div class="align-self-center check-icon pr-2">
+                <span class="fa fa-fw"></span>
+            </div>
+            <div class="media-body">
+                Monitoring
+            </div>
+          </div>
+      </a>
+      <a class="dropdown-item pl-2" id="monitoring_and_scratch_option_button">
+        <div class="media">
+          <div class="align-self-center check-icon pr-2">
+              <span class="fa fa-fw"></span>
+          </div>
+          <div class="media-body">
+              monitoring and scratch builds
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    window.addEventListener('load', function() {
+
+      set_up_monitoring = function(status){
+        var _label = "Disabled"
+        if (status === "monitoring") {
+          _label = "Monitoring";
+          $("#monitoring-icon").attr("class", "fa fa-fw fa-eye")
+        } else if (status === "monitoring-with-scratch") {
+          _label = "Scratch builds"
+          $("#monitoring-icon").attr("class", "fa fa-fw fa-eye")
+        } else {
+          $("#monitoring-icon").attr("class", "fa fa-fw fa-eye-slash")
+        }
+
+        $("#monitoring-label").text(_label);
+        $("#monitoring-label").removeClass("fa fa-circle-o-notch fa-spin fa-1x fa-fw");
+      }
+
+      $.ajax({
+        url: "{{ url_for('distgit_ns.anitya_patch_endpoint', repo=repo.name, namespace=repo.namespace) }}",
+        type: 'GET',
+        dataType: 'json',
+        success: function(res) {
+          console.log(res);
+          set_up_monitoring(res.monitoring)
+        }
+      });
+
+      {% if g.authenticated %}
+      $(".monitoring-menu a").click(function(){
+          var selectedValue = $(this).attr('id');
+          var _status = "no-monitoring";
+          if (selectedValue === "monitoring_option_button") {
+              _status = "monitoring";
+          } else if (selectedValue === "monitoring_and_scratch_option_button") {
+              _status = "monitoring-with-scratch"
+          }
+
+          $.ajax({
+            url: "{{ url_for('distgit_ns.anitya_patch_endpoint', repo=repo.name, namespace=repo.namespace) }}",
+            type: 'PATCH',
+            data: {
+              anitya_status: _status,
+            },
+            dataType: 'json',
+            success: function(res) {
+              set_up_monitoring(res.monitoring)
+            },
+            error: function() {
+              alert('Unable to change the monitoring status! ' + error);
+            }
+          });
+
+      });
+      {% endif %}
+    });
+  </script>
+  {% endif %}
+
+</nav>
