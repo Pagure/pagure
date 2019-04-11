@@ -332,6 +332,11 @@ class PagureLibTaskServicestests(tests.Modeltests):
         )
         calls = [
             call(
+                u'Good Morning\n\n'
+                u'This is the log of loading all the files pushed in the git '
+                u'repo into\n'
+                u'the database. It should ignore files that are not JSON files,'
+                u' this\nis fine.\n\n'
                 u'Loading: file1 -- 1/2 ... ... Done\n'
                 u'Loading: file2 -- 2/2 ... ... Done',
                 u'Issue import report',
@@ -380,6 +385,11 @@ class PagureLibTaskServicestests(tests.Modeltests):
 
         calls = [
             call(
+                u'Good Morning\n\n'
+                u'This is the log of loading all the files pushed in the git '
+                u'repo into\n'
+                u'the database. It should ignore files that are not JSON files,'
+                u' this\nis fine.\n\n'
                 u'Loading: file1 -- 1/2 ... ... FAILED\n',
                 u'Issue import report',
                 u'bar@pingou.com'
@@ -805,6 +815,11 @@ class PagureLibTaskServicesLoadJsonTickettests(tests.Modeltests):
         up_pr.assert_not_called()
         calls = [
             call(
+                u'Good Morning\n\n'
+                u'This is the log of loading all the files pushed in the git '
+                u'repo into\n'
+                u'the database. It should ignore files that are not JSON files,'
+                u' this\nis fine.\n\n'
                 u'Loading: %s -- 1/1 ... ... Done' % issue.uid,
                 u'Issue import report',
                 u'bar@pingou.com'

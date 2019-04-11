@@ -308,7 +308,14 @@ def load_json_commits_to_db(
     file_list = set(get_files_to_load(project.fullname, commits, abspath))
     n = len(file_list)
     _log.info("LOADJSON: %s files to process" % n)
-    mail_body = []
+    mail_body = [
+        "Good Morning",
+        "",
+        "This is the log of loading all the files pushed in the git repo into",
+        "the database. It should ignore files that are not JSON files, this",
+        "is fine.",
+        "",
+    ]
 
     for idx, filename in enumerate(sorted(file_list)):
         _log.info(
