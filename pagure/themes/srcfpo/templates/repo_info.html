@@ -477,7 +477,7 @@ $(document).ready(function() {
 
   {% if repo.namespace == 'rpms' %}
     $.ajax({
-      url: 'https://apps.fedoraproject.org/mdapi/rawhide/pkg/{{ repo.name }}',
+      url: 'https://apps.fedoraproject.org/mdapi/rawhide/srcpkg/{{ repo.name }}',
       type: 'GET',
       dataType: 'jsonp',
       success: function(res) {
