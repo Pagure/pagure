@@ -28,11 +28,12 @@ PRINTLOCK = None
 RUNNING = []
 FAILED = []
 NUMPROCS = multiprocessing.cpu_count() - 1
-if os.environ.get('BUILD_ID'):
+if os.environ.get("BUILD_ID"):
     NUMPROCS = multiprocessing.cpu_count()
 
 HERE = os.path.join(os.path.dirname(os.path.abspath(__file__)))
 LOG = logging.getLogger(__name__)
+
 
 def setup_parser():
     """ Set up the command line arguments supported and return the arguments
@@ -144,7 +145,10 @@ def setup_parser():
         help="Show the error files using `less`",
     )
     parser_run.add_argument(
-        "-n", default=None, nargs="?", type=int,
+        "-n",
+        default=None,
+        nargs="?",
+        type=int,
         help="Number of failed test to show",
     )
     parser_run.set_defaults(func=do_list)
@@ -152,7 +156,8 @@ def setup_parser():
     # SHOW-COVERAGE
     parser_run = subparsers.add_parser(
         "show-coverage",
-        help="Shows the coverage report from the data in the results folder")
+        help="Shows the coverage report from the data in the results folder",
+    )
     parser_run.add_argument(
         "--debug",
         dest="debug",
@@ -221,9 +226,9 @@ def remove_running(suite, failed):
     with PRINTLOCK:
         RUNNING.remove(suite)
         clean_line()
-        status = 'passed'
+        status = "passed"
         if failed:
-            status = 'FAILED'
+            status = "FAILED"
         print("Test suite %s: %s" % (status, suite))
         print_running()
 
@@ -255,15 +260,21 @@ class WorkerThread(threading.Thread):
                     cmd.append("--with-cover")
 
                 env = os.environ.copy()
-                env.update({
-                    "PAGURE_CONFIG": "../tests/test_config",
-                    "COVERAGE_FILE": os.path.join(
-                        self.results, "%s.coverage" % self.name
-                    ),
-                    "LANG": "en_US.UTF-8",
-                })
+                env.update(
+                    {
+                        "PAGURE_CONFIG": "../tests/test_config",
+                        "COVERAGE_FILE": os.path.join(
+                            self.results, "%s.coverage" % self.name
+                        ),
+                        "LANG": "en_US.UTF-8",
+                    }
+                )
                 proc = subprocess.Popen(
-                    cmd, cwd=".", stdout=resfile, stderr=subprocess.STDOUT, env=env
+                    cmd,
+                    cwd=".",
+                    stdout=resfile,
+                    stderr=subprocess.STDOUT,
+                    env=env,
                 )
                 res = proc.wait()
                 if res == 0:
@@ -299,9 +310,10 @@ def do_run(args):
             except:
                 print(
                     "Could not delete the %s directory, it will be "
-                    "wiped clean" % args.results)
+                    "wiped clean" % args.results
+                )
                 for content in os.listdir(args.results):
-                   os.remove(content)
+                    os.remove(content)
     else:
         os.mkdir(args.results)
 
@@ -313,7 +325,9 @@ def do_run(args):
         here = os.path.join(os.path.dirname(os.path.abspath(__file__)))
         failed_tests_fullpath = os.path.join(here, args.failed_tests)
         if not os.path.exists(failed_tests_fullpath):
-            print("Could not find the specified file:%s" % failed_tests_fullpath)
+            print(
+                "Could not find the specified file:%s" % failed_tests_fullpath
+            )
             return 1
         print("Loading failed tests")
         try:
@@ -346,12 +360,15 @@ def do_rerun(args):
         return 1
 
     if not os.path.exists(args.results):
-        print("Could not find an existing results folder at: %s" % args.results)
+        print(
+            "Could not find an existing results folder at: %s" % args.results
+        )
         return 1
 
     if not os.path.exists(os.path.join(args.results, "newfailed")):
         print(
-            "Could not find an failed tests in the results folder at: %s" % args.results
+            "Could not find an failed tests in the results folder at: %s"
+            % args.results
         )
         return 1
 
@@ -378,9 +395,9 @@ def do_rerun(args):
 def _get_pyvers(args):
     pyvers = [2, 3]
     if args.py2:
-        pyvers = [2,]
+        pyvers = [2]
     elif args.py3:
-        pyvers = [3,]
+        pyvers = [3]
 
     un_versioned = False
     try:
@@ -433,23 +450,45 @@ def _run_test_suites(args, suites):
 
     if len(pyvers) == 1:
         if pyvers[0] == 2:
-            subprocess.check_call([
-                "sed", "-i", "-e", "s|python|python2|",
-                "pagure/hooks/files/hookrunner"
-            ])
-            subprocess.check_call([
-                "sed", "-i", "-e", "s|\['alembic',|\['alembic-2',|",
-                "tests/test_alembic.py"
-            ])
+            subprocess.check_call(
+                [
+                    "sed",
+                    "-i",
+                    "-e",
+                    "s|python|python2|",
+                    "pagure/hooks/files/hookrunner",
+                ]
+            )
+            subprocess.check_call(
+                [
+                    "sed",
+                    "-i",
+                    "-e",
+                    "s|\['alembic',|\['alembic-2',|",
+                    "tests/test_alembic.py",
+                ]
+            )
         elif pyvers[0] == 3:
-            subprocess.check_call([
-                "sed", "-i", "-e", "s|python|python3|",
-                "pagure/hooks/files/hookrunner"
-            ], cwd=HERE)
-            subprocess.check_call([
-                "sed", "-i", "-e", "s|\['alembic',|\['alembic-3',|",
-                "tests/test_alembic.py"
-            ], cwd=HERE)
+            subprocess.check_call(
+                [
+                    "sed",
+                    "-i",
+                    "-e",
+                    "s|python|python3|",
+                    "pagure/hooks/files/hookrunner",
+                ],
+                cwd=HERE,
+            )
+            subprocess.check_call(
+                [
+                    "sed",
+                    "-i",
+                    "-e",
+                    "s|\['alembic',|\['alembic-3',|",
+                    "tests/test_alembic.py",
+                ],
+                cwd=HERE,
+            )
 
     for suite in suites:
         for pyver in pyvers:
@@ -472,12 +511,14 @@ def _run_test_suites(args, suites):
     print()
     print("All work done")
 
-    subprocess.check_call([
-        "git",
-        "checkout",
-        "pagure/hooks/files/hookrunner",
-        "tests/test_alembic.py"
-    ])
+    subprocess.check_call(
+        [
+            "git",
+            "checkout",
+            "pagure/hooks/files/hookrunner",
+            "tests/test_alembic.py",
+        ]
+    )
 
     # Gather results
     print()
@@ -527,12 +568,15 @@ def do_list(args):
         return 1
 
     if not os.path.exists(args.results):
-        print("Could not find an existing results folder at: %s" % args.results)
+        print(
+            "Could not find an existing results folder at: %s" % args.results
+        )
         return 1
 
     if not os.path.exists(os.path.join(args.results, "newfailed")):
         print(
-            "Could not find an failed tests in the results folder at: %s" % args.results
+            "Could not find an failed tests in the results folder at: %s"
+            % args.results
         )
         return 1
 
@@ -553,7 +597,7 @@ def do_list(args):
     failed_tests = len(suites)
 
     if args.n:
-        suites = suites[:args.n]
+        suites = suites[: args.n]
     print("- " + "\n- ".join(suites))
     print("Total: %s test failed" % failed_tests)
 
@@ -572,7 +616,9 @@ def do_show_coverage(args):
     for pyver in pyvers:
         coverfiles = []
         for fname in os.listdir(args.results):
-            if fname.endswith(".coverage") and fname.startswith("py%s-" % pyver):
+            if fname.endswith(".coverage") and fname.startswith(
+                "py%s-" % pyver
+            ):
                 coverfiles.append(os.path.join(args.results, fname))
 
         cover = None
@@ -583,7 +629,9 @@ def do_show_coverage(args):
         else:
             cover = COVER_PY
 
-        env = {"COVERAGE_FILE": os.path.join(args.results, "combined.coverage")}
+        env = {
+            "COVERAGE_FILE": os.path.join(args.results, "combined.coverage")
+        }
         cmd = [cover, "combine"] + coverfiles
         subprocess.check_call(cmd, env=env)
         print()

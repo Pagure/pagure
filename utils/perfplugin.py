@@ -17,12 +17,13 @@ from nose.plugins import Plugin
 
 import perfrepo
 
-log = logging.getLogger('nose.plugins.perfplugin')
+log = logging.getLogger("nose.plugins.perfplugin")
 
 
 class PerfPlugin(Plugin):
     """A plugin for Nose that reports back on the test performance."""
-    name = 'pagureperf'
+
+    name = "pagureperf"
 
     def options(self, parser, env=None):
         if env is None:
@@ -35,6 +36,6 @@ class PerfPlugin(Plugin):
             return
 
     def report(self, stream):
-        stream.write('GIT PERFORMANCE TOTALS:\n')
-        stream.write('\tWalks: %d\n' % perfrepo.TOTALS['walks'])
-        stream.write('\tSteps: %d\n' % perfrepo.TOTALS['steps'])
+        stream.write("GIT PERFORMANCE TOTALS:\n")
+        stream.write("\tWalks: %d\n" % perfrepo.TOTALS["walks"])
+        stream.write("\tSteps: %d\n" % perfrepo.TOTALS["steps"])

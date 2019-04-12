@@ -8,40 +8,46 @@ import os
 import subprocess
 
 
-parser = argparse.ArgumentParser(
-    description='Run the Pagure worker')
+parser = argparse.ArgumentParser(description="Run the Pagure worker")
 parser.add_argument(
-    '--config', '-c', dest='config',
-    help='Configuration file to use for pagure.')
+    "--config",
+    "-c",
+    dest="config",
+    help="Configuration file to use for pagure.",
+)
 parser.add_argument(
-    '--debug', dest='debug', action='store_true',
+    "--debug",
+    dest="debug",
+    action="store_true",
     default=False,
-    help='Expand the level of data returned.')
+    help="Expand the level of data returned.",
+)
 parser.add_argument(
-    '--noinfo', dest='noinfo', action='store_true',
+    "--noinfo",
+    dest="noinfo",
+    action="store_true",
     default=False,
-    help='Reduce the log level.')
+    help="Reduce the log level.",
+)
 
 args = parser.parse_args()
 
 env = {}
 if args.config:
     config = args.config
-    if not config.startswith('/'):
+    if not config.startswith("/"):
         here = os.path.join(os.path.dirname(os.path.abspath(__file__)))
         config = os.path.join(here, config)
-    env['PAGURE_CONFIG'] = config
+    env["PAGURE_CONFIG"] = config
 
-cmd = [
-    sys.executable, '-m', 'celery', 'worker', '-A', 'pagure.lib.tasks'
-]
+cmd = [sys.executable, "-m", "celery", "worker", "-A", "pagure.lib.tasks"]
 
 if args.debug:
-    cmd.append('--loglevel=debug')
+    cmd.append("--loglevel=debug")
 elif args.noinfo:
     pass
 else:
-    cmd.append('--loglevel=info')
+    cmd.append("--loglevel=info")
 
 subp = subprocess.Popen(cmd, env=env or None)
 subp.wait()

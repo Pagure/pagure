@@ -1,3 +1,1 @@
-config = {
-    'integrator.enabled': True,
-}
+config = {"integrator.enabled": True}

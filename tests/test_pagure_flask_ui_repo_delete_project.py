@@ -15,8 +15,9 @@ import os
 
 from mock import patch, MagicMock
 
-sys.path.insert(0, os.path.join(os.path.dirname(
-    os.path.abspath(__file__)), '..'))
+sys.path.insert(
+    0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+)
 
 import pagure.lib.query
 import tests
@@ -31,19 +32,22 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
 
         # Create some projects
         tests.create_projects(self.session)
-        tests.create_projects_git(os.path.join(self.path, 'repos'))
+        tests.create_projects_git(os.path.join(self.path, "repos"))
         self.session.commit()
 
         # Create all the git repos
-        tests.create_projects_git(os.path.join(self.path, 'repos'))
-        tests.create_projects_git(os.path.join(self.path, 'repos', 'docs'))
+        tests.create_projects_git(os.path.join(self.path, "repos"))
+        tests.create_projects_git(os.path.join(self.path, "repos", "docs"))
         tests.create_projects_git(
-            os.path.join(self.path, 'repos', 'tickets'), bare=True)
+            os.path.join(self.path, "repos", "tickets"), bare=True
+        )
         tests.create_projects_git(
-            os.path.join(self.path, 'repos', 'requests'), bare=True)
+            os.path.join(self.path, "repos", "requests"), bare=True
+        )
 
         project = pagure.lib.query.get_authorized_project(
-            self.session, project_name='test')
+            self.session, project_name="test"
+        )
         self.assertIsNotNone(project)
         # Ensure the project isn't read-only
         project.read_only = False
@@ -52,9 +56,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
 
         # Create a fork
         task = pagure.lib.query.fork_project(
-            session=self.session,
-            user='pingou',
-            repo=project,
+            session=self.session, user="pingou", repo=project
         )
         task.get()
 
@@ -62,193 +64,235 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
         projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 4)
 
-    @patch.dict('pagure.config.config', {'ENABLE_DEL_PROJECTS': False})
-    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
-    @patch('pagure.decorators.admin_session_timedout',
-           MagicMock(return_value=False))
+    @patch.dict("pagure.config.config", {"ENABLE_DEL_PROJECTS": False})
+    @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
+    @patch(
+        "pagure.decorators.admin_session_timedout",
+        MagicMock(return_value=False),
+    )
     def test_delete_repo_when_turned_off(self):
         """ Test the delete_repo endpoint for a fork when only deleting main
         project is forbidden.
         """
 
-        user = tests.FakeUser(username='pingou')
+        user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
-            output = self.app.post('/test/delete', follow_redirects=True)
+            output = self.app.post("/test/delete", follow_redirects=True)
             self.assertEqual(output.status_code, 404)
 
         projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 4)
 
-    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
-    @patch('pagure.decorators.admin_session_timedout',
-           MagicMock(return_value=False))
+    @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
+    @patch(
+        "pagure.decorators.admin_session_timedout",
+        MagicMock(return_value=False),
+    )
     def test_delete_button_present(self):
         """ Test that the delete button is present when deletions are
         allowed.
         """
 
-        user = tests.FakeUser(username='pingou')
+        user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
-            output = self.app.get('/test/settings')
+            output = self.app.get("/test/settings")
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<form action="/test/delete"', output.get_data(as_text=True))
-            self.assertIn('&nbsp; Delete the test project', output.get_data(as_text=True))
+            self.assertIn(
+                '<form action="/test/delete"', output.get_data(as_text=True)
+            )
+            self.assertIn(
+                "&nbsp; Delete the test project", output.get_data(as_text=True)
+            )
 
         projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 4)
 
-    @patch.dict('pagure.config.config', {'ENABLE_DEL_PROJECTS': False})
-    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
-    @patch('pagure.decorators.admin_session_timedout',
-           MagicMock(return_value=False))
+    @patch.dict("pagure.config.config", {"ENABLE_DEL_PROJECTS": False})
+    @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
+    @patch(
+        "pagure.decorators.admin_session_timedout",
+        MagicMock(return_value=False),
+    )
     def test_delete_button_absent(self):
         """ Test that the delete button is absent when deletions are not
         allowed.
         """
 
-        user = tests.FakeUser(username='pingou')
+        user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
-            output = self.app.get('/test/settings')
+            output = self.app.get("/test/settings")
             self.assertEqual(output.status_code, 200)
-            self.assertNotIn('<form action="/test/delete"', output.get_data(as_text=True))
-            self.assertNotIn('&nbsp; Delete the test project', output.get_data(as_text=True))
+            self.assertNotIn(
+                '<form action="/test/delete"', output.get_data(as_text=True)
+            )
+            self.assertNotIn(
+                "&nbsp; Delete the test project", output.get_data(as_text=True)
+            )
 
         projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 4)
 
-    @patch.dict('pagure.config.config', {'ENABLE_DEL_PROJECTS': False})
-    @patch.dict('pagure.config.config', {'ENABLE_DEL_FORKS': True})
-    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
-    @patch('pagure.decorators.admin_session_timedout',
-           MagicMock(return_value=False))
+    @patch.dict("pagure.config.config", {"ENABLE_DEL_PROJECTS": False})
+    @patch.dict("pagure.config.config", {"ENABLE_DEL_FORKS": True})
+    @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
+    @patch(
+        "pagure.decorators.admin_session_timedout",
+        MagicMock(return_value=False),
+    )
     def test_delete_fork_when_project_off_refreshing(self):
         """ Test the delete_repo endpoint for a fork when only deleting main
         project is forbidden but the fork is being refreshed in the backend
         """
         project = pagure.lib.query.get_authorized_project(
-            self.session, project_name='test', user='pingou')
+            self.session, project_name="test", user="pingou"
+        )
         self.assertIsNotNone(project)
         # Ensure the project isn't read-only
         project.read_only = True
         self.session.add(project)
         self.session.commit()
 
-        user = tests.FakeUser(username='pingou')
+        user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
             output = self.app.post(
-                '/fork/pingou/test/delete', follow_redirects=True)
+                "/fork/pingou/test/delete", follow_redirects=True
+            )
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                'The ACLs of this project '
-                'are being refreshed in the backend this prevents the '
-                'project from being deleted. Please wait for this task to '
-                'finish before trying again. Thanks!', output.get_data(as_text=True))
+                "The ACLs of this project "
+                "are being refreshed in the backend this prevents the "
+                "project from being deleted. Please wait for this task to "
+                "finish before trying again. Thanks!",
+                output.get_data(as_text=True),
+            )
 
         projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 4)
 
-    @patch.dict('pagure.config.config', {'ENABLE_DEL_PROJECTS': False})
-    @patch.dict('pagure.config.config', {'ENABLE_DEL_FORKS': True})
-    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
-    @patch('pagure.decorators.admin_session_timedout',
-           MagicMock(return_value=False))
+    @patch.dict("pagure.config.config", {"ENABLE_DEL_PROJECTS": False})
+    @patch.dict("pagure.config.config", {"ENABLE_DEL_FORKS": True})
+    @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
+    @patch(
+        "pagure.decorators.admin_session_timedout",
+        MagicMock(return_value=False),
+    )
     def test_delete_fork_when_project_off(self):
         """ Test the delete_repo endpoint for a fork when only deleting main
         project is forbidden.
         """
         project = pagure.lib.query.get_authorized_project(
-            self.session, project_name='test', user='pingou')
+            self.session, project_name="test", user="pingou"
+        )
         self.assertIsNotNone(project)
         # Ensure the project isn't read-only
         project.read_only = False
         self.session.add(project)
         self.session.commit()
 
-        user = tests.FakeUser(username='pingou')
+        user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
             output = self.app.post(
-                '/fork/pingou/test/delete', follow_redirects=True)
+                "/fork/pingou/test/delete", follow_redirects=True
+            )
             self.assertEqual(output.status_code, 200)
 
         projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 3)
 
-    @patch.dict('pagure.config.config', {'ENABLE_DEL_PROJECTS': False})
-    @patch.dict('pagure.config.config', {'ENABLE_DEL_FORKS': False})
-    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
-    @patch('pagure.decorators.admin_session_timedout',
-           MagicMock(return_value=False))
+    @patch.dict("pagure.config.config", {"ENABLE_DEL_PROJECTS": False})
+    @patch.dict("pagure.config.config", {"ENABLE_DEL_FORKS": False})
+    @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
+    @patch(
+        "pagure.decorators.admin_session_timedout",
+        MagicMock(return_value=False),
+    )
     def test_delete_fork_when_fork_and_project_off(self):
         """ Test the delete_repo endpoint for a fork when deleting fork and
         project is forbidden.
         """
 
-        user = tests.FakeUser(username='pingou')
+        user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
             output = self.app.post(
-                '/fork/pingou/test/delete', follow_redirects=True)
+                "/fork/pingou/test/delete", follow_redirects=True
+            )
             self.assertEqual(output.status_code, 404)
 
         projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 4)
 
-    @patch.dict('pagure.config.config', {'ENABLE_DEL_PROJECTS': False})
-    @patch.dict('pagure.config.config', {'ENABLE_DEL_FORKS': False})
-    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
-    @patch('pagure.decorators.admin_session_timedout',
-           MagicMock(return_value=False))
+    @patch.dict("pagure.config.config", {"ENABLE_DEL_PROJECTS": False})
+    @patch.dict("pagure.config.config", {"ENABLE_DEL_FORKS": False})
+    @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
+    @patch(
+        "pagure.decorators.admin_session_timedout",
+        MagicMock(return_value=False),
+    )
     def test_delete_fork_button_absent(self):
         """ Test that the delete button is absent when deletions are not
         allowed.
         """
 
-        user = tests.FakeUser(username='pingou')
+        user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
-            output = self.app.get('/fork/pingou/test/settings')
+            output = self.app.get("/fork/pingou/test/settings")
             self.assertEqual(output.status_code, 200)
             self.assertNotIn(
-                '<form action="/fork/pingou/test/delete"', output.get_data(as_text=True))
+                '<form action="/fork/pingou/test/delete"',
+                output.get_data(as_text=True),
+            )
             self.assertNotIn(
-                '&nbsp; Delete the forks/pingou/test project', output.get_data(as_text=True))
+                "&nbsp; Delete the forks/pingou/test project",
+                output.get_data(as_text=True),
+            )
 
         projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 4)
 
-    @patch.dict('pagure.config.config', {'ENABLE_DEL_PROJECTS': False})
-    @patch.dict('pagure.config.config', {'ENABLE_DEL_FORKS': True})
-    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
-    @patch('pagure.decorators.admin_session_timedout',
-           MagicMock(return_value=False))
+    @patch.dict("pagure.config.config", {"ENABLE_DEL_PROJECTS": False})
+    @patch.dict("pagure.config.config", {"ENABLE_DEL_FORKS": True})
+    @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
+    @patch(
+        "pagure.decorators.admin_session_timedout",
+        MagicMock(return_value=False),
+    )
     def test_delete_fork_button_fork_del_allowed(self):
         """ Test that the delete button is present when deletions of projects
         is not allowed but deletions of forks is.
         """
 
         project = pagure.lib.query.get_authorized_project(
-            self.session, project_name='test', user='pingou')
+            self.session, project_name="test", user="pingou"
+        )
         self.assertIsNotNone(project)
         # Ensure the project isn't read-only
         project.read_only = False
         self.session.add(project)
         self.session.commit()
 
-        user = tests.FakeUser(username='pingou')
+        user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
-            output = self.app.get('/fork/pingou/test/settings')
+            output = self.app.get("/fork/pingou/test/settings")
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<form action="/fork/pingou/test/delete"', output.get_data(as_text=True))
+                '<form action="/fork/pingou/test/delete"',
+                output.get_data(as_text=True),
+            )
             self.assertIn(
-                '&nbsp; Delete the forks/pingou/test project', output.get_data(as_text=True))
+                "&nbsp; Delete the forks/pingou/test project",
+                output.get_data(as_text=True),
+            )
 
         projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 4)
 
-    @patch.dict('pagure.config.config', {'ENABLE_DEL_PROJECTS': False})
-    @patch.dict('pagure.config.config', {'ENABLE_DEL_FORKS': True})
-    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
-    @patch('pagure.decorators.admin_session_timedout',
-           MagicMock(return_value=False))
+    @patch.dict("pagure.config.config", {"ENABLE_DEL_PROJECTS": False})
+    @patch.dict("pagure.config.config", {"ENABLE_DEL_FORKS": True})
+    @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
+    @patch(
+        "pagure.decorators.admin_session_timedout",
+        MagicMock(return_value=False),
+    )
     def test_delete_fork_button_fork_del_allowed_read_only(self):
         """ Test that the delete button is absent when deletions of projects
         is not allowed but deletions of forks is but fork is still being
@@ -256,21 +300,28 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
         """
 
         project = pagure.lib.query.get_authorized_project(
-            self.session, project_name='test', user='pingou')
+            self.session, project_name="test", user="pingou"
+        )
         self.assertIsNotNone(project)
         # Ensure the project is read-only
         project.read_only = True
         self.session.add(project)
         self.session.commit()
 
-        user = tests.FakeUser(username='pingou')
+        user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
-            output = self.app.get('/fork/pingou/test/settings')
+            output = self.app.get("/fork/pingou/test/settings")
             self.assertEqual(output.status_code, 200)
             self.assertNotIn(
-                '<form action="/fork/pingou/test/delete"', output.get_data(as_text=True))
+                '<form action="/fork/pingou/test/delete"',
+                output.get_data(as_text=True),
+            )
             self.assertIn(
-                'title="Action disabled while project\'s ACLs are being '
-                'refreshed">', output.get_data(as_text=True))
+                "title=\"Action disabled while project's ACLs are being "
+                'refreshed">',
+                output.get_data(as_text=True),
+            )
             self.assertIn(
-                '&nbsp; Delete the forks/pingou/test project', output.get_data(as_text=True))
+                "&nbsp; Delete the forks/pingou/test project",
+                output.get_data(as_text=True),
+            )

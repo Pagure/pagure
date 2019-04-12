@@ -14,9 +14,10 @@ import os
 import subprocess
 import unittest
 
+import six
 
-REPO_PATH = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..'))
+
+REPO_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 
 class TestAlembic(unittest.TestCase):
@@ -30,16 +31,16 @@ class TestAlembic(unittest.TestCase):
         """
 
         proc1 = subprocess.Popen(
-            ['alembic', 'history'],
-            cwd=REPO_PATH, stdout=subprocess.PIPE)
+            ["alembic", "history"], cwd=REPO_PATH, stdout=subprocess.PIPE
+        )
         proc2 = subprocess.Popen(
-            ['grep', ' (head), '],
-            stdin=proc1.stdout, stdout=subprocess.PIPE)
+            ["grep", " (head), "], stdin=proc1.stdout, stdout=subprocess.PIPE
+        )
         stdout = proc2.communicate()[0]
-        stdout = stdout.strip().decode('utf-8').split('\n')
+        stdout = stdout.strip().decode("utf-8").split("\n")
 
         self.assertEqual(len(stdout), 1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main(verbosity=2)

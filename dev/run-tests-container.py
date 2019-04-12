@@ -58,12 +58,14 @@ if __name__ == "__main__":
         container_files = ["fedora-pip-py3"]
     else:
         container_names = [
-            "pagure-f29-rpms-py3", "pagure-c7-rpms-py2",
-            "pagure-fedora-pip-py3"
+            "pagure-f29-rpms-py3",
+            "pagure-c7-rpms-py2",
+            "pagure-fedora-pip-py3",
         ]
         container_files = [
-            "f29-rpms-py3", "centos7-rpms-py2",
-            "fedora-pip-py3"
+            "f29-rpms-py3",
+            "centos7-rpms-py2",
+            "fedora-pip-py3",
         ]
 
     failed = []
@@ -77,7 +79,10 @@ if __name__ == "__main__":
                     "--build-arg",
                     "branch={}".format(os.environ.get("BRANCH") or "master"),
                     "--build-arg",
-                    "repo={}".format(os.environ.get("REPO") or "https://pagure.io/pagure.git"),
+                    "repo={}".format(
+                        os.environ.get("REPO")
+                        or "https://pagure.io/pagure.git"
+                    ),
                     "--rm",
                     "-t",
                     container_name,
@@ -105,11 +110,14 @@ if __name__ == "__main__":
                 container_name,
                 "-v",
                 "{}/results_{}:/pagure/results:z".format(
-                    os.getcwd(), container_files[idx]),
+                    os.getcwd(), container_files[idx]
+                ),
                 "-e",
                 "BRANCH={}".format(os.environ.get("BRANCH") or "master"),
                 "-e",
-                "REPO={}".format(os.environ.get("REPO") or "https://pagure.io/pagure.git"),
+                "REPO={}".format(
+                    os.environ.get("REPO") or "https://pagure.io/pagure.git"
+                ),
                 "--entrypoint=/bin/bash",
                 container_name,
             ]
@@ -125,11 +133,14 @@ if __name__ == "__main__":
                 container_name,
                 "-v",
                 "{}/results_{}:/pagure/results:z".format(
-                    os.getcwd(), container_files[idx]),
+                    os.getcwd(), container_files[idx]
+                ),
                 "-e",
                 "BRANCH={}".format(os.environ.get("BRANCH") or "master"),
                 "-e",
-                "REPO={}".format(os.environ.get("REPO") or "https://pagure.io/pagure.git"),
+                "REPO={}".format(
+                    os.environ.get("REPO") or "https://pagure.io/pagure.git"
+                ),
                 "-e",
                 "TESTCASE={}".format(args.test_case or ""),
                 container_name,

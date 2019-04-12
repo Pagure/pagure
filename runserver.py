@@ -7,56 +7,69 @@ import sys
 import os
 
 
-parser = argparse.ArgumentParser(
-    description='Run the Pagure app')
+parser = argparse.ArgumentParser(description="Run the Pagure app")
 parser.add_argument(
-    '--config', '-c', dest='config',
-    help='Configuration file to use for pagure.')
+    "--config",
+    "-c",
+    dest="config",
+    help="Configuration file to use for pagure.",
+)
 parser.add_argument(
-    '--plugins',  dest='plugins',
-    help='Configuration file for pagure plugin.')
+    "--plugins", dest="plugins", help="Configuration file for pagure plugin."
+)
 parser.add_argument(
-    '--debug', dest='debug', action='store_true',
+    "--debug",
+    dest="debug",
+    action="store_true",
     default=False,
-    help='Expand the level of data returned.')
+    help="Expand the level of data returned.",
+)
 parser.add_argument(
-    '--profile', dest='profile', action='store_true',
+    "--profile",
+    dest="profile",
+    action="store_true",
     default=False,
-    help='Profile Pagure.')
+    help="Profile Pagure.",
+)
 parser.add_argument(
-    '--perf-verbose', dest='perfverbose', action='store_true',
+    "--perf-verbose",
+    dest="perfverbose",
+    action="store_true",
     default=False,
-    help='Enable per-request printing of performance statistics.')
+    help="Enable per-request printing of performance statistics.",
+)
 parser.add_argument(
-    '--port', '-p', default=5000,
-    help='Port for the Pagure to run on.')
+    "--port", "-p", default=5000, help="Port for the Pagure to run on."
+)
 parser.add_argument(
-    '--no-debug', action='store_true',
-    help='Disable debugging')
+    "--no-debug", action="store_true", help="Disable debugging"
+)
 parser.add_argument(
-    '--host', default="127.0.0.1",
-    help='Hostname to listen on. When set to 0.0.0.0 the server is available '
-    'externally. Defaults to 127.0.0.1 making the it only visible on localhost')
+    "--host",
+    default="127.0.0.1",
+    help="Hostname to listen on. When set to 0.0.0.0 the server is available "
+    "externally. Defaults to 127.0.0.1 making the it only visible on localhost",
+)
 
 args = parser.parse_args()
 
 if args.config:
     config = args.config
-    if not config.startswith('/'):
+    if not config.startswith("/"):
         here = os.path.join(os.path.dirname(os.path.abspath(__file__)))
         config = os.path.join(here, config)
-    os.environ['PAGURE_CONFIG'] = config
+    os.environ["PAGURE_CONFIG"] = config
 
 if args.plugins:
     config = args.plugins
-    if not config.startswith('/'):
+    if not config.startswith("/"):
         here = os.path.join(os.path.dirname(os.path.abspath(__file__)))
         config = os.path.join(here, config)
-    os.environ['PAGURE_PLUGIN'] = config
+    os.environ["PAGURE_PLUGIN"] = config
 
 if args.perfverbose:
-    os.environ['PAGURE_PERFREPO'] = 'true'
-    os.environ['PAGURE_PERFREPO_VERBOSE'] = 'true'
+    os.environ["PAGURE_PERFREPO"] = "true"
+    os.environ["PAGURE_PERFREPO_VERBOSE"] = "true"
 
 from pagure.flask_app import create_app
 
@@ -64,7 +77,8 @@ APP = create_app()
 
 if args.profile:
     from werkzeug.contrib.profiler import ProfilerMiddleware
-    APP.config['PROFILE'] = True
+
+    APP.config["PROFILE"] = True
     APP.wsgi_app = ProfilerMiddleware(APP.wsgi_app, restrictions=[30])
 
 APP.debug = not args.no_debug

@@ -39,8 +39,9 @@ class TestDevData(tests.Modeltests):
             f.write("DB_URL = 'sqlite:///%s/db_dev_data.sqlite'\n" % self.path)
             f.write("GIT_FOLDER = '%s/repos'\n" % self.path)
             f.write(
-                "BROKER_URL = 'redis+socket://%(global_path)s/broker'\n" % \
-                    self.config_values)
+                "BROKER_URL = 'redis+socket://%(global_path)s/broker'\n"
+                % self.config_values
+            )
             f.write("CELERY_CONFIG = {'task_always_eager': True}\n")
 
         env = {

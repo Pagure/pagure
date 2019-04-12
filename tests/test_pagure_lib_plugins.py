@@ -14,8 +14,9 @@ import sys
 
 from mock import patch
 
-sys.path.insert(0, os.path.join(os.path.dirname(
-    os.path.abspath(__file__)), '..'))
+sys.path.insert(
+    0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+)
 
 import pagure.hooks
 import pagure.lib.plugins
@@ -29,9 +30,11 @@ class EnabledForAll(pagure.hooks.BaseHook):
     def is_enabled_for(cls, project):
         return True
 
+
 class DisabledForAll(pagure.hooks.BaseHook):
     name = "DisabledForAll"
     # disabled for all is the default
+
 
 class PagureLibtests_plugins(tests.Modeltests):
     """
@@ -51,14 +54,11 @@ class PagureLibtests_plugins(tests.Modeltests):
         load.return_value = [EnabledForAll]
         self.assertEqual(
             pagure.lib.plugins.get_enabled_plugins(project),
-            [(EnabledForAll, None)]
+            [(EnabledForAll, None)],
         )
 
         load.return_value = [DisabledForAll]
-        self.assertEqual(
-            pagure.lib.plugins.get_enabled_plugins(project),
-            []
-        )
+        self.assertEqual(pagure.lib.plugins.get_enabled_plugins(project), [])
 
     @patch("pagure.lib.plugins.load")
     def test_get_plugin_names(self, load):
@@ -69,5 +69,5 @@ class PagureLibtests_plugins(tests.Modeltests):
         self.assertEqual(pagure.lib.plugins.get_plugin_names(), [])
         self.assertEqual(
             pagure.lib.plugins.get_plugin_names(without_backref=True),
-            ['EnabledForAll']
+            ["EnabledForAll"],
         )

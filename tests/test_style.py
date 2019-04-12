@@ -28,6 +28,7 @@ TESTS_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__)))
 
 class TestStyle(unittest.TestCase):
     """This test class contains tests pertaining to code style."""
+
     def test_code_with_flake8(self):
         """Enforce PEP-8 compliance on the codebase.
 
@@ -37,13 +38,17 @@ class TestStyle(unittest.TestCase):
         # We ignore E712, which disallows non-identity comparisons with True and False
         # We ignore W503, which disallows line break before binary operator
         flake8_command = [
-            sys.executable, '-m', 'flake8', '--ignore=E712,W503,E203',
-            REPO_PATH
+            sys.executable,
+            "-m",
+            "flake8",
+            "--ignore=E712,W503,E203",
+            REPO_PATH,
         ]
 
         # check if we have an old flake8 or not
         import flake8
-        flake8_v = flake8.__version__.split('.')
+
+        flake8_v = flake8.__version__.split(".")
         for idx, val in enumerate(flake8_v):
             try:
                 val = int(val)
@@ -56,17 +61,16 @@ class TestStyle(unittest.TestCase):
             raise unittest.SkipTest("Flake8 version too old to be useful")
 
         proc = subprocess.Popen(
-            flake8_command,
-            stdout=subprocess.PIPE,
-            cwd=REPO_PATH,
-            )
+            flake8_command, stdout=subprocess.PIPE, cwd=REPO_PATH
+        )
         print(proc.communicate())
 
         self.assertEqual(proc.returncode, 0)
 
     @unittest.skipIf(
-        not (six.PY3 and sys.version_info.minor >=6),
-        "Black is only available in python 3.6+")
+        not (six.PY3 and sys.version_info.minor >= 6),
+        "Black is only available in python 3.6+",
+    )
     def test_code_with_black(self):
         """Enforce black compliance on the codebase.
 
@@ -90,13 +94,13 @@ class TestStyle(unittest.TestCase):
             cwd=REPO_PATH,
         )
         stdout, stderr = proc.communicate()
-        print('stdout: ')
-        print(stdout.decode('utf-8'))
-        print('stderr: ')
-        print(stderr.decode('utf-8'))
+        print("stdout: ")
+        print(stdout.decode("utf-8"))
+        print("stderr: ")
+        print(stderr.decode("utf-8"))
 
         self.assertEqual(proc.returncode, 0)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main(verbosity=2)

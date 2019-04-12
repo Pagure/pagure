@@ -13,29 +13,29 @@ import pagure.lib.model_base
 import pagure.lib.notify
 import pagure.lib.query
 
-if 'PAGURE_CONFIG' not in os.environ \
-        and os.path.exists('/etc/pagure/pagure.cfg'):
-    print('Using configuration file `/etc/pagure/pagure.cfg`')
-    os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
+if "PAGURE_CONFIG" not in os.environ and os.path.exists(
+    "/etc/pagure/pagure.cfg"
+):
+    print("Using configuration file `/etc/pagure/pagure.cfg`")
+    os.environ["PAGURE_CONFIG"] = "/etc/pagure/pagure.cfg"
 
 _config = pagure.config.reload_config()
 
 
 def main(check=False, debug=False):
-    ''' The function that actually sends the email
-    in case the expiration date is near'''
+    """ The function that actually sends the email
+    in case the expiration date is near"""
 
     current_time = datetime.utcnow()
     day_diff_for_mail = [10, 5, 1]
     email_dates = [
         email_day.date()
         for email_day in [
-            current_time + timedelta(days=i)
-                   for i in day_diff_for_mail
+            current_time + timedelta(days=i) for i in day_diff_for_mail
         ]
     ]
 
-    session = pagure.lib.model_base.create_session(_config['DB_URL'])
+    session = pagure.lib.model_base.create_session(_config["DB_URL"])
     tokens = session.query(model.Token).all()
 
     for token in tokens:
@@ -46,51 +46,63 @@ def main(check=False, debug=False):
             username = user.fullname or user.username
             user_email = user.default_email
             days_left = (token.expiration - datetime.utcnow()).days
-            subject = 'Pagure API key expiration date is near!'
+            subject = "Pagure API key expiration date is near!"
             if token.project:
-                text = '''Hi %s,
+                text = """Hi %s,
 Your Pagure API key %s linked to the project %s
 will expire in %s day(s).
 Please get a new key for non-interrupted service.
 
 Thanks,
-Your Pagure Admin. ''' % (
+Your Pagure Admin. """ % (
                     username,
                     token.description,
                     token.project.fullname,
-                    days_left
+                    days_left,
                 )
             else:
-                text = '''Hi %s,
+                text = """Hi %s,
 Your Pagure API key %s will expire in %s day(s).
 Please get a new key for non-interrupted service.
 
 Thanks,
-Your Pagure Admin. ''' % (
+Your Pagure Admin. """ % (
                     username,
                     token.description,
-                    days_left)
+                    days_left,
+                )
             if not check:
                 msg = pagure.lib.notify.send_email(text, subject, user_email)
             else:
-                print('Sending email to %s (%s) about key: %s' % (
-                    username, user_email, token.id))
+                print(
+                    "Sending email to %s (%s) about key: %s"
+                    % (username, user_email, token.id)
+                )
             if debug:
-                print('Sent mail to %s' % username)
+                print("Sent mail to %s" % username)
 
     session.remove()
     if debug:
-        print('Done')
+        print("Done")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-            description='Script to send email before the api token expires')
+        description="Script to send email before the api token expires"
+    )
     parser.add_argument(
-        '--check', dest='check', action='store_true', default=False,
-        help='Print the some output but does not send any email')
+        "--check",
+        dest="check",
+        action="store_true",
+        default=False,
+        help="Print the some output but does not send any email",
+    )
     parser.add_argument(
-        '--debug', dest='debug', action='store_true', default=False,
-        help='Print the debugging output')
+        "--debug",
+        dest="debug",
+        action="store_true",
+        default=False,
+        help="Print the debugging output",
+    )
     args = parser.parse_args()
     main(debug=args.debug)

@@ -22,8 +22,9 @@ import munch  # noqa
 from mock import patch, MagicMock  # noqa
 from six import StringIO  # noqa
 
-sys.path.insert(0, os.path.join(os.path.dirname(
-    os.path.abspath(__file__)), '..'))
+sys.path.insert(
+    0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+)
 
 import pagure.config  # noqa
 import pagure.exceptions  # noqa: E402
@@ -47,29 +48,28 @@ class PagureAdminAdminTokenEmptytests(tests.Modeltests):
         """ Test the do_create_admin_token function of pagure-admin without
         user.
         """
-        args = munch.Munch({'user': "pingou"})
+        args = munch.Munch({"user": "pingou"})
         with self.assertRaises(pagure.exceptions.PagureException) as cm:
             pagure.cli.admin.do_create_admin_token(args)
-        self.assertEqual(
-            cm.exception.args[0],
-            'No user "pingou" found'
-        )
+        self.assertEqual(cm.exception.args[0], 'No user "pingou" found')
 
     def test_do_list_admin_token_empty(self):
         """ Test the do_list_admin_token function of pagure-admin when there
         are not tokens in the db.
         """
-        list_args = munch.Munch({
-            'user': None,
-            'token': None,
-            'active': False,
-            'expired': False,
-            'all': False,
-        })
+        list_args = munch.Munch(
+            {
+                "user": None,
+                "token": None,
+                "active": False,
+                "expired": False,
+                "all": False,
+            }
+        )
         with tests.capture_output() as output:
             pagure.cli.admin.do_list_admin_token(list_args)
         output = output.getvalue()
-        self.assertEqual(output, 'No admin tokens found\n')
+        self.assertEqual(output, "No admin tokens found\n")
 
 
 class PagureAdminAdminRefreshGitolitetests(tests.Modeltests):
@@ -84,15 +84,13 @@ class PagureAdminAdminRefreshGitolitetests(tests.Modeltests):
 
         # Create the user pingou
         item = pagure.lib.model.User(
-            user='pingou',
-            fullname='PY C',
-            password='foo',
-            default_email='bar@pingou.com',
+            user="pingou",
+            fullname="PY C",
+            password="foo",
+            default_email="bar@pingou.com",
         )
         self.session.add(item)
-        item = pagure.lib.model.UserEmail(
-            user_id=1,
-            email='bar@pingou.com')
+        item = pagure.lib.model.UserEmail(user_id=1, email="bar@pingou.com")
         self.session.add(item)
         self.session.commit()
 
@@ -102,22 +100,22 @@ class PagureAdminAdminRefreshGitolitetests(tests.Modeltests):
         # Add a group
         msg = pagure.lib.query.add_group(
             self.session,
-            group_name='foo',
-            display_name='foo group',
+            group_name="foo",
+            display_name="foo group",
             description=None,
-            group_type='bar',
-            user='pingou',
+            group_type="bar",
+            user="pingou",
             is_admin=False,
             blacklist=[],
         )
         self.session.commit()
-        self.assertEqual(msg, 'User `pingou` added to the group `foo`.')
+        self.assertEqual(msg, "User `pingou` added to the group `foo`.")
 
         # Make the imported pagure use the correct db session
         pagure.cli.admin.session = self.session
 
-    @patch('pagure.cli.admin._ask_confirmation')
-    @patch('pagure.lib.git_auth.get_git_auth_helper')
+    @patch("pagure.cli.admin._ask_confirmation")
+    @patch("pagure.lib.git_auth.get_git_auth_helper")
     def test_do_refresh_gitolite_no_args(self, get_helper, conf):
         """ Test the do_generate_acl function with no special args. """
         conf.return_value = True
@@ -125,16 +123,17 @@ class PagureAdminAdminRefreshGitolitetests(tests.Modeltests):
         get_helper.return_value = helper
 
         args = munch.Munch(
-            {'group': None, 'project': None, 'all_': False, 'user': None})
+            {"group": None, "project": None, "all_": False, "user": None}
+        )
         pagure.cli.admin.do_generate_acl(args)
 
         get_helper.assert_called_with()
         args = helper.generate_acls.call_args
-        self.assertIsNone(args[1].get('group'))
-        self.assertIsNone(args[1].get('project'))
+        self.assertIsNone(args[1].get("group"))
+        self.assertIsNone(args[1].get("project"))
 
-    @patch('pagure.cli.admin._ask_confirmation')
-    @patch('pagure.lib.git_auth.get_git_auth_helper')
+    @patch("pagure.cli.admin._ask_confirmation")
+    @patch("pagure.lib.git_auth.get_git_auth_helper")
     def test_do_refresh_gitolite_all_project(self, get_helper, conf):
         """ Test the do_generate_acl function for all projects. """
         conf.return_value = True
@@ -142,16 +141,17 @@ class PagureAdminAdminRefreshGitolitetests(tests.Modeltests):
         get_helper.return_value = helper
 
         args = munch.Munch(
-            {'group': None, 'project': None, 'all_': True, 'user': None})
+            {"group": None, "project": None, "all_": True, "user": None}
+        )
         pagure.cli.admin.do_generate_acl(args)
 
         get_helper.assert_called_with()
         args = helper.generate_acls.call_args
-        self.assertIsNone(args[1].get('group'))
-        self.assertEqual(args[1].get('project'), -1)
+        self.assertIsNone(args[1].get("group"))
+        self.assertEqual(args[1].get("project"), -1)
 
-    @patch('pagure.cli.admin._ask_confirmation')
-    @patch('pagure.lib.git_auth.get_git_auth_helper')
+    @patch("pagure.cli.admin._ask_confirmation")
+    @patch("pagure.lib.git_auth.get_git_auth_helper")
     def test_do_refresh_gitolite_one_project(self, get_helper, conf):
         """ Test the do_generate_acl function for a certain project. """
         conf.return_value = True
@@ -159,16 +159,17 @@ class PagureAdminAdminRefreshGitolitetests(tests.Modeltests):
         get_helper.return_value = helper
 
         args = munch.Munch(
-            {'group': None, 'project': 'test', 'all_': False, 'user': None})
+            {"group": None, "project": "test", "all_": False, "user": None}
+        )
         pagure.cli.admin.do_generate_acl(args)
 
         get_helper.assert_called_with()
         args = helper.generate_acls.call_args
-        self.assertIsNone(args[1].get('group'))
-        self.assertEqual(args[1].get('project').fullname, 'test')
+        self.assertIsNone(args[1].get("group"))
+        self.assertEqual(args[1].get("project").fullname, "test")
 
-    @patch('pagure.cli.admin._ask_confirmation')
-    @patch('pagure.lib.git_auth.get_git_auth_helper')
+    @patch("pagure.cli.admin._ask_confirmation")
+    @patch("pagure.lib.git_auth.get_git_auth_helper")
     def test_do_refresh_gitolite_one_project_and_all(self, get_helper, conf):
         """ Test the do_generate_acl function for a certain project and all.
         """
@@ -177,16 +178,17 @@ class PagureAdminAdminRefreshGitolitetests(tests.Modeltests):
         get_helper.return_value = helper
 
         args = munch.Munch(
-            {'group': None, 'project': 'test', 'all_': True, 'user': None})
+            {"group": None, "project": "test", "all_": True, "user": None}
+        )
         pagure.cli.admin.do_generate_acl(args)
 
         get_helper.assert_called_with()
         args = helper.generate_acls.call_args
-        self.assertIsNone(args[1].get('group'))
-        self.assertEqual(args[1].get('project'), -1)
+        self.assertIsNone(args[1].get("group"))
+        self.assertEqual(args[1].get("project"), -1)
 
-    @patch('pagure.cli.admin._ask_confirmation')
-    @patch('pagure.lib.git_auth.get_git_auth_helper')
+    @patch("pagure.cli.admin._ask_confirmation")
+    @patch("pagure.lib.git_auth.get_git_auth_helper")
     def test_do_refresh_gitolite_one_group(self, get_helper, conf):
         """ Test the do_generate_acl function for a certain group. """
         conf.return_value = True
@@ -194,13 +196,14 @@ class PagureAdminAdminRefreshGitolitetests(tests.Modeltests):
         get_helper.return_value = helper
 
         args = munch.Munch(
-            {'group': 'foo', 'project': None, 'all_': False, 'user': None})
+            {"group": "foo", "project": None, "all_": False, "user": None}
+        )
         pagure.cli.admin.do_generate_acl(args)
 
         get_helper.assert_called_with()
         args = helper.generate_acls.call_args
-        self.assertEqual(args[1].get('group').group_name, 'foo')
-        self.assertIsNone(args[1].get('project'))
+        self.assertEqual(args[1].get("group").group_name, "foo")
+        self.assertIsNone(args[1].get("project"))
 
 
 class PagureAdminAdminTokentests(tests.Modeltests):
@@ -215,84 +218,88 @@ class PagureAdminAdminTokentests(tests.Modeltests):
 
         # Create the user pingou
         item = pagure.lib.model.User(
-            user='pingou',
-            fullname='PY C',
-            password='foo',
-            default_email='bar@pingou.com',
+            user="pingou",
+            fullname="PY C",
+            password="foo",
+            default_email="bar@pingou.com",
         )
         self.session.add(item)
-        item = pagure.lib.model.UserEmail(
-            user_id=1,
-            email='bar@pingou.com')
+        item = pagure.lib.model.UserEmail(user_id=1, email="bar@pingou.com")
         self.session.add(item)
         self.session.commit()
 
         # Make the imported pagure use the correct db session
         pagure.cli.admin.session = self.session
 
-    @patch('pagure.cli.admin._get_input')
-    @patch('pagure.cli.admin._ask_confirmation')
+    @patch("pagure.cli.admin._get_input")
+    @patch("pagure.cli.admin._ask_confirmation")
     def test_do_create_admin_token(self, conf, rinp):
         """ Test the do_create_admin_token function of pagure-admin. """
         conf.return_value = True
-        rinp.return_value = '1,2,3'
+        rinp.return_value = "1,2,3"
 
-        args = munch.Munch({'user': 'pingou'})
+        args = munch.Munch({"user": "pingou"})
         pagure.cli.admin.do_create_admin_token(args)
 
         # Check the outcome
-        list_args = munch.Munch({
-            'user': None,
-            'token': None,
-            'active': False,
-            'expired': False,
-            'all': False,
-        })
+        list_args = munch.Munch(
+            {
+                "user": None,
+                "token": None,
+                "active": False,
+                "expired": False,
+                "all": False,
+            }
+        )
         with tests.capture_output() as output:
             pagure.cli.admin.do_list_admin_token(list_args)
         output = output.getvalue()
         self.assertNotEqual(output, 'No user "pingou" found\n')
-        self.assertEqual(len(output.split('\n')), 2)
-        self.assertIn(' -- pingou -- ', output)
+        self.assertEqual(len(output.split("\n")), 2)
+        self.assertIn(" -- pingou -- ", output)
 
-    @patch('pagure.cli.admin._get_input')
-    @patch('pagure.cli.admin._ask_confirmation')
+    @patch("pagure.cli.admin._get_input")
+    @patch("pagure.cli.admin._ask_confirmation")
     def test_do_list_admin_token(self, conf, rinp):
         """ Test the do_list_admin_token function of pagure-admin. """
         # Create an admin token to use
         conf.return_value = True
-        rinp.return_value = '1,2,3'
+        rinp.return_value = "1,2,3"
 
-        args = munch.Munch({'user': 'pingou'})
+        args = munch.Munch({"user": "pingou"})
         pagure.cli.admin.do_create_admin_token(args)
 
         # Retrieve all tokens
-        list_args = munch.Munch({
-            'user': None,
-            'token': None,
-            'active': False,
-            'expired': False,
-            'all': False,
-        })
+        list_args = munch.Munch(
+            {
+                "user": None,
+                "token": None,
+                "active": False,
+                "expired": False,
+                "all": False,
+            }
+        )
         with tests.capture_output() as output:
             pagure.cli.admin.do_list_admin_token(list_args)
         output = output.getvalue()
         self.assertNotEqual(output, 'No user "pingou" found\n')
-        self.assertEqual(len(output.split('\n')), 2)
-        self.assertIn(' -- pingou -- ', output)
+        self.assertEqual(len(output.split("\n")), 2)
+        self.assertIn(" -- pingou -- ", output)
 
         # Retrieve pfrields's tokens
-        list_args = munch.Munch({
-            'user': 'pfrields',
-            'token': None,
-            'active': False,
-            'expired': False,
-            'all': False,
-        })
+        list_args = munch.Munch(
+            {
+                "user": "pfrields",
+                "token": None,
+                "active": False,
+                "expired": False,
+                "all": False,
+            }
+        )
         with tests.capture_output() as output:
             pagure.cli.admin.do_list_admin_token(list_args)
         output = output.getvalue()
-        self.assertEqual(output, 'No admin tokens found\n')
+        self.assertEqual(output, "No admin tokens found\n")
 
     def test_do_list_admin_token_non_admin_acls(self):
         """ Test the do_list_admin_token function of pagure-admin for a token
@@ -300,76 +307,85 @@ class PagureAdminAdminTokentests(tests.Modeltests):
         pagure.lib.query.add_token_to_user(
             self.session,
             project=None,
-            acls=['issue_assign', 'pull_request_subscribe'],
-            username='pingou')
+            acls=["issue_assign", "pull_request_subscribe"],
+            username="pingou",
+        )
 
         # Retrieve all admin tokens
-        list_args = munch.Munch({
-            'user': None,
-            'token': None,
-            'active': False,
-            'expired': False,
-            'all': False,
-        })
+        list_args = munch.Munch(
+            {
+                "user": None,
+                "token": None,
+                "active": False,
+                "expired": False,
+                "all": False,
+            }
+        )
         with tests.capture_output() as output:
             pagure.cli.admin.do_list_admin_token(list_args)
         output = output.getvalue()
-        self.assertEqual(output, 'No admin tokens found\n')
+        self.assertEqual(output, "No admin tokens found\n")
 
         # Retrieve all tokens
-        list_args = munch.Munch({
-            'user': None,
-            'token': None,
-            'active': False,
-            'expired': False,
-            'all': True,
-        })
+        list_args = munch.Munch(
+            {
+                "user": None,
+                "token": None,
+                "active": False,
+                "expired": False,
+                "all": True,
+            }
+        )
         with tests.capture_output() as output:
             pagure.cli.admin.do_list_admin_token(list_args)
         output = output.getvalue()
         self.assertNotEqual(output, 'No user "pingou" found\n')
-        self.assertEqual(len(output.split('\n')), 2)
-        self.assertIn(' -- pingou -- ', output)
+        self.assertEqual(len(output.split("\n")), 2)
+        self.assertIn(" -- pingou -- ", output)
 
-    @patch('pagure.cli.admin._get_input')
-    @patch('pagure.cli.admin._ask_confirmation')
+    @patch("pagure.cli.admin._get_input")
+    @patch("pagure.cli.admin._ask_confirmation")
     def test_do_info_admin_token(self, conf, rinp):
         """ Test the do_info_admin_token function of pagure-admin. """
         # Create an admin token to use
         conf.return_value = True
-        rinp.return_value = '2,4,5'
+        rinp.return_value = "2,4,5"
 
-        args = munch.Munch({'user': 'pingou'})
+        args = munch.Munch({"user": "pingou"})
         pagure.cli.admin.do_create_admin_token(args)
 
         # Retrieve the token
-        list_args = munch.Munch({
-            'user': None,
-            'token': None,
-            'active': False,
-            'expired': False,
-            'all': False,
-        })
+        list_args = munch.Munch(
+            {
+                "user": None,
+                "token": None,
+                "active": False,
+                "expired": False,
+                "all": False,
+            }
+        )
         with tests.capture_output() as output:
             pagure.cli.admin.do_list_admin_token(list_args)
         output = output.getvalue()
         self.assertNotEqual(output, 'No user "pingou" found\n')
-        self.assertEqual(len(output.split('\n')), 2)
-        self.assertIn(' -- pingou -- ', output)
+        self.assertEqual(len(output.split("\n")), 2)
+        self.assertIn(" -- pingou -- ", output)
 
-        token = output.split(' ', 1)[0]
+        token = output.split(" ", 1)[0]
 
-        args = munch.Munch({'token': token})
+        args = munch.Munch({"token": token})
         with tests.capture_output() as output:
             pagure.cli.admin.do_info_admin_token(args)
         output = output.getvalue()
-        self.assertIn(' -- pingou -- ', output.split('\n', 1)[0])
+        self.assertIn(" -- pingou -- ", output.split("\n", 1)[0])
         self.assertEqual(
-            output.split('\n', 1)[1], '''ACLs:
+            output.split("\n", 1)[1],
+            """ACLs:
   - issue_create
   - pull_request_comment
   - pull_request_flag
-''')
+""",
+        )
 
     def test_do_info_admin_token_non_admin_acl(self):
         """ Test the do_info_admin_token function of pagure-admin for a
@@ -377,297 +393,320 @@ class PagureAdminAdminTokentests(tests.Modeltests):
         pagure.lib.query.add_token_to_user(
             self.session,
             project=None,
-            acls=['issue_assign', 'pull_request_subscribe'],
-            username='pingou')
+            acls=["issue_assign", "pull_request_subscribe"],
+            username="pingou",
+        )
 
         # Retrieve the token
-        list_args = munch.Munch({
-            'user': None,
-            'token': None,
-            'active': False,
-            'expired': False,
-            'all': True,
-        })
+        list_args = munch.Munch(
+            {
+                "user": None,
+                "token": None,
+                "active": False,
+                "expired": False,
+                "all": True,
+            }
+        )
         with tests.capture_output() as output:
             pagure.cli.admin.do_list_admin_token(list_args)
         output = output.getvalue()
         self.assertNotEqual(output, 'No user "pingou" found\n')
-        self.assertEqual(len(output.split('\n')), 2)
-        self.assertIn(' -- pingou -- ', output)
+        self.assertEqual(len(output.split("\n")), 2)
+        self.assertIn(" -- pingou -- ", output)
 
-        token = output.split(' ', 1)[0]
+        token = output.split(" ", 1)[0]
 
-        args = munch.Munch({'token': token})
+        args = munch.Munch({"token": token})
         with tests.capture_output() as output:
             pagure.cli.admin.do_info_admin_token(args)
         output = output.getvalue()
-        self.assertIn(' -- pingou -- ', output.split('\n', 1)[0])
+        self.assertIn(" -- pingou -- ", output.split("\n", 1)[0])
         self.assertEqual(
-            output.split('\n', 1)[1], '''ACLs:
+            output.split("\n", 1)[1],
+            """ACLs:
   - issue_assign
   - pull_request_subscribe
-''')
+""",
+        )
 
-    @patch('pagure.cli.admin._get_input')
-    @patch('pagure.cli.admin._ask_confirmation')
+    @patch("pagure.cli.admin._get_input")
+    @patch("pagure.cli.admin._ask_confirmation")
     def test_do_expire_admin_token(self, conf, rinp):
         """ Test the do_expire_admin_token function of pagure-admin. """
-        if 'BUILD_ID' in os.environ:
-            raise unittest.case.SkipTest('Skipping on jenkins/el7')
+        if "BUILD_ID" in os.environ:
+            raise unittest.case.SkipTest("Skipping on jenkins/el7")
 
         # Create an admin token to use
         conf.return_value = True
-        rinp.return_value = '1,2,3'
+        rinp.return_value = "1,2,3"
 
-        args = munch.Munch({'user': 'pingou'})
+        args = munch.Munch({"user": "pingou"})
         pagure.cli.admin.do_create_admin_token(args)
 
         # Retrieve the token
-        list_args = munch.Munch({
-            'user': None,
-            'token': None,
-            'active': False,
-            'expired': False,
-            'all': False,
-        })
+        list_args = munch.Munch(
+            {
+                "user": None,
+                "token": None,
+                "active": False,
+                "expired": False,
+                "all": False,
+            }
+        )
         with tests.capture_output() as output:
             pagure.cli.admin.do_list_admin_token(list_args)
         output = output.getvalue()
         self.assertNotEqual(output, 'No user "pingou" found\n')
-        self.assertEqual(len(output.split('\n')), 2)
-        self.assertIn(' -- pingou -- ', output)
+        self.assertEqual(len(output.split("\n")), 2)
+        self.assertIn(" -- pingou -- ", output)
 
-        token = output.split(' ', 1)[0]
+        token = output.split(" ", 1)[0]
 
         # Before
-        list_args = munch.Munch({
-            'user': None,
-            'token': None,
-            'active': True,
-            'expired': False,
-            'all': False,
-        })
+        list_args = munch.Munch(
+            {
+                "user": None,
+                "token": None,
+                "active": True,
+                "expired": False,
+                "all": False,
+            }
+        )
         with tests.capture_output() as output:
             pagure.cli.admin.do_list_admin_token(list_args)
         output = output.getvalue()
-        self.assertNotEqual(output, 'No admin tokens found\n')
-        self.assertEqual(len(output.split('\n')), 2)
-        self.assertIn(' -- pingou -- ', output)
+        self.assertNotEqual(output, "No admin tokens found\n")
+        self.assertEqual(len(output.split("\n")), 2)
+        self.assertIn(" -- pingou -- ", output)
 
         # Expire the token
-        args = munch.Munch({'token': token})
+        args = munch.Munch({"token": token})
         pagure.cli.admin.do_expire_admin_token(args)
 
         # After
-        list_args = munch.Munch({
-            'user': None,
-            'token': None,
-            'active': True,
-            'expired': False,
-            'all': False,
-        })
+        list_args = munch.Munch(
+            {
+                "user": None,
+                "token": None,
+                "active": True,
+                "expired": False,
+                "all": False,
+            }
+        )
         with tests.capture_output() as output:
             pagure.cli.admin.do_list_admin_token(list_args)
         output = output.getvalue()
-        self.assertEqual(output, 'No admin tokens found\n')
+        self.assertEqual(output, "No admin tokens found\n")
 
-    @patch('pagure.cli.admin._get_input')
-    @patch('pagure.cli.admin._ask_confirmation')
+    @patch("pagure.cli.admin._get_input")
+    @patch("pagure.cli.admin._ask_confirmation")
     def test_do_update_admin_token_invalid_date(self, conf, rinp):
         """ Test the do_update_admin_token function of pagure-admin with
         an invalid date. """
-        if 'BUILD_ID' in os.environ:
-            raise unittest.case.SkipTest('Skipping on jenkins/el7')
+        if "BUILD_ID" in os.environ:
+            raise unittest.case.SkipTest("Skipping on jenkins/el7")
 
         # Create an admin token to use
         conf.return_value = True
-        rinp.return_value = '1,2,3'
+        rinp.return_value = "1,2,3"
 
-        args = munch.Munch({'user': 'pingou'})
+        args = munch.Munch({"user": "pingou"})
         pagure.cli.admin.do_create_admin_token(args)
 
         # Retrieve the token
-        list_args = munch.Munch({
-            'user': None,
-            'token': None,
-            'active': False,
-            'expired': False,
-            'all': False,
-        })
+        list_args = munch.Munch(
+            {
+                "user": None,
+                "token": None,
+                "active": False,
+                "expired": False,
+                "all": False,
+            }
+        )
         with tests.capture_output() as output:
             pagure.cli.admin.do_list_admin_token(list_args)
         output = output.getvalue()
         self.assertNotEqual(output, 'No user "pingou" found\n')
-        self.assertEqual(len(output.split('\n')), 2)
-        self.assertIn(' -- pingou -- ', output)
+        self.assertEqual(len(output.split("\n")), 2)
+        self.assertIn(" -- pingou -- ", output)
 
-        token = output.split(' ', 1)[0]
-        current_expiration = output.split(' ', 1)[1]
+        token = output.split(" ", 1)[0]
+        current_expiration = output.split(" ", 1)[1]
 
         # Set the expiration date to the token
-        args = munch.Munch({'token': token, 'date': 'aa-bb-cc'})
+        args = munch.Munch({"token": token, "date": "aa-bb-cc"})
         self.assertRaises(
             pagure.exceptions.PagureException,
             pagure.cli.admin.do_update_admin_token,
-            args
+            args,
         )
 
-    @patch('pagure.cli.admin._get_input')
-    @patch('pagure.cli.admin._ask_confirmation')
+    @patch("pagure.cli.admin._get_input")
+    @patch("pagure.cli.admin._ask_confirmation")
     def test_do_update_admin_token_invalid_date2(self, conf, rinp):
         """ Test the do_update_admin_token function of pagure-admin with
         an invalid date. """
-        if 'BUILD_ID' in os.environ:
-            raise unittest.case.SkipTest('Skipping on jenkins/el7')
+        if "BUILD_ID" in os.environ:
+            raise unittest.case.SkipTest("Skipping on jenkins/el7")
 
         # Create an admin token to use
         conf.return_value = True
-        rinp.return_value = '1,2,3'
+        rinp.return_value = "1,2,3"
 
-        args = munch.Munch({'user': 'pingou'})
+        args = munch.Munch({"user": "pingou"})
         pagure.cli.admin.do_create_admin_token(args)
 
         # Retrieve the token
-        list_args = munch.Munch({
-            'user': None,
-            'token': None,
-            'active': False,
-            'expired': False,
-            'all': False,
-        })
+        list_args = munch.Munch(
+            {
+                "user": None,
+                "token": None,
+                "active": False,
+                "expired": False,
+                "all": False,
+            }
+        )
         with tests.capture_output() as output:
             pagure.cli.admin.do_list_admin_token(list_args)
         output = output.getvalue()
         self.assertNotEqual(output, 'No user "pingou" found\n')
-        self.assertEqual(len(output.split('\n')), 2)
-        self.assertIn(' -- pingou -- ', output)
+        self.assertEqual(len(output.split("\n")), 2)
+        self.assertIn(" -- pingou -- ", output)
 
-        token = output.split(' ', 1)[0]
-        current_expiration = output.split(' ', 1)[1]
+        token = output.split(" ", 1)[0]
+        current_expiration = output.split(" ", 1)[1]
 
         # Set the expiration date to the token
-        args = munch.Munch({'token': token, 'date': '2017-18-01'})
+        args = munch.Munch({"token": token, "date": "2017-18-01"})
         self.assertRaises(
             pagure.exceptions.PagureException,
             pagure.cli.admin.do_update_admin_token,
-            args
+            args,
         )
 
-    @patch('pagure.cli.admin._get_input')
-    @patch('pagure.cli.admin._ask_confirmation')
+    @patch("pagure.cli.admin._get_input")
+    @patch("pagure.cli.admin._ask_confirmation")
     def test_do_update_admin_token_invalid_date3(self, conf, rinp):
         """ Test the do_update_admin_token function of pagure-admin with
         an invalid date (is today). """
-        if 'BUILD_ID' in os.environ:
-            raise unittest.case.SkipTest('Skipping on jenkins/el7')
+        if "BUILD_ID" in os.environ:
+            raise unittest.case.SkipTest("Skipping on jenkins/el7")
 
         # Create an admin token to use
         conf.return_value = True
-        rinp.return_value = '1,2,3'
+        rinp.return_value = "1,2,3"
 
-        args = munch.Munch({'user': 'pingou'})
+        args = munch.Munch({"user": "pingou"})
         pagure.cli.admin.do_create_admin_token(args)
 
         # Retrieve the token
-        list_args = munch.Munch({
-            'user': None,
-            'token': None,
-            'active': False,
-            'expired': False,
-            'all': False,
-        })
+        list_args = munch.Munch(
+            {
+                "user": None,
+                "token": None,
+                "active": False,
+                "expired": False,
+                "all": False,
+            }
+        )
         with tests.capture_output() as output:
             pagure.cli.admin.do_list_admin_token(list_args)
         output = output.getvalue()
         self.assertNotEqual(output, 'No user "pingou" found\n')
-        self.assertEqual(len(output.split('\n')), 2)
-        self.assertIn(' -- pingou -- ', output)
+        self.assertEqual(len(output.split("\n")), 2)
+        self.assertIn(" -- pingou -- ", output)
 
-        token = output.split(' ', 1)[0]
-        current_expiration = output.split(' ', 1)[1]
+        token = output.split(" ", 1)[0]
+        current_expiration = output.split(" ", 1)[1]
 
         # Set the expiration date to the token
-        args = munch.Munch({
-            'token': token, 'date': datetime.datetime.utcnow().date()
-        })
+        args = munch.Munch(
+            {"token": token, "date": datetime.datetime.utcnow().date()}
+        )
         self.assertRaises(
             pagure.exceptions.PagureException,
             pagure.cli.admin.do_update_admin_token,
-            args
+            args,
         )
 
-    @patch('pagure.cli.admin._get_input')
-    @patch('pagure.cli.admin._ask_confirmation')
+    @patch("pagure.cli.admin._get_input")
+    @patch("pagure.cli.admin._ask_confirmation")
     def test_do_update_admin_token(self, conf, rinp):
         """ Test the do_update_admin_token function of pagure-admin. """
-        if 'BUILD_ID' in os.environ:
-            raise unittest.case.SkipTest('Skipping on jenkins/el7')
+        if "BUILD_ID" in os.environ:
+            raise unittest.case.SkipTest("Skipping on jenkins/el7")
 
         # Create an admin token to use
         conf.return_value = True
-        rinp.return_value = '1,2,3'
+        rinp.return_value = "1,2,3"
 
-        args = munch.Munch({'user': 'pingou'})
+        args = munch.Munch({"user": "pingou"})
         pagure.cli.admin.do_create_admin_token(args)
 
         # Retrieve the token
-        list_args = munch.Munch({
-            'user': None,
-            'token': None,
-            'active': False,
-            'expired': False,
-            'all': False,
-        })
+        list_args = munch.Munch(
+            {
+                "user": None,
+                "token": None,
+                "active": False,
+                "expired": False,
+                "all": False,
+            }
+        )
         with tests.capture_output() as output:
             pagure.cli.admin.do_list_admin_token(list_args)
         output = output.getvalue()
         self.assertNotEqual(output, 'No user "pingou" found\n')
-        self.assertEqual(len(output.split('\n')), 2)
-        self.assertIn(' -- pingou -- ', output)
+        self.assertEqual(len(output.split("\n")), 2)
+        self.assertIn(" -- pingou -- ", output)
 
-        token = output.split(' ', 1)[0]
-        current_expiration = output.strip().split(' -- ', 2)[-1]
+        token = output.split(" ", 1)[0]
+        current_expiration = output.strip().split(" -- ", 2)[-1]
 
         # Before
-        list_args = munch.Munch({
-            'user': None,
-            'token': None,
-            'active': True,
-            'expired': False,
-            'all': False,
-        })
+        list_args = munch.Munch(
+            {
+                "user": None,
+                "token": None,
+                "active": True,
+                "expired": False,
+                "all": False,
+            }
+        )
         with tests.capture_output() as output:
             pagure.cli.admin.do_list_admin_token(list_args)
         output = output.getvalue()
-        self.assertNotEqual(output, 'No admin tokens found\n')
-        self.assertEqual(len(output.split('\n')), 2)
-        self.assertIn(' -- pingou -- ', output)
+        self.assertNotEqual(output, "No admin tokens found\n")
+        self.assertEqual(len(output.split("\n")), 2)
+        self.assertIn(" -- pingou -- ", output)
 
-        deadline = datetime.datetime.utcnow().date() \
-            + datetime.timedelta(days=3)
+        deadline = datetime.datetime.utcnow().date() + datetime.timedelta(
+            days=3
+        )
 
         # Set the expiration date to the token
-        args = munch.Munch({
-            'token': token,
-            'date': deadline.strftime('%Y-%m-%d')
-        })
+        args = munch.Munch(
+            {"token": token, "date": deadline.strftime("%Y-%m-%d")}
+        )
         pagure.cli.admin.do_update_admin_token(args)
 
         # After
-        list_args = munch.Munch({
-            'user': None,
-            'token': None,
-            'active': True,
-            'expired': False,
-            'all': False,
-        })
+        list_args = munch.Munch(
+            {
+                "user": None,
+                "token": None,
+                "active": True,
+                "expired": False,
+                "all": False,
+            }
+        )
         with tests.capture_output() as output:
             pagure.cli.admin.do_list_admin_token(list_args)
         output = output.getvalue()
-        self.assertEqual(output.split(' ', 1)[0], token)
+        self.assertEqual(output.split(" ", 1)[0], token)
         self.assertNotEqual(
-            output.strip().split(' -- ', 2)[-1],
-            current_expiration)
+            output.strip().split(" -- ", 2)[-1], current_expiration
+        )
 
 
 class PagureAdminGetWatchTests(tests.Modeltests):
@@ -682,41 +721,39 @@ class PagureAdminGetWatchTests(tests.Modeltests):
 
         # Create the user pingou
         item = pagure.lib.model.User(
-            user='pingou',
-            fullname='PY C',
-            password='foo',
-            default_email='bar@pingou.com',
+            user="pingou",
+            fullname="PY C",
+            password="foo",
+            default_email="bar@pingou.com",
         )
         self.session.add(item)
-        item = pagure.lib.model.UserEmail(
-            user_id=1,
-            email='bar@pingou.com')
+        item = pagure.lib.model.UserEmail(user_id=1, email="bar@pingou.com")
         self.session.add(item)
 
         # Create the user foo
         item = pagure.lib.model.User(
-            user='foo',
-            fullname='foo B.',
-            password='foob',
-            default_email='foo@pingou.com',
+            user="foo",
+            fullname="foo B.",
+            password="foob",
+            default_email="foo@pingou.com",
         )
         self.session.add(item)
 
         # Create two projects for the user pingou
         item = pagure.lib.model.Project(
             user_id=1,  # pingou
-            name='test',
-            description='namespaced test project',
-            hook_token='aaabbbeee',
-            namespace='somenamespace',
+            name="test",
+            description="namespaced test project",
+            hook_token="aaabbbeee",
+            namespace="somenamespace",
         )
         self.session.add(item)
 
         item = pagure.lib.model.Project(
             user_id=1,  # pingou
-            name='test',
-            description='Test project',
-            hook_token='aaabbbccc',
+            name="test",
+            description="Test project",
+            hook_token="aaabbbccc",
             namespace=None,
         )
         self.session.add(item)
@@ -730,25 +767,16 @@ class PagureAdminGetWatchTests(tests.Modeltests):
         """ Test the get-watch function of pagure-admin with an unknown
         project.
         """
-        args = munch.Munch({
-            'project': 'foobar',
-            'user': 'pingou',
-        })
+        args = munch.Munch({"project": "foobar", "user": "pingou"})
         with self.assertRaises(pagure.exceptions.PagureException) as cm:
             pagure.cli.admin.do_get_watch_status(args)
-        self.assertEqual(
-            cm.exception.args[0],
-            'No project found with: foobar'
-        )
+        self.assertEqual(cm.exception.args[0], "No project found with: foobar")
 
     def test_get_watch_get_project_invalid_project(self):
         """ Test the get-watch function of pagure-admin with an invalid
         project.
         """
-        args = munch.Munch({
-            'project': 'fo/o/bar',
-            'user': 'pingou',
-        })
+        args = munch.Munch({"project": "fo/o/bar", "user": "pingou"})
         with self.assertRaises(pagure.exceptions.PagureException) as cm:
             pagure.cli.admin.do_get_watch_status(args)
         self.assertEqual(
@@ -759,77 +787,65 @@ class PagureAdminGetWatchTests(tests.Modeltests):
     def test_get_watch_get_project_invalid_user(self):
         """ Test the get-watch function of pagure-admin on a invalid user.
         """
-        args = munch.Munch({
-            'project': 'test',
-            'user': 'beebop',
-        })
+        args = munch.Munch({"project": "test", "user": "beebop"})
         with self.assertRaises(pagure.exceptions.PagureException) as cm:
             pagure.cli.admin.do_get_watch_status(args)
-        self.assertEqual(
-            cm.exception.args[0],
-            'No user "beebop" found'
-        )
+        self.assertEqual(cm.exception.args[0], 'No user "beebop" found')
 
     def test_get_watch_get_project(self):
         """ Test the get-watch function of pagure-admin on a regular project.
         """
-        args = munch.Munch({
-            'project': 'test',
-            'user': 'pingou',
-        })
+        args = munch.Munch({"project": "test", "user": "pingou"})
         with tests.capture_output() as output:
             pagure.cli.admin.do_get_watch_status(args)
         output = output.getvalue()
         self.assertEqual(
-            'On test user: pingou is watching the following items: '
-            'issues, pull-requests\n', output)
+            "On test user: pingou is watching the following items: "
+            "issues, pull-requests\n",
+            output,
+        )
 
     def test_get_watch_get_project_not_watching(self):
         """ Test the get-watch function of pagure-admin on a regular project.
         """
 
-        args = munch.Munch({
-            'project': 'test',
-            'user': 'foo',
-        })
+        args = munch.Munch({"project": "test", "user": "foo"})
         with tests.capture_output() as output:
             pagure.cli.admin.do_get_watch_status(args)
         output = output.getvalue()
         self.assertEqual(
-            'On test user: foo is watching the following items: None\n',
-            output)
+            "On test user: foo is watching the following items: None\n", output
+        )
 
     def test_get_watch_get_project_namespaced(self):
         """ Test the get-watch function of pagure-admin on a namespaced project.
         """
 
-        args = munch.Munch({
-            'project': 'somenamespace/test',
-            'user': 'pingou',
-        })
+        args = munch.Munch({"project": "somenamespace/test", "user": "pingou"})
         with tests.capture_output() as output:
             pagure.cli.admin.do_get_watch_status(args)
         output = output.getvalue()
         self.assertEqual(
-            'On somenamespace/test user: pingou is watching the following '
-            'items: issues, pull-requests\n', output)
+            "On somenamespace/test user: pingou is watching the following "
+            "items: issues, pull-requests\n",
+            output,
+        )
 
     def test_get_watch_get_project_namespaced_not_watching(self):
         """ Test the get-watch function of pagure-admin on a namespaced project.
         """
 
-        args = munch.Munch({
-            'project': 'somenamespace/test',
-            'user': 'foo',
-        })
+        args = munch.Munch({"project": "somenamespace/test", "user": "foo"})
         with tests.capture_output() as output:
             pagure.cli.admin.do_get_watch_status(args)
         output = output.getvalue()
         with tests.capture_output() as _discarded:
             pagure.cli.admin.do_get_watch_status(args)
         self.assertEqual(
-            'On somenamespace/test user: foo is watching the following '
-            'items: None\n', output)
+            "On somenamespace/test user: foo is watching the following "
+            "items: None\n",
+            output,
+        )
 
 
 class PagureAdminUpdateWatchTests(tests.Modeltests):
@@ -844,41 +860,39 @@ class PagureAdminUpdateWatchTests(tests.Modeltests):
 
         # Create the user pingou
         item = pagure.lib.model.User(
-            user='pingou',
-            fullname='PY C',
-            password='foo',
-            default_email='bar@pingou.com',
+            user="pingou",
+            fullname="PY C",
+            password="foo",
+            default_email="bar@pingou.com",
         )
         self.session.add(item)
-        item = pagure.lib.model.UserEmail(
-            user_id=1,
-            email='bar@pingou.com')
+        item = pagure.lib.model.UserEmail(user_id=1, email="bar@pingou.com")
         self.session.add(item)
 
         # Create the user foo
         item = pagure.lib.model.User(
-            user='foo',
-            fullname='foo B.',
-            password='foob',
-            default_email='foo@pingou.com',
+            user="foo",
+            fullname="foo B.",
+            password="foob",
+            default_email="foo@pingou.com",
         )
         self.session.add(item)
 
         # Create two projects for the user pingou
         item = pagure.lib.model.Project(
             user_id=1,  # pingou
-            name='test',
-            description='namespaced test project',
-            hook_token='aaabbbeee',
-            namespace='somenamespace',
+            name="test",
+            description="namespaced test project",
+            hook_token="aaabbbeee",
+            namespace="somenamespace",
         )
         self.session.add(item)
 
         item = pagure.lib.model.Project(
             user_id=1,  # pingou
-            name='test',
-            description='Test project',
-            hook_token='aaabbbccc',
+            name="test",
+            description="Test project",
+            hook_token="aaabbbccc",
             namespace=None,
         )
         self.session.add(item)
@@ -892,27 +906,20 @@ class PagureAdminUpdateWatchTests(tests.Modeltests):
         """ Test the update-watch function of pagure-admin on an unknown
         project.
         """
-        args = munch.Munch({
-            'project': 'foob',
-            'user': 'pingou',
-            'status': '1'
-        })
+        args = munch.Munch(
+            {"project": "foob", "user": "pingou", "status": "1"}
+        )
         with self.assertRaises(pagure.exceptions.PagureException) as cm:
             pagure.cli.admin.do_update_watch_status(args)
-        self.assertEqual(
-            cm.exception.args[0],
-            'No project found with: foob'
-        )
+        self.assertEqual(cm.exception.args[0], "No project found with: foob")
 
     def test_get_watch_update_project_invalid_project(self):
         """ Test the update-watch function of pagure-admin on an invalid
         project.
         """
-        args = munch.Munch({
-            'project': 'fo/o/b',
-            'user': 'pingou',
-            'status': '1'
-        })
+        args = munch.Munch(
+            {"project": "fo/o/b", "user": "pingou", "status": "1"}
+        )
         with self.assertRaises(pagure.exceptions.PagureException) as cm:
             pagure.cli.admin.do_update_watch_status(args)
         self.assertEqual(
@@ -923,32 +930,23 @@ class PagureAdminUpdateWatchTests(tests.Modeltests):
     def test_get_watch_update_project_invalid_user(self):
         """ Test the update-watch function of pagure-admin on an invalid user.
         """
-        args = munch.Munch({
-            'project': 'test',
-            'user': 'foob',
-            'status': '1'
-        })
+        args = munch.Munch({"project": "test", "user": "foob", "status": "1"})
         with self.assertRaises(pagure.exceptions.PagureException) as cm:
             pagure.cli.admin.do_update_watch_status(args)
-        self.assertEqual(
-            cm.exception.args[0],
-            'No user "foob" found'
-        )
+        self.assertEqual(cm.exception.args[0], 'No user "foob" found')
 
     def test_get_watch_update_project_invalid_status(self):
         """ Test the update-watch function of pagure-admin with an invalid
         status.
         """
-        args = munch.Munch({
-            'project': 'test',
-            'user': 'pingou',
-            'status': '10'
-        })
+        args = munch.Munch(
+            {"project": "test", "user": "pingou", "status": "10"}
+        )
         with self.assertRaises(pagure.exceptions.PagureException) as cm:
             pagure.cli.admin.do_update_watch_status(args)
         self.assertEqual(
             cm.exception.args[0],
-            'Invalid status provided: 10 not in -1, 0, 1, 2, 3'
+            "Invalid status provided: 10 not in -1, 0, 1, 2, 3",
         )
 
     def test_get_watch_update_project_no_effect(self):
@@ -956,39 +954,37 @@ class PagureAdminUpdateWatchTests(tests.Modeltests):
         project - nothing changed.
         """
 
-        args = munch.Munch({
-            'project': 'test',
-            'user': 'pingou',
-        })
+        args = munch.Munch({"project": "test", "user": "pingou"})
         with tests.capture_output() as output:
             pagure.cli.admin.do_get_watch_status(args)
         output = output.getvalue()
         self.assertEqual(
-            'On test user: pingou is watching the following items: '
-            'issues, pull-requests\n', output)
+            "On test user: pingou is watching the following items: "
+            "issues, pull-requests\n",
+            output,
+        )
 
-        args = munch.Munch({
-            'project': 'test',
-            'user': 'pingou',
-            'status': '1'
-        })
+        args = munch.Munch(
+            {"project": "test", "user": "pingou", "status": "1"}
+        )
         with tests.capture_output() as output:
             pagure.cli.admin.do_update_watch_status(args)
         output = output.getvalue()
         self.assertEqual(
-            'Updating watch status of pingou to 1 (watch issues and PRs) '
-            'on test\n', output)
+            "Updating watch status of pingou to 1 (watch issues and PRs) "
+            "on test\n",
+            output,
+        )
 
-        args = munch.Munch({
-            'project': 'test',
-            'user': 'pingou',
-        })
+        args = munch.Munch({"project": "test", "user": "pingou"})
         with tests.capture_output() as output:
             pagure.cli.admin.do_get_watch_status(args)
         output = output.getvalue()
         self.assertEqual(
-            'On test user: pingou is watching the following items: '
-            'issues, pull-requests\n', output)
+            "On test user: pingou is watching the following items: "
+            "issues, pull-requests\n",
+            output,
+        )
 
 
 class PagureAdminReadOnlyTests(tests.Modeltests):
@@ -1003,32 +999,30 @@ class PagureAdminReadOnlyTests(tests.Modeltests):
 
         # Create the user pingou
         item = pagure.lib.model.User(
-            user='pingou',
-            fullname='PY C',
-            password='foo',
-            default_email='bar@pingou.com',
+            user="pingou",
+            fullname="PY C",
+            password="foo",
+            default_email="bar@pingou.com",
         )
         self.session.add(item)
-        item = pagure.lib.model.UserEmail(
-            user_id=1,
-            email='bar@pingou.com')
+        item = pagure.lib.model.UserEmail(user_id=1, email="bar@pingou.com")
         self.session.add(item)
 
         # Create two projects for the user pingou
         item = pagure.lib.model.Project(
             user_id=1,  # pingou
-            name='test',
-            description='namespaced test project',
-            hook_token='aaabbbeee',
-            namespace='somenamespace',
+            name="test",
+            description="namespaced test project",
+            hook_token="aaabbbeee",
+            namespace="somenamespace",
         )
         self.session.add(item)
 
         item = pagure.lib.model.Project(
             user_id=1,  # pingou
-            name='test',
-            description='Test project',
-            hook_token='aaabbbccc',
+            name="test",
+            description="Test project",
+            hook_token="aaabbbccc",
             namespace=None,
         )
         self.session.add(item)
@@ -1043,33 +1037,22 @@ class PagureAdminReadOnlyTests(tests.Modeltests):
         project.
         """
 
-        args = munch.Munch({
-            'project': 'foob',
-            'user': None,
-            'ro': None,
-        })
+        args = munch.Munch({"project": "foob", "user": None, "ro": None})
         with self.assertRaises(pagure.exceptions.PagureException) as cm:
             pagure.cli.admin.do_read_only(args)
-        self.assertEqual(
-            cm.exception.args[0],
-            'No project found with: foob'
-        )
+        self.assertEqual(cm.exception.args[0], "No project found with: foob")
 
     def test_read_only_invalid_project(self):
         """ Test the read-only function of pagure-admin on an invalid
         project.
         """
 
-        args = munch.Munch({
-            'project': 'fo/o/b',
-            'user': None,
-            'ro': None,
-        })
+        args = munch.Munch({"project": "fo/o/b", "user": None, "ro": None})
         with self.assertRaises(pagure.exceptions.PagureException) as cm:
             pagure.cli.admin.do_read_only(args)
         self.assertEqual(
             cm.exception.args[0],
-            'Invalid project name, has more than one "/": fo/o/b'
+            'Invalid project name, has more than one "/": fo/o/b',
         )
 
     def test_read_only(self):
@@ -1077,34 +1060,31 @@ class PagureAdminReadOnlyTests(tests.Modeltests):
         a non-namespaced project.
         """
 
-        args = munch.Munch({
-            'project': 'test',
-            'user': None,
-            'ro': None,
-        })
+        args = munch.Munch({"project": "test", "user": None, "ro": None})
         with tests.capture_output() as output:
             pagure.cli.admin.do_read_only(args)
         output = output.getvalue()
         self.assertEqual(
-            'The current read-only flag of the project test is set to True\n',
-            output)
+            "The current read-only flag of the project test is set to True\n",
+            output,
+        )
 
     def test_read_only_namespace(self):
         """ Test the read-only function of pagure-admin to get status of
         a namespaced project.
         """
 
-        args = munch.Munch({
-            'project': 'somenamespace/test',
-            'user': None,
-            'ro': None,
-        })
+        args = munch.Munch(
+            {"project": "somenamespace/test", "user": None, "ro": None}
+        )
         with tests.capture_output() as output:
             pagure.cli.admin.do_read_only(args)
         output = output.getvalue()
         self.assertEqual(
-            'The current read-only flag of the project somenamespace/test '\
-            'is set to True\n', output)
+            "The current read-only flag of the project somenamespace/test "
+            "is set to True\n",
+            output,
+        )
 
     def test_read_only_namespace_changed(self):
         """ Test the read-only function of pagure-admin to set the status of
@@ -1112,42 +1092,42 @@ class PagureAdminReadOnlyTests(tests.Modeltests):
         """
 
         # Before
-        args = munch.Munch({
-            'project': 'somenamespace/test',
-            'user': None,
-            'ro': None,
-        })
+        args = munch.Munch(
+            {"project": "somenamespace/test", "user": None, "ro": None}
+        )
         with tests.capture_output() as output:
             pagure.cli.admin.do_read_only(args)
         output = output.getvalue()
         self.assertEqual(
-            'The current read-only flag of the project somenamespace/test '\
-            'is set to True\n', output)
+            "The current read-only flag of the project somenamespace/test "
+            "is set to True\n",
+            output,
+        )
 
-        args = munch.Munch({
-            'project': 'somenamespace/test',
-            'user': None,
-            'ro': 'false',
-        })
+        args = munch.Munch(
+            {"project": "somenamespace/test", "user": None, "ro": "false"}
+        )
         with tests.capture_output() as output:
             pagure.cli.admin.do_read_only(args)
         output = output.getvalue()
         self.assertEqual(
-            'The read-only flag of the project somenamespace/test has been '
-            'set to False\n', output)
+            "The read-only flag of the project somenamespace/test has been "
+            "set to False\n",
+            output,
+        )
 
         # After
-        args = munch.Munch({
-            'project': 'somenamespace/test',
-            'user': None,
-            'ro': None,
-        })
+        args = munch.Munch(
+            {"project": "somenamespace/test", "user": None, "ro": None}
+        )
         with tests.capture_output() as output:
             pagure.cli.admin.do_read_only(args)
         output = output.getvalue()
         self.assertEqual(
-            'The current read-only flag of the project somenamespace/test '\
-            'is set to False\n', output)
+            "The current read-only flag of the project somenamespace/test "
+            "is set to False\n",
+            output,
+        )
 
     def test_read_only_no_change(self):
         """ Test the read-only function of pagure-admin to set the status of
@@ -1155,42 +1135,35 @@ class PagureAdminReadOnlyTests(tests.Modeltests):
         """
 
         # Before
-        args = munch.Munch({
-            'project': 'test',
-            'user': None,
-            'ro': None,
-        })
+        args = munch.Munch({"project": "test", "user": None, "ro": None})
         with tests.capture_output() as output:
             pagure.cli.admin.do_read_only(args)
         output = output.getvalue()
         self.assertEqual(
-            'The current read-only flag of the project test '\
-            'is set to True\n', output)
+            "The current read-only flag of the project test "
+            "is set to True\n",
+            output,
+        )
 
-        args = munch.Munch({
-            'project': 'test',
-            'user': None,
-            'ro': 'true',
-        })
+        args = munch.Munch({"project": "test", "user": None, "ro": "true"})
         with tests.capture_output() as output:
             pagure.cli.admin.do_read_only(args)
         output = output.getvalue()
         self.assertEqual(
-            'The read-only flag of the project test has been '
-            'set to True\n', output)
+            "The read-only flag of the project test has been " "set to True\n",
+            output,
+        )
 
         # After
-        args = munch.Munch({
-            'project': 'test',
-            'user': None,
-            'ro': None,
-        })
+        args = munch.Munch({"project": "test", "user": None, "ro": None})
         with tests.capture_output() as output:
             pagure.cli.admin.do_read_only(args)
         output = output.getvalue()
         self.assertEqual(
-            'The current read-only flag of the project test '\
-            'is set to True\n', output)
+            "The current read-only flag of the project test "
+            "is set to True\n",
+            output,
+        )
 
 
 class PagureNewGroupTests(tests.Modeltests):
@@ -1205,15 +1178,13 @@ class PagureNewGroupTests(tests.Modeltests):
 
         # Create the user pingou
         item = pagure.lib.model.User(
-            user='pingou',
-            fullname='PY C',
-            password='foo',
-            default_email='bar@pingou.com',
+            user="pingou",
+            fullname="PY C",
+            password="foo",
+            default_email="bar@pingou.com",
         )
         self.session.add(item)
-        item = pagure.lib.model.UserEmail(
-            user_id=1,
-            email='bar@pingou.com')
+        item = pagure.lib.model.UserEmail(user_id=1, email="bar@pingou.com")
         self.session.add(item)
 
         self.session.commit()
@@ -1229,17 +1200,19 @@ class PagureNewGroupTests(tests.Modeltests):
         is missing from the args.
         """
 
-        args = munch.Munch({
-            'group_name': 'foob',
-            'display': None,
-            'description': None,
-            'username': 'pingou',
-        })
+        args = munch.Munch(
+            {
+                "group_name": "foob",
+                "display": None,
+                "description": None,
+                "username": "pingou",
+            }
+        )
         with self.assertRaises(pagure.exceptions.PagureException) as cm:
             pagure.cli.admin.do_new_group(args)
         self.assertEqual(
             cm.exception.args[0],
-            'A display name must be provided for the group'
+            "A display name must be provided for the group",
         )
 
         groups = pagure.lib.query.search_groups(self.session)
@@ -1250,19 +1223,21 @@ class PagureNewGroupTests(tests.Modeltests):
         is missing from the args.
         """
 
-        args = munch.Munch({
-            'group_name': 'foob',
-            'display': 'foo group',
-            'description': None,
-            'username': None,
-        })
+        args = munch.Munch(
+            {
+                "group_name": "foob",
+                "display": "foo group",
+                "description": None,
+                "username": None,
+            }
+        )
 
         with self.assertRaises(pagure.exceptions.PagureException) as cm:
             pagure.cli.admin.do_new_group(args)
 
         self.assertEqual(
             cm.exception.args[0],
-            'An username must be provided to associate with the group'
+            "An username must be provided to associate with the group",
         )
 
         groups = pagure.lib.query.search_groups(self.session)
@@ -1273,20 +1248,22 @@ class PagureNewGroupTests(tests.Modeltests):
         are provided.
         """
 
-        args = munch.Munch({
-            'group_name': 'foob',
-            'display': 'foo group',
-            'description': None,
-            'username': 'pingou',
-        })
+        args = munch.Munch(
+            {
+                "group_name": "foob",
+                "display": "foo group",
+                "description": None,
+                "username": "pingou",
+            }
+        )
 
         pagure.cli.admin.do_new_group(args)
 
         groups = pagure.lib.query.search_groups(self.session)
         self.assertEqual(len(groups), 1)
 
-    @patch.dict('pagure.config.config', {'ENABLE_GROUP_MNGT': False})
-    @patch('pagure.cli.admin._ask_confirmation')
+    @patch.dict("pagure.config.config", {"ENABLE_GROUP_MNGT": False})
+    @patch("pagure.cli.admin._ask_confirmation")
     def test_new_group_grp_mngt_off_no(self, conf):
         """ Test the new-group function of pagure-admin when all arguments
         are provided and ENABLE_GROUP_MNGT if off in the config and the user
@@ -1294,20 +1271,22 @@ class PagureNewGroupTests(tests.Modeltests):
         """
         conf.return_value = False
 
-        args = munch.Munch({
-            'group_name': 'foob',
-            'display': 'foo group',
-            'description': None,
-            'username': 'pingou',
-        })
+        args = munch.Munch(
+            {
+                "group_name": "foob",
+                "display": "foo group",
+                "description": None,
+                "username": "pingou",
+            }
+        )
 
         pagure.cli.admin.do_new_group(args)
 
         groups = pagure.lib.query.search_groups(self.session)
         self.assertEqual(len(groups), 0)
 
-    @patch.dict('pagure.config.config', {'ENABLE_GROUP_MNGT': False})
-    @patch('pagure.cli.admin._ask_confirmation')
+    @patch.dict("pagure.config.config", {"ENABLE_GROUP_MNGT": False})
+    @patch("pagure.cli.admin._ask_confirmation")
     def test_new_group_grp_mngt_off_yes(self, conf):
         """ Test the new-group function of pagure-admin when all arguments
         are provided and ENABLE_GROUP_MNGT if off in the config and the user
@@ -1315,37 +1294,41 @@ class PagureNewGroupTests(tests.Modeltests):
         """
         conf.return_value = True
 
-        args = munch.Munch({
-            'group_name': 'foob',
-            'display': 'foo group',
-            'description': None,
-            'username': 'pingou',
-        })
+        args = munch.Munch(
+            {
+                "group_name": "foob",
+                "display": "foo group",
+                "description": None,
+                "username": "pingou",
+            }
+        )
 
         pagure.cli.admin.do_new_group(args)
 
         groups = pagure.lib.query.search_groups(self.session)
         self.assertEqual(len(groups), 1)
 
-    @patch.dict('pagure.config.config', {'BLACKLISTED_GROUPS': ['foob']})
+    @patch.dict("pagure.config.config", {"BLACKLISTED_GROUPS": ["foob"]})
     def test_new_group_grp_mngt_off_yes(self):
         """ Test the new-group function of pagure-admin when all arguments
         are provided but the group is black listed.
         """
 
-        args = munch.Munch({
-            'group_name': 'foob',
-            'display': 'foo group',
-            'description': None,
-            'username': 'pingou',
-        })
+        args = munch.Munch(
+            {
+                "group_name": "foob",
+                "display": "foo group",
+                "description": None,
+                "username": "pingou",
+            }
+        )
 
         with self.assertRaises(pagure.exceptions.PagureException) as cm:
             pagure.cli.admin.do_new_group(args)
 
         self.assertEqual(
             cm.exception.args[0],
-            'This group name has been blacklisted, please choose another one'
+            "This group name has been blacklisted, please choose another one",
         )
 
         groups = pagure.lib.query.search_groups(self.session)
@@ -1364,15 +1347,13 @@ class PagureListGroupEmptyTests(tests.Modeltests):
 
         # Create the user pingou
         item = pagure.lib.model.User(
-            user='pingou',
-            fullname='PY C',
-            password='foo',
-            default_email='bar@pingou.com',
+            user="pingou",
+            fullname="PY C",
+            password="foo",
+            default_email="bar@pingou.com",
         )
         self.session.add(item)
-        item = pagure.lib.model.UserEmail(
-            user_id=1,
-            email='bar@pingou.com')
+        item = pagure.lib.model.UserEmail(user_id=1, email="bar@pingou.com")
         self.session.add(item)
 
         self.session.commit()
@@ -1383,7 +1364,7 @@ class PagureListGroupEmptyTests(tests.Modeltests):
         groups = pagure.lib.query.search_groups(self.session)
         self.assertEqual(len(groups), 0)
 
-    @patch('sys.stdout', new_callable=StringIO)
+    @patch("sys.stdout", new_callable=StringIO)
     def test_no_groups(self, mock_stdout):
         """ Test the list-groups function of pagure-admin when there are no
         groups in the database
@@ -1394,7 +1375,7 @@ class PagureListGroupEmptyTests(tests.Modeltests):
 
         self.assertEqual(
             mock_stdout.getvalue(),
-            'No groups found in this pagure instance.\n'
+            "No groups found in this pagure instance.\n",
         )
 
         groups = pagure.lib.query.search_groups(self.session)
@@ -1413,27 +1394,25 @@ class PagureListGroupTests(tests.Modeltests):
 
         # Create the user pingou
         item = pagure.lib.model.User(
-            user='pingou',
-            fullname='PY C',
-            password='foo',
-            default_email='bar@pingou.com',
+            user="pingou",
+            fullname="PY C",
+            password="foo",
+            default_email="bar@pingou.com",
         )
         self.session.add(item)
-        item = pagure.lib.model.UserEmail(
-            user_id=1,
-            email='bar@pingou.com')
+        item = pagure.lib.model.UserEmail(user_id=1, email="bar@pingou.com")
         self.session.add(item)
 
         # Create a group
         pagure.lib.query.add_group(
             self.session,
-            group_name='JL',
-            display_name='Justice League',
-            description='Nope, it\'s not JLA anymore',
-            group_type='user',
-            user='pingou',
+            group_name="JL",
+            display_name="Justice League",
+            description="Nope, it's not JLA anymore",
+            group_type="user",
+            user="pingou",
             is_admin=False,
-            blacklist=[]
+            blacklist=[],
         )
 
         self.session.commit()
@@ -1444,7 +1423,7 @@ class PagureListGroupTests(tests.Modeltests):
         groups = pagure.lib.query.search_groups(self.session)
         self.assertEqual(len(groups), 1)
 
-    @patch('sys.stdout', new_callable=StringIO)
+    @patch("sys.stdout", new_callable=StringIO)
     def test_list_groups(self, mock_stdout):
         """ Test the list-groups function of pagure-admin when there is one
         group in the database
@@ -1455,8 +1434,7 @@ class PagureListGroupTests(tests.Modeltests):
 
         self.assertEqual(
             mock_stdout.getvalue(),
-            'List of groups on this Pagure instance:\n'
-            'Group: 1 - name JL\n'
+            "List of groups on this Pagure instance:\n" "Group: 1 - name JL\n",
         )
 
         groups = pagure.lib.query.search_groups(self.session)
@@ -1475,15 +1453,13 @@ class PagureBlockUserTests(tests.Modeltests):
 
         # Create the user pingou
         item = pagure.lib.model.User(
-            user='pingou',
-            fullname='PY C',
-            password='foo',
-            default_email='bar@pingou.com',
+            user="pingou",
+            fullname="PY C",
+            password="foo",
+            default_email="bar@pingou.com",
         )
         self.session.add(item)
-        item = pagure.lib.model.UserEmail(
-            user_id=1,
-            email='bar@pingou.com')
+        item = pagure.lib.model.UserEmail(user_id=1, email="bar@pingou.com")
         self.session.add(item)
 
         self.session.commit()
@@ -1491,7 +1467,7 @@ class PagureBlockUserTests(tests.Modeltests):
         # Make the imported pagure use the correct db session
         pagure.cli.admin.session = self.session
 
-        user = pagure.lib.query.get_user(self.session, 'pingou')
+        user = pagure.lib.query.get_user(self.session, "pingou")
         self.assertIsNone(user.refuse_sessions_before)
 
     def test_missing_date(self):
@@ -1499,18 +1475,15 @@ class PagureBlockUserTests(tests.Modeltests):
         provided.
         """
 
-        args = munch.Munch({
-            'username': 'pingou',
-            'date': None,
-        })
+        args = munch.Munch({"username": "pingou", "date": None})
         with self.assertRaises(pagure.exceptions.PagureException) as cm:
             pagure.cli.admin.do_block_user(args)
         self.assertEqual(
             cm.exception.args[0],
-            'Invalid date submitted: None, not of the format YYYY-MM-DD'
+            "Invalid date submitted: None, not of the format YYYY-MM-DD",
         )
 
-        user = pagure.lib.query.get_user(self.session, 'pingou')
+        user = pagure.lib.query.get_user(self.session, "pingou")
         self.assertIsNone(user.refuse_sessions_before)
 
     def test_missing_username(self):
@@ -1518,20 +1491,14 @@ class PagureBlockUserTests(tests.Modeltests):
         is missing from the args.
         """
 
-        args = munch.Munch({
-            'date': '2018-06-11',
-            'username': None,
-        })
+        args = munch.Munch({"date": "2018-06-11", "username": None})
 
         with self.assertRaises(pagure.exceptions.PagureException) as cm:
             pagure.cli.admin.do_block_user(args)
 
-        self.assertEqual(
-            cm.exception.args[0],
-            'An username must be specified'
-        )
+        self.assertEqual(cm.exception.args[0], "An username must be specified")
 
-        user = pagure.lib.query.get_user(self.session, 'pingou')
+        user = pagure.lib.query.get_user(self.session, "pingou")
         self.assertIsNone(user.refuse_sessions_before)
 
     def test_invalid_username(self):
@@ -1539,20 +1506,14 @@ class PagureBlockUserTests(tests.Modeltests):
         provided does correspond to any user in the DB.
         """
 
-        args = munch.Munch({
-            'date': '2018-06-11',
-            'username': 'invalid'
-        })
+        args = munch.Munch({"date": "2018-06-11", "username": "invalid"})
 
         with self.assertRaises(pagure.exceptions.PagureException) as cm:
             pagure.cli.admin.do_block_user(args)
 
-        self.assertEqual(
-            cm.exception.args[0],
-            'No user "invalid" found'
-        )
+        self.assertEqual(cm.exception.args[0], 'No user "invalid" found')
 
-        user = pagure.lib.query.get_user(self.session, 'pingou')
+        user = pagure.lib.query.get_user(self.session, "pingou")
         self.assertIsNone(user.refuse_sessions_before)
 
     def test_invalide_date(self):
@@ -1560,38 +1521,32 @@ class PagureBlockUserTests(tests.Modeltests):
         date is incorrect.
         """
 
-        args = munch.Munch({
-            'date': '2018-14-05',
-            'username': 'pingou',
-        })
+        args = munch.Munch({"date": "2018-14-05", "username": "pingou"})
 
         with self.assertRaises(pagure.exceptions.PagureException) as cm:
             pagure.cli.admin.do_block_user(args)
 
         self.assertEqual(
             cm.exception.args[0],
-            'Invalid date submitted: 2018-14-05, not of the format YYYY-MM-DD'
+            "Invalid date submitted: 2018-14-05, not of the format YYYY-MM-DD",
         )
 
-        user = pagure.lib.query.get_user(self.session, 'pingou')
+        user = pagure.lib.query.get_user(self.session, "pingou")
         self.assertIsNone(user.refuse_sessions_before)
 
-    @patch('pagure.cli.admin._ask_confirmation', MagicMock(return_value=True))
+    @patch("pagure.cli.admin._ask_confirmation", MagicMock(return_value=True))
     def test_block_user(self):
         """ Test the block-user function of pagure-admin when all arguments
         are provided correctly.
         """
 
-        args = munch.Munch({
-            'date': '2050-12-31',
-            'username': 'pingou',
-        })
+        args = munch.Munch({"date": "2050-12-31", "username": "pingou"})
 
         pagure.cli.admin.do_block_user(args)
 
-        user = pagure.lib.query.get_user(self.session, 'pingou')
+        user = pagure.lib.query.get_user(self.session, "pingou")
         self.assertIsNotNone(user.refuse_sessions_before)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main(verbosity=2)

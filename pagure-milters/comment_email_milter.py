@@ -26,9 +26,10 @@ import pagure.lib.model_base
 import pagure.lib.query
 
 
-if 'PAGURE_CONFIG' not in os.environ \
-        and os.path.exists('/etc/pagure/pagure.cfg'):
-    os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
+if "PAGURE_CONFIG" not in os.environ and os.path.exists(
+    "/etc/pagure/pagure.cfg"
+):
+    os.environ["PAGURE_CONFIG"] = "/etc/pagure/pagure.cfg"
 
 
 logq = Queue(maxsize=4)
@@ -36,8 +37,9 @@ _config = pagure.config.reload_config()
 
 
 def get_email_body(emailobj):
-    ''' Return the body of the email, preferably in text.
-    '''
+    """ Return the body of the email, preferably in text.
+    """
+
     def _get_body(emailobj):
         """ Return the first text/plain body found if the email is multipart
         or just the regular payload otherwise.
@@ -51,34 +53,33 @@ def get_email_body(emailobj):
                     return _get_body(payload)
 
                 body = payload.get_payload()
-                if payload.get_content_type() == 'text/plain':
+                if payload.get_content_type() == "text/plain":
                     return body
         else:
             return emailobj.get_payload()
 
     body = _get_body(emailobj)
 
-    enc = emailobj['Content-Transfer-Encoding']
-    if enc == 'base64':
+    enc = emailobj["Content-Transfer-Encoding"]
+    if enc == "base64":
         body = base64.decodestring(body)
 
     return body
 
 
 def clean_item(item):
-    ''' For an item provided as <item> return the content, if there are no
+    """ For an item provided as <item> return the content, if there are no
     <> then return the string.
-    '''
-    if '<' in item:
-        item = item.split('<')[1]
-    if '>' in item:
-        item = item.split('>')[0]
+    """
+    if "<" in item:
+        item = item.split("<")[1]
+    if ">" in item:
+        item = item.split(">")[0]
 
     return item
 
 
 class PagureMilter(Milter.Base):
-
     def __init__(self):  # A new instance with each new connection.
         self.id = Milter.uniqueID()  # Integer incremented with each call.
         self.fp = None
@@ -94,28 +95,28 @@ class PagureMilter(Milter.Base):
         # must use addheader, chgheader, replacebody to change the message
         # on the MTA.
         self.fp = BytesIO()
-        self.canon_from = '@'.join(parse_addr(mailfrom))
-        from_txt = 'From %s %s\n' % (self.canon_from, time.ctime())
-        self.fp.write(from_txt.encode('utf-8'))
+        self.canon_from = "@".join(parse_addr(mailfrom))
+        from_txt = "From %s %s\n" % (self.canon_from, time.ctime())
+        self.fp.write(from_txt.encode("utf-8"))
         return Milter.CONTINUE
 
     @Milter.noreply
     def header(self, name, hval):
-        ''' Headers '''
+        """ Headers """
         # add header to buffer
         header_txt = "%s: %s\n" % (name, hval)
-        self.fp.write(header_txt.encode('utf-8'))
+        self.fp.write(header_txt.encode("utf-8"))
         return Milter.CONTINUE
 
     @Milter.noreply
     def eoh(self):
-        ''' End of Headers '''
+        """ End of Headers """
         self.fp.write(b"\n")
         return Milter.CONTINUE
 
     @Milter.noreply
     def body(self, chunk):
-        ''' Body '''
+        """ Body """
         self.fp.write(chunk)
         return Milter.CONTINUE
 
@@ -127,138 +128,139 @@ class PagureMilter(Milter.Base):
         return Milter.CONTINUE
 
     def eom(self):
-        ''' End of Message '''
+        """ End of Message """
         self.fp.seek(0)
         msg = email.message_from_file(self.fp)
 
-        msg_id = msg.get('In-Reply-To', None)
+        msg_id = msg.get("In-Reply-To", None)
         if msg_id is None:
-            self.log('No In-Reply-To, keep going')
+            self.log("No In-Reply-To, keep going")
             return Milter.CONTINUE
 
         # Ensure we don't get extra lines in the message-id
-        msg_id = msg_id.split('\n')[0].strip()
+        msg_id = msg_id.split("\n")[0].strip()
 
-        self.log('msg-ig %s' % msg_id)
-        self.log('To %s' % msg['to'])
-        self.log('Cc %s' % msg.get('cc'))
-        self.log('From %s' % msg['From'])
+        self.log("msg-ig %s" % msg_id)
+        self.log("To %s" % msg["to"])
+        self.log("Cc %s" % msg.get("cc"))
+        self.log("From %s" % msg["From"])
 
         # Check the email was sent to the right address
-        email_address = msg['to']
-        if 'reply+' in msg.get('cc', ''):
-            email_address = msg['cc']
-        if 'reply+' not in email_address:
+        email_address = msg["to"]
+        if "reply+" in msg.get("cc", ""):
+            email_address = msg["cc"]
+        if "reply+" not in email_address:
             self.log(
-                'No valid recipient email found in To/Cc: %s'
-                % email_address)
+                "No valid recipient email found in To/Cc: %s" % email_address
+            )
             return Milter.CONTINUE
 
         # Ensure the user replied to his/her own notification, not that
         # they are trying to forge their ID into someone else's
-        salt = _config.get('SALT_EMAIL')
-        from_email = clean_item(msg['From'])
-        session = pagure.lib.model_base.create_session(_config['DB_URL'])
+        salt = _config.get("SALT_EMAIL")
+        from_email = clean_item(msg["From"])
+        session = pagure.lib.model_base.create_session(_config["DB_URL"])
         try:
             user = pagure.lib.query.get_user(session, from_email)
         except:
             self.log(
-                "Could not find an user in the DB associated with %s" %
-                from_email)
+                "Could not find an user in the DB associated with %s"
+                % from_email
+            )
             session.remove()
             return Milter.CONTINUE
 
         hashes = []
         for email_obj in user.emails:
-            m = hashlib.sha512('%s%s%s' % (msg_id, salt, email_obj.email))
+            m = hashlib.sha512("%s%s%s" % (msg_id, salt, email_obj.email))
             hashes.append(m.hexdigest())
 
-        tohash = email_address.split('@')[0].split('+')[-1]
+        tohash = email_address.split("@")[0].split("+")[-1]
         if tohash not in hashes:
-            self.log('hash list: %s' % hashes)
-            self.log('tohash:    %s' % tohash)
-            self.log('Hash does not correspond to the destination')
+            self.log("hash list: %s" % hashes)
+            self.log("tohash:    %s" % tohash)
+            self.log("Hash does not correspond to the destination")
             session.remove()
             return Milter.CONTINUE
 
-        if msg['From'] and msg['From'] == _config.get('FROM_EMAIL'):
+        if msg["From"] and msg["From"] == _config.get("FROM_EMAIL"):
             self.log("Let's not process the email we send")
             session.remove()
             return Milter.CONTINUE
 
         msg_id = clean_item(msg_id)
 
-        if msg_id and '-ticket-' in msg_id:
-            self.log('Processing issue')
+        if msg_id and "-ticket-" in msg_id:
+            self.log("Processing issue")
             session.remove()
             return self.handle_ticket_email(msg, msg_id)
-        elif msg_id and '-pull-request-' in msg_id:
-            self.log('Processing pull-request')
+        elif msg_id and "-pull-request-" in msg_id:
+            self.log("Processing pull-request")
             session.remove()
             return self.handle_request_email(msg, msg_id)
         else:
-            self.log('Not a pagure ticket or pull-request email, let it go')
+            self.log("Not a pagure ticket or pull-request email, let it go")
             session.remove()
             return Milter.CONTINUE
 
     def handle_ticket_email(self, emailobj, msg_id):
-        ''' Add the email as a comment on a ticket. '''
-        uid = msg_id.split('-ticket-')[-1].split('@')[0]
+        """ Add the email as a comment on a ticket. """
+        uid = msg_id.split("-ticket-")[-1].split("@")[0]
         parent_id = None
-        if '-' in uid:
-            uid, parent_id = uid.rsplit('-', 1)
-        if '/' in uid:
-            uid = uid.split('/')[0]
-        self.log('uid %s' % uid)
-        self.log('parent_id %s' % parent_id)
+        if "-" in uid:
+            uid, parent_id = uid.rsplit("-", 1)
+        if "/" in uid:
+            uid = uid.split("/")[0]
+        self.log("uid %s" % uid)
+        self.log("parent_id %s" % parent_id)
 
         data = {
-            'objid': uid,
-            'comment': get_email_body(emailobj),
-            'useremail': clean_item(emailobj['From']),
+            "objid": uid,
+            "comment": get_email_body(emailobj),
+            "useremail": clean_item(emailobj["From"]),
         }
-        url = _config.get('APP_URL')
+        url = _config.get("APP_URL")
 
-        if url.endswith('/'):
+        if url.endswith("/"):
             url = url[:-1]
-        url = '%s/pv/ticket/comment/' % url
-        self.log('Calling URL: %s' % url)
+        url = "%s/pv/ticket/comment/" % url
+        self.log("Calling URL: %s" % url)
         req = requests.put(url, data=data)
         if req.status_code == 200:
-            self.log('Comment added')
+            self.log("Comment added")
             return Milter.ACCEPT
-        self.log('Could not add the comment to ticket to pagure')
+        self.log("Could not add the comment to ticket to pagure")
         self.log(req.text)
 
         return Milter.CONTINUE
 
     def handle_request_email(self, emailobj, msg_id):
-        ''' Add the email as a comment on a request. '''
-        uid = msg_id.split('-pull-request-')[-1].split('@')[0]
+        """ Add the email as a comment on a request. """
+        uid = msg_id.split("-pull-request-")[-1].split("@")[0]
         parent_id = None
-        if '-' in uid:
-            uid, parent_id = uid.rsplit('-', 1)
-        if '/' in uid:
-            uid = uid.split('/')[0]
-        self.log('uid %s' % uid)
-        self.log('parent_id %s' % parent_id)
+        if "-" in uid:
+            uid, parent_id = uid.rsplit("-", 1)
+        if "/" in uid:
+            uid = uid.split("/")[0]
+        self.log("uid %s" % uid)
+        self.log("parent_id %s" % parent_id)
 
         data = {
-            'objid': uid,
-            'comment': get_email_body(emailobj),
-            'useremail': clean_item(emailobj['From']),
+            "objid": uid,
+            "comment": get_email_body(emailobj),
+            "useremail": clean_item(emailobj["From"]),
         }
-        url = _config.get('APP_URL')
+        url = _config.get("APP_URL")
 
-        if url.endswith('/'):
+        if url.endswith("/"):
             url = url[:-1]
-        url = '%s/pv/pull-request/comment/' % url
-        self.log('Calling URL: %s' % url)
+        url = "%s/pv/pull-request/comment/" % url
+        self.log("Calling URL: %s" % url)
         req = requests.put(url, data=data)
         if req.status_code == 200:
-            self.log('Comment added on PR')
+            self.log("Comment added on PR")
             return Milter.ACCEPT
-        self.log('Could not add the comment to PR to pagure')
+        self.log("Could not add the comment to PR to pagure")
         self.log(req.text)
 
         return Milter.CONTINUE
@@ -270,11 +272,13 @@ def background():
         if not t:
             break
         msg, id, ts = t
-        print("%s [%d]" % (time.strftime(
-            '%Y%b%d %H:%M:%S', time.localtime(ts)), id))
+        print(
+            "%s [%d]"
+            % (time.strftime("%Y%b%d %H:%M:%S", time.localtime(ts)), id)
+        )
         # 2005Oct13 02:34:11 [1] msg1 msg2 msg3 ...
         for i in msg:
-            print(i,)
+            print(i)
         print
 
 
@@ -285,12 +289,12 @@ def main():
     timeout = 600
     # Register to have the Milter factory create instances of your class:
     Milter.factory = PagureMilter
-    print("%s pagure milter startup" % time.strftime('%Y%b%d %H:%M:%S'))
+    print("%s pagure milter startup" % time.strftime("%Y%b%d %H:%M:%S"))
     sys.stdout.flush()
     Milter.runmilter("paguremilter", socketname, timeout)
     logq.put(None)
     bt.join()
-    print("%s pagure milter shutdown" % time.strftime('%Y%b%d %H:%M:%S'))
+    print("%s pagure milter shutdown" % time.strftime("%Y%b%d %H:%M:%S"))
 
 
 if __name__ == "__main__":

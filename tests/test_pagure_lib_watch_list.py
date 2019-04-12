@@ -17,17 +17,17 @@ import os
 
 import mock
 
-sys.path.insert(0, os.path.join(os.path.dirname(
-    os.path.abspath(__file__)), '..'))
+sys.path.insert(
+    0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+)
 
 import pagure.lib.model
 import pagure.lib.query
 import tests
 
-@mock.patch(
-        'pagure.lib.git.update_git', mock.MagicMock(return_value=True))
-@mock.patch(
-    'pagure.lib.notify.send_email', mock.MagicMock(return_value=True))
+
+@mock.patch("pagure.lib.git.update_git", mock.MagicMock(return_value=True))
+@mock.patch("pagure.lib.notify.send_email", mock.MagicMock(return_value=True))
 class PagureLibGetWatchListtests(tests.Modeltests):
     """ Tests for pagure.lib.query.get_watch_list """
 
@@ -36,12 +36,12 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         # Create a project ns/test
         item = pagure.lib.model.Project(
             user_id=1,  # pingou
-            name='test3',
-            namespace='ns',
-            description='test project #1',
-            hook_token='aaabbbcccdd',
+            name="test3",
+            namespace="ns",
+            description="test project #1",
+            hook_token="aaabbbcccdd",
         )
-        item.close_status = ['Invalid', 'Insufficient data', 'Fixed']
+        item.close_status = ["Invalid", "Insufficient data", "Fixed"]
         self.session.add(item)
         self.session.commit()
 
@@ -49,7 +49,7 @@ class PagureLibGetWatchListtests(tests.Modeltests):
             pagure.exceptions.InvalidObjectException,
             pagure.lib.query.get_watch_list,
             self.session,
-            item
+            item,
         )
 
     def test_get_watch_list_simple(self):
@@ -58,12 +58,12 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         # Create a project ns/test
         item = pagure.lib.model.Project(
             user_id=1,  # pingou
-            name='test3',
-            namespace='ns',
-            description='test project #1',
-            hook_token='aaabbbcccdd',
+            name="test3",
+            namespace="ns",
+            description="test project #1",
+            hook_token="aaabbbcccdd",
         )
-        item.close_status = ['Invalid', 'Insufficient data', 'Fixed']
+        item.close_status = ["Invalid", "Insufficient data", "Fixed"]
         self.session.add(item)
         self.session.commit()
 
@@ -72,17 +72,16 @@ class PagureLibGetWatchListtests(tests.Modeltests):
             issue_id=4,
             session=self.session,
             repo=item,
-            title='test issue',
-            content='content test issue',
-            user='pingou',
+            title="test issue",
+            content="content test issue",
+            user="pingou",
         )
         self.session.commit()
         self.assertEqual(iss.id, 4)
-        self.assertEqual(iss.title, 'test issue')
+        self.assertEqual(iss.title, "test issue")
 
         self.assertEqual(
-            pagure.lib.query.get_watch_list(self.session, iss),
-            set(['pingou'])
+            pagure.lib.query.get_watch_list(self.session, iss), set(["pingou"])
         )
 
     def test_get_watch_list_different_creator(self):
@@ -91,12 +90,12 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         # Create a project ns/test
         item = pagure.lib.model.Project(
             user_id=1,  # pingou
-            name='test3',
-            namespace='ns',
-            description='test project #1',
-            hook_token='aaabbbcccdd',
+            name="test3",
+            namespace="ns",
+            description="test project #1",
+            hook_token="aaabbbcccdd",
         )
-        item.close_status = ['Invalid', 'Insufficient data', 'Fixed']
+        item.close_status = ["Invalid", "Insufficient data", "Fixed"]
         self.session.add(item)
         self.session.commit()
 
@@ -105,17 +104,17 @@ class PagureLibGetWatchListtests(tests.Modeltests):
             issue_id=4,
             session=self.session,
             repo=item,
-            title='test issue',
-            content='content test issue',
-            user='foo',
+            title="test issue",
+            content="content test issue",
+            user="foo",
         )
         self.session.commit()
         self.assertEqual(iss.id, 4)
-        self.assertEqual(iss.title, 'test issue')
+        self.assertEqual(iss.title, "test issue")
 
         self.assertEqual(
             pagure.lib.query.get_watch_list(self.session, iss),
-            set(['pingou', 'foo'])
+            set(["pingou", "foo"]),
         )
 
     def test_get_watch_list_project_w_contributor(self):
@@ -124,55 +123,54 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         # Create a project ns/test3
         item = pagure.lib.model.Project(
             user_id=1,  # pingou
-            name='test3',
-            namespace='ns',
-            description='test project #1',
-            hook_token='aaabbbcccdd',
+            name="test3",
+            namespace="ns",
+            description="test project #1",
+            hook_token="aaabbbcccdd",
         )
-        item.close_status = ['Invalid', 'Insufficient data', 'Fixed']
+        item.close_status = ["Invalid", "Insufficient data", "Fixed"]
         self.session.add(item)
         self.session.commit()
 
         # Add a contributor to the project
         item = pagure.lib.model.User(
-            user='bar',
-            fullname='bar foo',
-            password='foo',
-            default_email='bar@bar.com',
+            user="bar",
+            fullname="bar foo",
+            password="foo",
+            default_email="bar@bar.com",
         )
         self.session.add(item)
-        item = pagure.lib.model.UserEmail(
-            user_id=3,
-            email='bar@bar.com')
+        item = pagure.lib.model.UserEmail(user_id=3, email="bar@bar.com")
         self.session.add(item)
 
         project = pagure.lib.query._get_project(
-            self.session, 'test3', namespace='ns')
+            self.session, "test3", namespace="ns"
+        )
         msg = pagure.lib.query.add_user_to_project(
             session=self.session,
             project=project,
-            new_user='bar',
-            user='pingou',
+            new_user="bar",
+            user="pingou",
         )
         self.session.commit()
-        self.assertEqual(msg, 'User added')
+        self.assertEqual(msg, "User added")
 
         # Create the ticket
         iss = pagure.lib.query.new_issue(
             issue_id=4,
             session=self.session,
             repo=project,
-            title='test issue',
-            content='content test issue',
-            user='foo',
+            title="test issue",
+            content="content test issue",
+            user="foo",
         )
         self.session.commit()
         self.assertEqual(iss.id, 4)
-        self.assertEqual(iss.title, 'test issue')
+        self.assertEqual(iss.title, "test issue")
 
         self.assertEqual(
             pagure.lib.query.get_watch_list(self.session, iss),
-            set(['pingou', 'foo', 'bar'])
+            set(["pingou", "foo", "bar"]),
         )
 
     def test_get_watch_list_user_in_group(self):
@@ -181,83 +179,82 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         # Create a project ns/test3
         item = pagure.lib.model.Project(
             user_id=1,  # pingou
-            name='test3',
-            namespace='ns',
-            description='test project #1',
-            hook_token='aaabbbcccdd',
+            name="test3",
+            namespace="ns",
+            description="test project #1",
+            hook_token="aaabbbcccdd",
         )
-        item.close_status = ['Invalid', 'Insufficient data', 'Fixed']
+        item.close_status = ["Invalid", "Insufficient data", "Fixed"]
         self.session.add(item)
         self.session.commit()
 
         # Create a third user
         item = pagure.lib.model.User(
-            user='bar',
-            fullname='bar foo',
-            password='foo',
-            default_email='bar@bar.com',
+            user="bar",
+            fullname="bar foo",
+            password="foo",
+            default_email="bar@bar.com",
         )
         self.session.add(item)
-        item = pagure.lib.model.UserEmail(
-            user_id=3,
-            email='bar@bar.com')
+        item = pagure.lib.model.UserEmail(user_id=3, email="bar@bar.com")
         self.session.add(item)
 
         # Create a group
         msg = pagure.lib.query.add_group(
             self.session,
-            group_name='foo',
-            display_name='foo group',
+            group_name="foo",
+            display_name="foo group",
             description=None,
-            group_type='bar',
-            user='pingou',
+            group_type="bar",
+            user="pingou",
             is_admin=False,
             blacklist=[],
         )
         self.session.commit()
-        self.assertEqual(msg, 'User `pingou` added to the group `foo`.')
+        self.assertEqual(msg, "User `pingou` added to the group `foo`.")
 
         # Add user to group
-        group = pagure.lib.query.search_groups(self.session, group_name='foo')
+        group = pagure.lib.query.search_groups(self.session, group_name="foo")
         msg = pagure.lib.query.add_user_to_group(
             self.session,
-            username='bar',
+            username="bar",
             group=group,
-            user='pingou',
+            user="pingou",
             is_admin=False,
         )
         self.session.commit()
-        self.assertEqual(msg, 'User `bar` added to the group `foo`.')
+        self.assertEqual(msg, "User `bar` added to the group `foo`.")
 
         project = pagure.lib.query._get_project(
-            self.session, 'test3', namespace='ns')
+            self.session, "test3", namespace="ns"
+        )
 
         # Add group to project
         msg = pagure.lib.query.add_group_to_project(
             session=self.session,
             project=project,
-            new_group='foo',
-            user='pingou',
+            new_group="foo",
+            user="pingou",
         )
         self.session.commit()
-        self.assertEqual(msg, 'Group added')
+        self.assertEqual(msg, "Group added")
 
         # Create the ticket
         iss = pagure.lib.query.new_issue(
             issue_id=4,
             session=self.session,
             repo=project,
-            title='test issue',
-            content='content test issue',
-            user='foo',
+            title="test issue",
+            content="content test issue",
+            user="foo",
         )
         self.session.commit()
         self.assertEqual(iss.id, 4)
-        self.assertEqual(iss.title, 'test issue')
+        self.assertEqual(iss.title, "test issue")
 
         self.assertEqual(
             pagure.lib.query.get_watch_list(self.session, iss),
-            set(['pingou', 'foo', 'bar'])
+            set(["pingou", "foo", "bar"]),
         )
 
     def test_get_watch_list_project_w_contributor_out(self):
@@ -266,65 +263,61 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         # Create a project ns/test3
         item = pagure.lib.model.Project(
             user_id=1,  # pingou
-            name='test3',
-            namespace='ns',
-            description='test project #1',
-            hook_token='aaabbbcccdd',
+            name="test3",
+            namespace="ns",
+            description="test project #1",
+            hook_token="aaabbbcccdd",
         )
-        item.close_status = ['Invalid', 'Insufficient data', 'Fixed']
+        item.close_status = ["Invalid", "Insufficient data", "Fixed"]
         self.session.add(item)
         self.session.commit()
 
         # Add a contributor to the project
         item = pagure.lib.model.User(
-            user='bar',
-            fullname='bar foo',
-            password='foo',
-            default_email='bar@bar.com',
+            user="bar",
+            fullname="bar foo",
+            password="foo",
+            default_email="bar@bar.com",
         )
         self.session.add(item)
-        item = pagure.lib.model.UserEmail(
-            user_id=3,
-            email='bar@bar.com')
+        item = pagure.lib.model.UserEmail(user_id=3, email="bar@bar.com")
         self.session.add(item)
 
         project = pagure.lib.query._get_project(
-            self.session, 'test3', namespace='ns')
+            self.session, "test3", namespace="ns"
+        )
         msg = pagure.lib.query.add_user_to_project(
             session=self.session,
             project=project,
-            new_user='bar',
-            user='pingou',
+            new_user="bar",
+            user="pingou",
         )
         self.session.commit()
-        self.assertEqual(msg, 'User added')
+        self.assertEqual(msg, "User added")
 
         # Set the user `pingou` to not watch the project
         msg = pagure.lib.query.update_watch_status(
-            session=self.session,
-            project=project,
-            user='pingou',
-            watch='0',
+            session=self.session, project=project, user="pingou", watch="0"
         )
         self.session.commit()
-        self.assertEqual(msg, 'You are no longer watching this project')
+        self.assertEqual(msg, "You are no longer watching this project")
 
         # Create the ticket
         iss = pagure.lib.query.new_issue(
             issue_id=4,
             session=self.session,
             repo=project,
-            title='test issue',
-            content='content test issue',
-            user='foo',
+            title="test issue",
+            content="content test issue",
+            user="foo",
         )
         self.session.commit()
         self.assertEqual(iss.id, 4)
-        self.assertEqual(iss.title, 'test issue')
+        self.assertEqual(iss.title, "test issue")
 
         self.assertEqual(
             pagure.lib.query.get_watch_list(self.session, iss),
-            set(['foo', 'bar'])
+            set(["foo", "bar"]),
         )
 
     def test_get_watch_list_project_w_contributor_out_pr(self):
@@ -333,61 +326,61 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         # Create a project ns/test3
         item = pagure.lib.model.Project(
             user_id=1,  # pingou
-            name='test3',
-            namespace='ns',
-            description='test project #1',
-            hook_token='aaabbbcccdd',
+            name="test3",
+            namespace="ns",
+            description="test project #1",
+            hook_token="aaabbbcccdd",
         )
-        item.close_status = ['Invalid', 'Insufficient data', 'Fixed']
+        item.close_status = ["Invalid", "Insufficient data", "Fixed"]
         self.session.add(item)
         self.session.commit()
 
         # Add a contributor to the project
         item = pagure.lib.model.User(
-            user='bar',
-            fullname='bar foo',
-            password='foo',
-            default_email='bar@bar.com',
+            user="bar",
+            fullname="bar foo",
+            password="foo",
+            default_email="bar@bar.com",
         )
         self.session.add(item)
-        item = pagure.lib.model.UserEmail(
-            user_id=3,
-            email='bar@bar.com')
+        item = pagure.lib.model.UserEmail(user_id=3, email="bar@bar.com")
         self.session.add(item)
 
         project = pagure.lib.query._get_project(
-            self.session, 'test3', namespace='ns')
+            self.session, "test3", namespace="ns"
+        )
         msg = pagure.lib.query.add_user_to_project(
             session=self.session,
             project=project,
-            new_user='bar',
-            user='pingou',
+            new_user="bar",
+            user="pingou",
         )
         self.session.commit()
-        self.assertEqual(msg, 'User added')
+        self.assertEqual(msg, "User added")
 
         # Create the pull-request
         req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_from=project,
-            branch_from='dev',
+            branch_from="dev",
             repo_to=project,
-            branch_to='master',
-            title='test pull-request',
-            user='foo',
+            branch_to="master",
+            title="test pull-request",
+            user="foo",
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
-        self.assertEqual(req.title, 'test pull-request')
+        self.assertEqual(req.title, "test pull-request")
 
         # Set the user `pingou` to not watch the pull-request
-        out = pagure.lib.query.set_watch_obj(self.session, 'pingou', req, False)
-        self.assertEqual(
-            out, 'You are no longer watching this pull-request')
+        out = pagure.lib.query.set_watch_obj(
+            self.session, "pingou", req, False
+        )
+        self.assertEqual(out, "You are no longer watching this pull-request")
 
         self.assertEqual(
             pagure.lib.query.get_watch_list(self.session, req),
-            set(['foo', 'bar'])
+            set(["foo", "bar"]),
         )
 
     def test_get_watch_list_project_w_contributor_watching_project(self):
@@ -396,134 +389,125 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         # Create a project ns/test3
         item = pagure.lib.model.Project(
             user_id=1,  # pingou
-            name='test3',
-            namespace='ns',
-            description='test project #1',
-            hook_token='aaabbbcccdd',
+            name="test3",
+            namespace="ns",
+            description="test project #1",
+            hook_token="aaabbbcccdd",
         )
-        item.close_status = ['Invalid', 'Insufficient data', 'Fixed']
+        item.close_status = ["Invalid", "Insufficient data", "Fixed"]
         self.session.add(item)
         self.session.commit()
 
         # Add a new user
         item = pagure.lib.model.User(
-            user='bar',
-            fullname='bar foo',
-            password='foo',
-            default_email='bar@bar.com',
+            user="bar",
+            fullname="bar foo",
+            password="foo",
+            default_email="bar@bar.com",
         )
         self.session.add(item)
-        item = pagure.lib.model.UserEmail(
-            user_id=3,
-            email='bar@bar.com')
+        item = pagure.lib.model.UserEmail(user_id=3, email="bar@bar.com")
         self.session.add(item)
 
         # Set the user `bar` to watch the project
         project = pagure.lib.query._get_project(
-            self.session, 'test3', namespace='ns')
+            self.session, "test3", namespace="ns"
+        )
         msg = pagure.lib.query.update_watch_status(
-            session=self.session,
-            project=project,
-            user='bar',
-            watch='1',
+            session=self.session, project=project, user="bar", watch="1"
         )
         self.session.commit()
         self.assertEqual(
-            msg, 'You are now watching issues and PRs on this project')
+            msg, "You are now watching issues and PRs on this project"
+        )
 
         # Create the pull-request
         req = pagure.lib.query.new_pull_request(
             session=self.session,
             repo_from=project,
-            branch_from='dev',
+            branch_from="dev",
             repo_to=project,
-            branch_to='master',
-            title='test pull-request',
-            user='foo',
+            branch_to="master",
+            title="test pull-request",
+            user="foo",
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
-        self.assertEqual(req.title, 'test pull-request')
+        self.assertEqual(req.title, "test pull-request")
 
         self.assertEqual(
             pagure.lib.query.get_watch_list(self.session, req),
-            set(['foo', 'bar', 'pingou'])
+            set(["foo", "bar", "pingou"]),
         )
 
-    @mock.patch.dict('pagure.config.config', {'PAGURE_ADMIN_USERS': 'foo'})
+    @mock.patch.dict("pagure.config.config", {"PAGURE_ADMIN_USERS": "foo"})
     def test_get_watch_list_project_w_private_issue(self):
         """ Test get_watch_list when the project has one contributor watching
         the project and the issue is private """
         # Create a project ns/test3
         item = pagure.lib.model.Project(
             user_id=1,  # pingou
-            name='test3',
-            namespace='ns',
-            description='test project #1',
-            hook_token='aaabbbcccdd',
+            name="test3",
+            namespace="ns",
+            description="test project #1",
+            hook_token="aaabbbcccdd",
         )
-        item.close_status = ['Invalid', 'Insufficient data', 'Fixed']
+        item.close_status = ["Invalid", "Insufficient data", "Fixed"]
         self.session.add(item)
         self.session.commit()
 
         # Add a new user
         item = pagure.lib.model.User(
-            user='bar',
-            fullname='bar foo',
-            password='foo',
-            default_email='bar@bar.com',
+            user="bar",
+            fullname="bar foo",
+            password="foo",
+            default_email="bar@bar.com",
         )
         self.session.add(item)
-        item = pagure.lib.model.UserEmail(
-            user_id=3,
-            email='bar@bar.com')
+        item = pagure.lib.model.UserEmail(user_id=3, email="bar@bar.com")
         self.session.add(item)
 
         # Set the user `bar` to watch the project
         project = pagure.lib.query.get_authorized_project(
-            self.session, 'test3', namespace='ns')
+            self.session, "test3", namespace="ns"
+        )
         msg = pagure.lib.query.update_watch_status(
-            session=self.session,
-            project=project,
-            user='bar',
-            watch='1',
+            session=self.session, project=project, user="bar", watch="1"
         )
         self.session.commit()
         self.assertEqual(
-            msg, 'You are now watching issues and PRs on this project')
+            msg, "You are now watching issues and PRs on this project"
+        )
 
         # Create the ticket
         iss = pagure.lib.query.new_issue(
             issue_id=4,
             session=self.session,
             repo=project,
-            title='test issue',
-            content='content test issue',
-            user='pingou',
+            title="test issue",
+            content="content test issue",
+            user="pingou",
             private=True,
         )
         self.session.commit()
         self.assertEqual(iss.id, 4)
-        self.assertEqual(iss.title, 'test issue')
+        self.assertEqual(iss.title, "test issue")
 
         self.assertEqual(
-            pagure.lib.query.get_watch_list(self.session, iss),
-            set(['pingou'])
+            pagure.lib.query.get_watch_list(self.session, iss), set(["pingou"])
         )
-        out = pagure.lib.query.set_watch_obj(self.session, 'foo', iss, True)
-        self.assertEqual(out, 'You are now watching this issue')
+        out = pagure.lib.query.set_watch_obj(self.session, "foo", iss, True)
+        self.assertEqual(out, "You are now watching this issue")
         self.assertEqual(
             pagure.lib.query.get_watch_list(self.session, iss),
-            set(['pingou','foo'])
+            set(["pingou", "foo"]),
         )
-        out = pagure.lib.query.set_watch_obj(self.session, 'foo', iss, False)
+        out = pagure.lib.query.set_watch_obj(self.session, "foo", iss, False)
+        self.assertEqual(out, "You are no longer watching this issue")
         self.assertEqual(
-            out, 'You are no longer watching this issue')
-        self.assertEqual(
-            pagure.lib.query.get_watch_list(self.session, iss),
-            set(['pingou'])
+            pagure.lib.query.get_watch_list(self.session, iss), set(["pingou"])
         )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main(verbosity=2)

@@ -18,8 +18,9 @@ import os
 import json
 from mock import patch
 
-sys.path.insert(0, os.path.join(os.path.dirname(
-    os.path.abspath(__file__)), '..'))
+sys.path.insert(
+    0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+)
 
 import pagure.api
 import pagure.lib
@@ -33,21 +34,23 @@ class PagureFlaskApiAuthtests(tests.SimplePagureTest):
         """ Test the authentication when there is nothing in the database.
         """
 
-        output = self.app.post('/api/0/foo/new_issue')
+        output = self.app.post("/api/0/foo/new_issue")
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.get_data(as_text=True))
-        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
-                         data['error_code'])
-        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
+        self.assertEqual(
+            pagure.api.APIERROR.EINVALIDTOK.name, data["error_code"]
+        )
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data["error"])
 
-        headers = {'Authorization': 'token aabbbccc'}
+        headers = {"Authorization": "token aabbbccc"}
 
-        output = self.app.post('/api/0/foo/new_issue', headers=headers)
+        output = self.app.post("/api/0/foo/new_issue", headers=headers)
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.get_data(as_text=True))
-        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
-                         data['error_code'])
-        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
+        self.assertEqual(
+            pagure.api.APIERROR.EINVALIDTOK.name, data["error_code"]
+        )
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data["error"])
 
     def test_auth_noacl(self):
         """ Test the authentication when the token does not have any ACL.
@@ -55,21 +58,23 @@ class PagureFlaskApiAuthtests(tests.SimplePagureTest):
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
 
-        output = self.app.post('/api/0/test/new_issue')
+        output = self.app.post("/api/0/test/new_issue")
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.get_data(as_text=True))
-        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
-                         data['error_code'])
-        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
+        self.assertEqual(
+            pagure.api.APIERROR.EINVALIDTOK.name, data["error_code"]
+        )
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data["error"])
 
-        headers = {'Authorization': 'token aaabbbcccddd'}
+        headers = {"Authorization": "token aaabbbcccddd"}
 
-        output = self.app.post('/api/0/test/new_issue', headers=headers)
+        output = self.app.post("/api/0/test/new_issue", headers=headers)
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.get_data(as_text=True))
-        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
-                         data['error_code'])
-        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
+        self.assertEqual(
+            pagure.api.APIERROR.EINVALIDTOK.name, data["error_code"]
+        )
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data["error"])
 
     def test_auth_expired(self):
         """ Test the authentication when the token has expired.
@@ -77,21 +82,23 @@ class PagureFlaskApiAuthtests(tests.SimplePagureTest):
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
 
-        output = self.app.post('/api/0/test/new_issue')
+        output = self.app.post("/api/0/test/new_issue")
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.get_data(as_text=True))
-        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
-                         data['error_code'])
-        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
+        self.assertEqual(
+            pagure.api.APIERROR.EINVALIDTOK.name, data["error_code"]
+        )
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data["error"])
 
-        headers = {'Authorization': 'token expired_token'}
+        headers = {"Authorization": "token expired_token"}
 
-        output = self.app.post('/api/0/test/new_issue', headers=headers)
+        output = self.app.post("/api/0/test/new_issue", headers=headers)
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.get_data(as_text=True))
-        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
-                         data['error_code'])
-        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
+        self.assertEqual(
+            pagure.api.APIERROR.EINVALIDTOK.name, data["error_code"]
+        )
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data["error"])
 
     def test_auth(self):
         """ Test the token based authentication.
@@ -100,30 +107,31 @@ class PagureFlaskApiAuthtests(tests.SimplePagureTest):
         tests.create_tokens(self.session)
         tests.create_tokens_acl(self.session)
 
-        output = self.app.post('/api/0/test/new_issue')
+        output = self.app.post("/api/0/test/new_issue")
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.get_data(as_text=True))
-        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
-                         data['error_code'])
-        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
+        self.assertEqual(
+            pagure.api.APIERROR.EINVALIDTOK.name, data["error_code"]
+        )
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data["error"])
 
-        headers = {'Authorization': 'token aaabbbcccddd'}
+        headers = {"Authorization": "token aaabbbcccddd"}
 
-        output = self.app.post('/api/0/test/new_issue', headers=headers)
+        output = self.app.post("/api/0/test/new_issue", headers=headers)
         self.assertEqual(output.status_code, 400)
         data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
-              "error": "Invalid or incomplete input submitted",
-              "error_code": "EINVALIDREQ",
-              "errors": {
-                "issue_content": ["This field is required."],
-                "title": ["This field is required."]
-              }
-            }
+                "error": "Invalid or incomplete input submitted",
+                "error_code": "EINVALIDREQ",
+                "errors": {
+                    "issue_content": ["This field is required."],
+                    "title": ["This field is required."],
+                },
+            },
         )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main(verbosity=2)

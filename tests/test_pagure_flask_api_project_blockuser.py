@@ -45,8 +45,7 @@ class PagureFlaskApiProjectBlockuserTests(tests.SimplePagureTest):
         super(PagureFlaskApiProjectBlockuserTests, self).setUp()
 
         tests.create_projects(self.session)
-        tests.create_projects_git(
-            os.path.join(self.path, 'repos'), bare=True)
+        tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
         tests.create_tokens(self.session)
         tests.create_tokens_acl(self.session)
 
@@ -65,7 +64,9 @@ class PagureFlaskApiProjectBlockuserTests(tests.SimplePagureTest):
         self.assertEqual(project.block_users, [])
         self.blocked_users = []
 
-        project = pagure.lib.query.get_authorized_project(self.session, "test2")
+        project = pagure.lib.query.get_authorized_project(
+            self.session, "test2"
+        )
         project.block_users = ["foo"]
         self.session.add(project)
         self.session.commit()
@@ -225,9 +226,9 @@ class PagureFlaskApiProjectBlockuserTests(tests.SimplePagureTest):
         self.assertDictEqual(
             data,
             {
-                "error":"You have been blocked from this project",
-                "error_code":"EUBLOCKED"
-            }
+                "error": "You have been blocked from this project",
+                "error_code": "EUBLOCKED",
+            },
         )
 
     def test_ui_new_issue_user_blocked(self):
@@ -237,27 +238,25 @@ class PagureFlaskApiProjectBlockuserTests(tests.SimplePagureTest):
         user = tests.FakeUser(username="foo")
         with tests.user_set(self.app.application, user):
 
-            output = self.app.get('/test2/new_issue')
+            output = self.app.get("/test2/new_issue")
             self.assertEqual(output.status_code, 200)
-            self.assertIn(
-                'New Issue',
-                output.get_data(as_text=True))
+            self.assertIn("New Issue", output.get_data(as_text=True))
 
             csrf_token = self.get_csrf(output=output)
 
             data = {
-                'title': 'Test issue',
-                'issue_content': 'We really should improve on this issue',
-                'status': 'Open',
-                'csrf_token': csrf_token,
+                "title": "Test issue",
+                "issue_content": "We really should improve on this issue",
+                "status": "Open",
+                "csrf_token": csrf_token,
             }
 
-            output = self.app.post('/test2/new_issue', data=data)
+            output = self.app.post("/test2/new_issue", data=data)
             self.assertEqual(output.status_code, 403)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<p>You have been blocked from this project</p>',
-                output_text)
+                "<p>You have been blocked from this project</p>", output_text
+            )
 
 
 if __name__ == "__main__":

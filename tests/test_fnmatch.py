@@ -27,26 +27,26 @@ class FnmatchTests(unittest.TestCase):
     def test_fnmatch(self):
         """ Test the matching done by fnmatch. """
         matrix = [
-            ['pagure', '*', True],
-            ['ns/pagure', '*', True],
-            ['forks/user/ns/pagure', '*', True],
-            ['forks/user/pagure', '*', True],
-            ['pagure', 'rpms/*', False],
-            ['rpms/pagure', 'rpms/*', True],
-            ['forks/user/pagure', 'rpms/*', False],
-            ['forks/user/pagure', 'rpms/*', False],
-            ['pagure', 'pagure', True],
-            ['rpms/pagure', 'pagure', False],
-            ['forks/user/pagure', 'pagure', False],
-            ['forks/user/pagure', 'pagure', False],
-            ['pagure', 'pag*', True],
-            ['rpms/pagure', 'pag*', False],
-            ['forks/user/pagure', 'pag*', False],
-            ['forks/user/pagure', 'pag*', False],
+            ["pagure", "*", True],
+            ["ns/pagure", "*", True],
+            ["forks/user/ns/pagure", "*", True],
+            ["forks/user/pagure", "*", True],
+            ["pagure", "rpms/*", False],
+            ["rpms/pagure", "rpms/*", True],
+            ["forks/user/pagure", "rpms/*", False],
+            ["forks/user/pagure", "rpms/*", False],
+            ["pagure", "pagure", True],
+            ["rpms/pagure", "pagure", False],
+            ["forks/user/pagure", "pagure", False],
+            ["forks/user/pagure", "pagure", False],
+            ["pagure", "pag*", True],
+            ["rpms/pagure", "pag*", False],
+            ["forks/user/pagure", "pag*", False],
+            ["forks/user/pagure", "pag*", False],
         ]
         for row in matrix:
             self.assertEqual(fnmatch.fnmatch(row[0], row[1]), row[2])
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main(verbosity=2)

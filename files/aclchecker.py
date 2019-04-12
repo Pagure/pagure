@@ -99,7 +99,7 @@ result.update({"username": remoteuser, "cmd": cmd})
 
 for key in result:
     if result[key] is None:
-        result[key] = ''
+        result[key] = ""
 
 runargs = [arg % result for arg in runner]
 if env:
