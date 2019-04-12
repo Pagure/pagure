@@ -21,7 +21,9 @@ import unittest
 import six
 
 REPO_PATH = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..', 'pagure'))
+    os.path.join(os.path.dirname(__file__), "..", "pagure")
+)
+TESTS_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__)))
 
 
 class TestStyle(unittest.TestCase):
@@ -72,7 +74,14 @@ class TestStyle(unittest.TestCase):
         non-zero exit code.
         """
         black_command = [
-            sys.executable, '-m', 'black', '-l', '79', '--check', REPO_PATH
+            sys.executable,
+            "-m",
+            "black",
+            "-l",
+            "79",
+            "--check",
+            REPO_PATH,
+            TESTS_PATH,
         ]
         proc = subprocess.Popen(
             black_command,
