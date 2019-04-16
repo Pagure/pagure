@@ -1151,8 +1151,7 @@ def notify_commit_flag(flag, user):
 
     send_email(
         text,
-        "Coommit #%s - %s: %s"
-        % (flag.commit_hash, flag.username, flag.status),
+        "Commit #%s - %s: %s" % (flag.commit_hash, flag.username, flag.status),
         ",".join(mail_to),
         mail_id=flag.mail_id,
         in_reply_to=flag.project.mail_id,

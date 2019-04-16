@@ -3328,7 +3328,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
             '`' + commit.oid.hex + '` as success: '
             'Tests passed\n\n'
             'http://localhost.localdomain/test/c/' + commit.oid.hex + '\n',
-            'Coommit #' + commit.oid.hex + ' - Jenkins: success',
+            'Commit #' + commit.oid.hex + ' - Jenkins: success',
             'bar@pingou.com',
             in_reply_to='test-project-1',
             mail_id='test-commit-1-1',
