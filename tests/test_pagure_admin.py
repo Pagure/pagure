@@ -1548,5 +1548,151 @@ class PagureBlockUserTests(tests.Modeltests):
         self.assertIsNotNone(user.refuse_sessions_before)
 
 
+class PagureAdminDeleteProjectTests(tests.Modeltests):
+    """ Tests for pagure-admin delete-project """
+
+    populate_db = False
+
+    def setUp(self):
+        """ Set up the environnment, ran before every tests. """
+        super(PagureAdminDeleteProjectTests, self).setUp()
+        pagure.cli.admin.session = self.session
+
+        # Create the user pingou
+        item = pagure.lib.model.User(
+            user="pingou",
+            fullname="PY C",
+            password="foo",
+            default_email="bar@pingou.com",
+        )
+        self.session.add(item)
+        item = pagure.lib.model.UserEmail(user_id=1, email="bar@pingou.com")
+        self.session.add(item)
+
+        # Create two projects for the user pingou
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name="test",
+            description="namespaced test project",
+            hook_token="aaabbbeee",
+            namespace="somenamespace",
+        )
+        self.session.add(item)
+
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name="test",
+            description="Test project",
+            hook_token="aaabbbccc",
+            namespace=None,
+        )
+        self.session.add(item)
+
+        self.session.commit()
+
+        # Make the imported pagure use the correct db session
+        pagure.cli.admin.session = self.session
+
+    def test_delete_project_unknown_project(self):
+        """ Test the read-only function of pagure-admin on an unknown
+        project.
+        """
+
+        args = munch.Munch(
+            {"project": "foob", "user": None, "action_user": "pingou"}
+        )
+        with self.assertRaises(pagure.exceptions.PagureException) as cm:
+            pagure.cli.admin.do_delete_project(args)
+        self.assertEqual(cm.exception.args[0], "No project found with: foob")
+
+    def test_delete_project_invalid_project(self):
+        """ Test the read-only function of pagure-admin on an invalid
+        project.
+        """
+
+        args = munch.Munch(
+            {"project": "fo/o/b", "user": None, "action_user": "pingou"}
+        )
+        with self.assertRaises(pagure.exceptions.PagureException) as cm:
+            pagure.cli.admin.do_delete_project(args)
+        self.assertEqual(
+            cm.exception.args[0],
+            'Invalid project name, has more than one "/": fo/o/b',
+        )
+
+    @patch("pagure.cli.admin._ask_confirmation", MagicMock(return_value=True))
+    def test_delete_project(self):
+        """ Test the read-only function of pagure-admin to get status of
+        a non-namespaced project.
+        """
+
+        args = munch.Munch(
+            {"project": "test", "user": None, "action_user": "pingou"}
+        )
+        with tests.capture_output() as output:
+            pagure.cli.admin.do_delete_project(args)
+        output = output.getvalue()
+        self.assertEqual(
+            "Are you sure you want to delete: test?\n"
+            "  This cannot be undone!\n"
+            "Project deleted\n",
+            output,
+        )
+
+    @patch("pagure.cli.admin._ask_confirmation", MagicMock(return_value=True))
+    def test_delete_project_namespace(self):
+        """ Test the read-only function of pagure-admin to get status of
+        a namespaced project.
+        """
+
+        args = munch.Munch(
+            {
+                "project": "somenamespace/test",
+                "user": None,
+                "action_user": "pingou",
+            }
+        )
+        with tests.capture_output() as output:
+            pagure.cli.admin.do_delete_project(args)
+        output = output.getvalue()
+        self.assertEqual(
+            "Are you sure you want to delete: somenamespace/test?\n"
+            "  This cannot be undone!\n"
+            "Project deleted\n",
+            output,
+        )
+
+    @patch("pagure.cli.admin._ask_confirmation", MagicMock(return_value=True))
+    def test_delete_project_namespace_changed(self):
+        """ Test the read-only function of pagure-admin to set the status of
+        a namespaced project.
+        """
+
+        # Before
+        projects = pagure.lib.query.search_projects(self.session)
+        self.assertEqual(len(projects), 2)
+
+        args = munch.Munch(
+            {
+                "project": "somenamespace/test",
+                "user": None,
+                "action_user": "pingou",
+            }
+        )
+        with tests.capture_output() as output:
+            pagure.cli.admin.do_delete_project(args)
+        output = output.getvalue()
+        self.assertEqual(
+            "Are you sure you want to delete: somenamespace/test?\n"
+            "  This cannot be undone!\n"
+            "Project deleted\n",
+            output,
+        )
+
+        # After
+        projects = pagure.lib.query.search_projects(self.session)
+        self.assertEqual(len(projects), 1)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

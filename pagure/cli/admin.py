@@ -387,6 +387,32 @@ def _parser_ensure_project_hooks(subparser):
     local_parser.set_defaults(func=do_ensure_project_hooks)
 
 
+def _parser_delete_project(subparser):
+    """ Set up the CLI argument parser for the delete-project action.
+
+    :arg subparser: an argparse subparser allowing to have action's specific
+        arguments
+
+     """
+    local_parser = subparser.add_parser(
+        "delete-project", help="Delete the project specified"
+    )
+    local_parser.add_argument(
+        "--user", help="User of the project (to use only on forks)"
+    )
+    local_parser.add_argument(
+        "project",
+        help="Project to update (as namespace/project if there "
+        "is a namespace)",
+    )
+    local_parser.add_argument(
+        "action_user",
+        help="Username of the user doing the action (ie: deleting the "
+        "project)",
+    )
+    local_parser.set_defaults(func=do_delete_project)
+
+
 def parse_arguments(args=None):
     """ Set-up the argument parsing. """
     parser = argparse.ArgumentParser(
@@ -441,6 +467,9 @@ def parse_arguments(args=None):
 
     # ensure-project-hooks
     _parser_ensure_project_hooks(subparser)
+
+    # delete-project
+    _parser_delete_project(subparser)
 
     return parser.parse_args(args)
 
@@ -706,6 +735,45 @@ def do_create_admin_token(args):
         print(
             pagure.lib.query.add_token_to_user(session, None, acls, args.user)
         )
+
+
+def do_delete_project(args):
+    """ Delete a project.
+
+    :arg args: the argparse object returned by ``parse_arguments()``.
+
+    """
+    _log.debug("project:       %s", args.project)
+    _log.debug("user:          %s", args.user)
+    _log.debug("user deleting: %s", args.action_user)
+
+    # Validate users
+    pagure.lib.query.get_user(session, args.user)
+    pagure.lib.query.get_user(session, args.action_user)
+
+    # Get the project
+    project = _get_project(args.project, user=args.user)
+
+    if project is None:
+        raise pagure.exceptions.PagureException(
+            "No project found with: %s" % args.project
+        )
+
+    print(
+        "Are you sure you want to delete: %s?\n  This cannot be undone!"
+        % project.fullname
+    )
+    if not _ask_confirmation():
+        return
+
+    pagure.lib.tasks.delete_project(
+        namespace=project.namespace,
+        name=project.name,
+        user=project.user.user if project.is_fork else None,
+        action_user=args.action_user,
+    )
+    session.commit()
+    print("Project deleted")
 
 
 def do_get_watch_status(args):
