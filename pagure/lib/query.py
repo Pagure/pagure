@@ -142,6 +142,23 @@ def get_user_by_id(session, userid):
     return query.first()
 
 
+def get_blocked_users(session, username=None, date=None):
+    """ Returns all the users that are blocked in this pagure instance.
+    """
+    now = datetime.datetime.utcnow()
+    query = session.query(model.User).filter(
+        model.User.refuse_sessions_before >= (date or now)
+    )
+    if username:
+        if "*" in username:
+            username = username.replace("*", "%")
+            query = query.filter(model.User.user.ilike(username))
+        else:
+            query = query.filter(model.User.user == username)
+
+    return query.all()
+
+
 def get_next_id(session, projectid):
     """ Returns the next identifier of a project ticket or pull-request
     based on the identifier already in the database.

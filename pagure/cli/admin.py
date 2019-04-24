@@ -346,12 +346,21 @@ def _parser_block_user(subparser):
         help="Prevents an user to interact with this pagure instance until "
         "the specified date",
     )
-    local_parser.add_argument("username", help="Name of the user to block")
+    local_parser.add_argument(
+        "username", default=None, nargs="?", help="Name of the user to block"
+    )
     local_parser.add_argument(
         "date",
+        nargs="?",
         default=None,
         help="Date before which the user is not welcome on this pagure "
         "instance",
+    )
+    local_parser.add_argument(
+        "--list",
+        default=False,
+        action="store_true",
+        help="List all blocked users",
     )
     local_parser.set_defaults(func=do_block_user)
 
@@ -969,6 +978,41 @@ def do_list_groups(args):
         print("No groups found in this pagure instance.")
 
 
+def do_list_blocked_users(args):
+    """ List all the blocked users.
+
+    :arg args: the argparse object returned by ``parse_arguments()``.
+
+    """
+    date = None
+    if args.date:
+        try:
+            date = arrow.get(args.date, "YYYY-MM-DD").replace(tzinfo="UTC")
+            date = date.datetime
+        except Exception as err:
+            _log.exception(err)
+            raise pagure.exceptions.PagureException(
+                "Invalid date submitted: %s, not of the format "
+                "YYYY-MM-DD" % args.date
+            )
+
+    blocked_users = pagure.lib.query.get_blocked_users(
+        session, username=args.username or None, date=date
+    )
+    if blocked_users:
+        print("Users blocked:")
+        for user in blocked_users:
+            print(
+                " %s  -  %s"
+                % (
+                    user.user.ljust(20),
+                    user.refuse_sessions_before.isoformat(),
+                )
+            )
+    else:
+        print("No users are currently blocked")
+
+
 def do_block_user(args):
     """ Block the specified user from all interactions with pagure until the
     specified date.
@@ -979,6 +1023,10 @@ def do_block_user(args):
 
     _log.debug("username:           %s", args.username)
     _log.debug("date:               %s", args.date)
+    _log.debug("list:               %s", args.list)
+
+    if args.list:
+        return do_list_blocked_users(args)
 
     if not args.username:
         raise pagure.exceptions.PagureException(
@@ -999,9 +1047,7 @@ def do_block_user(args):
 
     print(
         "The user `%s` will be blocked from all interaction with this "
-        "pagure instance until: %s.",
-        user.username,
-        date.isoformat(),
+        "pagure instance until: %s." % (user.username, date.isoformat())
     )
     if not _ask_confirmation():
         return

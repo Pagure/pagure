@@ -1475,7 +1475,7 @@ class PagureBlockUserTests(tests.Modeltests):
         provided.
         """
 
-        args = munch.Munch({"username": "pingou", "date": None})
+        args = munch.Munch({"username": "pingou", "date": None, "list": False})
         with self.assertRaises(pagure.exceptions.PagureException) as cm:
             pagure.cli.admin.do_block_user(args)
         self.assertEqual(
@@ -1491,7 +1491,9 @@ class PagureBlockUserTests(tests.Modeltests):
         is missing from the args.
         """
 
-        args = munch.Munch({"date": "2018-06-11", "username": None})
+        args = munch.Munch(
+            {"date": "2018-06-11", "username": None, "list": False}
+        )
 
         with self.assertRaises(pagure.exceptions.PagureException) as cm:
             pagure.cli.admin.do_block_user(args)
@@ -1506,7 +1508,9 @@ class PagureBlockUserTests(tests.Modeltests):
         provided does correspond to any user in the DB.
         """
 
-        args = munch.Munch({"date": "2018-06-11", "username": "invalid"})
+        args = munch.Munch(
+            {"date": "2018-06-11", "username": "invalid", "list": False}
+        )
 
         with self.assertRaises(pagure.exceptions.PagureException) as cm:
             pagure.cli.admin.do_block_user(args)
@@ -1521,7 +1525,9 @@ class PagureBlockUserTests(tests.Modeltests):
         date is incorrect.
         """
 
-        args = munch.Munch({"date": "2018-14-05", "username": "pingou"})
+        args = munch.Munch(
+            {"date": "2018-14-05", "username": "pingou", "list": False}
+        )
 
         with self.assertRaises(pagure.exceptions.PagureException) as cm:
             pagure.cli.admin.do_block_user(args)
@@ -1540,12 +1546,127 @@ class PagureBlockUserTests(tests.Modeltests):
         are provided correctly.
         """
 
-        args = munch.Munch({"date": "2050-12-31", "username": "pingou"})
+        args = munch.Munch(
+            {"date": "2050-12-31", "username": "pingou", "list": False}
+        )
 
         pagure.cli.admin.do_block_user(args)
 
         user = pagure.lib.query.get_user(self.session, "pingou")
         self.assertIsNotNone(user.refuse_sessions_before)
+
+    def test_list_blocked_user(self):
+        """ Test the block-user function of pagure-admin when all arguments
+        are provided correctly.
+        """
+
+        args = munch.Munch({"list": True, "username": None, "date": None})
+
+        with tests.capture_output() as output:
+            pagure.cli.admin.do_block_user(args)
+
+        output = output.getvalue()
+        self.assertEqual("No users are currently blocked\n", output)
+
+    @patch("pagure.cli.admin._ask_confirmation", MagicMock(return_value=True))
+    def test_list_blocked_user_with_data(self):
+        """ Test the block-user function of pagure-admin when all arguments
+        are provided correctly.
+        """
+        args = munch.Munch(
+            {"date": "2050-12-31", "username": "pingou", "list": False}
+        )
+        pagure.cli.admin.do_block_user(args)
+
+        args = munch.Munch({"list": True, "username": None, "date": None})
+
+        with tests.capture_output() as output:
+            pagure.cli.admin.do_block_user(args)
+
+        output = output.getvalue()
+        self.assertEqual(
+            "Users blocked:\n"
+            " pingou                -  2050-12-31T00:00:00\n",
+            output,
+        )
+
+    @patch("pagure.cli.admin._ask_confirmation", MagicMock(return_value=True))
+    def test_list_blocked_user_with_username_data(self):
+        """ Test the block-user function of pagure-admin when all arguments
+        are provided correctly.
+        """
+        args = munch.Munch(
+            {"date": "2050-12-31", "username": "pingou", "list": False}
+        )
+        pagure.cli.admin.do_block_user(args)
+
+        args = munch.Munch({"list": True, "username": "ralph", "date": None})
+
+        with tests.capture_output() as output:
+            pagure.cli.admin.do_block_user(args)
+
+        output = output.getvalue()
+        self.assertEqual("No users are currently blocked\n", output)
+
+        args = munch.Munch({"list": True, "username": "pin*", "date": None})
+
+        with tests.capture_output() as output:
+            pagure.cli.admin.do_block_user(args)
+        output = output.getvalue()
+        self.assertEqual(
+            "Users blocked:\n"
+            " pingou                -  2050-12-31T00:00:00\n",
+            output,
+        )
+
+    @patch("pagure.cli.admin._ask_confirmation", MagicMock(return_value=True))
+    def test_list_blocked_user_with_date(self):
+        """ Test the block-user function of pagure-admin when all arguments
+        are provided correctly.
+        """
+        args = munch.Munch(
+            {"list": True, "username": None, "date": "2050-12-31"}
+        )
+
+        with tests.capture_output() as output:
+            pagure.cli.admin.do_block_user(args)
+
+        output = output.getvalue()
+        self.assertEqual("No users are currently blocked\n", output)
+
+    @patch("pagure.cli.admin._ask_confirmation", MagicMock(return_value=True))
+    def test_list_blocked_user_with_date_and_data(self):
+        """ Test the block-user function of pagure-admin when all arguments
+        are provided correctly.
+        """
+        args = munch.Munch(
+            {"date": "2050-12-31", "username": "pingou", "list": False}
+        )
+        pagure.cli.admin.do_block_user(args)
+
+        args = munch.Munch(
+            {"list": True, "username": None, "date": "2050-12-31"}
+        )
+
+        with tests.capture_output() as output:
+            pagure.cli.admin.do_block_user(args)
+
+        output = output.getvalue()
+        self.assertEqual(
+            "Users blocked:\n"
+            " pingou                -  2050-12-31T00:00:00\n",
+            output,
+        )
+
+        args = munch.Munch(
+            {"list": True, "username": None, "date": "2051-01-01"}
+        )
+
+        with tests.capture_output() as output:
+            pagure.cli.admin.do_block_user(args)
+
+        output = output.getvalue()
+        self.assertEqual("No users are currently blocked\n", output)
 
 
 class PagureAdminDeleteProjectTests(tests.Modeltests):
