@@ -538,6 +538,18 @@ def request_pull_edit(repo, requestid, username=None, namespace=None):
         request.title = form.title.data.strip()
         request.initial_comment = form.initial_comment.data.strip()
         flask.g.session.add(request)
+        if not request.private and not request.project.private:
+            pagure.lib.notify.log(
+                request.project,
+                topic="pull-request.initial_comment.edited",
+                msg={
+                    "pullrequest": request.to_json(
+                        public=True, with_comments=False
+                    ),
+                    "project": request.project.to_json(public=True),
+                    "agent": flask.g.fas_user.username,
+                },
+            )
         try:
             # Link the PR to issue(s) if there is such link
             pagure.lib.query.link_pr_to_issue_on_description(
