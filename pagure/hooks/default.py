@@ -28,6 +28,9 @@ _config = pagure.config.reload_config()
 _log = logging.getLogger(__name__)
 
 
+FEDMSG_INIT = False
+
+
 def send_fedmsg_notifications(project, topic, msg):
     """ If the user or admin asked for fedmsg notifications on commit, this will
     do it.
@@ -43,13 +46,16 @@ def send_fedmsg_notifications(project, topic, msg):
     if always_fedmsg or (project.fedmsg_hook and project.fedmsg_hook.active):
         if _config.get("FEDMSG_NOTIFICATIONS", True):
             try:
+                global FEDMSG_INIT
                 print("  - to fedmsg")
                 import fedmsg
 
                 config = fedmsg.config.load_config([], None)
                 config["active"] = True
                 config["endpoints"]["relay_inbound"] = config["relay_inbound"]
-                fedmsg.init(name="relay_inbound", **config)
+                if not FEDMSG_INIT:
+                    fedmsg.init(name="relay_inbound", **config)
+                    FEDMSG_INIT = True
 
                 pagure.lib.notify.fedmsg_publish(topic=topic, msg=msg)
             except Exception:
@@ -114,6 +120,42 @@ def send_webhook_notifications(project, topic, msg):
             _log.exception(
                 "Error sending web-hook notifications on commit push"
             )
+
+
+def send_action_notification(
+    session, subject, action, project, repodir, user, refname, rev
+):
+    """ Send out-going notifications about the branch that was just deleted.
+    """
+    email = pagure.lib.git.get_author_email(rev, repodir)
+    name = pagure.lib.git.get_author(rev, repodir)
+    author = pagure.lib.query.search_user(session, email=email)
+    if author:
+        author = author.to_json(public=True)
+    else:
+        author = name
+
+    topic = "git.%s.%s" % (subject, action)
+    msg = dict(
+        authors=[author],
+        agent=user,
+        repo=project.to_json(public=True)
+        if not isinstance(project, six.string_types)
+        else project,
+    )
+    if subject == "branch":
+        msg["branch"] = refname
+    elif subject == "tag":
+        msg["tag"] = refname
+
+    # Send blink notification to any 3rd party plugins, if there are any
+    pagure.lib.notify.blinker_publish(topic, msg)
+
+    if not project.private:
+        send_fedmsg_notifications(project, topic, msg)
+        send_stomp_notifications(project, topic, msg)
+        send_mqtt_notifications(project, topic, msg)
+        send_webhook_notifications(project, topic, msg)
 
 
 def send_notifications(session, project, repodir, user, refname, revs, forced):
@@ -271,13 +313,54 @@ class DefaultRunner(BaseRunner):
 
             forced = False
             if set(newrev) == set(["0"]):
-                print(
-                    "Deleting a reference/branch, so we won't run the "
-                    "pagure hook"
-                )
-                return
+                if refname.startswith("refs/tags"):
+                    refname = refname.replace("refs/tags/", "")
+                    send_action_notification(
+                        session,
+                        "tag",
+                        "deletion",
+                        project,
+                        repodir,
+                        username,
+                        refname,
+                        oldrev,
+                    )
+                    print("Deleting a tag, so we won't run the " "pagure hook")
+                elif refname.startswith("refs/heads/"):
+                    refname = refname.replace("refs/heads/", "")
+                    send_action_notification(
+                        session,
+                        "branch",
+                        "deletion",
+                        project,
+                        repodir,
+                        username,
+                        refname,
+                        oldrev,
+                    )
+                    print(
+                        "Deleting a branch, so we won't run the " "pagure hook"
+                    )
+                else:
+                    print(
+                        "Deleting %s, so we wont run the pagure hook nor "
+                        "send notifications"
+                    )
+                continue
             elif set(oldrev) == set(["0"]):
                 oldrev = "^%s" % oldrev
+                if refname.startswith("refs/tags"):
+                    refname = refname.replace("refs/tags/", "")
+                    send_action_notification(
+                        session,
+                        "tag",
+                        "creation",
+                        project,
+                        repodir,
+                        username,
+                        refname,
+                        newrev,
+                    )
             elif pagure.lib.git.is_forced_push(oldrev, newrev, repodir):
                 forced = True
                 base = pagure.lib.git.get_base_revision(
