@@ -1351,9 +1351,21 @@ def api_pull_request_create(repo, username=None, namespace=None):
 
     """
 
-    repo = _get_repo(repo, username, namespace)
-    _check_pull_request(repo)
-    _check_token(repo)
+    repo_to = _get_repo(repo, username, namespace)
+    repo_from_d = get_request_data().get("repo_from")
+    try:
+        repo_from = (_get_repo(repo_from_d['repo'], repo_from_d.get('username'),
+            repo_from_d.get('namespace')))
+    except Exception:
+        repo_from = None
+    if not repo_from:
+        raise pagure.exceptions.APIError(
+            400,
+            error_code=APIERROR.EINVALIDREQ,
+            errors={"repo_from": ["This field is required."]},
+        )
+    _check_pull_request(repo_to)
+    _check_token(repo_from)
 
     form = pagure.forms.RequestPullForm(csrf_enabled=False)
     if not form.validate_on_submit():
@@ -1375,35 +1387,31 @@ def api_pull_request_create(repo, username=None, namespace=None):
             errors={"branch_from": ["This field is required."]},
         )
 
-    parent = repo
-    if repo.parent:
-        parent = repo.parent
-
-    if not parent.settings.get("pull_requests", True):
+    if not repo_to.settings.get("pull_requests", True):
         raise pagure.exceptions.APIError(
             404, error_code=APIERROR.EPULLREQUESTSDISABLED
         )
 
-    repo_committer = pagure.utils.is_repo_committer(repo)
+    repo_committer = pagure.utils.is_repo_committer(repo_from)
 
     if not repo_committer:
         raise pagure.exceptions.APIError(
             401, error_code=APIERROR.ENOTHIGHENOUGH
         )
 
-    repo_obj = pygit2.Repository(repo.repopath("main"))
-    orig_repo = pygit2.Repository(parent.repopath("main"))
+    git_repo_from = pygit2.Repository(repo_from.repopath("main"))
+    git_repo_to = pygit2.Repository(repo_to.repopath("main"))
 
     try:
         diff, diff_commits, orig_commit = pagure.lib.git.get_diff_info(
-            repo_obj, orig_repo, branch_from, branch_to
+            git_repo_from, git_repo_to, branch_from, branch_to
         )
     except pagure.exceptions.PagureException as err:
         raise pagure.exceptions.APIError(
             400, error_code=APIERROR.EINVALIDREQ, errors=str(err)
         )
 
-    if parent.settings.get(
+    if repo_to.settings.get(
         "Enforce_signed-off_commits_in_pull-request", False
     ):
         for commit in diff_commits:
@@ -1424,10 +1432,10 @@ def api_pull_request_create(repo, username=None, namespace=None):
 
     request = pagure.lib.query.new_pull_request(
         flask.g.session,
-        repo_to=parent,
+        repo_to=repo_to,
         branch_to=branch_to,
         branch_from=branch_from,
-        repo_from=repo,
+        repo_from=repo_from,
         title=form.title.data,
         initial_comment=initial_comment,
         user=flask.g.fas_user.username,

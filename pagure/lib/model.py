@@ -470,6 +470,17 @@ class Project(BASE):
         viewonly=True,
     )
 
+    def __repr__(self):
+        return "Project(%s, name:%s, namespace:%s, url:%s, is_fork:%s,\
+                parent_id:%s)" % (
+            self.id,
+            self.name,
+            self.namespace,
+            self.url,
+            self.is_fork,
+            self.parent_id,
+        )
+
     @property
     def isa(self):
         """ A string to allow finding out that this is a project. """
