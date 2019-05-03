@@ -1986,7 +1986,7 @@ def _check_value(value):
         value = True
     elif str(value).lower() in ["false"]:
         value = True
-    elif str(value).isnumeric():
+    elif str(value).isdigit():
         value = int(value)
     return value
 
