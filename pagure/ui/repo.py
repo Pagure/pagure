@@ -3084,6 +3084,8 @@ def give_project(repo, username=None, namespace=None):
             flask.abort(
                 404, description="No such user %s found" % new_username
             )
+
+        failed = False
         try:
             old_main_admin = repo.user.user
             pagure.lib.query.set_project_owner(
@@ -3092,30 +3094,47 @@ def give_project(repo, username=None, namespace=None):
                 new_owner,
                 required_groups=pagure_config.get("REQUIRED_GROUPS"),
             )
-            # If the person doing the action is the former main admin, keep
-            # them as admins
-            if flask.g.fas_user.username == old_main_admin:
-                pagure.lib.query.add_user_to_project(
-                    flask.g.session,
-                    repo,
-                    new_user=flask.g.fas_user.username,
-                    user=flask.g.fas_user.username,
-                )
             flask.g.session.commit()
-            pagure.lib.git.generate_gitolite_acls(project=repo)
-            flask.flash(
-                "The project has been transferred to %s" % new_username
-            )
         except pagure.exceptions.PagureException as msg:
+            failed = True
             flask.g.session.rollback()
             _log.debug(msg)
             flask.flash(str(msg), "error")
         except SQLAlchemyError:  # pragma: no cover
+            failed = True
             flask.g.session.rollback()
             flask.flash(
                 "Due to a database error, this project could not be "
                 "transferred.",
                 "error",
+            )
+
+        if not failed:
+            try:
+                # If the person doing the action is the former main admin, keep
+                # them as admins
+                if flask.g.fas_user.username == old_main_admin:
+                    pagure.lib.query.add_user_to_project(
+                        flask.g.session,
+                        repo,
+                        new_user=flask.g.fas_user.username,
+                        user=flask.g.fas_user.username,
+                    )
+                flask.g.session.commit()
+            except pagure.exceptions.PagureException as msg:
+                flask.g.session.rollback()
+                _log.debug(msg)
+            except SQLAlchemyError:  # pragma: no cover
+                flask.g.session.rollback()
+                flask.flash(
+                    "Due to a database error, this access could not be "
+                    "entirely set.",
+                    "error",
+                )
+
+            pagure.lib.git.generate_gitolite_acls(project=repo)
+            flask.flash(
+                "The project has been transferred to %s" % new_username
             )
 
     return flask.redirect(
