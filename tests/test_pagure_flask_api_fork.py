@@ -2810,12 +2810,12 @@ class PagureFlaskApiForktests(tests.Modeltests):
             "initial_comment": "the manifest",
             "branch_to": "master",
             "branch_from": "branch",
+            "repo_from": "test",
+            "repo_from_username": "pingou",
         }
 
         output = self.app.post(
-            "/api/0/fork/pingou/test/pull-request/new",
-            headers=headers,
-            data=data,
+            "/api/0/test/pull-request/new", headers=headers, data=data
         )
         self.assertEqual(output.status_code, 200)
 

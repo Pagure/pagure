@@ -1279,45 +1279,45 @@ def api_pull_request_create(repo, username=None, namespace=None):
     Input
     ^^^^^
 
-    +-------------------------+----------+-------------+------------------------+
-    | Key                     | Type     | Optionality | Description            |
-    +=========================+==========+=============+========================+
-    | ``title``               | string   | Mandatory   | The title to give to   |
-    |                         |          |             | this pull-request      |
-    +-------------------------+----------+-------------+------------------------+
-    | ``branch_to``           | string   | Mandatory   | The name of the branch |
-    |                         |          |             | the submitted changes  |
-    |                         |          |             | should be merged into. |
-    +-------------------------+----------+-------------+------------------------+
-    | ``branch_from``         | string   | Mandatory   | The name of the branch |
-    |                         |          |             | containing the changes |
-    |                         |          |             | to merge               |
-    +-------------------------+----------+-------------+------------------------+
-    | ``repo_from``           | string   | Optional    | The name of the project|
-    |                         |          |             | the changes originate  |
-    |                         |          |             | from.                  |
-    |                         |          |             | If not specified the   |
-    |                         |          |             | repo_from is assumed   |
-    |                         |          |             | to be the repo_to.     |
-    +-------------------------+----------+-------------+------------------------+
-    | ``repo_from_username``  | string   | Optional    | The username of the    |
-    |                         |          |             | project the changes    |
-    |                         |          |             | originate from.        |
-    |                         |          |             | If not specified the   |
-    |                         |          |             | repo_from is assumed   |
-    |                         |          |             | to be the repo_to.     |
-    +-------------------------+----------+-------------+------------------------+
-    | ``repo_from_namespace`` | string   | Optional    | The namespace of the   |
-    |                         |          |             | project the changes    |
-    |                         |          |             | originate from.        |
-    |                         |          |             | If not specified the   |
-    |                         |          |             | repo_from is assumed   |
-    |                         |          |             | to be the repo_to.     |
-    +-------------------------+----------+-------------+------------------------+
-    | ``initial_comment``     | string   | Optional    | The intial comment     |
-    |                         |          |             | describing what these  |
-    |                         |          |             | changes are about.     |
-    +-------------------------+----------+-------------+------------------------+
+    +-----------------------+----------+-------------+------------------------+
+    | Key                   | Type     | Optionality | Description            |
+    +=======================+==========+=============+========================+
+    | ``title``             | string   | Mandatory   | The title to give to   |
+    |                       |          |             | this pull-request      |
+    +-----------------------+----------+-------------+------------------------+
+    | ``branch_to``         | string   | Mandatory   | The name of the branch |
+    |                       |          |             | the submitted changes  |
+    |                       |          |             | should be merged into. |
+    +-----------------------+----------+-------------+------------------------+
+    | ``branch_from``       | string   | Mandatory   | The name of the branch |
+    |                       |          |             | containing the changes |
+    |                       |          |             | to merge               |
+    +-----------------------+----------+-------------+------------------------+
+    | ``repo_from``         | string   | Optional    | The name of the project|
+    |                       |          |             | the changes originate  |
+    |                       |          |             | from.                  |
+    |                       |          |             | If not specified the   |
+    |                       |          |             | repo_from is assumed   |
+    |                       |          |             | to be the repo_to.     |
+    +-----------------------+----------+-------------+------------------------+
+    | ``repo_from_username``| string   | Optional    | The username of the    |
+    |                       |          |             | project the changes    |
+    |                       |          |             | originate from.        |
+    |                       |          |             | If not specified the   |
+    |                       |          |             | repo_from is assumed   |
+    |                       |          |             | to be the repo_to.     |
+    +-----------------------+----------+-------------+------------------------+
+    |``repo_from_namespace``| string   | Optional    | The namespace of the   |
+    |                       |          |             | project the changes    |
+    |                       |          |             | originate from.        |
+    |                       |          |             | If not specified the   |
+    |                       |          |             | repo_from is assumed   |
+    |                       |          |             | to be the repo_to.     |
+    +-----------------------+----------+-------------+------------------------+
+    | ``initial_comment``   | string   | Optional    | The intial comment     |
+    |                       |          |             | describing what these  |
+    |                       |          |             | changes are about.     |
+    +-----------------------+----------+-------------+------------------------+
 
     Sample response
     ^^^^^^^^^^^^^^^
@@ -1369,18 +1369,20 @@ def api_pull_request_create(repo, username=None, namespace=None):
           }
         }
 
-    """
+    """  # noqa
 
     repo_to = _get_repo(repo, username, namespace)
-    repo_from_d = get_request_data().get("repo_from")
 
-    if repo_from_d and repo_from_d.get("repo"):
-        print(repo_from_d)
-        print('='*50)
+    req_data = get_request_data()
+    repo_from = req_data.get("repo_from")
+    repo_from_username = req_data.get("repo_from_username")
+    repo_from_namespace = req_data.get("repo_from_namespace")
+
+    if repo_from:
         repo_from = _get_repo(
-            repo_from_d["repo"],
-            repo_from_d.get("username"),
-            repo_from_d.get("namespace"),
+            repo_from,
+            username=repo_from_username,
+            namespace=repo_from_namespace,
         )
     else:
         repo_from = repo_to
@@ -1606,7 +1608,7 @@ def api_pull_request_diffstats(repo, requestid, username=None, namespace=None):
         for patch in diff:
             stats = pagure.lib.git.get_stats_patch(patch)
             new_path = stats["new_path"]
-            del (stats["new_path"])
+            del stats["new_path"]
             output[new_path] = stats
     else:
         raise pagure.exceptions.APIError(400, error_code=APIERROR.ENOPRSTATS)

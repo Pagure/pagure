@@ -6757,9 +6757,7 @@ class PagureFlaskRepoTestHooktests(tests.Modeltests):
         """ Test the test_hook endpoint when the user is logged in. """
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
-            data = {
-                "csrf_token": self.get_csrf()
-            }
+            data = {"csrf_token": self.get_csrf()}
             output = self.app.post("/test/settings/test_hook", data=data)
             self.assertEqual(output.status_code, 302)
 
