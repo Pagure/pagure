@@ -104,7 +104,8 @@
             <div class="text-muted">Created {{repo.date_created|humanize}}</div>
             <div class="text-muted">
               Maintained by
-              <a href="{{ url_for('ui_ns.view_user', username=repo.user.user)}}">
+              <a href="{{ url_for('ui_ns.view_user', username=repo.user.user)}}"
+                 id="point_of_contact">
                 {{- repo.user.user -}}
               </a>
             </div>

@@ -109,6 +109,21 @@
     </div>
   </div>
 
+  {% if g.authenticated and repo.user.user == "orphan" %}
+  <div id="take-orphan-section">
+    <div class="col-xs-2" style="height:1em;"></div>
+    <p>Orphaned:</p>
+    <div class="btn-group">
+      <a href="#" title="Adopt this orphaned package"
+          class="btn btn-sm btn-outline-primary"
+          id="take-orphan-button">
+        <i id="take-orphan-icon" class="fa fa-fw fa-hand-paper-o"></i>
+        Take
+      </a>
+    </div>
+  </div>
+  {% endif %}
+
   <script type="text/javascript" nonce="{{ g.nonce }}">
     window.addEventListener('load', function() {
 
@@ -160,6 +175,28 @@
           },
           error: function() {
             alert('Unable to change the monitoring status! ' + error);
+          }
+        });
+      });
+      {% endif %}
+
+      {% if g.authenticated and repo.user.user == "orphan" %}
+      $("#take-orphan-button").click(function(){
+
+        $.ajax({
+          url: "{{ url_for('distgit_ns.take_orphan_endpoint', repo=repo.name, namespace=repo.namespace) }}",
+          type: 'POST',
+          dataType: 'json',
+          success: function(res) {
+            $("#point_of_contact").html("{{ g.fas_user.username }}");
+            $("#take-orphan-section").hide();
+          },
+          error: function(res) {
+            if (res.responseJSON.errors) {
+              alert('Unable to change the point of contact: ' + res.responseJSON.errors);
+            } else {
+              alert('Unable to change the point of contact: ' + res.responseJSON.error);
+            }
           }
         });
       });
