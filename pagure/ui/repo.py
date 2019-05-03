@@ -1291,7 +1291,7 @@ def test_web_hook(repo, username=None, namespace=None):
             project=repo,
             topic="Test.notification",
             msg={"content": "Test message"},
-            redis=True,
+            webhook=True,
         )
         flask.flash("Notification triggered")
 

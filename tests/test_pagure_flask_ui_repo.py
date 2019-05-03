@@ -6696,5 +6696,73 @@ index 0000000..fb7093d
         )
 
 
+class PagureFlaskRepoTestHooktests(tests.Modeltests):
+    """ Tests for the web hook test function """
+
+    def setUp(self):
+        """ Set up the environnment, ran before every tests. """
+        super(PagureFlaskRepoTestHooktests, self).setUp()
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, "repos"))
+
+    @patch(
+        "pagure.decorators.admin_session_timedout",
+        MagicMock(return_value=False),
+    )
+    def test_test_hook_no_project(self):
+        """ Test the test_hook endpoint when the project doesn't exist. """
+        # No project
+        output = self.app.post("/foo/settings/test_hook")
+        self.assertEqual(output.status_code, 404)
+
+    @patch(
+        "pagure.decorators.admin_session_timedout",
+        MagicMock(return_value=False),
+    )
+    def test_test_hook_existing_project(self):
+        """ Test the test_hook endpoint when the project doesn't exist. """
+        user = tests.FakeUser()
+        with tests.user_set(self.app.application, user):
+            output = self.app.post("/test/settings/test_hook")
+            self.assertEqual(output.status_code, 403)
+
+    @patch(
+        "pagure.decorators.admin_session_timedout",
+        MagicMock(return_value=False),
+    )
+    def test_test_hook_logged_out(self):
+        """ Test the test_hook endpoint when the project isn't logged in. """
+        # User not logged in
+        output = self.app.post("/test/settings/test_hook")
+        self.assertEqual(output.status_code, 302)
+
+    @patch(
+        "pagure.decorators.admin_session_timedout",
+        MagicMock(return_value=False),
+    )
+    def test_test_hook_logged_in_no_csrf(self):
+        """ Test the test_hook endpoint when the user is logged in. """
+        user = tests.FakeUser(username="pingou")
+        with tests.user_set(self.app.application, user):
+            output = self.app.post("/test/settings/test_hook")
+            self.assertEqual(output.status_code, 302)
+        self.assertEqual(output.status_code, 302)
+
+    @patch(
+        "pagure.decorators.admin_session_timedout",
+        MagicMock(return_value=False),
+    )
+    def test_test_hook_logged_in_csrf(self):
+        """ Test the test_hook endpoint when the user is logged in. """
+        user = tests.FakeUser(username="pingou")
+        with tests.user_set(self.app.application, user):
+            data = {
+                "csrf_token": self.get_csrf()
+            }
+            output = self.app.post("/test/settings/test_hook", data=data)
+            self.assertEqual(output.status_code, 302)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
