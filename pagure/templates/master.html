@@ -33,10 +33,10 @@
           {% if (config.get('ENABLE_NEW_PROJECTS', True) and config.get('ENABLE_UI_NEW_PROJECTS', True))
           or config.get('ENABLE_GROUP_MNGT', False)  %}
           <li class="nav-item dropdown ml-3">
-            <a class="nav-link dropdown-toggle font-weight-bold" 
+            <a class="nav-link dropdown-toggle font-weight-bold"
               data-toggle="dropdown"
               href="#"
-              role="button" aria-haspopup="true" 
+              role="button" aria-haspopup="true"
               aria-expanded="false">
             Create
             </a>
@@ -168,7 +168,7 @@
             filename='vendor/jquery/jquery.min.js') }}?version={{ g.version}}">
     </script>
     {{theme.js_imports()}}
-    <script type="text/javascript">
+    <script type="text/javascript" nonce="{{ g.nonce }}">
 $('[data-toggle="tooltip"]').tooltip({placement : 'bottom'});
     </script>
     {% endblock %}
@@ -176,7 +176,7 @@ $('[data-toggle="tooltip"]').tooltip({placement : 'bottom'});
 {% if config['FEDMENU_URL'] %}
 <script src="{{ config['FEDMENU_URL'] }}/js/fedmenu.js"></script>
 <script src="{{ config['FEDMENU_URL'] }}/js/fedora-libravatar.js"></script>
-<script>
+<script type="text/javascript" nonce="{{ g.nonce }}">
   fedmenu({
     'url': '{{ config["FEDMENU_DATA_URL"] }}',
     'mimeType': 'application/javascript',

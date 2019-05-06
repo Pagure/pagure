@@ -42,7 +42,7 @@
 <script type="text/javascript"
   src="{{ url_for('static', filename='vendor/highlight.js/spec.js') }}?version={{ g.version}}"></script>
 
-<script>
+<script type="text/javascript" nonce="{{ g.nonce }}">
   $(document).ready(function() {
   $('pre.syntaxhighlightblock code').each(function(i, block) {
     hljs.highlightBlock(block);

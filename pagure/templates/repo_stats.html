@@ -42,7 +42,7 @@
 <script type="text/javascript" src="{{
   url_for('static', filename='issues_stats.js') }}?version={{ g.version}}"></script>
 
-<script type="text/javascript">
+<script type="text/javascript" nonce="{{ g.nonce }}">
 
 {% if g.repo_obj and g.repo_obj.is_empty %}
 var repo_exists = false;

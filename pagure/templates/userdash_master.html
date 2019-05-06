@@ -115,7 +115,7 @@
 {% block jscripts %}
 {{ super() }}
 <script src="{{ url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}" type="text/javascript"> </script>
-<script>
+<script type="text/javascript" nonce="{{ g.nonce }}">
 $('#userdash-search').selectize({
     persist: false,
     maxItems: 1,

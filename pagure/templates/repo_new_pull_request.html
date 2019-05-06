@@ -386,7 +386,7 @@
 <script type="text/javascript"
   src="{{ url_for('static', filename='request_ev.js') }}?version={{ g.version}}"></script>
 
-<script type="text/javascript">
+<script type="text/javascript" nonce="{{ g.nonce }}">
 
 function showTab(){
   $('#pr-tabs a[href="#request_diff"]').tab('show')

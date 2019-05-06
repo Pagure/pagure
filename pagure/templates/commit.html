@@ -495,7 +495,7 @@
     <script type="text/javascript"
       src="{{ url_for('static', filename='vendor/diff2html/diff2html-ui.min.js') }}?version={{ g.version}}"></script>
 
-    <script type="text/javascript">
+    <script type="text/javascript" nonce="{{ g.nonce }}">
       $(document).ready(function() {
         $(".diffcollapse").click(function(e){
           $(this).find("i").toggleClass("fa-caret-down fa-caret-up")

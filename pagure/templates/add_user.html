@@ -73,7 +73,7 @@
 {{ super() }}
 <script type="text/javascript"
         src="{{ url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}"></script>
-<script type="text/javascript">
+<script type="text/javascript" nonce="{{ g.nonce }}">
 $( document ).ready(function() {
   var user_to_update = "{{ user_to_update }}";
   if (!user_to_update || user_to_update === "None") {

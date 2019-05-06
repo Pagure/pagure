@@ -110,7 +110,7 @@
 
 {% block jscripts %}
 {{ super() }}
-<script type="text/javascript">
+<script type="text/javascript" nonce="{{ g.nonce }}">
 $(function() {
   {% if g.authenticated and g.repo_committer %}
   var _cnt = 0;

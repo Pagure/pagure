@@ -21,7 +21,7 @@
 
 {% block jscripts %}
 {{ super() }}
-<script>
+<script type="text/javascript" nonce="{{ g.nonce }}">
 function processMessages(item, lastitem) {
   if (item["topic"].indexOf("io.pagure.prod.pagure.pull-request") > -1 ){
     if (lastitem.valueOf() != new String("PR#"+item["msg"]["pullrequest"]["id"]).valueOf())

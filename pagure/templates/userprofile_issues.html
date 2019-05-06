@@ -58,7 +58,7 @@
 
 {% block jscripts %}
     {{ super() }}
-    <script type="text/javascript">
+    <script type="text/javascript" nonce="{{ g.nonce }}">
       count_issues(status='.issue-status-open');
       $(function(){
         $('.issues-tagbar .btn').click(function(){

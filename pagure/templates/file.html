@@ -263,7 +263,7 @@ No content found in this repository
 <script type="text/javascript"
   src="{{ url_for('static', filename='vendor/highlight.js/spec.js') }}?version={{ g.version}}"></script>
 
-<script>
+<script type="text/javascript" nonce="{{ g.nonce }}">
   $(document).ready(function() {
   $('pre.syntaxhighlightblock code').each(function(i, block) {
     hljs.highlightBlock(block);
@@ -272,7 +272,7 @@ No content found in this repository
 });
 </script>
 
-<script type="text/javascript">
+<script type="text/javascript" nonce="{{ g.nonce }}">
   function updateHighlight() {
     var cls = "highlighted-line";
     $('.' + cls).removeClass(cls)

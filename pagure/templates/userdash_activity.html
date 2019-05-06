@@ -138,7 +138,7 @@
 
 {% block jscripts %}
     {{ super() }}
-    <script>
+    <script type="text/javascript" nonce="{{ g.nonce }}">
       $(document).ready(function() {
         var $acls_selectize = $('#acls-selectize').selectize({
     onInitialize: function(){

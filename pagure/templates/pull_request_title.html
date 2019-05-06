@@ -87,7 +87,7 @@
   src="{{ url_for('static', filename='vendor/jquery.atwho/jquery.atwho.min.js') }}?version={{ g.version}}">
 </script>
 
-<script>
+<script type="text/javascript" nonce="{{ g.nonce }}">
   $("#preview").hide();
   $("#edit_previewinmarkdown").click(
     function(event, ui) {

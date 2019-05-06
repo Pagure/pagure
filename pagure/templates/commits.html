@@ -209,7 +209,7 @@
 
 {% block jscripts %}
 {{ super() }}
-<script type="text/javascript">
+<script type="text/javascript" nonce="{{ g.nonce }}">
   $(function(){
     $('.diff_commits_link').click(function(){
       $('#diff_commits').toggle();

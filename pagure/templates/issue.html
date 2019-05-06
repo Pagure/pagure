@@ -657,7 +657,7 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
 <script type="text/javascript" src="{{ url_for('static', filename='vendor/jquery.caret/jquery.caret.min.js') }}?version={{ g.version}}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='vendor/jquery.atwho/jquery.atwho.min.js') }}?version={{ g.version}}"></script>
 
-<script type="text/javascript">
+<script type="text/javascript" nonce="{{ g.nonce }}">
 
 {% if g.authenticated and form %}
 $(document).ready(function() {
@@ -850,7 +850,7 @@ $(document).ready(function() {
 {% endif %}
 
 
-<script type="text/javascript">
+<script type="text/javascript" nonce="{{ g.nonce }}">
 var source = null;
 var sse = true;
 
@@ -965,7 +965,7 @@ function try_async_comment(form) {
 </script>
 
 
-<script type="text/javascript">
+<script type="text/javascript" nonce="{{ g.nonce }}">
 {% if g.authenticated and (g.repo_user or issue.user.user == g.fas_user.username or open_access) %}
 function take_issue(){
   var _url = "{{ url_for('api_ns.api_assign_issue',

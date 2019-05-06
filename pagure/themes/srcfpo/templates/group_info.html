@@ -130,7 +130,7 @@
 {% block jscripts %}
   {{ super() }}
   <script src="{{ url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}" type="text/javascript"> </script>
-  <script type="text/javascript">
+  <script type="text/javascript" nonce="{{ g.nonce }}">
   $(document).ready(function() {
     $('#headerSearch').on('keypress keydown keyup', function(e) {
       if (e.which == 13) {

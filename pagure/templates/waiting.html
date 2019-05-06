@@ -32,7 +32,7 @@
 
 {% block jscripts %}
 {{ super() }}
-<script type="text/javascript">
+<script type="text/javascript" nonce="{{ g.nonce }}">
 var _delay = 1;
 var _cnt = '{{ count }}';
 

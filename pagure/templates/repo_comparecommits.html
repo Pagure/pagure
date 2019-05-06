@@ -133,7 +133,7 @@
 
 {% block jscripts %}
 {{ super() }}
-<script type="text/javascript">
+<script type="text/javascript" nonce="{{ g.nonce }}">
 
 $(document).ready(function () {
   $('#show_hidden_commits a').click(function(e){

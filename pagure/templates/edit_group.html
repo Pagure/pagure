@@ -79,7 +79,7 @@
 
 <script type="text/javascript" src="{{ url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}"></script>
 
-<script type="text/javascript">
+<script type="text/javascript" nonce="{{ g.nonce }}">
 $('#user').selectize({
   valueField: 'user',
   labelField: 'user',

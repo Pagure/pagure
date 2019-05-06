@@ -336,7 +336,7 @@
 
 {% block jscripts %}
 {{ super() }}
-<script type="text/javascript">
+<script type="text/javascript" nonce="{{ g.nonce }}">
   $(document).ready(function() {
     $('#nav-tab a.nav-link').on('shown.bs.tab', function (e) {
       window.location.hash = e.target.hash+'-tab';

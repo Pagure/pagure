@@ -340,7 +340,7 @@ git push -u origin master</pre>
 
 {% block jscripts %}
 {{ super() }}
-<script type="text/javascript">
+<script type="text/javascript" nonce="{{ g.nonce }}">
 $(document).ready(function() {
     {% if g.repo_watch_levels %}
         var currentWatchStatusButton = $('#watch_{{ g.repo_watch_levels | join('_') }}_button .check-icon span');

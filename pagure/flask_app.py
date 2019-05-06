@@ -13,6 +13,7 @@ from __future__ import unicode_literals, absolute_import
 import datetime
 import gc
 import logging
+import string
 import time
 import os
 
@@ -244,6 +245,9 @@ def set_request():
     flask.g.main_app = flask.current_app
     flask.g.version = pagure.__version__
     flask.g.confirmationform = pagure.forms.ConfirmationForm()
+    flask.g.nonce = pagure.lib.login.id_generator(
+        size=25, chars=string.ascii_letters + string.digits
+    )
 
     flask.g.issues_enabled = pagure_config.get("ENABLE_TICKETS", True)
 

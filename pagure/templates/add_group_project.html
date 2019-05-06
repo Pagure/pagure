@@ -75,7 +75,7 @@
 {{ super() }}
 <script type="text/javascript"
         src="{{ url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}"></script>
-<script type="text/javascript">
+<script type="text/javascript" nonce="{{ g.nonce }}">
 function set_up_group_list(url, query, callback) {
   $.getJSON(
       url, {

@@ -764,7 +764,7 @@
 <script type="text/javascript"
   src="{{ url_for('static', filename='request_ev.js') }}?version={{ g.version}}"></script>
 
-<script type="text/javascript">
+<script type="text/javascript" nonce="{{ g.nonce }}">
 function cancel_edit_btn() {
   $(".cancel").unbind();
   $(".cancel").click(
@@ -1275,7 +1275,7 @@ function try_async_comment(form, inline) {
 
 </script>
 
-<script type="text/javascript">
+<script type="text/javascript" nonce="{{ g.nonce }}">
 var cur_hash = null;
 
 function highlight_comment() {
@@ -1627,7 +1627,7 @@ setup_btn_take_drop();
 
 
 
-<script type="text/javascript">
+<script type="text/javascript" nonce="{{ g.nonce }}">
 var source = null;
 var sse = true;
 {% if config['EVENTSOURCE_SOURCE'] and pull_request %}

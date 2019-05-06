@@ -293,13 +293,13 @@
         src="{{ url_for('static',
             filename='vendor/lazyload/lazyload.min.js') }}?version={{ g.version}}">
     </script>
-<script type="text/javascript">
+<script type="text/javascript" nonce="{{ g.nonce }}">
 window.addEventListener("load", function(event) {
     lazyload();
 });
 
 </script>
-<script>
+<script type="text/javascript" nonce="{{ g.nonce }}">
 $("#giturl-toggle").on('click', function(event){
   event.stopPropagation();
   $("#giturl-more").toggle();

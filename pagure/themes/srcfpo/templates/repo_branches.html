@@ -120,7 +120,7 @@
 
 {% block jscripts %}
 {{ super() }}
-<script type="text/javascript">
+<script type="text/javascript" nonce="{{ g.nonce }}">
 function disable_branches(){
   function get_branches(_url){
     $.ajax({

@@ -55,7 +55,7 @@
 {% if config.get('PRIVATE_PROJECTS', False) %}
 {% block jscripts %}
 {{ super() }}
-<script type="text/javascript">
+<script type="text/javascript" nonce="{{ g.nonce }}">
 var _user = '{{ g.fas_user.username }}';
 $('#private').change(function(){
   var _private = $('#private').is(':checked');

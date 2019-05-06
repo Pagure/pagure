@@ -1128,7 +1128,7 @@
 
 <script type="text/javascript" src="{{ url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}"></script>
 
-<script type="text/javascript">
+<script type="text/javascript" nonce="{{ g.nonce }}">
 function updateform() {
   $('.custom-keys').change(function() {
     field_type = $(this).val();
@@ -1142,7 +1142,7 @@ function updateform() {
 updateform();
 </script>
 
-<script type="text/javascript">
+<script type="text/javascript" nonce="{{ g.nonce }}">
 function show_acls(acls) {
   var _txt = '<div title="ACLs details" id="show_meeting">'
     + '<ul>';
@@ -1461,7 +1461,7 @@ $('.ajaxed').click(function(e) {
 
 </script>
 
-<script type="text/javascript">
+<script type="text/javascript" nonce="{{ g.nonce }}">
   $(document).ready(function() {
     $('#nav-tab a.nav-link').on('shown.bs.tab', function (e) {
       window.location.hash = e.target.hash;
