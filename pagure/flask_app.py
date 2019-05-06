@@ -165,6 +165,7 @@ def create_app(config=None):
     app.register_blueprint(themeblueprint)
 
     app.before_request(set_request)
+    app.after_request(after_request)
     app.teardown_request(end_request)
 
     if perfrepo:
@@ -492,6 +493,17 @@ def end_request(exception=None):
     """
     flask.g.session.remove()
     gc.collect()
+
+
+def after_request(response):
+    """ After request callback, adjust the headers returned """
+    csp_headers = pagure_config["CSP_HEADERS"]
+    try:
+        csp_headers = csp_headers.format(nonce=flask.g.nonce)
+    except (KeyError, IndexError):
+        pass
+    response.headers.set("Content-Security-Policy", csp_headers)
+    return response
 
 
 def _get_user(username):

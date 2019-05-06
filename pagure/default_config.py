@@ -525,6 +525,7 @@ REACTIONS = [
     ("Confused", "emojione-1F615"),  # Confused
     ("Heart", "emojione-2764"),  # Heart
 ]
+
 # This is used for faster indexing. Do not change.
 _REACTIONS_DICT = dict(REACTIONS)
 
@@ -610,4 +611,10 @@ SSH_COMMAND_NON_REPOSPANNER = (
         "%(reponame)s",
     ],
     {},
+)
+
+CSP_HEADERS = (
+    "default-src 'self' https:; "
+    "script-src 'self' 'nonce-{nonce}'; "
+    "style-src 'self' 'nonce-{nonce}'"
 )
