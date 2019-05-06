@@ -2439,7 +2439,7 @@ def search_projects(
                 model.User.user == private,
             )
         )
-        sub_q2 = session.query(model.Project.id).filter(
+        sub_q2 = session.query(sqlalchemy.distinct(model.Project.id)).filter(
             # User got admin or commit right
             sqlalchemy.and_(
                 model.Project.private == True,  # noqa: E712
@@ -2452,7 +2452,7 @@ def search_projects(
                 ),
             )
         )
-        sub_q3 = session.query(model.Project.id).filter(
+        sub_q3 = session.query(sqlalchemy.distinct(model.Project.id)).filter(
             # User created a group that has admin or commit right
             sqlalchemy.and_(
                 model.Project.private == True,  # noqa: E712
@@ -2467,7 +2467,7 @@ def search_projects(
                 ),
             )
         )
-        sub_q4 = session.query(model.Project.id).filter(
+        sub_q4 = session.query(sqlalchemy.distinct(model.Project.id)).filter(
             # User is part of a group that has admin or commit right
             sqlalchemy.and_(
                 model.Project.private == True,  # noqa: E712
@@ -2494,14 +2494,25 @@ def search_projects(
                 model.PagureGroup.group_name.notin_(exclude_groups)
             )
 
-        projects = projects.filter(
-            model.Project.id.in_(
-                subquery0.union(sub_q1)
-                .union(sub_q2)
-                .union(sub_q3)
-                .union(sub_q4)
-            )
+        private_repo_subq = (
+            subquery0.union(sub_q1).union(sub_q2).union(sub_q3).union(sub_q4)
         )
+
+        # There is something going on here, we shouldn't have to invoke/call
+        # the sub-query, it should work fine with:
+        #    model.Project.id.in_(private_repo_subq.subquery())
+        # however, it does not. Either something gets really confused with
+        # sqlite or the generated SQL is broken
+        # The issues seems to be with the unions in the subquery just above.
+        # Since we can't quite get this to work, let's bite the bullet and go
+        # with this approach, but damn I don't like it!
+        # This issue appeared with sqlalchemy 1.3.0 and is still present in
+        # 1.3.13 tested today.
+        private_repos = private_repo_subq.all()
+        if private_repos:
+            projects = projects.filter(
+                model.Project.id.in_(list(set(zip(*private_repos)))[0])
+            )
 
     if fork is not None:
         if fork is True:
@@ -2532,7 +2543,7 @@ def search_projects(
         projects = projects.filter(model.Project.namespace == namespace)
 
     query = session.query(model.Project).filter(
-        model.Project.id.in_(projects.subquery())
+        model.Project.id.in_(projects.as_scalar())
     )
 
     if sort == "latest":
