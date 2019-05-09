@@ -1964,13 +1964,23 @@ def rebase_pull_request(session, request, username):
         # Push the changes
         _log.info("Pushing %s to %s", branch_ref.name, request.branch_from)
         try:
-            tempclone.push(
-                username,
-                branch_ref.name,
-                request.branch_from,
-                pull_request=request,
-                force=True,
-            )
+            if request.allow_rebase:
+                tempclone.push(
+                    username,
+                    branch_ref.name,
+                    request.branch_from,
+                    pull_request=request,
+                    force=True,
+                    internal="yes",
+                )
+            else:
+                tempclone.push(
+                    username,
+                    branch_ref.name,
+                    request.branch_from,
+                    pull_request=request,
+                    force=True,
+                )
         except subprocess.CalledProcessError as err:
             _log.debug(
                 "Rebase FAILED: {cmd} returned code {code} with the "

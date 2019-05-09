@@ -315,6 +315,11 @@ class RequestPullForm(PagureForm):
     initial_comment = wtforms.TextAreaField(
         "Initial Comment", [wtforms.validators.Optional()]
     )
+    allow_rebase = wtforms.BooleanField(
+        "Allow rebasing",
+        [wtforms.validators.Optional()],
+        false_values=FALSE_VALUES,
+    )
 
 
 class RemoteRequestPullForm(RequestPullForm):

@@ -1712,6 +1712,7 @@ def new_request_pull(
                 repo_from=repo,
                 title=form.title.data,
                 initial_comment=initial_comment,
+                allow_rebase=form.allow_rebase.data,
                 user=flask.g.fas_user.username,
                 commit_start=commit_start,
                 commit_stop=commit_stop,
@@ -1756,6 +1757,8 @@ def new_request_pull(
 
     if not flask.g.repo_committer:
         form = None
+    elif flask.request.method == "GET":
+        form.allow_rebase.data = True
 
     # if the pull request we are creating only has one commit,
     # we automatically fill out the form fields for the PR with

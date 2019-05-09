@@ -1960,6 +1960,8 @@ class PullRequest(BASE):
         nullable=True,
     )
 
+    allow_rebase = sa.Column(sa.Boolean, default=False, nullable=False)
+
     # While present this column isn't used anywhere yet
     private = sa.Column(sa.Boolean, nullable=False, default=False)
 

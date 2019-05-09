@@ -208,6 +208,15 @@
           {% endif %}
           <div id="preview" class="p-1">
           </div>
+          <div class="form-control">
+            <label for="allow_rebase">Allow rebasing</label>
+            <label class="c-input c-checkbox">
+              <input checked id="allow_rebase" name="allow_rebase" type="checkbox" value="y">
+            </label>
+            <small class="text-muted">
+              Let the maintainer of the target project to rebase the pull-request
+            </small>
+          </div>
         </div>
         <div class="card-footer bg-light">
           <div class="d-flex align-items-center">
