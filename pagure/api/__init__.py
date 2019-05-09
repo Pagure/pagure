@@ -81,7 +81,7 @@ class APIERROR(enum.Enum):
     EISSUENOTALLOWED = "You are not allowed to view this issue"
     EPRNOTALLOWED = "You are not allowed to view this pull-request"
     EPULLREQUESTSDISABLED = (
-        "Pull-Request have been deactivated for this " "project"
+        "Pull-Request have been deactivated for this project"
     )
     ENOREQ = "Pull-Request not found"
     ENOPRCLOSE = (
