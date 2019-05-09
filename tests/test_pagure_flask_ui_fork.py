@@ -2558,7 +2558,7 @@ index 0000000..2a552bb
                 """<textarea class="form-control" rows=8 id="initial_comment" name="initial_comment"
             placeholder="Describe your changes" tabindex=1>
 More information</textarea>
-            <div id="preview" class="p-1">""",
+          <div id="preview" class="p-1">""",
                 output_text,
             )
             self.assertIn(

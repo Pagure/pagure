@@ -193,10 +193,10 @@
           </div>
         </div>
         <div class="card-body">
-            <textarea class="form-control" rows=8 id="initial_comment" name="initial_comment"
+          <textarea class="form-control" rows=8 id="initial_comment" name="initial_comment"
             placeholder="Describe your changes" tabindex=1>
             {{- form.initial_comment.data if form.initial_comment.data else '' -}}
-            </textarea>
+          </textarea>
           {% if form.initial_comment.errors %}
           <span class="float-right text-danger">
             <small>
@@ -206,24 +206,24 @@
             </small>
           </span>
           {% endif %}
-            <div id="preview" class="p-1">
-            </div>
+          <div id="preview" class="p-1">
           </div>
-          <div class="card-footer bg-light">
-            <div class="d-flex align-items-center">
-              <small>Comments use <a href="https://docs.pagure.org/pagure/usage/markdown.html"
-                  target="_blank" rel="noopener noreferrer" class="notblue">Markdown Syntax</a></small>
-              <div class="ml-auto">
-                <div class="btn-group">
-                    <input type="submit" class="btn btn-primary" value="Create Pull Request"{%
-                      if not diff %} disabled title="There appear to be no diff, so nothing to request pulling"{% endif %}>
+        </div>
+        <div class="card-footer bg-light">
+          <div class="d-flex align-items-center">
+            <small>Comments use <a href="https://docs.pagure.org/pagure/usage/markdown.html"
+                target="_blank" rel="noopener noreferrer" class="notblue">Markdown Syntax</a></small>
+            <div class="ml-auto">
+              <div class="btn-group">
+                  <input type="submit" class="btn btn-primary" value="Create Pull Request"{%
+                    if not diff %} disabled title="There appear to be no diff, so nothing to request pulling"{% endif %}>
 
-                </div>
               </div>
             </div>
           </div>
         </div>
-        {{ form.csrf_token }}
+      </div>
+      {{ form.csrf_token }}
     </div>
 
 
