@@ -323,6 +323,7 @@ def format_loc(
                             "edit_url": flask.url_for(
                                 "ui_ns.pull_request_edit_comment",
                                 repo=comment.parent.project.name,
+                                namespace=comment.parent.project.namespace,
                                 requestid=comment.parent.id,
                                 commentid=comment.id,
                                 username=comment.parent.user.user
