@@ -122,6 +122,7 @@ class APIERROR(enum.Enum):
     ETRACKERREADONLY = "The issue tracker of this project is read-only"
     ENOPRSTATS = "No statistics could be computed for this PR"
     EUBLOCKED = "You have been blocked from this project"
+    EREBASENOTALLOWED = "You are not authorized to rebase this pull-request"
 
 
 def get_authorized_api_project(session, repo, user=None, namespace=None):

@@ -665,10 +665,15 @@ def api_pull_request_rebase(repo, requestid, username=None, namespace=None):
     repo = _get_repo(repo, username, namespace)
     _check_pull_request(repo)
     _check_token(repo)
-    _get_request(repo, requestid)
+    request = _get_request(repo, requestid)
 
     if not is_repo_committer(repo):
         raise pagure.exceptions.APIError(403, error_code=APIERROR.ENOPRCLOSE)
+
+    if not request.allow_rebase:
+        raise pagure.exceptions.APIError(
+            403, error_code=APIERROR.EREBASENOTALLOWED
+        )
 
     task = pagure.lib.tasks.rebase_pull_request.delay(
         repo.name,

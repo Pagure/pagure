@@ -68,6 +68,7 @@ class PagureRebasetests(tests.Modeltests):
             branch_to="master",
             title="PR from the test branch",
             user="pingou",
+            allow_rebase=True,
         )
         self.session.commit()
         self.assertEqual(req.id, 1)
@@ -396,6 +397,154 @@ class PagureRebasetests(tests.Modeltests):
                 "or renew your API token.",
                 "error_code": "EINVALIDTOK",
                 "errors": "Invalid token",
+            },
+        )
+
+
+class PagureRebaseNotAllowedtests(tests.Modeltests):
+    """ Tests rebasing pull-request in pagure """
+
+    maxDiff = None
+
+    @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
+    def setUp(self):
+        """ Set up the environnment, ran before every tests. """
+        super(PagureRebaseNotAllowedtests, self).setUp()
+
+        pagure.config.config["REQUESTS_FOLDER"] = None
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
+        tests.create_projects_git(
+            os.path.join(self.path, "requests"), bare=True
+        )
+        tests.add_content_to_git(
+            os.path.join(self.path, "repos", "test.git"),
+            branch="master",
+            content="foobarbaz",
+            filename="testfile",
+        )
+        tests.add_content_to_git(
+            os.path.join(self.path, "repos", "test.git"),
+            branch="test",
+            content="foobar",
+            filename="sources",
+        )
+        tests.add_readme_git_repo(os.path.join(self.path, "repos", "test.git"))
+
+        # Create a PR for these changes
+        project = pagure.lib.query.get_authorized_project(self.session, "test")
+        req = pagure.lib.query.new_pull_request(
+            session=self.session,
+            repo_from=project,
+            branch_from="test",
+            repo_to=project,
+            branch_to="master",
+            title="PR from the test branch",
+            user="pingou",
+            allow_rebase=False,
+        )
+        self.session.commit()
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, "PR from the test branch")
+
+        self.project = pagure.lib.query.get_authorized_project(
+            self.session, "test"
+        )
+        self.assertEqual(len(project.requests), 1)
+        self.request = self.project.requests[0]
+
+    def test_rebase_api_ui_logged_in(self):
+        """ Test the rebase PR API endpoint when logged in from the UI and
+        its outcome. """
+
+        user = tests.FakeUser(username="pingou")
+        with tests.user_set(self.app.application, user):
+            # Get the merge status first so it's cached and can be refreshed
+            csrf_token = self.get_csrf()
+            data = {"requestid": self.request.uid, "csrf_token": csrf_token}
+            output = self.app.post("/pv/pull-request/merge", data=data)
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.get_data(as_text=True))
+            self.assertEqual(
+                data,
+                {
+                    "code": "MERGE",
+                    "message": "The pull-request can be merged with "
+                    "a merge commit",
+                    "short_code": "With merge",
+                },
+            )
+
+            output = self.app.post("/api/0/test/pull-request/1/rebase")
+            self.assertEqual(output.status_code, 403)
+            data = json.loads(output.get_data(as_text=True))
+            self.assertEqual(
+                data,
+                {
+                    "error": "You are not authorized to rebase this pull-request",
+                    "error_code": "EREBASENOTALLOWED",
+                },
+            )
+
+    def test_rebase_api_ui_logged_in_different_user(self):
+        """ Test the rebase PR API endpoint when logged in from the UI and
+        its outcome. """
+        # Add 'foo' to the project 'test' so 'foo' can rebase the PR
+        repo = pagure.lib.query._get_project(self.session, "test")
+        msg = pagure.lib.query.add_user_to_project(
+            session=self.session, project=repo, new_user="foo", user="pingou"
+        )
+        self.session.commit()
+        self.assertEqual(msg, "User added")
+
+        user = tests.FakeUser(username="foo")
+        with tests.user_set(self.app.application, user):
+            # Get the merge status first so it's cached and can be refreshed
+            csrf_token = self.get_csrf()
+            data = {"requestid": self.request.uid, "csrf_token": csrf_token}
+            output = self.app.post("/pv/pull-request/merge", data=data)
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.get_data(as_text=True))
+            self.assertEqual(
+                data,
+                {
+                    "code": "MERGE",
+                    "message": "The pull-request can be merged with "
+                    "a merge commit",
+                    "short_code": "With merge",
+                },
+            )
+
+            output = self.app.post("/api/0/test/pull-request/1/rebase")
+            self.assertEqual(output.status_code, 403)
+            data = json.loads(output.get_data(as_text=True))
+            self.assertEqual(
+                data,
+                {
+                    "error": "You are not authorized to rebase this pull-request",
+                    "error_code": "EREBASENOTALLOWED",
+                },
+            )
+
+    def test_rebase_api_api_logged_in(self):
+        """ Test the rebase PR API endpoint when using an API token and
+        its outcome. """
+
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        headers = {"Authorization": "token aaabbbcccddd"}
+
+        output = self.app.post(
+            "/api/0/test/pull-request/1/rebase", headers=headers
+        )
+        self.assertEqual(output.status_code, 403)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(
+            data,
+            {
+                "error": "You are not authorized to rebase this pull-request",
+                "error_code": "EREBASENOTALLOWED",
             },
         )
 
