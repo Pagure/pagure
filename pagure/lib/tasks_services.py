@@ -422,7 +422,7 @@ def trigger_ci_build(
     if pr_uid:
         pr = pagure.lib.query.get_request_by_uid(session, pr_uid)
         if pr.remote:
-            project_name = pr.project_to.fullname
+            project_name = pr.project.fullname
         else:
             project_name = pr.project_from.fullname
 
