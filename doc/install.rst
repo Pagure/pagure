@@ -272,10 +272,7 @@ pagure.
 If you installed by RPM, then enable and start the worker services
 ::
 
-        systemctl enable pagure_ev.service
-        systemctl start pagure_ev.service
-        systemctl enable pagure_worker.service
-        systemctl start pagure_worker.service
+        systemctl enable --now pagure_worker.service pagure_gitolite_worker.service
         
 
 Set up virus scanning
