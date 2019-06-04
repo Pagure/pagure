@@ -683,6 +683,29 @@ See the `SSH hostkeys/Fingerprints page on pagure.io <https://pagure.io/ssh_info
 Where `<foo>` and `<bar>` must be replaced by your values.
 
 
+CSP_HEADERS
+~~~~~~~~~~~
+
+Content Security Policy (CSP) is a computer security standard introduced to
+prevent cross-site scripting (XSS), clickjacking and other code injection
+attacks resulting from execution of malicious content in the trusted web page
+context
+
+Source: https://en.wikipedia.org/wiki/Content_Security_Policy
+
+
+Defaults to:
+
+::
+    CSP_HEADERS = (
+        "default-src 'self' https:; "
+        "script-src 'self' 'nonce-{nonce}'; "
+        "style-src 'self' 'nonce-{nonce}'"
+    )
+
+Where ``{nonce}`` is dynamically set by pagure.
+
+
 LOGGING
 ~~~~~~~
 
