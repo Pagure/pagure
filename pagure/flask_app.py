@@ -502,7 +502,7 @@ def after_request(response):
         csp_headers = csp_headers.format(nonce=flask.g.nonce)
     except (KeyError, IndexError):
         pass
-    response.headers.set("Content-Security-Policy", csp_headers)
+    response.headers.set(str("Content-Security-Policy"), csp_headers)
     return response
 
 
