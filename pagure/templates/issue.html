@@ -637,7 +637,7 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
 
 {% block jscripts %}
 {{ super() }}
-<script type="text/javascript">
+<script type="text/javascript" nonce="{{ g.nonce }}">
   var UPLOAD_URL = "{{ url_for('ui_ns.upload_issue', repo=repo.name, username=username, namespace=repo.namespace, issueid=issue.id) }}";
 </script>
 <script type="text/javascript"

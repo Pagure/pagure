@@ -112,9 +112,11 @@
 
 {% block jscripts %}
 {{ super() }}
-<script>var myCodeMirror = CodeMirror.fromTextArea(document.getElementById("textareaCode"), {
+<script type="text/javascript" nonce="{{ g.nonce }}">
+    var myCodeMirror = CodeMirror.fromTextArea(document.getElementById("textareaCode"), {
     lineNumbers: true
-  });</script>
+  });
+</script>
 <script type="text/javascript" nonce="{{ g.nonce }}">
 
 var lbranch = $('#branch').html();

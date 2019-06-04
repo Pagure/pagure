@@ -290,15 +290,16 @@
 {% block jscripts %}
 {{ super() }}
 <script type="text/javascript"
-        src="{{ url_for('static',
-            filename='vendor/lazyload/lazyload.min.js') }}?version={{ g.version}}">
-    </script>
+    src="{{ url_for('static',
+        filename='vendor/lazyload/lazyload.min.js') }}?version={{ g.version}}">
+</script>
+
 <script type="text/javascript" nonce="{{ g.nonce }}">
 window.addEventListener("load", function(event) {
     lazyload();
 });
-
 </script>
+
 <script type="text/javascript" nonce="{{ g.nonce }}">
 $("#giturl-toggle").on('click', function(event){
   event.stopPropagation();

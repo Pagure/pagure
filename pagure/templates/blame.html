@@ -180,7 +180,9 @@ No content found in this repository
 <script type="text/javascript"
   src="{{ url_for('static', filename='vendor/highlight.js/spec.js') }}?version={{ g.version}}"></script>
 
-<script>hljs.initHighlightingOnLoad();</script>
+<script type="text/javascript" nonce="{{ g.nonce }}">
+  hljs.initHighlightingOnLoad();
+</script>
 
 <script type="text/javascript" nonce="{{ g.nonce }}">
 function updateHighlight() {
