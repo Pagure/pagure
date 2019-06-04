@@ -2877,10 +2877,12 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn('<table class="code_table">', output_text)
-        self.assertIn(
+        self.assertTrue(
             '<tr><td class="cell1"><a id="1" href="#1" '
-            'data-line-number="1"></a></td>',
-            output_text,
+            'data-line-number="1"></a></td>' in output_text
+            or
+            '<tr><td class="cell1"><a data-line-number="1" '
+            'href="#1" id="1"></a></td>' in output_text
         )
         self.assertIn(
             '<td class="cell2"><pre><code> bar</code></pre></td>', output_text
@@ -2899,10 +2901,12 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn('<table class="code_table">', output_text)
-        self.assertIn(
+        self.assertTrue(
             '<tr><td class="cell1"><a id="1" href="#1" '
-            'data-line-number="1"></a></td>',
-            output_text,
+            'data-line-number="1"></a></td>' in output_text
+            or
+            '<tr><td class="cell1"><a data-line-number="1" '
+            'href="#1" id="1"></a></td>' in output_text
         )
         self.assertIn(
             '<td class="cell2"><pre><code> bar</code></pre></td>', output_text
@@ -2916,10 +2920,12 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn('<table class="code_table">', output_text)
-        self.assertIn(
+        self.assertTrue(
             '<tr><td class="cell1"><a id="1" href="#1" '
-            'data-line-number="1"></a></td>',
-            output_text,
+            'data-line-number="1"></a></td>' in output_text
+            or
+            '<tr><td class="cell1"><a data-line-number="1" '
+            'href="#1" id="1"></a></td>' in output_text
         )
         self.assertIn(
             '<td class="cell2"><pre><code> bar</code></pre></td>', output_text
@@ -2966,10 +2972,12 @@ class PagureFlaskRepotests(tests.Modeltests):
         )
         self.assertIn("</span>&nbsp; Šource", output_text)
         self.assertIn('<table class="code_table">', output_text)
-        self.assertIn(
+        self.assertTrue(
             '<tr><td class="cell1"><a id="1" href="#1" '
-            'data-line-number="1"></a></td>',
-            output_text,
+            'data-line-number="1"></a></td>' in output_text
+            or
+            '<tr><td class="cell1"><a data-line-number="1" '
+            'href="#1" id="1"></a></td>' in output_text
         )
         self.assertIn(
             '<td class="cell2"><pre><code>Row 0</code></pre></td>', output_text
@@ -3006,10 +3014,12 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn('<table class="code_table">', output_text)
-        self.assertIn(
+        self.assertTrue(
             '<tr><td class="cell1"><a id="1" href="#1" '
-            'data-line-number="1"></a></td>',
-            output_text,
+            'data-line-number="1"></a></td>' in output_text
+            or
+            '<tr><td class="cell1"><a data-line-number="1" '
+            'href="#1" id="1"></a></td>' in output_text
         )
         self.assertIn(
             '<td class="cell2"><pre><code> barRow 0</code></pre></td>',
@@ -3045,10 +3055,12 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn('<table class="code_table">', output_text)
-        self.assertIn(
+        self.assertTrue(
             '<tr><td class="cell1"><a id="1" href="#1" '
-            'data-line-number="1"></a></td>',
-            output_text,
+            'data-line-number="1"></a></td>' in output_text
+            or
+            '<tr><td class="cell1"><a data-line-number="1" '
+            'href="#1" id="1"></a></td>' in output_text
         )
         self.assertIn(
             '<td class="cell2"><pre><code> bar</code></pre></td>', output_text

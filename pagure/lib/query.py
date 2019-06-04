@@ -4368,8 +4368,9 @@ def clean_input(text, ignore=None):
     attrs["table"] = ["class"]
     attrs["span"] = ["class", "id"]
     attrs["div"] = ["class", "id"]
-    attrs["td"] = ["align"]
+    attrs["td"] = ["align", "class"]
     attrs["th"] = ["align"]
+    attrs["a"].extend(["id", "data-line-number"])
     if not ignore or "img" not in ignore:
         # newer bleach need three args for attribute callable
         if tuple(bleach_v) >= (2, 0, 0):  # pragma: no cover
