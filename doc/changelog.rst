@@ -3,6 +3,40 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
+5.6 (2019-06-04)
+----------------
+
+.. warning:: This release contains a security fix for CVE-2019-11556
+
+- Couple of fixes for the mirroring-in feature
+- Fix linking to issues or PRs when pre-viewing a comment
+- Include a search icon near the filter button on the issues list
+- Include a small introduction text to email on loading files
+- Move the side-bar of the repo_master into its own template for easier
+  overriding by other themes
+- Enforce black on all pagure, including tests, docs and all
+- Add an option to pagure-admin to delete a project
+- Add an option to pagure-admin block-user to list the users blocked
+- Ensure "No activity" rows get removed on subsequent updates of the calendar
+  heatmap (Frank Dana)
+- Send a notification upon editing the initial comment of a PR
+- Send notifications on tag creation and tag and branch deletion
+- Comment reply button: remove icon title (Frank Dana)
+- Fix updating project options when running pagure in python 2
+- Fix the test button for webhook notifications
+- Fix opening PR on forks on the page listing the PRs
+- Add repo_from argument for API create pull request (Lenka Segura)
+- Drop commit_flags_uid_key from commit_flags
+- Add missing namespace in the link to edit inline comments in PR
+- Add support for allowing the maintainers of the target project rebase
+- Do not allow rebase via the API if the PR does not allow it
+- Improve the install documentation (MR)
+- Add CSP headers support and a mechanism to customize them
+- Fix triggering a CI run on remote pull-requests
+- Add a button to take maintenance of orphaned packages in dist-git
+- Fix giving a project to someone who already had it
+- Ensure the blame view does not render html
+
 5.5 (2019-04-08)
 ----------------
 - themes/srcfpo: move icons to the theme instead of linking them from other apps

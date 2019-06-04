@@ -2,6 +2,20 @@ Upgrading Pagure
 ================
 
 
+From 5.5 to 5.6
+---------------
+
+The 5.6 release contains a database schema updates, so:
+
+* Update the data schema using alembic: ``alembic upgrade head``
+
+(As usual, do your backups before).
+
+New configuration key added:
+
+* CSP_HEADERS
+
+
 From 5.4 to 5.5
 ---------------
 

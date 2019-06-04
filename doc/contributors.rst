@@ -3,12 +3,12 @@ Contributors to pagure
 
 Pagure would be nothing without its contributors.
 
-On February 22, 2019 (release 5.3) the list looks as follow:
+On June 4, 2019 (release 5.6) the list looks as follow:
 
 =================  ===========
 Number of commits  Contributor
 =================  ===========
-  6557              Pierre-Yves Chibon <pingou@pingoured.fr>
+  6596              Pierre-Yves Chibon <pingou@pingoured.fr>
    328              Ryan Lerch <rlerch@redhat.com>
    172              Vivek Anand <vivekanand1101@gmail.com>
    139              farhaanbukhsh <farhaan.bukhsh@gmail.com>
@@ -30,9 +30,9 @@ Number of commits  Contributor
     19              Aurélien Bompard <aurelien@bompard.org>
     19              Gaurav Kumar <aavrug@gmail.com>
     18              Abhijeet Kasurde <akasurde@redhat.com>
+    18              Lenka Segura <lenka@sepu.cz>
     18              Sayan Chowdhury <sayan.chowdhury2012@gmail.com>
     17              Adam Williamson <awilliam@redhat.com>
-    17              Lenka Segura <lenka@sepu.cz>
     17              Ralph Bean <rbean@redhat.com>
     16              Brian Stinson <brian@bstinson.com>
     15              Igor Gnatenko <ignatenkobrain@fedoraproject.org>
@@ -90,6 +90,7 @@ Number of commits  Contributor
      2              Hervé Beraud <hberaud@redhat.com>
      2              Kamil Páral <kparal@redhat.com>
      2              Luis Guzman <ark@switnet.org>
+     2              MR <mrx@mailinator.com>
      2              Neha Kandpal <iec2015048@iiita.ac.in>
      2              Nuno Maltez <nuno@cognitiva.com>
      2              Ompragash <om.apsara@gmail.com>
@@ -119,8 +120,10 @@ Number of commits  Contributor
      1              Charelle Collett <ccollett@redhat.com>
      1              David Caro <dcaroest@redhat.com>
      1              Eashan <eashankadam@gmail.com>
+     1              FeRD (Frank Dana) <ferdnyc@gmail.com>
      1              Felix Yan <felixonmars@users.sf.net>
      1              Filip Valder <fvalder@redhat.com>
+     1              Frank Dana (FeRD) <ferdnyc@gmail.com>
      1              Haikel Guemar <hguemar@fedoraproject.org>
      1              Hazel Smith <hazel@hazelesque.uk>
      1              Jeremy Cline <jcline@redhat.com>
@@ -132,6 +135,7 @@ Number of commits  Contributor
      1              Mathew Robinson <mathew.robinson3114@gmail.com>
      1              Miro Hrončok <miro@hroncok.cz>
      1              Mohan Boddu <mboddu@redhat.com>
+     1              Pavel Raiskup <praiskup@redhat.com>
      1              Peter Kolínek <fedora@pessoft.com>
      1              Petr Šplíchal <psplicha@redhat.com>
      1              Randy Barlow <randy@electronsweatshop.com>
