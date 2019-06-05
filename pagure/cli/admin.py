@@ -31,6 +31,7 @@ if "PAGURE_CONFIG" not in os.environ and os.path.exists(
 import pagure.config  # noqa: E402
 import pagure.exceptions  # noqa: E402
 import pagure.lib.git  # noqa: E402
+import pagure.lib.model  # noqa: E402
 import pagure.lib.model_base  # noqa: E402
 import pagure.lib.query  # noqa: E402
 import pagure.lib.tasks_utils  # noqa: E402
@@ -503,6 +504,23 @@ def _parser_set_default_branch(subparser):
     local_parser.set_defaults(func=do_set_default_branch)
 
 
+def _parser_update_acls(subparser):
+    """ Set up the CLI argument parser for the update-acls action.
+
+    :arg subparser: an argparse subparser allowing to have action's specific
+        arguments
+
+     """
+
+    local_parser = subparser.add_parser(
+        "update-acls",
+        help="Update the ACLs stored in the database with the ones defined "
+        "in the configuration file (addition only, no ACLs are removed from "
+        "the database).",
+    )
+    local_parser.set_defaults(func=do_update_acls)
+
+
 def parse_arguments(args=None):
     """ Set-up the argument parsing. """
     parser = argparse.ArgumentParser(
@@ -566,6 +584,9 @@ def parse_arguments(args=None):
 
     # set-default-branch
     _parser_set_default_branch(subparser)
+
+    # update-acls
+    _parser_update_acls(subparser)
 
     return parser.parse_args(args)
 
@@ -904,6 +925,22 @@ def do_delete_project(args):
     )
     session.commit()
     print("Project deleted")
+
+
+def do_update_acls(args):
+    """ Update the ACLs in the database from the list present in the
+    configuration file.
+
+    :arg args: the argparse object returned by ``parse_arguments()``.
+
+    """
+    acls = _config.get("ACLS", {})
+    _log.debug("ACLS:       %s", acls)
+
+    pagure.lib.model.create_default_status(session, acls=acls)
+    print(
+        "ACLS in the database synced with the list in the configuration file"
+    )
 
 
 def do_get_watch_status(args):

@@ -2262,5 +2262,116 @@ class PagureSetDefaultBranchTests(tests.Modeltests):
         self.assertEqual(gitrepo.head.shorthand, "dev")
 
 
+class PagureAdminUpdateAclsTests(tests.Modeltests):
+    """ Tests for pagure-admin update-acls """
+
+    populate_db = False
+    maxDiff = None
+
+    def setUp(self):
+        """ Set up the environnment, ran before every tests. """
+        super(PagureAdminUpdateAclsTests, self).setUp()
+        pagure.cli.admin.session = self.session
+
+        # Make the imported pagure use the correct db session
+        pagure.cli.admin.session = self.session
+
+    def test_update_acls(self):
+        """ Test the update-acls function of pagure-admin.
+        """
+        args = munch.Munch()
+        with tests.capture_output() as output:
+            pagure.cli.admin.do_update_acls(args)
+
+        output = output.getvalue()
+        self.assertEqual(
+            "ACLS in the database synced with the list in the configuration file\n",
+            output,
+        )
+
+        acls = pagure.lib.query.get_acls(self.session)
+        self.assertEqual(
+            [a.name for a in acls],
+            [
+                "commit",
+                "commit_flag",
+                "create_branch",
+                "create_project",
+                "fork_project",
+                "generate_acls_project",
+                "internal_access",
+                "issue_assign",
+                "issue_change_status",
+                "issue_comment",
+                "issue_create",
+                "issue_subscribe",
+                "issue_update",
+                "issue_update_custom_fields",
+                "issue_update_milestone",
+                "modify_project",
+                "pull_request_assign",
+                "pull_request_close",
+                "pull_request_comment",
+                "pull_request_create",
+                "pull_request_flag",
+                "pull_request_merge",
+                "pull_request_rebase",
+                "pull_request_subscribe",
+                "pull_request_update",
+                "tag_project",
+                "update_watch_status",
+            ],
+        )
+
+    @patch.dict(
+        "pagure.cli.admin._config",
+        {"ACLS": {"dummy_acls": "Dummy ACL for testing"}},
+    )
+    def test_update_acls_new_acls(self):
+        args = munch.Munch({"debug": True})
+        with tests.capture_output() as output:
+            pagure.cli.admin.do_update_acls(args)
+
+        output = output.getvalue()
+        self.assertEqual(
+            "ACLS in the database synced with the list in the configuration file\n",
+            output,
+        )
+        acls = pagure.lib.query.get_acls(self.session)
+        self.assertEqual(
+            [a.name for a in acls],
+            [
+                "commit",
+                "commit_flag",
+                "create_branch",
+                "create_project",
+                "dummy_acls",
+                "fork_project",
+                "generate_acls_project",
+                "internal_access",
+                "issue_assign",
+                "issue_change_status",
+                "issue_comment",
+                "issue_create",
+                "issue_subscribe",
+                "issue_update",
+                "issue_update_custom_fields",
+                "issue_update_milestone",
+                "modify_project",
+                "pull_request_assign",
+                "pull_request_close",
+                "pull_request_comment",
+                "pull_request_create",
+                "pull_request_flag",
+                "pull_request_merge",
+                "pull_request_rebase",
+                "pull_request_subscribe",
+                "pull_request_update",
+                "tag_project",
+                "update_watch_status",
+            ],
+        )
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
