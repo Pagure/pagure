@@ -385,7 +385,7 @@ def api_view_issues(repo, username=None, namespace=None):
     """
     repo = _get_repo(repo, username, namespace)
     _check_issue_tracker(repo)
-    _check_token(repo)
+    _check_token(repo, project_token=False)
 
     assignee = flask.request.args.get("assignee", None)
     author = flask.request.args.get("author", None)

@@ -1498,6 +1498,182 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             },
         )
 
+    def test_api_view_issues_user_token(self):
+        """ Test the api_new_issue method of the flask api. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, "tickets"), bare=True
+        )
+        tests.create_tokens(self.session, project_id=None)
+        tests.create_tokens_acl(self.session)
+
+        headers = {"Authorization": "token aaabbbcccddd"}
+
+        data = {
+            "title": "test issue",
+            "issue_content": "This issue needs attention",
+        }
+
+        # Create an issue
+        output = self.app.post(
+            "/api/0/test/new_issue", data=data, headers=headers
+        )
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        data["issue"]["date_created"] = "1431414800"
+        data["issue"]["last_updated"] = "1431414800"
+        self.assertDictEqual(
+            data, {"issue": FULL_ISSUE_LIST[8], "message": "Issue created"}
+        )
+
+        # List all opened issues
+        output = self.app.get("/api/0/test/issues")
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        for idx in range(len(data["issues"])):
+            data["issues"][idx]["date_created"] = "1431414800"
+            data["issues"][idx]["last_updated"] = "1431414800"
+        for k in ["first", "last"]:
+            self.assertIsNotNone(data["pagination"][k])
+            data["pagination"][k] = "http://localhost..."
+
+        self.assertDictEqual(
+            data,
+            {
+                "args": {
+                    "assignee": None,
+                    "author": None,
+                    "milestones": [],
+                    "no_stones": None,
+                    "order": None,
+                    "priority": None,
+                    "since": None,
+                    "status": None,
+                    "tags": [],
+                },
+                "issues": [FULL_ISSUE_LIST[8]],
+                "pagination": {
+                    "first": "http://localhost...",
+                    "last": "http://localhost...",
+                    "next": None,
+                    "page": 1,
+                    "pages": 1,
+                    "per_page": 20,
+                    "prev": None,
+                },
+                "total_issues": 1,
+            },
+        )
+
+    def test_api_view_issues_private_user_token(self):
+        """ Test the api_new_issue method of the flask api. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, "tickets"), bare=True
+        )
+        tests.create_tokens(self.session, project_id=None)
+        tests.create_tokens_acl(self.session)
+
+        headers = {"Authorization": "token aaabbbcccddd"}
+
+        data = {
+            "title": "test issue",
+            "issue_content": "This issue needs attention",
+            "private": True
+        }
+
+        # Create an issue
+        output = self.app.post(
+            "/api/0/test/new_issue", data=data, headers=headers
+        )
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        lcl_issue = copy.deepcopy(FULL_ISSUE_LIST[8])
+        lcl_issue["private"] = True
+        data["issue"]["date_created"] = "1431414800"
+        data["issue"]["last_updated"] = "1431414800"
+        self.assertDictEqual(
+            data, {"issue": lcl_issue, "message": "Issue created"}
+        )
+
+        # List all opened issues - unauth
+        output = self.app.get("/api/0/test/issues")
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        for idx in range(len(data["issues"])):
+            data["issues"][idx]["date_created"] = "1431414800"
+            data["issues"][idx]["last_updated"] = "1431414800"
+        for k in ["first", "last"]:
+            self.assertIsNotNone(data["pagination"][k])
+            data["pagination"][k] = "http://localhost..."
+
+        self.assertDictEqual(
+            data,
+            {
+                "args": {
+                    "assignee": None,
+                    "author": None,
+                    "milestones": [],
+                    "no_stones": None,
+                    "order": None,
+                    "priority": None,
+                    "since": None,
+                    "status": None,
+                    "tags": [],
+                },
+                "issues": [],
+                "pagination": {
+                    "first": "http://localhost...",
+                    "last": "http://localhost...",
+                    "next": None,
+                    "page": 1,
+                    "pages": 0,
+                    "per_page": 20,
+                    "prev": None,
+                },
+                "total_issues": 0,
+            },
+        )
+
+        # List all opened issues - auth
+        output = self.app.get("/api/0/test/issues", headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        for idx in range(len(data["issues"])):
+            data["issues"][idx]["date_created"] = "1431414800"
+            data["issues"][idx]["last_updated"] = "1431414800"
+        for k in ["first", "last"]:
+            self.assertIsNotNone(data["pagination"][k])
+            data["pagination"][k] = "http://localhost..."
+
+        self.assertDictEqual(
+            data,
+            {
+                "args": {
+                    "assignee": None,
+                    "author": None,
+                    "milestones": [],
+                    "no_stones": None,
+                    "order": None,
+                    "priority": None,
+                    "since": None,
+                    "status": None,
+                    "tags": [],
+                },
+                "issues": [lcl_issue],
+                "pagination": {
+                    "first": "http://localhost...",
+                    "last": "http://localhost...",
+                    "next": None,
+                    "page": 1,
+                    "pages": 1,
+                    "per_page": 20,
+                    "prev": None,
+                },
+                "total_issues": 1,
+            },
+        )
+
     def test_api_view_issues_since_invalid_format(self):
         """ Test the api_view_issues method of the flask api. """
         self.test_api_new_issue()
