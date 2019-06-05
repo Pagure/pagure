@@ -246,7 +246,8 @@ a.notblue {
     box-shadow: 0 0 5px #999;
 }
 
-pre.softwrap
+pre.softwrap,
+.softwrap
 {
   white-space: pre-wrap;
   word-wrap: break-word;
@@ -262,6 +263,10 @@ th[data-sort] {
 
 .hidden, .milestone_inactive, .expired_api_keys{
   display: none;
+}
+
+.progress-bar {
+  line-height: 2em;
 }
 
 .code_table .cell_commit{
@@ -361,18 +366,144 @@ th[data-sort] {
 
 
 .selectize-control:before{
-    -webkit-animation: fa-spin 2s infinite linear;
+  -webkit-animation: fa-spin 2s infinite linear;
   animation: fa-spin 2s infinite linear;
-    content: '\f1ce';
+  content: '\f1ce';
   font-family: FontAwesome;
-    z-index: 2;
-    position: absolute;
-    display: block;
-    right: 34px;
+  z-index: 2;
+  position: absolute;
+  display: block;
+  right: 34px;
   top: 7px;
-    opacity: 0;
+  opacity: 0;
 }
 
 .selectize-control.loading:before{
   opacity:0.4;
+}
+
+.font-0.9em {
+  font-size:0.9em;
+}
+
+.font-1em {
+ font-size: 1em;
+}
+
+.font-90p {
+  font-size: 90%;
+}
+
+.inline {
+  display: inline;
+}
+
+.inline-block {
+  display: inline-block;
+}
+
+#PR-dropdown,
+#filters-dropdown,
+#merge-alert {
+  min-width:400px;
+}
+
+#source-dropdown,
+#sort-dropdown,
+#filters-list-dropdown,
+#archive_format_dropdown {
+  width:300px;
+}
+
+#maintainers_dropdown {
+  width:500px;
+}
+
+#issue_templates_dropdown {
+  position: absolute;
+  transform: translate3d(-110px, 31px, 0px);
+  top: 0px;
+  left: 0px;
+  will-change: transform;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.badge-tag {
+  width:100%;
+  display:block;
+}
+
+.width-40p {
+  width:40px;
+}
+
+.width-60p {
+  width:60px;
+}
+
+.width-150p {
+  width:150px;
+}
+
+.width-100per {
+  width:100%;
+}
+
+.height-22p {
+  height:22px;
+}
+
+.height-8p {
+  height:8px
+}
+
+.height-100per {
+  height: 100%
+}
+
+.text-align-right {
+  text-align:right;
+}
+
+.center {
+    text-align:center;
+}
+
+.justify {
+    text-align:justify;
+}
+
+.new_commit {
+  position:absolute;
+  left:-2em;
+  top:0;
+  padding:5px;
+  padding-top:20px;
+  height:100%;
+  vertical-align:middle;
+}
+
+#docframe {
+  min-height:700px;
+  width:100%
+}
+
+.commit_hash {
+  font-size: 1em;
+  background: #ddd;
+}
+
+.light_gray_bg {
+  background-color:#ccc;
+}
+
+.font-monospace {
+  font-family:monospace
+}
+
+.flex-1{
+  flex:1;
 }

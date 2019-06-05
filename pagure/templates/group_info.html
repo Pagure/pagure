@@ -6,8 +6,8 @@
 {% set tag = "groups" %}
 
 {% block header %}
-<link href="{{ url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}?version={{ g.version}}"
-  rel="stylesheet" />
+<link nonce="{{ g.nonce }}" rel="stylesheet" href="{{
+  url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}?version={{ g.version}}"/>
 {% endblock %}
 
 {% block content %}
@@ -80,7 +80,7 @@
 
             {% if g.authenticated and (member or g.admin)
                   and config.get('ENABLE_GROUP_MNGT') %}
-            <div class="list-group-item" id="add_user_form_wrapper" style="display:none;">
+            <div class="list-group-item hidden" id="add_user_form_wrapper">
               <form action="{{ url_for('ui_ns.view_group', group=group.group_name)
                 }}" method="post" id="add_user_form">
                   <input placeholder="search for user" class="form-control" id="user" name="user" title="User name"/>
@@ -98,7 +98,7 @@
               {% if g.authenticated and user != group.creator
                     and (member or g.admin)
                     and config.get('ENABLE_GROUP_MNGT') %}
-               <form class="float-right" method="POST" style="display: inline-block"
+               <form class="float-right inline-block" method="POST"
                 action="{{ url_for('ui_ns.group_user_delete',
                     group=group.group_name, user=user.user) }}">
                 {{ form.csrf_token }}
@@ -123,7 +123,9 @@
 
 {% block jscripts %}
   {{ super() }}
-  <script src="{{ url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}" type="text/javascript"> </script>
+  <script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+    url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}" type="text/javascript"> </script>
+
   <script type="text/javascript" nonce="{{ g.nonce }}">
   $(document).ready(function() {
     $('#headerSearch').on('keypress keydown keyup', function(e) {

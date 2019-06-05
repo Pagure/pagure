@@ -5,9 +5,10 @@
 {% set tag = "home" %}
 
 {% block header %}
-<link href="{{ url_for('static', filename='vendor/highlight.js/styles/github.css') }}?version={{ g.version}}"
-  rel="stylesheet" />
-<style>
+<link  nonce="{{ g.nonce }}" rel="stylesheet" href="{{
+  url_for('static', filename='vendor/highlight.js/styles/github.css') }}?version={{ g.version}}"/>
+
+<style nonce="{{ g.nonce }}">
   .hljs {
     background: #fff;
   }
@@ -175,9 +176,9 @@ No content found in this repository
 
 {% block jscripts %}
 {{ super() }}
-<script type="text/javascript"
+<script type="text/javascript" nonce="{{ g.nonce }}"
   src="{{ url_for('static', filename='vendor/highlight.js/highlight.pack.js') }}?version={{ g.version}}"></script>
-<script type="text/javascript"
+<script type="text/javascript" nonce="{{ g.nonce }}"
   src="{{ url_for('static', filename='vendor/highlight.js/spec.js') }}?version={{ g.version}}"></script>
 
 <script type="text/javascript" nonce="{{ g.nonce }}">

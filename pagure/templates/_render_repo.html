@@ -3,7 +3,7 @@
 {% macro searchbox(select) %}
 <form action="{{url_for('ui_ns.search')}}" id="headerSearch">
 
-    <select name="type" style="display:none;">
+    <select name="type" class="hidden">
       <option value="projects"{% if select=='projects' %} selected {% endif %}>{{projectstring(plural=True)}}</option>
       <option value="projects_forks"{% if select=='projects_forks' %} selected {% endif %}>{{projectstring(plural=True)}} &amp; Forks</option>
       <option value="user"{% if select=='users' %} selected {% endif %}>Users</option>
@@ -18,7 +18,7 @@
       elif select=='users' %} Search Users {%
       elif select=='groups'%} Search Groups{%
       endif %}" class="form-control" title="Search" />
-    <input type="submit" style="display:none;" value="Search" class="btn btn-primary" />
+    <input type="submit" class="hidden" value="Search" class="btn btn-primary" />
   </form>
 {% endmacro%}
 
@@ -58,7 +58,7 @@
         <span class="pl-2">
           <small>created {{repo.date_created|humanize}}</small>
         </span>
-        <div style="text-align:right;" class="pr-2 text-muted float-right">
+        <div class="pr-2 text-muted float-right text-align-right">
           <span title="Forks" data-toggle="tooltip">
             <i class="fa fa-code-fork"></i>
             {{repo.forks|count}}
@@ -257,11 +257,11 @@
                       src="{{ repo.avatar_email | avatar_url }}"
                       width=60 height=60 />
                   {% elif repo.is_fork %}
-                    <div class="align-self-center text-center" style="width:60px">
+                    <div class="align-self-center text-center width-60p" >
                       <span class="fa fa-code-fork fa-4x text-muted" ></span>
                     </div>
                   {% else %}
-                    <div class="align-self-center text-center mr-3" style="width:60px">
+                    <div class="align-self-center text-center mr-3 width-60p">
                       <span class="fa {{projecticon()}} fa-4x text-muted" ></span>
                     </div>
                   {% endif %}
@@ -294,17 +294,16 @@
 {% endmacro %}
 
 {% macro render_activity_graph(username, _class="") %}
-<script type="text/javascript"src="{{
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
   url_for('static', filename='vendor/jquery/jquery.min.js') }}?version={{ g.version}}"></script>
-<script type="text/javascript" src="{{
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
   url_for('static', filename='vendor/d3/d3.v3.min.js') }}"></script>
-<script type="text/javascript" src="{{
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
   url_for('static', filename='vendor/jstimezonedetect/jstz.min.js') }}?version={{ g.version}}"></script>
-<script type="text/javascript" src="{{
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
   url_for('static', filename='vendor/cal-heatmap/cal-heatmap.min.js') }}?version={{ g.version}}"></script>
-<link rel="stylesheet" href="{{
+<link rel="stylesheet" nonce="{{ g.nonce }}" href="{{
   url_for('static', filename='vendor/cal-heatmap/cal-heatmap.css') }}?version={{ g.version}}" />
-
 
 <div class="mb-2 {{_class}}" id="user_graph">
   <div class="p-0">

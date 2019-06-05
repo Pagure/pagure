@@ -100,7 +100,7 @@
                 <span class="fa fa-save"></span>
               </a>
               <div class="dropdown-menu dropdown-menu-right">
-                <div class="m-3" style="width:300px;">
+                <div class="m-3" id="archive_format_dropdown">
                   <li>
                     <ul>
                       <a href="{{
@@ -134,7 +134,7 @@
           </div>
         </div>
         {% if tag['body_msg'] %}
-        <div style="white-space:pre-wrap;">
+        <div class="softwrap">
 {{ tag['body_msg'] }}</div>
         {% endif %}
       </div>

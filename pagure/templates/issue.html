@@ -7,12 +7,12 @@
 {% set tag = "home"%}
 
 {% block header %}
-<link href="{{ url_for('static', filename='vendor/emojione/emojione.sprites.css') }}?version={{ g.version}}"
-  rel="stylesheet" />
-<link href="{{ url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}?version={{ g.version}}"
-  rel="stylesheet" />
-<link href="{{ url_for('static', filename='vendor/jquery.atwho/jquery.atwho.css') }}?version={{ g.version}}"
-  rel="stylesheet" />
+<link rel="stylesheet" nonce="{{ g.nonce }}" href="{{
+  url_for('static', filename='vendor/emojione/emojione.sprites.css') }}?version={{ g.version}}"/>
+<link rel="stylesheet" nonce="{{ g.nonce }}" href="{{
+  url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}?version={{ g.version}}"/>
+<link rel="stylesheet" nonce="{{ g.nonce }}" href="{{
+  url_for('static', filename='vendor/jquery.atwho/jquery.atwho.css') }}?version={{ g.version}}"/>
 {% endblock %}
 
 {% block repo %}
@@ -106,10 +106,10 @@
         <div class="btn-group">
         <div class="dropdown">
           {% if g.authenticated and (g.repo_user or open_access or g.fas_user.username == issue.user.user) %}
-          <a href="javascript:void(0)" class="font-weight-bold btn btn-sm {{'btn-success' if issue.status=='Open' else 'btn-danger'}} dropdown-toggle"
+          <a class="font-weight-bold btn btn-sm {{'btn-success' if issue.status=='Open' else 'btn-danger'}} dropdown-toggle pointer"
           id="dropdownMenuButton" data-toggle='dropdown' aria-haspopup="true" aria-expanded="false">
           {% else %}
-          <a href="javascript:void(0)" class="font-weight-bold opacity-100 disabled btn btn-sm {{'btn-success' if issue.status=='Open' else 'btn-danger'}}">
+          <a class="font-weight-bold opacity-100 disabled btn btn-sm {{'btn-success' if issue.status=='Open' else 'btn-danger'}} pointer">
           {% endif %}
               {% if issue.status == 'Open' %}
                 Open
@@ -126,17 +126,17 @@
               {% if repo.close_status %}
               <h6 class="dropdown-header">Close issue as:</h6>
               {% for close_status in repo.close_status %}
-              <a class="dropdown-item close_status_dropdown_action" href="javascript:void(0)" data-value="{{close_status}}">{{close_status}}</a>
+              <a class="dropdown-item close_status_dropdown_action pointer" data-value="{{close_status}}">{{close_status}}</a>
               {% endfor %}
               {% else %}
-              <a class="dropdown-item close_status_dropdown_action" href="javascript:void(0)" data-value="">Close Issue</a>
+              <a class="dropdown-item close_status_dropdown_action pointer" data-value="">Close Issue</a>
               {% endif %}
             {% else %}
-              <a class="dropdown-item close_status_dropdown_action" href="javascript:void(0)">Reopen Issue</a>
+              <a class="dropdown-item close_status_dropdown_action pointer">Reopen Issue</a>
             {% endif %}
             {% if g.repo_committer %}
             <div class="dropdown-divider"></div>
-            <a class="dropdown-item text-danger" href="javascript:void(0)" id="closeticket"
+            <a class="dropdown-item text-danger pointer" id="closeticket"
                 title="Delete this ticket">
                 <i class="fa fa-fw fa-trash"></i> Delete Issue
             </a>
@@ -190,10 +190,10 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
               <div class="col">
                       <ul class="nav nav-tabs float-right border-bottom-0">
                         <li class="nav-item">
-                          <a class="nav-link" id="previewinmarkdown" href="javascript:void(0)">Preview</a>
+                          <a class="nav-link pointer" id="previewinmarkdown">Preview</a>
                         </li>
                         <li class="nav-item">
-                          <a class="nav-link active" id="editinmarkdown" href="javascript:void(0)">Edit</a>
+                          <a class="nav-link active pointer" id="editinmarkdown" >Edit</a>
                         </li>
                       </ul>
                     {% if repo.quick_replies %}
@@ -214,8 +214,8 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
                       Browse to attach images or drag them into the comment field
                     </label>
                 </label>
-                <div id="progress" class="progress" style="display: none; height:22px">
-                  <div id="progress-bar" class="progress-bar" style="height:22px; line-height: 2em;">0%</div>
+                <div id="progress" class="progress hidden height-22p">
+                  <div id="progress-bar" class="progress-bar height-22p">0%</div>
                 </div>
             </div>
           </div>
@@ -229,24 +229,24 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
                   {% if issue.status == 'Open' %}
                     {% if repo.close_status %}
                     <div class="btn-group">
-                    <a href="javascript:void(0)" class="btn btn-outline-primary dropdown-toggle"
+                    <a class="btn btn-outline-primary dropdown-toggle pointer"
                     id="dropdownMenuButton" data-toggle='dropdown' aria-haspopup="true" aria-expanded="false" tabindex=3>
                       Comment &amp; Close
                     </a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
                       <h6 class="dropdown-header">Close issue as:</h6>
                       {% for close_status in repo.close_status %}
-                        <a class="dropdown-item comment_and_close_action" href="javascript:void(0)" data-value="{{close_status}}">{{close_status}}</a>
+                        <a class="dropdown-item comment_and_close_action pointer" data-value="{{close_status}}">{{close_status}}</a>
                       {% endfor %}
                     </div>
                     </div>
                     {% else %}
-                      <a class="btn btn-outline-primary comment_and_close_action" data-value="" href="javascript:void(0)">
+                      <a class="btn btn-outline-primary comment_and_close_action pointer" data-value="">
                         Comment &amp; Close
                       </a>
                     {% endif %}
                 {% else %}
-                <a class="btn btn-outline-primary comment_and_close_action" data-value="" href="javascript:void(0)">
+                <a class="btn btn-outline-primary comment_and_close_action pointer" data-value="">
                     Comment &amp; Reopen
                   </a>
                 {% endif %}
@@ -279,8 +279,8 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
             {% if g.authenticated and (g.repo_user or g.fas_user.username == issue.user.user or open_access)
               and not repo.settings.get('issue_tracker_read_only', False) %}
             <div class="ml-auto">
-            <a class="btn btn-outline-primary border-0 btn-sm issue-metadata-display editmetadatatoggle" href="javascript:void(0)" style="display: inline-block;"><i class="fa fa-fw fa-pencil"></i></a>
-            <a class="btn btn-outline-secondary border-0 btn-sm issue-metadata-form hidden editmetadatatoggle" href="javascript:void(0)" style="display: none;"><i class="fa fa-fw fa-times"></i></a>
+            <a class="btn btn-outline-primary border-0 btn-sm issue-metadata-display editmetadatatoggle pointer inline-block"><i class="fa fa-fw fa-pencil"></i></a>
+            <a class="btn btn-outline-secondary border-0 btn-sm issue-metadata-form hidden editmetadatatoggle pointer hidden"><i class="fa fa-fw fa-times"></i></a>
             </div>
             {% endif %}
           </h5>
@@ -308,7 +308,7 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
                         {{ issue.assignee.username }}
                       </a>
                       {% if g.authenticated and (issue.assignee.username == g.fas_user.username) %}
-                      &mdash; <a href="javascript:void(0)" id="drop-btn"
+                      &mdash; <a class="pointer" id="drop-btn"
                           title="drop the assignment of this issue">
                         Drop
                       </a>
@@ -320,7 +320,7 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
                     {% if g.authenticated and (g.repo_user or g.fas_user.username == issue.user.user or open_access) and issue.status|lower == 'open'
                       and (not issue.assignee or issue.assignee.username != g.fas_user.username)
                       and not repo.settings.get('issue_tracker_read_only', False) %}
-                      &mdash; <a href="javascript:void(0)" id="take-btn"
+                      &mdash; <a class="pointer" id="take-btn"
                       title="assign this issue to you">
                         Take
                     </a>
@@ -346,8 +346,8 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
               <h4 class="ml-2" id="taglist">
                 {% for tag in issue.tags %}
                   <a id="tag-{{ tag.tag }}" title="{{ tag.tag_description }}"
-                    style="background-color:{{ tag.tag_color}}; width:100%; display: block;"
-                    class="badge badge-secondary text-left my-1 p-2"
+                    data-bg-color="{{ tag.tag_color }}"
+                    class="badge badge-secondary text-left my-1 p-2 badge-tag"
                     href="{{ url_for('ui_ns.view_issues',
                         repo=repo.name,
                         username=username,
@@ -640,22 +640,22 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
 <script type="text/javascript" nonce="{{ g.nonce }}">
   var UPLOAD_URL = "{{ url_for('ui_ns.upload_issue', repo=repo.name, username=username, namespace=repo.namespace, issueid=issue.id) }}";
 </script>
-<script type="text/javascript"
-    src="{{ url_for('static', filename='vendor/jquery.textcomplete/jquery.textcomplete.min.js') }}?version={{ g.version}}">
-</script>
-<script type="text/javascript"
-    src="{{ url_for('static', filename='vendor/emojione/emojione.min.js') }}?version={{ g.version}}">
-</script>
-<script type="text/javascript"
-    src="{{ url_for('static', filename='emoji/emojicomplete.js') }}?version={{ g.version}}">
-</script>
-<script type="text/javascript"
-  src="{{ url_for('static', filename='upload.js') }}?version={{ g.version}}">
-</script>
 
-<script type="text/javascript" src="{{ url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='vendor/jquery.caret/jquery.caret.min.js') }}?version={{ g.version}}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='vendor/jquery.atwho/jquery.atwho.min.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}"src="{{
+  url_for('static', filename='vendor/jquery.textcomplete/jquery.textcomplete.min.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='vendor/emojione/emojione.min.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='emoji/emojicomplete.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='upload.js') }}?version={{ g.version}}"></script>
+
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='vendor/jquery.caret/jquery.caret.min.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='vendor/jquery.atwho/jquery.atwho.min.js') }}?version={{ g.version}}"></script>
 
 <script type="text/javascript" nonce="{{ g.nonce }}">
 
@@ -730,6 +730,7 @@ $(document).ready(function() {
    })
  });
 {% endif %}
+
 function setup_edit_btns() {
   $(".edit_btn").unbind();
   $(".edit_btn").click(function() {
@@ -793,6 +794,12 @@ function setup_reply_btns() {
 });
 };
 
+function color_tags() {
+  $(".badge-tag").each(function(ind, obj) {
+    $(obj).css('background-color', $(obj).attr('data-bg-color'));
+  });
+}
+
 $(document).ready(function() {
   var cur_hash = null;
 
@@ -840,13 +847,14 @@ $(document).ready(function() {
   cancel_edit_btn();
   setup_edit_btns();
   setup_reply_btns();
+  color_tags();
 
 });
 </script>
 
 {% if config['EVENTSOURCE_SOURCE'] and not issue.private %}
-<script type="text/javascript"
-  src="{{ url_for('static', filename='issue_ev.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='issue_ev.js') }}?version={{ g.version}}"></script>
 {% endif %}
 
 
@@ -978,7 +986,8 @@ function take_issue(){
         + '<a href="{{ url_for("ui_ns.view_issues", repo=repo.name, username=username, namespace=repo.namespace) }}'
         + '?assignee={{ g.fas_user.username }}">'
         + '{{ g.fas_user.username }}</a>'
-        + ' &mdash; <a href="javascript:void(0)" id="drop-btn" title="drop the assignment of this issue">Drop</a></div></div>';
+        + ' &mdash; <a id="drop-btn" title="drop the assignment of this issue" '
+        + 'class="pointer">Drop</a></div></div>';
       $('#assignee_plain').html(_user_url);
       $('#assignee').val("{{ g.fas_user.username }}");
       setup_btn_take_drop();
@@ -1002,7 +1011,8 @@ function drop_issue(){
   $.post( _url, _data ).done(
     function(data) {
       var _user_url = '<div class="ml-2">\n<span class="text-muted">None</span>'
-        + ' &mdash; <a href="javascript:void(0)" id="take-btn" title="assign this issue to you">Take</a></div>';
+        + ' &mdash; <a id="take-btn" title="assign this issue to you" '
+        + 'class="pointer">Take</a></div>';
       $('#assignee_plain').html(_user_url);
       $('#assignee').val("");
       setup_btn_take_drop();
@@ -1028,43 +1038,41 @@ function setup_btn_take_drop(){
 
 $( document ).ready(function() {
 
-$(".close_status_dropdown_action").click(function(event){
-  var status = "{{issue.status}}";
-  if (status == "Open") {
-    $("#changestatusform #statusform_status").val("Closed");
-    $("#changestatusform #statusform_close_status").val($(this).attr("data-value"));
-  } else {
-    $("#changestatusform #statusform_status").val("Open");
-  }
-  $("#changestatusform #statusform_assignee").val($("#assignee").val());
-  $("#changestatusform #statusform_tag").val($("#tag").val());
-  $("#changestatusform #statusform_priority").val($("#priority").val());
-  $("#changestatusform #statusform_milestone").val($("#milestone").val());
-  $("#changestatusform #statusform_blocking").val($("#blocking").val());
-  $("#changestatusform #statusform_depending").val($("#depending").val());
+  $(".close_status_dropdown_action").click(function(event){
+    var status = "{{issue.status}}";
+    if (status == "Open") {
+      $("#changestatusform #statusform_status").val("Closed");
+      $("#changestatusform #statusform_close_status").val($(this).attr("data-value"));
+    } else {
+      $("#changestatusform #statusform_status").val("Open");
+    }
+    $("#changestatusform #statusform_assignee").val($("#assignee").val());
+    $("#changestatusform #statusform_tag").val($("#tag").val());
+    $("#changestatusform #statusform_priority").val($("#priority").val());
+    $("#changestatusform #statusform_milestone").val($("#milestone").val());
+    $("#changestatusform #statusform_blocking").val($("#blocking").val());
+    $("#changestatusform #statusform_depending").val($("#depending").val());
 
-  {% if repo.issue_keys %}
-    {% for field in repo.issue_keys %}
-      $("#changestatusform #statusform_{{ field.name | replace(' ', '_') }}").val($("#{{ field.name | replace(' ', '_') }}").val());
-    {% endfor %}
-  {% endif %}
-  $("#changestatusform").submit();
+    {% if repo.issue_keys %}
+      {% for field in repo.issue_keys %}
+        $("#changestatusform #statusform_{{ field.name | replace(' ', '_') }}").val($("#{{ field.name | replace(' ', '_') }}").val());
+      {% endfor %}
+    {% endif %}
+    $("#changestatusform").submit();
 
-});
+  });
 
-$(".comment_and_close_action").click(function(event){
-  var status = "{{issue.status}}";
-  if (status == "Open") {
-    $(".mainform #status").val("Closed");
-    $(".mainform #close_status").val($(this).attr("data-value"));
-  } else {
-    $(".mainform #status").val("Open");
-  }
-  $(".mainform").submit();
+  $(".comment_and_close_action").click(function(event){
+    var status = "{{issue.status}}";
+    if (status == "Open") {
+      $(".mainform #status").val("Closed");
+      $(".mainform #close_status").val($(this).attr("data-value"));
+    } else {
+      $(".mainform #status").val("Open");
+    }
+    $(".mainform").submit();
 
-});
-
-
+  });
 
 
   var emojiStrategy;
@@ -1277,8 +1285,10 @@ $( "#previewinmarkdown" ).click(
 </script>
 
 {% if repo.quick_replies %}
-<script type="text/javascript" src="{{ url_for('static', filename='quick_reply.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='quick_reply.js') }}?version={{ g.version}}"></script>
 {% endif %}
-<script type="text/javascript" src="{{ url_for('static', filename='reactions.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='reactions.js') }}?version={{ g.version}}"></script>
 
 {% endblock %}

@@ -7,8 +7,8 @@
 
 
 {% block header %}
-  <link rel="stylesheet" type="text/css" media="screen"
-      href="{{ url_for('static', filename='toggle.css') }}?version={{ g.version}}"/>
+<link rel="stylesheet" type="text/css" media="screen" nonce="{{ g.nonce }}" href="{{
+  url_for('static', filename='toggle.css') }}?version={{ g.version}}"/>
 {% endblock %}
 
 
@@ -275,12 +275,12 @@
 {% endblock %}
 
 {% block jscripts %}
-    {{ super() }}
-    <script type="text/javascript" nonce="{{ g.nonce }}">
-      $(function(){
-        $('.show_parts input[type="checkbox"]').change(function(){
-          $('#' + $(this).attr('name')).toggle();
-        });
-      });
-    </script>
+{{ super() }}
+<script type="text/javascript" nonce="{{ g.nonce }}">
+  $(function(){
+    $('.show_parts input[type="checkbox"]').change(function(){
+      $('#' + $(this).attr('name')).toggle();
+    });
+  });
+</script>
 {% endblock %}

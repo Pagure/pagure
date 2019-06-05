@@ -25,7 +25,7 @@
       </div>
 
       <div class="col-sm-1">
-        <a href="javascript:void(0)" class="btn btn-outline-danger remove-settings-field-row"><i class="fa fa-trash"></i></a>
+        <a class="btn btn-outline-danger remove-settings-field-row pointer"><i class="fa fa-trash"></i></a>
       </div>
     </div>
     {% for user in repo.block_users | sort %}
@@ -36,12 +36,12 @@
         </div>
 
         <div class="col-sm-1">
-          <a href="javascript:void(0)" class="btn btn-outline-danger remove-settings-field-row"><i class="fa fa-trash"></i></a>
+          <a class="btn btn-outline-danger remove-settings-field-row pointer"><i class="fa fa-trash"></i></a>
         </div>
       </div>
     {% endfor %}
   </div>
-  <a href="javascript:void(0)" class="btn btn-secondary pt-2 btn-sm btn-block add-settings-field-row" data-target="#blockusers-list">
+  <a class="btn btn-secondary pt-2 btn-sm btn-block add-settings-field-row pointer" data-target="#blockusers-list">
       <i class="fa fa-plus"></i> Add new user
   </a>
 

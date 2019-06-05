@@ -76,7 +76,7 @@
                     {% endif %}
 
                   </button>
-                  <div class="dropdown-menu p-4" style="min-width:400px" aria-labelledby="dropdownMenuButton" id="filters-dropdown">
+                  <div class="dropdown-menu p-4" aria-labelledby="dropdownMenuButton" id="filters-dropdown">
                     <div>
                       <form id="filters_form" action="{{ url_for('ui_ns.userdash_projects') }}" method="GET">
 
@@ -309,10 +309,10 @@
 {% endblock %}
 
 {% block jscripts %}
-    {{ super() }}
-    <script type="text/javascript" nonce="{{ g.nonce }}">
-      $(document).ready(function() {
-        var $acls_selectize = $('#acls-selectize').selectize({
+{{ super() }}
+<script type="text/javascript" nonce="{{ g.nonce }}">
+$(document).ready(function() {
+  var $acls_selectize = $('#acls-selectize').selectize({
     onInitialize: function(){
       $("#acls-filter-group .selectize-control").on('click', function(event){
         event.stopPropagation();
@@ -321,32 +321,27 @@
         event.stopPropagation();
       })
     }
-    });
+  });
 
-    var acls_selectize_control = $acls_selectize[0].selectize;
+  var acls_selectize_control = $acls_selectize[0].selectize;
 
-    $("#acls-selectize-reset").on('click', function(e){
-      acls_selectize_control.clear();
-    });
+  $("#acls-selectize-reset").on('click', function(e){
+    acls_selectize_control.clear();
+  });
 
-    $("#search_pattern-selectize-reset").on('click', function(e){
-      $('input[name="search_pattern"]').val('');
-    });
-
+  $("#search_pattern-selectize-reset").on('click', function(e){
+    $('input[name="search_pattern"]').val('');
+  });
 
   $( "#filters_form" ).submit(function( event ) {
-
     if ($('select[name="acl"]').val() == ''){
-    $('select[name="acl"]').prop("disabled", true);
+      $('select[name="acl"]').prop("disabled", true);
     }
+    if ($('input[name="search_pattern"]').val() == ''){
+      $('input[name="search_pattern"]').prop("disabled", true);
+    }
+  });
 
-       if ($('input[name="search_pattern"]').val() == ''){
-    $('input[name="search_pattern"]').prop("disabled", true);
-   }
-
-
-    });
-
-      });
-    </script>
+});
+</script>
 {% endblock %}

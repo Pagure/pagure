@@ -159,8 +159,8 @@
 
 
             {% if g.fas_user %}
-              <a class="reply btn btn-outline-primary border-0" data-toggle="tooltip"
-                  title="Reply to this comment - lose formatting" href="javascript:void(0)">
+              <a class="reply btn btn-outline-primary border-0 pointer" data-toggle="tooltip"
+                  title="Reply to this comment - lose formatting">
                 <span class="fa fa-share-square-o"></span>
               </a>
             {% endif %}
@@ -251,8 +251,8 @@
         <div class="issue_action icon">
           <div class="btn-group" role="group" aria-label="Basic example">
             {% if g.fas_user %}
-              <a class="reply btn btn-outline-primary border-0" data-toggle="tooltip"
-                  title="Reply to this comment - lose formatting" href="javascript:void(0)">
+              <a class="reply btn btn-outline-primary border-0 pointer" data-toggle="tooltip"
+                  title="Reply to this comment - lose formatting"
                 <span class="fa fa-share-square-o"></span>
               </a>
             {% endif %}
@@ -315,7 +315,7 @@
   <div class="issue_action icon float-right">
     <div class="btn-group" role="group">
       {% if g.fas_user %}
-        <a href="javascript:void(0)" class="btn btn-outline-secondary border-0 btn-sm reply"
+        <a class="btn btn-outline-secondary border-0 btn-sm reply pointer"
           title="Reply to the initial comment - lose formatting">
           <i class="fa fa-share-square-o"></i> Reply
         </a>

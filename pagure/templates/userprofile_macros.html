@@ -2,41 +2,41 @@
 
 {% macro render_repo_listing(repos) %}
 <div class="list-group">
-            {% for repo in repos %}
-              {% set url = url_for('ui_ns.view_repo',
-              repo=repo.name,
-              username=repo.user.username if repo.is_fork else None,
-              namespace=repo.namespace) %}
-              <div class="list-group-item">
-                <div class="media">
-                  {% if repo.avatar_email %}
-                    <img class="align-self-center text-center mr-3"
-                      src="{{ repo.avatar_email | avatar_url }}"
-                      width=40 height=40 />
-                  {% elif repo.is_fork %}
-                    <div class="align-self-center text-center pt-1" style="width:40px">
-                      <span class="fa fa-code-fork fa-2x text-muted" ></span>
-                    </div>
-                  {% else %}
-                    <div class="align-self-center text-center mr-3 pt-1" style="width:40px">
-                      <span class="fa {{projecticon()}} fa-2x text-muted" ></span>
-                    </div>
-                  {% endif %}
-                  <div class="media-body align-self-center">
-                    <a class="font-weight-bold" href="{{ url }}">{{ repo.fullname }}</a>
+  {% for repo in repos %}
+    {% set url = url_for('ui_ns.view_repo',
+    repo=repo.name,
+    username=repo.user.username if repo.is_fork else None,
+    namespace=repo.namespace) %}
+    <div class="list-group-item">
+      <div class="media">
+        {% if repo.avatar_email %}
+          <img class="align-self-center text-center mr-3"
+            src="{{ repo.avatar_email | avatar_url }}"
+            width=40 height=40 />
+        {% elif repo.is_fork %}
+          <div class="align-self-center text-center pt-1 width-40p">
+            <span class="fa fa-code-fork fa-2x text-muted" ></span>
+          </div>
+        {% else %}
+          <div class="align-self-center text-center mr-3 pt-1 width-40p">
+            <span class="fa {{projecticon()}} fa-2x text-muted" ></span>
+          </div>
+        {% endif %}
+        <div class="media-body align-self-center">
+          <a class="font-weight-bold" href="{{ url }}">{{ repo.fullname }}</a>
 
-                    <div data-toggle="tooltip" class="line-height-1">
-                      <small>
-                        {% if repo.description %}
-                          {{ repo.description }}
-                        {% else %}
-                          <span class="text-muted">no description<span>
-                        {% endif %}
-                      </small>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            {% endfor %}
-            </div>
+          <div data-toggle="tooltip" class="line-height-1">
+            <small>
+              {% if repo.description %}
+                {{ repo.description }}
+              {% else %}
+                <span class="text-muted">no description<span>
+              {% endif %}
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
 {% endmacro %}

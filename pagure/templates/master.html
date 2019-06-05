@@ -7,10 +7,10 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <title>{% block title %}{% endblock %} - {{ theme.site_title }}</title>
     {{ theme.head_imports() }}
-    <link href="{{ url_for('static', filename='pagure.css') }}?version={{ g.version}}"
-    type="text/css" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='vendor/font-awesome/font-awesome.css') }}?version={{ g.version}}"
-    type="text/css" rel="stylesheet" />
+    <link type="text/css" rel="stylesheet" nonce="{{ g.nonce }}" href="{{
+      url_for('static', filename='pagure.css') }}?version={{ g.version}}"/>
+    <link type="text/css" rel="stylesheet" nonce="{{ g.nonce }}" href="{{
+      url_for('static', filename='vendor/font-awesome/font-awesome.css') }}?version={{ g.version}}"/>
     {% block header %}{% endblock %}
   </head>
   <body id="{{ tag }}">
@@ -163,10 +163,9 @@
     {{theme.footer()}}
 
     {% block jscripts %}
-    <script type="text/javascript"
-        src="{{ url_for('static',
-            filename='vendor/jquery/jquery.min.js') }}?version={{ g.version}}">
-    </script>
+    <script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+      url_for('static', filename='vendor/jquery/jquery.min.js') }}?version={{ g.version}}"></script>
+
     {{theme.js_imports()}}
     <script type="text/javascript" nonce="{{ g.nonce }}">
 $('[data-toggle="tooltip"]').tooltip({placement : 'bottom'});
@@ -174,8 +173,8 @@ $('[data-toggle="tooltip"]').tooltip({placement : 'bottom'});
     {% endblock %}
 
 {% if config['FEDMENU_URL'] %}
-<script src="{{ config['FEDMENU_URL'] }}/js/fedmenu.js"></script>
-<script src="{{ config['FEDMENU_URL'] }}/js/fedora-libravatar.js"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{ config['FEDMENU_URL'] }}/js/fedmenu.js"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{ config['FEDMENU_URL'] }}/js/fedora-libravatar.js"></script>
 <script type="text/javascript" nonce="{{ g.nonce }}">
   fedmenu({
     'url': '{{ config["FEDMENU_DATA_URL"] }}',

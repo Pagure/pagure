@@ -8,9 +8,9 @@
 {% set tag = "home"%}
 
 {% block header %}
-<link href="{{ url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}?version={{ g.version}}"
-  rel="stylesheet" />
-<style>
+<link nonce="{{ g.nonce }}" rel="stylesheet" href="{{
+  url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}?version={{ g.version}}"/>
+<style nonce="{{ g.nonce }}">
   #tags-filter-group .selectize-input .item{
     background-color: {{tag.tag_color}};
     color:white;
@@ -94,14 +94,14 @@
             {% set progress_popover_string = oth_issues_cnt|string+" Open Issues | "+ issues_cnt|string + " Closed Issues"%}
           {% endif %}
           <div class="list-group-item p-0">
-            <div class="progress" style="height:8px" title="{{progress_popover_string}}">
+            <div class="progress height-8p" title="{{progress_popover_string}}">
               <div class="progress-bar bg-success" role="progressbar"
-                   style="width:{{percentage|round|int}}%"
-                   aria-valuenow="{{percentage|round|int}}" aria-valuemin="0" aria-valuemax="{{percentage|round|int}}">
+                   data-width="{{ percentage|round|int }}%"
+                   aria-valuenow="{{ percentage|round|int }}" aria-valuemin="0" aria-valuemax="{{percentage|round|int}}">
               </div>
               <div class="progress-bar bg-danger" role="progressbar"
-                   style="width:{{100-percentage|round|int}}%"
-                   aria-valuenow="{{100-percentage|round|int}}" aria-valuemin="{{percentage|round|int}}" aria-valuemax="100">
+                   data-width="{{ 100-percentage|round|int }}%"
+                   aria-valuenow="{{ 100-percentage|round|int }}" aria-valuemin="{{percentage|round|int}}" aria-valuemax="100">
               </div>
             </div>
           </div>
@@ -211,7 +211,7 @@
                           <span>{{ search_pattern }}</span>
                         {% endif %}
                     </button>
-                    <div class="dropdown-menu p-4" style="min-width:400px" aria-labelledby="dropdownMenuButton" id="filters-dropdown">
+                    <div class="dropdown-menu p-4" aria-labelledby="dropdownMenuButton" id="filters-dropdown">
                       <div>
                         <form id="filters_form" action="{{ url_for('ui_ns.view_issues',
                               username=username,
@@ -403,7 +403,7 @@
                     <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-flip="false" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                       <i class="fa fa-fw fa-sort"></i> Sort
                     </button>
-                    <div class="dropdown-menu dropdown-menu-right" style="min-width:300px" aria-labelledby="dropdownMenuButton">
+                    <div class="dropdown-menu dropdown-menu-right" id="filters-list-dropdown" aria-labelledby="dropdownMenuButton">
                       <div class="list-group list-group-flush">
                       {% for filter in filters_list %}
                         <div class="list-group-item pl-1">
@@ -536,10 +536,25 @@
 {% block jscripts %}
 {{ super() }}
 
-<script type="text/javascript"
-  src="{{ url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}"></script>
+
 <script type="text/javascript" nonce="{{ g.nonce }}">
+function color_tags() {
+  $(".small-badge-tag").each(function(ind, obj) {
+    $(obj).css('background-color', $(obj).attr('data-bg-color'));
+  });
+}
+
+function update_progress_bar() {
+  $(".progress-bar").each(function(ind, obj) {
+    $(obj).css('width', $(obj).attr('data-width'));
+  });
+}
+
 $(document).ready(function() {
+    color_tags();
+    update_progress_bar();
 
     $("#search_pattern-selectize-reset").on('click', function(e){
       $('input[name="search_pattern"]').val('');

@@ -4,8 +4,10 @@
     repo.namespace + '/' if repo.namespace }}{{ repo.name }}{% endblock %}
 {% set tag = "home" %}
 {% block header %}
-<script src="{{ url_for('static', filename='vendor/codemirror/codemirror.js') }}?version={{ g.version}}"></script>
-<link rel="stylesheet" href="{{ url_for('static', filename='vendor/codemirror/codemirror.css') }}?version={{ g.version}}">
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='vendor/codemirror/codemirror.js') }}?version={{ g.version}}"></script>
+<link rel="stylesheet"  nonce="{{ g.nonce }}" href="{{
+  url_for('static', filename='vendor/codemirror/codemirror.css') }}?version={{ g.version}}">
 {% endblock%}
 
 {% block repo %}

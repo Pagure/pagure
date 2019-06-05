@@ -24,11 +24,11 @@
       <span class="fa fa-star" title="default email address" data-toggle="tooltip"></span>
     </div>
     {% else %}
-    <form style="display:inline;" method="POST"
+    <form class="inline" method="POST"
       action="{{ url_for('ui_ns.set_default_email') }}" id="default_mail">
       <input type="hidden" value="{{ email.email }}" name="email" />
       {{ form.csrf_token }}
-      <a class="float-right p-r-1 btn btn-outline-warning border-0 text-secondary mr-1" href="javascript:void(0);"
+      <a class="float-right p-r-1 btn btn-outline-warning border-0 text-secondary mr-1 pointer"
          onclick="$(this).closest('form').submit();"
          title="Set as default email address">
          <span class="fa fa-star" data-toggle="tooltip"></span>
@@ -38,7 +38,7 @@
   {% else %}
     <div class="float-right">
       <small>pending verification via email </small>
-      <form style="display:inline;" method="POST"
+      <form class="inline" method="POST"
         action="{{ url_for('ui_ns.reconfirm_email') }}" id="reconfirm_mail">
         <input type="hidden" value="{{ email.email }}" name="email" />
         {{ form.csrf_token }}
@@ -175,7 +175,8 @@
                               {% endfor %}
                               </span>
                             </div>
-                            <input class="form-control bg-white" style="font-family:monospace" type="text" value="{{ token.id }}" readonly>
+                            <input class="form-control bg-white font-monospace"
+                                type="text" value="{{ token.id }}" readonly>
                             {% if token.expired %}
                               <span class="input-group-prepend">
                                 <small class="font-weight-bold text-danger input-group-text">Expired on {{ token.expiration.date() }}</small>
@@ -212,8 +213,7 @@
         <div class="tab-pane fade" id="nav-ssh" role="tabpanel" aria-labelledby="nav-ssh-tab">
             <h3 class="font-weight-bold mb-3">
               SSH Keys
-              <a href="javascript:void(0);"
-                class="btn btn-outline-primary btn-sm float-right ssh_key_btn ssh_key_block">
+              <a class="btn btn-outline-primary btn-sm float-right ssh_key_btn ssh_key_block pointer">
               Add SSH key
               </a>
             </h3>
@@ -226,7 +226,7 @@
                         <div class="input-group-prepend">
                           <span class="input-group-text"><span class="fa fa-key"></span></span>
                         </div>
-                        <input class="form-control bg-white" style="font-family:monospace" readonly
+                        <input class="form-control bg-white font-monospace" readonly
                         type="text" value="{{ key.ssh_short_key }}"/>
                       <form class="pull-xs-right" method="POST"
                         action="{{ url_for(
@@ -245,8 +245,7 @@
               </div>
             </div>
 
-          <div class="row justify-content-around ssh_key_block"
-              style="display: none;">
+          <div class="row justify-content-around ssh_key_block hidden">
             <div class="col">
               <div class="card mt-5">
                 <div class="card-header">

@@ -9,8 +9,8 @@
 
 
 {% block header %}
-<link href="{{ url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}?version={{ g.version}}"
-  rel="stylesheet" />
+<link nonce="{{ g.nonce }}" rel="stylesheet" href="{{
+  url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}?version={{ g.version}}"/>
 {% endblock %}
 
 {% block content %}
@@ -39,7 +39,9 @@
 
 {% block jscripts %}
     {{ super() }}
-<script src="{{ url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}" type="text/javascript"> </script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}" type="text/javascript"> </script>
+
 <script type="text/javascript" nonce="{{ g.nonce }}">
 $(document).ready(function() {
 

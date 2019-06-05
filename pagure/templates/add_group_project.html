@@ -3,8 +3,8 @@
 {% set tag = "groups" %}
 
 {% block header %}
-<link href="{{ url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}?version={{ g.version}}"
-  rel="stylesheet" />
+<link nonce="{{ g.nonce }}" rel="stylesheet" href="{{
+  url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}?version={{ g.version}}"/>
 {% endblock %}
 
 {% block title %}Add group - {{
@@ -27,8 +27,7 @@
       <fieldset class="form-group">
         <label for="group"><strong>Group Name</strong></label>
         <input class="form-control" name="group" id="group"
-          placeholder="Start typing to search groups"
-          value="" style="margin-bottom:1%"/>
+          placeholder="Start typing to search groups" value=""/>
         <select class="form-control" id="access" name="access">
           {% for access in access_levels %}
             <option value="{{ access }}" id="{{ access }}"> {{ access }} </option>
@@ -42,8 +41,8 @@
         {{ form.csrf_token }}
       </p>
     </form>
-    <p style="text-align:center;"> <strong>Access Levels</strong> </p>
-    <p style="text-align:justify;">
+    <p class="center"> <strong>Access Levels</strong> </p>
+    <p class="justify">
     <strong>Ticket</strong>: A user or a group with this level of access can only edit metadata
       of an issue. This includes changing the status of an issue, adding/removing
       tags from them, adding/removing assignees and every other option which can
@@ -53,14 +52,14 @@
       won't have. It also won't be able to "delete" the issue because, it falls
       outside of "Edit Metadata".
     </p>
-    <p style="text-align:justify;">
+    <p class="justify">
     <strong>Commit</strong>: A user or a group with this level of access can do everything what
       a user/group with ticket access can do + it can do everything on the project
       which doesn't include access to settings page. It can "Edit Metadata" of an issue
       just like a user with ticket access would do, can merge a pull request, can push
       to the main repository directly, delete an issue, cancel a pull request etc.
     </p>
-    <p style="text-align:justify;">
+    <p class="justify">
     <strong>Admin</strong>: The user/group with this access has access to everything on the project.
       All the "users" of the project that have been added till now are having this access.
       They can change the settings of the project, add/remove users/groups on the project.
@@ -73,8 +72,9 @@
 
 {% block jscripts %}
 {{ super() }}
-<script type="text/javascript"
-        src="{{ url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+    url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}"></script>
+
 <script type="text/javascript" nonce="{{ g.nonce }}">
 function set_up_group_list(url, query, callback) {
   $.getJSON(

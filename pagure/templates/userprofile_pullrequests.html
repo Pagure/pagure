@@ -65,33 +65,33 @@
 {% endblock %}
 
 {% block jscripts %}
-    {{ super() }}
-    <script type="text/javascript" nonce="{{ g.nonce }}">
-      count_issues(status='.pr-status-open');
-      $(function(){
-        $('.issues-tagbar .btn').click(function(){
-          var current_btn = $(this).attr("data-togglebutton");
-          count_issues(status='.'+current_btn);
-          $('.issues-tagbar .btn-primary').addClass("btn-outline-primary");
-          $('.issues-tagbar .btn-primary').removeClass("btn-primary");
-          $(this).removeClass("btn-outline-primary");
-          $(this).addClass("btn-primary");
-          if (current_btn == "pr-status-all"){
-            count_issues(status='');
-            $(".pr-status").show();
-          } else {
-            $(".pr-status").hide();
-            $("."+$(this).attr("data-togglebutton")).show();
-          }
-          showNoResultMessage();
-        });
-      });
-
-      function count_issues(status='.pr-status-open') {
-        var assigned_pr_count = $(status + '.pr-assigned').length;
-        var opened_pr_count = $(status + '.pr-created').length;
-        $('#assigned_pr_count').text(assigned_pr_count);
-        $('#opened_pr_count').text(opened_pr_count);
+{{ super() }}
+<script type="text/javascript" nonce="{{ g.nonce }}">
+  count_issues(status='.pr-status-open');
+  $(function(){
+    $('.issues-tagbar .btn').click(function(){
+      var current_btn = $(this).attr("data-togglebutton");
+      count_issues(status='.'+current_btn);
+      $('.issues-tagbar .btn-primary').addClass("btn-outline-primary");
+      $('.issues-tagbar .btn-primary').removeClass("btn-primary");
+      $(this).removeClass("btn-outline-primary");
+      $(this).addClass("btn-primary");
+      if (current_btn == "pr-status-all"){
+        count_issues(status='');
+        $(".pr-status").show();
+      } else {
+        $(".pr-status").hide();
+        $("."+$(this).attr("data-togglebutton")).show();
       }
-    </script>
+      showNoResultMessage();
+    });
+  });
+
+  function count_issues(status='.pr-status-open') {
+    var assigned_pr_count = $(status + '.pr-assigned').length;
+    var opened_pr_count = $(status + '.pr-created').length;
+    $('#assigned_pr_count').text(assigned_pr_count);
+    $('#opened_pr_count').text(opened_pr_count);
+  }
+</script>
 {% endblock %}

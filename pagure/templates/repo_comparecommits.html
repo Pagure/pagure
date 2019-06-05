@@ -8,12 +8,11 @@
 {% set tag = "home" %}
 
 {% block header %}
-<link href="{{ url_for('static', filename='vendor/emojione/emojione.sprites.css') }}?version={{ g.version}}"
-  rel="stylesheet" />
-<link href="{{ url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}?version={{ g.version}}"
-  rel="stylesheet" />
-<link href="{{ url_for('static', filename='vendor/jquery.atwho/jquery.atwho.css') }}?version={{ g.version}}"
-  rel="stylesheet" />
+<link type="text/css" rel="stylesheet" nonce="{{ g.nonce }}" href="{{
+  url_for('static', filename='vendor/emojione/emojione.sprites.css') }}?version={{ g.version}}"/>
+<link type="text/css" rel="stylesheet" nonce="{{ g.nonce }}" href="{{
+  url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}?version={{ g.version}}"/>
+<link type="text/css" rel="stylesheet" nonce="{{ g.nonce }}" href="{{url_for('static', filename='vendor/jquery.atwho/jquery.atwho.css') }}?version={{ g.version}}"/>
 {% endblock %}
 
 {% block repo %}
@@ -69,7 +68,7 @@
       {% endif %}
       {% if not loop.last and loop.index == 2 %}
         <div class="list-group-item text-center bg-light" id="show_hidden_commits">
-          <a href="javascript:void(0)">{{diff_commits|length - 2}} more commits...</a>
+          <a class="pointer">{{diff_commits|length - 2}} more commits...</a>
         </div>
       {% endif %}
       {% if loop.first or loop.last%}

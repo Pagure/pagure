@@ -2,8 +2,8 @@
 {% from "_formhelper.html" import render_bootstrap_field %}
 
 {% block header %}
-<link href="{{ url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}?version={{ g.version}}"
-  rel="stylesheet" />
+<link nonce="{{ g.nonce }}" rel="stylesheet" href="{{
+    url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}?version={{ g.version}}"/>
 {% endblock %}
 
 {% set tag = "groups" %}
@@ -55,8 +55,7 @@
                 method="post" class="icon">
             {{ form.csrf_token }}
             <input class="form-control" name="username" id="user"
-              placeholder="Start typing to search users"
-              value="" style="margin-bottom:1%"/>
+              placeholder="Start typing to search users" value=""/>
             <button class="btn btn-danger" type="submit"
               onclick="return confirm('Are you sure to give {{ group.group_name }}? \nThis is final and cannot be un-done.');"
               title="Give the group to someone">
@@ -77,7 +76,8 @@
 {% block jscripts %}
 {{ super() }}
 
-<script type="text/javascript" src="{{ url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}"></script>
 
 <script type="text/javascript" nonce="{{ g.nonce }}">
 $('#user').selectize({

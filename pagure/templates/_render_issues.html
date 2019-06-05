@@ -28,7 +28,7 @@
                     {% endif %}
                 </div>
                 <!--<div class="ml-auto nowrap mr-3">-->
-                    <span class="row font-weight-bold text-muted ml-auto nowrap" style="width:150px">
+                    <span class="row font-weight-bold text-muted ml-auto nowrap width-150p">
 
                     <div class="col-6 px-0 text-right">
                         {% if issue.assignee %}
@@ -111,8 +111,8 @@
                         {% for tag in issue.tags %}
                             {% if filterstatus %}
                             <a id="tag-{{ tag.tag }}" title="{{ tag.tag_description }}"
-                                  style="background-color:{{ tag.tag_color}}; font-size:90%"
-                                  class="badge badge-secondary"
+                                  data-bg-color="{{ tag.tag_color}}"
+                                  class="badge badge-secondary font-90p small-badge-tag"
                                   href="{{ url_for('ui_ns.view_issues',
                                       repo=repo.name,
                                       username=repo.username if repo.is_fork else None,
@@ -124,8 +124,8 @@
                             </a>
                             {% else %}
                             <span id="tag-{{ tag.tag }}" title="{{ tag.tag_description }}"
-                                  style="background-color:{{ tag.tag_color}}; font-size:90%"
-                                  class="badge badge-secondary">
+                                  data-bg-color="{{ tag.tag_color}}"
+                                  class="badge badge-secondary font-90p small-badge-tag">
                                 {{ tag.tag }}
                             </span>
                             {% endif %}

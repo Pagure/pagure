@@ -27,8 +27,7 @@
       method="post" class="icon">
       {{ tag_form.csrf_token }}
       Select region to move to:
-      <select class="form-control" name="region" id="region"
-              style="margin-bottom:1%" >
+      <select class="form-control" name="region" id="region" >
         {% for region in config.get('REPOSPANNER_REGIONS') %}
           <option value="{{region}}">{{ region }}</option>
         {% endfor %}

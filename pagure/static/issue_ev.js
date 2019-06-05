@@ -71,7 +71,7 @@ unassigne_issue = function(data) {
   var field = $('#assignee_plain');
   var _html = '<div class="text-muted">None';
   if ( data.comment_user == username) {
-  _html = _html + ' — <a href="javascript:void(0)" id="take-btn" title="assign this issue to you">Take</a>'
+  _html = _html + ' — <a id="take-btn" title="assign this issue to you">Take</a>'
   }
   _html = _html + '</div>';
   field.html(_html);
@@ -162,8 +162,8 @@ add_comment = function(data, username) {
     + '    <div class="issue_actions ml-auto">'
     + '        <div class="issue_action icon">'
     + '          <div class="btn-group" role="group" aria-label="Basic example">'
-    + '              <a class="reply btn btn-outline-primary border-0" data-toggle="tooltip"'
-    + '                  title="Reply to this comment - lose formatting" href="javascript:void(0)">'
+    + '              <a class="reply btn btn-outline-primary border-0 pointer" data-toggle="tooltip"'
+    + '                  title="Reply to this comment - lose formatting">'
     + '                <span class="fa fa-share-square-o" title="Reply to this comment"></span>'
     + '              </a>';
     if ( data.comment_user == username) {

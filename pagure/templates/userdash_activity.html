@@ -60,7 +60,7 @@
                     <span class="fa fa-fw text-ccc fa-2x"></span>
                 {% endif%}
                         </div>
-                        <div style="flex:1;" class="pl-2">
+                        <div class="pl-2 flex-1">
                         {% if log.issue %}
                             {% set verb = {
                                 'created': 'opened',
@@ -138,9 +138,9 @@
 
 {% block jscripts %}
     {{ super() }}
-    <script type="text/javascript" nonce="{{ g.nonce }}">
-      $(document).ready(function() {
-        var $acls_selectize = $('#acls-selectize').selectize({
+<script type="text/javascript" nonce="{{ g.nonce }}">
+$(document).ready(function() {
+  var $acls_selectize = $('#acls-selectize').selectize({
     onInitialize: function(){
       $("#acls-filter-group .selectize-control").on('click', function(event){
         event.stopPropagation();
@@ -149,32 +149,27 @@
         event.stopPropagation();
       })
     }
-    });
+  });
 
-    var acls_selectize_control = $acls_selectize[0].selectize;
+  var acls_selectize_control = $acls_selectize[0].selectize;
 
-    $("#acls-selectize-reset").on('click', function(e){
-      acls_selectize_control.clear();
-    });
+  $("#acls-selectize-reset").on('click', function(e){
+    acls_selectize_control.clear();
+  });
 
-    $("#search_pattern-selectize-reset").on('click', function(e){
-      $('input[name="search_pattern"]').val('');
-    });
-
+  $("#search_pattern-selectize-reset").on('click', function(e){
+    $('input[name="search_pattern"]').val('');
+  });
 
   $( "#filters_form" ).submit(function( event ) {
-
     if ($('select[name="acl"]').val() == ''){
-    $('select[name="acl"]').prop("disabled", true);
+      $('select[name="acl"]').prop("disabled", true);
     }
+    if ($('input[name="search_pattern"]').val() == ''){
+      $('input[name="search_pattern"]').prop("disabled", true);
+    }
+  });
 
-       if ($('input[name="search_pattern"]').val() == ''){
-    $('input[name="search_pattern"]').prop("disabled", true);
-   }
-
-
-    });
-
-      });
-    </script>
+});
+</script>
 {% endblock %}

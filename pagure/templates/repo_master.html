@@ -93,12 +93,12 @@
             {% endif %}
             {% if g.authenticated %}
             <div class="btn-group">
-              <a href="#" class="btn btn-outline-primary btn-sm dropdown-toggle"
+              <a class="btn btn-outline-primary btn-sm dropdown-toggle pointer"
                 data-toggle="dropdown"
                 aria-haspopup="true" aria-expanded="false" id="pr-button">
                 <i class="fa fa-arrow-circle-down fa-fw"></i> Open PR
               </a>
-              <div class="dropdown-menu dropdown-menu-right" id="PR-dropdown" style="min-width:400px">
+              <div class="dropdown-menu dropdown-menu-right pointer" id="PR-dropdown">
                 {% if g.repo_forked %}
                 <span id="pr-dropdown-forklist">
                   <div class="dropdown-header font-size-1">
@@ -181,7 +181,7 @@
           <span>Clone</span>
         </a>
         <div class="dropdown-menu dropdown-menu-right">
-          <div class="m-3" style="width:300px;">
+          <div class="m-3" id="source-dropdown" class="pointer">
             <div>
               <h5><strong>Source Code</strong></h5>
               {% if g.authenticated and g.repo_committer %}
@@ -236,7 +236,7 @@
                 </p>
               </div>
               <p class="text-right">
-                <a href="javascript:void(0)" id="giturl-toggle">
+                <a id="giturl-toggle" class="pointer">
                   Other Git URLs <i class="fa fa-angle-down" aria-hidden="true"></i>
                 </a>
               </p>
@@ -289,10 +289,8 @@
 
 {% block jscripts %}
 {{ super() }}
-<script type="text/javascript"
-    src="{{ url_for('static',
-        filename='vendor/lazyload/lazyload.min.js') }}?version={{ g.version}}">
-</script>
+<script type="text/javascript"  nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='vendor/lazyload/lazyload.min.js') }}?version={{ g.version}}"></script>
 
 <script type="text/javascript" nonce="{{ g.nonce }}">
 window.addEventListener("load", function(event) {

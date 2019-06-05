@@ -109,9 +109,9 @@ Project Options
   </div>
 </div>
 
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+      url_for('static', filename='vendor/jquery/jquery.min.js') }}?version={{ g.version}}"></script>
 
-<script type="text/javascript"
-  src="/static/vendor/jquery/jquery.min.js"></script>
 <script type="text/javascript" nonce="{{ g.nonce }}">
   $(document).ready(function() {
     $('.help_content').hide();

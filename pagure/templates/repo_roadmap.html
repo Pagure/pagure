@@ -91,7 +91,7 @@
                                     <span>only incomplete</span>
                                     {% endif %}
                                 </button>
-                                <div class="dropdown-menu p-4" style="min-width:400px" aria-labelledby="dropdownMenuButton" id="filters-dropdown">
+                                <div class="dropdown-menu p-4" aria-labelledby="dropdownMenuButton" id="filters-dropdown">
                                 <div>
                                     <form id="filters_form" action="{{ url_for('ui_ns.view_roadmap',
                                         username=username,
@@ -232,23 +232,20 @@
                     <div class="col-6">
                         {% if milestones[milestone]['Total'] != 0 %}
                             {% set completed_percentage = (100.0 * (milestones[milestone]['Closed'] / milestones[milestone]['Total'])) %}
-                            <div class="progress"
-                                 style="height:100%"
+                            <div class="progress height-100per"
                                  title="{{completed_percentage|round|int}}% Completed | {{milestones[milestone]['Closed']}} Closed Issues | {{milestones[milestone]['Open']}} Open Issues"
                                  data-toggle="tooltip" data-placement="bottom">
                                 <div class="progress-bar bg-primary"
-                                    role="progressbar"
-                                    style="width:{{completed_percentage|round|int}}%"
+                                    role="progressbar""
+                                    data-width="{{completed_percentage|round|int}}%"
                                     aria-valuenow="{{completed_percentage|round|int}}"
                                     aria-valuemin="0"
                                     aria-valuemax="100">
                                 </div>
                             </div>
                         {% else %}
-                            {% set completed_percentage = 0 %}
-                            <div class="progress" style="height:100%">
-                                <div class="progress-bar progress-bar-striped"
-                                    style="width:100%;background-color:#ccc"
+                            <div class="progress height-100per ">
+                                <div class="progress-bar progress-bar-striped width-100per light_gray_bg"
                                     title="no issues assigned to the {{milestone}} milestone"
                                     data-toggle="tooltip" data-placement="bottom"
                                     role="progressbar"
@@ -278,4 +275,21 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block jscripts %}
+{{ super() }}
+
+<script type="text/javascript" nonce="{{ g.nonce }}">
+
+function update_progress_bar() {
+  $(".progress-bar").each(function(ind, obj) {
+    $(obj).css('width', $(obj).attr('data-width'));
+  });
+}
+
+$(document).ready(function() {
+    update_progress_bar();
+});
+</script>
 {% endblock %}

@@ -17,12 +17,12 @@
 {% set tag = "home" %}
 
 {% block header %}
-<link href="{{ url_for('static', filename='vendor/emojione/emojione.sprites.css') }}?version={{ g.version}}"
-  rel="stylesheet" />
-<link href="{{ url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}?version={{ g.version}}"
-  rel="stylesheet" />
-<link href="{{ url_for('static', filename='vendor/jquery.atwho/jquery.atwho.css') }}?version={{ g.version}}"
-  rel="stylesheet" />
+<link type="text/css" rel="stylesheet" nonce="{{ g.nonce }}" href="{{
+   url_for('static', filename='vendor/emojione/emojione.sprites.css') }}?version={{ g.version}}"/>
+<link type="text/css" rel="stylesheet" nonce="{{ g.nonce }}" href="{{
+  url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}?version={{ g.version}}"/>
+<link type="text/css" rel="stylesheet" nonce="{{ g.nonce }}" href="{{
+  url_for('static', filename='vendor/jquery.atwho/jquery.atwho.css') }}?version={{ g.version}}"/>
 {% endblock %}
 
 {% block repo %}
@@ -85,7 +85,7 @@
   {% endif %}
     <div class="p-b-1">
     Pull from
-          <span class="badge badge-light badge-pill border border-secondary" style="font-size:1em">
+          <span class="badge badge-light badge-pill border border-secondary font-1em">
           {%- if remote_git -%}
             {{ remote_git }}
           {%- else -%}
@@ -104,9 +104,7 @@
           {%- endif -%}
           </span>
           <span class="dropdown dropdown-btn">
-          <a href="javascript:void(0)"
-             class="badge badge-secondary badge-pill border border-secondary dropdown-toggle"
-             style="font-size:1em"
+          <a class="badge badge-secondary badge-pill border border-secondary dropdown-toggle pointer font-1em"
              data-toggle="dropdown">
             <span class="fa fa-random"></span>
             {{ branch_from }}
@@ -114,14 +112,14 @@
           <div class="dropdown-menu">
             {% for br in parent_branches |reverse %}
               {% if br != branch_from %}
-              <a href="javascript:void(0)" class="dropdown-item branch_from_item" data-value="{{br}}"><span class="fa fa-random"></span> {{ br }}</a>
+              <a class="dropdown-item branch_from_item pointer" data-value="{{br}}"><span class="fa fa-random"></span> {{ br }}</a>
               {% endif %}
             {% endfor %}
           </div>
           </span>
       to
       <span>
-      <span class="badge badge-light badge-pill border border-secondary dropdown-toggle" id="family-toggle" style="font-size:1em" data-toggle="dropdown">
+      <span class="badge badge-light badge-pill border border-secondary dropdown-toggle font-1em" id="family-toggle" data-toggle="dropdown">
         {%- if parent.is_fork -%}
           <i class="fa fa-code-fork"></i>&nbsp;
         {%- else -%}
@@ -140,9 +138,7 @@
       </div>
       </span>
       <span class="dropdown dropdown-btn">
-      <a href="javascript:void(0)"
-          class="badge badge-secondary badge-pill border border-secondary dropdown-toggle"
-          style="font-size:1em"
+      <a class="badge badge-secondary badge-pill border border-secondary dropdown-toggle pointer font-1em"
           data-toggle="dropdown">
         <span class="fa fa-random"></span>
         {{ branch_to }}
@@ -150,7 +146,7 @@
       <div class="dropdown-menu">
           {% for branch in g.branches |reverse %}
           {% if branch != branch_to %}
-          <a href="javascript:void(0)" class="dropdown-item branch_to_item" data-value="{{branch}}"><span class="fa fa-random"></span> {{ branch }}</a>
+          <a class="dropdown-item branch_to_item pointer" data-value="{{branch}}"><span class="fa fa-random"></span> {{ branch }}</a>
           {% endif %}
         {% endfor %}
       </div>
@@ -183,10 +179,10 @@
             <div class="col d-flex">
                <ul class="nav nav-tabs ml-auto border-bottom-0">
                   <li class="nav-item">
-                    <a class="nav-link" id="previewinmarkdown" href="javascript:void(0)">Preview</a>
+                    <a class="nav-link pointer" id="previewinmarkdown" >Preview</a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link active" id="editinmarkdown" href="javascript:void(0)">Edit</a>
+                    <a class="nav-link active pointer" id="editinmarkdown" >Edit</a>
                   </li>
                 </ul>
               </div>
@@ -368,23 +364,20 @@
 
 {% block jscripts %}
 {{ super() }}
-<script type="text/javascript"
-    src="{{ url_for('static', filename='vendor/jquery.textcomplete/jquery.textcomplete.min.js') }}?version={{ g.version}}">
-</script>
-<script type="text/javascript"
-    src="{{ url_for('static', filename='vendor/emojione/emojione.min.js') }}?version={{ g.version}}">
-</script>
-<script type="text/javascript"
-    src="{{ url_for('static', filename='emoji/emojicomplete.js') }}?version={{ g.version}}">
-</script>
-<script type="text/javascript"
-    src="{{ url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}"> </script>
-<script type="text/javascript"
-    src="{{ url_for('static', filename='vendor/jquery.caret/jquery.caret.min.js') }}?version={{ g.version}}"></script>
-<script type="text/javascript"
-    src="{{ url_for('static', filename='vendor/jquery.atwho/jquery.atwho.min.js') }}?version={{ g.version}}"></script>
-<script type="text/javascript"
-  src="{{ url_for('static', filename='request_ev.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='vendor/jquery.textcomplete/jquery.textcomplete.min.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='vendor/emojione/emojione.min.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='emoji/emojicomplete.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}"> </script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='vendor/jquery.caret/jquery.caret.min.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='vendor/jquery.atwho/jquery.atwho.min.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='request_ev.js') }}?version={{ g.version}}"></script>
 
 <script type="text/javascript" nonce="{{ g.nonce }}">
 

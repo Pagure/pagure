@@ -12,12 +12,12 @@
 {% set tag = "home" %}
 
 {% block header %}
-<link href="{{ url_for('static', filename='vendor/emojione/emojione.sprites.css') }}?version={{ g.version}}"
-  rel="stylesheet" />
-<link href="{{ url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}?version={{ g.version}}"
-  rel="stylesheet" />
-<link href="{{ url_for('static', filename='vendor/jquery.atwho/jquery.atwho.css') }}?version={{ g.version}}"
-  rel="stylesheet" />
+<link type="text/css" rel="stylesheet" nonce="{{ g.nonce }}" href="{{
+  url_for('static', filename='vendor/emojione/emojione.sprites.css') }}?version={{ g.version}}"/>
+<link type="text/css" rel="stylesheet" nonce="{{ g.nonce }}" href="{{
+  url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}?version={{ g.version}}"/>
+<link type="text/css" rel="stylesheet" nonce="{{ g.nonce }}" href="{{
+  url_for('static', filename='vendor/jquery.atwho/jquery.atwho.css') }}?version={{ g.version}}"/>
 {% endblock %}
 
 {% block repo %}
@@ -85,7 +85,7 @@
         <div class="mt-2">
           <small>
             {% if pull_request.remote_git or pull_request.project_from.is_fork %}
-            <span class="badge badge-light badge-pill border border-secondary" style="font-size:1em">
+            <span class="badge badge-light badge-pill border border-secondary font-1em">
               {% if pull_request.remote_git %}
                 <i class="fa fa-globe"></i>
                 {{pull_request.remote_git}}
@@ -108,8 +108,7 @@
                     namespace=repo.namespace,
                     identifier=pull_request.branch_from)
                   }}"
-                  class="badge badge-secondary badge-pill border border-secondary"
-                  style="font-size:1em">
+                  class="badge badge-secondary badge-pill border border-secondary font-1em">
                 <span class="fa fa-random"></span>
                 {{ pull_request.branch_from }}
               </a>
@@ -121,8 +120,7 @@
                       namespace=repo.namespace,
                       identifier=pull_request.branch)
                       }}"
-                class="badge badge-secondary badge-pill border border-secondary"
-                style="font-size:1em">
+                class="badge badge-secondary badge-pill border border-secondary font-1em">
               <i class="fa fa-random"></i>
             {{ pull_request.branch }}
             </a>
@@ -137,7 +135,7 @@
            {% if pull_request.status == 'Open' and g.authenticated and
               (g.repo_committer or g.fas_user.username == pull_request.user.username) %}
                 {% if mergeform and pull_request.remote %}
-                  <form style="display:inline;" action="{{ url_for(
+                  <form class="inline" action="{{ url_for(
                     'ui_ns.refresh_request_pull',
                     username=repo.user.user if repo.is_fork else None,
                     namespace=repo.namespace,
@@ -150,7 +148,7 @@
                   </form>
                 {% endif %}
 
-              <form style="display:inline;" action="{{ url_for(
+              <form class="inline" action="{{ url_for(
                   'ui_ns.close_request_pull',
                   username=repo.user.user if repo.is_fork else None,
                   namespace=repo.namespace,
@@ -177,7 +175,7 @@
           class="btn btn-outline-secondary btn-sm disabled dropdown-toggle" data-toggle="dropdown">
             <span class="fa fa-circle-o-notch fa-spin fa-fw"></span> <span id="merge-status-text">Merge</span>
           </a>
-          <div id="merge-alert" class="text-xs-center dropdown-menu dropdown-menu-right p-0" style="min-width:400px">
+          <div id="merge-alert" class="text-xs-center dropdown-menu dropdown-menu-right p-0">
              <div class="alert text-center mb-0">
                 {% if pull_request.status == 'Open' and g.repo_committer and pull_request.allow_rebase %}
                 <small id="merge-alert-message"></small>
@@ -432,10 +430,10 @@
           <div class="col">
                   <ul class="nav nav-tabs float-right">
                     <li class="nav-item">
-                      <a class="nav-link" id="previewinmarkdown" href="javascript:void(0)">Preview</a>
+                      <a class="nav-link pointer" id="previewinmarkdown">Preview</a>
                     </li>
                     <li class="nav-item">
-                      <a class="nav-link active" id="editinmarkdown" href="javascript:void(0)">Edit</a>
+                      <a class="nav-link active pointer" id="editinmarkdown">Edit</a>
                     </li>
                   </ul>
                 {% if repo.quick_replies %}
@@ -478,7 +476,7 @@
             </span>
           </a>
         </p>
-        <pre id="local_pull_info" style="display:none">git fetch {{ config.get('GIT_URL_GIT') }}{{ repo.fullname }}.git refs/pull/{{ pull_request.id }}/head:pr{{ pull_request.id }}</pre>
+        <pre id="local_pull_info" class="hidden">git fetch {{ config.get('GIT_URL_GIT') }}{{ repo.fullname }}.git refs/pull/{{ pull_request.id }}/head:pr{{ pull_request.id }}</pre>
       </div>
     {% endif %}
 
@@ -493,8 +491,8 @@
           and (g.repo_user
               or g.fas_user.username == pull_request.user.user) %}
           <div class="ml-auto">
-          <a class="btn btn-outline-primary border-0 btn-sm issue-metadata-display editmetadatatoggle" href="javascript:void(0)"><i class="fa fa-fw fa-pencil"></i></a>
-          <a class="btn btn-outline-secondary border-0 btn-sm issue-metadata-form hidden editmetadatatoggle" href="javascript:void(0)" ><i class="fa fa-fw fa-times"></i></a>
+          <a class="btn btn-outline-primary border-0 btn-sm issue-metadata-display editmetadatatoggle pointer" ><i class="fa fa-fw fa-pencil"></i></a>
+          <a class="btn btn-outline-secondary border-0 btn-sm issue-metadata-form hidden editmetadatatoggle pointer" ><i class="fa fa-fw fa-times"></i></a>
           </div>
         {% endif %}
         </h5>
@@ -529,7 +527,7 @@
                     {{ pull_request.assignee.username }}
                   </a>
                   {% if g.authenticated and (pull_request.assignee.username == g.fas_user.username) %}
-                  &mdash; <a href="javascript:void(0)" id="drop-btn"
+                  &mdash; <a class="pointer" id="drop-btn"
                       title="drop the assignment of this pull-request">
                     Drop
                   </a>
@@ -541,7 +539,7 @@
                   {% if g.authenticated and (g.repo_user or g.fas_user.username == pull_request.user.user) and pull_request.status|lower == 'open'
                     and (not pull_request.assignee or pull_request.assignee.username != g.fas_user.username)
                     and not repo.settings.get('pull_request_tracker_read_only', False) %}
-                    &mdash; <a href="javascript:void(0)" id="take-btn"
+                    &mdash; <a class="pointer" id="take-btn"
                     title="assign this pull_request to you"> Take </a>
                   {% endif %}
                 </div>
@@ -567,8 +565,8 @@
             <h4 id="taglist" class="ml-2">
               {% for tag in pull_request.tags %}
                 <a id="tag-{{ tag.tag }}" title="{{ tag.tag_description }}"
-                  style="background-color:{{ tag.tag_color}}; width:100%; display:block;"
-                  class="badge badge-primary text-left my-1 p-2"
+                  data-bg-color="{{ tag.tag_color }}"
+                  class="badge badge-primary text-left my-1 p-2 badge-tag"
                   href="{{ url_for('ui_ns.request_pulls',
                       repo=repo.name,
                       username=repo.user.user if repo.is_fork else None,
@@ -746,23 +744,20 @@
 
 {% block jscripts %}
 {{ super() }}
-<script type="text/javascript"
-    src="{{ url_for('static', filename='vendor/jquery.textcomplete/jquery.textcomplete.min.js') }}?version={{ g.version}}">
-</script>
-<script type="text/javascript"
-    src="{{ url_for('static', filename='vendor/emojione/emojione.min.js') }}?version={{ g.version}}">
-</script>
-<script type="text/javascript"
-    src="{{ url_for('static', filename='emoji/emojicomplete.js') }}?version={{ g.version}}">
-</script>
-<script type="text/javascript"
-    src="{{ url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}"> </script>
-<script type="text/javascript"
-    src="{{ url_for('static', filename='vendor/jquery.caret/jquery.caret.min.js') }}?version={{ g.version}}"></script>
-<script type="text/javascript"
-    src="{{ url_for('static', filename='vendor/jquery.atwho/jquery.atwho.min.js') }}?version={{ g.version}}"></script>
-<script type="text/javascript"
-  src="{{ url_for('static', filename='request_ev.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='vendor/jquery.textcomplete/jquery.textcomplete.min.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='vendor/emojione/emojione.min.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='emoji/emojicomplete.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}"> </script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='vendor/jquery.caret/jquery.caret.min.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='vendor/jquery.atwho/jquery.atwho.min.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='request_ev.js') }}?version={{ g.version}}"></script>
 
 <script type="text/javascript" nonce="{{ g.nonce }}">
 function cancel_edit_btn() {
@@ -1278,6 +1273,12 @@ function try_async_comment(form, inline) {
 <script type="text/javascript" nonce="{{ g.nonce }}">
 var cur_hash = null;
 
+function color_tags() {
+  $(".badge-tag").each(function(ind, obj) {
+    $(obj).css('background-color', $(obj).attr('data-bg-color'));
+  });
+}
+
 function highlight_comment() {
   var _hash = window.location.hash;
   if (_hash != cur_hash) {
@@ -1339,6 +1340,8 @@ function updateHighlight(onload) {
 }
 
 $(document).ready(function () {
+  color_tags();
+
   {% if g.authenticated and pull_request %}
   function set_up_subcribed() {
     $("#subcribe-btn").click(function(){
@@ -1568,7 +1571,7 @@ function take_issue(){
         + '<a href="{{ url_for("ui_ns.request_pulls", repo=repo.name, username=username, namespace=repo.namespace) }}'
         + '?assignee={{ g.fas_user.username }}">'
         + '{{ g.fas_user.username }}</a>'
-        + ' &mdash; <a href="javascript:void(0)" id="drop-btn" title="drop the assignment of this pull-request">Drop</a></div></div>';
+        + ' &mdash; <a class="pointer" id="drop-btn" title="drop the assignment of this pull-request">Drop</a></div></div>';
       $('#assignee_plain').html(_user_url);
       $('#assignee').val("{{ g.fas_user.username }}");
       setup_btn_take_drop();
@@ -1592,7 +1595,7 @@ function drop_issue(){
   $.post( _url, _data ).done(
     function(data) {
       var _user_url = '<div class="ml-2">\n<span class="text-muted">None</span>'
-        + ' &mdash; <a href="javascript:void(0)" id="take-btn" title="assign this pull-request to you">Take</a></div>';
+        + ' &mdash; <a class="pointer" id="take-btn" title="assign this pull-request to you">Take</a></div>';
       $('#assignee_plain').html(_user_url);
       $('#assignee').val("");
       setup_btn_take_drop();

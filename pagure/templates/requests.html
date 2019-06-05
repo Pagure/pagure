@@ -9,8 +9,8 @@
 {% set tag = "home" %}
 
 {% block header %}
-<link href="{{ url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}"
-  rel="stylesheet" />
+<link type="text/css" rel="stylesheet" nonce="{{ g.nonce }}" href="{{
+  url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}"/>
 {% endblock %}
 
 {% block repo %}
@@ -125,7 +125,7 @@
                       {{ assignee }}
                     {% endif %}
                   </button>
-                  <div class="dropdown-menu p-4" style="min-width:400px" aria-labelledby="dropdownMenuButton" id="filters-dropdown">
+                  <div class="dropdown-menu p-4" aria-labelledby="dropdownMenuButton" id="filters-dropdown">
                     <div>
                       <form id="filters_form" action="{{ url_for('ui_ns.request_pulls',
                             username=username,
@@ -197,7 +197,7 @@
                   <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-flip="false" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fa fa-fw fa-sort"></i> Sort
                   </button>
-                  <div class="dropdown-menu dropdown-menu-right" style="min-width:300px" aria-labelledby="dropdownMenuButton">
+                  <div class="dropdown-menu dropdown-menu-right" id="sort-dropdown" aria-labelledby="dropdownMenuButton">
                     <div class="list-group list-group-flush">
                     {% for filter in filters_list %}
                       <div class="list-group-item pl-1">
@@ -297,8 +297,9 @@
 {% block jscripts %}
 {{ super() }}
 
-<script type="text/javascript"
-  src="{{ url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}"></script>
+
 <script type="text/javascript" nonce="{{ g.nonce }}">
 $(document).ready(function() {
 

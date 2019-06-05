@@ -77,7 +77,8 @@
 {% endmacro %}
 
 {% macro diffcollapsebtn(loop)%}
-  <a href="javascript:void(0)" class="btn btn-sm btn-outline-primary diffhighlightcollapse ml-2" data-toggle="collapse" data-target="#diffhighlight_{{loop.index}}">
+  <a class="btn btn-sm btn-outline-primary diffhighlightcollapse ml-2 pointer"
+    data-toggle="collapse" data-target="#diffhighlight_{{loop.index}}">
     <i class="fa fa-fw fa-caret-up"></i>
   </a>
 {% endmacro %}

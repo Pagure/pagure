@@ -5,8 +5,8 @@
 {% set tag = "home" %}
 
 {% block header %}
-<link href="{{ url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}?version={{ g.version}}"
-  rel="stylesheet" />
+<link type="text/css" rel="stylesheet" nonce="{{ g.nonce }}" href="{{
+  url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}?version={{ g.version}}"/>
 {% endblock %}
 
 
@@ -448,7 +448,7 @@
                             <span class="input-group-text">Push Access</span>
                           </div>
                           {% endif %}
-                          <input class="form-control bg-white" style="font-family:monospace" readonly
+                          <input class="form-control bg-white font-monospace" readonly
                           type="text" value="{{ deploykey.ssh_short_key }}"/>
                         <form class="pull-xs-right" method="POST"
                           action="{{ url_for(
@@ -551,16 +551,16 @@
                                      value="{{ repo.priorities[priority] }}" class="form-control"/>
                             </div>
                             <div class="col-sm-1">
-                              <a href="javascript:void(0)" class="btn btn-outline-danger remove-settings-field-row"><i class="fa fa-trash"></i></a>
+                              <a class="btn btn-outline-danger remove-settings-field-row pointer"><i class="fa fa-trash"></i></a>
                             </div>
                         </div>
                       {% endfor %}
                       </div>
-                      <a href="javascript:void(0)" class="btn btn-outline-primary pt-2 btn-sm btn-block add-settings-field-row" data-target="#priorities-list">
+                      <a class="btn btn-outline-primary pt-2 btn-sm btn-block add-settings-field-row pointer" data-target="#priorities-list">
                           <i class="fa fa-plus"></i> Add new priority
                       </a>
                       {% if not repo.priorities %}
-                      <a href="javascript:void(0)" class="btn btn-outline-secondary btn-sm btn-block" id="default_priorities">
+                      <a class="btn btn-outline-secondary btn-sm btn-block pointer" id="default_priorities">
                           Populate with defaults
                       </a>
                       {% endif %}
@@ -654,7 +654,7 @@
                             </div>
 
                             <div class="col-sm-1">
-                              <a href="javascript:void(0)" class="btn btn-outline-danger remove-settings-field-row"><i class="fa fa-trash"></i></a>
+                              <a class="btn btn-outline-danger remove-settings-field-row pointer"><i class="fa fa-trash"></i></a>
                             </div>
                         </div>
                         {% for status in repo.close_status | sort %}
@@ -665,16 +665,16 @@
                               </div>
 
                               <div class="col-sm-1">
-                                <a href="javascript:void(0)" class="btn btn-outline-danger remove-settings-field-row"><i class="fa fa-trash"></i></a>
+                                <a class="btn btn-outline-danger remove-settings-field-row pointer"><i class="fa fa-trash"></i></a>
                               </div>
                           </div>
                         {% endfor %}
                         </div>
-                        <a href="javascript:void(0)" class="btn btn-outline-primary pt-2 btn-sm btn-block add-settings-field-row" data-target="#status-list">
+                        <a class="btn btn-outline-primary pt-2 btn-sm btn-block add-settings-field-row pointer" data-target="#status-list">
                             <i class="fa fa-plus"></i> Add new close status
                         </a>
                         {% if not repo.close_status %}
-                        <a href="javascript:void(0)" class="btn btn-outline-secondary btn-sm btn-block" id="default_statuses">
+                        <a class="btn btn-outline-secondary btn-sm btn-block pointer" id="default_statuses">
                             Populate with defaults
                         </a>
                         {% endif %}
@@ -747,7 +747,7 @@
                                       <input type="checkbox" name="custom_keys_notify" title="Trigger email notification when updated" class="form-control"/>
                                     </div>
                                     <div class="col-sm-1">
-                                      <a href="javascript:void(0)" class="btn btn-outline-danger remove-settings-field-row"><i class="fa fa-trash"></i></a>
+                                      <a class="btn btn-outline-danger remove-settings-field-row pointer"><i class="fa fa-trash"></i></a>
                                     </div>
                                   </div>
                               {% for field in repo.issue_keys | sort %}
@@ -792,12 +792,12 @@
                                       class="form-control"/>
                                     </div>
                                     <div class="col-sm-1">
-                                      <a href="javascript:void(0)" class="btn btn-outline-danger remove-settings-field-row"><i class="fa fa-trash"></i></a>
+                                      <a class="btn btn-outline-danger remove-settings-field-row pointer"><i class="fa fa-trash"></i></a>
                                     </div>
                             </div>
                           {% endfor %}
                           </div>
-                          <a href="javascript:void(0)" class="btn btn-outline-primary pt-2 btn-sm btn-block add-settings-field-row" data-target="#customfields-list">
+                          <a class="btn btn-outline-primary pt-2 btn-sm btn-block add-settings-field-row pointer" data-target="#customfields-list">
                               <i class="fa fa-plus"></i> Add new custom field
                           </a>
                           <button class="btn btn-primary mt-3 float-right" type="submit"
@@ -876,7 +876,7 @@
                               tags=tag.tag) }}">{% endif %}
                             <span class="fa fa-tag"></span>&nbsp; {{ tag.tag }}
                           {% if g.issues_enabled %}</a>{% endif %}
-                          &nbsp;<span class="badge badge-info" style="background-color:{{tag.tag_color}}">{{tag.tag}}</span>
+                          &nbsp;<span class="badge badge-info" data-bg-color="{{tag.tag_color}}">{{tag.tag}}</span>
                           &nbsp;<span class="text-muted">{{ tag.tag_description or '' }}</span>
                           <div class="float-right">
                           <form class="icon del_icon float-right" method="POST"
@@ -920,7 +920,7 @@
                         </div>
                         <div class="row p-t-1">
                           <div class="col-sm-12">
-                            <a class="btn btn-outline-primary btn-sm btn-block" id="new_tag" href="javascript:void(0)">
+                            <a class="btn btn-outline-primary btn-sm btn-block pointer" id="new_tag">
                                 Add New Tag
                             </a>
                           </div>
@@ -1059,8 +1059,7 @@
                         method="post" class="icon">
                     {{ tag_form.csrf_token }}
                     <input class="form-control" name="user" id="user"
-                      placeholder="Start typing to search users"
-                      value="" style="margin-bottom:1%"/>
+                      placeholder="Start typing to search users" value=""/>
                     <button class="btn btn-danger" type="submit"
                       onclick="return confirm('Are you sure to give {{ repo.fullname }}? \nThis is final and cannot be un-done.');"
                       title="Give the project to someone">
@@ -1126,7 +1125,8 @@
 {% block jscripts %}
 {{ super() }}
 
-<script type="text/javascript" src="{{ url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}"></script>
 
 <script type="text/javascript" nonce="{{ g.nonce }}">
 function updateform() {
@@ -1139,7 +1139,17 @@ function updateform() {
     }
   });
 };
-updateform();
+
+function color_tags() {
+  $(".badge").each(function(ind, obj) {
+    $(obj).css('background-color', $(obj).attr('data-bg-color'));
+  });
+}
+
+$(document).ready(function() {
+    updateform();
+    color_tags();
+});
 </script>
 
 <script type="text/javascript" nonce="{{ g.nonce }}">

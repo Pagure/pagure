@@ -24,11 +24,10 @@
         {% else %}
             {% set completed_percentage = (100.0 * total_closed / (total_closed+total_open)) %}
             <div class="list-group-item p-0">
-                <div class="progress"
-                        style="height:8px">
+                <div class="progress height-8p">
                     <div class="progress-bar bg-primary"
                         role="progressbar"
-                        style="width:{{completed_percentage|round|int}}%"
+                        data-width="{{completed_percentage|round|int}}%"
                         aria-valuenow="{{completed_percentage|round|int}}"
                         aria-valuemin="0"
                         aria-valuemax="100">
@@ -73,4 +72,21 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block jscripts %}
+{{ super() }}
+
+<script type="text/javascript" nonce="{{ g.nonce }}">
+
+function update_progress_bar() {
+  $(".progress-bar").each(function(ind, obj) {
+    $(obj).css('width', $(obj).attr('data-width'));
+  });
+}
+
+$(document).ready(function() {
+    update_progress_bar();
+});
+</script>
 {% endblock %}

@@ -28,8 +28,8 @@
     </div>
     <div class="col-10">
       <section id="stats">
-        <span id="data_stats_spinner" style="display:none;"></span>
-        <span id="data_stats" style="display:none;"></span>
+        <span id="data_stats_spinner hidden"></span>
+        <span id="data_stats hidden"></span>
       </section>
     </div>
   </div>
@@ -37,9 +37,9 @@
 
 {% block jscripts %}
 {{ super() }}
-<script type="text/javascript" src="{{
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
   url_for('static', filename='vendor/d3/d3.v4.min.js') }}?version={{ g.version}}"></script>
-<script type="text/javascript" src="{{
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
   url_for('static', filename='issues_stats.js') }}?version={{ g.version}}"></script>
 
 <script type="text/javascript" nonce="{{ g.nonce }}">

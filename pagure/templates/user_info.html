@@ -6,8 +6,8 @@
 
 
 {% block header %}
-  <link href="{{ url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}?version={{ g.version}}"
-  rel="stylesheet" />
+<link type="text/css" rel="stylesheet" nonce="{{ g.nonce }}" href="{{
+  url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}?version={{ g.version}}"/>
 {% endblock %}
 
 
@@ -67,16 +67,15 @@
 
 {% block jscripts %}
     {{ super() }}
-    <script type="text/javascript" nonce="{{ g.nonce }}">
-      $(function(){
-        $('.show_parts input[type="checkbox"]').change(function(){
-          $('#' + $(this).attr('name')).toggle();
-        });
-      });
-    </script>
-<script src="{{ url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}" type="text/javascript"> </script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}"></script>
+
 <script type="text/javascript" nonce="{{ g.nonce }}">
 $(document).ready(function() {
+  $('.show_parts input[type="checkbox"]').change(function(){
+      $('#' + $(this).attr('name')).toggle();
+    });
+
   $('#headerSearch').on('keypress keydown keyup', function(e) {
     if (e.which == 13) {
         e.preventDefault();

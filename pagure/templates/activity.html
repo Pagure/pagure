@@ -9,10 +9,10 @@
 <div class="list-group" id="messages">
 </div>
 <div class="text-xs-center">
-  <span id="noactivity" style="display:none;">
+  <span id="noactivity" class="hidden;">
     No activity reported on the {{repo.name}} project
   </span>
-  <button class="btn btn-secondary" style="display:none;" id='loadmore'>
+  <button class="btn btn-secondary" class="hidden;" id='loadmore'>
     Load more
   </button>
   <img id="spinnergif" src="{{ url_for('static', filename='images/spinner.gif') }}?version={{ g.version}}">
@@ -72,7 +72,7 @@ function processMessages(item, lastitem) {
       }
     } else {
       $(messagedetail).html("\
-      <div style='background-color:red'>\
+      <div class='alert'>\
         "+item["meta"]["subtitle"]+"\
       </div>");
     }
@@ -143,7 +143,7 @@ function processMessages(item, lastitem) {
          .append(" to "+item["msg"]["issue"]["assignee"]["name"]);
     } else {
       $(messagedetail).html("\
-        <div style='background-color:red'>\
+        <div class='alert'>\
           "+item["meta"]["subtitle"]+"\
         </div>\
         ");
@@ -164,7 +164,7 @@ function processMessages(item, lastitem) {
         </div>");
     } else {
       $("#messages").append("\
-        <div style='background-color:red'>\
+        <div class='alert'>\
           "+item["meta"]["subtitle"]+"\
         </div>");
     }
@@ -202,14 +202,14 @@ function processMessages(item, lastitem) {
       return "GITCOMMIT#"+item["msg"]["commit"]["branch"];
     } else {
       $("#messages").append("\
-      <div style='background-color:red'>\
+      <div class='alert'>\
       "+item["meta"]["subtitle"]+"\
       </div>");
     }
     return "";
   } else {
     $("#messages").append("\
-    <div style='background-color:pink'>\
+    <div class='info'>\
     "+item["meta"]["subtitle"]+"\
     </div>");
     return "";

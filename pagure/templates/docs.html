@@ -11,8 +11,7 @@
         repo=repo.namespace + '.' + repo.name if repo.namespace else repo.name,
         username=username,
         filename=filename) }}"
-    frameborder="0" style="min-height:700px;width:100%"
-    onload="resize_iframe()">
+    frameborder="0" onload="resize_iframe()">
   <p>Your browser does not support iframe, please visit
   <a href="{{ config['DOC_APP_URL'] + url_for('ui_ns.view_repo',
         repo=repo.namespace + '.' + repo.name if repo.namespace else repo.name,

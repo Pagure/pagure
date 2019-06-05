@@ -4,15 +4,16 @@
     repo.namespace + '/' if repo.namespace }}{{ repo.name }} - {{ commitid }}{% endblock %}
 {% set tag = "commit"%}
 {% block header %}
-<link href="{{ url_for('static', filename='vendor/highlight.js/styles/github.css') }}?version={{ g.version}}"
-  rel="stylesheet" />
-<link href="{{ url_for('static', filename='vendor/diff2html/diff2html.css') }}?version={{ g.version}}"
-  rel="stylesheet" />
-  {% if splitview %}
-  <style>
-      .repo-body-container{max-width:100%!important}
-  </style>
-  {% endif %}
+<link rel="stylesheet" nonce="{{ g.nonce }}" href="{{
+  url_for('static', filename='vendor/highlight.js/styles/github.css') }}?version={{ g.version}}"/>
+<link rel="stylesheet" nonce="{{ g.nonce }}" href="{{
+  url_for('static', filename='vendor/diff2html/diff2html.css') }}?version={{ g.version}}"/>
+
+{% if splitview %}
+<style  nonce="{{ g.nonce }}">
+  .repo-body-container{max-width:100%!important}
+</style>
+{% endif %}
 {% endblock %}
 {% block repo %}
 {% set splitted_message = commit.message.split('\n') %}
@@ -486,14 +487,14 @@
 {% block jscripts %}
     {{ super() }}
 
-    <script type="text/javascript"
-      src="{{ url_for('static', filename='vendor/diff2html/diff2html.min.js') }}?version={{ g.version}}"></script>
-    <script type="text/javascript"
-      src="{{ url_for('static', filename='vendor/highlight.js/highlight.pack.js') }}?version={{ g.version}}"></script>
-    <script type="text/javascript"
-      src="{{ url_for('static', filename='vendor/highlight.js/spec.js') }}?version={{ g.version}}"></script>
-    <script type="text/javascript"
-      src="{{ url_for('static', filename='vendor/diff2html/diff2html-ui.min.js') }}?version={{ g.version}}"></script>
+    <script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+      url_for('static', filename='vendor/diff2html/diff2html.min.js') }}?version={{ g.version}}"></script>
+    <script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+      url_for('static', filename='vendor/highlight.js/highlight.pack.js') }}?version={{ g.version}}"></script>
+    <script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+      url_for('static', filename='vendor/highlight.js/spec.js') }}?version={{ g.version}}"></script>
+    <script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+      url_for('static', filename='vendor/diff2html/diff2html-ui.min.js') }}?version={{ g.version}}"></script>
 
     <script type="text/javascript" nonce="{{ g.nonce }}">
       $(document).ready(function() {

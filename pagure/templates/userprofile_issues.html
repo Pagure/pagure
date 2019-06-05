@@ -57,31 +57,31 @@
 {% endblock %}
 
 {% block jscripts %}
-    {{ super() }}
-    <script type="text/javascript" nonce="{{ g.nonce }}">
-      count_issues(status='.issue-status-open');
-      $(function(){
-        $('.issues-tagbar .btn').click(function(){
-          var current_btn = $(this).attr("data-togglebutton");
-          count_issues(status='.'+current_btn);
-          $('.issues-tagbar .btn-primary').addClass("btn-outline-primary");
-          $('.issues-tagbar .btn-primary').removeClass("btn-primary");
-          $(this).removeClass("btn-outline-primary");
-          $(this).addClass("btn-primary");
-          if (current_btn == "issue-status-all"){
-            count_issues(status='');
-            $(".issue-status").show();
-          } else {
-            $(".issue-status").hide();
-            $("."+$(this).attr("data-togglebutton")).show();
-          }
-        });
-      });
-      function count_issues(status='.issue-status-open') {
-        var assigned_issue_count = $(status + '.loop-index-1').length;
-        var opened_issue_count = $(status + '.loop-index-2').length;
-        $('#assigned_issue_count').text(assigned_issue_count);
-        $('#opened_issue_count').text(opened_issue_count);
+{{ super() }}
+<script type="text/javascript" nonce="{{ g.nonce }}">
+  count_issues(status='.issue-status-open');
+  $(function(){
+    $('.issues-tagbar .btn').click(function(){
+      var current_btn = $(this).attr("data-togglebutton");
+      count_issues(status='.'+current_btn);
+      $('.issues-tagbar .btn-primary').addClass("btn-outline-primary");
+      $('.issues-tagbar .btn-primary').removeClass("btn-primary");
+      $(this).removeClass("btn-outline-primary");
+      $(this).addClass("btn-primary");
+      if (current_btn == "issue-status-all"){
+        count_issues(status='');
+        $(".issue-status").show();
+      } else {
+        $(".issue-status").hide();
+        $("."+$(this).attr("data-togglebutton")).show();
       }
-    </script>
+    });
+  });
+  function count_issues(status='.issue-status-open') {
+    var assigned_issue_count = $(status + '.loop-index-1').length;
+    var opened_issue_count = $(status + '.loop-index-2').length;
+    $('#assigned_issue_count').text(assigned_issue_count);
+    $('#opened_issue_count').text(opened_issue_count);
+  }
+</script>
 {% endblock %}

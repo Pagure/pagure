@@ -8,12 +8,12 @@
 {% set tag = "home" %}
 
 {% block header %}
-<link href="{{ url_for('static', filename='vendor/emojione/emojione.sprites.css') }}?version={{ g.version}}"
-  rel="stylesheet" />
-<link href="{{ url_for('static', filename='vendor/jquery.atwho/jquery.atwho.css') }}?version={{ g.version}}"
-  rel="stylesheet" />
-<link href="{{ url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}?version={{ g.version}}"
-  rel="stylesheet" />
+<link type="text/css" rel="stylesheet" nonce="{{ g.nonce }}" href="{{
+  url_for('static', filename='vendor/emojione/emojione.sprites.css') }}?version={{ g.version}}"/>
+<link type="text/css" rel="stylesheet" nonce="{{ g.nonce }}" href="{{
+  url_for('static', filename='vendor/jquery.atwho/jquery.atwho.css') }}?version={{ g.version}}"/>
+<link type="text/css" rel="stylesheet" nonce="{{ g.nonce }}" href="{{
+  url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}?version={{ g.version}}"/>
 {% endblock %}
 
 
@@ -81,10 +81,10 @@
                       <button title="Issue Templates" type="button" class="btn btn-outline-secondary border-0 dropdown-toggle qr-btn" data-toggle="dropdown" aria-expanded="false">
                         <span class="fa fa-list-ul"></span> Types <span class="caret"></span>
                       </button>
-                      <div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; transform: translate3d(-110px, 31px, 0px); top: 0px; left: 0px; will-change: transform;">
+                      <div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" id="issue_templates_dropdown">
                           <div class="dropdown-header">Issue Templates</div>
                           {% for type in types %}
-                          <a href="javascript:void(0)" class="issue-template dropdown-item" data-value="{{type}}">{{type}}</a>
+                          <a class="issue-template dropdown-item pointer" data-value="{{type}}">{{type}}</a>
                         {% endfor %}
 
                       </div>
@@ -97,10 +97,10 @@
                   {% endif %}
                   <ul class="nav nav-tabs {{'ml-auto' if notemplates}} border-bottom-0">
                     <li class="nav-item">
-                      <a class="nav-link" id="previewinmarkdown" href="javascript:void(0)">Preview</a>
+                      <a class="nav-link pointer" id="previewinmarkdown">Preview</a>
                     </li>
                     <li class="nav-item">
-                      <a class="nav-link active" id="editinmarkdown" href="javascript:void(0)">Edit</a>
+                      <a class="nav-link active pointer" id="editinmarkdown">Edit</a>
                     </li>
                   </ul>
                 </div>
@@ -132,8 +132,8 @@
                         Browse to attach images or drag them into the comment field
                       </label>
                     </label>
-                    <div id="progress" class="progress" style="display: none; height:22px">
-                      <div id="progress-bar" class="progress-bar" style="height:22px; line-height: 2em;">0%</div>
+                    <div id="progress" class="progress hidden height-22p">
+                      <div id="progress-bar" class="progress-bar height-22p">0%</div>
                     </div>
                 </div>
               </div>
@@ -204,24 +204,18 @@
 
 {% block jscripts %}
 {{ super() }}
-<script type="text/javascript"
-    src="{{ url_for('static', filename='vendor/jquery.textcomplete/jquery.textcomplete.min.js') }}?version={{ g.version}}">
-</script>
-<script type="text/javascript"
-    src="{{ url_for('static', filename='vendor/emojione/emojione.min.js') }}?version={{ g.version}}">
-</script>
-<script type="text/javascript"
-    src="{{ url_for('static', filename='emoji/emojicomplete.js') }}?version={{ g.version}}">
-</script>
-<script type="text/javascript"
-    src="{{ url_for('static', filename='vendor/jquery.caret/jquery.caret.min.js') }}?version={{ g.version}}">
-</script>
-<script type="text/javascript"
-    src="{{ url_for('static', filename='vendor/jquery.atwho/jquery.atwho.min.js') }}?version={{ g.version}}">
-</script>
-<script type="text/javascript"
-    src="{{ url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}">
-</script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='vendor/jquery.textcomplete/jquery.textcomplete.min.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='vendor/emojione/emojione.min.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='emoji/emojicomplete.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='vendor/jquery.caret/jquery.caret.min.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='vendor/jquery.atwho/jquery.atwho.min.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}"></script>
 
 <script type="text/javascript" nonce="{{ g.nonce }}">
 {% if g.authenticated and form %}

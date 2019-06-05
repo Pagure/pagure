@@ -15,7 +15,7 @@
         Create new API Key
       </a>
       <div class="btn-group">
-        <a href="javascript:void(0)" method="post" class="btn btn-sm btn-outline-primary"
+        <a method="post" class="btn btn-sm btn-outline-primary class"
           title="Show old API token" id="show_old_keys">
           Show old API Keys
         </a>
@@ -83,7 +83,7 @@
                 </div>
               </div>
 
-              <input class="form-control bg-white" style="font-family:monospace" type="text" value="{{ token.id }}" readonly>
+              <input class="form-control bg-white font-monospace" type="text" value="{{ token.id }}" readonly>
               {% if token.expired %}
                 <span class="input-group-prepend">
                   <span class="input-group-text text-danger">
