@@ -152,7 +152,7 @@
     </div>
 
     {% autoescape false %}
-    {{ content | blame_loc(repo, username, blame) | noJS | safe }}
+    {{ content | blame_loc(repo, username, blame) }}
     {% endautoescape %}
   </div>
 {% else %}

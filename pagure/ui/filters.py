@@ -476,7 +476,7 @@ def blame_loc(loc, repo, username, blame):
             )
         )
         output.append(
-            '<td class="cell2"><pre><code>%s</code></pre></td>' % line
+            '<td class="cell2"><pre><code>%s</code></pre></td>' % no_js(line)
         )
         output.append("</tr>")
 
