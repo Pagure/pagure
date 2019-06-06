@@ -462,9 +462,9 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             # the user can do the following things
             # edit metadata
             self.assertIn(
-                '<a class="btn btn-outline-primary border-0 btn-sm issue-metadata-display'
-                ' editmetadatatoggle" href="javascript:void(0)" style="display: inline-block;">'
-                '<i class="fa fa-fw fa-pencil">',
+                '<a class="btn btn-outline-primary border-0 btn-sm '
+                'issue-metadata-display editmetadatatoggle pointer inline-block'
+                '"><i class="fa fa-fw fa-pencil"></i></a>',
                 output_text,
             )
 
@@ -707,7 +707,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
 
             # the user can delete the ticket
             self.assertIn(
-                '<a class="dropdown-item text-danger" href="javascript:void(0)" id="closeticket"\n'
+                '<a class="dropdown-item text-danger pointer" id="closeticket"\n'
                 '                title="Delete this ticket">\n',
                 output_text,
             )
@@ -717,9 +717,9 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             # the user can do the following things
             # edit metadata
             self.assertIn(
-                '<a class="btn btn-outline-primary border-0 btn-sm issue-metadata-display'
-                ' editmetadatatoggle" href="javascript:void(0)" style="display: inline-block;">'
-                '<i class="fa fa-fw fa-pencil">',
+                '<a class="btn btn-outline-primary border-0 btn-sm '
+                'issue-metadata-display editmetadatatoggle pointer inline-block'
+                '"><i class="fa fa-fw fa-pencil"></i></a>',
                 output_text,
             )
 
@@ -958,7 +958,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 output_text,
             )
             self.assertIn(
-                '<a class="dropdown-item text-danger" href="javascript:void(0)" id="closeticket"\n'
+                '<a class="dropdown-item text-danger pointer" id="closeticket"\n'
                 '                title="Delete this ticket">\n',
                 output_text,
             )
@@ -967,10 +967,11 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
 
             # the user can do the following things
             # edit metadata
+
             self.assertIn(
-                '<a class="btn btn-outline-primary border-0 btn-sm issue-metadata-display'
-                ' editmetadatatoggle" href="javascript:void(0)" style="display: inline-block;">'
-                '<i class="fa fa-fw fa-pencil">',
+                '<a class="btn btn-outline-primary border-0 btn-sm '
+                'issue-metadata-display editmetadatatoggle pointer inline-block'
+                '"><i class="fa fa-fw fa-pencil"></i></a>',
                 output_text,
             )
 

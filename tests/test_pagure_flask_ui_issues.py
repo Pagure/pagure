@@ -842,7 +842,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertIn('title="2 Open Issues | 1 Closed Issues', output_text)
         self.assertIn(
             'bg-success" role="progressbar"\n'
-            '                   style="width:67%"\n',
+            '                   data-width="67%"\n',
             output_text,
         )
 
@@ -858,7 +858,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertIn('title="2 Open Issues | 1 Closed Issues"', output_text)
         self.assertIn(
             'bg-danger" role="progressbar"\n'
-            '                   style="width:33%"\n',
+            '                   data-width="33%"\n',
             output_text,
         )
 
@@ -1344,7 +1344,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output_text,
             )
             self.assertNotIn(
-                '<a class="dropdown-item text-danger" href="javascript:void(0)" id="closeticket"\n'
+                '<a class="dropdown-item text-danger pointer" id="closeticket"\n'
                 '                title="Delete this ticket">\n',
                 output_text,
             )
@@ -1356,7 +1356,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertNotIn("function take_issue(){", output_text)
             self.assertNotIn("function drop_issue(){", output_text)
             self.assertNotIn(
-                '<a href="javascript:void(0)" id="take-btn"\n', output_text
+                '<a class="pointer" id="take-btn"\n', output_text
             )
 
         user.username = "pingou"
@@ -1370,7 +1370,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output_text,
             )
             self.assertIn(
-                '<a class="dropdown-item text-danger" href="javascript:void(0)" id="closeticket"\n'
+                '<a class="dropdown-item text-danger pointer" id="closeticket"\n'
                 '                title="Delete this ticket">\n',
                 output_text,
             )
@@ -1508,7 +1508,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertIn("function take_issue(){", output_text)
             self.assertIn("function drop_issue(){", output_text)
             self.assertIn(
-                '<a href="javascript:void(0)" id="take-btn"\n', output_text
+                '<a class="pointer" id="take-btn"\n', output_text
             )
 
     @patch("pagure.lib.git.update_git")
@@ -1575,7 +1575,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output_text,
             )
             self.assertNotIn(
-                '<a class="dropdown-item text-danger" href="javascript:void(0)" id="closeticket"\n'
+                '<a class="dropdown-item text-danger pointer" id="closeticket"\n'
                 '                title="Delete this ticket">\n',
                 output_text,
             )
@@ -1587,7 +1587,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertIn("function take_issue(){", output_text)
             self.assertIn("function drop_issue(){", output_text)
             self.assertIn(
-                '<a href="javascript:void(0)" id="take-btn"\n', output_text
+                '<a class="pointer" id="take-btn"\n', output_text
             )
 
     @patch("pagure.lib.git.update_git")
@@ -1651,7 +1651,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output_text,
             )
             self.assertNotIn(
-                '<a class="dropdown-item text-danger" href="javascript:void(0)" id="closeticket"\n'
+                '<a class="dropdown-item text-danger pointer" id="closeticket"\n'
                 '                title="Delete this ticket">\n',
                 output_text,
             )
@@ -1659,7 +1659,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertNotIn("function take_issue(){", output_text)
             self.assertNotIn("function drop_issue(){", output_text)
             self.assertNotIn(
-                '<a href="javascript:void(0)" id="take-btn"\n', output_text
+                '<a class="pointer" id="take-btn"\n', output_text
             )
 
             # user no ACLs = no metadata form
@@ -1690,7 +1690,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output_text,
             )
             self.assertNotIn(
-                '<a class="dropdown-item text-danger" href="javascript:void(0)" id="closeticket"\n'
+                '<a class="dropdown-item text-danger pointer" id="closeticket"\n'
                 '                title="Delete this ticket">\n',
                 output_text,
             )
@@ -1702,7 +1702,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertIn("function take_issue(){", output_text)
             self.assertIn("function drop_issue(){", output_text)
             self.assertIn(
-                '<a href="javascript:void(0)" id="take-btn"\n', output_text
+                '<a class="pointer" id="take-btn"\n', output_text
             )
 
             # user has ticket == Sees the metadata
@@ -3764,9 +3764,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertIn("<title>test - Pagure</title>", output_text)
             self.assertTrue('<div id="edit">' in output_text)
             self.assertTrue('<section class="edit_comment">' in output_text)
-            self.assertTrue(
-                '<textarea class="form-control" id="update_comment"'
-                in output_text
+            self.assertIn(
+                '<textarea class="form-control width-100per" id="update_comment"',
+                output_text
             )
 
             csrf_token = self.get_csrf(output=output)
@@ -3838,7 +3838,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertIn("Comment added", output_text)
             self.assertNotIn(
                 '<a class="btn btn-outline-primary border-0 btn-sm issue-metadata-display'
-                ' editmetadatatoggle" href="javascript:void(0)" style="display: inline-block;">'
+                ' editmetadatatoggle pointer inline-block">'
                 '<i class="fa fa-fw fa-pencil">',
                 output_text,
             )
@@ -3865,7 +3865,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             )
             self.assertIn(
                 '<a class="btn btn-outline-primary border-0 btn-sm issue-metadata-display'
-                ' editmetadatatoggle" href="javascript:void(0)" style="display: inline-block;">'
+                ' editmetadatatoggle pointer inline-block">'
                 '<i class="fa fa-fw fa-pencil">',
                 output_text,
             )
@@ -3989,7 +3989,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             )
             self.assertIn(
                 '<span class="badge badge-info" '
-                'style="background-color:#00ff00">green</span>\n'
+                'data-bg-color="#00ff00">green</span>\n'
                 "                          &nbsp;"
                 '<span class="text-muted">sample description</span>',
                 output_text,
@@ -3999,7 +3999,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             )
             self.assertIn(
                 '<span class="badge badge-info" '
-                'style="background-color:#ff0000">red1</span>\n'
+                'data-bg-color="#ff0000">red1</span>\n'
                 "                          &nbsp;"
                 '<span class="text-muted">lorem ipsum</span>',
                 output_text,
@@ -4224,7 +4224,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             )
             self.assertIn(
                 '<span class="badge badge-info" '
-                'style="background-color:#003cff">blue</span>\n'
+                'data-bg-color="#003cff">blue</span>\n'
                 "                          &nbsp;"
                 '<span class="text-muted"></span>',
                 output_text,
@@ -4234,7 +4234,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             )
             self.assertIn(
                 '<span class="badge badge-info" '
-                'style="background-color:#ff0000">red</span>\n'
+                'data-bg-color="#ff0000">red</span>\n'
                 "                          &nbsp;"
                 '<span class="text-muted">lorem ipsum</span>',
                 output_text,
@@ -4260,7 +4260,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             )
             self.assertIn(
                 '<span class="badge badge-info" '
-                'style="background-color:#00ff00">green</span>\n'
+                'data-bg-color="#00ff00">green</span>\n'
                 "                          &nbsp;"
                 '<span class="text-muted">sample description</span>',
                 output_text,
@@ -4270,7 +4270,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             )
             self.assertIn(
                 '<span class="badge badge-info" '
-                'style="background-color:#ff0000">red1</span>\n'
+                'data-bg-color="#ff0000">red1</span>\n'
                 "                          &nbsp;"
                 '<span class="text-muted">lorem ipsum</span>',
                 output_text,
@@ -4296,7 +4296,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             )
             self.assertIn(
                 '<span class="badge badge-info" '
-                'style="background-color:#ff0000">red2</span>\n'
+                'data-bg-color="#ff0000">red2</span>\n'
                 "                          &nbsp;"
                 '<span class="text-muted"></span>',
                 output_text,
@@ -4306,7 +4306,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             )
             self.assertIn(
                 '<span class="badge badge-info" '
-                'style="background-color:#ff0000">red3</span>\n'
+                'data-bg-color="#ff0000">red3</span>\n'
                 "                          &nbsp;"
                 '<span class="text-muted"></span>',
                 output_text,
@@ -4332,7 +4332,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             )
             self.assertIn(
                 '<span class="badge badge-info" '
-                'style="background-color:#ff0000">red2</span>\n'
+                'data-bg-color="#ff0000">red2</span>\n'
                 "                          &nbsp;"
                 '<span class="text-muted"></span>',
                 output_text,
@@ -4342,7 +4342,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             )
             self.assertIn(
                 '<span class="badge badge-info" '
-                'style="background-color:#ff0000">red3</span>\n'
+                'data-bg-color="#ff0000">red3</span>\n'
                 "                          &nbsp;"
                 '<span class="text-muted"></span>',
                 output_text,
@@ -4413,7 +4413,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             )
             self.assertIn(
                 '<span class="badge badge-info" '
-                'style="background-color:#000">is:red2</span>\n'
+                'data-bg-color="#000">is:red2</span>\n'
                 "                          &nbsp;"
                 '<span class="text-muted"></span>',
                 output_text,
@@ -4595,8 +4595,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.get("/ns/test3/issue/1")
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<a class="btn btn-outline-primary comment_and_close_action" '
-                'data-value="" href="javascript:void(0)">\n'
+                '<a class="btn btn-outline-primary comment_and_close_action pointer" '
+                'data-value="">\n'
                 "                        Comment &amp; Close\n",
                 output.get_data(as_text=True),
             )

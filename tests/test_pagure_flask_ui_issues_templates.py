@@ -155,15 +155,15 @@ class PagureFlaskIssuesTemplatetests(tests.Modeltests):
             )
             self.assertIn("Issue Templates", output_text)
             self.assertIn(
-                '<a href="javascript:void(0)" class="issue-template dropdown-item" data-value="RFE">RFE</a>',
+                '<a class="issue-template dropdown-item pointer" data-value="RFE">RFE</a>',
                 output_text,
             )
             self.assertIn(
-                '<a href="javascript:void(0)" class="issue-template dropdown-item" data-value="2018-bid">2018-bid</a>',
+                '<a class="issue-template dropdown-item pointer" data-value="2018-bid">2018-bid</a>',
                 output_text,
             )
             self.assertIn(
-                '<a href="javascript:void(0)" class="issue-template dropdown-item" data-value="default">default</a>',
+                '<a class="issue-template dropdown-item pointer" data-value="default">default</a>',
                 output_text,
             )
             self.assertIn(
@@ -186,15 +186,15 @@ class PagureFlaskIssuesTemplatetests(tests.Modeltests):
             )
             self.assertIn("Issue Templates", output_text)
             self.assertIn(
-                '<a href="javascript:void(0)" class="issue-template dropdown-item" data-value="RFE">RFE</a>',
+                '<a class="issue-template dropdown-item pointer" data-value="RFE">RFE</a>',
                 output_text,
             )
             self.assertIn(
-                '<a href="javascript:void(0)" class="issue-template dropdown-item" data-value="2018-bid">2018-bid</a>',
+                '<a class="issue-template dropdown-item pointer" data-value="2018-bid">2018-bid</a>',
                 output_text,
             )
             self.assertIn(
-                '<a href="javascript:void(0)" class="issue-template dropdown-item" data-value="default">default</a>',
+                '<a class="issue-template dropdown-item pointer" data-value="default">default</a>',
                 output_text,
             )
             self.assertIn(

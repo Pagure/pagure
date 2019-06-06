@@ -242,7 +242,7 @@ class PagureFlaskIssuesOpenAccesstests(tests.Modeltests):
             self.assertIn("function take_issue(){", output_text)
             self.assertNotIn("function drop_issue(){", output_text)
             self.assertIn(
-                '<a href="javascript:void(0)" id="take-btn"\n', output_text
+                '<a class="pointer" id="take-btn"\n', output_text
             )
 
             csrf_token = self.get_csrf(output=output)
@@ -353,7 +353,7 @@ class PagureFlaskIssuesOpenAccesstests(tests.Modeltests):
             self.assertIn("function take_issue(){", output_text)
             self.assertIn("function drop_issue(){", output_text)
             self.assertIn(
-                '<a href="javascript:void(0)" id="take-btn"\n', output_text
+                '<a class="pointer" id="take-btn"\n', output_text
             )
 
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
@@ -416,7 +416,7 @@ class PagureFlaskIssuesOpenAccesstests(tests.Modeltests):
             self.assertIn("function take_issue(){", output_text)
             self.assertNotIn("function drop_issue(){", output_text)
             self.assertIn(
-                '<a href="javascript:void(0)" id="take-btn"\n', output_text
+                '<a class="pointer" id="take-btn"\n', output_text
             )
 
             # user no ACLs = no metadata form
@@ -459,7 +459,7 @@ class PagureFlaskIssuesOpenAccesstests(tests.Modeltests):
             self.assertIn("function take_issue(){", output_text)
             self.assertIn("function drop_issue(){", output_text)
             self.assertIn(
-                '<a href="javascript:void(0)" id="take-btn"\n', output_text
+                '<a class="pointer" id="take-btn"\n', output_text
             )
 
             # user has ticket == Sees the metadata
@@ -1157,9 +1157,9 @@ class PagureFlaskIssuesOpenAccesstests(tests.Modeltests):
             self.assertIn("<title>test - Pagure</title>", output_text)
             self.assertTrue('<div id="edit">' in output_text)
             self.assertTrue('<section class="edit_comment">' in output_text)
-            self.assertTrue(
-                '<textarea class="form-control" id="update_comment"'
-                in output_text
+            self.assertIn(
+                '<textarea class="form-control width-100per" id="update_comment"',
+                output_text
             )
 
             csrf_token = self.get_csrf(output=output)
@@ -1230,9 +1230,9 @@ class PagureFlaskIssuesOpenAccesstests(tests.Modeltests):
             self.assertNotIn("Successfully edited issue #1\n", output_text)
             self.assertIn("Comment added", output_text)
             self.assertIn(
-                '<a class="btn btn-outline-primary border-0 btn-sm issue-metadata-display'
-                ' editmetadatatoggle" href="javascript:void(0)" style="display: inline-block;">'
-                '<i class="fa fa-fw fa-pencil">',
+                '<a class="btn btn-outline-primary border-0 btn-sm '
+                'issue-metadata-display editmetadatatoggle pointer inline-block'
+                '"><i class="fa fa-fw fa-pencil"></i></a>',
                 output_text,
             )
 
@@ -1257,9 +1257,9 @@ class PagureFlaskIssuesOpenAccesstests(tests.Modeltests):
                 "Issue status updated to: Closed (was: Open)", output_text
             )
             self.assertIn(
-                '<a class="btn btn-outline-primary border-0 btn-sm issue-metadata-display'
-                ' editmetadatatoggle" href="javascript:void(0)" style="display: inline-block;">'
-                '<i class="fa fa-fw fa-pencil">',
+                '<a class="btn btn-outline-primary border-0 btn-sm '
+                'issue-metadata-display editmetadatatoggle pointer inline-block'
+                '"><i class="fa fa-fw fa-pencil"></i></a>',
                 output_text,
             )
 

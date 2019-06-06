@@ -2352,7 +2352,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 2,
             )
             self.assertIn(
-                '<a href="javascript:void(0)">1 more commits...', output_text
+                '<a class="pointer">1 more commits...', output_text
             )
             self.assertIn(
                 'title="View file as of 4829cf">Šource</a>', output_text
@@ -2386,7 +2386,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 output_text,
             )
             self.assertIn(
-                '<a href="javascript:void(0)">1 more commits...', output_text
+                '<a class="pointer">1 more commits...', output_text
             )
             self.assertIn(
                 'title="View file as of 000000">Šource</a>', output_text
