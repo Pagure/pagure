@@ -252,6 +252,7 @@ By default pagure provides the following backends:
 - `test_auth`: simple debugging backend printing and returning the string ``Called GitAuthTestHelper.generate_acls()``
 - `gitolite2`: allows deploying pagure on the top of gitolite 2
 - `gitolite3`: allows deploying pagure on the top of gitolite 3
+- `pagure`: Pagure git auth implementation (using keyhelper.py and aclchecker.py)
 
 Defaults to: ``gitolite3``
 
