@@ -534,12 +534,12 @@ def view_issues(repo, username=None, namespace=None):
 
     if "content" in extra_fields:
         extra_fields["search_content"] = extra_fields["content"]
-        del (extra_fields["content"])
+        del extra_fields["content"]
 
     for field in fields:
         if field in extra_fields:
             fields[field] = extra_fields[field]
-            del (extra_fields[field])
+            del extra_fields[field]
 
     custom_search.update(extra_fields)
 
@@ -563,7 +563,7 @@ def view_issues(repo, username=None, namespace=None):
     )
 
     status = fields["status"]
-    del (fields["status"])
+    del fields["status"]
 
     if status.lower() in ["all"]:
         status = None

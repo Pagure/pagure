@@ -1186,7 +1186,7 @@ def pull_request_ready_branch(self, session, namespace, name, user):
                 pr.project.url_path,
                 pr.id,
             )
-            del (branches[pr.branch_from])
+            del branches[pr.branch_from]
     return {"new_branch": branches, "branch_w_pr": branches_pr}
 
 

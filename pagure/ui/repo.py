@@ -2961,7 +2961,7 @@ def delete_report(repo, username=None, namespace=None):
         if report not in reports:
             flask.flash("Unknown report: %s" % report, "error")
         else:
-            del (reports[report])
+            del reports[report]
             repo.reports = reports
             try:
                 flask.g.session.add(repo)
