@@ -18,6 +18,7 @@ import subprocess  # noqa
 import sys  # noqa
 import unittest  # noqa
 
+import pygit2
 import munch  # noqa
 from mock import patch, MagicMock  # noqa
 from six import StringIO  # noqa
@@ -1813,6 +1814,164 @@ class PagureAdminDeleteProjectTests(tests.Modeltests):
         # After
         projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 1)
+
+
+class PagureCreateBranchTests(tests.Modeltests):
+    """ Tests for pagure-admin create-branch """
+
+    populate_db = True
+
+    def setUp(self):
+        """ Set up the environnment, ran before every tests. """
+        super(PagureCreateBranchTests, self).setUp()
+
+        # Create a couple of projects
+        tests.create_projects(self.session)
+        # Create their git repo
+        tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
+
+        # Make the imported pagure use the correct db session
+        pagure.cli.admin.session = self.session
+
+    def test_create_branch_unknown_project(self):
+        """ Test the read-only function of pagure-admin on an unknown
+        project.
+        """
+
+        args = munch.Munch(
+            {
+                "project": "foob",
+                "user": None,
+                "new_branch": "new_branch",
+                "from_branch": "master",
+                "from_commit": None,
+                "action_user": "pingou",
+            }
+        )
+        with self.assertRaises(pagure.exceptions.PagureException) as cm:
+            pagure.cli.admin.do_create_branch(args)
+        self.assertEqual(
+            cm.exception.args[0], "No project found with: foob, user: None"
+        )
+
+    def test_create_branch_invalid_project(self):
+        """ Test the read-only function of pagure-admin on an invalid
+        project.
+        """
+
+        args = munch.Munch(
+            {
+                "project": "f/o/o/b",
+                "user": None,
+                "new_branch": "new_branch",
+                "from_branch": "master",
+                "from_commit": None,
+                "action_user": "pingou",
+            }
+        )
+        with self.assertRaises(pagure.exceptions.PagureException) as cm:
+            pagure.cli.admin.do_create_branch(args)
+        self.assertEqual(
+            cm.exception.args[0],
+            'Invalid project name, has more than one "/": f/o/o/b',
+        )
+
+    def test_create_branch_commit_and_branch_from(self):
+        """ Test the read-only function of pagure-admin to get status of
+        a non-namespaced project.
+        """
+
+        args = munch.Munch(
+            {
+                "project": "test",
+                "user": None,
+                "new_branch": "new_branch",
+                "from_branch": "master",
+                "from_commit": "foobar",
+                "action_user": "pingou",
+            }
+        )
+        with self.assertRaises(pagure.exceptions.PagureException) as cm:
+            pagure.cli.admin.do_create_branch(args)
+        self.assertEqual(
+            cm.exception.args[0],
+            "You must create the branch from something, either a commit "
+            "or another branch, not from both",
+        )
+
+    def test_create_branch_no_branch_from(self):
+        """ Test the read-only function of pagure-admin to get status of
+        a non-namespaced project.
+        """
+
+        args = munch.Munch(
+            {
+                "project": "test",
+                "user": None,
+                "new_branch": "new_branch",
+                "from_branch": "master",
+                "from_commit": None,
+                "action_user": "pingou",
+            }
+        )
+        with self.assertRaises(pagure.exceptions.PagureException) as cm:
+            pagure.cli.admin.do_create_branch(args)
+        self.assertEqual(
+            cm.exception.args[0], 'The "master" branch does not exist'
+        )
+
+    def test_create_branch_no_commit_from(self):
+        """ Test the read-only function of pagure-admin to get status of
+        a non-namespaced project.
+        """
+
+        args = munch.Munch(
+            {
+                "project": "test",
+                "user": None,
+                "new_branch": "new_branch",
+                "from_branch": None,
+                "from_commit": "foobar",
+                "action_user": "pingou",
+            }
+        )
+        with self.assertRaises(pagure.exceptions.PagureException) as cm:
+            pagure.cli.admin.do_create_branch(args)
+        self.assertEqual(
+            cm.exception.args[0], "No commit foobar found from which to branch"
+        )
+
+    def test_create_branch_from_branch(self):
+        """ Test the do_create_admin_token function of pagure-admin. """
+
+        gitrepo_path = os.path.join(self.path, "repos", "test.git")
+        tests.add_content_git_repo(gitrepo_path)
+
+        # Check branch before:
+        gitrepo = pygit2.Repository(gitrepo_path)
+        self.assertEqual(gitrepo.listall_branches(), ["master"])
+
+        args = munch.Munch(
+            {
+                "project": "test",
+                "user": None,
+                "new_branch": "new_branch",
+                "from_branch": "master",
+                "from_commit": None,
+                "action_user": "pingou",
+            }
+        )
+
+        with tests.capture_output() as output:
+            pagure.cli.admin.do_create_branch(args)
+        output = output.getvalue()
+        self.assertEqual("Branch created\n", output)
+
+        # Check branch after:
+        gitrepo = pygit2.Repository(gitrepo_path)
+        self.assertEqual(
+            sorted(gitrepo.listall_branches()), ["master", "new_branch"]
+        )
 
 
 if __name__ == "__main__":

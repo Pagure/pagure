@@ -422,6 +422,46 @@ def _parser_delete_project(subparser):
     local_parser.set_defaults(func=do_delete_project)
 
 
+def _parser_create_branch(subparser):
+    """ Set up the CLI argument parser for the create-branch action.
+
+    :arg subparser: an argparse subparser allowing to have action's specific
+        arguments
+
+     """
+    local_parser = subparser.add_parser(
+        "create-branch",
+        help="Create the specified branch in the specified project",
+    )
+    local_parser.add_argument(
+        "--user", help="User of the project (to use only on forks)"
+    )
+    local_parser.add_argument(
+        "project",
+        help="Project to update (as namespace/project if there "
+        "is a namespace)",
+    )
+    local_parser.add_argument(
+        "--from-branch",
+        default=None,
+        help="Name of the branch on which to base the new one",
+    )
+    local_parser.add_argument(
+        "--from-commit",
+        default=None,
+        help="Commit on which to base the new branch",
+    )
+    local_parser.add_argument(
+        "new_branch", help="Name of the new branch to create"
+    )
+    local_parser.add_argument(
+        "action_user",
+        help="Username of the user doing the action (ie: creating the "
+        "branch)",
+    )
+    local_parser.set_defaults(func=do_create_branch)
+
+
 def parse_arguments(args=None):
     """ Set-up the argument parsing. """
     parser = argparse.ArgumentParser(
@@ -479,6 +519,9 @@ def parse_arguments(args=None):
 
     # delete-project
     _parser_delete_project(subparser)
+
+    # create-branch
+    _parser_create_branch(subparser)
 
     return parser.parse_args(args)
 
@@ -1120,6 +1163,60 @@ def do_ensure_project_hooks(args):
             project, project.repospanner_region, hook=args.hook
         )
     return projects
+
+
+def do_create_branch(args):
+    """ Creates the specified git branch
+
+    Args:
+        args (argparse.Namespace): Parsed arguments
+    """
+    _log.debug("project:         %s", args.project)
+    _log.debug("user:            %s", args.user)
+    _log.debug("new branch:      %s", args.new_branch)
+    _log.debug("from branch:     %s", args.from_branch)
+    _log.debug("from commit:     %s", args.from_commit)
+    _log.debug("user creating:   %s", args.action_user)
+
+    if not args.from_branch and not args.from_commit:
+        raise pagure.exceptions.PagureException(
+            "You must create the branch from something, either a commit "
+            "or another branch"
+        )
+    if args.from_branch and args.from_commit:
+        raise pagure.exceptions.PagureException(
+            "You must create the branch from something, either a commit "
+            "or another branch, not from both"
+        )
+
+    # Validate users
+    pagure.lib.query.get_user(session, args.action_user)
+
+    # Get the project
+    project = _get_project(args.project, user=args.user)
+
+    if project is None:
+        raise pagure.exceptions.PagureException(
+            "No project found with: %s, user: %s" % (args.project, args.user)
+        )
+
+    try:
+        pagure.lib.git.new_git_branch(
+            args.action_user,
+            project,
+            args.new_branch,
+            from_branch=args.from_branch,
+            from_commit=args.from_commit,
+        )
+    except ValueError:
+        if args.from_commit:
+            raise pagure.exceptions.PagureException(
+                "No commit %s found from which to branch" % (args.from_commit)
+            )
+        else:  # pragma: no-cover
+            raise
+
+    print("Branch created")
 
 
 def main():
