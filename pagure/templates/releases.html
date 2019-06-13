@@ -30,7 +30,7 @@
 
 {% if config.get('UPLOAD_FOLDER_PATH') and config.get('UPLOAD_FOLDER_URL') %}
 <p>
-  If the developers have upload one or more tarball(s), you will be able to
+  If the developers have uploaded one or more tarball(s), you will be able to
   find them in the <a href="{{ config['UPLOAD_FOLDER_URL'] + repo.fullname }}">
     release folder.
   </a>
@@ -38,7 +38,7 @@
 {% if pagure_checksum %}
 <p>
   The <a href="{{ config['UPLOAD_FOLDER_URL'] + repo.fullname }}/CHECKSUMS">CHECKSUMS</a>
-  file contains the checksums (sha256 and sha512) of the files uploaded to
+  file contains the checksums (SHA256 and SHA512) of the files uploaded to
   pagure.
 </p>
 <p>
