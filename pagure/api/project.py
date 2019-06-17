@@ -271,6 +271,17 @@ def api_git_branches(repo, username=None, namespace=None):
         GET /api/0/fork/<username>/<repo>/git/branches
         GET /api/0/fork/<username>/<namespace>/<repo>/git/branches
 
+    Parameters
+    ^^^^^^^^^^
+
+    +-----------------+----------+---------------+--------------------------+
+    | Key             | Type     | Optionality   | Description              |
+    +=================+==========+===============+==========================+
+    | ``with_commits``| string   | Optional      | | Include the commit hash|
+    |                 |          |               |   corresponding to the   |
+    |                 |          |               |   HEAD of each branch    |
+    +-----------------+----------+---------------+--------------------------+
+
     Sample response
     ^^^^^^^^^^^^^^^
 
@@ -281,10 +292,23 @@ def api_git_branches(repo, username=None, namespace=None):
           "branches": ["master", "dev"]
         }
 
+        {
+          "total_branches": 2,
+          "branches": {
+            "master": "16ae2a4df107658b52750063ae203f978cf02ff7",
+            "dev": "8351c460167a41defc393f5b6c1d51fe1b3b82b8"
+          }
+        }
+
     """
+
+    with_commits = pagure.utils.is_true(
+        flask.request.values.get("with_commits", False)
+    )
+
     repo = _get_repo(repo, username, namespace)
 
-    branches = pagure.lib.git.get_git_branches(repo)
+    branches = pagure.lib.git.get_git_branches(repo, with_commits=with_commits)
 
     return flask.jsonify(
         {"total_branches": len(branches), "branches": branches}

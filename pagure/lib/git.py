@@ -2450,13 +2450,25 @@ def reinit_git(project, repofolder):
     )
 
 
-def get_git_branches(project):
+def get_git_branches(project, with_commits=False):
     """ Return a list of branches for the project
     :arg project: The Project instance to get the branches for
     """
     repo_path = pagure.utils.get_repo_path(project)
-    repo_obj = pygit2.Repository(repo_path)
-    return repo_obj.listall_branches()
+    repo_obj = PagureRepo(repo_path)
+
+    if with_commits:
+        branches = {}
+
+        for branch in repo_obj.listall_branches():
+            resolved_branch = repo_obj.lookup_branch(branch).resolve()
+            com = resolved_branch.peel()
+            if com:
+                branches[branch] = com.oid.hex
+    else:
+        branches = repo_obj.listall_branches()
+
+    return branches
 
 
 def new_git_branch(
