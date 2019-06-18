@@ -1,8 +1,9 @@
 This is a slightly patched version of the Highlightjs-line-numbers plugin from
 https://github.com/wcoder/highlightjs-line-numbers.js
 
+Downstream repo: https://pagure.io/pagure-highlightjs-line-numbers.js
+
 It adds some additional classes and links on the line numbers to get some stuff
 in Pagure working.
 
-This was patched over this version of the upstream file:
-https://github.com/wcoder/highlightjs-line-numbers.js/blob/35dcbb3e23ef6ee185b816f3af09265a0d561f54/dist/highlightjs-line-numbers.min.js
+This file version comes from this commit: https://pagure.io/pagure-highlightjs-line-numbers.js/tree/a8a95ff2384d9f03d8aa832e793ce0af464329ff
