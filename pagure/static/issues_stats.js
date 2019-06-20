@@ -57,17 +57,6 @@ function issues_history_stats_plot(url, _b, _s) {
   });
 }
 
-function wait_for_task(url, callback) {
-  $.get(url)
-  .done(function(data){
-    callback(data);
-    $("#data_stats_spinner").hide();
-  })
-  .fail(function(){
-    window.setTimeout(wait_for_task(url, callback), 1000);
-  });
-}
-
 function show_commits_authors(data) {
   var _b = $("#data_stats");
   var html = '<h2>Authors stats</h2><p> Since '
@@ -156,4 +145,15 @@ function process_async(url, _data, callback) {
   .done(function(data) {
     wait_for_task(data.url, callback);
   })
+}
+
+function wait_for_task(url, callback) {
+  $.get(url)
+  .done(function(data){
+    callback(data);
+    $("#data_stats_spinner").hide();
+  })
+  .fail(function(){
+    window.setTimeout(function() {wait_for_task(url, callback);}, 1000);
+  });
 }
