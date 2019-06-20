@@ -83,6 +83,8 @@ def fedora_messaging_publish(topic, message):  # pragma: no cover
             topic="pagure.{}".format(topic), body=message
         )
         fedora_messaging.api.publish(msg)
+    except ImportError:
+        _log.warning("Fedora messaging does not appear to be available")
     except fedora_messaging.exceptions.PublishReturned as e:
         _log.warning(
             "Fedora Messaging broker rejected message %s: %s", msg.id, e
