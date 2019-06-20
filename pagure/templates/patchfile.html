@@ -6,6 +6,8 @@
 {% block header %}
 <link type="text/css" rel="stylesheet" nonce="{{ g.nonce }}" href="{{
   url_for('static', filename='vendor/highlight.js/styles/github.css') }}?version={{ g.version}}"/>
+<link nonce="{{ g.nonce }}" rel="stylesheet" href="{{
+  url_for('static', filename='vendor/highlightjs-line-numbers/highlightjs-line-numbers.min.css') }}?version={{ g.version }}"/>
 <style nonce="{{ g.nonce }}">
   .hljs {
     background: #fff;
