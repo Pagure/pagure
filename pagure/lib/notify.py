@@ -292,15 +292,6 @@ def _get_emails_for_obj(obj):
             if comment.user.default_email:
                 emails.add(comment.user.default_email)
 
-    # Add the person that opened the issue/PR
-    if obj.user.default_email:
-        emails.add(obj.user.default_email)
-
-    # Add the person assigned to the issue/PR
-    if obj.isa in ["issue", "pull-request"]:
-        if obj.assignee and obj.assignee.default_email:
-            emails.add(obj.assignee.default_email)
-
     # Add public notifications to lists/users set project-wide
     if obj.isa == "issue" and not obj.private:
         for notifs in obj.project.notifications.get("issues", []):
@@ -336,6 +327,15 @@ def _get_emails_for_obj(obj):
             pagure_config.get("FROM_EMAIL", "pagure@fedoraproject.org")
         ),
     )
+
+    # Add the person that opened the issue/PR
+    if obj.user.default_email:
+        emails.add(obj.user.default_email)
+
+    # Add the person assigned to the issue/PR
+    if obj.isa in ["issue", "pull-request"]:
+        if obj.assignee and obj.assignee.default_email:
+            emails.add(obj.assignee.default_email)
 
     return emails
 
