@@ -31,8 +31,8 @@
               {{ render_bootstrap_field(form.repospanner_region, field_description="repoSpanner region to create the project in") }}
             {% endif %}
             <input class="btn btn-primary" type="submit" value="Create" title="Update description">
-            <input type="button" class="btn btn-default float-right"
-              value="Cancel" onclick="history.back();">
+            <input type="button" class="btn btn-default float-right cancel_btn"
+              value="Cancel">
             {{ form.csrf_token }}
           </form>
         </div>

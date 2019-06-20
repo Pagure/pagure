@@ -120,8 +120,7 @@
           username=username,
           namespace=repo.namespace,
           branchname=branchname, filename=filename) }}">
-        <button class="btn btn-sm btn-secondary"
-          onclick="fork_project.submit();">
+        <button class="btn btn-sm btn-secondary fork_project_btn">
             Fork and Edit
         </button>
         {{ forkbuttonform.csrf_token }}
@@ -199,6 +198,8 @@ function updateHighlight() {
   return [];
 }
 $(document).ready(function () {
+  $('.fork_project_btn').click($("[name=fork_project]").submit);
+
   var lines = updateHighlight();
   if (lines) {
     var offset = $('[data-line-number=' + lines[0] + ']').offset().top;

@@ -187,7 +187,6 @@
                   }}" method="POST"  id="merge_pr_form">
                   {{ mergeform.csrf_token }}
                   <button id="merge_btn" type="submit"
-                    onclick="return confirm('Confirm merging this pull-request');"
                     class="btn btn-block my-2">Merge</button>
                   {% if can_delete_branch %}
                   <div class="small">
@@ -219,8 +218,8 @@
               {{ trigger_ci_pr_form.csrf_token }}
               {{ trigger_ci_pr_form.comment(id="ci_pr_comment", hidden=True) }}
                 {% for comment, meta in trigger_ci|dictsort %}
-                  <a class="dropdown-item" href="#" title="{{ meta["description"] }}"
-                  onclick="$('#ci_pr_comment').val('{{ comment }}'); $('#ci_pr_trigger_form').submit()">{{ meta["name"] }}</a>
+                  <a class="dropdown-item trigger-ci-btn" href="#" title="{{ meta["description"] }}"
+                  data-comment="{{ comment }}">{{ meta["name"] }}</a>
                 {% endfor %}
             </form>
           </div>
@@ -909,6 +908,17 @@ function show_merge_status(){
 {% endif %}
 
 $(document).ready(function() {
+  $('#merge_btn').click(function() {
+      return confirm('Confirm merging this pull-request');
+  });
+  $('.trigger-ci-btn').click(function() {
+    $('#ci_pr_comment').val($(this).attr("data-comment"));
+    $('#ci_pr_trigger_form').submit();
+  });
+  $('.inline_comment_link_btn').click(function() { showTab() });
+  $('.delete_comment_btn').click(function() {
+    return confirm('Do you really want to remove this comment?');
+  });
 
   $('#rebase_btn').click(function(){
     var _conf = confirm('Confirm rebasing this pull-request');

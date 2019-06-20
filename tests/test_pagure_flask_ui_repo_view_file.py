@@ -243,8 +243,8 @@ class PagureFlaskRepoViewFiletests(LocalBasetests):
             output_text,
         )
         self.assertIn(
-            'onclick="fork_project.submit();">\n                    '
-            "        Fork and Edit",
+            '<button class="btn btn-sm btn-secondary fork_project_btn">'
+                '\n                            Fork and Edit',
             output_text,
         )
 
@@ -266,8 +266,8 @@ class PagureFlaskRepoViewFiletests(LocalBasetests):
                 output_text,
             )
             self.assertIn(
-                'onclick="fork_project.submit();">\n                    '
-                "        Fork and Edit",
+                '<button class="btn btn-sm btn-secondary fork_project_btn">'
+                '\n                            Fork and Edit',
                 output_text,
             )
 
@@ -359,8 +359,8 @@ class PagureFlaskRepoViewFileForktests(LocalBasetests):
             output_text,
         )
         self.assertIn(
-            'onclick="fork_project.submit();">\n                    '
-            "        Fork and Edit",
+            '<button class="btn btn-sm btn-secondary fork_project_btn">'
+                '\n                            Fork and Edit',
             output_text,
         )
 
@@ -381,8 +381,8 @@ class PagureFlaskRepoViewFileForktests(LocalBasetests):
                 output_text,
             )
             self.assertNotIn(
-                'onclick="fork_project.submit();">\n                    '
-                "        Fork and Edit",
+                '<button class="btn btn-sm btn-secondary fork_project_btn">'
+                '\n                            Fork and Edit',
                 output_text,
             )
 
@@ -405,8 +405,8 @@ class PagureFlaskRepoViewFileForktests(LocalBasetests):
                 output_text,
             )
             self.assertIn(
-                'onclick="fork_project.submit();">\n                    '
-                "        Fork and Edit",
+                '<button class="btn btn-sm btn-secondary fork_project_btn">'
+                '\n                            Fork and Edit',
                 output_text,
             )
 
@@ -428,8 +428,8 @@ class PagureFlaskRepoViewFileForktests(LocalBasetests):
                 output_text,
             )
             self.assertIn(
-                'onclick="fork_project.submit();">\n                    '
-                "        Edit in your fork",
+                '<button class="btn btn-sm btn-secondary fork_project_btn">'
+                '\n                            Edit in your fork',
                 output_text,
             )
 

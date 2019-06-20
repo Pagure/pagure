@@ -86,8 +86,7 @@
             </div>
             <div class="btn-group">
                 {% if g.authenticated and not g.repo_starred %}
-                  <a href="#" class="btn btn-sm btn-outline-primary font-weight-bold"
-                    onclick="$('#star_project').submit();">
+                  <a href="#" class="btn btn-sm btn-outline-primary font-weight-bold star_btn">
                     <form method="POST" name="star_project" id="star_project"
                       action="{{ url_for(
                       'ui_ns.star_project',
@@ -106,8 +105,7 @@
                                 namespace=repo.namespace,
                     )}}" class="btn btn-sm btn-primary font-weight-bold">{{ repo.stargazers|length }}</a>
                 {% elif g.authenticated and g.repo_starred %}
-                  <a href="#" class="btn btn-sm btn-outline-primary font-weight-bold"
-                    onclick="$('#unstar_project').submit();">
+                  <a href="#" class="btn btn-sm btn-outline-primary font-weight-bold unstar_btn">
                     <form method="POST" name="unstar_project" id="unstar_project"
                       action="{{ url_for(
                       'ui_ns.star_project',
@@ -342,6 +340,8 @@ git push -u origin master</pre>
 {{ super() }}
 <script type="text/javascript" nonce="{{ g.nonce }}">
 $(document).ready(function() {
+    $('.star_btn').click( function() { $('#star_project').submit()} );
+    $('.unstar_btn').click( function() { $('#unstar_project').submit()} );
     {% if g.repo_watch_levels %}
         var currentWatchStatusButton = $('#watch_{{ g.repo_watch_levels | join('_') }}_button .check-icon span');
     {% else %}

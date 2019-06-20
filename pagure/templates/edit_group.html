@@ -56,8 +56,7 @@
             {{ form.csrf_token }}
             <input class="form-control" name="username" id="user"
               placeholder="Start typing to search users" value=""/>
-            <button class="btn btn-danger" type="submit"
-              onclick="return confirm('Are you sure to give {{ group.group_name }}? \nThis is final and cannot be un-done.');"
+            <button class="btn btn-danger give_group_btn" type="submit"
               title="Give the group to someone">
                 <i class="fa fa-share-square-o"></i>&nbsp; Give the {{ group.group_name }} group
             </button>
@@ -98,5 +97,9 @@ $('#user').selectize({
     );
   }
 });
+
+$('.give_group_btn').click(function() {
+  return confirm('Are you sure to give {{ group.group_name }}? \nThis is final and cannot be un-done.');
+})
 </script>
 {% endblock %}

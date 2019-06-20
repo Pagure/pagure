@@ -16,7 +16,7 @@
         <form action="{{ url_for('ui_ns.add_user_email') }}" method="post">
             {{ render_bootstrap_field(form.email) }}
             <input type="submit" class="btn btn-primary" value="Add">
-            <input type="button" value="Cancel" class="btn btn-secondary" onclick="history.back();">
+            <input type="button" value="Cancel" class="btn btn-secondary cancel_btn">
             {{ form.csrf_token }}
         </form>
       </div>

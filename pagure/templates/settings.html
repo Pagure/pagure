@@ -213,10 +213,7 @@
                             username=username,
                             namespace=repo.namespace) }}"
                           method="post" class="icon">
-                      <button class="btn btn-primary" type="submit"
-                        onclick="return confirm('Are you sure to generate a new token for '
-                          + 'this project/fork? \nThis will break all web hook in place and '
-                          + 'cannot be un-done.');"
+                      <button class="btn btn-primary" type="submit" id="generate_new_hook_token"
                         title="Generate a new hook token">
                         <span class="fa fa-refresh"></span> &nbsp;Re-generate
                       </button>
@@ -359,9 +356,8 @@
                                 username=username,
                                 namespace=repo.namespace,
                                 userid=user.id) }}">
-                            <button
-                              onclick="return confirm('You sure you want to remove this user from this project?');"
-                              title="Remove user" class="btn btn-danger btn-sm">
+                            <button title="Remove user"
+                              class="btn btn-danger btn-sm remove_user_btn">
                               <i class="fa fa-trash"></i>
                             </button>
                             {{ form.csrf_token }}
@@ -395,8 +391,7 @@
                                 namespace=repo.namespace,
                                 groupid=group.id) }}">
                             <button
-                              onclick="return confirm('You sure you want to remove this group from this project?');"
-                              title="Remove group" class="btn btn-danger btn-sm pull-right">
+                              title="Remove group" class="btn btn-danger btn-sm pull-right remove_group_btn">
                               <i class="fa fa-trash"></i>
                             </button>
                             {{ form.csrf_token }}
@@ -458,8 +453,7 @@
                               namespace=repo.namespace,
                               keyid=deploykey.id) }}">
                           <button
-                            onclick="return confirm('You sure you want to remove this deploy key from this project?');"
-                            title="Remove deploy key" class="btn btn-outline-danger">
+                            title="Remove deploy key" class="btn btn-outline-danger remove_deploy_key_btn">
                             <i class="fa fa-trash"></i>
                           </button>
                           {{ form.csrf_token }}
@@ -839,8 +833,7 @@
                                 <input type="hidden" value="{{ report }}" name="report" />
                                 {{ tag_form.csrf_token }}
                                 <button
-                                  onclick="return confirm('Do you really want to remove the report: {{ report }}?');"
-                                  title="Delete report" class="btn btn-danger btn-sm">
+                                  title="Delete report" class="btn btn-danger btn-sm delete_report_btn">
                                   <i class="fa fa-trash"></i>
                                 </button>
                               </form>
@@ -887,9 +880,8 @@
                               namespace=repo.namespace) }}">
                             <input type="hidden" value="{{ tag.tag }}" name="tag" />
                             {{ tag_form.csrf_token }}
-                            <button
-                              onclick="return confirm('Do you really want to remove the tag: {{ tag.tag }}?');"
-                              title="Remove tag" class="btn btn-danger btn-sm">
+                            <button title="Remove tag" data-tag-name="{{ tag.tag }}"
+                              class="btn btn-danger btn-sm remove_tag_btn">
                               <i class="fa fa-trash"></i>
                             </button>
                           </form>
@@ -1060,8 +1052,7 @@
                     {{ tag_form.csrf_token }}
                     <input class="form-control" name="user" id="user"
                       placeholder="Start typing to search users" value=""/>
-                    <button class="btn btn-danger" type="submit"
-                      onclick="return confirm('Are you sure to give {{ repo.fullname }}? \nThis is final and cannot be un-done.');"
+                    <button class="btn btn-danger give_project_btn" type="submit"
                       title="Give the project to someone">
                         <i class="fa fa-share-square-o"></i>&nbsp; Give the {{repo.name}} project
                     </button>
@@ -1102,8 +1093,7 @@
             namespace=repo.namespace) }}"
               method="post" class="icon">
 
-            <button class="btn btn-danger" type="submit"
-              onclick="return confirm('Are you sure to delete {{ repo.fullname }}? \nThis is final and cannot be un-done.');"
+            <button class="btn btn-danger delete_project_btn" type="submit"
               title="Delete the project/fork">
                 <i class="fa fa-trash"></i>
                 &nbsp; Delete the {{ repo.fullname }} project
@@ -1149,6 +1139,53 @@ function color_tags() {
 $(document).ready(function() {
     updateform();
     color_tags();
+
+    $('#generate_new_hook_token').click(function() {
+        return confirm('Are you sure to generate a new token for '
+                          + 'this project/fork? \nThis will break all web hook in place and '
+                          + 'cannot be un-done.');
+    });
+
+    $('.remove_user_btn').click(function(){
+      return confirm('You sure you want to remove this user from this project?');
+    });
+
+    $('.remove_group_btn').click(function(){
+      return confirm('You sure you want to remove this group from this project?');
+    });
+
+    $('.remove_deploy_key_btn').click(function(){
+      return confirm('You sure you want to remove this deploy key from this project?');
+    });
+
+    $('.delete_report_btn').click(function(){
+      return confirm('Do you really want to remove the report: {{ report }}?');
+    });
+
+    $('.remove_tag_btn').click(function(){
+      var _tag = $(this).attr('data-tag-name');
+      return confirm('Do you really want to remove the tag: ' + _tag + '?');
+    });
+
+    $('.give_project_btn').click(function(){
+      return confirm('Are you sure to give {{ repo.fullname }}? \nThis is final and cannot be un-done.');
+    });
+
+    $('.delete_project_btn').click(function(){
+      return confirm('Are you sure to delete {{ repo.fullname }}? \nThis is final and cannot be un-done.');
+    });
+
+    $('.revoke_token_btn').click(function(){
+      return confirm('Are you sure to revoke this token ?'
+                     + '\nThis will break all application using it and '
+                     + 'cannot be un-done.');
+    });
+
+    $('.renew_token_btn').click(function(){
+      return confirm('Are you sure to renew this token ?'
+                     + '\nIt will have the same ACL but will be a different key.');
+    });
+
 });
 </script>
 
@@ -1485,9 +1522,9 @@ $('.ajaxed').click(function(e) {
     window.onhashchange = function () {
       $(window.location.hash.slice(0,-4)).tab('show');
     }
-    const anchor = window.location.hash.slice(0,-4);
-    console.log(anchor);
-    $(anchor).tab('show');
+    const _anchor = window.location.hash.slice(0,-4);
+    console.log(_anchor);
+    $(_anchor).tab('show');
     window.scrollTo(0,0);
   });
 </script>

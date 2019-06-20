@@ -34,10 +34,8 @@
                 class="btn btn-sm btn-outline-primary">
                 <span class="fa fa-pencil" title="Edit group"></span>&nbsp;Edit
             </a>
-              <button
-                onclick="return confirm('Are you sure you want to delete the group `{{group.group_name}}`?');"
-                title="Delete group"
-                class="btn btn-sm btn-outline-danger">
+              <button title="Delete group"
+                class="btn btn-sm btn-outline-danger delete-group-btn">
                 <i class="fa fa-trash"></i> &nbsp;Delete
               </button>
             </div>
@@ -102,11 +100,9 @@
                 action="{{ url_for('ui_ns.group_user_delete',
                     group=group.group_name, user=user.user) }}">
                 {{ form.csrf_token }}
-                <button
-                  onclick="return confirm('Are you sure to remove user `{{
-                    user.user}}` from the group `{{group.group_name}}`?');"
-                  title="Remove user from group"
-                  class="btn btn-sm btn-outline-danger border-0">
+                <button title="Remove user from group"
+                  data-username="{{ user.user }}"
+                  class="btn btn-sm btn-outline-danger border-0 remove-user-btn">
                   <i class="fa fa-trash"></i>
                 </button>
               </form>
@@ -128,6 +124,12 @@
 
   <script type="text/javascript" nonce="{{ g.nonce }}">
   $(document).ready(function() {
+    $('.delete-group-btn').click(function() {
+        return confirm('Are you sure you want to delete the group `{{ group.group_name }}`?');
+    })
+    $('.remove-user-btn').click(function() {
+        return confirm('Are you sure to remove user `' + $(this).attr('data-username') + '` from the group `{{ group.group_name }}`?');
+    })
     $('#headerSearch').on('keypress keydown keyup', function(e) {
       if (e.which == 13) {
           e.preventDefault();

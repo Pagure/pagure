@@ -29,7 +29,7 @@
       {{ render_bootstrap_field(form.pushaccess, field_description="Do you want to give this key push access?") }}
 
       <p class="buttons indent">
-        <input type="button" value="Cancel" class="btn btn-secondary" onclick="history.back();">
+        <input type="button" value="Cancel" class="btn btn-secondary cancel_btn">
         <input type="submit" class="btn btn-primary" value="Add">
         {{ form.csrf_token }}
       </p>

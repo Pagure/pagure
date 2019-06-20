@@ -168,7 +168,10 @@
 
     {{theme.js_imports()}}
     <script type="text/javascript" nonce="{{ g.nonce }}">
-$('[data-toggle="tooltip"]').tooltip({placement : 'bottom'});
+      $('[data-toggle="tooltip"]').tooltip({placement : 'bottom'});
+      $(".cancel_btn").click(function() {
+        history.back();
+      });
     </script>
     {% endblock %}
 

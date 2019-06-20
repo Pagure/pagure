@@ -56,7 +56,7 @@
             <a class="btn btn-secondary" href="{{ url_for('ui_ns.user_settings')
                 }}#nav-api-tab">Cancel</a>
             {% endif %}
-            <span class="btn" onclick="toggle()">Toggle all</span>
+            <span class="btn toggle_all">Toggle all</span>
             {{ form.csrf_token }}
           </div>
         </form>
@@ -73,6 +73,9 @@
       checkboxes[i].checked = !checkboxes[i].checked;
     }
   }
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelector('.toggle_all').addEventListener('click', toggle);
+  });
 </script>
 {% endmacro %}
 

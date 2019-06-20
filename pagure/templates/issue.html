@@ -669,6 +669,10 @@ $(document).ready(function() {
     doUpload("{{ form.csrf_token.current_token }}", this.files);
   });
 
+  $('.delete_comment_btn').click(function() {
+    return confirm('Do you really want to remove this comment?');
+  });
+
   $('.mainform #assignee').selectize({
     valueField: 'user',
     labelField: 'user',

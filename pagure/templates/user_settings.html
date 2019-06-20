@@ -13,9 +13,8 @@
         action="{{ url_for('ui_ns.remove_user_email') }}">
       <input type="hidden" value="{{ email.email }}" name="email" />
       {{ form.csrf_token }}
-      <button
-        onclick="return confirm('Do you really want to remove the email: {{ email.email }}?');"
-        title="Remove email" class="btn btn btn-outline-danger">
+      <button title="Remove email" data-email="{{ email.email }}"
+        class="btn btn btn-outline-danger delete-email-btn">
         <i class="fa fa-trash fa-fw"></i>
       </button>
     </form>
@@ -28,9 +27,8 @@
       action="{{ url_for('ui_ns.set_default_email') }}" id="default_mail">
       <input type="hidden" value="{{ email.email }}" name="email" />
       {{ form.csrf_token }}
-      <a class="float-right p-r-1 btn btn-outline-warning border-0 text-secondary mr-1 pointer"
-         onclick="$(this).closest('form').submit();"
-         title="Set as default email address">
+      <a class="float-right p-r-1 btn btn-outline-warning border-0 text-secondary mr-1 pointer submit-btn"
+         data-form-id="email" title="Set as default email address">
          <span class="fa fa-star" data-toggle="tooltip"></span>
       </a>
     </form>
@@ -42,9 +40,8 @@
         action="{{ url_for('ui_ns.reconfirm_email') }}" id="reconfirm_mail">
         <input type="hidden" value="{{ email.email }}" name="email" />
         {{ form.csrf_token }}
-        <button
-          onclick="$(this).closest('form').submit();"
-          title="Resend validation email" class="btn btn btn-outline-primary">
+        <button data-form-id="reconfirm_mail"
+          title="Resend validation email" class="btn btn btn-outline-primary submit-btn">
           <span class="fa fa-retweet fa-fw"></span>
         </button>
       </form>
@@ -190,10 +187,7 @@
                             <form action="{{ url_for(
                                 'ui_ns.revoke_api_user_token', token_id=token.id) }}"
                               method="post" class="icon">
-                              <button class="btn btn-outline-danger" type="submit"
-                                  onclick="return confirm('Are you sure to revoke this token ?'
-                                      + '\nThis will break all application using it and '
-                                      + 'cannot be un-done.');"
+                              <button class="btn btn-outline-danger remote-token-btn" type="submit"
                                   title="Revoke token">
                                 <i class="fa fa-trash"></i>
                               </button>
@@ -232,9 +226,8 @@
                         action="{{ url_for(
                             'ui_ns.remove_user_sshkey',
                             keyid=key.id) }}">
-                        <button
-                          onclick="return confirm('You sure you want to remove this SSH key?');"
-                          title="Remove SSH key" class="btn btn-outline-danger">
+                        <button title="Remove SSH key"
+                          class="btn btn-outline-danger delete-sshkey-btn">
                           <i class="fa fa-trash"></i>
                         </button>
                         {{ form.csrf_token }}
@@ -337,6 +330,22 @@
 {{ super() }}
 <script type="text/javascript" nonce="{{ g.nonce }}">
   $(document).ready(function() {
+    $('.submit-btn').click(function() {
+      var _form_name = $(this).attr('data-form-id');
+        $('#' + _form-id).submit();
+    });
+    $('.remove-token-btn').click(function() {
+      return confirm('Are you sure to revoke this token ?'
+                     + '\nThis will break all application using it and '
+                     + 'cannot be un-done.');
+    })
+    $('.delete-email-btn').click(function() {
+      return confirm('Do you really want to remove the email: ' + $(this).attr('data-email') + '?');
+    })
+    $('.delete-sshkey-btn').click(function() {
+      return confirm('You sure you want to remove this SSH key?');
+    })
+
     $('#nav-tab a.nav-link').on('shown.bs.tab', function (e) {
       window.location.hash = e.target.hash+'-tab';
       window.scrollTo(0,0);
@@ -349,9 +358,9 @@
     window.onhashchange = function () {
       $(window.location.hash).tab('show');
     }
-    const anchor = window.location.hash;
-    console.log(anchor);
-    $(anchor).tab('show');
+    const _anchor = window.location.hash;
+    console.log(_anchor);
+    $(_anchor).tab('show');
     window.scrollTo(0,0);
 
     $(".ssh_key_btn").click(function() {

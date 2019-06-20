@@ -85,15 +85,15 @@
                             username=username,
                             namespace=repo.namespace,
                             branchname=branch)
-                    }}" method="post" class="icon d-inline"
-                    onsubmit="return confirm('Are you sure you want to remove the branch: {{ branch | unicode }}?\nThis cannot be un-done!');">
+                    }}" method="post" class="icon d-inline delete-branch-form"
+                    data-branch-name="{{ branch | unicode }}">
                     {{ g.confirmationform.csrf_token }}
                     <a title="Remove branch {{ branch | unicode }}" href="#"
-                      class="btn btn-outline-danger"
-                      onclick="$('#delete_branch_form-{{
+                      class="btn btn-outline-danger delete-branch-btn"
+                      data-branch-name="{{
                         branch | unicode | replace('/', '__') | replace('.', '\\\\.')
                         | replace('+', '___')
-                        }}').submit();">
+                        }}">
                       <i class="fa fa-trash"></i>
                     </a>
                   </form>
@@ -113,6 +113,16 @@
 <script type="text/javascript" nonce="{{ g.nonce }}">
 $(function() {
   {% if g.authenticated and g.repo_committer %}
+
+  $(".delete-branch-btn").click(function() {
+    $('#delete_branch_form-' + $(this).attr("data-branch-name")).submit()
+  });
+
+  $(".delete-branch-form").submit(function() {
+    console.log($(this));
+    return confirm('Are you sure you want to remove the branch: ' + $(this).attr("data-branch-name") + '?\nThis cannot be un-done!');
+  });
+
   var _cnt = 0;
 
   function set_up_branch_pr_info(res) {

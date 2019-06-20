@@ -387,6 +387,10 @@ function showTab(){
 
 
 $(document).ready(function() {
+  $('.inline_comment_link_btn').click(function() { showTab() });
+  $('.delete_comment_btn').click(function() {
+    return confirm('Do you really want to remove this comment?');
+  });
 
   $('.branch_from_item').click(function(e){
     {% if remote_git and not (config.get('DISABLE_REMOTE_PR', True)) %}

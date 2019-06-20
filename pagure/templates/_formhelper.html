@@ -130,7 +130,7 @@
             }}">commented
             {% if PRinline %}
             on line <a href="#c-{{ comment.commit_id }}-{{ comment.line }}"
-                        onclick="showTab()">{{
+                        class="inline_comment_link_btn">{{
                         comment.line }} of {{ comment.filename }}</a>
             {% endif %}
             {{ comment.date_created | humanize}}</span>
@@ -176,9 +176,8 @@
             {% if id != 0 and g.fas_user and (g.repo_committer or (
                 comment.parent.status in [True, 'Open']
                 and g.fas_user.username == comment.user.username)) %}
-            <button class="btn btn-outline-primary border-0" type="submit"
+            <button class="btn btn-outline-primary border-0 delete_comment_btn" type="submit"
                 name="drop_comment" value="{{ comment.id }}"
-                onclick="return confirm('Do you really want to remove this comment?');"
                 title="Remove comment">
               <i class="fa fa-trash"></i>
             </button>

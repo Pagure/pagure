@@ -127,8 +127,7 @@
                         username=username,
                         namespace=repo.namespace,
                         branchname=branchname, filename=filename) }}">
-                    <button class="btn btn-sm btn-secondary"
-                        onclick="fork_project.submit();">
+                    <button class="btn btn-sm btn-secondary fork_project_btn">
                             {% if g.repo_forked %}
                             Edit in your fork
                             {% else %}
@@ -268,6 +267,8 @@ No content found in this repository
 
 <script type="text/javascript" nonce="{{ g.nonce }}">
   $(document).ready(function() {
+  $('.fork_project_btn').click($("[name=fork_project]").submit);
+
   $('pre.syntaxhighlightblock code').each(function(i, block) {
     hljs.highlightBlock(block);
     hljs.lineNumbersBlock(block);
@@ -276,6 +277,7 @@ No content found in this repository
 </script>
 
 <script type="text/javascript" nonce="{{ g.nonce }}">
+
   function updateHighlight() {
     var cls = "highlighted-line";
     $('.' + cls).removeClass(cls)

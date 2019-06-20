@@ -167,8 +167,7 @@
                 namespace=repo.namespace) }}">
               {{ g.forkbuttonform.csrf_token }}
             </form>
-              <button class="btn btn-sm btn-outline-primary"
-              onclick="$('#fork_project').submit();">
+              <button class="btn btn-sm btn-outline-primary fork_project_btn">
               <i class="fa fa-code-fork fa-fw"></i> Fork</button>
             {% endif %}
           </div>
@@ -304,6 +303,11 @@ $("#giturl-toggle").on('click', function(event){
   $("#giturl-more").toggle();
   $("#giturl-toggle").hide();
 })
+
+$(".fork_project_btn").click(function() {
+  $('#fork_project').submit();
+});
+
 {% if g.authenticated and not g.repo_obj.is_empty %}
 
 {% if g.repo_committer %}

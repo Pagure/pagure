@@ -32,7 +32,7 @@
   {{ plugin.extra_info | render(repo=repo, username=username) | safe }}
   {% endif %}
   <p class="buttons indent">
-      <input type="button" value="Cancel" class="btn btn-secondary" onclick="history.back();">
+      <input type="button" value="Cancel" class="btn btn-secondary cancel_btn">
       <input type="submit" class="btn btn-primary" value="Update">
       {{ form.csrf_token }}
     </p>
