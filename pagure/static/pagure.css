@@ -507,3 +507,21 @@ th[data-sort] {
 .flex-1{
   flex:1;
 }
+
+.markdown table {
+  display: block;
+  overflow: auto;
+  width: 100%;
+  margin-bottom: 5px;
+  background-color: #fff;
+}
+
+.markdown table tr {
+  border-top: 1px solid #c6cbd1;
+}
+
+.markdown table td, .markdown table th {
+  border: 1px solid #dfe2e5;
+  padding: 6px 13px;
+}
+
