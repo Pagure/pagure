@@ -351,7 +351,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
                     "date": date,
                     "date_created": "1477558752",
                     "type": "pull-request",
-                    "description_mk": '<p>pingou created PR <a href="/test/pull-request/1" title="[Closed] test pull-request">test#1</a></p>',
+                    "description_mk": '<div class="markdown"><p>pingou created PR <a href="/test/pull-request/1" title="[Closed] test pull-request">test#1</a></p></div>',
                     "id": 1,
                     "ref_id": "1",
                     "type": "created",
@@ -361,7 +361,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
                     "date": date,
                     "date_created": "1477558752",
                     "type": "pull-request",
-                    "description_mk": '<p>pingou commented on PR <a href="/test/pull-request/1" title="[Closed] test pull-request">test#1</a></p>',
+                    "description_mk": '<div class="markdown"><p>pingou commented on PR <a href="/test/pull-request/1" title="[Closed] test pull-request">test#1</a></p></div>',
                     "id": 2,
                     "ref_id": "1",
                     "type": "commented",
@@ -371,7 +371,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
                     "date": date,
                     "date_created": "1477558752",
                     "type": "pull-request",
-                    "description_mk": '<p>pingou closed PR <a href="/test/pull-request/1" title="[Closed] test pull-request">test#1</a></p>',
+                    "description_mk": '<div class="markdown"><p>pingou closed PR <a href="/test/pull-request/1" title="[Closed] test pull-request">test#1</a></p></div>',
                     "id": 3,
                     "ref_id": "1",
                     "type": "closed",
@@ -381,7 +381,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
                     "date": date,
                     "date_created": "1477558752",
                     "type": "pull-request",
-                    "description_mk": '<p>pingou commented on PR <a href="/test/pull-request/1" title="[Closed] test pull-request">test#1</a></p>',
+                    "description_mk": '<div class="markdown"><p>pingou commented on PR <a href="/test/pull-request/1" title="[Closed] test pull-request">test#1</a></p></div>',
                     "id": 4,
                     "ref_id": "1",
                     "type": "commented",
@@ -427,7 +427,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
         exp = {
             "activities": [
-                {"description_mk": "<p>pingou committed on test#githash</p>"}
+                {"description_mk": '<div class="markdown"><p>pingou committed on test#githash</p></div>'}
             ],
             "date": date,
         }
@@ -532,7 +532,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
         exp = {
             "activities": [
-                {"description_mk": "<p>pingou committed on test#githash</p>"}
+                {"description_mk": '<div class="markdown"><p>pingou committed on test#githash</p></div>'}
             ],
             "date": utcdate,
         }
@@ -641,7 +641,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
         exp = {
             "activities": [
-                {"description_mk": "<p>pingou committed on test#githash</p>"}
+                {"description_mk": '<div class="markdown"><p>pingou committed on test#githash</p></div>'}
             ],
             "date": utcdate,
         }

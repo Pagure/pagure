@@ -4244,93 +4244,93 @@ class PagureLibtests(tests.Modeltests):
         ]
         expected = [
             # 'foo bar test#1 see?',
-            '<p>foo bar <a href="http://localhost.localdomain/test/pull-request/1"'
-            ' title="[Open] test pull-request">test#1</a> see?</p>',
+            '<div class="markdown"><p>foo bar <a href="http://localhost.localdomain/test/pull-request/1"'
+            ' title="[Open] test pull-request">test#1</a> see?</p></div>',
             # 'foo bar pingou/test#2 I mean, really', -- unknown namespace
-            "<p>foo bar pingou/test#2 I mean, really</p>",
+            '<div class="markdown"><p>foo bar pingou/test#2 I mean, really</p></div>',
             # 'foo bar fork/pingou/test#2 bouza!',
-            '<p>foo bar <a href="http://localhost.localdomain/fork/'
+            '<div class="markdown"><p>foo bar <a href="http://localhost.localdomain/fork/'
             'pingou/test/pull-request/2" title="[Open] test pull-request in fork">'
-            "pingou/test#2</a> bouza!</p>",
+            "pingou/test#2</a> bouza!</p></div>",
             # 'foo bar forks/pingou/test#2 bouza!',  -- the 's' doesn't matter
-            '<p>foo bar <a href="http://localhost.localdomain/fork/'
+            '<div class="markdown"><p>foo bar <a href="http://localhost.localdomain/fork/'
             'pingou/test/pull-request/2" title="[Open] test pull-request in fork">'
-            "pingou/test#2</a> bouza!</p>",
+            "pingou/test#2</a> bouza!</p></div>",
             # 'foo bar ns/test3#4 bouza!',
-            '<p>foo bar <a href="http://localhost.localdomain/ns/test3/issue/4"'
-            ' title="[Open] test issue">ns/test3#4</a> bouza!</p>',
+            '<div class="markdown"><p>foo bar <a href="http://localhost.localdomain/ns/test3/issue/4"'
+            ' title="[Open] test issue">ns/test3#4</a> bouza!</p></div>',
             # 'foo bar fork/user/ns/test#5 bouza!', -- unknown fork
-            "<p>foo bar user/ns/test#5 bouza!</p>",
+            '<div class="markdown"><p>foo bar user/ns/test#5 bouza!</p></div>',
             # 'foo bar fork/pingou/ns/test#7 bouza!',
-            '<p>foo bar <a href="http://localhost.localdomain/'
+            '<div class="markdown"><p>foo bar <a href="http://localhost.localdomain/'
             'fork/pingou/ns/test/issue/7" title="[Open] test issue #7">'
-            "pingou/ns/test#7</a> bouza!</p>",
+            "pingou/ns/test#7</a> bouza!</p></div>",
             # 'test#1 bazinga!',
-            '<p><a href="http://localhost.localdomain/test/pull-request/1" '
-            'title="[Open] test pull-request">test#1</a> bazinga!</p>',
+            '<div class="markdown"><p><a href="http://localhost.localdomain/test/pull-request/1" '
+            'title="[Open] test pull-request">test#1</a> bazinga!</p></div>',
             # 'pingou opened the PR forks/pingou/test#2'
-            '<p>pingou opened the PR <a href="http://localhost.localdomain/'
+            '<div class="markdown"><p>pingou opened the PR <a href="http://localhost.localdomain/'
             'fork/pingou/test/pull-request/2" '
-            'title="[Open] test pull-request in fork">pingou/test#2</a></p>',
+            'title="[Open] test pull-request in fork">pingou/test#2</a></p></div>',
             # 'fork/pingou/ns/test#8 is private',
-            '<p><a href="http://localhost.localdomain/fork/pingou/ns/test/issue/8" '
-            'title="Private issue">pingou/ns/test#8</a> is private</p>',
+            '<div class="markdown"><p><a href="http://localhost.localdomain/fork/pingou/ns/test/issue/8" '
+            'title="Private issue">pingou/ns/test#8</a> is private</p></div>',
             # 'implicit link to #1',
-            '<p>implicit link to <a href="http://localhost.localdomain/test/pull-request/1" title="[Open] test pull-request">#1</a></p>',
+            '<div class="markdown"><p>implicit link to <a href="http://localhost.localdomain/test/pull-request/1" title="[Open] test pull-request">#1</a></p></div>',
             # 'implicit link .#1. with non-whitespace, non-word characters',
-            '<p>implicit link .<a href="http://localhost.localdomain/test/pull-request/1" title="[Open] test pull-request">#1</a>. with non-whitespace, non-word characters</p>',
+            '<div class="markdown"><p>implicit link .<a href="http://localhost.localdomain/test/pull-request/1" title="[Open] test pull-request">#1</a>. with non-whitespace, non-word characters</p></div>',
             # '#2 - implicit link at start of line',
-            '<p><a href="http://localhost.localdomain/test/issue/2" title="[Open] test issue">#2</a> - implicit link at start of line</p>',
+            '<div class="markdown"><p><a href="http://localhost.localdomain/test/issue/2" title="[Open] test issue">#2</a> - implicit link at start of line</p></div>',
             # '#2. implicit link at start of line with no whitespace after',
-            '<p><a href="http://localhost.localdomain/test/issue/2" title="[Open] test issue">#2</a>. implicit link at start of line with no whitespace after</p>',
+            '<div class="markdown"><p><a href="http://localhost.localdomain/test/issue/2" title="[Open] test issue">#2</a>. implicit link at start of line with no whitespace after</p></div>',
             # '#regular header',
-            "<h1>regular header</h1>",
+            '<div class="markdown"><h1>regular header</h1></div>',
             # '#34 looks like an implicit link, but no issue 34',
-            "<h1>34 looks like an implicit link, but no issue 34</h1>",
+            '<div class="markdown"><h1>34 looks like an implicit link, but no issue 34</h1></div>',
             # 'pingou committed on test#9364354a4555ba17aa60f0dc844d70b74eb1aecd',
-            '<p>pingou committed on <a href="http://localhost.localdomain/'
+            '<div class="markdown"><p>pingou committed on <a href="http://localhost.localdomain/'
             'test/c/9364354a4555ba17aa60f0dc844d70b74eb1aecd" '
             'title="Commit 9364354a4555ba17aa60f0dc844d70b74eb1aecd"'
-            ">test#9364354a4555ba17aa60f0dc844d70b74eb1aecd</a></p>",
+            ">test#9364354a4555ba17aa60f0dc844d70b74eb1aecd</a></p></div>",
             # 'irc://pagure.io'
-            '<p><a href="irc://pagure.io">irc://pagure.io</a></p>',
+            '<div class="markdown"><p><a href="irc://pagure.io">irc://pagure.io</a></p></div>',
             # 'ircs://pagure.io' - This is getting cleaned by python-bleach
             # and the version 1.4.3 that we have won't let us adjust the
             # list of supported protocols
             # '<p><a href="ircs://pagure.io">ircs://pagure.io</a></p>',
-            '<p><a href="ircs://pagure.io">ircs://pagure.io</a></p>'
+            '<div class="markdown"><p><a href="ircs://pagure.io">ircs://pagure.io</a></p></div>'
             if tuple(bleach_v) >= (1, 5, 0)
-            else "<p><a>ircs://pagure.io</a></p>",
+            else '<div class="markdown"><p><a>ircs://pagure.io</a></p></div>',
             # 'http://pagure.io'
-            '<p><a href="http://pagure.io">http://pagure.io</a></p>',
+            '<div class="markdown"><p><a href="http://pagure.io">http://pagure.io</a></p></div>',
             # 'https://pagure.io'
-            '<p><a href="https://pagure.io">https://pagure.io</a></p>',
+            '<div class="markdown"><p><a href="https://pagure.io">https://pagure.io</a></p></div>',
             # '<https://pagure.io/pagure>'
-            '<p><a href="https://pagure.io/pagure">https://pagure.io/pagure'
-            "</a></p>",
+            '<div class="markdown"><p><a href="https://pagure.io/pagure">https://pagure.io/pagure'
+            "</a></p></div>",
             # '~~foo~~'
-            "<p><del>foo</del></p>",
+            '<div class="markdown"><p><del>foo</del></p></div>',
             # '~~foo bar~~'
-            "<p><del>foo bar</del></p>",
+            '<div class="markdown"><p><del>foo bar</del></p></div>',
             # '~~[BZ#1435310](https://bugzilla.redhat.com/1435310)~~'
-            '<p><del><a href="https://bugzilla.redhat.com/1435310">'
-            "BZ#1435310</a></del></p>",
+            '<div class="markdown"><p><del><a href="https://bugzilla.redhat.com/1435310">'
+            "BZ#1435310</a></del></p></div>",
             # '~~[BZ#1435310](https://bugzilla.redhat.com/1435310) avc
             # denial during F26AH boot 'error_name=org.freedesktop.systemd1
             # .NoSuchDynamicUser~~'
-            '<p><del><a href="https://bugzilla.redhat.com/1435310">'
+            '<div class="markdown"><p><del><a href="https://bugzilla.redhat.com/1435310">'
             "BZ#1435310</a> avc denial during F26AH boot 'error_name="
-            "org.freedesktop.systemd1.NoSuchDynamicUser'</del></p>",
+            "org.freedesktop.systemd1.NoSuchDynamicUser'</del></p></div>",
             # '``~~foo bar~~``'
-            "<p><code>~~foo bar~~</code></p>",
+            '<div class="markdown"><p><code>~~foo bar~~</code></p></div>',
             # '~~foo bar~~ and ~~another ~~',
-            "<p><del>foo bar</del> and <del>another </del></p>",
+            '<div class="markdown"><p><del>foo bar</del> and <del>another </del></p></div>',
             # 'lets mention @pingou',
-            '<p>lets mention <a href="http://localhost.localdomain/user/pingou">@pingou</a></p>',
+            '<div class="markdown"><p>lets mention <a href="http://localhost.localdomain/user/pingou">@pingou</a></p></div>',
             # '@pingou at start of line',
-            '<p><a href="http://localhost.localdomain/user/pingou">@pingou</a> at start of line</p>',
+            '<div class="markdown"><p><a href="http://localhost.localdomain/user/pingou">@pingou</a> at start of line</p></div>',
             # 'but not someone@pingou.com',
-            "<p>but not someone@pingou.com</p>",
+            '<div class="markdown"><p>but not someone@pingou.com</p></div>',
         ]
 
         if old_markdown:
@@ -4338,26 +4338,26 @@ class PagureLibtests(tests.Modeltests):
                 # '[![Fedora_infinity_small.png]'
                 # '(/test/issue/raw/Fedora_infinity_small.png)]'
                 # '(/test/issue/raw/Fedora_infinity_small.png)',
-                '<p><a href="/test/issue/raw/Fedora_infinity_small.png"><span>'
+                '<div class="markdown"><p><a href="/test/issue/raw/Fedora_infinity_small.png"><span>'
                 '<img alt="Fedora_infinity_small.png" class="lazyload" '
                 'data-src="/test/issue/raw/Fedora_infinity_small.png" src="">'
                 "<noscript>"
                 '<img alt="Fedora_infinity_small.png" '
                 'src="/test/issue/raw/Fedora_infinity_small.png" />'
-                "</noscript></span></a></p>"
+                "</noscript></span></a></p></div>"
             )
         else:
             expected.append(
                 # '[![Fedora_infinity_small.png]'
                 # '(/test/issue/raw/Fedora_infinity_small.png)]'
                 # '(/test/issue/raw/Fedora_infinity_small.png)',
-                '<p><a href="/test/issue/raw/Fedora_infinity_small.png"><span>'
+                '<div class="markdown"><p><a href="/test/issue/raw/Fedora_infinity_small.png"><span>'
                 '<img alt="Fedora_infinity_small.png" class="lazyload" '
                 'data-src="/test/issue/raw/Fedora_infinity_small.png" src="">'
                 "<noscript>"
                 '<img alt="Fedora_infinity_small.png" '
                 'src="/test/issue/raw/Fedora_infinity_small.png">'
-                "</noscript></span></a></p>"
+                "</noscript></span></a></p></div>"
             )
 
         with self.app.application.app_context():
@@ -5139,7 +5139,7 @@ class PagureLibtests(tests.Modeltests):
 foo bar
         """
 
-        expected = """<table>
+        expected = """<div class="markdown"><table>
 <thead>
 <tr>
 <th align="left">Left-aligned</th>
@@ -5160,7 +5160,7 @@ foo bar
 </tr>
 </tbody>
 </table>
-<p>foo bar</p>"""
+<p>foo bar</p></div>"""
 
         with self.app.application.app_context():
             html = pagure.lib.query.text2markdown(text)
@@ -5182,7 +5182,7 @@ foo bar
 foo bar
         """
 
-        expected = """<table>
+        expected = """<div class="markdown"><table>
 <thead>
 <tr>
 <th align="left">Left-aligned</th>
@@ -5203,7 +5203,7 @@ foo bar
 </tr>
 </tbody>
 </table>
-<p>foo bar</p>"""
+<p>foo bar</p></div>"""
 
         with self.app.application.app_context():
             html = pagure.lib.query.text2markdown(text)

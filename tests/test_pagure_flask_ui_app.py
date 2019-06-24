@@ -910,8 +910,8 @@ class PagureFlaskApptests(tests.Modeltests):
             )
             self.assertIn(
                 """<section class="readme">
-              <h1>project-1</h1>
-<p>Prõjéctö #1</p>
+              <div class="markdown"><h1>project-1</h1>
+<p>Prõjéctö #1</p></div>
             </section>""",
                 output_text,
             )
@@ -931,8 +931,8 @@ class PagureFlaskApptests(tests.Modeltests):
             )
             self.assertIn(
                 """<section class="readme">
-              <h1>project-2</h1>
-<p>Мой первый суперский репозиторий</p>
+              <div class="markdown"><h1>project-2</h1>
+<p>Мой первый суперский репозиторий</p></div>
             </section>""",
                 output_text,
             )
@@ -1345,11 +1345,11 @@ class PagureFlaskApptests(tests.Modeltests):
         data["csrf_token"] = csrf_token
         output = self.app.post("/markdown/", data=data)
         self.assertEqual(output.status_code, 200)
-        exp = """<h2>test</h2>
+        exp = """<div class="markdown"><h2>test</h2>
 <ul>
 <li>1</li>
 <li>item 2</li>
-</ul>"""
+</ul></div>"""
         self.assertEqual(output.get_data(as_text=True), exp)
 
         tests.create_projects(self.session)
@@ -1362,22 +1362,22 @@ class PagureFlaskApptests(tests.Modeltests):
         ]
         expected = [
             # 'pingou committed on test#9364354a4555ba17aa60f0dc844d70b74eb1aecd',
-            '<p>pingou committed on <a href="/test/c/9364354a4555ba17aa60f0dc844d70b74eb1aecd" '
+            '<div class="markdown"><p>pingou committed on <a href="/test/c/9364354a4555ba17aa60f0dc844d70b74eb1aecd" '
             'title="Commit 9364354a4555ba17aa60f0dc844d70b74eb1aecd"'
-            ">test#9364354a4555ba17aa60f0dc844d70b74eb1aecd</a></p>",
+            ">test#9364354a4555ba17aa60f0dc844d70b74eb1aecd</a></p></div>",
             # 'Cf commit 936435',
-            "<p>Cf commit 936435</p>",
+            '<div class="markdown"><p>Cf commit 936435</p></div>',
             # 'Cf commit 9364354',
             #'<p>Cf commit 9364354</p>',
-            '<p>Cf commit <a href="/test/c/9364354" '
-            'title="Commit 9364354">9364354</a></p>',
+            '<div class="markdown"><p>Cf commit <a href="/test/c/9364354" '
+            'title="Commit 9364354">9364354</a></p></div>',
             # 'Cf commit 9364354a',
-            '<p>Cf commit <a href="/test/c/9364354a" '
-            'title="Commit 9364354a">9364354</a></p>',
+            '<div class="markdown"><p>Cf commit <a href="/test/c/9364354a" '
+            'title="Commit 9364354a">9364354</a></p></div>',
             # 'Cf commit 9364354a4555ba17aa60f0dc844d70b74eb1aecd',
-            '<p>Cf commit <a href="/test/c/9364354a4555ba17aa60f0dc844d70b74eb1aecd" '
+            '<div class="markdown"><p>Cf commit <a href="/test/c/9364354a4555ba17aa60f0dc844d70b74eb1aecd" '
             'title="Commit 9364354a4555ba17aa60f0dc844d70b74eb1aecd"'
-            ">9364354</a></p>",
+            ">9364354</a></p></div>",
         ]
 
         with self.app.application.app_context():
@@ -1406,7 +1406,7 @@ class PagureFlaskApptests(tests.Modeltests):
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
         text = "Cf commit 9364354a4555ba17aa60f0d"
-        exp = "<p>Cf commit 9364354a4555ba17aa60f0d</p>"
+        exp = '<div class="markdown"><p>Cf commit 9364354a4555ba17aa60f0d</p></div>'
 
         with self.app.application.app_context():
             data = {"content": text, "csrf_token": csrf_token}
@@ -1439,8 +1439,8 @@ class PagureFlaskApptests(tests.Modeltests):
 
         text = "Cf commit %s" % first_commit.oid.hex
         exp = (
-            '<p>Cf commit <a href="/test/c/{0}" title="Commit {0}">{1}'
-            "</a></p>".format(first_commit.oid.hex, first_commit.oid.hex[:7])
+            '<div class="markdown"><p>Cf commit <a href="/test/c/{0}" title="Commit {0}">{1}'
+            "</a></p></div>".format(first_commit.oid.hex, first_commit.oid.hex[:7])
         )
 
         with self.app.application.app_context():
