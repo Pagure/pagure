@@ -25,6 +25,7 @@ import flask
 
 import markdown.inlinepatterns
 import markdown.preprocessors
+import markdown.postprocessors
 import markdown.util
 import pygit2
 import re
@@ -369,6 +370,11 @@ class ImagePatternLazyLoad(ImagePattern):
         return output
 
 
+class EncapsulateMarkdownPostprocessor(markdown.postprocessors.Postprocessor):
+    def run(self, text):
+        return '<div class="markdown">' + text + "</div>"
+
+
 class PagureExtension(markdown.extensions.Extension):
     def extendMarkdown(self, md, md_globals):
         # First, make it so that bare links get automatically linkified.
@@ -409,6 +415,8 @@ class PagureExtension(markdown.extensions.Extension):
             )
 
         md.inlinePatterns["striked"] = StrikeThroughPattern(STRIKE_THROUGH_RE)
+
+        md.postprocessors["encapsulate"] = EncapsulateMarkdownPostprocessor()
 
         md.registerExtension(self)
 
