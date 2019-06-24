@@ -4075,7 +4075,7 @@ class PagureLibtests(tests.Modeltests):
     @patch("flask.g")
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_text2markdown(self, g, req, reqget):
-        """ Test the test2markdown method in pagure.lib.query. """
+        """ Test the text2markdown method in pagure.lib.query. """
         pagure.config.config["TESTING"] = True
         pagure.config.config["SERVER_NAME"] = "localhost.localdomain"
 
@@ -4367,7 +4367,7 @@ class PagureLibtests(tests.Modeltests):
                 self.assertEqual(html, expected[idx])
 
     def test_text2markdown_exception(self):
-        """ Test the test2markdown method in pagure.lib.query. """
+        """ Test the text2markdown method in pagure.lib.query. """
 
         text = "test#1 bazinga!"
         expected_html = "test#1 bazinga!"
@@ -4376,7 +4376,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(html, expected_html)
 
     def test_text2markdown_empty_string(self):
-        """ Test the test2markdown method in pagure.lib.query. """
+        """ Test the text2markdown method in pagure.lib.query. """
 
         text = ""
         expected_html = ""
