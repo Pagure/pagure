@@ -1440,7 +1440,9 @@ class PagureFlaskApptests(tests.Modeltests):
         text = "Cf commit %s" % first_commit.oid.hex
         exp = (
             '<div class="markdown"><p>Cf commit <a href="/test/c/{0}" title="Commit {0}">{1}'
-            "</a></p></div>".format(first_commit.oid.hex, first_commit.oid.hex[:7])
+            "</a></p></div>".format(
+                first_commit.oid.hex, first_commit.oid.hex[:7]
+            )
         )
 
         with self.app.application.app_context():

@@ -241,9 +241,7 @@ class PagureFlaskIssuesOpenAccesstests(tests.Modeltests):
             # Not author nor admin but open_access = take
             self.assertIn("function take_issue(){", output_text)
             self.assertNotIn("function drop_issue(){", output_text)
-            self.assertIn(
-                '<a class="pointer" id="take-btn"\n', output_text
-            )
+            self.assertIn('<a class="pointer" id="take-btn"\n', output_text)
 
             csrf_token = self.get_csrf(output=output)
 
@@ -352,9 +350,7 @@ class PagureFlaskIssuesOpenAccesstests(tests.Modeltests):
             # user has ticket = take ok
             self.assertIn("function take_issue(){", output_text)
             self.assertIn("function drop_issue(){", output_text)
-            self.assertIn(
-                '<a class="pointer" id="take-btn"\n', output_text
-            )
+            self.assertIn('<a class="pointer" id="take-btn"\n', output_text)
 
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
@@ -415,9 +411,7 @@ class PagureFlaskIssuesOpenAccesstests(tests.Modeltests):
             # user no ACLs but open_access = take action/button - no drop
             self.assertIn("function take_issue(){", output_text)
             self.assertNotIn("function drop_issue(){", output_text)
-            self.assertIn(
-                '<a class="pointer" id="take-btn"\n', output_text
-            )
+            self.assertIn('<a class="pointer" id="take-btn"\n', output_text)
 
             # user no ACLs = no metadata form
             self.assertNotIn(
@@ -458,9 +452,7 @@ class PagureFlaskIssuesOpenAccesstests(tests.Modeltests):
             # user has ticket = take ok
             self.assertIn("function take_issue(){", output_text)
             self.assertIn("function drop_issue(){", output_text)
-            self.assertIn(
-                '<a class="pointer" id="take-btn"\n', output_text
-            )
+            self.assertIn('<a class="pointer" id="take-btn"\n', output_text)
 
             # user has ticket == Sees the metadata
             self.assertIn(
@@ -1159,7 +1151,7 @@ class PagureFlaskIssuesOpenAccesstests(tests.Modeltests):
             self.assertTrue('<section class="edit_comment">' in output_text)
             self.assertIn(
                 '<textarea class="form-control width-100per" id="update_comment"',
-                output_text
+                output_text,
             )
 
             csrf_token = self.get_csrf(output=output)
@@ -1231,7 +1223,7 @@ class PagureFlaskIssuesOpenAccesstests(tests.Modeltests):
             self.assertIn("Comment added", output_text)
             self.assertIn(
                 '<a class="btn btn-outline-primary border-0 btn-sm '
-                'issue-metadata-display editmetadatatoggle pointer inline-block'
+                "issue-metadata-display editmetadatatoggle pointer inline-block"
                 '"><i class="fa fa-fw fa-pencil"></i></a>',
                 output_text,
             )
@@ -1258,7 +1250,7 @@ class PagureFlaskIssuesOpenAccesstests(tests.Modeltests):
             )
             self.assertIn(
                 '<a class="btn btn-outline-primary border-0 btn-sm '
-                'issue-metadata-display editmetadatatoggle pointer inline-block'
+                "issue-metadata-display editmetadatatoggle pointer inline-block"
                 '"><i class="fa fa-fw fa-pencil"></i></a>',
                 output_text,
             )

@@ -2351,9 +2351,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 ),
                 2,
             )
-            self.assertIn(
-                '<a class="pointer">1 more commits...', output_text
-            )
+            self.assertIn('<a class="pointer">1 more commits...', output_text)
             self.assertIn(
                 'title="View file as of 4829cf">Šource</a>', output_text
             )
@@ -2385,9 +2383,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '<pre class="alert-danger"><code>- Row 0</code></pre>',
                 output_text,
             )
-            self.assertIn(
-                '<a class="pointer">1 more commits...', output_text
-            )
+            self.assertIn('<a class="pointer">1 more commits...', output_text)
             self.assertIn(
                 'title="View file as of 000000">Šource</a>', output_text
             )
@@ -2880,8 +2876,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertTrue(
             '<tr><td class="cell1"><a id="1" href="#1" '
             'data-line-number="1"></a></td>' in output_text
-            or
-            '<tr><td class="cell1"><a data-line-number="1" '
+            or '<tr><td class="cell1"><a data-line-number="1" '
             'href="#1" id="1"></a></td>' in output_text
         )
         self.assertIn(
@@ -2904,8 +2899,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertTrue(
             '<tr><td class="cell1"><a id="1" href="#1" '
             'data-line-number="1"></a></td>' in output_text
-            or
-            '<tr><td class="cell1"><a data-line-number="1" '
+            or '<tr><td class="cell1"><a data-line-number="1" '
             'href="#1" id="1"></a></td>' in output_text
         )
         self.assertIn(
@@ -2923,8 +2917,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertTrue(
             '<tr><td class="cell1"><a id="1" href="#1" '
             'data-line-number="1"></a></td>' in output_text
-            or
-            '<tr><td class="cell1"><a data-line-number="1" '
+            or '<tr><td class="cell1"><a data-line-number="1" '
             'href="#1" id="1"></a></td>' in output_text
         )
         self.assertIn(
@@ -2975,8 +2968,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertTrue(
             '<tr><td class="cell1"><a id="1" href="#1" '
             'data-line-number="1"></a></td>' in output_text
-            or
-            '<tr><td class="cell1"><a data-line-number="1" '
+            or '<tr><td class="cell1"><a data-line-number="1" '
             'href="#1" id="1"></a></td>' in output_text
         )
         self.assertIn(
@@ -3017,8 +3009,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertTrue(
             '<tr><td class="cell1"><a id="1" href="#1" '
             'data-line-number="1"></a></td>' in output_text
-            or
-            '<tr><td class="cell1"><a data-line-number="1" '
+            or '<tr><td class="cell1"><a data-line-number="1" '
             'href="#1" id="1"></a></td>' in output_text
         )
         self.assertIn(
@@ -3058,8 +3049,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertTrue(
             '<tr><td class="cell1"><a id="1" href="#1" '
             'data-line-number="1"></a></td>' in output_text
-            or
-            '<tr><td class="cell1"><a data-line-number="1" '
+            or '<tr><td class="cell1"><a data-line-number="1" '
             'href="#1" id="1"></a></td>' in output_text
         )
         self.assertIn(

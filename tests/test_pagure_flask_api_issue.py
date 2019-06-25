@@ -1579,7 +1579,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         data = {
             "title": "test issue",
             "issue_content": "This issue needs attention",
-            "private": True
+            "private": True,
         }
 
         # Create an issue

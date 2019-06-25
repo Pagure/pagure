@@ -2564,7 +2564,7 @@ More information</textarea>
             self.assertIn(
                 '<a class="dropdown-item branch_from_item pointer" '
                 'data-value="master"><span class="fa fa-random">'
-                '</span> master</a>',
+                "</span> master</a>",
                 output_text,
             )
 
@@ -2789,7 +2789,7 @@ More information</textarea>
             self.assertIn(
                 '<a class="dropdown-item branch_from_item pointer" '
                 'data-value="master"><span class="fa fa-random">'
-                '</span> master</a>',
+                "</span> master</a>",
                 output_text,
             )
 
@@ -3106,13 +3106,13 @@ More information</textarea>
             self.assertIn(
                 '<a class="dropdown-item branch_from_item pointer" '
                 'data-value="master"><span class="fa fa-random">'
-                '</span> master</a>',
+                "</span> master</a>",
                 output_text,
             )
             self.assertIn(
                 '<a class="dropdown-item branch_from_item pointer" '
                 'data-value="random_branch"><span class="fa fa-random">'
-                '</span> random_branch</a>',
+                "</span> random_branch</a>",
                 output_text,
             )
 
@@ -3208,13 +3208,13 @@ More information</textarea>
             self.assertIn(
                 '<a class="dropdown-item branch_from_item pointer" '
                 'data-value="master"><span class="fa fa-random">'
-                '</span> master</a>',
+                "</span> master</a>",
                 output_text,
             )
             self.assertIn(
                 '<a class="dropdown-item branch_from_item pointer" '
                 'data-value="random_branch"><span class="fa fa-random">'
-                '</span> random_branch</a>',
+                "</span> random_branch</a>",
                 output_text,
             )
 
@@ -4776,12 +4776,12 @@ class TestTicketAccessEditPRMetadata(tests.Modeltests):
             output_text,
         )
         self.assertIn(
-                '<i class="fa fa-fw fa-pencil"></i></a>',
-                '<a class="btn btn-outline-primary border-0 btn-sm '
-                'issue-metadata-display editmetadatatoggle pointer inline-block'
-                '"><i class="fa fa-fw fa-pencil"></i></a>',
-                output_text,
-            )
+            '<i class="fa fa-fw fa-pencil"></i></a>',
+            '<a class="btn btn-outline-primary border-0 btn-sm '
+            "issue-metadata-display editmetadatatoggle pointer inline-block"
+            '"><i class="fa fa-fw fa-pencil"></i></a>',
+            output_text,
+        )
         self.assertNotIn(
             '<form method="POST" action="/test/pull-request/1/update">',
             output_text,
@@ -4804,7 +4804,7 @@ class TestTicketAccessEditPRMetadata(tests.Modeltests):
             self.assertIn(
                 '<i class="fa fa-fw fa-pencil"></i></a>',
                 '<a class="btn btn-outline-primary border-0 btn-sm '
-                'issue-metadata-display editmetadatatoggle pointer inline-block'
+                "issue-metadata-display editmetadatatoggle pointer inline-block"
                 '"><i class="fa fa-fw fa-pencil"></i></a>',
                 output_text,
             )
@@ -4832,7 +4832,7 @@ class TestTicketAccessEditPRMetadata(tests.Modeltests):
             self.assertIn(
                 '<i class="fa fa-fw fa-pencil"></i></a>',
                 '<a class="btn btn-outline-primary border-0 btn-sm '
-                'issue-metadata-display editmetadatatoggle pointer inline-block'
+                "issue-metadata-display editmetadatatoggle pointer inline-block"
                 '"><i class="fa fa-fw fa-pencil"></i></a>',
                 output_text,
             )
@@ -4863,7 +4863,7 @@ class TestTicketAccessEditPRMetadata(tests.Modeltests):
             self.assertIn(
                 '<i class="fa fa-fw fa-pencil"></i></a>',
                 '<a class="btn btn-outline-primary border-0 btn-sm '
-                'issue-metadata-display editmetadatatoggle pointer inline-block'
+                "issue-metadata-display editmetadatatoggle pointer inline-block"
                 '"><i class="fa fa-fw fa-pencil"></i></a>',
                 output_text,
             )
@@ -4893,7 +4893,7 @@ class TestTicketAccessEditPRMetadata(tests.Modeltests):
             self.assertIn(
                 '<i class="fa fa-fw fa-pencil"></i></a>',
                 '<a class="btn btn-outline-primary border-0 btn-sm '
-                'issue-metadata-display editmetadatatoggle pointer inline-block'
+                "issue-metadata-display editmetadatatoggle pointer inline-block"
                 '"><i class="fa fa-fw fa-pencil"></i></a>',
                 output_text,
             )

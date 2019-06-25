@@ -463,7 +463,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             # edit metadata
             self.assertIn(
                 '<a class="btn btn-outline-primary border-0 btn-sm '
-                'issue-metadata-display editmetadatatoggle pointer inline-block'
+                "issue-metadata-display editmetadatatoggle pointer inline-block"
                 '"><i class="fa fa-fw fa-pencil"></i></a>',
                 output_text,
             )
@@ -718,7 +718,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             # edit metadata
             self.assertIn(
                 '<a class="btn btn-outline-primary border-0 btn-sm '
-                'issue-metadata-display editmetadatatoggle pointer inline-block'
+                "issue-metadata-display editmetadatatoggle pointer inline-block"
                 '"><i class="fa fa-fw fa-pencil"></i></a>',
                 output_text,
             )
@@ -970,7 +970,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
 
             self.assertIn(
                 '<a class="btn btn-outline-primary border-0 btn-sm '
-                'issue-metadata-display editmetadatatoggle pointer inline-block'
+                "issue-metadata-display editmetadatatoggle pointer inline-block"
                 '"><i class="fa fa-fw fa-pencil"></i></a>',
                 output_text,
             )

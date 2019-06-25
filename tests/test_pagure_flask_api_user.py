@@ -427,7 +427,9 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
         exp = {
             "activities": [
-                {"description_mk": '<div class="markdown"><p>pingou committed on test#githash</p></div>'}
+                {
+                    "description_mk": '<div class="markdown"><p>pingou committed on test#githash</p></div>'
+                }
             ],
             "date": date,
         }
@@ -532,7 +534,9 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
         exp = {
             "activities": [
-                {"description_mk": '<div class="markdown"><p>pingou committed on test#githash</p></div>'}
+                {
+                    "description_mk": '<div class="markdown"><p>pingou committed on test#githash</p></div>'
+                }
             ],
             "date": utcdate,
         }
@@ -641,7 +645,9 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
         exp = {
             "activities": [
-                {"description_mk": '<div class="markdown"><p>pingou committed on test#githash</p></div>'}
+                {
+                    "description_mk": '<div class="markdown"><p>pingou committed on test#githash</p></div>'
+                }
             ],
             "date": utcdate,
         }

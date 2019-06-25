@@ -244,7 +244,7 @@ class PagureFlaskRepoViewFiletests(LocalBasetests):
         )
         self.assertIn(
             '<button class="btn btn-sm btn-secondary fork_project_btn">'
-                '\n                            Fork and Edit',
+            "\n                            Fork and Edit",
             output_text,
         )
 
@@ -267,7 +267,7 @@ class PagureFlaskRepoViewFiletests(LocalBasetests):
             )
             self.assertIn(
                 '<button class="btn btn-sm btn-secondary fork_project_btn">'
-                '\n                            Fork and Edit',
+                "\n                            Fork and Edit",
                 output_text,
             )
 
@@ -360,7 +360,7 @@ class PagureFlaskRepoViewFileForktests(LocalBasetests):
         )
         self.assertIn(
             '<button class="btn btn-sm btn-secondary fork_project_btn">'
-                '\n                            Fork and Edit',
+            "\n                            Fork and Edit",
             output_text,
         )
 
@@ -382,7 +382,7 @@ class PagureFlaskRepoViewFileForktests(LocalBasetests):
             )
             self.assertNotIn(
                 '<button class="btn btn-sm btn-secondary fork_project_btn">'
-                '\n                            Fork and Edit',
+                "\n                            Fork and Edit",
                 output_text,
             )
 
@@ -406,7 +406,7 @@ class PagureFlaskRepoViewFileForktests(LocalBasetests):
             )
             self.assertIn(
                 '<button class="btn btn-sm btn-secondary fork_project_btn">'
-                '\n                            Fork and Edit',
+                "\n                            Fork and Edit",
                 output_text,
             )
 
@@ -429,7 +429,7 @@ class PagureFlaskRepoViewFileForktests(LocalBasetests):
             )
             self.assertIn(
                 '<button class="btn btn-sm btn-secondary fork_project_btn">'
-                '\n                            Edit in your fork',
+                "\n                            Edit in your fork",
                 output_text,
             )
 
