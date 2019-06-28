@@ -362,8 +362,7 @@
             username=repo.user.user if repo.is_fork else None,
             namespace=repo.namespace,
             requestid=requestid)
-        }}" method="post" class="icon"
-        onsubmit="return try_async_comment(this, null)" >
+        }}" method="post" class="icon form_pr_drop_comment">
     {% endif %}
 
       {{repo_renderdiff(diff=diff,
@@ -388,8 +387,7 @@
             username=repo.user.user if repo.is_fork else None,
             namespace=repo.namespace,
             requestid=requestid)
-          }}" method="post" id="request_comment"
-          onsubmit="return try_async_comment(this, null)">
+          }}" method="post" id="request_comment" class="form_pr_drop_comment">
 
     {% if pull_request.comments %}
       {% for comment in pull_request.comments %}
@@ -447,7 +445,7 @@
         username=repo.user.user if repo.is_fork else None,
         namespace=repo.namespace,
         requestid=requestid) }}"
-        method="post" onsubmit="return try_async_comment(this, false)">
+        method="post" class="form_pr_add_comment">
       {{ mergeform.csrf_token }}
       <div class="card-body">
                 <textarea class="form-control" rows=8 id="comment" name="comment"
@@ -1009,6 +1007,14 @@ $(document).ready(function() {
     }
   });
 
+  $('.form_pr_drop_comment').submit(function() {
+    return try_async_comment(this, null);
+  });
+
+  $('.form_pr_add_comment').submit(function() {
+    return try_async_comment($this, false);
+  })
+
 {% if pull_request %}
 {# These lines are only for existing pull-requests, not new ones #}
 
@@ -1276,6 +1282,11 @@ function try_async_comment(form, inline) {
     })
   return false;
 };
+
+$(".add_comment_form").submit(function(event) {
+  return try_async_comment(this, true);
+})
+
 {% endif %}
 
 </script>

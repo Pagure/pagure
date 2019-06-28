@@ -149,7 +149,7 @@
 
 <form action="{{ url_for('ui_ns.update_issue', username=username,
 namespace=repo.namespace, repo=repo.name, issueid=issueid)
-}}" method="post" onsubmit="return try_async_comment(this)" class="mainform">
+}}" method="post" class="mainform">
 {{ form.csrf_token }}
   <div class="row mt-4">
   <div class="col-md-8 mt-2">
@@ -671,6 +671,10 @@ $(document).ready(function() {
 
   $('.delete_comment_btn').click(function() {
     return confirm('Do you really want to remove this comment?');
+  });
+
+  $('.mainform').submit(function() {
+    return try_async_comment(this);
   });
 
   $('.mainform #assignee').selectize({
