@@ -6,4 +6,4 @@ Downstream repo: https://pagure.io/pagure-highlightjs-line-numbers.js
 It adds some additional classes and links on the line numbers to get some stuff
 in Pagure working and disables inline style tag injection to avoid CSP errors
 
-This files version comes from this commit: https://pagure.io/pagure-highlightjs-line-numbers.js/c/28702694fea765b90c53690db63b545b2aa0d8b0
+This files version comes from this commit: https://pagure.io/pagure-highlightjs-line-numbers.js/c/8670cf96d705da31343133785630c2fea7faed67
