@@ -1008,11 +1008,11 @@ $(document).ready(function() {
   });
 
   $('.form_pr_drop_comment').submit(function() {
-    return try_async_comment(this, null);
+    return try_async_comment($(this), null);
   });
 
   $('.form_pr_add_comment').submit(function() {
-    return try_async_comment($this, false);
+    return try_async_comment($(this), false);
   })
 
 {% if pull_request %}
