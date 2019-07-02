@@ -1181,7 +1181,7 @@ function try_async_comment(form, inline) {
     set_ui_for_comment(false);
     return true;
   }
-  var _url = form.action;
+  var _url = form.attr("action");
   if (_url.indexOf('?') != -1){
       _url += "&js=1";
   } else {

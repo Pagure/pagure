@@ -947,7 +947,7 @@ function try_async_comment(form) {
     form.submit();
     return false;
   }
-  var _url = form.action + "?js=1";
+  var _url = form.attr("action") + "?js=1";
   $.post( _url, _data )
     .done(function(data) {
       if(data == 'ok') {
