@@ -819,6 +819,7 @@ function setup_reply_btns() {
           _prev += "\n\n";
       }
       $( "#comment" ).val(_prev + _output.join("\n"));
+      $( "#comment" ).focus();
     }
   );
 };
