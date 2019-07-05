@@ -3,12 +3,12 @@ Contributors to pagure
 
 Pagure would be nothing without its contributors.
 
-On June 4, 2019 (release 5.6) the list looks as follow:
+On July 5, 2019 (release 5.7) the list looks as follow:
 
 =================  ===========
 Number of commits  Contributor
 =================  ===========
-  6596              Pierre-Yves Chibon <pingou@pingoured.fr>
+  6613              Pierre-Yves Chibon <pingou@pingoured.fr>
    328              Ryan Lerch <rlerch@redhat.com>
    172              Vivek Anand <vivekanand1101@gmail.com>
    139              farhaanbukhsh <farhaan.bukhsh@gmail.com>
@@ -24,6 +24,7 @@ Number of commits  Contributor
     32              Matt Prahl <mprahl@redhat.com>
     32              Pradeep CE (cep) <breathingcode@gmail.com>
     25              Lubomír Sedlář <lubomir.sedlar@gmail.com>
+    24              Julen Landa Alustiza <jlanda@fedoraproject.org>
     24              Neal Gompa <ngompa13@gmail.com>
     23              rahul Bajaj <you@example.com>
     20              Jeremy Cline <jeremy@jcline.org>
@@ -47,7 +48,6 @@ Number of commits  Contributor
      9              mprahl <mprahl@redhat.com>
      8              Lei Yang <yltt1234512@gmail.com>
      8              Paul W. Frields <stickster@gmail.com>
-     7              Julen Landa Alustiza <jlanda@fedoraproject.org>
      7              René Genz <liebundartig@freenet.de>
      6              Michael Scherer <misc@redhat.com>
      6              ymdatta <ymdatta@protonmail.com>
@@ -100,6 +100,7 @@ Number of commits  Contributor
      2              Simo Sorce <simo@redhat.com>
      2              Stasiek Michalski <hellcp@opensuse.org>
      2              Tim Flink <tflink@fedoraproject.org>
+     2              Tim Landscheidt <tim@tim-landscheidt.de>
      2              Todd Zullinger <tmz@pobox.com>
      2              William Moreno Reyes <williamjmorenor@gmail.com>
      2              bruno <bruno@wolff.to>
@@ -149,7 +150,6 @@ Number of commits  Contributor
      1              Stephen Gallagher <sgallagh@redhat.com>
      1              Tiago M. Vieira <tiago@tvieira.com>
      1              Till Hofmann <hofmann@kbsg.rwth-aachen.de>
-     1              Tim Landscheidt <tim@tim-landscheidt.de>
      1              Vadim Rutkovsky <vrutkovs@redhat.com>
      1              Vyacheslav Anzhiganov <vanzhiganov@ya.ru>
      1              Yves Martin <ymartin1040@gmail.com>
@@ -164,6 +164,7 @@ Number of commits  Contributor
      1              ishcherb <ishcherb@redhat.com>
      1              jcvicelli <jcvicelli@gmail.com>
      1              josef radinger <cheese@nosuchhost.net>
+     1              mrx@mailinator.com <mrx@mailinator.com>
      1              pingou <pingou@fedoraproject.org>
      1              prasad0896 <shendep@yahoo.co.in>
      1              rishika7000 <rishika7000@gmail.com>

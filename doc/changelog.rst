@@ -3,6 +3,27 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
+
+5.7 (2019-07-05)
+------------------
+
+- Many fixes to properly support for CSP headers (Many thanks to Julien Landa
+  Alustiza for his help with this)
+- Fix the blame view
+- Allow project-less API token to retrieve issues via the API
+- Better integration work on our fork of highlightjs-line-numbers (Julian Landa
+  Alustiza)
+- Document the git auth backend `pagure` (mrx@mailinator.com)
+- Catch ImportError before trying to catch any fedora_messaging exceptions
+- pagure markdown extension: encapsulate our markdowns on a div tag (Julen Landa
+  Alustiza)
+- Add styling for markdown tables (Julen Landa Alustiza)
+- Always notify the person who opened the ticket/PR or are assigned to it
+- Add a create-branch action to pagure-admin
+- Bump jquery to latest version, fixing some CSP errors (Julen Landa Alustiza)
+- Fix file view anchor link highlight & scrolling (Julen Landa Alustiza)
+- Focus the comment textarea after hitting the reply button (Julen Landa Alustiza)
+
 5.6 (2019-06-04)
 ----------------
 
