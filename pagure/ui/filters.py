@@ -193,7 +193,7 @@ def format_loc(
                 ' data-filename="%(filename)s" data-commit="%(commit)s"'
                 ' data-tree="%(tree_id)s">'
                 "<p>"
-                '<span class="fa fa-comment prc_img" style="display: none;"'
+                '<span class="fa fa-comment prc_img hidden"'
                 'alt="Add comment" title="Add comment"></span>'
                 "</p>"
                 "</td>"
@@ -438,9 +438,6 @@ def blame_loc(loc, repo, username, blame):
         except IndexError:
             # Happens at the end of the file, since we are using idx + 1
             continue
-
-        if '<pre style="line-height: 125%">' in line:
-            line = line.split('<pre style="line-height: 125%">')[1]
 
         output.append(
             '<tr><td class="cell1">'
