@@ -66,7 +66,7 @@
   </a>
 
   {% if 'distgit_ns' in g.main_app.blueprints and not repo.is_fork %}
-  <div class="col-xs-2" style="height:1em;"></div>
+  <div class="col-xs-2 line-height-1"></div>
   <p>Monitoring status:</p>
   <div class="btn-group">
     <a href="#" title="Monitoring status"
@@ -111,7 +111,7 @@
 
   {% if g.authenticated and repo.user.user == "orphan" %}
   <div id="take-orphan-section">
-    <div class="col-xs-2" style="height:1em;"></div>
+    <div class="col-xs-2 line-height-1"></div>
     <p>Orphaned:</p>
     <div class="btn-group">
       <a href="#" title="Adopt this orphaned package"

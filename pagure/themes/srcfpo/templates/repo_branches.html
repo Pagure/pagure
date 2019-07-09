@@ -5,7 +5,7 @@
 {% set tag = "home" %}
 
 {% block header %}
-<style>
+<style nonce="{{ g.nonce }}">
 .disabled_branch a {
   color: #818a91;
 }
