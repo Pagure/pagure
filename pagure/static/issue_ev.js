@@ -162,7 +162,7 @@ add_comment = function(data, username) {
     + '    <div class="issue_actions ml-auto">'
     + '        <div class="issue_action icon">'
     + '          <div class="btn-group" role="group" aria-label="Basic example">'
-    + '              <a class="reply btn btn-outline-primary border-0 pointer" data-toggle="tooltip"'
+    + '              <button class="reply btn btn-outline-primary border-0" type="button"'
     + '                  title="Reply to this comment - lose formatting">'
     + '                <span class="fa fa-share-square-o" title="Reply to this comment"></span>'
     + '              </a>';

@@ -159,10 +159,9 @@
 
 
             {% if g.fas_user %}
-              <a class="reply btn btn-outline-primary border-0 pointer" data-toggle="tooltip"
-                  title="Reply to this comment - lose formatting">
+              <button class="reply btn btn-outline-primary border-0" type="button" title="Reply to this comment - lose formatting">
                 <span class="fa fa-share-square-o"></span>
-              </a>
+            </button>
             {% endif %}
             {% if id != 0 and g.fas_user and (g.repo_committer or (
               comment.parent.status in [True, 'Open']
