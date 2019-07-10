@@ -1041,6 +1041,17 @@ $(document).ready(function() {
     return window.confirm("Are you sure you want to reopen this requested pull?");
   });
 
+  $(".comment_body").each(function(ind, obj) {
+    var source = $(obj).html();
+    var preview = emojione.toImage(source);
+    $(obj).html(preview);
+  });
+  $(".pr_comment").each(function(ind, obj) {
+    var source = $(obj).html();
+    var preview = emojione.toImage(source);
+    $(obj).html(preview);
+  });
+
 {% if g.authenticated %}
 
   $( ".code_table tr" ).hover(
@@ -1102,17 +1113,6 @@ $(document).ready(function() {
 
   setup_edit_btns();
   setup_reply_btns();
-
-  $(".comment_body").each(function(ind, obj) {
-    var source = $(obj).html();
-    var preview = emojione.toImage(source);
-    $(obj).html(preview);
-  });
-  $(".pr_comment").each(function(ind, obj) {
-    var source = $(obj).html();
-    var preview = emojione.toImage(source);
-    $(obj).html(preview);
-  });
 
 {% endif %}
 
