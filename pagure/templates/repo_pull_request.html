@@ -818,7 +818,7 @@ function setup_reply_btns() {
       if (_prev.length > 0){
           _prev += "\n\n";
       }
-      $( "#comment" ).val(_prev + _output.join("\n"));
+      $( "#comment" ).val(_prev + _output.join("\n") + "\n\n");
       $( "#comment" ).focus();
     }
   );
