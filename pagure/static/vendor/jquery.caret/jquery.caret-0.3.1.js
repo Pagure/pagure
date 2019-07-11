@@ -275,9 +275,9 @@ InputCaret = (function() {
     }
     start_range = $inputor.val().slice(0, pos);
     end_range = $inputor.val().slice(pos);
-    html = "<span style='position: relative; display: inline;'>" + format(start_range) + "</span>";
-    html += "<span id='caret' style='position: relative; display: inline;'>|</span>";
-    html += "<span style='position: relative; display: inline;'>" + format(end_range) + "</span>";
+    html = '<span class="caret-span">' + format(start_range) + '</span>';
+    html += '<span id="caret" class="caret-spain">|</span>';
+    html += '<span class="caret-span">' + format(end_range) + '</span>';
     mirror = new Mirror($inputor);
     return at_rect = mirror.create(html).rect();
   };

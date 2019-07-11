@@ -525,3 +525,7 @@ th[data-sort] {
   padding: 6px 13px;
 }
 
+.caret-span {
+  display: inline;
+  position: relative;
+}
