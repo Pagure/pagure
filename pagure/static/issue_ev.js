@@ -22,10 +22,17 @@ add_tags = function(data, _issues_url) {
 
   var field = $('#taglist');
   for (i=0; i<data.added_tags.length; i++ ){
-    tag = data.added_tags[i]
-    var html = '<a id="tag-' + tag + '" title="" style="background-color:' + data.added_tags_color[i] + '; width:100%; display: block;"'
-            + ' class="badge badge-secondary text-left my-1 p-2" href="' + _issues_url + '?tags=' + tag + '">'+tag+'</a>';
-    field.append(html);
+    tag = data.added_tags[i];
+    var obj = document.createElement('a');
+    $(obj).attr('id', 'tag-' + tag);
+    $(obj).attr('title', '');
+    $(obj).addClass('badge badge-secondary badge-tag text-left my-1 p-2 ');
+    $(obj).attr('href', _issues_url + '?tags=' + tag);
+    $(obj).attr('data-bg-color', data.added_tags_color[i]);
+    $(obj).text(tag);
+
+    field.append(obj);
+    $(obj).css('background-color', $(obj).attr('data-bg-color'));
     if ($select.length) {
       selectize.createItem(tag);
     }
