@@ -55,8 +55,8 @@ add_comment = function(data, username) {
       + '         class="btn btn-outline-primary border-0" data-comment="' + data.comment_id + '" data-objid="' + data.request_id + '">'
       + '        <i class="fa fa-pencil"  title="Edit comment"></i>'
       + '      </a>'
-      + '      <button class="btn btn-outline-primary border-0" title="Remove comment" name="drop_comment" '
-      + '         value="' + data.comment_id + '" type="submit" onclick="return confirm(\'Do you really want to remove this comment?\');" >'
+      + '      <button class="btn btn-outline-primary border-0 delete_comment_btn" title="Remove comment" name="drop_comment" '
+      + '         value="' + data.comment_id + '" type="submit" >'
       + '        <i class="fa fa-trash"></i>'
       + '      </button>'
       + '    </div>';
