@@ -1,1 +1,1 @@
-selectize-0.12.3.js
+selectize-0.12.6.js
