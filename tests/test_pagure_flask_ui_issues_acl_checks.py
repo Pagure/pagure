@@ -126,7 +126,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 output_text,
             )
             self.assertNotIn(
-                '<a class="dropdown-item text-danger" href="javascript:void(0)" id="closeticket"\n'
+                '<a class="dropdown-item text-danger pointer" id="closeticket"\n'
                 '                title="Delete this ticket">\n',
                 output.get_data(as_text=True),
             )
@@ -134,7 +134,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             # no edit metadata
             self.assertNotIn(
                 '<a class="btn btn-outline-primary border-0 btn-sm issue-metadata-display'
-                ' editmetadatatoggle" href="javascript:void(0)" style="display: inline-block;">'
+                ' editmetadatatoggle pointer inline-block"">'
                 '<i class="fa fa-fw fa-pencil">',
                 output_text,
             )
@@ -188,7 +188,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 output_text,
             )
             self.assertNotIn(
-                '<a class="dropdown-item text-danger" href="javascript:void(0)" id="closeticket"\n'
+                '<a class="dropdown-item text-danger pointer" id="closeticket"\n'
                 '                title="Delete this ticket">\n',
                 output_text,
             )
@@ -198,7 +198,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             # no edit metadata
             self.assertNotIn(
                 '<a class="btn btn-outline-primary border-0 btn-sm issue-metadata-display'
-                ' editmetadatatoggle" href="javascript:void(0)" style="display: inline-block;">'
+                ' editmetadatatoggle pointer inline-block">'
                 '<i class="fa fa-fw fa-pencil">',
                 output_text,
             )
@@ -389,7 +389,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 output_text,
             )
             self.assertNotIn(
-                '<a class="dropdown-item text-danger" href="javascript:void(0)" id="closeticket"\n'
+                '<a class="dropdown-item text-danger pointer" id="closeticket"\n'
                 '                title="Delete this ticket">\n',
                 output_text,
             )
@@ -397,7 +397,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             # no edit metadata
             self.assertNotIn(
                 '<a class="btn btn-outline-primary border-0 btn-sm issue-metadata-display'
-                ' editmetadatatoggle" href="javascript:void(0)" style="display: inline-block;">'
+                ' editmetadatatoggle pointer inline-block">'
                 '<i class="fa fa-fw fa-pencil">',
                 output_text,
             )
@@ -452,7 +452,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
 
             # the user still can't delete the ticket
             self.assertNotIn(
-                '<a class="dropdown-item text-danger" href="javascript:void(0)" id="closeticket"\n'
+                '<a class="dropdown-item text-danger pointer" id="closeticket"\n'
                 '                title="Delete this ticket">\n',
                 output_text,
             )
@@ -644,7 +644,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 output_text,
             )
             self.assertNotIn(
-                '<a class="dropdown-item text-danger" href="javascript:void(0)" id="closeticket"\n'
+                '<a class="dropdown-item text-danger pointer" id="closeticket"\n'
                 '                title="Delete this ticket">\n',
                 output_text,
             )
@@ -652,7 +652,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             # no edit metadata
             self.assertNotIn(
                 '<a class="btn btn-outline-primary border-0 btn-sm issue-metadata-display'
-                ' editmetadatatoggle" href="javascript:void(0)" style="display: inline-block;">'
+                ' editmetadatatoggle pointer inline-block">'
                 '<i class="fa fa-fw fa-pencil">',
                 output_text,
             )
@@ -897,7 +897,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 output_text,
             )
             self.assertNotIn(
-                '<a class="dropdown-item text-danger" href="javascript:void(0)" id="closeticket"\n'
+                '<a class="dropdown-item text-danger pointer" id="closeticket"\n'
                 '                title="Delete this ticket">\n',
                 output_text,
             )
@@ -905,7 +905,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             # no edit metadata
             self.assertNotIn(
                 '<a class="btn btn-outline-primary border-0 btn-sm issue-metadata-display'
-                ' editmetadatatoggle" href="javascript:void(0)" style="display: inline-block;">'
+                ' editmetadatatoggle pointer inline-block">'
                 '<i class="fa fa-fw fa-pencil">',
                 output_text,
             )
