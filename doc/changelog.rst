@@ -3,15 +3,19 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
-
-5.7 (2019-07-05)
+5.7.1 (2019-07-12)
 ------------------
 
-- Many fixes to properly support for CSP headers (Many thanks to Julien Landa
+- More CSP headers fixes (Thanks again to Julen Landa Alustiza for them!)
+
+5.7 (2019-07-05)
+----------------
+
+- Many fixes to properly support for CSP headers (Many thanks to Julen Landa
   Alustiza for his help with this)
 - Fix the blame view
 - Allow project-less API token to retrieve issues via the API
-- Better integration work on our fork of highlightjs-line-numbers (Julian Landa
+- Better integration work on our fork of highlightjs-line-numbers (Julen Landa
   Alustiza)
 - Document the git auth backend `pagure` (mrx@mailinator.com)
 - Catch ImportError before trying to catch any fedora_messaging exceptions
