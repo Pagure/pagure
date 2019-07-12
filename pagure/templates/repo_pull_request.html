@@ -1016,6 +1016,21 @@ $(document).ready(function() {
     return try_async_comment($(this), false);
   })
 
+  function submitFormOnCtrlKey(event) {
+    if (event.ctrlKey && event.keyCode == 13) {
+      var form = event.target.form;
+      form.submit();
+      event.preventDefault();
+    }
+  }
+
+  $('#comment').keydown(function(e) {
+    submitFormOnCtrlKey(e);
+  });
+  $('#inline-comment').keydown(function(e) {
+    submitFormOnCtrlKey(e);
+  });
+
 {% if pull_request %}
 {# These lines are only for existing pull-requests, not new ones #}
 

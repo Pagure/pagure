@@ -1237,6 +1237,18 @@ $( "#previewinmarkdown" ).click(
     }
   );
 
+  function submitFormOnCtrlKey(event) {
+    if (event.ctrlKey && event.keyCode == 13) {
+      var form = event.target.form;
+      form.submit();
+      event.preventDefault();
+    }
+  }
+
+  $('#comment').keydown(function(e) {
+    submitFormOnCtrlKey(e);
+  });
+
 
   {% if g.authenticated and (
     g.repo_user
