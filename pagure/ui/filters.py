@@ -296,11 +296,10 @@ def format_loc(
         )
 
         tpl_delete = (
-            '<button class="btn btn-outline-primary border-0" '
-            'title="Remove comment" '
-            'name="drop_comment" value="%(commentid)s" type="submit" '
-            "onclick=\"return confirm('Do you really want to remove this"
-            ' comment?\');" ><i class="fa fa-trash"></i>'
+            '<button class="btn btn-outline-primary border-0 '
+            'delete_comment_btn" title="Remove comment" name="drop_comment"'
+            'value="%(commentid)s" type="submit">'
+            '<i class="fa fa-trash"></i>'
             "</button>"
         )
 
