@@ -1354,9 +1354,12 @@ function updateHighlight(onload) {
       }
     }
     var file = parseInt(location.hash.substr(2).split('__')[0], 10);
-    var lines = location.hash.split('__')[1].split('-').map(function (x) { return parseInt(x, 10) });
-    for (var i = lines[lines.length - 1]; i >= lines[0]; i--) {
-      $('#' + '_' + file + '__' + i).closest('tr').addClass(cls);
+    if (file)
+    {
+      var lines = location.hash.split('__')[1].split('-').map(function (x) { return parseInt(x, 10) });
+      for (var i = lines[lines.length - 1]; i >= lines[0]; i--) {
+        $('#' + '_' + file + '__' + i).closest('tr').addClass(cls);
+      }
     }
   }
 }
@@ -1408,7 +1411,7 @@ $(document).ready(function () {
   set_up_subcribed();
   {% endif %}
 
-  updateHighlight(true)
+  updateHighlight(true);
   {% if form or pull_request %}
   $( "#preview" ).hide();
   $( "#previewinmarkdown" ).click(
