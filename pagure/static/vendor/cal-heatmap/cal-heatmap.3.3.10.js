@@ -589,10 +589,6 @@ var CalHeatMap = function() {
 		self.root = d3.select(self.options.itemSelector).append("svg").attr("class", "cal-heatmap-container");
 
 		self.tooltip = d3.select(self.options.itemSelector)
-			.attr("style", function() {
-				var current = d3.select(self.options.itemSelector).attr("style");
-				return (current !== null ? current : "") + "position:relative;";
-			})
 			.append("div")
 			.attr("class", "ch-tooltip")
 		;
