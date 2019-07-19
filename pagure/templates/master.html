@@ -8,9 +8,9 @@
     <title>{% block title %}{% endblock %} - {{ theme.site_title }}</title>
     {{ theme.head_imports() }}
     <link type="text/css" rel="stylesheet" nonce="{{ g.nonce }}" href="{{
-      url_for('static', filename='pagure.css') }}?version={{ g.version}}"/>
-    <link type="text/css" rel="stylesheet" nonce="{{ g.nonce }}" href="{{
       url_for('static', filename='vendor/font-awesome/font-awesome.css') }}?version={{ g.version}}"/>
+    <link type="text/css" rel="stylesheet" nonce="{{ g.nonce }}" href="{{
+      url_for('static', filename='pagure.css') }}?version={{ g.version}}"/>
     {% block header %}{% endblock %}
   </head>
   <body id="{{ tag }}">
