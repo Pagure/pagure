@@ -22,12 +22,3 @@
 </iframe>
 
 {% endblock %}
-
-{% block jscripts %}
-{{ super() }}
-<script type="text/javascript" nonce="{{ g.nonce }}">
-$('#docframe').load(function() {
-  resize_iframe();
-});
-</script>
-{% endblock %}
