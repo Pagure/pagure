@@ -24,7 +24,7 @@
               user.created | humanize }}</span>
           {% if config['FAS_URL'] %} &bull; (<a href="{{ config['FAS_URL'].rstrip('/') }}/user/view/{{ username }}">fas</a>){%
           endif %}
-          <img src="https://apps.fedoraproject.org/calendar/api/{{ username }}/shield/vacation?connector=on&always=0" alt="" />
+          <img id="vacation" src="https://apps.fedoraproject.org/calendar/api/{{ username }}/shield/vacation?connector=on&always=0" alt="" />
           </div>
         </div>
       </div>
@@ -108,4 +108,13 @@
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block jscripts %}
+{{ super() }}
+<script type="text/javascript" nonce="{{ g.nonce }}">
+  $('#vacation').on('error', function() {
+    $(this).hide();
+  });
+</script>
 {% endblock %}
