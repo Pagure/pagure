@@ -18,7 +18,8 @@ RUN dnf -y install \
     gcc \
     redis \
     which \
-    git
+    git \
+    glibc-langpack-en
 
 RUN cd / \
     && git clone -b $BRANCH $REPO \
