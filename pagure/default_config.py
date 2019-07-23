@@ -615,6 +615,6 @@ SSH_COMMAND_NON_REPOSPANNER = (
 
 CSP_HEADERS = (
     "default-src 'self' https:; "
-    "script-src 'self' 'nonce-{nonce}'; "
-    "style-src 'self' 'nonce-{nonce}'"
+    "script-src 'self' '{nonce_script}'; "
+    "style-src 'self' '{nonce_style}'; "
 )

@@ -458,6 +458,7 @@ def auth_login():  # pragma: no cover
         groups = set(groups).union(admins)
         ext_committer = set(pagure_config.get("EXTERNAL_COMMITTER", {}))
         groups = set(groups).union(ext_committer)
+        flask.g.unsafe_javascript = True
         return FAS.login(return_url=return_point, groups=groups)
     elif auth == "local":
         form = pagure.login_forms.LoginForm()
@@ -499,7 +500,15 @@ def after_request(response):
     """ After request callback, adjust the headers returned """
     csp_headers = pagure_config["CSP_HEADERS"]
     try:
-        csp_headers = csp_headers.format(nonce=flask.g.nonce)
+        style_csp = "nonce-" + flask.g.nonce
+        script_csp = (
+            "unsafe-inline"
+            if "unsafe_javascript" in flask.g and flask.g.unsafe_javascript
+            else "nonce-" + flask.g.nonce
+        )
+        csp_headers = csp_headers.format(
+            nonce_script=script_csp, nonce_style=style_csp
+        )
     except (KeyError, IndexError):
         pass
     response.headers.set(str("Content-Security-Policy"), csp_headers)
