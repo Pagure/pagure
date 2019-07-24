@@ -432,7 +432,7 @@ $("#pr-button").one("click",
 );
 
 $('.pr_comment_form').submit(function() {
-  return try_async_comment(this, null);
+  return try_async_comment($(this), null);
 });
 
 {% endif %}

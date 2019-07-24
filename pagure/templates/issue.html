@@ -674,7 +674,7 @@ $(document).ready(function() {
   });
 
   $('.mainform').submit(function() {
-    return try_async_comment(this);
+    return try_async_comment($(this));
   });
 
   $('.mainform #assignee').selectize({

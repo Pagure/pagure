@@ -1285,7 +1285,7 @@ function try_async_comment(form, inline) {
 };
 
 $(".add_comment_form").submit(function(event) {
-  return try_async_comment(this, true);
+  return try_async_comment($(this), true);
 })
 
 {% endif %}
