@@ -34,6 +34,7 @@ import flask
 import pagure.lib.query
 import pagure.lib.tasks_services
 from pagure.config import config as pagure_config
+from pagure.pfmarkdown import MENTION_RE
 
 
 _log = logging.getLogger(__name__)
@@ -233,8 +234,7 @@ def _add_mentioned_users(emails, comment):
     """ Check the comment to see if an user is mentioned in it and if
     so add this user to the list of people to notify.
     """
-    mentio_re = r"@(\w+)"
-    for username in re.findall(mentio_re, comment):
+    for username in re.findall(MENTION_RE, comment):
         user = pagure.lib.query.search_user(flask.g.session, username=username)
         if user:
             emails.add(user.default_email)

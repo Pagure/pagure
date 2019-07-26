@@ -52,7 +52,7 @@ except ImportError:
 # MENTION_RE regex). Note that it is a zero-length match - it does
 # not capture or consume any of the string - and it does not appear
 # as a group for the match object.
-MENTION_RE = r"(?<!\w)@(\w+)"
+MENTION_RE = r"(?<![\w\-\"\'\`\$\!\*\+#%&/=^{}|~])@(\w+)"
 # Each line below correspond to a line of the regex:
 #  1) Don't start matching in the middle of a word
 #  2) See if there is a `forks/` at the start

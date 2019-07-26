@@ -15,6 +15,7 @@ import sys
 import os
 
 import mock
+import munch
 import six
 
 sys.path.insert(
@@ -127,6 +128,120 @@ http://localhost.localdomain/test/issue/1
 
         # Mail should be sent to user #1.
         self.assertEqual(args[2], self.user1.default_email)
+
+        # Mail ID should be comment #1's mail ID...
+        self.assertEqual(kwargs["mail_id"], self.comment1.mail_id)
+
+        # In reply to issue #1's mail ID.
+        self.assertEqual(kwargs["in_reply_to"], self.issue1.mail_id)
+
+        # Project name should be...project (full) name.
+        self.assertEqual(kwargs["project_name"], self.project1.fullname)
+
+        # Mail should be from user1 (who wrote the comment).
+        self.assertEqual(kwargs["user_from"], self.user1.fullname)
+
+    @mock.patch("pagure.lib.notify.send_email")
+    def test_user_notified_new_comment(self, fakemail):
+        """Check that users that are @mentionned are notified."""
+        self.comment1.comment = "Hey @foo. Let's do it!"
+        g = munch.Munch()
+        g.session = self.session
+        with mock.patch("flask.g", g):
+            pagure.lib.notify.notify_new_comment(self.comment1)
+
+        (_, args, kwargs) = fakemail.mock_calls[0]
+
+        # Mail should be sent to both users
+        self.assertIn(
+            args[2],
+            ["bar@pingou.com,foo@bar.com", "foo@bar.com,bar@pingou.com"],
+        )
+
+        # Mail ID should be comment #1's mail ID...
+        self.assertEqual(kwargs["mail_id"], self.comment1.mail_id)
+
+        # In reply to issue #1's mail ID.
+        self.assertEqual(kwargs["in_reply_to"], self.issue1.mail_id)
+
+        # Project name should be...project (full) name.
+        self.assertEqual(kwargs["project_name"], self.project1.fullname)
+
+        # Mail should be from user1 (who wrote the comment).
+        self.assertEqual(kwargs["user_from"], self.user1.fullname)
+
+    @mock.patch("pagure.lib.notify.send_email")
+    def test_user_notified_new_comment_start_row(self, fakemail):
+        """Check that users that are @mentionned are notified."""
+        self.comment1.comment = "@foo, okidoki"
+        g = munch.Munch()
+        g.session = self.session
+        with mock.patch("flask.g", g):
+            pagure.lib.notify.notify_new_comment(self.comment1)
+
+        (_, args, kwargs) = fakemail.mock_calls[0]
+
+        # Mail should be sent to both users
+        self.assertIn(
+            args[2],
+            ["bar@pingou.com,foo@bar.com", "foo@bar.com,bar@pingou.com"],
+        )
+
+        # Mail ID should be comment #1's mail ID...
+        self.assertEqual(kwargs["mail_id"], self.comment1.mail_id)
+
+        # In reply to issue #1's mail ID.
+        self.assertEqual(kwargs["in_reply_to"], self.issue1.mail_id)
+
+        # Project name should be...project (full) name.
+        self.assertEqual(kwargs["project_name"], self.project1.fullname)
+
+        # Mail should be from user1 (who wrote the comment).
+        self.assertEqual(kwargs["user_from"], self.user1.fullname)
+
+    @mock.patch("pagure.lib.notify.send_email")
+    def test_user_notified_new_comment_with_email(self, fakemail):
+        """Ensures that @mention doesn't over-reach."""
+        self.comment1.comment = "So apparently bar@foo.com exists"
+        g = munch.Munch()
+        g.fas_user = tests.FakeUser(username="pingou")
+        g.authenticated = True
+        g.session = self.session
+        with mock.patch("flask.g", g):
+            pagure.lib.notify.notify_new_comment(self.comment1)
+
+        (_, args, kwargs) = fakemail.mock_calls[0]
+
+        # Mail should be sent to both users
+        self.assertEqual(args[2], "bar@pingou.com")
+
+        # Mail ID should be comment #1's mail ID...
+        self.assertEqual(kwargs["mail_id"], self.comment1.mail_id)
+
+        # In reply to issue #1's mail ID.
+        self.assertEqual(kwargs["in_reply_to"], self.issue1.mail_id)
+
+        # Project name should be...project (full) name.
+        self.assertEqual(kwargs["project_name"], self.project1.fullname)
+
+        # Mail should be from user1 (who wrote the comment).
+        self.assertEqual(kwargs["user_from"], self.user1.fullname)
+
+    @mock.patch("pagure.lib.notify.send_email")
+    def test_user_notified_new_comment_with_email_with_number(self, fakemail):
+        """Ensures that @mention doesn't over-reach."""
+        self.comment1.comment = "So apparently bar123@foo.com exists"
+        g = munch.Munch()
+        g.fas_user = tests.FakeUser(username="pingou")
+        g.authenticated = True
+        g.session = self.session
+        with mock.patch("flask.g", g):
+            pagure.lib.notify.notify_new_comment(self.comment1)
+
+        (_, args, kwargs) = fakemail.mock_calls[0]
+
+        # Mail should be sent to both users
+        self.assertEqual(args[2], "bar@pingou.com")
 
         # Mail ID should be comment #1's mail ID...
         self.assertEqual(kwargs["mail_id"], self.comment1.mail_id)
