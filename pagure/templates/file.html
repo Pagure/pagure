@@ -272,16 +272,19 @@ No content found in this repository
   $('pre.syntaxhighlightblock code').each(function(i, block) {
     hljs.highlightBlock(block);
     hljs.lineNumbersBlock(block);
-    var cls = "highlighted-line";
-    var lines = location.hash.substr(2).split('-').map(function (x) { return parseInt(x, 10) });
-    if (! isNaN(lines[0]))
-    {
-      $("#_" + lines[0]).get(0).scrollIntoView();
-      for (var i = lines[lines.length - 1]; i >= lines[0]; i--) {
-        $('#_' + i).parent().parent().addClass(cls);
-      }
+  });
+
+  var cls = "highlighted-line";
+  var lines = location.hash.substr(2).split('-').map(function (x) { return parseInt(x, 10) });
+  if (! isNaN(lines[0]))
+  {
+    for (var i = lines[lines.length - 1]; i >= lines[0]; i--) {
+      $('#_' + i).parent().parent().addClass(cls);
     }
-  })
+    setTimeout(function(){
+      $("#_" + lines[0]).get(0).scrollIntoView({behavior: "smooth", block: "start", inline: "nearest"});
+    }, 50);
+  }
 });
 </script>
 
