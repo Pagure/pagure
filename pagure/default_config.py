@@ -617,4 +617,5 @@ CSP_HEADERS = (
     "default-src 'self' https:; "
     "script-src 'self' '{nonce_script}'; "
     "style-src 'self' '{nonce_style}'; "
+    "object-src" 'none'"
 )
