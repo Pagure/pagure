@@ -1633,7 +1633,7 @@ class PagureBlockUserTests(tests.Modeltests):
             pagure.cli.admin.do_block_user(args)
 
         output = output.getvalue()
-        self.assertEqual("No users are currently blocked\n", output)
+        self.assertIn("No users are currently blocked\n", output)
 
     @patch("pagure.cli.admin._ask_confirmation", MagicMock(return_value=True))
     def test_list_blocked_user_with_date_and_data(self):
@@ -1653,7 +1653,7 @@ class PagureBlockUserTests(tests.Modeltests):
             pagure.cli.admin.do_block_user(args)
 
         output = output.getvalue()
-        self.assertEqual(
+        self.assertIn(
             "Users blocked:\n"
             " pingou                -  2050-12-31T00:00:00\n",
             output,
@@ -1667,7 +1667,7 @@ class PagureBlockUserTests(tests.Modeltests):
             pagure.cli.admin.do_block_user(args)
 
         output = output.getvalue()
-        self.assertEqual("No users are currently blocked\n", output)
+        self.assertIn("No users are currently blocked\n", output)
 
 
 class PagureAdminDeleteProjectTests(tests.Modeltests):
