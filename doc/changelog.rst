@@ -3,6 +3,12 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
+5.7.2 (2019-07-30)
+------------------
+
+- More CSP headers related fixes (Again thanks to Julen Landa Alustiza)
+- Ensures @<username> doesn't overreach to email
+
 5.7.1 (2019-07-12)
 ------------------
 
