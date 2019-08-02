@@ -24,7 +24,7 @@ def upgrade():
     )
     op.execute('''UPDATE pull_requests SET allow_rebase=False;''')
     op.alter_column(
-        'pull_requests', 'allow_rebase',
+        'pull_requests', 'allow_rebase', existing_type=sa.Boolean,
         nullable=False, existing_nullable=True)
 
 
