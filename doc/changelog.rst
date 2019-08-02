@@ -3,6 +3,13 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
+5.7.3 (2019-08-02)
+------------------
+
+- Fix the alembic revision adding support for allow_rebase on PRs to work with
+  mysql
+- Make the doc build in sphinx with python3 by default
+
 5.7.2 (2019-07-30)
 ------------------
 

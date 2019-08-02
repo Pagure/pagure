@@ -16,7 +16,7 @@
 
 
 Name:               pagure
-Version:            5.7.2
+Version:            5.7.3
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -491,6 +491,9 @@ done
 
 
 %changelog
+* Fri Aug 02 2019 Pierre-Yves Chibon <pingou@pingoured.fr> - 5.7.3-1
+- Update to pagure 5.7.3
+
 * Tue Jul 30 2019 Pierre-Yves Chibon <pingou@pingoured.fr> - 5.7.2-1
 - Update to pagure 5.7.2
 
