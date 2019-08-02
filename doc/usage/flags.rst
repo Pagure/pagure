@@ -40,7 +40,7 @@ with the titles: ``Flag a commit`` or ``Flag a pull-request``.
     (for ``failure`` vs ``error`` think of the test system ran the tests but
     they failed vs the test system did not get to run the tests)
 
-- **percent**: this is an optional field which allows to provide some more
+- **percent**: this is an optional field which can be used to provide some more
   details about the outcome of the task. For example this could be used for
   test coverage, or the number of test that failed/passed.
 

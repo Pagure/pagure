@@ -51,7 +51,7 @@ Filter for issues *not* having a certain tag
 --------------------------------------------
 
 Very much in the same way pagure allows you to filter for issues having a
-certain tag, pagure allows to filter for issues *not* having a certain tag.
+certain tag, pagure allows one to filter for issues *not* having a certain tag.
 To do this, simply prepend a ``!`` in front of the tag.
 
 Example:

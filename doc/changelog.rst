@@ -385,7 +385,7 @@ This document records all notable changes to `Pagure <https://pagure.io>`_.
 - Correctly align edit button for groups in repo settings (Ryan Lerch)
 - Fix all-around sidebar heading borders (Ryan Lerch)
 - Remove incorrect count label on related PRs (Ryan Lerch)
-- Move attachements to sidebar (Ryan Lerch)
+- Move attachments to sidebar (Ryan Lerch)
 - Add reporter and assignee to notification emails headers (Lenka Segura)
 - Make sure that ticket changes don't get duplicated (Patrick Uiterwijk)
 - Fix the git ssh urls in the templates
@@ -926,7 +926,7 @@ This document records all notable changes to `Pagure <https://pagure.io>`_.
 - Include the targeted branch in the list of PRs
 - Separately link user/namespace/name
 - Fix the pagination when listing projects via the view_projects endpoints
-- Retain access when transfering ownership of the project (Matt Prahl)
+- Retain access when transferring ownership of the project (Matt Prahl)
 
 
 3.6 (2017-08-14)
@@ -1189,7 +1189,7 @@ This document records all notable changes to `Pagure <https://pagure.io>`_.
 - When creating the pull-request, save the commit_start and commit_stop
 - Ensure there is a date before trying to humanize it
 - Fixing showing tags even when some of them are not formatted as expected
-- Allow repo user to Take/Drop assigment of issue (Vivek Anand)
+- Allow repo user to Take/Drop assignment of issue (Vivek Anand)
 - Add merge status column in pull requests page (Abhijeet Kasurde)
 - Allow user with ticket access to edit custom fields, metadata and the privacy
   flag (Vivek Anand)
@@ -1231,7 +1231,7 @@ This document records all notable changes to `Pagure <https://pagure.io>`_.
   (Eashan)
 - Document how to filter out for issues having a certain tag in the tips and
   tricks section
-- Allow to manually triggering a run of pagure-ci via a list of sentences set in
+- Allow one to manually triggering a run of pagure-ci via a list of sentences set in
   the configuration
 - Add support for admin API token to pagure-admin
 - Make clicking on 'Unassigned' filter the unassigned PR as it does for issues
@@ -1325,7 +1325,7 @@ This document records all notable changes to `Pagure <https://pagure.io>`_.
 - Add a configuration key allowing to hide some projects that users have access
   to only via these groups
 - Fix figuring out which branches are not merged in namespaced project
-- Automatically link the commits mentionned in a ticket if their hash is 7 chars
+- Automatically link the commits mentioned in a ticket if their hash is 7 chars
   or more
 - Allow dropping all the priorities info of an issue
 - Do not edit multiple times the milestone info when updating a ticket
@@ -1418,7 +1418,7 @@ This document records all notable changes to `Pagure <https://pagure.io>`_.
 - Make interacting with the different git repos a locked process to avoid
   lost/orphan commits
 - Update API doc for api_view_user (Clement Verna)
-- Dont return 404 when viewing empty files (Pradeep CE (cep))
+- Don't return 404 when viewing empty files (Pradeep CE (cep))
 - Do not automatically update the last_updated or updated_on fields
 - Make alembic use the DB url specified in the configuration file of pagure
 - Only connect to the smtp server if we're going to send an email
@@ -1472,7 +1472,7 @@ This document records all notable changes to `Pagure <https://pagure.io>`_.
 - Let the notifications render correctly when added by the SSE server
 - Fix the URL for pull request on the list of branches of a fork (Rahul Bajaj)
 - Adjust the markdown processor to have 1 regex for all cross-project links
-- Remove unsued variables (Farhaan Bukhsh)
+- Remove unused variables (Farhaan Bukhsh)
 - Hide the title of private tickets when linking to them in markdown
 - Show user activity in pagure on the user's page
 - Add the possibility to subscribe to issues
@@ -1648,7 +1648,7 @@ This document records all notable changes to `Pagure <https://pagure.io>`_.
 - Don't track pagure_env (venv) dir (Paul W. Frields)
 - Setting Mail-Followup-To when sending message to users (Sergio Durigan Junior)
   (Fixed by Ryan Lerch and I)
-- Fixed the tickets hook so that we dont ignore the files committed in the first
+- Fixed the tickets hook so that we don't ignore the files committed in the first
   commit (Clement Verna)
 - Fix behavior of view of tree if default branch is not 'master' (Vivek Anand)
 - Fix checking the release folder for forks
@@ -1809,11 +1809,11 @@ This document records all notable changes to `Pagure <https://pagure.io>`_.
 2.2.1 (2016-06-01)
 ------------------
 
-- Fix showing the inital comment on PR having only one commit (Ryan Lerch)
+- Fix showing the initial comment on PR having only one commit (Ryan Lerch)
 - Fix diffs not showing for additions/deletions for files under 1000 lines (Ryan
   Lerch)
 - Split out the commits page to a template of its own (Ryan Lerch)
-- Fix hightlighting the commits tab on commit view
+- Fix highlighting the commits tab on commit view
 - Fix the fact that the no readme box show on empty repo (Ryan Lerch)
 
 
@@ -1964,7 +1964,7 @@ This document records all notable changes to `Pagure <https://pagure.io>`_.
 - Fix the of the Docs tab and the Fork button with rounded corners (Pedro Lima)
 - Expand the information in the notifications message when a PR is updated (Ryan
   Lerch)
-- Fix hidding the reply buttons when users are not authenticated (Paul W. Frields)
+- Fix hiding the reply buttons when users are not authenticated (Paul W. Frields)
 - Improve the description of the git hooks (Lubomír Sedlář)
 - Allow reply to a notification of pagure and setting the reply email address as
   Cc

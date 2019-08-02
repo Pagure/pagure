@@ -11,7 +11,7 @@ How does it work?
 
 The principal is:
 * pagure will trigger a build on jenkins when a pull-request is created,
-  updated or when someone explicitely asks pagure to do so or when a new commit
+  updated or when someone explicitly asks pagure to do so or when a new commit
   is pushed (if pagure-ci is configured to trigger on commit).
 
 * pagure will send a few information to jenkins when triggering a build:
