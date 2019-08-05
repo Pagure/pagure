@@ -619,4 +619,5 @@ CSP_HEADERS = (
     "style-src 'self' '{nonce_style}'; "
     "object-src 'none';"
     "base-uri 'self';"
+    "img-src 'self' https:;"
 )
