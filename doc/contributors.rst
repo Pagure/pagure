@@ -3,12 +3,12 @@ Contributors to pagure
 
 Pagure would be nothing without its contributors.
 
-On August 2, 2019 (release 5.7.3) the list looks as follow:
+On August 10, 2019 (release 5.7.4) the list looks as follow:
 
 =================  ===========
 Number of commits  Contributor
 =================  ===========
-  6621              Pierre-Yves Chibon <pingou@pingoured.fr>
+  6623              Pierre-Yves Chibon <pingou@pingoured.fr>
    328              Ryan Lerch <rlerch@redhat.com>
    172              Vivek Anand <vivekanand1101@gmail.com>
    139              farhaanbukhsh <farhaan.bukhsh@gmail.com>
@@ -18,14 +18,14 @@ Number of commits  Contributor
     88              Farhaan Bukhsh <farhaan.bukhsh@gmail.com>
     64              Slavek Kabrda <bkabrda@redhat.com>
     59              Johan Cwiklinski <johan@x-tnd.be>
-    50              Julen Landa Alustiza <jlanda@fedoraproject.org>
+    51              Julen Landa Alustiza <jlanda@fedoraproject.org>
     50              Karsten Hopp <karsten@redhat.com>
     47              Mark Reynolds <mreynolds@redhat.com>
     32              Lubomír Sedlář <lsedlar@redhat.com>
     32              Matt Prahl <mprahl@redhat.com>
     32              Pradeep CE (cep) <breathingcode@gmail.com>
     25              Lubomír Sedlář <lubomir.sedlar@gmail.com>
-    24              Neal Gompa <ngompa13@gmail.com>
+    25              Neal Gompa <ngompa13@gmail.com>
     23              rahul Bajaj <you@example.com>
     20              Jeremy Cline <jeremy@jcline.org>
     19              Aurélien Bompard <aurelien@bompard.org>

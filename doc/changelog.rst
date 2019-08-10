@@ -3,6 +3,15 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
+5.7.4 (2019-08-10)
+------------------
+
+- Fix again the alembic revision adding support for allow_rebase on PRs to
+  actually work with mysql
+- Relax the default CSP policy so avatars are loaded from libravatar and other
+  outside resources
+- Improve the support for spec file highlighting
+
 5.7.3 (2019-08-02)
 ------------------
 
