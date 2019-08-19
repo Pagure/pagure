@@ -75,7 +75,7 @@ class APIERROR(enum.Enum):
     EINVALIDTOK = (
         "Invalid or expired token. Please visit %s to get or "
         "renew your API token."
-        % urljoin(pagure_config["APP_URL"], "settings#api-keys")
+        % urljoin(pagure_config["APP_URL"], "settings#nav-api-tab")
     )
     ENOISSUE = "Issue not found"
     EISSUENOTALLOWED = "You are not allowed to view this issue"
