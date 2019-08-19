@@ -90,7 +90,7 @@ class PagureFlaskApiProjectBlockuserTests(tests.SimplePagureTest):
             data,
             {
                 "error": "Invalid or expired token. Please visit "
-                "http://localhost.localdomain/settings#api-keys to "
+                "http://localhost.localdomain/settings#nav-api-tab to "
                 "get or renew your API token.",
                 "error_code": "EINVALIDTOK",
                 "errors": "Invalid token",
@@ -111,7 +111,7 @@ class PagureFlaskApiProjectBlockuserTests(tests.SimplePagureTest):
             data,
             {
                 "error": "Invalid or expired token. Please visit "
-                "http://localhost.localdomain/settings#api-keys to "
+                "http://localhost.localdomain/settings#nav-api-tab to "
                 "get or renew your API token.",
                 "error_code": "EINVALIDTOK",
                 "errors": "Invalid token",
