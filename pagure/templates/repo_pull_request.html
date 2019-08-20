@@ -177,7 +177,7 @@
           </a>
           <div id="merge-alert" class="text-xs-center dropdown-menu dropdown-menu-right p-0">
              <div class="alert text-center mb-0">
-                {% if pull_request.status == 'Open' and g.repo_committer and pull_request.allow_rebase %}
+                {% if pull_request.status == 'Open' and g.repo_committer %}
                 <small id="merge-alert-message"></small>
                 <form action="{{ url_for('ui_ns.merge_request_pull',
                         repo=repo.name,
@@ -194,8 +194,10 @@
                   </div>
                   {% endif %}
                 </form>
+                {% if pull_request.allow_rebase %}
                 <button id="rebase_btn" type="submit"
                   class="btn btn-block my-2">Rebase</button>
+                {% endif %}
               {% else %}
               <small id="merge-alert-message"></small>
               {% endif %}
