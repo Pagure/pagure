@@ -737,19 +737,36 @@ def view_blame_file(repo, filename, username=None, namespace=None):
     repo = flask.g.repo
     repo_obj = flask.g.repo_obj
 
-    branchname = flask.request.args.get("identifier", "master")
+    branchname = flask.request.args.get("identifier")
 
-    if repo_obj.is_empty or repo_obj.head_is_unborn:
+    if repo_obj.is_empty:
         flask.abort(404, description="Empty repo cannot have a file")
 
-    if branchname in repo_obj.listall_branches():
-        branch = repo_obj.lookup_branch(branchname)
-        commit = branch.peel(pygit2.Commit)
+    if branchname is None:
+        if repo_obj.head_is_unborn:
+            flask.abort(
+                404, description="Identifier is mandatory on unborn HEAD repos"
+            )
+
+        branchname = repo_obj.head.shorthand
+        commit = repo_obj[repo_obj.head.target]
+
     else:
-        try:
-            commit = repo_obj[branchname]
-        except ValueError:
-            commit = repo_obj[repo_obj.head.target]
+        if branchname in repo_obj.listall_branches():
+            branch = repo_obj.lookup_branch(branchname)
+            commit = branch.peel(pygit2.Commit)
+        elif branchname in pagure.lib.git.get_git_tags(repo):
+            branch = repo_obj.lookup_reference(
+                "refs/tags/{}".format(branchname)
+            )
+            commit = branch.peel(pygit2.Commit)
+        else:
+            try:
+                commit = repo_obj[branchname]
+            except ValueError:
+                flask.abort(
+                    404, description="Cannot find specified identifier"
+                )
 
     if isinstance(commit, pygit2.Tag):
         commit = commit.peel(pygit2.Commit)
