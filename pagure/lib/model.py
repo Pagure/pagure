@@ -472,8 +472,8 @@ class Project(BASE):
 
     def __repr__(self):
         return (
-            "Project(%s, name:%s, namespace:%s, url:%s, is_fork:%s,\
-                parent_id:%s)"
+            "Project(%s, name:%s, namespace:%s, url:%s, is_fork:%s, "
+            "parent_id:%s)"
             % (
                 self.id,
                 self.name,
