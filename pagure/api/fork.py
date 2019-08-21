@@ -1393,7 +1393,7 @@ def api_pull_request_create(repo, username=None, namespace=None):
         repo_from = repo_to
 
     _check_pull_request(repo_to)
-    _check_token(repo_from)
+    _check_token(repo_from, project_token=False)
 
     form = pagure.forms.RequestPullForm(csrf_enabled=False)
     if not form.validate_on_submit():
