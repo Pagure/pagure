@@ -165,7 +165,7 @@
 
         $.ajax({
           url: "{{ url_for('distgit_ns.anitya_patch_endpoint', repo=repo.name, namespace=repo.namespace) }}",
-          type: 'PATCH',
+          type: 'POST',
           data: {
             anitya_status: _status,
           },
