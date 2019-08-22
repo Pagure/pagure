@@ -1974,5 +1974,98 @@ class PagureCreateBranchTests(tests.Modeltests):
         )
 
 
+class PagureSetDefaultBranchTests(tests.Modeltests):
+    """ Tests for pagure-admin set-default-branch """
+
+    populate_db = True
+
+    def setUp(self):
+        """ Set up the environment, run before every tests. """
+        super(PagureSetDefaultBranchTests, self).setUp()
+
+        # Create a couple of projects
+        tests.create_projects(self.session)
+        # Create their git repo
+        tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
+
+        # Make the imported pagure use the correct db session
+        pagure.cli.admin.session = self.session
+
+    def test_set_default_branch_unknown_project(self):
+        """ Test the set-default-branch function of pagure-admin on an unknown
+        project.
+        """
+
+        args = munch.Munch(
+            {"project": "foob", "user": None, "branch": "master"}
+        )
+        with self.assertRaises(pagure.exceptions.PagureException) as cm:
+            pagure.cli.admin.do_set_default_branch(args)
+        self.assertEqual(
+            cm.exception.args[0], "No project found with: foob, user: None"
+        )
+
+    def test_set_default_branch_invalid_project(self):
+        """ Test the set-default-branch function of pagure-admin on an invalid
+        project.
+        """
+
+        args = munch.Munch(
+            {"project": "f/o/o/b", "user": None, "branch": "master"}
+        )
+        with self.assertRaises(pagure.exceptions.PagureException) as cm:
+            pagure.cli.admin.do_set_default_branch(args)
+        self.assertEqual(
+            cm.exception.args[0],
+            'Invalid project name, has more than one "/": f/o/o/b',
+        )
+
+    def test_set_default_branch_unknown_branch(self):
+        """ Test the set-default-branch function of pagure-admin on an unknown
+        branch.
+        """
+
+        args = munch.Munch({"project": "test", "user": None, "branch": "foob"})
+        with self.assertRaises(pagure.exceptions.PagureException) as cm:
+            pagure.cli.admin.do_set_default_branch(args)
+        self.assertEqual(
+            cm.exception.args[0], "No foob branch found on project: test"
+        )
+
+    def test_set_default_branch_invalid_branch(self):
+        """ Test the set-default-branch function of pagure-admin on an invalid branch.
+        """
+
+        args = munch.Munch(
+            {"project": "test", "user": None, "branch": "~invalid~"}
+        )
+        with self.assertRaises(pagure.exceptions.PagureException) as cm:
+            pagure.cli.admin.do_set_default_branch(args)
+        self.assertEqual(
+            cm.exception.args[0], "No ~invalid~ branch found on project: test"
+        )
+
+    def test_set_default_branch(self):
+        """ Test the set-default-branch funcion of pagure-admin. """
+
+        gitrepo_path = os.path.join(self.path, "repos", "test.git")
+        tests.add_content_git_repo(gitrepo_path)
+        tests.add_commit_git_repo(gitrepo_path, branch="dev")
+
+        # Check default branch before:
+        gitrepo = pygit2.Repository(gitrepo_path)
+        self.assertEqual(gitrepo.head.shorthand, "master")
+
+        args = munch.Munch({"project": "test", "user": None, "branch": "dev"})
+
+        with tests.capture_output() as output:
+            pagure.cli.admin.do_set_default_branch(args)
+        output = output.getvalue()
+        self.assertEqual("Branch dev set as default\n", output)
+
+        # Check default branch after:
+        self.assertEqual(gitrepo.head.shorthand, "dev")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

@@ -17,6 +17,7 @@ import os
 import requests
 from string import Template
 import sys
+import pygit2
 
 import arrow
 from six.moves import input
@@ -34,6 +35,7 @@ import pagure.lib.model_base  # noqa: E402
 import pagure.lib.query  # noqa: E402
 import pagure.lib.tasks_utils  # noqa: E402
 from pagure.flask_app import generate_user_key_files  # noqa: E402
+from pagure.utils import get_repo_path  # noqa: E402
 
 
 _config = pagure.config.reload_config()
@@ -462,6 +464,30 @@ def _parser_create_branch(subparser):
     local_parser.set_defaults(func=do_create_branch)
 
 
+def _parser_set_default_branch(subparser):
+    """ Set up the CLI argument parser for the set-default-branch action.
+
+    :arg subparser: an argparse subparser allowing to have action's specific
+        arguments
+
+     """
+    local_parser = subparser.add_parser(
+        "set-default-branch", help="Set the specified branch as default"
+    )
+    local_parser.add_argument(
+        "project",
+        help="Project to update (as namespace/project if there "
+        "is a namespace)",
+    )
+    local_parser.add_argument(
+        "--user", help="User of the project (to use only on forks)"
+    )
+    local_parser.add_argument(
+        "branch", help="Name of the branch to be set as default"
+    )
+    local_parser.set_defaults(func=do_set_default_branch)
+
+
 def parse_arguments(args=None):
     """ Set-up the argument parsing. """
     parser = argparse.ArgumentParser(
@@ -522,6 +548,9 @@ def parse_arguments(args=None):
 
     # create-branch
     _parser_create_branch(subparser)
+
+    # set-default-branch
+    _parser_set_default_branch(subparser)
 
     return parser.parse_args(args)
 
@@ -1217,6 +1246,37 @@ def do_create_branch(args):
             raise
 
     print("Branch created")
+
+
+def do_set_default_branch(args):
+    """ Sets the specified git branch as default
+
+    Args:
+        args (argparse.Namespace): Parsed arguments
+    """
+    _log.debug("project:         %s", args.project)
+    _log.debug("user:            %s", args.user)
+    _log.debug("branch:          %s", args.branch)
+
+    # Get the project
+    project = _get_project(args.project, user=args.user)
+
+    if project is None:
+        raise pagure.exceptions.PagureException(
+            "No project found with: %s, user: %s" % (args.project, args.user)
+        )
+
+    repo_path = get_repo_path(project)
+    repo_obj = pygit2.Repository(repo_path)
+
+    if args.branch not in repo_obj.listall_branches():
+        raise pagure.exceptions.PagureException(
+            "No %s branch found on project: %s" % (args.branch, args.project)
+        )
+
+    pagure.lib.git.git_set_ref_head(project, args.branch)
+
+    print("Branch %s set as default" % (args.branch))
 
 
 def main():
