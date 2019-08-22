@@ -69,6 +69,7 @@
   <div class="col-xs-2 line-height-1"></div>
   <p>Monitoring status:</p>
   <div class="btn-group">
+    {% if g.authenticated %}
     <a href="#" title="Monitoring status"
         class="btn btn-sm dropdown-toggle btn-outline-primary"
         data-toggle="dropdown" id="monitoring-button">
@@ -107,6 +108,13 @@
         </div>
       </a>
     </div>
+    {% else %}
+    <button title="Monitoring status" class="btn btn-sm btn-outline-primary disabled"
+        id="monitoring-button">
+      <i id="monitoring-icon" class="fa fa-fw fa-eye"></i>
+      <span id="monitoring-label" class="fa fa-circle-o-notch fa-spin fa-1x fa-fw"></span>
+    </button>
+    {% endif %}
   </div>
 
   {% if g.authenticated and repo.user.user == "orphan" %}
