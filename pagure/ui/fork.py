@@ -1115,7 +1115,7 @@ def merge_request_pull(repo, requestid, username=None, namespace=None):
                 )
             )
         if request.assignee.username != flask.g.fas_user.username:
-            flask.flash("Only the assignee can merge this review", "error")
+            flask.flash("Only the assignee can merge this request", "error")
             return flask.redirect(
                 flask.url_for(
                     "ui_ns.request_pull",

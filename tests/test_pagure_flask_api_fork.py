@@ -1191,7 +1191,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-                "error": "Only the assignee can merge this review",
+                "error": "Only the assignee can merge this request",
                 "error_code": "ENOTASSIGNEE",
             },
         )
