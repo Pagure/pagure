@@ -702,7 +702,7 @@ class PagureFlaskForktests(tests.Modeltests):
                 output_text,
             )
             self.assertIn(
-                "Only the assignee can " "merge this review", output_text
+                "Only the assignee can merge this request", output_text
             )
 
             # Project w/ minimal PR score

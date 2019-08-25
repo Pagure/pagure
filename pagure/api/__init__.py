@@ -92,7 +92,7 @@ class APIERROR(enum.Enum):
         "necessary to be merged"
     )
     EPRCONFLICTS = "This pull-request conflicts and thus cannot be merged"
-    ENOTASSIGNEE = "Only the assignee can merge this review"
+    ENOTASSIGNEE = "Only the assignee can merge this request"
     ENOTASSIGNED = "This request must be assigned to be merged"
     ENOUSER = "No such user found"
     ENOCOMMENT = "Comment not found"
