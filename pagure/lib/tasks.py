@@ -775,7 +775,11 @@ def merge_pull_request(
 
     refresh_pr_cache.delay(name, namespace, user)
     return ret(
-        "ui_ns.view_repo", repo=name, username=user, namespace=namespace
+        "ui_ns.request_pull",
+        repo=name,
+        requestid=requestid,
+        username=user,
+        namespace=namespace,
     )
 
 

@@ -491,7 +491,8 @@ class PagureRemotePRtests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                "<title>Overview - test - Pagure</title>", output_text
+                "<title>PR#1: Remote PR title - test\n - Pagure</title>",
+                output_text,
             )
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))

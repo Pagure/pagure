@@ -221,7 +221,8 @@ class PagureLibGitAuthtests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                "<title>Overview - hooktest - Pagure</title>", output_text
+                "<title>PR#1: PR to master - hooktest\n - Pagure</title>",
+                output_text,
             )
 
             # Check file after the merge

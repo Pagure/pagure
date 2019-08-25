@@ -187,7 +187,8 @@ class PagureMergePrNoForkTest(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                "<title>Overview - test - Pagure</title>", output_text
+                "<title>PR#1: test pull-request - test\n - Pagure</title>",
+                output_text,
             )
 
         self.session = pagure.lib.query.create_session(self.dbpath)
@@ -215,7 +216,8 @@ class PagureMergePrNoForkTest(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                "<title>Overview - test - Pagure</title>", output_text
+                "<title>PR#1: test pull-request - test\n - Pagure</title>",
+                output_text,
             )
 
         self.session = pagure.lib.query.create_session(self.dbpath)
