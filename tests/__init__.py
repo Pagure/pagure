@@ -977,7 +977,13 @@ def add_tag_git_repo(folder, tagname, obj_hash, message):
 
 
 def add_content_to_git(
-    folder, branch="master", filename="sources", content="foo", message=None
+    folder,
+    branch="master",
+    filename="sources",
+    content="foo",
+    message=None,
+    author=("Alice Author", "alice@authors.tld"),
+    commiter=("Cecil Committer", "cecil@committers.tld"),
 ):
     """ Create some more commits for the specified git repo. """
     repo, newfolder, branch_ref_obj = _clone_and_top_commits(
@@ -1006,8 +1012,8 @@ def add_content_to_git(
 
     # Commits the files added
     tree = repo.index.write_tree()
-    author = pygit2.Signature("Alice Author", "alice@authors.tld")
-    committer = pygit2.Signature("Cecil Committer", "cecil@committers.tld")
+    author = pygit2.Signature(*author)
+    committer = pygit2.Signature(*commiter)
     branch_ref = "refs/heads/%s" % branch
     message = message or "Add content to file %s" % (filename)
     repo.create_commit(
