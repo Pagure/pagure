@@ -3,6 +3,34 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
+5.7.8 (2019-08-28)
+------------------
+
+- themes/srcfpo: Fix some csp errors
+- themes/srcfpo: Fix error message when interacting with the release-monitoring
+  button
+- themes/srcfpo: Show the release-monitoring dropdown only on authenticated
+  users
+- themes/srcfpo: Fix capitalization incoherency
+- Fix url on the invalid token error message
+- Fix typo on the pull request merge error message
+
+5.7.7 (2019-08-21)
+------------------
+
+- Allow cross-project API token to open pull-request
+- Move the button to change the anitya status to use POST requests
+
+5.7.6 (2019-08-21)
+------------------
+
+- Allow updating PRs via the API using cross-project tokens
+
+5.7.5 (2019-08-21)
+------------------
+
+- Fix the logic to make the merge button appear on pull-request
+
 5.7.4 (2019-08-10)
 ------------------
 
