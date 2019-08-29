@@ -130,6 +130,19 @@
       </a>
     </div>
   </div>
+  {% elif not g.authenticated and repo.user.user == "orphan" %}
+    <div id="take-orphan-section">
+    <div class="col-xs-2 line-height-1"></div>
+    <p>Orphaned:</p>
+    <div class="btn-group">
+      <a href="#" title="Adopt this orphaned package"
+          class="btn btn-sm btn-outline-primary disabled"
+          id="take-orphan-button">
+        <i id="take-orphan-icon" class="fa fa-fw fa-hand-paper-o"></i>
+        Take
+      </a>
+    </div>
+  </div>
   {% endif %}
 
   <script type="text/javascript" nonce="{{ g.nonce }}">
