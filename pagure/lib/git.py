@@ -2453,6 +2453,7 @@ def reinit_git(project, repofolder):
 def get_git_branches(project, with_commits=False):
     """ Return a list of branches for the project
     :arg project: The Project instance to get the branches for
+    :arg with_commits: Whether we should return branch head commits or not
     """
     repo_path = pagure.utils.get_repo_path(project)
     repo_obj = PagureRepo(repo_path)
