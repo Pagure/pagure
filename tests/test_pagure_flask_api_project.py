@@ -148,6 +148,47 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             },
         )
 
+    def test_api_git_branches_with_commits(self):
+        """ Test the api_git_branches method of the flask api with with_commits=True. """
+        # Create a git repo to add branches to
+        tests.create_projects(self.session)
+        repo_path = os.path.join(self.path, "repos", "test.git")
+        tests.add_content_git_repo(repo_path)
+        new_repo_path = tempfile.mkdtemp(prefix="pagure-api-git-branches-test")
+        clone_repo = pygit2.clone_repository(repo_path, new_repo_path)
+
+        # Create two other branches based on master
+        for branch in ["pats-win-49", "pats-win-51"]:
+            clone_repo.create_branch(branch, clone_repo.head.peel())
+            refname = "refs/heads/{0}:refs/heads/{0}".format(branch)
+            PagureRepo.push(clone_repo.remotes[0], refname)
+
+        # Check that the branches show up on the API
+        output = self.app.get("/api/0/test/git/branches?with_commits=true")
+        # Delete the cloned git repo after the API call
+        shutil.rmtree(new_repo_path)
+
+        # Get the commit hex
+        repo_obj = pygit2.Repository(
+            os.path.join(self.path, "repos", "test.git")
+        )
+        commit = repo_obj[repo_obj.head.target]
+
+        # Verify the API data
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                "branches": {
+                    "master": commit.hex,
+                    "pats-win-49": commit.hex,
+                    "pats-win-51": commit.hex,
+                },
+                "total_branches": 3,
+            },
+        )
+
     def test_api_git_branches_empty_repo(self):
         """ Test the api_git_branches method of the flask api when the repo is
         empty.
