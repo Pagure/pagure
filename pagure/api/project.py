@@ -277,7 +277,7 @@ def api_git_branches(repo, username=None, namespace=None):
     +-----------------+----------+---------------+--------------------------+
     | Key             | Type     | Optionality   | Description              |
     +=================+==========+===============+==========================+
-    | ``with_commits``| string   | Optional      | | Include the commit hash|
+    | ``with_commits``| boolean  | Optional      | | Include the commit hash|
     |                 |          |               |   corresponding to the   |
     |                 |          |               |   HEAD of each branch    |
     +-----------------+----------+---------------+--------------------------+
