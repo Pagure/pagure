@@ -84,7 +84,7 @@
         </div>
         <div class="mt-2">
           <small>
-            {% if pull_request.remote_git or pull_request.project_from.is_fork %}
+            {% if pull_request.remote_git or (pull_request.project_from and pull_request.project_from.is_fork) %}
             <span class="badge badge-light badge-pill border border-secondary font-1em">
               {% if pull_request.remote_git %}
                 <i class="fa fa-globe"></i>
@@ -99,8 +99,7 @@
                 {%- endif -%}
                 {{pull_request.project_from.name}}
               {% endif %}
-              </span>
-            {% endif %}
+            </span>
             <a href="{{ url_for('ui_ns.view_tree',
                     repo=pull_request.project_from.name,
                     username=pull_request.project_from.user.user
@@ -111,7 +110,13 @@
                   class="badge badge-secondary badge-pill border border-secondary font-1em">
                 <span class="fa fa-random"></span>
                 {{ pull_request.branch_from }}
-              </a>
+            </a>
+            {% else %}
+            <span class="badge badge-light badge-pill border border-seconday font-1em">
+              <i class="fa fa-question"></i>
+              Unknown source
+            </span>
+            {% endif %}
           &nbsp;into&nbsp;
             <a href="{{ url_for('ui_ns.view_tree',
                       repo=pull_request.project.name,
@@ -292,7 +297,7 @@
     <div class="list-group">
         {% for commit in diff_commits %}
 
-            {% if pull_request.status and pull_request.project_from.is_fork %}
+            {% if pull_request.status and (pull_request.project_from and pull_request.project_from.is_fork) %}
               {% set commit_link = url_for(
                 'ui_ns.view_commit',
                 repo=pull_request.project_from.name,

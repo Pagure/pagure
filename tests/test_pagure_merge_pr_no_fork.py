@@ -205,7 +205,9 @@ class PagureMergePrNoForkTest(tests.Modeltests):
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
             data = {"csrf_token": self.get_csrf()}
-
+            # Check the PR view on UI
+            output = self.app.get("/test/pull-request/1")
+            self.assertEqual(output.status_code, 200)
             # Merge PR
             output = self.app.post(
                 "/test/pull-request/1/merge", data=data, follow_redirects=True

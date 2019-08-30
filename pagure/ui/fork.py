@@ -331,6 +331,7 @@ def request_pull(repo, requestid, username=None, namespace=None):
     can_delete_branch = (
         pagure_config.get("ALLOW_DELETE_BRANCH", True)
         and not request.remote_git
+        and request.project_from
         and pagure.utils.is_repo_committer(request.project_from)
     )
     return flask.render_template(
