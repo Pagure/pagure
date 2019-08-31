@@ -1631,10 +1631,7 @@ def change_ref_head(repo, username=None, namespace=None):
     if form.validate_on_submit():
         branchname = form.branches.data
         try:
-            reference = repo_obj.lookup_reference(
-                "refs/heads/%s" % branchname
-            ).resolve()
-            repo_obj.set_head(reference.name)
+            pagure.lib.git.git_set_ref_head(project=repo, branch=branchname)
             flask.flash("Default branch updated to %s" % branchname)
         except Exception as err:  # pragma: no cover
             _log.exception(err)

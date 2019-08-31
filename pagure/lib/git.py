@@ -2512,6 +2512,18 @@ def new_git_branch(
         tempclone.push(username, branch, branch)
 
 
+def git_set_ref_head(project, branch):
+    """ Set the HEAD reference of the project
+    :arg project: The project instance to set the HEAD reference
+    :arg branch: The branch to be set as HEAD reference
+    """
+    repo_path = pagure.utils.get_repo_path(project)
+    repo_obj = PagureRepo(repo_path)
+
+    reference = repo_obj.lookup_reference("refs/heads/%s" % branch).resolve()
+    repo_obj.set_head(reference.name)
+
+
 def delete_project_repos(project):
     """ Deletes the actual git repositories on disk or repoSpanner
 
