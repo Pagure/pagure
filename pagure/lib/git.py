@@ -89,6 +89,9 @@ def commit_to_patch(
             # First commit in the repo
             diff = commit.tree.diff_to_tree(swap=True)
 
+        if diff.patch is None:
+            continue
+
         if find_similar and diff:
             diff.find_similar()
 
@@ -138,7 +141,7 @@ Subject: {subject}
     if separated:
         return patch
     else:
-        return "".join(patch)
+        return "".join(filter(None, patch))
 
 
 def generate_gitolite_acls(project=None, group=None):

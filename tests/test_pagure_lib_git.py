@@ -3277,6 +3277,20 @@ class PagureLibGitCommitToPatchtests(tests.Modeltests):
 
         self.second_commit = repo.revparse_single("HEAD")
 
+        # Add empty commit
+        repo.create_commit(
+            "refs/heads/master",  # the name of the reference to update
+            author,
+            committer,
+            "Empty commit",
+            # binary string representing the tree object ID
+            tree,
+            # list of binary strings representing parents of the new commit
+            [self.second_commit.oid.hex],
+        )
+
+        self.third_commit = repo.revparse_single("HEAD")
+
     def test_commit_to_patch_first_commit(self):
         """ Test the commit_to_patch function of pagure.lib.git. """
         repo = pygit2.init_repository(self.gitrepo)
@@ -3621,6 +3635,24 @@ index 9f44358..2a552bb 100644
             output.append(patch)
 
         self.assertEqual(output, exp)
+
+    def test_commit_to_patch_empty_commit(self):
+        """ Test the commit_to_path function of pagure.lib.git. """
+        repo = pygit2.init_repository(self.gitrepo)
+
+        patch = pagure.lib.git.commit_to_patch(repo, self.third_commit)
+        exp = ""
+        self.assertEqual(patch, exp)
+
+    def test_commit_to_patch_empty_commit_diff(self):
+        """ Test the commit_to_patch function of pagure.lib.git. """
+        repo = pygit2.init_repository(self.gitrepo)
+
+        patch = pagure.lib.git.commit_to_patch(
+            repo, self.third_commit, diff_view=True
+        )
+        exp = ""
+        self.assertEqual(patch, exp)
 
 
 if __name__ == "__main__":
