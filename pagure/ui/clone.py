@@ -241,6 +241,13 @@ def clone_proxy(project, username=None, namespace=None):
         asuser=flask.request.remote_user,
     )
     if not project:
+        _log.info(
+            "%s could not find project: %s for user %s and namespace %s",
+            flask.request.remote_user,
+            project,
+            username,
+            namespace,
+        )
         flask.abort(404, description="Project not found")
 
     if project.is_on_repospanner:
