@@ -229,7 +229,7 @@ def request_pulls(repo, username=None, namespace=None):
     "/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>"
 )
 def request_pull(repo, requestid, username=None, namespace=None):
-    """ Create a pull request with the changes from the fork into the project.
+    """ View a pull request with the changes from the fork into the project.
     """
     repo = flask.g.repo
 
