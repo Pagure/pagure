@@ -413,7 +413,7 @@ class DefaultRunner(BaseRunner):
 
         # Refresh of all opened PRs
         parent = project.parent or project
-        if _config.get("GIT_HOOK_DB_RO", False):
+        if not _config.get("GIT_HOOK_DB_RO", False):
             pagure.lib.tasks.refresh_pr_cache(
                 parent.name,
                 parent.namespace,
