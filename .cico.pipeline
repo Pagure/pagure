@@ -57,7 +57,7 @@ node('pagure') {
         }
 
         stage('Clone Test Suite') {
-            onmyduffynode "git clone --single-branch --depth 1 https://pagure.io/pagure.git"
+            onmyduffynode "GIT_TRACE=1 GIT_CURL_VERBOSE=1 git clone --single-branch --depth 1 https://pagure.io/pagure.git"
         }
 
         stage('Run Test Suite') {

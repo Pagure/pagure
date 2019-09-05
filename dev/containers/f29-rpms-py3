@@ -19,7 +19,7 @@ RUN dnf -y --enablerepo=updates-testing install \
     git
 
 RUN cd / \
-    && git clone -b $BRANCH $REPO \
+    && GIT_TRACE=1 GIT_CURL_VERBOSE=1 git clone -b $BRANCH $REPO \
     && chmod +x /pagure/dev/containers/runtests_py3.sh \
     && sed -i -e 's|\["alembic",|\["alembic-3",|' /pagure/tests/test_alembic.py
 
