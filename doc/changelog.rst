@@ -3,6 +3,14 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
+5.7.9 (2019-09-05)
+------------------
+
+- Fix rendering badges on the PR list page
+- Tweak when we show the merge and the rebase buttons
+- Fix the logic around interacting with read-only databases in hooks
+- Fix .diff and .patch generation for empty commits
+
 5.7.8 (2019-08-28)
 ------------------
 
