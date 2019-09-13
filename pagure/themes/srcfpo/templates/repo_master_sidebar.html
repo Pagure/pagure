@@ -222,6 +222,26 @@
         });
       });
       {% endif %}
+      {% if repo.user.user == "orphan" %}
+      $.ajax({
+        url: "{{ url_for('distgit_ns.get_actived_status', repo=repo.name, namespace=repo.namespace) }}",
+        type: 'GET',
+        dataType: 'json',
+        success: function(res) {
+          if (!res.active){
+            var _btn = $("#take-orphan-button");
+            _btn.off("click");
+            _btn.click(function(){
+                window.open(
+                    "https://pagure.io/releng/new_issue?title="
+                    + "Unretire {{repo.namespace}}/{{repo.name}}");
+            });
+            _btn.prop( "title", "Package retired - Open a releng ticket to adopt it" );
+            _btn.html("Retired");
+          }
+        }
+      });
+      {% endif %}
 
     });
   </script>
