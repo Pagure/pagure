@@ -125,7 +125,7 @@ def send_webhook_notifications(project, topic, msg):
 def send_action_notification(
     session, subject, action, project, repodir, user, refname, rev
 ):
-    """ Send out-going notifications about the branch that was just deleted.
+    """ Send out-going notifications about the branch/tag.
     """
     email = pagure.lib.git.get_author_email(rev, repodir)
     name = pagure.lib.git.get_author(rev, repodir)
@@ -145,8 +145,10 @@ def send_action_notification(
     )
     if subject == "branch":
         msg["branch"] = refname
+        msg["rev"] = rev
     elif subject == "tag":
         msg["tag"] = refname
+        msg["rev"] = rev
 
     # Send blink notification to any 3rd party plugins, if there are any
     pagure.lib.notify.blinker_publish(topic, msg)
