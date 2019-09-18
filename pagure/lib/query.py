@@ -1497,6 +1497,7 @@ def add_pull_request_flag(
             user_id=user_obj.id,
             token_id=token,
         )
+    request.updated_on = datetime.datetime.utcnow()
     session.add(pr_flag)
     # Make sure we won't have SQLAlchemy error before we continue
     session.flush()
