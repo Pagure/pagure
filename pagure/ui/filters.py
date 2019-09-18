@@ -97,7 +97,8 @@ def get_syntax_alias(filename):
     """
 
     override_rules = pagure_config.get(
-        "SYNTAX_ALIAS_OVERRIDES", {".spec": "rpm-specfile", ".patch": "diff"}
+        "SYNTAX_ALIAS_OVERRIDES",
+        {".spec": "rpm-specfile", ".patch": "diff", ".adoc": "asciidoc"},
     )
     fn, fn_ext = splitext(filename)
 
