@@ -585,6 +585,16 @@ def _get_project(arg_project, user=None):
     )
 
 
+def _check_project(_project, **kwargs):
+    """ Check that the project extracted with args is a valid project """
+    if _project is None:
+        raise pagure.exceptions.PagureException(
+            "No project found with: {}".format(
+                ", ".join(["{}={}".format(k, v) for k, v in kwargs.items()])
+            )
+        )
+
+
 def do_generate_acl(args):
     """ Regenerate the gitolite ACL file.
 
@@ -835,10 +845,7 @@ def do_delete_project(args):
     # Get the project
     project = _get_project(args.project, user=args.user)
 
-    if project is None:
-        raise pagure.exceptions.PagureException(
-            "No project found with: %s" % args.project
-        )
+    _check_project(project, project=args.project, user=args.user)
 
     print(
         "Are you sure you want to delete: %s?\n  This cannot be undone!"
@@ -871,10 +878,7 @@ def do_get_watch_status(args):
     # Get the project
     project = _get_project(args.project)
 
-    if project is None:
-        raise pagure.exceptions.PagureException(
-            "No project found with: %s" % args.project
-        )
+    _check_project(project, project=args.project)
 
     level = (
         pagure.lib.query.get_watch_level_on_repo(
@@ -928,10 +932,7 @@ def do_update_watch_status(args):
     # Get the project
     project = _get_project(args.project)
 
-    if project is None:
-        raise pagure.exceptions.PagureException(
-            "No project found with: %s" % args.project
-        )
+    _check_project(project, project=args.project)
 
     print(
         "Updating watch status of %s to %s (%s) on %s"
@@ -961,10 +962,7 @@ def do_read_only(args):
     # Get the project
     project = _get_project(args.project, user=args.user)
 
-    if project is None:
-        raise pagure.exceptions.PagureException(
-            "No project found with: %s" % args.project
-        )
+    _check_project(project, project=args.project)
 
     # Validate ro flag
     if args.ro and args.ro.lower() not in ["true", "false"]:
@@ -1224,10 +1222,7 @@ def do_create_branch(args):
     # Get the project
     project = _get_project(args.project, user=args.user)
 
-    if project is None:
-        raise pagure.exceptions.PagureException(
-            "No project found with: %s, user: %s" % (args.project, args.user)
-        )
+    _check_project(project, project=args.project, user=args.user)
 
     try:
         pagure.lib.git.new_git_branch(
@@ -1261,10 +1256,7 @@ def do_set_default_branch(args):
     # Get the project
     project = _get_project(args.project, user=args.user)
 
-    if project is None:
-        raise pagure.exceptions.PagureException(
-            "No project found with: %s, user: %s" % (args.project, args.user)
-        )
+    _check_project(project, project=args.project, user=args.user)
 
     repo_path = get_repo_path(project)
     repo_obj = pygit2.Repository(repo_path)

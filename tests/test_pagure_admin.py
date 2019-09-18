@@ -771,7 +771,9 @@ class PagureAdminGetWatchTests(tests.Modeltests):
         args = munch.Munch({"project": "foobar", "user": "pingou"})
         with self.assertRaises(pagure.exceptions.PagureException) as cm:
             pagure.cli.admin.do_get_watch_status(args)
-        self.assertEqual(cm.exception.args[0], "No project found with: foobar")
+        self.assertEqual(
+            cm.exception.args[0], "No project found with: project=foobar"
+        )
 
     def test_get_watch_get_project_invalid_project(self):
         """ Test the get-watch function of pagure-admin with an invalid
@@ -912,7 +914,9 @@ class PagureAdminUpdateWatchTests(tests.Modeltests):
         )
         with self.assertRaises(pagure.exceptions.PagureException) as cm:
             pagure.cli.admin.do_update_watch_status(args)
-        self.assertEqual(cm.exception.args[0], "No project found with: foob")
+        self.assertEqual(
+            cm.exception.args[0], "No project found with: project=foob"
+        )
 
     def test_get_watch_update_project_invalid_project(self):
         """ Test the update-watch function of pagure-admin on an invalid
@@ -1041,7 +1045,9 @@ class PagureAdminReadOnlyTests(tests.Modeltests):
         args = munch.Munch({"project": "foob", "user": None, "ro": None})
         with self.assertRaises(pagure.exceptions.PagureException) as cm:
             pagure.cli.admin.do_read_only(args)
-        self.assertEqual(cm.exception.args[0], "No project found with: foob")
+        self.assertEqual(
+            cm.exception.args[0], "No project found with: project=foob"
+        )
 
     def test_read_only_invalid_project(self):
         """ Test the read-only function of pagure-admin on an invalid
@@ -1725,7 +1731,10 @@ class PagureAdminDeleteProjectTests(tests.Modeltests):
         )
         with self.assertRaises(pagure.exceptions.PagureException) as cm:
             pagure.cli.admin.do_delete_project(args)
-        self.assertEqual(cm.exception.args[0], "No project found with: foob")
+        self.assertEqual(
+            cm.exception.args[0],
+            "No project found with: project=foob, user=None",
+        )
 
     def test_delete_project_invalid_project(self):
         """ Test the read-only function of pagure-admin on an invalid
@@ -1851,7 +1860,8 @@ class PagureCreateBranchTests(tests.Modeltests):
         with self.assertRaises(pagure.exceptions.PagureException) as cm:
             pagure.cli.admin.do_create_branch(args)
         self.assertEqual(
-            cm.exception.args[0], "No project found with: foob, user: None"
+            cm.exception.args[0],
+            "No project found with: project=foob, user=None",
         )
 
     def test_create_branch_invalid_project(self):
@@ -2002,7 +2012,8 @@ class PagureSetDefaultBranchTests(tests.Modeltests):
         with self.assertRaises(pagure.exceptions.PagureException) as cm:
             pagure.cli.admin.do_set_default_branch(args)
         self.assertEqual(
-            cm.exception.args[0], "No project found with: foob, user: None"
+            cm.exception.args[0],
+            "No project found with: project=foob, user=None",
         )
 
     def test_set_default_branch_invalid_project(self):
