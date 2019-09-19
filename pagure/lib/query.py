@@ -3210,6 +3210,7 @@ def search_pull_requests(
     status=None,
     author=None,
     assignee=None,
+    tags=None,
     count=False,
     offset=None,
     limit=None,
@@ -3284,6 +3285,57 @@ def search_pull_requests(
 
     if branch_from is not None:
         query = query.filter(model.PullRequest.branch_from == branch_from)
+
+    if tags is not None and tags != []:
+        if isinstance(tags, six.string_types):
+            tags = [tags]
+        notags = []
+        ytags = []
+        for tag in tags:
+            if tag.startswith("!"):
+                notags.append(tag[1:])
+            else:
+                ytags.append(tag)
+
+        if ytags:
+            sub_q2 = session.query(sqlalchemy.distinct(model.PullRequest.uid))
+            if project_id is not None:
+                sub_q2 = sub_q2.filter(
+                    model.PullRequest.project_id == project_id
+                )
+            sub_q2 = (
+                sub_q2.filter(
+                    model.PullRequest.uid == model.TagPullRequest.request_uid
+                )
+                .filter(model.TagPullRequest.tag_id == model.TagColored.id)
+                .filter(model.TagColored.tag.in_(ytags))
+            )
+        if notags:
+            sub_q3 = session.query(sqlalchemy.distinct(model.PullRequest.uid))
+            if project_id is not None:
+                sub_q3 = sub_q3.filter(
+                    model.PullRequest.project_id == project_id
+                )
+            sub_q3 = (
+                sub_q3.filter(
+                    model.PullRequest.uid == model.TagPullRequest.request_uid
+                )
+                .filter(model.TagPullRequest.tag_id == model.TagColored.id)
+                .filter(model.TagColored.tag.in_(notags))
+            )
+        # Adjust the main query based on the parameters specified
+        if ytags and not notags:
+            query = query.filter(model.PullRequest.uid.in_(sub_q2))
+        elif not ytags and notags:
+            query = query.filter(~model.PullRequest.uid.in_(sub_q3))
+        elif ytags and notags:
+            final_set = set([i[0] for i in sub_q2.all()]) - set(
+                [i[0] for i in sub_q3.all()]
+            )
+            if final_set:
+                query = query.filter(
+                    model.PullRequest.uid.in_(list(final_set))
+                )
 
     if search_pattern is not None:
         if "*" in search_pattern:

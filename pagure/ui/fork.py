@@ -69,6 +69,8 @@ def request_pulls(repo, username=None, namespace=None):
     """ List all Pull-requests associated to a repo
     """
     status = flask.request.args.get("status", "Open")
+    tags = flask.request.args.getlist("tags")
+    tags = [tag.strip() for tag in tags if tag.strip()]
     assignee = flask.request.args.get("assignee", None)
     search_pattern = flask.request.args.get("search_pattern", None)
     author = flask.request.args.get("author", None)
@@ -98,6 +100,7 @@ def request_pulls(repo, username=None, namespace=None):
             order_key=order_key,
             assignee=assignee,
             author=author,
+            tags=tags,
             search_pattern=search_pattern,
             offset=flask.g.offset,
             limit=flask.g.limit,
@@ -112,6 +115,7 @@ def request_pulls(repo, username=None, namespace=None):
             order_key=order_key,
             assignee=assignee,
             author=author,
+            tags=tags,
             search_pattern=search_pattern,
             offset=flask.g.offset,
             limit=flask.g.limit,
@@ -126,6 +130,7 @@ def request_pulls(repo, username=None, namespace=None):
             order_key=order_key,
             assignee=assignee,
             author=author,
+            tags=tags,
             search_pattern=search_pattern,
             offset=flask.g.offset,
             limit=flask.g.limit,
@@ -140,6 +145,7 @@ def request_pulls(repo, username=None, namespace=None):
             order_key=order_key,
             assignee=assignee,
             author=author,
+            tags=tags,
             search_pattern=search_pattern,
             offset=flask.g.offset,
             limit=flask.g.limit,
@@ -151,6 +157,7 @@ def request_pulls(repo, username=None, namespace=None):
         status="Open",
         assignee=assignee,
         author=author,
+        tags=tags,
         search_pattern=search_pattern,
         count=True,
     )
@@ -161,6 +168,7 @@ def request_pulls(repo, username=None, namespace=None):
         status="Merged",
         assignee=assignee,
         author=author,
+        tags=tags,
         search_pattern=search_pattern,
         count=True,
     )
@@ -171,6 +179,7 @@ def request_pulls(repo, username=None, namespace=None):
         status="Closed",
         assignee=assignee,
         author=author,
+        tags=tags,
         search_pattern=search_pattern,
         count=True,
     )
@@ -193,11 +202,15 @@ def request_pulls(repo, username=None, namespace=None):
             total_requests = closed_cnt + merged_cnt + open_cnt
         total_page = int(ceil(total_requests / float(flask.g.limit)))
 
+    tag_list = pagure.lib.query.get_tags_of_project(flask.g.session, repo)
+
     return flask.render_template(
         "requests.html",
         select="requests",
         repo=repo,
         username=username,
+        tag_list=tag_list,
+        tags=tags,
         requests=requests,
         open_cnt=open_cnt,
         merged_cnt=merged_cnt,

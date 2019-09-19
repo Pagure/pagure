@@ -11,6 +11,20 @@
 {% block header %}
 <link type="text/css" rel="stylesheet" nonce="{{ g.nonce }}" href="{{
   url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}"/>
+<style nonce="{{ g.nonce }}">
+  #tags-filter-group .selectize-input .item{
+    background-color: {{tag.tag_color}};
+    color:white;
+    font-weight:bold;
+    padding-left:6px;
+    width:100%;
+  }
+  {% for tag in tag_list %}
+  #tags-filter-group .selectize-input .item[data-value='{{tag.tag}}']{
+    background-color: {{tag.tag_color}};
+  }
+  {% endfor %}
+</style>
 {% endblock %}
 
 {% block repo %}
@@ -132,6 +146,20 @@
                             namespace=repo.namespace,
                             repo=repo.name ) }}" method="GET">
                         <input type="hidden" name="status" value="{{ status }}" />
+
+                        <div class="form-group row mb-1" id="tags-filter-group">
+                          <label for="tags" class="col-auto align-self-center pl-1 pr-0"><i class="text-muted fa fa-fw fa-tag"></i></label>
+                          <div class="col pl-1">
+                            <select name="tags" multiple id="tags-selectize" placeholder="Tags">
+                              {% for tag in tag_list %}
+                              <option value="{{ tag.tag }}" {% if tag.tag in tags %}selected="selected"{% endif %}>{{tag.tag}}</option>
+                              {% endfor %}
+                            </select>
+                          </div>
+                          <div class="col-auto pl-0 pr-1 pt-1">
+                            <i class="fa fa-times fa-fw text-muted" id="tags-selectize-reset"></i>
+                          </div>
+                        </div>
 
                         <div class="form-group row mb-2">
                           <label for="search_pattern" class="col-auto align-self-center pl-1 pr-0"><i class="text-muted fa fa-fw fa-search"></i></label>
@@ -308,6 +336,25 @@ $(document).ready(function() {
     $("#search_pattern-selectize-reset").on('click', function(e){
       $('input[name="search_pattern"]').val('');
     });
+
+    var $tags_selectize = $('#tags-selectize').selectize({
+    plugins: ['remove_button'],
+    closeAfterSelect: true,
+    onInitialize: function(){
+      $("#tags-filter-group .selectize-control").on('click', function(event){
+        event.stopPropagation();
+      })
+      $("#filters-dropdown").on('click', function(event){
+        event.stopPropagation();
+      })
+    }
+    });
+
+  var tags_selectize_control = $tags_selectize[0].selectize;
+
+  $("#tags-selectize-reset").on('click', function(e){
+    tags_selectize_control.clear();
+  });
 
     var $assignee_selectize = $('#assignee-selectize').selectize({
       valueField: 'user',
