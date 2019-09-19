@@ -538,6 +538,8 @@ def request_pull_edit(repo, requestid, username=None, namespace=None):
     if form.validate_on_submit():
         request.title = form.title.data.strip()
         request.initial_comment = form.initial_comment.data.strip()
+        if flask.g.fas_user.username == request.user.username:
+            request.allow_rebase = form.allow_rebase.data
         flask.g.session.add(request)
         if not request.private and not request.project.private:
             pagure.lib.notify.log(

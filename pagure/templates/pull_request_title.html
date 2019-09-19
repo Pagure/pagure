@@ -51,7 +51,16 @@
               <div id="preview" class="p-1">
               </div>
             </fieldset>
-
+            <div class="form-control">
+              <label for="allow_rebase">Allow rebasing</label>
+              <label class="c-input c-checkbox">
+              <input id="allow_rebase" name="allow_rebase" type="checkbox" value="y" {%
+                if request.allow_rebase -%}checked{%- endif -%} {% if g.fas_user.username != request.user.username %} disabled{% endif %}>
+              </label>
+              <small class="text-muted">
+                Let the maintainer of the target project to rebase the pull-request
+              </small>
+            </div>
           </table>
           <p class="buttons indent">
             <input type="submit" class="btn btn-primary" value="Save">
