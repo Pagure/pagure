@@ -81,86 +81,14 @@ class PagureFlaskPrNoSourcestests(tests.Modeltests):
         object.
         """
 
-        # Clone the main repo
-        gitrepo = os.path.join(self.path, "repos", repo.path)
-        newpath = tempfile.mkdtemp(prefix="pagure-fork-test")
-        repopath = os.path.join(newpath, "test")
-        clone_repo = pygit2.clone_repository(gitrepo, repopath)
-
-        # Create a file in that git repo
-        with open(os.path.join(repopath, "sources"), "w") as stream:
-            stream.write("foo\n bar")
-        clone_repo.index.add("sources")
-        clone_repo.index.write()
-
-        # Commits the files added
-        tree = clone_repo.index.write_tree()
-        author = pygit2.Signature("Alice Author", "alice@authors.tld")
-        committer = pygit2.Signature("Cecil Committer", "cecil@committers.tld")
-        clone_repo.create_commit(
-            "refs/heads/master",  # the name of the reference to update
-            author,
-            committer,
-            "Add sources file for testing",
-            # binary string representing the tree object ID
-            tree,
-            # list of binary strings representing parents of the new commit
-            [],
+        req = tests.add_pull_request_git_repo(
+            self.path, self.session, repo, fork, branch_from
         )
-        refname = "refs/heads/master:refs/heads/master"
-        ori_remote = clone_repo.remotes[0]
-        PagureRepo.push(ori_remote, refname)
 
-        first_commit = clone_repo.revparse_single("HEAD")
-
-        # Set the second repo
-        repopath = os.path.join(self.path, "repos", fork.path)
-        new_gitrepo = os.path.join(newpath, "fork_test")
-        clone_repo = pygit2.clone_repository(repopath, new_gitrepo)
-
-        # Add the main project as remote repo
-        upstream_path = os.path.join(self.path, "repos", repo.path)
-        remote = clone_repo.create_remote("upstream", upstream_path)
-        remote.fetch()
-
-        # Edit the sources file again
-        with open(os.path.join(new_gitrepo, "sources"), "w") as stream:
-            stream.write("foo\n bar\nbaz\n boose")
-        clone_repo.index.add("sources")
-        clone_repo.index.write()
-
-        # Commits the files added
-        tree = clone_repo.index.write_tree()
-        author = pygit2.Signature("Alice Author", "alice@authors.tld")
-        committer = pygit2.Signature("Cecil Committer", "cecil@committers.tld")
-        clone_repo.create_commit(
-            "refs/heads/%s" % branch_from,
-            author,
-            committer,
-            "A commit on branch %s" % branch_from,
-            tree,
-            [first_commit.oid.hex],
-        )
-        refname = "refs/heads/%s" % (branch_from)
-        ori_remote = clone_repo.remotes[0]
-        PagureRepo.push(ori_remote, refname)
-
-        # Create a PR for these changes
-        project = pagure.lib.query.get_authorized_project(self.session, "test")
-        req = pagure.lib.query.new_pull_request(
-            session=self.session,
-            repo_from=fork,
-            branch_from=branch_from,
-            repo_to=project,
-            branch_to="master",
-            title="PR from the %s branch" % branch_from,
-            user="pingou",
-        )
-        self.session.commit()
         self.assertEqual(req.id, 1)
         self.assertEqual(req.title, "PR from the %s branch" % branch_from)
 
-        shutil.rmtree(newpath)
+        tests.clean_pull_requests_path()
 
     def test_request_pull_reference(self):
         """ Test if there is a reference created for a new PR. """
