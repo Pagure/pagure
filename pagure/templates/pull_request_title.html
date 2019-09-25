@@ -45,7 +45,7 @@
               <div id="edit">
                 <textarea class="form-control width-100per" id="initial_comment"
                     name="initial_comment">
-                  {{- form.initial_comment.data -}}
+                  {{- form.initial_comment.data if form.initial_comment.data -}}
                 </textarea>
               </div>
               <div id="preview" class="p-1">
