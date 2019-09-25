@@ -656,6 +656,8 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
   url_for('static', filename='vendor/jquery.caret/jquery.caret.min.js') }}?version={{ g.version}}"></script>
 <script type="text/javascript" nonce="{{ g.nonce }}" src="{{
   url_for('static', filename='vendor/jquery.atwho/jquery.atwho.min.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='tags.js') }}?version={{ g.version}}"></script>
 
 <script type="text/javascript" nonce="{{ g.nonce }}">
 
@@ -802,12 +804,6 @@ function setup_reply_btns() {
 });
 };
 
-function color_tags() {
-  $(".badge-tag").each(function(ind, obj) {
-    $(obj).css('background-color', $(obj).attr('data-bg-color'));
-  });
-}
-
 $(document).ready(function() {
   var cur_hash = null;
 
@@ -855,7 +851,6 @@ $(document).ready(function() {
   cancel_edit_btn();
   setup_edit_btns();
   setup_reply_btns();
-  color_tags();
 
 });
 </script>

@@ -66,6 +66,8 @@
 
 {% block jscripts %}
 {{ super() }}
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='tags.js') }}?version={{ g.version}}"></script>
 <script type="text/javascript" nonce="{{ g.nonce }}">
   count_issues(status='.pr-status-open');
   $(function(){

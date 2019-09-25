@@ -538,13 +538,10 @@
 
 <script type="text/javascript" nonce="{{ g.nonce }}" src="{{
   url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='tags.js') }}?version={{ g.version}}"></script>
 
 <script type="text/javascript" nonce="{{ g.nonce }}">
-function color_tags() {
-  $(".small-badge-tag").each(function(ind, obj) {
-    $(obj).css('background-color', $(obj).attr('data-bg-color'));
-  });
-}
 
 function update_progress_bar() {
   $(".progress-bar").each(function(ind, obj) {
@@ -553,7 +550,6 @@ function update_progress_bar() {
 }
 
 $(document).ready(function() {
-    color_tags();
     update_progress_bar();
 
     $("#search_pattern-selectize-reset").on('click', function(e){

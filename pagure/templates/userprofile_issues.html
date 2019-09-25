@@ -4,7 +4,6 @@
 
 {% from "_render_issues.html" import render_issue_row %}
 
-
 {% block userprofile_content %}
 <div class="pt-4">
   <div class="container pb-5">
@@ -58,6 +57,8 @@
 
 {% block jscripts %}
 {{ super() }}
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='tags.js') }}?version={{ g.version}}"></script>
 <script type="text/javascript" nonce="{{ g.nonce }}">
   count_issues(status='.issue-status-open');
   $(function(){

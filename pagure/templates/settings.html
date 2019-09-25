@@ -1117,6 +1117,8 @@
 
 <script type="text/javascript" nonce="{{ g.nonce }}" src="{{
   url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='tags.js') }}?version={{ g.version}}"></script>
 
 <script type="text/javascript" nonce="{{ g.nonce }}">
 function updateform() {
@@ -1130,15 +1132,8 @@ function updateform() {
   });
 };
 
-function color_tags() {
-  $(".badge").each(function(ind, obj) {
-    $(obj).css('background-color', $(obj).attr('data-bg-color'));
-  });
-}
-
 $(document).ready(function() {
     updateform();
-    color_tags();
 
     $('#generate_new_hook_token').click(function() {
         return confirm('Are you sure to generate a new token for '

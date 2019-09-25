@@ -764,6 +764,8 @@
   url_for('static', filename='vendor/jquery.atwho/jquery.atwho.min.js') }}?version={{ g.version}}"></script>
 <script type="text/javascript" nonce="{{ g.nonce }}" src="{{
   url_for('static', filename='request_ev.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='tags.js') }}?version={{ g.version}}"></script>
 
 <script type="text/javascript" nonce="{{ g.nonce }}">
 function cancel_edit_btn() {
@@ -1319,12 +1321,6 @@ $(".add_comment_form").submit(function(event) {
 <script type="text/javascript" nonce="{{ g.nonce }}">
 var cur_hash = null;
 
-function color_tags() {
-  $(".badge-tag").each(function(ind, obj) {
-    $(obj).css('background-color', $(obj).attr('data-bg-color'));
-  });
-}
-
 function highlight_comment() {
   var _hash = window.location.hash;
   if (_hash != cur_hash) {
@@ -1389,7 +1385,6 @@ function updateHighlight(onload) {
 }
 
 $(document).ready(function () {
-  color_tags();
 
   {% if g.authenticated and pull_request %}
   function set_up_subcribed() {
