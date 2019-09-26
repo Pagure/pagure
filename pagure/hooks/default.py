@@ -330,7 +330,7 @@ class DefaultRunner(BaseRunner):
                         refname,
                         oldrev,
                     )
-                    print("Deleting a tag, so we won't run the " "pagure hook")
+                    print("Deleting a tag, so we won't run the pagure hook")
                 elif refname.startswith("refs/heads/"):
                     refname = refname.replace("refs/heads/", "")
                     send_action_notification(
@@ -343,13 +343,11 @@ class DefaultRunner(BaseRunner):
                         refname,
                         oldrev,
                     )
-                    print(
-                        "Deleting a branch, so we won't run the " "pagure hook"
-                    )
+                    print("Deleting a branch, so we won't run the pagure hook")
                 else:
                     print(
                         "Deleting %s, so we wont run the pagure hook nor "
-                        "send notifications"
+                        "send notifications" % refname
                     )
                 continue
             elif set(oldrev) == set(["0"]):
@@ -359,6 +357,18 @@ class DefaultRunner(BaseRunner):
                     send_action_notification(
                         session,
                         "tag",
+                        "creation",
+                        project,
+                        repodir,
+                        username,
+                        refname,
+                        newrev,
+                    )
+                if refname.startswith("refs/heads/"):
+                    refname = refname.replace("refs/heads/", "")
+                    send_action_notification(
+                        session,
+                        "branch",
                         "creation",
                         project,
                         repodir,
