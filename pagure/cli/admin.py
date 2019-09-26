@@ -590,7 +590,9 @@ def _check_project(_project, **kwargs):
     if _project is None:
         raise pagure.exceptions.PagureException(
             "No project found with: {}".format(
-                ", ".join(["{}={}".format(k, v) for k, v in kwargs.items()])
+                ", ".join(
+                    ["{}={}".format(k, v) for k, v in sorted(kwargs.items())]
+                )
             )
         )
 
