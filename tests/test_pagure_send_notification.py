@@ -62,6 +62,7 @@ class PagureHooksDefault(tests.SimplePagureTest):
 
     @mock.patch("pagure.hooks.default.send_fedmsg_notifications")
     def test_send_notifications(self, fedmsg):
+        oldrev = "9e5f51c951c6cab20fe81419320ed740533e2f2f"
         project, sha = self.init_test_repo()
         pagure.hooks.default.send_notifications(
             self.session,
@@ -71,12 +72,14 @@ class PagureHooksDefault(tests.SimplePagureTest):
             "master",
             [sha],
             False,
+            oldrev,
         )
         (_, args, kwargs) = fedmsg.mock_calls[0]
         self.assertEqual(args[1], "git.receive")
         self.assertEqual(args[2]["repo"]["name"], "test")
         self.assertEqual(args[2]["start_commit"], sha)
         self.assertEqual(args[2]["forced"], False)
+        self.assertEqual(args[2]["old_commit"], oldrev)
 
 
 if __name__ == "__main__":

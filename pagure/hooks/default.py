@@ -160,7 +160,9 @@ def send_action_notification(
         send_webhook_notifications(project, topic, msg)
 
 
-def send_notifications(session, project, repodir, user, refname, revs, forced):
+def send_notifications(
+    session, project, repodir, user, refname, revs, forced, oldrev
+):
     """ Send out-going notifications about the commits that have just been
     pushed.
     """
@@ -187,6 +189,7 @@ def send_notifications(session, project, repodir, user, refname, revs, forced):
             total_commits=len(revs),
             start_commit=revs[0],
             end_commit=revs[-1],
+            old_commit=oldrev,
             branch=refname,
             forced=forced,
             authors=list(authors),
@@ -402,7 +405,14 @@ class DefaultRunner(BaseRunner):
             # This one is sending fedmsg and web-hook notifications for project
             # that set them up
             send_notifications(
-                session, project, repodir, username, refname, commits, forced
+                session,
+                project,
+                repodir,
+                username,
+                refname,
+                commits,
+                forced,
+                oldrev,
             )
 
             # Now display to the user if this isn't the default branch links to
