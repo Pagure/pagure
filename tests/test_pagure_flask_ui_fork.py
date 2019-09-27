@@ -1516,6 +1516,189 @@ class PagureFlaskForktests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
     @patch("pagure.lib.notify.send_email")
+    def test_request_pulls_filters_tags(self, send_email):
+        """Test the requests_pull
+
+        i.e Make sure that the results are filtered properly"""
+        send_email.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
+
+        repo = pagure.lib.query.get_authorized_project(self.session, "test")
+        # Create some tags to play with
+        pagure.lib.query.new_tag(
+            self.session, "tag-1", "tag-1 descripcion", "#ff0000", repo.id
+        )
+        pagure.lib.query.new_tag(
+            self.session, "tag-2", "tag-2 description", "#00ff00", repo.id
+        )
+        pagure.lib.query.new_tag(
+            self.session, "tag-3", "tag-3 description", "#0000ff", repo.id
+        )
+
+        fork = pagure.lib.model.Project(
+            user_id=2,
+            name="test",
+            description="test project #1",
+            hook_token="aaabbb",
+            is_fork=True,
+            parent_id=1,
+        )
+        self.session.add(fork)
+        self.session.commit()
+
+        # Create PR's to play with
+        # PR-1, tags: tag-1, tag-3
+        req = pagure.lib.query.new_pull_request(
+            session=self.session,
+            repo_to=repo,
+            repo_from=fork,
+            branch_from="feature",
+            branch_to="master",
+            title="First PR",
+            user="pingou",
+            status="Open",
+        )
+        pagure.lib.query.update_tags(
+            self.session, obj=req, tags=["tag-1", "tag-3"], username="pingou"
+        )
+        self.session.commit()
+
+        # PR-2, tags: tag-2, tag-3
+        req = pagure.lib.query.new_pull_request(
+            session=self.session,
+            repo_to=repo,
+            repo_from=fork,
+            branch_from="feature",
+            branch_to="master",
+            title="Second PR",
+            user="pingou",
+            status="Open",
+        )
+        pagure.lib.query.update_tags(
+            self.session, obj=req, tags=["tag-2", "tag-3"], username="pingou"
+        )
+        self.session.commit()
+
+        # PR-3 closed, tags: tag-1, tag-3
+        req = pagure.lib.query.new_pull_request(
+            session=self.session,
+            repo_to=repo,
+            repo_from=fork,
+            branch_from="feature",
+            branch_to="master",
+            title="Third PR",
+            user="pingou",
+            status="Closed",
+        )
+        pagure.lib.query.update_tags(
+            self.session, obj=req, tags=["tag-1", "tag-3"], username="pingou"
+        )
+        self.session.commit()
+
+        # PR-4 closed, tags: tag-1, tag-2
+        req = pagure.lib.query.new_pull_request(
+            session=self.session,
+            repo_to=repo,
+            repo_from=fork,
+            branch_from="feature",
+            branch_to="master",
+            title="Fourth PR",
+            user="pingou",
+            status="Closed",
+        )
+        pagure.lib.query.update_tags(
+            self.session, obj=req, tags=["tag-1", "tag-2"], username="pingou"
+        )
+        self.session.commit()
+
+        # filter by 'tag-1'
+        output = self.app.get("/test/pull-requests?tags=tag-1")
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        tr_elements = re.findall(
+            '<div class="request-row list-group-item list-group-item-action ">(.*?)</div><!--end request-row-->',
+            output_text,
+            re.M | re.S,
+        )
+        self.assertEqual(1, len(tr_elements))
+        self.assertIn('href="/test/pull-request/1', tr_elements[0])
+
+        # filter by '!tag-1'
+        output = self.app.get("/test/pull-requests?tags=!tag-1")
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        tr_elements = re.findall(
+            '<div class="request-row list-group-item list-group-item-action ">(.*?)</div><!--end request-row-->',
+            output_text,
+            re.M | re.S,
+        )
+        self.assertEqual(1, len(tr_elements))
+        self.assertIn('href="/test/pull-request/2', tr_elements[0])
+
+        # filter by 'tag-2' and 'tag-3'
+        output = self.app.get("/test/pull-requests?tags=tag2&tags=tag-3")
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        tr_elements = re.findall(
+            '<div class="request-row list-group-item list-group-item-action ">(.*?)</div><!--end request-row-->',
+            output_text,
+            re.M | re.S,
+        )
+        self.assertEqual(2, len(tr_elements))
+        self.assertIn('href="/test/pull-request/2', tr_elements[0])
+        self.assertIn('href="/test/pull-request/1', tr_elements[1])
+
+        # filter by '!tag-3'
+        output = self.app.get("/test/pull-requests?tags=!tag-3")
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        tr_elements = re.findall(
+            '<div class="request-row list-group-item list-group-item-action ">(.*?)</div><!--end request-row-->',
+            output_text,
+            re.M | re.S,
+        )
+        self.assertEqual(0, len(tr_elements))
+
+        # filter by tag-2 on Closed prs
+        output = self.app.get("/test/pull-requests?status=Closed&tags=tag-2")
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        tr_elements = re.findall(
+            '<div class="request-row list-group-item list-group-item-action ">(.*?)</div><!--end request-row-->',
+            output_text,
+            re.M | re.S,
+        )
+        self.assertEqual(1, len(tr_elements))
+        self.assertIn('href="/test/pull-request/4', tr_elements[0])
+
+        # filter by !tag-2 on Closed prs
+        output = self.app.get("/test/pull-requests?status=Closed&tags=!tag-2")
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        tr_elements = re.findall(
+            '<div class="request-row list-group-item list-group-item-action ">(.*?)</div><!--end request-row-->',
+            output_text,
+            re.M | re.S,
+        )
+        self.assertEqual(1, len(tr_elements))
+        self.assertIn('href="/test/pull-request/3', tr_elements[0])
+
+        # filter by tag-2 on all the prs
+        output = self.app.get("/test/pull-requests?status=all&tags=tag-2")
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        tr_elements = re.findall(
+            '<div class="request-row list-group-item list-group-item-action ">(.*?)</div><!--end request-row-->',
+            output_text,
+            re.M | re.S,
+        )
+        self.assertEqual(2, len(tr_elements))
+        self.assertIn('href="/test/pull-request/4', tr_elements[0])
+        self.assertIn('href="/test/pull-request/2', tr_elements[1])
+
+    @patch("pagure.lib.notify.send_email")
     def test_request_pull_patch(self, send_email):
         """ Test the request_pull_patch endpoint. """
         send_email.return_value = True
