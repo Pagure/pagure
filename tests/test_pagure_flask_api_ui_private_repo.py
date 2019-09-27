@@ -1508,6 +1508,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                     "args": {
                         "assignee": None,
                         "author": None,
+                        "tags": [],
                         "page": 1,
                         "per_page": 20,
                         "status": True,

@@ -123,6 +123,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
                 "args": {
                     "assignee": None,
                     "author": None,
+                    "tags": [],
                     "page": 1,
                     "per_page": 20,
                     "status": "closed",
@@ -158,6 +159,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
             {
                 "assignee": None,
                 "author": None,
+                "tags": [],
                 "page": 1,
                 "per_page": 20,
                 "status": "closed",
@@ -301,6 +303,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
             {
                 "assignee": None,
                 "author": None,
+                "tags": [],
                 "page": 1,
                 "per_page": 20,
                 "status": "all",
@@ -325,6 +328,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
             {
                 "assignee": None,
                 "author": None,
+                "tags": [],
                 "page": 1,
                 "per_page": 20,
                 "status": "all",
@@ -386,6 +390,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
             "args": {
                 "assignee": None,
                 "author": None,
+                "tags": [],
                 "page": 1,
                 "per_page": 20,
                 "status": True,
@@ -512,6 +517,126 @@ class PagureFlaskApiForktests(tests.Modeltests):
             self.assertIsNotNone(data["pagination"][k])
             data2["pagination"][k] = "http://localhost..."
         self.assertDictEqual(data, data2)
+
+    @patch("pagure.lib.notify.send_email")
+    def test_api_pull_request_view_tag_filtered(self, send_email):
+        """ Test the api_pull_request_view method of the flask api to list
+            tag filtered open PRs. """
+        send_email.return_value = True
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+        repo = pagure.lib.query.get_authorized_project(self.session, "test")
+
+        # Add a tag
+        pagure.lib.query.new_tag(
+            self.session, "tag-1", "tag-1 description", "#ff0000", repo.id
+        )
+        # Create a pull-request
+        forked_repo = pagure.lib.query.get_authorized_project(
+            self.session, "test"
+        )
+        req = pagure.lib.query.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from="master",
+            repo_to=repo,
+            branch_to="master",
+            title="test pull-request",
+            user="pingou",
+        )
+        self.session.commit()
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, "test pull-request")
+
+        output = self.app.get("/api/0/test/pull-requests?tags=tag-1")
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        for k in ["first", "last"]:
+            self.assertIsNotNone(data["pagination"][k])
+            data["pagination"][k] = "http://localhost..."
+        self.assertDictEqual(
+            data,
+            {
+                "args": {
+                    "assignee": None,
+                    "author": None,
+                    "tags": ["tag-1"],
+                    "page": 1,
+                    "per_page": 20,
+                    "status": True,
+                },
+                "pagination": {
+                    "first": "http://localhost...",
+                    "last": "http://localhost...",
+                    "next": None,
+                    "page": 1,
+                    "pages": 0,
+                    "per_page": 20,
+                    "prev": None,
+                },
+                "requests": [],
+                "total_requests": 0,
+            },
+        )
+
+        # Tag the PR and try again
+        pagure.lib.query.update_tags(
+            self.session, obj=req, tags=["tag-1"], username="pingou"
+        )
+        self.session.commit()
+
+        output = self.app.get("/api/0/test/pull-requests?tags=tag-1")
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(
+            sorted(data.keys()),
+            ["args", "pagination", "requests", "total_requests"],
+        )
+        self.assertDictEqual(
+            data["args"],
+            {
+                "assignee": None,
+                "author": None,
+                "tags": ["tag-1"],
+                "page": 1,
+                "per_page": 20,
+                "status": True,
+            },
+        )
+        self.assertEqual(data["total_requests"], 1)
+
+        # Try negative filtering
+        output = self.app.get("/api/0/test/pull-requests?tags=!tag-1")
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        for k in ["first", "last"]:
+            self.assertIsNotNone(data["pagination"][k])
+            data["pagination"][k] = "http://localhost..."
+        self.assertDictEqual(
+            data,
+            {
+                "args": {
+                    "assignee": None,
+                    "author": None,
+                    "tags": ["!tag-1"],
+                    "page": 1,
+                    "per_page": 20,
+                    "status": True,
+                },
+                "pagination": {
+                    "first": "http://localhost...",
+                    "last": "http://localhost...",
+                    "next": None,
+                    "page": 1,
+                    "pages": 0,
+                    "per_page": 20,
+                    "prev": None,
+                },
+                "requests": [],
+                "total_requests": 0,
+            },
+        )
 
     @patch("pagure.lib.notify.send_email")
     def test_api_pull_request_view_pr_disabled(self, send_email):

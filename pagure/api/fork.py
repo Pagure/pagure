@@ -87,6 +87,13 @@ def api_pull_request_views(repo, username=None, namespace=None):
     | ``author``    | string   | Optional     | | Filter the author of     |
     |               |          |              |   pull requests            |
     +---------------+----------+--------------+----------------------------+
+    | ``tags``      | string   | Optional     | | A list of tags you       |
+    |               |          |              |   wish to filter. If you   |
+    |               |          |              |   want to filter for pull  |
+    |               |          |              |   requests not having a    |
+    |               |          |              |   tag, add an exclamation  |
+    |               |          |              |   mark in front of it      |
+    +---------------+----------+--------------+----------------------------+
 
     Sample response
     ^^^^^^^^^^^^^^^
@@ -97,7 +104,8 @@ def api_pull_request_views(repo, username=None, namespace=None):
           "args": {
             "assignee": null,
             "author": null,
-            "status": true
+            "status": true,
+            "tags": null
           },
           "total_requests": 1,
           "requests": [
@@ -154,6 +162,8 @@ def api_pull_request_views(repo, username=None, namespace=None):
     status = flask.request.args.get("status", True)
     assignee = flask.request.args.get("assignee", None)
     author = flask.request.args.get("author", None)
+    tags = flask.request.args.getlist("tags")
+    tags = [tag.strip() for tag in tags if tag.strip()]
 
     status_text = ("%s" % status).lower()
     requests = []
@@ -164,6 +174,7 @@ def api_pull_request_views(repo, username=None, namespace=None):
             status=False,
             assignee=assignee,
             author=author,
+            tags=tags,
         )
 
     elif status_text == "all":
@@ -173,6 +184,7 @@ def api_pull_request_views(repo, username=None, namespace=None):
             status=None,
             assignee=assignee,
             author=author,
+            tags=tags,
         )
 
     else:
@@ -182,6 +194,7 @@ def api_pull_request_views(repo, username=None, namespace=None):
             assignee=assignee,
             author=author,
             status=status,
+            tags=tags,
         )
 
     page = get_page()
@@ -201,7 +214,12 @@ def api_pull_request_views(repo, username=None, namespace=None):
         "requests": [
             request.to_json(public=True, api=True) for request in requests_page
         ],
-        "args": {"status": status, "assignee": assignee, "author": author},
+        "args": {
+            "status": status,
+            "assignee": assignee,
+            "author": author,
+            "tags": tags,
+        },
     }
     if pagination_metadata:
         jsonout["args"]["page"] = page
