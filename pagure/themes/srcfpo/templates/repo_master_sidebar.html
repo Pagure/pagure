@@ -65,7 +65,7 @@
     <i class="fa fa-tags text-muted fa-fw"></i>&nbsp;Releases
   </a>
 
-  {% if 'distgit_ns' in g.main_app.blueprints and not repo.is_fork %}
+  {% if 'distgit_ns' in g.main_app.blueprints and not repo.is_fork and repo.namespace != 'tests'%}
   <div class="col-xs-2 line-height-1"></div>
   <p>Monitoring status:</p>
   <div class="btn-group">

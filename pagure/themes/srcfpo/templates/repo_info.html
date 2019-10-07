@@ -312,6 +312,7 @@
               </div>
             </div>
 
+            {% if repo.namespace != 'tests' %}
             <div class="row text-center mb-4">
               <div class="col">
 
@@ -367,6 +368,7 @@
 
               </div>
             </div>
+            {% endif %}
 
             {% if g.authenticated and g.repo_committer and not repo.is_fork
               and not repo.settings.get('pull_requests', True) and not readme %}
