@@ -170,6 +170,12 @@ def _parser_admin_token_expire(subparser):
         "expire", help="Expire a specific API token"
     )
     local_parser.add_argument("token", help="API token")
+    local_parser.add_argument(
+        "--all",
+        default=False,
+        action="store_true",
+        help="Act on any API token instead of only those with admin ACLs",
+    )
     local_parser.set_defaults(func=do_expire_admin_token)
 
 
@@ -201,6 +207,12 @@ def _parser_admin_token_update(subparser):
     )
     local_parser.add_argument("token", help="API token")
     local_parser.add_argument("date", help="New expiration date")
+    local_parser.add_argument(
+        "--all",
+        default=False,
+        action="store_true",
+        help="Act on any API token instead of only those with admin ACLs",
+    )
     local_parser.set_defaults(func=do_update_admin_token)
 
 
@@ -736,8 +748,11 @@ def do_expire_admin_token(args):
 
     """
     _log.debug("token:          %s", args.token)
+    _log.debug("all:            %s", args.all)
 
     acls = pagure.config.config["ADMIN_API_ACLS"]
+    if args.all:
+        acls = None
     token = pagure.lib.query.search_token(session, acls, token=args.token)
     if not token:
         raise pagure.exceptions.PagureException("No such admin token found")
@@ -763,8 +778,11 @@ def do_update_admin_token(args):
     """
     _log.debug("token:          %s", args.token)
     _log.debug("new date:       %s", args.date)
+    _log.debug("all:            %s", args.all)
 
     acls = pagure.config.config["ADMIN_API_ACLS"]
+    if args.all:
+        acls = None
     token = pagure.lib.query.search_token(session, acls, token=args.token)
     if not token:
         raise pagure.exceptions.PagureException("No such admin token found")

@@ -481,7 +481,64 @@ class PagureAdminAdminTokentests(tests.Modeltests):
         self.assertIn(" -- pingou -- ", output)
 
         # Expire the token
-        args = munch.Munch({"token": token})
+        args = munch.Munch({"token": token, "all": False})
+        pagure.cli.admin.do_expire_admin_token(args)
+
+        # After
+        list_args = munch.Munch(
+            {
+                "user": None,
+                "token": None,
+                "active": True,
+                "expired": False,
+                "all": False,
+            }
+        )
+        with tests.capture_output() as output:
+            pagure.cli.admin.do_list_admin_token(list_args)
+        output = output.getvalue()
+        self.assertEqual(output, "No admin tokens found\n")
+
+    @patch("pagure.cli.admin._get_input")
+    @patch("pagure.cli.admin._ask_confirmation")
+    def test_do_expire_admin_token_non_admin_acls(self, conf, rinp):
+        """ Test the do_expire_admin_token function of pagure-admin for a token
+        without any admin ACL. """
+        if "BUILD_ID" in os.environ:
+            raise unittest.case.SkipTest("Skipping on jenkins/el7")
+
+        # Create an admin token to use
+        conf.return_value = True
+        rinp.return_value = "1,2,3"
+
+        pagure.lib.query.add_token_to_user(
+            self.session,
+            project=None,
+            acls=["issue_assign", "pull_request_subscribe"],
+            username="pingou",
+        )
+
+        # Retrieve all tokens to get the one of interest
+        list_args = munch.Munch(
+            {
+                "user": None,
+                "token": None,
+                "active": False,
+                "expired": False,
+                "all": True,
+            }
+        )
+        with tests.capture_output() as output:
+            pagure.cli.admin.do_list_admin_token(list_args)
+        output = output.getvalue()
+        self.assertNotEqual(output, 'No user "pingou" found\n')
+        self.assertEqual(len(output.split("\n")), 2)
+        self.assertIn(" -- pingou -- ", output)
+
+        token = output.split(" ", 1)[0]
+
+        # Expire the token
+        args = munch.Munch({"token": token, "all": True})
         pagure.cli.admin.do_expire_admin_token(args)
 
         # After
@@ -535,7 +592,7 @@ class PagureAdminAdminTokentests(tests.Modeltests):
         current_expiration = output.split(" ", 1)[1]
 
         # Set the expiration date to the token
-        args = munch.Munch({"token": token, "date": "aa-bb-cc"})
+        args = munch.Munch({"token": token, "date": "aa-bb-cc", "all": False})
         self.assertRaises(
             pagure.exceptions.PagureException,
             pagure.cli.admin.do_update_admin_token,
@@ -578,7 +635,9 @@ class PagureAdminAdminTokentests(tests.Modeltests):
         current_expiration = output.split(" ", 1)[1]
 
         # Set the expiration date to the token
-        args = munch.Munch({"token": token, "date": "2017-18-01"})
+        args = munch.Munch(
+            {"token": token, "date": "2017-18-01", "all": False}
+        )
         self.assertRaises(
             pagure.exceptions.PagureException,
             pagure.cli.admin.do_update_admin_token,
@@ -622,7 +681,11 @@ class PagureAdminAdminTokentests(tests.Modeltests):
 
         # Set the expiration date to the token
         args = munch.Munch(
-            {"token": token, "date": datetime.datetime.utcnow().date()}
+            {
+                "token": token,
+                "date": datetime.datetime.utcnow().date(),
+                "all": False,
+            }
         )
         self.assertRaises(
             pagure.exceptions.PagureException,
@@ -687,7 +750,11 @@ class PagureAdminAdminTokentests(tests.Modeltests):
 
         # Set the expiration date to the token
         args = munch.Munch(
-            {"token": token, "date": deadline.strftime("%Y-%m-%d")}
+            {
+                "token": token,
+                "date": deadline.strftime("%Y-%m-%d"),
+                "all": False,
+            }
         )
         pagure.cli.admin.do_update_admin_token(args)
 
@@ -699,6 +766,76 @@ class PagureAdminAdminTokentests(tests.Modeltests):
                 "active": True,
                 "expired": False,
                 "all": False,
+            }
+        )
+        with tests.capture_output() as output:
+            pagure.cli.admin.do_list_admin_token(list_args)
+        output = output.getvalue()
+        self.assertEqual(output.split(" ", 1)[0], token)
+        self.assertNotEqual(
+            output.strip().split(" -- ", 2)[-1], current_expiration
+        )
+
+    @patch("pagure.cli.admin._get_input")
+    @patch("pagure.cli.admin._ask_confirmation")
+    def test_do_update_admin_token_non_admin_acls(self, conf, rinp):
+        """ Test the do_update_admin_token function of pagure-admin for a token
+        without any admin ACL. """
+        if "BUILD_ID" in os.environ:
+            raise unittest.case.SkipTest("Skipping on jenkins/el7")
+
+        # Create an admin token to use
+        conf.return_value = True
+        rinp.return_value = "1,2,3"
+
+        pagure.lib.query.add_token_to_user(
+            self.session,
+            project=None,
+            acls=["issue_assign", "pull_request_subscribe"],
+            username="pingou",
+        )
+
+        # Retrieve all tokens to get the one of interest
+        list_args = munch.Munch(
+            {
+                "user": None,
+                "token": None,
+                "active": False,
+                "expired": False,
+                "all": True,
+            }
+        )
+        with tests.capture_output() as output:
+            pagure.cli.admin.do_list_admin_token(list_args)
+        output = output.getvalue()
+        self.assertNotEqual(output, 'No user "pingou" found\n')
+        self.assertEqual(len(output.split("\n")), 2)
+        self.assertIn(" -- pingou -- ", output)
+
+        token = output.split(" ", 1)[0]
+        current_expiration = output.strip().split(" -- ", 2)[-1]
+        deadline = datetime.datetime.utcnow().date() + datetime.timedelta(
+            days=3
+        )
+
+        # Set the expiration date to the token
+        args = munch.Munch(
+            {
+                "token": token,
+                "date": deadline.strftime("%Y-%m-%d"),
+                "all": True,
+            }
+        )
+        pagure.cli.admin.do_update_admin_token(args)
+
+        # After
+        list_args = munch.Munch(
+            {
+                "user": None,
+                "token": None,
+                "active": True,
+                "expired": False,
+                "all": True,
             }
         )
         with tests.capture_output() as output:
