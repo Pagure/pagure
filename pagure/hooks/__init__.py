@@ -531,7 +531,7 @@ def run_hook_file(hooktype):
     )
     if not project:
         raise Exception(
-            "Not able to find the project corresponding to: %%s - s - "
+            "Not able to find the project corresponding to: %s - %s - "
             "%s - %s" % (repotype, username, namespace, repo)
         )
 
