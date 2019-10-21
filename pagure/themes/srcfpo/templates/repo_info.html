@@ -370,6 +370,14 @@
             </div>
             {% endif %}
 
+            {% if repo.namespace == 'rpms' %}
+            <div class="row">
+              <div class="col" id="bodhi_updates">
+                <i class="fa fa-circle-o-notch fa-spin fa-1x fa-fw"></i>
+              </div>
+            </div>
+            {% endif %}
+
             {% if g.authenticated and g.repo_committer and not repo.is_fork
               and not repo.settings.get('pull_requests', True) and not readme %}
             <div class="row">
@@ -495,6 +503,20 @@ $(document).ready(function() {
               ' (<a target="_blank" rel="noopener noreferrer" href="'
               + res['url'] + '"a>upstream</a>)')
         }
+      }
+    });
+
+
+    $.ajax({
+      url: "{{ url_for('distgit_ns.bodhi_updates_endpoint', repo=repo.name, namespace=repo.namespace, html=1) }}",
+      type: 'GET',
+      dataType: 'html',
+      success: function(res) {
+        $("#bodhi_updates").html(res);
+      },
+      error: function(res) {
+        console.log(res);
+        $("#bodhi_updates").html("<p>Failed to retrieve updates from bodhi</p>");
       }
     });
   {% endif %}
