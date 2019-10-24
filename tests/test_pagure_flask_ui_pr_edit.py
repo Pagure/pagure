@@ -97,8 +97,11 @@ class PagureFlaskPrEdittests(tests.Modeltests):
         )
 
     def tearDown(self):
+        try:
+            tests.clean_pull_requests_path()
+        except:
+            pass
         super(PagureFlaskPrEdittests, self).tearDown()
-        tests.clean_pull_requests_path()
 
     def test_pr_edit_pull_request_unauthenticated(self):
         output = self.app.get("/test/pull-request/1/edit")
