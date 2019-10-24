@@ -434,9 +434,6 @@ class PagureAdminAdminTokentests(tests.Modeltests):
     @patch("pagure.cli.admin._ask_confirmation")
     def test_do_expire_admin_token(self, conf, rinp):
         """ Test the do_expire_admin_token function of pagure-admin. """
-        if "BUILD_ID" in os.environ:
-            raise unittest.case.SkipTest("Skipping on jenkins/el7")
-
         # Create an admin token to use
         conf.return_value = True
         rinp.return_value = "1,2,3"
@@ -504,8 +501,6 @@ class PagureAdminAdminTokentests(tests.Modeltests):
     def test_do_expire_admin_token_non_admin_acls(self, conf, rinp):
         """ Test the do_expire_admin_token function of pagure-admin for a token
         without any admin ACL. """
-        if "BUILD_ID" in os.environ:
-            raise unittest.case.SkipTest("Skipping on jenkins/el7")
 
         # Create an admin token to use
         conf.return_value = True
@@ -561,8 +556,6 @@ class PagureAdminAdminTokentests(tests.Modeltests):
     def test_do_update_admin_token_invalid_date(self, conf, rinp):
         """ Test the do_update_admin_token function of pagure-admin with
         an invalid date. """
-        if "BUILD_ID" in os.environ:
-            raise unittest.case.SkipTest("Skipping on jenkins/el7")
 
         # Create an admin token to use
         conf.return_value = True
@@ -604,8 +597,6 @@ class PagureAdminAdminTokentests(tests.Modeltests):
     def test_do_update_admin_token_invalid_date2(self, conf, rinp):
         """ Test the do_update_admin_token function of pagure-admin with
         an invalid date. """
-        if "BUILD_ID" in os.environ:
-            raise unittest.case.SkipTest("Skipping on jenkins/el7")
 
         # Create an admin token to use
         conf.return_value = True
@@ -649,8 +640,6 @@ class PagureAdminAdminTokentests(tests.Modeltests):
     def test_do_update_admin_token_invalid_date3(self, conf, rinp):
         """ Test the do_update_admin_token function of pagure-admin with
         an invalid date (is today). """
-        if "BUILD_ID" in os.environ:
-            raise unittest.case.SkipTest("Skipping on jenkins/el7")
 
         # Create an admin token to use
         conf.return_value = True
@@ -697,8 +686,6 @@ class PagureAdminAdminTokentests(tests.Modeltests):
     @patch("pagure.cli.admin._ask_confirmation")
     def test_do_update_admin_token(self, conf, rinp):
         """ Test the do_update_admin_token function of pagure-admin. """
-        if "BUILD_ID" in os.environ:
-            raise unittest.case.SkipTest("Skipping on jenkins/el7")
 
         # Create an admin token to use
         conf.return_value = True
@@ -781,8 +768,6 @@ class PagureAdminAdminTokentests(tests.Modeltests):
     def test_do_update_admin_token_non_admin_acls(self, conf, rinp):
         """ Test the do_update_admin_token function of pagure-admin for a token
         without any admin ACL. """
-        if "BUILD_ID" in os.environ:
-            raise unittest.case.SkipTest("Skipping on jenkins/el7")
 
         # Create an admin token to use
         conf.return_value = True
