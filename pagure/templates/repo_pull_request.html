@@ -135,121 +135,105 @@
 
       </h4>
     <div class="ml-auto d-flex">
-        {% if g.authenticated and (g.fas_user.username == pull_request.user.username
-          or g.repo_committer) and pull_request.status == 'Open'%}
-           {% if pull_request.status == 'Open' and g.authenticated and
-              (g.repo_committer or g.fas_user.username == pull_request.user.username) %}
-                {% if mergeform and pull_request.remote %}
-                  <form class="inline" action="{{ url_for(
-                    'ui_ns.refresh_request_pull',
-                    username=repo.user.user if repo.is_fork else None,
-                    namespace=repo.namespace,
-                    repo=repo.name, requestid=requestid) }}" method="POST">
-                      <button type="submit" value="Refresh" id="refresh_pr"
-                              class="btn btn-outline-primary btn-sm" title="Refresh the remote pull request">
-                        <span class="fa fa-refresh"></span> Refresh
-                      </button>
-                      {{ mergeform.csrf_token }}
-                  </form>
-                {% endif %}
-
+        {% if pull_request.status == 'Open' %}
+          {% if g.authenticated and (g.fas_user.username == pull_request.user.username
+            or g.repo_committer) %}
+            {% if mergeform and pull_request.remote %}
               <form class="inline" action="{{ url_for(
-                  'ui_ns.close_request_pull',
+                  'ui_ns.refresh_request_pull',
                   username=repo.user.user if repo.is_fork else None,
                   namespace=repo.namespace,
                   repo=repo.name, requestid=requestid) }}" method="POST">
-           {% endif %}
-
-           {% if pull_request.status == 'Open' and g.authenticated and
-              (g.repo_committer or g.fas_user.username == pull_request.user.username) %}
+                <button type="submit" value="Refresh" id="refresh_pr"
+                    class="btn btn-outline-primary btn-sm" title="Refresh the remote pull request">
+                  <span class="fa fa-refresh"></span> Refresh
+                </button>
+                {{ mergeform.csrf_token }}
+              </form>
+            {% endif %}
+            <form class="inline" action="{{ url_for(
+                'ui_ns.close_request_pull',
+                username=repo.user.user if repo.is_fork else None,
+                namespace=repo.namespace,
+                repo=repo.name, requestid=requestid) }}" method="POST">
               {{ mergeform.csrf_token }}
-                  <button type="submit" value="Close" id="close_pr"
-                          class="btn btn-outline-danger btn-sm" title="Close PR without merging it" data-toggle="tooltip">
-                    <span class="fa fa-times"></span> Close
-                  </button>
-          {% endif %}
-          {% if pull_request.status == 'Open' and g.authenticated and
-              (g.repo_committer or g.fas_user.username == pull_request.user.username) %}
+              <button type="submit" value="Close" id="close_pr"
+                  class="btn btn-outline-danger btn-sm" title="Close PR without merging it" data-toggle="tooltip">
+                <span class="fa fa-times"></span> Close
+              </button>
             </form>
           {% endif %}
-        {% endif %}
-        {% if pull_request.status == 'Open' %}
-        <div class="dropdown float-right ml-1">
-        <span class="dropdown dropdown-btn">
-          <a href="#" id="merge_dropdown_btn"
-          class="btn btn-outline-secondary btn-sm disabled dropdown-toggle" data-toggle="dropdown">
-            <span class="fa fa-circle-o-notch fa-spin fa-fw"></span> <span id="merge-status-text">Merge</span>
-          </a>
-          <div id="merge-alert" class="text-xs-center dropdown-menu dropdown-menu-right p-0">
-             <div class="alert text-center mb-0">
-              {% if pull_request.status == 'Open' %}
-                {% if g.repo_committer %}
-                  <small id="merge-alert-message"></small>
-                  <form action="{{ url_for('ui_ns.merge_request_pull',
-                          repo=repo.name,
-                          username=repo.user.user if repo.is_fork else None,
-                          namespace=repo.namespace,
-                          requestid=requestid)
-                    }}" method="POST"  id="merge_pr_form">
-                    {{ mergeform.csrf_token }}
-                    <button id="merge_btn" type="submit"
-                      class="btn btn-block my-2">Merge</button>
-                    {% if can_delete_branch %}
-                    <div class="small">
-                    {{ mergeform.delete_branch }} {{ mergeform.delete_branch.label }}
-                    </div>
-                    {% endif %}
+          <div class="dropdown float-right ml-1">
+            <span class="dropdown dropdown-btn">
+              <a href="#" id="merge_dropdown_btn"
+                  class="btn btn-outline-secondary btn-sm disabled dropdown-toggle" data-toggle="dropdown">
+                <span class="fa fa-circle-o-notch fa-spin fa-fw"></span> <span id="merge-status-text">Merge</span>
+              </a>
+              <div id="merge-alert" class="text-xs-center dropdown-menu dropdown-menu-right p-0">
+                <div class="alert text-center mb-0">
+                  {% if g.repo_committer %}
+                    <small id="merge-alert-message"></small>
+                    <form action="{{ url_for('ui_ns.merge_request_pull',
+                        repo=repo.name,
+                        username=repo.user.user if repo.is_fork else None,
+                        namespace=repo.namespace,
+                        requestid=requestid)
+                        }}" method="POST"  id="merge_pr_form">
+                      {{ mergeform.csrf_token }}
+                      <button id="merge_btn" type="submit"
+                          class="btn btn-block my-2">Merge</button>
+                      {% if can_delete_branch %}
+                        <div class="small">
+                          {{ mergeform.delete_branch }} {{ mergeform.delete_branch.label }}
+                        </div>
+                      {% endif %}
+                    </form>
+                  {% endif %}
+                  {% if g.authenticated and (g.repo_committer and pull_request.allow_rebase) or can_rebase_branch %}
+                  <button id="rebase_btn" type="submit"
+                    class="btn btn-block my-2">Rebase</button>
+                  {% endif %}
+                </div>
+              </div>
+            </span>
+            {% if g.authenticated and trigger_ci %}
+              <span class="dropdown dropdown-btn">
+                <a href="#" id="ci_dropdown_btn"
+                    class="btn btn-outline-primary btn-sm btn-info dropdown-toggle" data-toggle="dropdown">
+                  Rerun CI
+                </a>
+                <div class="text-xs-center dropdown-menu dropdown-menu-right p-0">
+                  <form action="{{ url_for('ui_ns.ci_trigger_request_pull',
+                      repo=repo.name,
+                      username=repo.username if repo.is_fork else None,
+                      namespace=repo.namespace,
+                      requestid=requestid)
+                      }}" method="POST" id="ci_pr_trigger_form">
+                    {{ trigger_ci_pr_form.csrf_token }}
+                    {{ trigger_ci_pr_form.comment(id="ci_pr_comment", hidden=True) }}
+                    {% for comment, meta in trigger_ci|dictsort %}
+                      <a class="dropdown-item trigger-ci-btn" href="#" title="{{ meta["description"] }}"
+                          data-comment="{{ comment }}">{{ meta["name"] }}</a>
+                    {% endfor %}
                   </form>
-                {% endif %}
-                {% if (g.repo_committer and pull_request.allow_rebase) or can_rebase_branch %}
-                <button id="rebase_btn" type="submit"
-                  class="btn btn-block my-2">Rebase</button>
-                {% endif %}
-              {% else %}
-              <small id="merge-alert-message"></small>
-              {% endif %}
-            </div>
+                </div>
+              </span>
+          {% endif %}
           </div>
-        </span>
-        {% if g.authenticated and trigger_ci %}
-        <span class="dropdown dropdown-btn">
-          <a href="#" id="ci_dropdown_btn"
-          class="btn btn-outline-primary btn-sm btn-info dropdown-toggle" data-toggle="dropdown">
-            Rerun CI
-          </a>
-          <div class="text-xs-center dropdown-menu dropdown-menu-right p-0">
-            <form action="{{ url_for('ui_ns.ci_trigger_request_pull',
-                    repo=repo.name,
-                    username=repo.username if repo.is_fork else None,
-                    namespace=repo.namespace,
-                    requestid=requestid)
-              }}" method="POST" id="ci_pr_trigger_form">
-              {{ trigger_ci_pr_form.csrf_token }}
-              {{ trigger_ci_pr_form.comment(id="ci_pr_comment", hidden=True) }}
-                {% for comment, meta in trigger_ci|dictsort %}
-                  <a class="dropdown-item trigger-ci-btn" href="#" title="{{ meta["description"] }}"
-                  data-comment="{{ comment }}">{{ meta["name"] }}</a>
-                {% endfor %}
-            </form>
-          </div>
-        </span>
-        {% endif %}
-      </div>
-      {% endif %}
-      {% if pull_request.status == 'Closed' and g.authenticated and
-      (g.repo_committer or g.fas_user.username == pull_request.user.username) %}
-      <form action="{{ url_for(
-            'ui_ns.reopen_request_pull',
-            username=repo.user.user if repo.is_fork else None,
-            namespace=repo.namespace,
-            repo=repo.name, requestid=requestid) }}" method="POST">
-      {{ mergeform.csrf_token }}
-      <button type="submit" value="Reopen" id="reopen_pr"
-              class="btn btn-sm btn-outline-danger" title="Reopen PR">
-        Reopen Pull Request
-      </button>
-      </form>
-   {% endif %}
+        {% elif pull_request.status == 'Closed' and g.authenticated and
+          (g.repo_committer or g.fas_user.username == pull_request.user.username) %}
+          <form action="{{ url_for(
+              'ui_ns.reopen_request_pull',
+              username=repo.user.user if repo.is_fork else None,
+              namespace=repo.namespace,
+              repo=repo.name, requestid=requestid) }}" method="POST">
+              {{ mergeform.csrf_token }}
+            <button type="submit" value="Reopen" id="reopen_pr"
+                class="btn btn-sm btn-outline-danger" title="Reopen PR">
+              Reopen Pull Request
+            </button>
+          </form>
+       {% endif %}
     </div>
   </div>
 
