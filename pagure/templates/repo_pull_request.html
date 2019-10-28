@@ -201,7 +201,7 @@
                     {% endif %}
                   </form>
                 {% endif %}
-                {% if pull_request.allow_rebase or can_delete_branch %}
+                {% if (g.repo_committer and pull_request.allow_rebase) or can_rebase_branch %}
                 <button id="rebase_btn" type="submit"
                   class="btn btn-block my-2">Rebase</button>
                 {% endif %}

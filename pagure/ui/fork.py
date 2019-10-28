@@ -341,11 +341,14 @@ def request_pull(repo, requestid, username=None, namespace=None):
             continue
         trigger_ci[comment] = meta
 
-    can_delete_branch = (
-        pagure_config.get("ALLOW_DELETE_BRANCH", True)
-        and not request.remote_git
+    can_rebase_branch = (
+        not request.remote_git
         and request.project_from
         and pagure.utils.is_repo_committer(request.project_from)
+    )
+
+    can_delete_branch = (
+        pagure_config.get("ALLOW_DELETE_BRANCH", True) and can_rebase_branch
     )
     return flask.render_template(
         "repo_pull_request.html",
@@ -360,6 +363,7 @@ def request_pull(repo, requestid, username=None, namespace=None):
         mergeform=form,
         subscribers=pagure.lib.query.get_watch_list(flask.g.session, request),
         tag_list=pagure.lib.query.get_tags_of_project(flask.g.session, repo),
+        can_rebase_branch=can_rebase_branch,
         can_delete_branch=can_delete_branch,
         trigger_ci=trigger_ci,
         trigger_ci_pr_form=trigger_ci_pr_form,
