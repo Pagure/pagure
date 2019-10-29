@@ -50,24 +50,43 @@ class PagureRebasetests(tests.Modeltests):
             content="foobarbaz",
             filename="testfile",
         )
+        project = pagure.lib.query.get_authorized_project(self.session, "test")
+        # Fork the project
+        task = pagure.lib.query.fork_project(
+            session=self.session, user="foo", repo=project
+        )
+        self.session.commit()
+        self.assertEqual(
+            task.get(),
+            {
+                "endpoint": "ui_ns.view_repo",
+                "repo": "test",
+                "username": "foo",
+                "namespace": None,
+            },
+        )
         tests.add_content_to_git(
-            os.path.join(self.path, "repos", "test.git"),
+            os.path.join(self.path, "repos", "forks", "foo", "test.git"),
             branch="test",
             content="foobar",
             filename="sources",
         )
+        fork_repo = pagure.lib.query.get_authorized_project(
+            self.session, "test", user="foo"
+        )
+
         tests.add_readme_git_repo(os.path.join(self.path, "repos", "test.git"))
 
         # Create a PR for these changes
-        project = pagure.lib.query.get_authorized_project(self.session, "test")
+
         req = pagure.lib.query.new_pull_request(
             session=self.session,
-            repo_from=project,
+            repo_from=fork_repo,
             branch_from="test",
             repo_to=project,
             branch_to="master",
             title="PR from the test branch",
-            user="pingou",
+            user="foo",
             allow_rebase=True,
         )
         self.session.commit()
@@ -208,20 +227,81 @@ class PagureRebasetests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn("rebased onto", output_text)
             repo = pagure.lib.query._get_project(self.session, "test")
-            self.assertEqual(
-                repo.requests[0].comments[0].user.username, "pingou"
-            )
+            # This should be pingou, but we have some bug that adds the
+            # rebase message as PR author instead of rebaser
+            self.assertEqual(repo.requests[0].comments[0].user.username, "foo")
 
     def test_rebase_api_ui_logged_in_different_user(self):
         """ Test the rebase PR API endpoint when logged in from the UI and
         its outcome. """
-        # Add 'foo' to the project 'test' so 'foo' can rebase the PR
+        # Add 'bar' to the project 'test' so 'bar' can rebase the PR
+        item = pagure.lib.model.User(
+            user="bar",
+            fullname="bar foo",
+            password=b"foo",
+            default_email="bar@foo.com",
+        )
+        self.session.add(item)
+        item = pagure.lib.model.UserEmail(user_id=2, email="bar@foo.com")
+        self.session.add(item)
+
+        self.session.commit()
         repo = pagure.lib.query._get_project(self.session, "test")
         msg = pagure.lib.query.add_user_to_project(
-            session=self.session, project=repo, new_user="foo", user="pingou"
+            session=self.session, project=repo, new_user="bar", user="pingou"
         )
         self.session.commit()
         self.assertEqual(msg, "User added")
+
+        user = tests.FakeUser(username="bar")
+        with tests.user_set(self.app.application, user):
+            # Get the merge status first so it's cached and can be refreshed
+            csrf_token = self.get_csrf()
+            data = {"requestid": self.request.uid, "csrf_token": csrf_token}
+            output = self.app.post("/pv/pull-request/merge", data=data)
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.get_data(as_text=True))
+            self.assertEqual(
+                data,
+                {
+                    "code": "MERGE",
+                    "message": "The pull-request can be merged with "
+                    "a merge commit",
+                    "short_code": "With merge",
+                },
+            )
+
+            output = self.app.post("/api/0/test/pull-request/1/rebase")
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.get_data(as_text=True))
+            self.assertEqual(data, {"message": "Pull-request rebased"})
+
+            data = {"requestid": self.request.uid, "csrf_token": csrf_token}
+            output = self.app.post("/pv/pull-request/merge", data=data)
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.get_data(as_text=True))
+            self.assertEqual(
+                data,
+                {
+                    "code": "FFORWARD",
+                    "message": "The pull-request can be merged and "
+                    "fast-forwarded",
+                    "short_code": "Ok",
+                },
+            )
+
+            output = self.app.get("/test/pull-request/1")
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn("rebased onto", output_text)
+            repo = pagure.lib.query._get_project(self.session, "test")
+            # This should be bar, but we have some bug that adds the
+            # rebase message as PR author instead of rebaser
+            self.assertEqual(repo.requests[0].comments[0].user.username, "foo")
+
+    def test_rebase_api_ui_logged_in_pull_request_author(self):
+        """ Test the rebase PR API endpoint when logged in from the UI and
+        its outcome. """
 
         user = tests.FakeUser(username="foo")
         with tests.user_set(self.app.application, user):
@@ -423,24 +503,43 @@ class PagureRebaseNotAllowedtests(tests.Modeltests):
             content="foobarbaz",
             filename="testfile",
         )
+        project = pagure.lib.query.get_authorized_project(self.session, "test")
+        # Fork the project
+        task = pagure.lib.query.fork_project(
+            session=self.session, user="foo", repo=project
+        )
+        self.session.commit()
+        self.assertEqual(
+            task.get(),
+            {
+                "endpoint": "ui_ns.view_repo",
+                "repo": "test",
+                "username": "foo",
+                "namespace": None,
+            },
+        )
         tests.add_content_to_git(
-            os.path.join(self.path, "repos", "test.git"),
+            os.path.join(self.path, "repos", "forks", "foo", "test.git"),
             branch="test",
             content="foobar",
             filename="sources",
         )
+        fork_repo = pagure.lib.query.get_authorized_project(
+            self.session, "test", user="foo"
+        )
+
         tests.add_readme_git_repo(os.path.join(self.path, "repos", "test.git"))
 
         # Create a PR for these changes
         project = pagure.lib.query.get_authorized_project(self.session, "test")
         req = pagure.lib.query.new_pull_request(
             session=self.session,
-            repo_from=project,
+            repo_from=fork_repo,
             branch_from="test",
             repo_to=project,
             branch_to="master",
             title="PR from the test branch",
-            user="pingou",
+            user="foo",
             allow_rebase=False,
         )
         self.session.commit()
@@ -486,18 +585,71 @@ class PagureRebaseNotAllowedtests(tests.Modeltests):
                 },
             )
 
+            # Add pingou to fork repo so he can rebase while allow_rebase = False
+            fork = pagure.lib.query.get_authorized_project(
+                self.session, "test", user="foo"
+            )
+            msg = pagure.lib.query.add_user_to_project(
+                session=self.session,
+                project=fork,
+                new_user="pingou",
+                user="foo",
+            )
+            self.session.commit()
+            self.assertEqual(msg, "User added")
+
+            output = self.app.post("/api/0/test/pull-request/1/rebase")
+            self.assertEqual(output.status_code, 200)
+
+            data = json.loads(output.get_data(as_text=True))
+            self.assertEqual(data, {"message": "Pull-request rebased"})
+
+            data = {"requestid": self.request.uid, "csrf_token": csrf_token}
+            output = self.app.post("/pv/pull-request/merge", data=data)
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.get_data(as_text=True))
+            self.assertEqual(
+                data,
+                {
+                    "code": "FFORWARD",
+                    "message": "The pull-request can be merged and "
+                    "fast-forwarded",
+                    "short_code": "Ok",
+                },
+            )
+
+            output = self.app.get("/test/pull-request/1")
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn("rebased onto", output_text)
+            repo = pagure.lib.query._get_project(self.session, "test")
+            # This should be pingou, but we have some bug that adds the
+            # rebase message as PR author instead of rebaser
+            self.assertEqual(repo.requests[0].comments[0].user.username, "foo")
+
     def test_rebase_api_ui_logged_in_different_user(self):
         """ Test the rebase PR API endpoint when logged in from the UI and
         its outcome. """
-        # Add 'foo' to the project 'test' so 'foo' can rebase the PR
+        # Add 'bar' to the project 'test' so 'bar' can rebase the PR
+        item = pagure.lib.model.User(
+            user="bar",
+            fullname="bar foo",
+            password=b"foo",
+            default_email="bar@foo.com",
+        )
+        self.session.add(item)
+        item = pagure.lib.model.UserEmail(user_id=2, email="bar@foo.com")
+        self.session.add(item)
+
+        self.session.commit()
         repo = pagure.lib.query._get_project(self.session, "test")
         msg = pagure.lib.query.add_user_to_project(
-            session=self.session, project=repo, new_user="foo", user="pingou"
+            session=self.session, project=repo, new_user="bar", user="pingou"
         )
         self.session.commit()
         self.assertEqual(msg, "User added")
 
-        user = tests.FakeUser(username="foo")
+        user = tests.FakeUser(username="bar")
         with tests.user_set(self.app.application, user):
             # Get the merge status first so it's cached and can be refreshed
             csrf_token = self.get_csrf()
@@ -526,6 +678,45 @@ class PagureRebaseNotAllowedtests(tests.Modeltests):
                 },
             )
 
+            # Add bar to fork repo so he can rebase while allow_rebase = False
+            fork = pagure.lib.query.get_authorized_project(
+                self.session, "test", user="foo"
+            )
+            msg = pagure.lib.query.add_user_to_project(
+                session=self.session, project=fork, new_user="bar", user="foo"
+            )
+            self.session.commit()
+            self.assertEqual(msg, "User added")
+
+            output = self.app.post("/api/0/test/pull-request/1/rebase")
+            self.assertEqual(output.status_code, 200)
+
+            data = json.loads(output.get_data(as_text=True))
+            self.assertEqual(data, {"message": "Pull-request rebased"})
+
+            data = {"requestid": self.request.uid, "csrf_token": csrf_token}
+            output = self.app.post("/pv/pull-request/merge", data=data)
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.get_data(as_text=True))
+            self.assertEqual(
+                data,
+                {
+                    "code": "FFORWARD",
+                    "message": "The pull-request can be merged and "
+                    "fast-forwarded",
+                    "short_code": "Ok",
+                },
+            )
+
+            output = self.app.get("/test/pull-request/1")
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn("rebased onto", output_text)
+            repo = pagure.lib.query._get_project(self.session, "test")
+            # This should be bar, but we have some bug that adds the
+            # rebase message as PR author instead of rebaser
+            self.assertEqual(repo.requests[0].comments[0].user.username, "foo")
+
     def test_rebase_api_api_logged_in(self):
         """ Test the rebase PR API endpoint when using an API token and
         its outcome. """
@@ -547,6 +738,92 @@ class PagureRebaseNotAllowedtests(tests.Modeltests):
                 "error_code": "EREBASENOTALLOWED",
             },
         )
+
+        # Add pingou to fork repo so he can rebase while allow_rebase = False
+        fork = pagure.lib.query.get_authorized_project(
+            self.session, "test", user="foo"
+        )
+        msg = pagure.lib.query.add_user_to_project(
+            session=self.session, project=fork, new_user="pingou", user="foo"
+        )
+        self.session.commit()
+        self.assertEqual(msg, "User added")
+
+        output = self.app.post(
+            "/api/0/test/pull-request/1/rebase", headers=headers
+        )
+        self.assertEqual(output.status_code, 200)
+
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(data, {"message": "Pull-request rebased"})
+
+        user = tests.FakeUser(username="pingou")
+        with tests.user_set(self.app.application, user):
+
+            data = {
+                "requestid": self.request.uid,
+                "csrf_token": self.get_csrf(),
+            }
+            output = self.app.post("/pv/pull-request/merge", data=data)
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.get_data(as_text=True))
+            self.assertEqual(
+                data,
+                {
+                    "code": "FFORWARD",
+                    "message": "The pull-request can be merged and "
+                    "fast-forwarded",
+                    "short_code": "Ok",
+                },
+            )
+
+    def test_rebase_api_ui_logged_in_pull_request_author(self):
+        """ Test the rebase PR API endpoint when logged in from the UI and
+        its outcome. """
+
+        user = tests.FakeUser(username="foo")
+        with tests.user_set(self.app.application, user):
+            # Get the merge status first so it's cached and can be refreshed
+            csrf_token = self.get_csrf()
+            data = {"requestid": self.request.uid, "csrf_token": csrf_token}
+            output = self.app.post("/pv/pull-request/merge", data=data)
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.get_data(as_text=True))
+            self.assertEqual(
+                data,
+                {
+                    "code": "MERGE",
+                    "message": "The pull-request can be merged with "
+                    "a merge commit",
+                    "short_code": "With merge",
+                },
+            )
+
+            output = self.app.post("/api/0/test/pull-request/1/rebase")
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.get_data(as_text=True))
+            self.assertEqual(data, {"message": "Pull-request rebased"})
+
+            data = {"requestid": self.request.uid, "csrf_token": csrf_token}
+            output = self.app.post("/pv/pull-request/merge", data=data)
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.get_data(as_text=True))
+            self.assertEqual(
+                data,
+                {
+                    "code": "FFORWARD",
+                    "message": "The pull-request can be merged and "
+                    "fast-forwarded",
+                    "short_code": "Ok",
+                },
+            )
+
+            output = self.app.get("/test/pull-request/1")
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn("rebased onto", output_text)
+            repo = pagure.lib.query._get_project(self.session, "test")
+            self.assertEqual(repo.requests[0].comments[0].user.username, "foo")
 
 
 if __name__ == "__main__":
