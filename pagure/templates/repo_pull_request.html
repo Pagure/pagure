@@ -192,6 +192,10 @@
                   {% if g.authenticated and (g.repo_committer and pull_request.allow_rebase) or can_rebase_branch %}
                   <button id="rebase_btn" type="submit"
                     class="btn btn-block my-2">Rebase</button>
+                  {% elif g.authenticated and g.repo_committer %}
+                  <button id="rebase_btn" disabled
+                    title="PR author does not allow rebasing it"
+                    class="btn btn-block my-2">Rebase</button>
                   {% endif %}
                 </div>
               </div>
