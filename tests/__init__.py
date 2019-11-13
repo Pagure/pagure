@@ -512,6 +512,19 @@ class SimplePagureTest(unittest.TestCase):
             wtforms_v[idx] = val
         return tuple(wtforms_v)
 
+    def get_arrow_version(self):
+        """ Returns the arrow version as a tuple."""
+        import arrow
+
+        arrow_v = arrow.__version__.split(".")
+        for idx, val in enumerate(arrow_v):
+            try:
+                val = int(val)
+            except ValueError:
+                pass
+            arrow_v[idx] = val
+        return tuple(arrow_v)
+
     def assertURLEqual(self, url_1, url_2):
         url_parsed_1 = list(urlparse(url_1))
         url_parsed_1[4] = parse_qs(url_parsed_1[4])

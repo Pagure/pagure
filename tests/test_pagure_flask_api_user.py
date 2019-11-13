@@ -328,17 +328,38 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         output = self.app.get("/api/0/user/pingou/activity/AABB")
         self.assertEqual(output.status_code, 400)
 
-        # Invalid date
+        # Invalid date, arrow >= 0.15 throws an exception,
+        # previous versions parsed it
         output = self.app.get("/api/0/user/pingou/activity/2016asd")
-        self.assertEqual(output.status_code, 200)
-        exp = {"activities": [], "date": "2016-01-01"}
-        self.assertEqual(json.loads(output.get_data(as_text=True)), exp)
+        if self.get_arrow_version() >= (0, 15):
+            self.assertEqual(output.status_code, 400)
+            exp = {
+                "error": "Could not match input '2016asd' to any of the following formats: "
+                "YYYY-MM-DD, YYYY-M-DD, YYYY-M-D, YYYY/MM/DD, YYYY/M/DD, YYYY/M/D, "
+                "YYYY.MM.DD, YYYY.M.DD, YYYY.M.D, YYYYMMDD, YYYY-DDDD, YYYYDDDD, "
+                "YYYY-MM, YYYY/MM, YYYY.MM, YYYY",
+                "error_code": "ENOCODE",
+            }
+            self.assertEqual(json.loads(output.get_data(as_text=True)), exp)
+        else:
+            self.assertEqual(output.status_code, 200)
+            exp = {"activities": [], "date": "2016-01-01"}
+            self.assertEqual(json.loads(output.get_data(as_text=True)), exp)
 
-        # Date parsed, just not really as expected
+        # Invalid date, arrow => throws an exception,
+        # previous versions parsed it just not really as expected
         output = self.app.get("/api/0/user/pingou/activity/20161245")
-        self.assertEqual(output.status_code, 200)
-        exp = {"activities": [], "date": "1970-08-22"}
-        self.assertEqual(json.loads(output.get_data(as_text=True)), exp)
+        if self.get_arrow_version() >= (0, 15):
+            self.assertEqual(output.status_code, 400)
+            exp = {
+                "error": "day is out of range for month",
+                "error_code": "ENOCODE",
+            }
+            self.assertEqual(json.loads(output.get_data(as_text=True)), exp)
+        else:
+            self.assertEqual(output.status_code, 200)
+            exp = {"activities": [], "date": "1970-08-22"}
+            self.assertEqual(json.loads(output.get_data(as_text=True)), exp)
 
         date = datetime.datetime.utcnow().date().strftime("%Y-%m-%d")
         # Retrieve the user's logs for today
