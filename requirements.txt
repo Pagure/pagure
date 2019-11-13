@@ -1,7 +1,7 @@
 # Used for when working from a virtualenv.
 # Use this file by running "$ pip install -r requirements.txt"
 alembic
-arrow < 0.15.0
+arrow
 bcrypt
 binaryornot
 bleach
