@@ -727,7 +727,7 @@ def api_view_user_activity_date(username, date):
     try:
         date = arrow.get(date)
         date = date.strftime("%Y-%m-%d")
-    except arrow.parser.ParserError as err:
+    except (arrow.parser.ParserError, ValueError) as err:
         raise pagure.exceptions.APIError(
             400, error_code=APIERROR.ENOCODE, error=str(err)
         )
