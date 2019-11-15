@@ -13,7 +13,7 @@
     <div class="form-group">
       <div class="input-group input-group-sm">
         <div class="input-group-prepend"><span class="input-group-text">SSH</span></div>
-        <input class="form-control bg-white" type="text" value="{{
+        <input class="form-control bg-white select-on-focus" type="text" value="{{
           end_url_ssh | git_url_ssh }}{{ repo.fullname }}.git" readonly>
       </div>
     </div>
@@ -190,7 +190,7 @@
               <div class="form-group">
                 <div class="input-group input-group-sm">
                   <div class="input-group-prepend"><span class="input-group-text">GIT</span></div>
-                  <input class="form-control bg-white" type="text" value="{{
+                  <input class="form-control bg-white select-on-focus" type="text" value="{{
                     config.get('GIT_URL_GIT') }}{{ repo.path }}" readonly>
                 </div>
               </div>
@@ -212,7 +212,7 @@
                   <div class="form-group">
                     <div class="input-group input-group-sm">
                       <div class="input-group-prepend"><span class="input-group-text">GIT</span></div>
-                      <input class="form-control bg-white" type="text" value="{{
+                      <input class="form-control bg-white select-on-focus" type="text" value="{{
                         config.get('GIT_URL_GIT') }}docs/{{ repo.path }}" readonly>
                     </div>
                   </div>
@@ -306,6 +306,10 @@ $("#giturl-toggle").on('click', function(event){
 
 $(".fork_project_btn").click(function() {
   $('#fork_project').submit();
+});
+
+$(".select-on-focus").on("focus", function() {
+  $(this).select();
 });
 
 {% if g.authenticated and not g.repo_obj.is_empty %}
