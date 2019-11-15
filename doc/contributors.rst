@@ -3,22 +3,22 @@ Contributors to pagure
 
 Pagure would be nothing without its contributors.
 
-On August 10, 2019 (release 5.7.4) the list looks as follow:
+On November 15, 2019 (release 5.8) the list looks as follow:
 
 =================  ===========
 Number of commits  Contributor
 =================  ===========
-  6623              Pierre-Yves Chibon <pingou@pingoured.fr>
+  6638              Pierre-Yves Chibon <pingou@pingoured.fr>
    328              Ryan Lerch <rlerch@redhat.com>
    172              Vivek Anand <vivekanand1101@gmail.com>
    139              farhaanbukhsh <farhaan.bukhsh@gmail.com>
    133              Clement Verna <cverna@tutanota.com>
    133              Patrick Uiterwijk <puiterwijk@redhat.com>
+    99              Julen Landa Alustiza <jlanda@fedoraproject.org>
     98              Patrick Uiterwijk <patrick@puiterwijk.org>
     88              Farhaan Bukhsh <farhaan.bukhsh@gmail.com>
     64              Slavek Kabrda <bkabrda@redhat.com>
     59              Johan Cwiklinski <johan@x-tnd.be>
-    51              Julen Landa Alustiza <jlanda@fedoraproject.org>
     50              Karsten Hopp <karsten@redhat.com>
     47              Mark Reynolds <mreynolds@redhat.com>
     32              Lubomír Sedlář <lsedlar@redhat.com>
@@ -31,14 +31,14 @@ Number of commits  Contributor
     19              Aurélien Bompard <aurelien@bompard.org>
     19              Gaurav Kumar <aavrug@gmail.com>
     18              Abhijeet Kasurde <akasurde@redhat.com>
+    18              Fabien Boucher <fboucher@redhat.com>
     18              Lenka Segura <lenka@sepu.cz>
     18              Sayan Chowdhury <sayan.chowdhury2012@gmail.com>
     17              Adam Williamson <awilliam@redhat.com>
+    17              Brian Stinson <brian@bstinson.com>
     17              Ralph Bean <rbean@redhat.com>
-    16              Brian Stinson <brian@bstinson.com>
     15              Igor Gnatenko <ignatenkobrain@fedoraproject.org>
     15              Vibhor Verma <vibhcool@gmail.com>
-    14              Fabien Boucher <fboucher@redhat.com>
     14              Justin W. Flory <git@jwf.io>
     13              Ghost-script <subho.prp@gmail.com>
     13              Martin Basti <mbasti@redhat.com>
@@ -54,13 +54,14 @@ Number of commits  Contributor
      5              Mike McLean <mikem@redhat.com>
      5              Oliver Gutierrez <ogutierrez@redhat.com>
      5              Shaily <shaily15297@yahoo.com>
+     5              Till Maas <opensource@till.name>
      5              jingjing <sanri.ok@163.com>
      5              vanzhiganov <vanzhiganov@ya.ru>
      5              yangl1996 <yltt1234512@gmail.com>
      4              Alex Gleason <alex@alexgleason.me>
      4              Eric Barbour <ebarbour@redhat.com>
      4              Maciej Lasyk <maciek@lasyk.info>
-     4              Till Maas <opensource@till.name>
+     4              Sergio Durigan Junior <sergiodj@sergiodj.net>
      4              clime <clime@redhat.com>
      3              Akanksha <akanksha_mishra01@yahoo.com>
      3              Ankush Behl <cloudbehl@gmail.com>
@@ -68,6 +69,7 @@ Number of commits  Contributor
      3              Chenxiong Qi <cqi@redhat.com>
      3              Dhriti Shikhar <dhriti.shikhar.rokz@gmail.com>
      3              Eric Barbour <emb4gu@virginia.edu>
+     3              FeRD (Frank Dana) <ferdnyc@gmail.com>
      3              Jan Pokorný <jpokorny@redhat.com>
      3              Jason Tibbitts <tibbs@math.uh.edu>
      3              Kushal Khandelwal <kushal124@gmail.com>
@@ -75,7 +77,6 @@ Number of commits  Contributor
      3              Pierre-YvesChibon <pingou@fedoraproject.org>
      3              Ricky Elrod <ricky@elrod.me>
      3              Ryan Lerch <rlerch@localhost.localdomain>
-     3              Sergio Durigan Junior <sergiodj@sergiodj.net>
      3              Stefan Bühler <stbuehler@web.de>
      3              bill auger <mr.j.spam.me@gmail.com>
      3              cep <breathingcode@gmail.com>
@@ -103,6 +104,7 @@ Number of commits  Contributor
      2              Tim Landscheidt <tim@tim-landscheidt.de>
      2              Todd Zullinger <tmz@pobox.com>
      2              William Moreno Reyes <williamjmorenor@gmail.com>
+     2              Your Name <jlanda@fedoraproject.org>
      2              bruno <bruno@wolff.to>
      2              dhrish20 <dhrish20@gmail.com>
      2              hellcp <hellcp@opensuse.org>
@@ -121,7 +123,6 @@ Number of commits  Contributor
      1              Charelle Collett <ccollett@redhat.com>
      1              David Caro <dcaroest@redhat.com>
      1              Eashan <eashankadam@gmail.com>
-     1              FeRD (Frank Dana) <ferdnyc@gmail.com>
      1              Felix Yan <felixonmars@users.sf.net>
      1              Filip Valder <fvalder@redhat.com>
      1              Frank Dana (FeRD) <ferdnyc@gmail.com>

@@ -1,6 +1,13 @@
 Upgrading Pagure
 ================
 
+From 5.7 to 5.8
+---------------
+
+The 5.8 release does not contain any database schema changes nor changes in the
+configuration keys.
+
+
 From 5.6 to 5.7
 ---------------
 

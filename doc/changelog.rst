@@ -3,6 +3,80 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
+5.8 (2019-11-15)
+----------------
+- Enable the ctrl-enter keys to submit forms on tickets and PRs (Julen
+  Landa Alustiza)
+- Fix spelling errors on doc/. (Sergio Durigan Junior)
+- Fix renewing url on invalid token error message (Julen Landa Alustiza)
+- themes/srcfpo: show release-monitoring choice dropdown only on
+  authenticated sessions (Julen Landa Alustiza)
+- themes/srcfpo: fix error callback on release-monitoring button ajax
+  (Julen Landa Alustiza)
+- When not authenticated show the 'take' button but disabled
+- disable smooth scrolling on initial highlight & scroll process (Julen
+  Landa Alustiza)
+- Accept a with_commits parameter on the branches api to resolve the HEAD
+  commits (Brian Stinson)
+- Fix PR view when fork was deleted (Julen Landa Alustiza)
+- Return to the pr view after merging it (Julen Landa Alustiza)
+- Add asciidoc syntax override (FeRD (Frank Dana))
+- Fix git blame on unborn HEAD or non-master default branch repos (Julen
+  Landa Alustiza)
+- Drop the adopt button when the package is retired
+- Add a set-default-branch action to pagure-admin (Julen Landa Alustiza)
+- Allow changing allow_rebase from pull-request edit (Julen Landa Alustiza)
+- Add revision along with tag/branch creation/deletion (Fabien Boucher)
+- Send oldrev as old_commit for git.receive event (Fabien Boucher)
+- Tag filtering support on pull requests list view (Julen Landa Alustiza)
+- Tag filtering support on api pull requests endpoint (Julen Landa Alustiza)
+- Send notification when a branch is created (Fabien Boucher)
+- themes/srcfpo: show navigation buttons, anitya integration and orphan
+  taking button only when namespace is not test (Julen Landa Alustiza)
+- Add support to expire and update any API token, not just the admin ones
+- theme/srcfpo: Include the package's update information in their info page
+- Fix setting one's default email address (Julen Landa Alustiza)
+- Fix the logic to rebase PRs (Julen Landa Alustiza)
+- Add support for arrow >= 0.15
+- Select full text on git|ssh url input boxes when they get focus (Julen
+  Landa Alustiza)
+
+5.7.9 (2019-09-05)
+------------------
+
+- Fix rendering badges on the PR list page
+- Tweak when we show the merge and the rebase buttons
+- Fix the logic around interacting with read-only databases in hooks
+- Fix .diff and .patch generation for empty commits
+
+5.7.8 (2019-08-28)
+------------------
+
+- themes/srcfpo: Fix some csp errors
+- themes/srcfpo: Fix error message when interacting with the release-monitoring
+  button
+- themes/srcfpo: Show the release-monitoring dropdown only on authenticated
+  users
+- themes/srcfpo: Fix capitalization incoherency
+- Fix url on the invalid token error message
+- Fix typo on the pull request merge error message
+
+5.7.7 (2019-08-21)
+------------------
+
+- Allow cross-project API token to open pull-request
+- Move the button to change the anitya status to use POST requests
+
+5.7.6 (2019-08-21)
+------------------
+
+- Allow updating PRs via the API using cross-project tokens
+
+5.7.5 (2019-08-21)
+------------------
+
+- Fix the logic to make the merge button appear on pull-request
+
 5.7.4 (2019-08-10)
 ------------------
 
