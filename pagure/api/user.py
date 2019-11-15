@@ -636,7 +636,7 @@ def api_view_user_activity_stats(username):
             try:
 
                 return arrow.get(d, tz).replace(hour=12).timestamp
-            except arrow.parser.ParserError:
+            except (arrow.parser.ParserError, ValueError):
                 # if tz is invalid for some reason, just go with UTC
                 return arrow.get(d).replace(hour=12).timestamp
         else:
