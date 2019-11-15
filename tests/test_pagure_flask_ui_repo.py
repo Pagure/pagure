@@ -1748,7 +1748,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                '<input class="form-control bg-white" type="text" '
+                '<input class="form-control bg-white select-on-focus" type="text" '
                 'value="ssh://git@localhost.localdomain/tickets/test.git" readonly>',
                 output_text,
             )
@@ -1775,7 +1775,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertNotIn(
-                '<input class="form-control bg-white" type="text" '
+                '<input class="form-control bg-white select-on-focus" type="text" '
                 'value="ssh://git@localhost.localdomain/tickets/test.git" readonly>',
                 output_text,
             )

@@ -93,7 +93,7 @@ class PagureFlaskSlashInNametests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<input class="form-control bg-white" type="text" '
+            '<input class="form-control bg-white select-on-focus" type="text" '
             'value="git://localhost.localdomain/test.git" readonly>',
             output_text,
         )
@@ -137,7 +137,7 @@ class PagureFlaskSlashInNametests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<input class="form-control bg-white" type="text" '
+            '<input class="form-control bg-white select-on-focus" type="text" '
             'value="git://localhost.localdomain/forks/test.git" readonly>',
             output_text,
         )
@@ -176,7 +176,7 @@ class PagureFlaskSlashInNametests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<input class="form-control bg-white" type="text" '
+            '<input class="form-control bg-white select-on-focus" type="text" '
             'value="git://localhost.localdomain/test.git" readonly>',
             output_text,
         )
@@ -215,7 +215,7 @@ class PagureFlaskSlashInNametests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn(
-            '<input class="form-control bg-white" type="text" '
+            '<input class="form-control bg-white select-on-focus" type="text" '
             'value="git://localhost.localdomain/forks/test.git" readonly>',
             output_text,
         )
