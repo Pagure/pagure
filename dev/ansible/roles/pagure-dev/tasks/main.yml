@@ -34,7 +34,6 @@
       - python3-chardet
       - python3-cryptography
       - python3-docutils
-      - python3-enum34
       - python3-eventlet
       - python3-fedora-flask
       - python3-flask
@@ -93,7 +92,7 @@
       - "pygit2=={{ libgit2_version.stdout_lines[0] }}.*"
     virtualenv: /home/{{ ansible_env.SUDO_USER }}/.virtualenvs/python3-pagure/
     virtualenv_python: python3
-    virtualenv_command: virtualenv-3
+    virtualenv_command: virtualenv
 
 # Install Pagure inside a virtualenv and configure it for python3
 - name: Install pygit2 in the python3 virtualenv
@@ -109,7 +108,7 @@
   pip:
     requirements: /home/{{ ansible_env.SUDO_USER }}/devel/{{ item }}
     virtualenv: /home/{{ ansible_env.SUDO_USER }}/.virtualenvs/python3-pagure/
-    virtualenv_command: virtualenv-3
+    virtualenv_command: virtualenv
   with_items:
     - "requirements.txt"
     - "requirements-ev.txt"
@@ -132,7 +131,7 @@
     name: /home/{{ ansible_env.SUDO_USER }}/devel/
     extra_args: '-e'
     virtualenv: /home/{{ ansible_env.SUDO_USER }}/.virtualenvs/python3-pagure/
-    virtualenv_command: virtualenv-3
+    virtualenv_command: virtualenv
 
 - name: Install Pagure package into /usr/lib
   pip:

@@ -4,8 +4,8 @@
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
- config.vm.box_url = "https://download.fedoraproject.org/pub/fedora/linux/releases/28/Cloud/x86_64/images/Fedora-Cloud-Base-Vagrant-28-1.1.x86_64.vagrant-libvirt.box"
- config.vm.box = "f28-cloud-libvirt"
+ config.vm.box_url = "https://download.fedoraproject.org/pub/fedora/linux/releases/30/Cloud/x86_64/images/Fedora-Cloud-Base-Vagrant-30-1.2.x86_64.vagrant-libvirt.box"
+ config.vm.box = "f30-cloud-libvirt"
 
 
  # Forward traffic on the host to the development server on the guest
@@ -27,8 +27,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
  # config.vm.synced_folder ".", "/vagrant", type: "nfs", nfs_version: 4, nfs_udp: false
  config.vm.synced_folder ".", "/vagrant", disabled: true
  config.vm.synced_folder ".", "/home/vagrant/devel",
-     type: "sshfs",
-     sshfs_opts_append: "-o nonempty"
+     type: "sshfs"
 
  # To cache update packages (which is helpful if frequently doing `vagrant destroy && vagrant up`)
  # you can create a local directory and share it to the guest's DNF cache. The directory needs to
