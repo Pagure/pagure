@@ -108,6 +108,13 @@
     - "requirements-ev.txt"
     - "requirements-testing.txt"
 
+- name: Hotfix python-fedora to make flask_fas_openid compatible with flask >= 1.0
+  become: "{{ ansible_env.SUDO_USER }}"
+  lineinfile:
+    path: /home/{{ ansible_env.SUDO_USER }}/.virtualenvs/python3-pagure/lib/python3.7/site-packages/flask_fas_openid.py
+    regexp: '^        if assume_recent or \(major >'
+    line: '        if assume_recent or (major > 0 or minor >= 10):'
+
 - name: Install Pagure package into a virtualenv
   become_user: "{{ ansible_env.SUDO_USER }}"
   pip:
