@@ -5,8 +5,7 @@ Documentation=https://pagure.io/pagure
 
 [Service]
 Environment="PAGURE_CONFIG=/home/vagrant/pagure.cfg"
-ExecStart=/home/vagrant/.virtualenvs/python3-pagure/bin/python \
-          /home/vagrant/devel/pagure-webhook/pagure-webhook-server.py
+ExecStart=/home/vagrant/.virtualenvs/python3-pagure/bin/celery worker -A pagure.lib.tasks --loglevel=info -Q pagure_webhook
 Type=simple
 
 [Install]
