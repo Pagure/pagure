@@ -59,9 +59,12 @@ class TestCommitsAuthorStats(unittest.TestCase):
             "alice@example.com": MockUser("Alice", "alice@example.com")
         }
 
-        num_commits, authors, num_authors, last_time = tasks.commits_author_stats(
-            self.repopath
-        )
+        (
+            num_commits,
+            authors,
+            num_authors,
+            last_time,
+        ) = tasks.commits_author_stats(self.repopath)
 
         self.assertEqual(num_commits, 1)
         self.assertEqual(num_authors, 1)
@@ -109,9 +112,12 @@ class TestCommitsAuthorStats(unittest.TestCase):
             "alice@example.com": MockUser("Alice", "alice@example.com")
         }
 
-        num_commits, authors, num_authors, last_time = tasks.commits_author_stats(
-            self.repopath
-        )
+        (
+            num_commits,
+            authors,
+            num_authors,
+            last_time,
+        ) = tasks.commits_author_stats(self.repopath)
 
         self.assertEqual(num_commits, 2)
         self.assertEqual(num_authors, 1)
@@ -156,9 +162,12 @@ class TestCommitsAuthorStats(unittest.TestCase):
         ]
         self.authors = {}
 
-        num_commits, authors, num_authors, last_time = tasks.commits_author_stats(
-            self.repopath
-        )
+        (
+            num_commits,
+            authors,
+            num_authors,
+            last_time,
+        ) = tasks.commits_author_stats(self.repopath)
 
         self.assertEqual(num_commits, 1)
         self.assertEqual(num_authors, 1)
@@ -206,9 +215,12 @@ class TestCommitsAuthorStats(unittest.TestCase):
         ]
         self.authors = {}
 
-        num_commits, authors, num_authors, last_time = tasks.commits_author_stats(
-            self.repopath
-        )
+        (
+            num_commits,
+            authors,
+            num_authors,
+            last_time,
+        ) = tasks.commits_author_stats(self.repopath)
 
         self.assertEqual(num_commits, 3)
         self.assertEqual(num_authors, 2)

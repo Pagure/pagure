@@ -301,7 +301,7 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
 
     @mock.patch.dict("pagure.config.config", {"EXTERNAL_COMMITTER": config})
     def test_is_repo_committer_external_committer_restricting_another_one(
-        self
+        self,
     ):
         """ Test is_repo_committer in pagure with EXTERNAL_COMMITTER
         configured to give access the provenpackager just for one repo not

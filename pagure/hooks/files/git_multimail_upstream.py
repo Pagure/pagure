@@ -3636,9 +3636,10 @@ class Push(object):
                 "%(objectname) %(objecttype) %(refname)\n"
                 "%(*objectname) %(*objecttype) %(refname)"
             )
-            ref_filter_regex, is_inclusion_filter = (
-                self.environment.get_ref_filter_regex()
-            )
+            (
+                ref_filter_regex,
+                is_inclusion_filter,
+            ) = self.environment.get_ref_filter_regex()
             for line in read_git_lines(
                 ["for-each-ref", "--format=%s" % (fmt,)]
             ):
@@ -3865,9 +3866,10 @@ def include_ref(refname, ref_filter_regex, is_inclusion_filter):
 
 def run_as_post_receive_hook(environment, mailer):
     environment.check()
-    send_filter_regex, send_is_inclusion_filter = environment.get_ref_filter_regex(
-        True
-    )
+    (
+        send_filter_regex,
+        send_is_inclusion_filter,
+    ) = environment.get_ref_filter_regex(True)
     ref_filter_regex, is_inclusion_filter = environment.get_ref_filter_regex(
         False
     )
@@ -3902,9 +3904,10 @@ def run_as_update_hook(
     environment, mailer, refname, oldrev, newrev, force_send=False
 ):
     environment.check()
-    send_filter_regex, send_is_inclusion_filter = environment.get_ref_filter_regex(
-        True
-    )
+    (
+        send_filter_regex,
+        send_is_inclusion_filter,
+    ) = environment.get_ref_filter_regex(True)
     ref_filter_regex, is_inclusion_filter = environment.get_ref_filter_regex(
         False
     )
