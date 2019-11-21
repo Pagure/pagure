@@ -88,6 +88,18 @@
         {% endfor %}
         </div>
 
+        <h2>
+            Plugins
+            <a name="plugins" title="Permalink to this headline" href="#plugins">
+                <span class="fa fa-link"></span>
+            </a>
+        </h2>
+        <div class="accordion">
+            {% for html in plugins %}
+            {{ html | InsertDiv | safe }}
+            {% endfor %}
+        </div>
+
         {% if config.get('PAGURE_CI_SERVICES') %}
         <h2>
             Continous Integration Services

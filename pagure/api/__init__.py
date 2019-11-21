@@ -123,6 +123,10 @@ class APIERROR(enum.Enum):
     ENOPRSTATS = "No statistics could be computed for this PR"
     EUBLOCKED = "You have been blocked from this project"
     EREBASENOTALLOWED = "You are not authorized to rebase this pull-request"
+    ENOPLUGIN = "No such plugin"
+    EPLUGINDISABLED = "Plugin disabled"
+    EPLUGINCHANGENOTALLOWED = "This plugin cannot be changed"
+    EPLUGINNOTINSTALLED = "Project doesn't have this plugin installed"
 
 
 def get_authorized_api_project(session, repo, user=None, namespace=None):
@@ -304,6 +308,7 @@ from pagure.api import fork  # noqa: E402
 from pagure.api import project  # noqa: E402
 from pagure.api import user  # noqa: E402
 from pagure.api import group  # noqa: E402
+from pagure.api import plugins  # noqa: E402
 
 if pagure_config.get("PAGURE_CI_SERVICES", False):
     from pagure.api.ci import jenkins  # noqa: E402
@@ -623,6 +628,11 @@ def api():
     api_view_group_doc = load_doc(group.api_view_group)
     api_groups_doc = load_doc(group.api_groups)
 
+    api_install_plugin_doc = load_doc(plugins.api_install_plugin)
+    api_remove_plugin_doc = load_doc(plugins.api_remove_plugin)
+    api_view_plugins_project_doc = load_doc(plugins.api_view_plugins_project)
+    api_view_plugins_doc = load_doc(plugins.api_view_plugins)
+
     if pagure_config.get("ENABLE_TICKETS", True):
         api_project_tags_doc = load_doc(api_project_tags)
     api_error_codes_doc = load_doc(api_error_codes)
@@ -680,6 +690,12 @@ def api():
             api_view_user_requests_actionable_doc,
         ],
         groups=[api_groups_doc, api_view_group_doc],
+        plugins=[
+            api_install_plugin_doc,
+            api_remove_plugin_doc,
+            api_view_plugins_project_doc,
+            api_view_plugins_doc,
+        ],
         ci=ci_doc,
         extras=extras,
     )

@@ -15,7 +15,8 @@ import logging
 
 
 import pagure.exceptions
-import pagure.lib.query
+
+from pagure.lib import plugins
 
 from pagure.config import config as pagure_config
 from pagure.api import APIERROR, get_authorized_api_project
@@ -233,3 +234,33 @@ def _check_private_pull_request_access(request):
         raise pagure.exceptions.APIError(
             403, error_code=APIERROR.EPRNOTALLOWED
         )
+
+
+def _check_plugin(repo, plugin):
+    """
+    Check if plugin exists.
+
+    :param repo: Repository object
+    :param plugin: Plugin class
+    :return plugin object
+    """
+    plugin = plugins.get_plugin(plugin)
+    if not plugin:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPLUGIN)
+
+    if repo.private and plugin.name == "Pagure CI":
+        raise pagure.exceptions.APIError(
+            404, error_code=APIERROR.EPLUGINDISABLED
+        )
+
+    if plugin.name in pagure.config.config.get("DISABLED_PLUGINS", []):
+        raise pagure.exceptions.APIError(
+            404, error_code=APIERROR.EPLUGINDISABLED
+        )
+
+    if plugin.name == "default":
+        raise pagure.exceptions.APIError(
+            403, error_code=APIERROR.EPLUGINCHANGENOTALLOWED
+        )
+
+    return plugin
