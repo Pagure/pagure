@@ -58,12 +58,6 @@
       - python3-virtualenv
     state: present
 
-- name: register the libgit2 version installed
-  shell: rpm -q libgit2|cut -d \- -f 2| cut -d \. -f 1,2
-  register: libgit2_version
-  args:
-    warn: false
-
 # Add various helpful configuration files
 - name: Install a custom bashrc
   become_user: "{{ ansible_env.SUDO_USER }}"
@@ -83,6 +77,12 @@
 - name: populate bash history
   become_user: "{{ ansible_env.SUDO_USER }}"
   copy: src=bash_history dest=/home/{{ ansible_env.SUDO_USER }}/.bash_history
+
+- name: register the libgit2 version installed
+  shell: rpm -q libgit2|cut -d \- -f 2| cut -d \. -f 1,2
+  register: libgit2_version
+  args:
+    warn: false
 
 # Install Pagure inside a virtualenv and configure it
 - name: Install pygit2 in the virtualenv
