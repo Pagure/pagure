@@ -8,4 +8,4 @@ ExecStart=/home/vagrant/.virtualenvs/python3-pagure/bin/python %h/devel/runserve
 Type=simple
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
