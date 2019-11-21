@@ -100,6 +100,9 @@
     requirements: /home/{{ ansible_env.SUDO_USER }}/devel/{{ item }}
     virtualenv: /home/{{ ansible_env.SUDO_USER }}/.virtualenvs/python3-pagure/
     virtualenv_command: virtualenv
+    virtualenv_python: python3
+    virtualenv_site_packages: yes
+    extra_args: --no-use-pep517
   with_items:
     - "requirements.txt"
     - "requirements-ev.txt"
