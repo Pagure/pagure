@@ -467,7 +467,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             issue = copy.deepcopy(FULL_ISSUE_LIST[8])
             issue["id"] = 1
             self.assertIn(
-                "pagure_tests_placebo.png)](/test/issue/raw/files/"
+                "_tests_placebo.png)](/test/issue/raw/files/"
                 "8a06845923010b27bfd8e7e75acff7badc40d1021b4994e01f5e11ca"
                 "40bc3abe",
                 data["issue"]["content"],
