@@ -206,12 +206,13 @@
     - pagure_webhook.service
     - pagure_worker.service
 
-- name: Enable the Pagure systemd services
+- name: Enable and start the Pagure systemd services
   become: False
   systemd:
     daemon_reload: yes
     name: "{{ item }}"
     enabled: True
+    state: started
     scope: user
   with_items:
     - pagure
