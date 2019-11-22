@@ -49,6 +49,69 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.gga_patcher.stop()
         super(PagureFlaskApiProjecttests, self).tearDown()
 
+    def test_api_project_tags(self):
+        """ Test the api_project_tags function.  """
+        tests.create_projects(self.session)
+
+        output = self.app.get("/api/0/foo/tags/")
+        self.assertEqual(output.status_code, 404)
+        expected_rv = {
+            "error": "Project not found",
+            "error_code": "ENOPROJECT",
+        }
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(data, expected_rv)
+
+        output = self.app.get("/api/0/test/tags/")
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(sorted(data.keys()), ["tags", "total_tags"])
+        self.assertEqual(data["tags"], [])
+        self.assertEqual(data["total_tags"], 0)
+
+        # Add an issue and tag it so that we can list them
+        item = pagure.lib.model.Issue(
+            id=1,
+            uid="foobar",
+            project_id=1,
+            title="issue",
+            content="a bug report",
+            user_id=1,  # pingou
+        )
+        self.session.add(item)
+        self.session.commit()
+        item = pagure.lib.model.TagColored(
+            tag="tag1", tag_color="DeepBlueSky", project_id=1
+        )
+        self.session.add(item)
+        self.session.commit()
+        item = pagure.lib.model.TagIssueColored(
+            issue_uid="foobar", tag_id=item.id
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        output = self.app.get("/api/0/test/tags/")
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(sorted(data.keys()), ["tags", "total_tags"])
+        self.assertEqual(data["tags"], ["tag1"])
+        self.assertEqual(data["total_tags"], 1)
+
+        output = self.app.get("/api/0/test/tags/?pattern=t")
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(sorted(data.keys()), ["tags", "total_tags"])
+        self.assertEqual(data["tags"], ["tag1"])
+        self.assertEqual(data["total_tags"], 1)
+
+        output = self.app.get("/api/0/test/tags/?pattern=p")
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(sorted(data.keys()), ["tags", "total_tags"])
+        self.assertEqual(data["tags"], [])
+        self.assertEqual(data["total_tags"], 0)
+
     def test_api_git_tags(self):
         """ Test the api_git_tags method of the flask api. """
         tests.create_projects(self.session)
