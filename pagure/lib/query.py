@@ -942,7 +942,7 @@ def edit_issue_tags(
     new_tag_color,
     user,
 ):
-    """ Removes the specified tag of a project. """
+    """ Edits the specified tag of a project. """
     user_obj = get_user(session, user)
     old_tag_name = old_tag
 
