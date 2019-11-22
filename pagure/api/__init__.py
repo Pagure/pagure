@@ -454,66 +454,6 @@ def api_task_status(taskid):
     return flask.jsonify(output)
 
 
-@API.route("/<repo>/tags")
-@API.route("/<repo>/tags/")
-@API.route("/fork/<username>/<repo>/tags")
-@API.route("/fork/<username>/<repo>/tags/")
-def api_project_tags(repo, username=None):
-    """
-    List all the tags of a project
-    ------------------------------
-    List the tags made on the project's issues.
-
-    ::
-
-        GET /api/0/<repo>/tags
-
-    ::
-
-        GET /api/0/fork/<username>/<repo>/tags
-
-    Parameters
-    ^^^^^^^^^^
-
-    +---------------+----------+---------------+--------------------------+
-    | Key           | Type     | Optionality   | Description              |
-    +===============+==========+===============+==========================+
-    | ``pattern``   | string   | Optional      | | Filters the starting   |
-    |               |          |               |   letters of the tags    |
-    +---------------+----------+---------------+--------------------------+
-
-    Sample response
-    ^^^^^^^^^^^^^^^
-
-    ::
-
-        {
-          "total_tags": 2,
-          "tags": ["tag1", "tag2"]
-        }
-
-    """
-
-    pattern = flask.request.args.get("pattern", None)
-    if pattern is not None and not pattern.endswith("*"):
-        pattern += "*"
-
-    project_obj = get_authorized_api_project(flask.g.session, repo, username)
-    if not project_obj:
-        output = {"output": "notok", "error": "Project not found"}
-        jsonout = flask.jsonify(output)
-        jsonout.status_code = 404
-        return jsonout
-
-    tags = pagure.lib.query.get_tags_of_project(
-        flask.g.session, project_obj, pattern=pattern
-    )
-
-    return flask.jsonify(
-        {"total_tags": len(tags), "tags": [tag.tag for tag in tags]}
-    )
-
-
 @API.route("/error_codes/")
 @API.route("/error_codes")
 @API.route("/-/error_codes")
@@ -634,7 +574,7 @@ def api():
     api_view_plugins_doc = load_doc(plugins.api_view_plugins)
 
     if pagure_config.get("ENABLE_TICKETS", True):
-        api_project_tags_doc = load_doc(api_project_tags)
+        api_project_tags_doc = load_doc(project.api_project_tags)
     api_error_codes_doc = load_doc(api_error_codes)
 
     extras = [api_whoami_doc, api_version_doc, api_error_codes_doc]

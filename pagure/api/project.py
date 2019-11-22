@@ -41,6 +41,68 @@ from pagure.config import config as pagure_config
 _log = logging.getLogger(__name__)
 
 
+@API.route("/<repo>/tags")
+@API.route("/<repo>/tags/")
+@API.route("/<namespace>/<repo>/tags")
+@API.route("/<namespace>/<repo>/tags/")
+@API.route("/fork/<username>/<repo>/tags")
+@API.route("/fork/<username>/<repo>/tags/")
+@API.route("/fork/<username>/<namespace>/<repo>/tags")
+@API.route("/fork/<username>/<namespace>/<repo>/tags/")
+@api_method
+def api_project_tags(repo, username=None, namespace=None):
+    """
+    List all the tags of a project
+    ------------------------------
+    List the tags made on the project's issues.
+
+    ::
+
+        GET /api/0/<repo>/tags
+        GET /api/0/<namespace>/<repo>/git/tags
+
+    ::
+
+        GET /api/0/fork/<username>/<repo>/tags
+        GET /api/0/fork/<username>/<namespace>/<repo>/tags
+
+    Parameters
+    ^^^^^^^^^^
+
+    +---------------+----------+---------------+--------------------------+
+    | Key           | Type     | Optionality   | Description              |
+    +===============+==========+===============+==========================+
+    | ``pattern``   | string   | Optional      | | Filters the starting   |
+    |               |          |               |   letters of the tags    |
+    +---------------+----------+---------------+--------------------------+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "total_tags": 2,
+          "tags": ["tag1", "tag2"]
+        }
+
+    """
+
+    pattern = flask.request.args.get("pattern", None)
+    if pattern is not None and not pattern.endswith("*"):
+        pattern += "*"
+
+    project_obj = _get_repo(repo, username, namespace)
+
+    tags = pagure.lib.query.get_tags_of_project(
+        flask.g.session, project_obj, pattern=pattern
+    )
+
+    return flask.jsonify(
+        {"total_tags": len(tags), "tags": [tag.tag for tag in tags]}
+    )
+
+
 @API.route("/<repo>/git/tags")
 @API.route("/<namespace>/<repo>/git/tags")
 @API.route("/fork/<username>/<repo>/git/tags")
