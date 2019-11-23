@@ -491,6 +491,7 @@ def api():
     api_project_doc = load_doc(project.api_project)
     api_projects_doc = load_doc(project.api_projects)
     api_project_watchers_doc = load_doc(project.api_project_watchers)
+    api_project_tags_doc = load_doc(project.api_project_tags)
     api_git_tags_doc = load_doc(project.api_git_tags)
     api_project_git_urls_doc = load_doc(project.api_project_git_urls)
     api_git_branches_doc = load_doc(project.api_git_branches)
@@ -573,14 +574,9 @@ def api():
     api_view_plugins_project_doc = load_doc(plugins.api_view_plugins_project)
     api_view_plugins_doc = load_doc(plugins.api_view_plugins)
 
-    if pagure_config.get("ENABLE_TICKETS", True):
-        api_project_tags_doc = load_doc(project.api_project_tags)
     api_error_codes_doc = load_doc(api_error_codes)
 
     extras = [api_whoami_doc, api_version_doc, api_error_codes_doc]
-
-    if pagure_config.get("ENABLE_TICKETS", True):
-        extras.append(api_project_tags_doc)
 
     return flask.render_template(
         "api.html",
@@ -591,6 +587,7 @@ def api():
             api_modify_project_doc,
             api_project_doc,
             api_projects_doc,
+            api_project_tags_doc,
             api_git_tags_doc,
             api_project_git_urls_doc,
             api_project_watchers_doc,
