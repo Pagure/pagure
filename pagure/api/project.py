@@ -34,7 +34,7 @@ from pagure.api import (
     get_page,
     get_per_page,
 )
-from pagure.api.utils import _get_repo, _check_token
+from pagure.api.utils import _get_repo, _check_token, _get_project_tag
 from pagure.config import config as pagure_config
 
 
@@ -181,6 +181,59 @@ def api_project_tags_new(repo, username=None, namespace=None):
         raise pagure.exceptions.APIError(
             400, error_code=APIERROR.EINVALIDREQ, errors=form.errors
         )
+
+    jsonout = flask.jsonify(output)
+    return jsonout
+
+
+@API.route("/<repo>/tag/<tag>", methods=["DELETE"])
+@API.route("/<namespace>/<repo>/tag/<tag>", methods=["DELETE"])
+@API.route("/fork/<username>/<repo>/tag/<tag>", methods=["DELETE"])
+@API.route("/fork/<username>/<namespace>/<repo>/tag/<tag>", methods=["DELETE"])
+@api_login_required(acls=["modify_project"])
+@api_method
+def api_project_tag_delete(repo, tag, username=None, namespace=None):
+    """
+    Delete a tag on a project
+    -------------------------
+
+    Delete a tag on project's issues and pull requests.
+
+    ::
+
+        DELETE /api/0/<repo>/tag/<tag>
+        DELETE /api/0/<namespace>/<repo>/tag/<tag>
+
+    ::
+
+        DELETE /api/0/fork/<username>/<repo>/tag/<tag>
+        DELETE /api/0/fork/<username>/<namespace>/<repo>/tag/<tag>
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+        {
+            "message": "Tag blue has been deleted"
+        }
+
+    """
+    output = {}
+    repo = _get_repo(repo, username, namespace)
+    _check_token(repo)
+    tag = _get_project_tag(repo.id, tag)
+    tags = tag.tag
+
+    try:
+        msgs = pagure.lib.query.remove_tags(
+            flask.g.session, repo, tags, user=flask.g.fas_user.username
+        )
+        flask.g.session.commit()
+        output["message"] = msgs[0]
+    except SQLAlchemyError as err:  # pragma: no cover
+        flask.g.session.rollback()
+        _log.exception(err)
+        raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
     jsonout = flask.jsonify(output)
     return jsonout
