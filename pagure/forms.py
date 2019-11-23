@@ -366,6 +366,26 @@ class AddIssueTagForm(DeleteIssueTagForm):
     )
 
 
+class ApiAddIssueTagForm(PagureForm):
+    """ Form to add a tag to a project from the API endpoint """
+
+    tag = wtforms.StringField(
+        "Tag",
+        [
+            wtforms.validators.DataRequired(),
+            wtforms.validators.Regexp(TAGS_REGEX, flags=re.IGNORECASE),
+            wtforms.validators.Length(max=255),
+        ],
+    )
+
+    tag_description = wtforms.StringField(
+        "Tag Description", [wtforms.validators.Optional()]
+    )
+    tag_color = wtforms.StringField(
+        "Tag Color", [wtforms.validators.DataRequired()]
+    )
+
+
 class StatusForm(PagureForm):
     """ Form to add/change the status of an issue. """
 

@@ -492,6 +492,7 @@ def api():
     api_projects_doc = load_doc(project.api_projects)
     api_project_watchers_doc = load_doc(project.api_project_watchers)
     api_project_tags_doc = load_doc(project.api_project_tags)
+    api_project_tags_new_doc = load_doc(project.api_project_tags_new)
     api_git_tags_doc = load_doc(project.api_git_tags)
     api_project_git_urls_doc = load_doc(project.api_project_git_urls)
     api_git_branches_doc = load_doc(project.api_git_branches)
@@ -588,6 +589,7 @@ def api():
             api_project_doc,
             api_projects_doc,
             api_project_tags_doc,
+            api_project_tags_new_doc,
             api_git_tags_doc,
             api_project_git_urls_doc,
             api_project_watchers_doc,

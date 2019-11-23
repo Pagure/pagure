@@ -103,6 +103,89 @@ def api_project_tags(repo, username=None, namespace=None):
     )
 
 
+@API.route("/<repo>/tags/new", methods=["POST"])
+@API.route("/<namespace>/<repo>/tags/new", methods=["POST"])
+@API.route("/fork/<username>/<repo>/tags/new", methods=["POST"])
+@API.route("/fork/<username>/<namespace>/<repo>/tags/new", methods=["POST"])
+@api_login_required(acls=["modify_project"])
+@api_method
+def api_project_tags_new(repo, username=None, namespace=None):
+    """
+    Create a new tag on a project
+    ------------------------------
+
+    Create a new tag on the project's issues and pull requests.
+
+    ::
+
+        POST /api/0/<repo>/tags/new
+        POST /api/0/<namespace>/<repo>/tags/new
+
+    ::
+
+        POST /api/0/fork/<username>/<repo>/tags/new
+        POST /api/0/fork/<username>/<namespace>/<repo>/tags/new
+
+    Input
+    ^^^^^
+
+    +-------------------+--------+-------------+---------------------------+
+    | Key               | Type   | Optionality | Description               |
+    +===================+========+=============+===========================+
+    | 'tag'             | string | Mandatory   | The name of the tag       |
+    +-------------------+--------+-------------+---------------------------+
+    | 'tag_color'       | string | Mandatory   | The color of the tag      |
+    +-------------------+--------+-------------+---------------------------+
+    | 'tag_description' | string | Optional    | | The description of the  |
+    |                   |        |             |   tag                     |
+    +-------------------+--------+-------------+---------------------------+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+            "tag": {
+                "tag": "tag1",
+                "tag_color": "DeepBlueSky",
+                "tag_description": "Our blue tag"
+            },
+            "message": "Tag created"
+        }
+
+    """
+    output = {}
+    repo = _get_repo(repo, username, namespace)
+    _check_token(repo, project_token=False)
+
+    form = pagure.forms.ApiAddIssueTagForm(csrf_enabled=False)
+    if form.validate_on_submit():
+        tag_name = form.tag.data
+        tag_description = form.tag_description.data
+        tag_color = form.tag_color.data
+        try:
+            tag = pagure.lib.query.new_tag(
+                flask.g.session, tag_name, tag_description, tag_color, repo.id
+            )
+            flask.g.session.commit()
+            output["message"] = "Tag created"
+            output["tag"] = tag.to_json()
+
+        except SQLAlchemyError as err:
+            flask.g.session.rollback()
+            _log.exception(err)
+            raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
+
+    else:
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.EINVALIDREQ, errors=form.errors
+        )
+
+    jsonout = flask.jsonify(output)
+    return jsonout
+
+
 @API.route("/<repo>/git/tags")
 @API.route("/<namespace>/<repo>/git/tags")
 @API.route("/fork/<username>/<repo>/git/tags")
