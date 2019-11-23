@@ -1819,6 +1819,14 @@ class TagColored(BASE):
         ),
     )
 
+    def to_json(self):
+        output = {
+            "tag": self.tag,
+            "tag_description": self.tag_description,
+            "tag_color": self.tag_color,
+        }
+        return output
+
     def __repr__(self):
         return "TagColored(id: %s, tag:%s, tag_description:%s, color:%s)" % (
             self.id,
