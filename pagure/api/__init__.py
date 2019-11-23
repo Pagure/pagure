@@ -127,6 +127,7 @@ class APIERROR(enum.Enum):
     EPLUGINDISABLED = "Plugin disabled"
     EPLUGINCHANGENOTALLOWED = "This plugin cannot be changed"
     EPLUGINNOTINSTALLED = "Project doesn't have this plugin installed"
+    ENOTAG = "Tag not found"
 
 
 def get_authorized_api_project(session, repo, user=None, namespace=None):

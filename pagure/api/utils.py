@@ -264,3 +264,21 @@ def _check_plugin(repo, plugin):
         )
 
     return plugin
+
+
+def _get_project_tag(project_id, tag_name):
+    """Check if tag exists and get tag obj
+    : param project_id: id of the project
+    : param tag_name: name of the tag
+    : raises pagure.exceptions.APIError: when tag_name doesn't exist on
+        project with id = project_id
+    : return tag object
+    """
+    tag = pagure.lib.query.get_colored_tag(
+        flask.g.session, tag_name, project_id
+    )
+
+    if tag is None:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOTAG)
+
+    return tag
