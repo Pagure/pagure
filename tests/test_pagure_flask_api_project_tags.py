@@ -358,3 +358,52 @@ class PagureFlaskApiProjectTagstests(tests.Modeltests):
         expected_rv = {"tags": [], "total_tags": 0}
         data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(data, expected_rv)
+
+    def test_api_project_tag_view_no_project(self):
+        """ Test the api_project_tag_view method of the flask api.  """
+        output = self.app.get("/api/0/foo/tag/tag1")
+        self.assertEqual(output.status_code, 404)
+        expected_rv = {
+            "error": "Project not found",
+            "error_code": "ENOPROJECT",
+        }
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(data, expected_rv)
+
+    def test_api_project_tag_view_wrong_tag(self):
+        """ Test the api_project_tag_view method of the flask api.  """
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        item = pagure.lib.model.TagColored(
+            tag="blue", tag_color="DeepBlueSky", project_id=1
+        )
+        self.session.add(item)
+        self.session.commit()
+        output = self.app.get("/api/0/test/tag/tag1")
+        self.assertEqual(output.status_code, 404)
+        expected_rv = {"error": "Tag not found", "error_code": "ENOTAG"}
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(data, expected_rv)
+
+    def test_api_project_tag_view(self):
+        """ Test the api_project_tag_view method of the flask api.  """
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        item = pagure.lib.model.TagColored(
+            tag="blue", tag_color="DeepBlueSky", project_id=1
+        )
+        self.session.add(item)
+        self.session.commit()
+        output = self.app.get("/api/0/test/tag/blue")
+        self.assertEqual(output.status_code, 200)
+        expected_rv = {
+            "tag": "blue",
+            "tag_color": "DeepBlueSky",
+            "tag_description": "",
+        }
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(data, expected_rv)

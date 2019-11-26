@@ -103,6 +103,47 @@ def api_project_tags(repo, username=None, namespace=None):
     )
 
 
+@API.route("/<repo>/tag/<tag>", methods=["GET"])
+@API.route("/<namespace>/<repo>/tag/<tag>", methods=["GET"])
+@API.route("/fork/<username>/<repo>/tag/<tag>", methods=["GET"])
+@API.route("/fork/<username>/<namespace>/<repo>/tag/<tag>", methods=["GET"])
+@api_method
+def api_project_tag_view(repo, tag, username=None, namespace=None):
+    """
+    View a tag of a project
+    -----------------------
+    View a tag on project's issues or pull requests.
+
+    ::
+
+        GET /api/0/<repo>/tag/<tag>
+        GET /api/0/<repo>/tag/<tag>
+
+    ::
+        GET /api/0/fork/<username>/<repo>/tag/<tag>
+        GET /api/0/fork/<username>/<namespace>/tag/<tag>
+
+        Sample response
+        ----------------
+
+    ::
+
+        {
+            "tag": "tag1",
+            "tag_color": "DeepBlueSky"
+            "tag_description": "Our blue tag"
+        }
+
+    """
+    repo = _get_repo(repo, username, namespace)
+    _check_token(repo, project_token=False)
+    tag = _get_project_tag(repo.id, tag)
+    output = tag.to_json()
+
+    jsonout = flask.jsonify(output)
+    return jsonout
+
+
 @API.route("/<repo>/tags/new", methods=["POST"])
 @API.route("/<namespace>/<repo>/tags/new", methods=["POST"])
 @API.route("/fork/<username>/<repo>/tags/new", methods=["POST"])
