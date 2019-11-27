@@ -600,7 +600,7 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
                 output_type = "binary"
             if file_content is not None:
                 output_type = "file"
-                content = content.data.decode("utf-8")
+                content = encoding_utils.decode(content.data)
             else:
                 output_type = "binary"
         elif not isbinary:
