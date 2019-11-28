@@ -84,22 +84,26 @@
         </div>
         <div class="mt-2">
           <small>
-            {% if pull_request.remote_git or (pull_request.project_from and pull_request.project_from.is_fork) %}
+            {% if pull_request.remote_git %}
             <span class="badge badge-light badge-pill border border-secondary font-1em">
-              {% if pull_request.remote_git %}
-                <i class="fa fa-globe"></i>
-                {{pull_request.remote_git}}
-              {% elif pull_request.project_from.is_fork %}
-                <i class="fa fa-code-fork"></i>
-                {% if pull_request.project_from.namespace %}
-                  {{pull_request.project_from.namespace}}/
-                {% endif %}
-                {% if pull_request.project_from.is_fork -%}
-                  {{ pull_request.project_from.user.user }}/
-                {%- endif -%}
-                {{pull_request.project_from.name}}
-              {% endif %}
+              <i class="fa fa-globe"></i>{{ pull_request.remote_git }}
             </span>
+            {% elif pull_request.project_from and pull_request.project_from.id != repo.id %}
+            <span class="badge badge-light badge-pill border border-secondary font-1em">
+              <i class="fa fa-code-fork"></i>
+              {% if pull_request.project_from.namespace %}
+                {{pull_request.project_from.namespace}}/
+              {% endif %}
+              {% if pull_request.project_from.is_fork -%}
+                {{ pull_request.project_from.user.user }}/
+              {%- endif -%}
+              {{ pull_request.project_from.name }}  
+            </span>
+            {% elif pull_request.project_from is none and pull_request.remote_git is none %}
+            <span class="badge badge-light badge-pill border border-seconday font-1em">
+              <i class="fa fa-question"></i> Unknown source
+            </span>
+            {% endif %}
             <a href="{{ url_for('ui_ns.view_tree',
                     repo=pull_request.project_from.name,
                     username=pull_request.project_from.user.user
@@ -108,16 +112,10 @@
                     identifier=pull_request.branch_from)
                   }}"
                   class="badge badge-secondary badge-pill border border-secondary font-1em">
-                <span class="fa fa-random"></span>
+                <i class="fa fa-random"></i>
                 {{ pull_request.branch_from }}
             </a>
-            {% else %}
-            <span class="badge badge-light badge-pill border border-seconday font-1em">
-              <i class="fa fa-question"></i>
-              Unknown source
-            </span>
-            {% endif %}
-          &nbsp;into&nbsp;
+            &nbsp;into&nbsp;
             <a href="{{ url_for('ui_ns.view_tree',
                       repo=pull_request.project.name,
                       username=pull_request.project.user.user
@@ -127,7 +125,7 @@
                       }}"
                 class="badge badge-secondary badge-pill border border-secondary font-1em">
               <i class="fa fa-random"></i>
-            {{ pull_request.branch }}
+              {{ pull_request.branch }}
             </a>
           </small>
         </div>
