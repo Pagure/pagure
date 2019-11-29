@@ -341,11 +341,13 @@ def request_pull(repo, requestid, username=None, namespace=None):
             continue
         trigger_ci[comment] = meta
 
-    can_rebase_branch = (
-        not request.remote_git
-        and request.project_from
-        and pagure.utils.is_repo_committer(request.project_from)
-    )
+    committer = False
+    if request.project_from:
+        committer = pagure.utils.is_repo_committer(request.project_from)
+    else:
+        committer = pagure.utils.is_repo_committer(request.project)
+
+    can_rebase_branch = not request.remote_git and committer
 
     can_delete_branch = (
         pagure_config.get("ALLOW_DELETE_BRANCH", True) and can_rebase_branch
@@ -1177,7 +1179,14 @@ def merge_request_pull(repo, requestid, username=None, namespace=None):
                     requestid=requestid,
                 )
             )
-        if not pagure.utils.is_repo_committer(request.project_from):
+
+        committer = False
+        if request.project_from:
+            committer = pagure.utils.is_repo_committer(request.project_from)
+        else:
+            committer = pagure.utils.is_repo_committer(request.project)
+
+        if not committer:
             flask.flash(
                 "You do not have permissions to delete the branch in the "
                 "source repo",

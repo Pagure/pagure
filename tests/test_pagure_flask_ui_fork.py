@@ -301,6 +301,170 @@ class PagureFlaskForktests(tests.Modeltests):
         )
 
     @patch("pagure.lib.notify.send_email")
+    def test_request_pull_delete_branch_button_no_auth(self, send_email):
+        """ Test the request_pull endpoint. """
+        send_email.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, "requests"), bare=True
+        )
+
+        set_up_git_repo(
+            self.session, self.path, new_project=None, branch_from="feature"
+        )
+
+        project = pagure.lib.query.get_authorized_project(self.session, "test")
+        self.assertEqual(len(project.requests), 1)
+
+        # View the pull-request
+        output = self.app.get("/test/pull-request/1")
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        self.assertIn(
+            "<title>PR#1: PR from the feature branch - test\n - "
+            "Pagure</title>",
+            output_text,
+        )
+        self.assertIn(
+            'title="View file as of 2a552b">sources</a>', output_text
+        )
+        # Un-authenticated user cannot see this checkbox
+        self.assertNotIn(
+            '<input id="delete_branch" name="delete_branch" type="checkbox" '
+            'value="y"> <label for="delete_branch">Delete branch after '
+            "merging</label>",
+            output_text,
+        )
+
+    @patch("pagure.lib.notify.send_email")
+    def test_request_pull_delete_branch_button(self, send_email):
+        """ Test the request_pull endpoint. """
+        send_email.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, "requests"), bare=True
+        )
+
+        set_up_git_repo(
+            self.session, self.path, new_project=None, branch_from="feature"
+        )
+
+        project = pagure.lib.query.get_authorized_project(self.session, "test")
+        self.assertEqual(len(project.requests), 1)
+
+        # View the pull-request
+        user = tests.FakeUser()
+        user.username = "pingou"
+        with tests.user_set(self.app.application, user):
+            output = self.app.get("/test/pull-request/1")
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                "<title>PR#1: PR from the feature branch - test\n - "
+                "Pagure</title>",
+                output_text,
+            )
+            self.assertIn(
+                'title="View file as of 2a552b">sources</a>', output_text
+            )
+            self.assertIn(
+                '<input id="delete_branch" name="delete_branch" type="checkbox" '
+                'value="y"> <label for="delete_branch">Delete branch after '
+                "merging</label>",
+                output_text,
+            )
+
+    @patch("pagure.lib.notify.send_email")
+    def test_request_pull_delete_branch_button_no_project_from(
+        self, send_email
+    ):
+        """ Test the request_pull endpoint. """
+        send_email.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, "requests"), bare=True
+        )
+
+        set_up_git_repo(
+            self.session, self.path, new_project=None, branch_from="feature"
+        )
+
+        project = pagure.lib.query.get_authorized_project(self.session, "test")
+        self.assertEqual(len(project.requests), 1)
+        project.requests[0].project_from = None
+        self.session.add(project.requests[0])
+        self.session.commit()
+
+        # View the pull-request
+        user = tests.FakeUser()
+        user.username = "pingou"
+        with tests.user_set(self.app.application, user):
+            output = self.app.get("/test/pull-request/1")
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                "<title>PR#1: PR from the feature branch - test\n - "
+                "Pagure</title>",
+                output_text,
+            )
+            self.assertIn(
+                'title="View file as of 2a552b">sources</a>', output_text
+            )
+            self.assertIn(
+                '<input id="delete_branch" name="delete_branch" type="checkbox" '
+                'value="y"> <label for="delete_branch">Delete branch after '
+                "merging</label>",
+                output_text,
+            )
+
+    @patch("pagure.lib.notify.send_email")
+    def test_request_pull_delete_branch_button_no_project_from_no_acl(
+        self, send_email
+    ):
+        """ Test the request_pull endpoint. """
+        send_email.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, "requests"), bare=True
+        )
+
+        set_up_git_repo(
+            self.session, self.path, new_project=None, branch_from="feature"
+        )
+
+        project = pagure.lib.query.get_authorized_project(self.session, "test")
+        self.assertEqual(len(project.requests), 1)
+        project.requests[0].project_from = None
+        self.session.add(project.requests[0])
+        self.session.commit()
+
+        # View the pull-request
+        user = tests.FakeUser()
+        user.username = "foo"
+        with tests.user_set(self.app.application, user):
+            output = self.app.get("/test/pull-request/1")
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                "<title>PR#1: PR from the feature branch - test\n - "
+                "Pagure</title>",
+                output_text,
+            )
+            self.assertIn(
+                'title="View file as of 2a552b">sources</a>', output_text
+            )
+            self.assertNotIn(
+                '<input id="delete_branch" name="delete_branch" type="checkbox" '
+                'value="y"> <label for="delete_branch">Delete branch after '
+                "merging</label>",
+                output_text,
+            )
+
+    @patch("pagure.lib.notify.send_email")
     def test_task_update_request_pull(self, send_email):
         """ Test the task update_pull_request endpoint. """
         send_email.return_value = True
