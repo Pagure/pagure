@@ -144,10 +144,40 @@
     </div>
   </div>
   {% endif %}
+  <p></p>
+  <br>
+  <br>
+  Bugzilla Overrides:
+  <br>
+  <div class="row">
+    {% if g.authenticated and repo.user.user == g.fas_user.username or pagure_admin %}
+    <div class="col">
+      <form action="" id="change_assignees">
+          <label for="fedora_assignee">Fedora Assignee</label>
+          <input title="Empty input resets assignee" class="form-control" name="fedora_assignee" id="fedora_assignee" value="{{
+                    repo.bzoverride.fedora_assignee if repo.bzoverride.fedora_assignee else repo.user.user }}" size=8/>
+	  <br>
+          <label for="epel_assignee">EPEL Assignee</label>
+          <input title="Empty input resets assignee" class="form-control" name="epel_assignee" id="epel_assignee"value="{{
+                    repo.bzoverride.epel_assignee if repo.bzoverride.epel_assignee else repo.user.user }}"
+                 description="Default assignee for EPEL bugzillas"/>
+        <button class="btn btn-primary" type="submit" title="Update bugzilla overrides" id="update_assignees">
+           Update
+        </button>
+      </form>
+    </div>
+    {% else %}
+    <div class="col">
+      Fedora Assignee:<br>
+      {{ repo.bzoverride.fedora_assignee if repo.bzoverride.fedora_assignee else repo.user.user }}
+      <br><br>
+      EPEL Assignee:<br>
+      {{ repo.bzoverride.epel_assignee if repo.bzoverride.epel_assignee else repo.user.user }}
+    {% endif %}
+  </div>
 
   <script type="text/javascript" nonce="{{ g.nonce }}">
     window.addEventListener('load', function() {
-
       set_up_monitoring = function(status){
         var _label = "Disabled"
         if (status === "monitoring") {
@@ -172,6 +202,28 @@
           console.log(res);
           set_up_monitoring(res.monitoring)
         }
+      });
+
+      $("#update_assignees").click(function(){
+              $.ajax({
+                      url: "{{ url_for('distgit_ns.bzoverride_patch_endpoint', repo=repo.name, namespace=repo.namespace) }}",
+                      type: 'post',
+                      dataType: 'json',
+                      contentType: 'application/json',
+                      data: JSON.stringify({
+                         'epel_assignee': $('#epel_assignee').val(),
+                         'fedora_assignee': $('#fedora_assignee').val()
+                      }),
+                      success: function(res) {
+                              console.log("Successfully changed the bugzilla assignees")
+                      },
+                      error: function(res) {
+                              console.log(JSON.stringify({ 'epel_assignee': $('#epel_assignee').val(), 'fedora_assignee': $('#fedora_assignee').val() }))
+                              console.log("{{ url_for('distgit_ns.bzoverride_patch_endpoint', repo=repo.name, namespace=repo.namespace) }}")
+			      console.log(res.responseText)
+			      console.log(res.getAllResponseHeaders())
+                      }
+              })
       });
 
       {% if g.authenticated %}
