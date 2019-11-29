@@ -1727,6 +1727,7 @@ def new_issue(
     issue_id=None,
     issue_uid=None,
     private=False,
+    related_prs=[],
     status=None,
     close_status=None,
     notify=True,

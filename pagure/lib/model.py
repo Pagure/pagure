@@ -1483,6 +1483,11 @@ class Issue(BASE):
             "closed_by": self.closed_by.to_json(public=public)
             if self.closed_by
             else None,
+            "related_prs": [
+                {"id": pr.id, "title": pr.title} for pr in self.related_prs
+            ]
+            if self.related_prs
+            else [],
         }
 
         comments = []

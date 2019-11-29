@@ -49,6 +49,7 @@ FULL_ISSUE_LIST = [
         "milestone": None,
         "priority": None,
         "private": True,
+        "related_prs": [],
         "status": "Closed",
         "tags": [],
         "title": "Test issue",
@@ -70,6 +71,7 @@ FULL_ISSUE_LIST = [
         "milestone": None,
         "priority": None,
         "private": True,
+        "related_prs": [],
         "status": "Open",
         "tags": [],
         "title": "test issue1",
@@ -91,6 +93,7 @@ FULL_ISSUE_LIST = [
         "milestone": None,
         "priority": None,
         "private": True,
+        "related_prs": [],
         "status": "Open",
         "tags": [],
         "title": "test issue",
@@ -112,6 +115,7 @@ FULL_ISSUE_LIST = [
         "milestone": None,
         "priority": None,
         "private": False,
+        "related_prs": [],
         "status": "Open",
         "tags": [],
         "title": "test issue",
@@ -133,6 +137,7 @@ FULL_ISSUE_LIST = [
         "milestone": None,
         "priority": None,
         "private": False,
+        "related_prs": [],
         "status": "Open",
         "tags": [],
         "title": "test issue",
@@ -154,6 +159,7 @@ FULL_ISSUE_LIST = [
         "milestone": None,
         "priority": None,
         "private": False,
+        "related_prs": [],
         "status": "Open",
         "tags": [],
         "title": "test issue",
@@ -175,6 +181,7 @@ FULL_ISSUE_LIST = [
         "milestone": None,
         "priority": None,
         "private": False,
+        "related_prs": [],
         "status": "Open",
         "tags": [],
         "title": "test issue",
@@ -196,6 +203,7 @@ FULL_ISSUE_LIST = [
         "milestone": "milestone-1.0",
         "priority": None,
         "private": False,
+        "related_prs": [],
         "status": "Open",
         "tags": [],
         "title": "test issue",
@@ -217,6 +225,7 @@ FULL_ISSUE_LIST = [
         "milestone": None,
         "priority": None,
         "private": False,
+        "related_prs": [],
         "status": "Open",
         "tags": [],
         "title": "test issue",
@@ -242,6 +251,7 @@ LCL_ISSUES = [
         "milestone": None,
         "priority": None,
         "private": False,
+        "related_prs": [],
         "status": "Open",
         "tags": [],
         "title": "Issue #2",
@@ -263,6 +273,7 @@ LCL_ISSUES = [
         "milestone": None,
         "priority": None,
         "private": False,
+        "related_prs": [],
         "status": "Open",
         "tags": [],
         "title": "Issue #1",
@@ -2482,6 +2493,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                         "milestone": None,
                         "priority": None,
                         "private": True,
+                        "related_prs": [],
                         "status": "Open",
                         "tags": [],
                         "title": "Issue #3",
@@ -2545,6 +2557,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                 "milestone": None,
                 "priority": None,
                 "private": False,
+                "related_prs": [],
                 "status": "Open",
                 "tags": [],
                 "title": "test issue",
@@ -2644,6 +2657,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                 "milestone": None,
                 "priority": None,
                 "private": True,
+                "related_prs": [],
                 "status": "Open",
                 "tags": [],
                 "title": "Test issue",
@@ -2675,6 +2689,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                 "milestone": None,
                 "priority": None,
                 "private": True,
+                "related_prs": [],
                 "status": "Open",
                 "tags": [],
                 "title": "Test issue",
@@ -3154,6 +3169,60 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 400)
         data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(data, {"error": "error", "error_code": "ENOCODE"})
+
+    def test_api_view_issue_related_prs(self):
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, "tickets"))
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        # Create issue
+        repo = pagure.lib.query.get_authorized_project(self.session, "test")
+        msg = pagure.lib.query.new_issue(
+            session=self.session,
+            repo=repo,
+            title="Test issue #1",
+            content="We should work on this",
+            user="pingou",
+            private=False,
+            issue_uid="aaabbbccc1",
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, "Test issue #1")
+        self.assertEqual(msg.related_prs, [])
+        self.assertEqual(msg.id, 1)
+
+        # Create pull request
+        repo_to = pagure.lib.query.get_authorized_project(self.session, "test")
+        repo_from = pagure.lib.query.get_authorized_project(
+            self.session, "test"
+        )
+
+        msg = pagure.lib.query.new_pull_request(
+            session=self.session,
+            repo_from=repo_from,
+            repo_to=repo_to,
+            branch_from="master",
+            branch_to="master",
+            title="New shiny feature",
+            user="pingou",
+            initial_comment="Fixes #1",
+        )
+        self.session.commit()
+        self.assertEqual(msg.id, 2)
+        self.assertEqual(msg.title, "New shiny feature")
+
+        output = self.app.get("/api/0/test/pull-request/2")
+        self.assertEqual(
+            json.loads(output.get_data(as_text=True)).get("initial_comment"),
+            "Fixes #1",
+        )
+
+        output = self.app.get("/api/0/test/issue/1")
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(
+            data.get("related_prs"), [{"id": 2, "title": "New shiny feature"}]
+        )
 
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")

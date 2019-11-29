@@ -1742,6 +1742,7 @@ class PagureFlaskApiUsertestissues(tests.Modeltests):
                             "url_path": "test",
                             "user": {"fullname": "PY C", "name": "pingou"},
                         },
+                        "related_prs": [],
                         "status": "Open",
                         "tags": [],
                         "title": "Test issue",

@@ -1411,7 +1411,7 @@ new file mode 100644
 index 0000000..60f7480
 --- /dev/null
 +++ b/456
-@@ -0,0 +1,29 @@
+@@ -0,0 +1,30 @@
 +{
 +    "assignee": null,
 +    "blocks": [],
@@ -1427,6 +1427,7 @@ index 0000000..60f7480
 +    "milestone": null,
 +    "priority": null,
 +    "private": false,
++    "related_prs": [],
 +    "status": "Open",
 +    "tags": [],
 +    "title": "Test issue",
