@@ -3,6 +3,14 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
+5.8.1 (2019-12-02)
+------------------
+- Fix the link to the container namespace in srcfpo
+- Fix checking if the user is a committer of the repo the PR originates from
+- Fix showing the origin of the PR when it originates from the same project
+- Do not hard-code UTF-8 when showing a file
+- Fix the Vagrant setup
+
 5.8 (2019-11-15)
 ----------------
 - Enable the ctrl-enter keys to submit forms on tickets and PRs (Julen
