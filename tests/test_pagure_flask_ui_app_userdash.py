@@ -376,6 +376,53 @@ class PagureFlaskAppUserdashTests(tests.Modeltests):
             )
             self.assertEqual(output_text.count('title="Private project"'), 1)
 
+    def test_index_logged_in_non_user_group(self):
+        """
+        Test the index endpoint when logged in with a member of non-user type
+        group.
+        """
+        tests.create_projects(self.session)
+
+        # Add a 3rd project just for foo
+        item = pagure.lib.model.Project(
+            user_id=2,  # foo
+            name="test3",
+            description="test project #3 with a very long description",
+            hook_token="aaabbbeeefff",
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        # Add admin group
+        item = pagure.lib.model.PagureGroup(
+            group_name="admin",
+            group_type="admin",
+            user_id=1,  # pingou
+            display_name="admin",
+            description="Admin Group",
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        # Add foo to admin group
+        item = pagure.lib.model.PagureUserGroup(
+            user_id=2, group_id=1  # foo  # admin group
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        user = tests.FakeUser(username="foo")
+        with tests.user_set(self.app.application, user):
+            output = self.app.get("/dashboard/projects")
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<h4 class="font-weight-bold mb-0">My Projects</h4>\n'
+                '          <span class="btn btn-outline-secondary disabled'
+                ' opacity-100 border-0 ml-auto font-weight-bold">1 Projects</span>\n',
+                output_text,
+            )
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
