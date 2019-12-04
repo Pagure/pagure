@@ -159,11 +159,11 @@ def userdash_projects():
     groups = []
 
     for group in user.groups:
-        groups.append(
-            pagure.lib.query.search_groups(
-                flask.g.session, group_name=group, group_type="user"
-            )
+        group_obj = pagure.lib.query.search_groups(
+            flask.g.session, group_name=group, group_type="user"
         )
+        if group_obj:
+            groups.append(group_obj)
 
     acl = flask.request.args.get("acl", "").strip().lower() or None
     search_pattern = flask.request.args.get("search_pattern", None)
