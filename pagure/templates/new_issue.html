@@ -266,7 +266,7 @@ $(document).ready(function() {
     var _url = "{{
       url_for('internal_ns.get_ticket_template',
               repo=repo.name,
-              username=repo.username if repo.is_fork else None,
+              username=repo.user.user if repo.is_fork else None,
               namespace=repo.namespace) }}";
     _url += '?template=' + _type;
     $.ajax({

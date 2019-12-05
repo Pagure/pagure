@@ -86,7 +86,7 @@
                 and not repo.settings.get('issue_tracker_read_only', False) %}
             <a href="{{ url_for('ui_ns.new_issue',
                 repo=g.repo.name,
-                username=g.repo.username if g.repo.is_fork else none,
+                username=g.repo.user.user if g.repo.is_fork else none,
                 namespace=g.repo.namespace) }}"
               class="btn btn-outline-primary btn-sm">
               <i class="fa fa-exclamation-circle fa-fw"></i> New issue</a>

@@ -207,7 +207,7 @@
                 <div class="text-xs-center dropdown-menu dropdown-menu-right p-0">
                   <form action="{{ url_for('ui_ns.ci_trigger_request_pull',
                       repo=repo.name,
-                      username=repo.username if repo.is_fork else None,
+                      username=repo.user.user if repo.is_fork else None,
                       namespace=repo.namespace,
                       requestid=requestid)
                       }}" method="POST" id="ci_pr_trigger_form">

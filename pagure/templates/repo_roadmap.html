@@ -49,7 +49,7 @@
                                 <a class="dropdown-item {% if milestones_status_select == 'active' %}active{%endif%}"
                                         href="{{ url_for('ui_ns.view_roadmap',
                                         repo=repo.name,
-                                        username=repo.username if repo.is_fork else None,
+                                        username=repo.user.user if repo.is_fork else None,
                                         namespace=repo.namespace,
                                        status='active',
                                        keyword=keyword,) }}">
@@ -59,7 +59,7 @@
                                 <a class="dropdown-item {% if milestones_status_select == 'inactive' %}active{%endif%}"
                                     href="{{ url_for('ui_ns.view_roadmap',
                                         repo=repo.name,
-                                        username=repo.username if repo.is_fork else None,
+                                        username=repo.user.user if repo.is_fork else None,
                                         namespace=repo.namespace,
                                         status='inactive',
                                         keyword=keyword) }}">
@@ -69,7 +69,7 @@
                                 <a class="dropdown-item {% if milestones_status_select == 'all' %}active{%endif%}"
                                         href="{{ url_for('ui_ns.view_roadmap',
                                         repo=repo.name,
-                                        username=repo.username if repo.is_fork else None,
+                                        username=repo.user.user if repo.is_fork else None,
                                         namespace=repo.namespace,
                                        status='all',
                                        keyword=keyword) }}">
@@ -211,7 +211,7 @@
             <a href="{{ url_for(
                 'ui_ns.view_milestone',
                 repo=repo.name,
-                username=repo.username if repo.is_fork else None,
+                username=repo.user.user if repo.is_fork else None,
                 namespace=repo.namespace,
                 milestone=milestone) }}"
                 class="list-group-item list-group-item-action">
