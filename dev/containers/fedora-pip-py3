@@ -25,11 +25,6 @@ RUN cd / \
     && GIT_TRACE=1 GIT_CURL_VERBOSE=1 git clone -b $BRANCH $REPO \
     && chmod +x /pagure/dev/containers/tox_py3.sh
 
-# Install pygit2 manually, outside of the virtualenv since it is tightly coupled
-# which the version of libgit2 installed on the system.
-RUN pip3 install "pygit2 <= `rpm -q libgit2 --queryformat='%{version}'`" && \
-    cd /pagure
-
 WORKDIR /pagure
 ENTRYPOINT ["/pagure/dev/containers/tox_py3.sh"]
 CMD []
