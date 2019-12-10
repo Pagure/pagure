@@ -120,7 +120,13 @@ def __get_tree_and_content(repo_obj, commit, path):
         # Not tested and no idea how to test it, but better safe than sorry
         flask.abort(404, description="File not found")
 
-    if isinstance(blob_or_tree, pygit2.TreeEntry):  # Returned a file
+    is_file = False
+    try:
+        is_file = isinstance(blob_or_tree, pygit2.TreeEntry)
+    except AttributeError:
+        is_file = isinstance(blob_or_tree, pygit2.Blob)
+
+    if is_file:
         filename = blob_or_tree.name
         name, ext = os.path.splitext(filename)
         blob_obj = repo_obj[blob_or_tree.oid]
