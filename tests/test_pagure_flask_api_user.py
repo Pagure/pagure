@@ -464,7 +464,6 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         will occur on XXXX-02-15 in UTC, but on XXXX-02-14 local.
         """
         tests.create_projects(self.session)
-        repo = pagure.lib.query._get_project(self.session, "test")
 
         today = datetime.datetime.utcnow().date()
         # 02-15 on current year could be in the future, so use last year date
@@ -579,7 +578,6 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         occur on XXXX-02-15 in UTC, but on XXXX-02-16 in local time.
         """
         tests.create_projects(self.session)
-        repo = pagure.lib.query._get_project(self.session, "test")
 
         today = datetime.datetime.utcnow().date()
         # 02-15 on current year could be in the future, so use last year date
