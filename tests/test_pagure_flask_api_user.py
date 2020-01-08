@@ -467,11 +467,10 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         repo = pagure.lib.query._get_project(self.session, "test")
 
         today = datetime.datetime.utcnow().date()
-        year = today.year
-        if today.year == 2 and today.date <= 15:
-            year = year - 1
-        elif today.year < 2:
-            year = year - 1
+        # 02-15 on current year could be in the future, so use last year date
+        # always to ensure that 02-15 is not a future date
+        year = today.year - 1
+
         dateobj = datetime.datetime(year, 2, 15, 3, 30)
         utcdate = "%s-02-15" % year
         # the Unix timestamp for YYYY-02-15 12:00 UTC
@@ -483,7 +482,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
                 ).total_seconds()
             )
         )
-        localdate = "%s-02-14" % today.year
+        localdate = "%s-02-14" % year
         # the Unix timestamp for YYYY-02-15 18:00 America/New_York
         localts = str(
             int(
@@ -583,11 +582,10 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         repo = pagure.lib.query._get_project(self.session, "test")
 
         today = datetime.datetime.utcnow().date()
-        year = today.year
-        if today.year == 2 and today.date <= 15:
-            year = year - 1
-        elif today.year < 2:
-            year = year - 1
+        # 02-15 on current year could be in the future, so use last year date
+        # always to ensure that 02-15 is not a future date
+        year = today.year - 1
+
         dateobj = datetime.datetime(year, 2, 15, 22, 30)
         utcdate = "%s-02-15" % year
         # the Unix timestamp for YYYY-02-15 12:00 UTC
