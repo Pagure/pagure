@@ -579,6 +579,122 @@ def api_view_issue(repo, issueid, username=None, namespace=None):
     return jsonout
 
 
+@API.route("/<repo>/issue/<issueid>", methods=["POST"])
+@API.route("/<namespace>/<repo>/issue/<issueid>", methods=["POST"])
+@API.route("/fork/<username>/<repo>/issue/<issueid>", methods=["POST"])
+@API.route(
+    "/fork/<username>/<namespace>/<repo>/issue/<issueid>", methods=["POST"]
+)
+@api_login_required(acls=["issue_update"])
+@api_method
+def api_issue_update(repo, issueid, username=None, namespace=None):
+    """
+    Update issue information
+    ------------------------
+    Update the title and issue content of an existing issue.
+
+    ::
+
+        POST /api/0/<repo>/issue/<issue_id>
+        POST /api/0/<namespace>/<repo>/issue/<issue_id>
+
+    ::
+
+        POST /api/0/fork/<username>/<repo>/issue/<issue_id>
+        POST /api/0/fork/<username>/<namespace>/<repo>/issue/<issue_id>
+
+    Input
+    ^^^^^
+
+    +-------------------+--------+-------------+---------------------------+
+    | Key               | Type   | Optionality | Description               |
+    +===================+========+=============+===========================+
+    | ``title``         | string | Mandatory   | The title of the issue    |
+    +-------------------+--------+-------------+---------------------------+
+    | ``issue_content`` | string | Mandatory   | | The description of the  |
+    |                   |        |             |   issue                   |
+    +-------------------+--------+-------------+---------------------------+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "issue": {
+            "assignee": null,
+            "blocks": [],
+            "close_status": null,
+            "closed_at": null,
+            "closed_by": null,
+            "comments": [],
+            "content": "This issue needs attention",
+            "custom_fields": [],
+            "date_created": "1479458613",
+            "depends": [],
+            "id": 1,
+            "milestone": null,
+            "priority": null,
+            "private": false,
+            "status": "Open",
+            "tags": [],
+            "title": "test issue",
+            "user": {
+              "fullname": "PY C",
+              "name": "pingou"
+            }
+          },
+          "message": "Issue edited"
+        }
+
+    """
+
+    output = {}
+    repo = _get_repo(repo, username, namespace)
+    _check_issue_tracker(repo)
+    _check_token(repo)
+
+    issue_id = issue_uid = None
+    try:
+        issue_id = int(issueid)
+    except (ValueError, TypeError):
+        issue_uid = issueid
+
+    issue = _get_issue(repo, issue_id, issueuid=issue_uid)
+    _check_private_issue_access(issue)
+
+    form = pagure.forms.IssueFormSimplied(csrf_enabled=False)
+
+    if form.validate_on_submit():
+        title = form.title.data.strip()
+        content = form.issue_content.data
+
+        try:
+            pagure.lib.query.edit_issue(
+                session=flask.g.session,
+                issue=issue,
+                user=flask.g.fas_user.username,
+                title=title,
+                content=content,
+            )
+            flask.g.session.commit()
+
+            output["message"] = "Issue edited"
+            output["issue"] = issue.to_json(public=True)
+        except SQLAlchemyError as err:
+            flask.g.session.rollback()
+            _log.exception(err)
+            raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
+
+    else:
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.EINVALIDREQ, errors=form.errors
+        )
+
+    jsonout = flask.jsonify(output)
+    return jsonout
+
+
 @API.route("/<repo>/issue/<issueid>/comment/<int:commentid>")
 @API.route("/<namespace>/<repo>/issue/<issueid>/comment/<int:commentid>")
 @API.route("/fork/<username>/<repo>/issue/<issueid>/comment/<int:commentid>")

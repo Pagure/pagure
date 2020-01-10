@@ -518,6 +518,7 @@ def api():
     issues = []
     if pagure_config.get("ENABLE_TICKETS", True):
         issues.append(load_doc(issue.api_new_issue))
+        issues.append(load_doc(issue.api_issue_update))
         issues.append(load_doc(issue.api_view_issues))
         issues.append(load_doc(issue.api_view_issue))
         issues.append(load_doc(issue.api_view_issue_comment))
