@@ -3954,7 +3954,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.assertDictEqual(
             data,
             {
-                "error": "Issue tracker disabled for this project",
+                "error": "Issue tracker disabled",
                 "error_code": "ETRACKERDISABLED",
             },
         )
