@@ -143,6 +143,14 @@
       {% endif %}
 
       <a class="btn btn-secondary btn-sm" href="{{ url_for(
+                    'ui_ns.view_history_file',
+                    repo=repo.name,
+                    username=username,
+                    namespace=repo.namespace,
+                    identifier=branchname,
+                    filename=filename) | unicode }}" title="View git log for this file">History</a>
+
+      <a class="btn btn-secondary btn-sm" href="{{ url_for(
         'ui_ns.view_raw_file',
         repo=repo.name,
         username=username,
