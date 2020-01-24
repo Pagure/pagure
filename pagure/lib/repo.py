@@ -130,3 +130,29 @@ class PagureRepo(pygit2.Repository):
                         % (pygit2.GIT_MERGE_ANALYSIS_NORMAL)
                     )
                     raise AssertionError("Unknown merge analysis result")
+
+    @staticmethod
+    def log(path, log_options=None, target=None, fromref=None):
+        """ Run git log with the specified options at the specified target.
+
+        This method runs the system's `git log` command since pygit2 doesn't
+        offer us the possibility to do this via them.
+
+        :kwarg log_options: options to pass to git log
+        :type log_options: list or None
+        :kwarg target: the target of the git log command, can be a ref, a
+            file or nothing
+        :type path_to: str or None
+        :kwarg fromref: a reference/commit to use when generating the log
+        :type path_to: str or None
+        :
+        """
+        cmd = ["git", "log"]
+        if log_options:
+            cmd.extend(log_options)
+        if fromref:
+            cmd.append(fromref)
+        if target:
+            cmd.extend(["--", target])
+
+        return run_command(cmd, cwd=path)
