@@ -1,7 +1,6 @@
 {% extends "repo_master.html" %}
 
-{% block title %}Tree - {{
-    repo.namespace + '/' if repo.namespace }}{{ repo.name }}{% endblock %}
+{% block title %}File history - {{ repo.fullname }}{% endblock %}
 {% set tag = "home" %}
 
 {% block header %}
@@ -104,18 +103,56 @@
 {% if log %}
   <div class="card-block p-a-0">
     <div class="bg-light border pr-2">
-      <div class="highlight">
-        <table class="code_table">
-          {% for line in log %}
-          <tr>
-            <td class="cell1"><a id="{{ loop.index }}" href="#{{ loop.index }}" data-line-number="{{ loop.index }}"></a></td>
-            <td class="cell_commit"><a href="{{ url_for('.view_commit',
-              repo=repo.name, username=username, namespace=repo.namespace, commitid=line[0])}}">{{ line[0] }}</a></td>
-            <td class="cell2"><pre>{{ line[-1] }}</pre></td>
-          </tr>
-          {% endfor %}
-        </table>
-      </div>
+
+          <div class="list-group my-2">
+              {% for line in log %}
+              {% set commit = g.repo_obj[line[0]] %}
+              <div class="list-group-item " id="c_{{ commit.hex }}">
+                <div class="row align-items-center">
+                  <div class="col">
+                    <a href="{{ url_for('ui_ns.view_commit',
+                      repo=repo.name,
+                      username=username,
+                      namespace=repo.namespace,
+                      commitid=commit.hex, branch=branchname) }}"
+                      class="notblue">
+                      <strong>{{ commit.message.split('\n')[0] }}</strong>
+                    </a>
+                    <div>
+                    {{commit.author|author2user_commits(
+                      link=url_for('ui_ns.view_commits',
+                          repo=repo.name,
+                          branchname=branchname,
+                          username=username,
+                          namespace=repo.namespace,
+                          author=commit.author.email),
+                      cssclass="notblue")|safe}}
+                      <span class="commitdate"
+                      title="{{ commit.commit_time|format_ts }}"> &bull;
+                    {{ commit.commit_time|humanize }}</span>&nbsp;&nbsp;
+                      <span id="commit-actions"></span>
+                    </div>
+                  </div>
+                  <div class="col-xs-auto pr-3 text-right">
+                    <div class="btn-group">
+                      <a href="{{ url_for('ui_ns.view_commit',
+                        repo=repo.name,
+                        username=username,
+                        namespace=repo.namespace,
+                        commitid=commit.hex, branch=branchname) }}"
+                        class="btn btn-outline-primary font-weight-bold commithash" id="c_{{ commit.hex }}">
+                        <code>{{ commit.hex|short }}</code>
+                      </a>
+                      <a class="btn btn-outline-primary font-weight-bold" href="{{ url_for(
+                        'ui_ns.view_tree', username=username, namespace=repo.namespace,
+                        repo=repo.name, identifier=commit.hex) }}"><span class="fa fa-file-code-o fa-fw"></span></a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+
     </div>
   </div>
 {% else %}
@@ -127,53 +164,10 @@ No history found for this file in this repository
 
 {% block jscripts %}
 {{ super() }}
-<script type="text/javascript" nonce="{{ g.nonce }}"
-  src="{{ url_for('static', filename='vendor/highlight.js/highlight.pack.js') }}?version={{ g.version}}"></script>
-<script type="text/javascript" nonce="{{ g.nonce }}"
-  src="{{ url_for('static', filename='vendor/highlight.js/spec.js') }}?version={{ g.version}}"></script>
 
 <script type="text/javascript" nonce="{{ g.nonce }}">
-  hljs.initHighlightingOnLoad();
-</script>
-
-<script type="text/javascript" nonce="{{ g.nonce }}">
-function updateHighlight() {
-  var cls = "highlighted-line";
-  $('.' + cls).removeClass(cls)
-  if (location.hash !== '') {
-    var lines = location.hash.substr(2).split('-').map(function (x) { return parseInt(x, 10) });
-    for (var i = lines[lines.length - 1]; i >= lines[0]; i--) {
-      $('[data-line-number=' + i + ']').closest('tr').addClass(cls);
-    }
-    return lines;
-  }
-  return [];
-}
 $(document).ready(function () {
   $('.fork_project_btn').click($("[name=fork_project]").submit);
-
-  var lines = updateHighlight();
-  if (lines) {
-    var offset = $('[data-line-number=' + lines[0] + ']').offset().top;
-    $('html, body').animate({scrollTop: offset}, 200);
-  }
-});
-$(window).on('hashchange', updateHighlight);
-var selected = [];
-$("[data-line-number]").click(function (ev) {
-  var line = $(this).attr('data-line-number');
-  if (ev.shiftKey) {
-    selected = selected.slice(-1).concat(line);
-  } else {
-    selected = [line];
-  }
-
-  var hash = '_' + selected[0];
-  if (selected.length === 2) {
-    hash = '_' + Math.min(selected[0], selected[1]) + '-' + Math.max(selected[0], selected[1]);
-  }
-  window.location.hash = hash;
-  return false;
 });
 </script>
 {% endblock %}

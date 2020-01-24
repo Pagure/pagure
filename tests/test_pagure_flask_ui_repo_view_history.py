@@ -66,7 +66,7 @@ class PagureFlaskRepoViewHistoryFiletests(tests.Modeltests):
     def setUp(self):
         """ Set up the environment, ran before every tests. """
         super(PagureFlaskRepoViewHistoryFiletests, self).setUp()
-        self.regex = re.compile(r'>(\w+)</a></td>\n            <td class="cell2">')
+        self.regex = re.compile(r' <div class="list-group-item " id="c_')
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
 
@@ -91,16 +91,7 @@ class PagureFlaskRepoViewHistoryFiletests(tests.Modeltests):
         output = self.app.get("/test/history/sources")
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
-        self.assertIn('<table class="code_table">', output_text)
-        self.assertTrue(
-            '<td class="cell1"><a id="1" href="#1" '
-            'data-line-number="1"></a></td>' in output_text
-            or '<td class="cell1"><a data-line-number="1" '
-            'href="#1" id="1"></a></td>' in output_text
-        )
-        self.assertIn(
-            '<td class="cell2"><pre>foo</pre></td>', output_text
-        )
+        self.assertIn("<strong>foo</strong>", output_text)
         data = self.regex.findall(output_text)
         self.assertEqual(len(data), 2)
 
@@ -112,16 +103,7 @@ class PagureFlaskRepoViewHistoryFiletests(tests.Modeltests):
         output = self.app.get("/test/history/sources")
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
-        self.assertIn('<table class="code_table">', output_text)
-        self.assertTrue(
-            '<td class="cell1"><a id="1" href="#1" '
-            'data-line-number="1"></a></td>' in output_text
-            or '<td class="cell1"><a data-line-number="1" '
-            'href="#1" id="1"></a></td>' in output_text
-        )
-        self.assertIn(
-            '<td class="cell2"><pre>bar</pre></td>', output_text
-        )
+        self.assertIn("<strong>bar</strong>", output_text)
         data = self.regex.findall(output_text)
         self.assertEqual(len(data), 3)
 
@@ -138,16 +120,7 @@ class PagureFlaskRepoViewHistoryFiletests(tests.Modeltests):
         )
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
-        self.assertIn('<table class="code_table">', output_text)
-        self.assertTrue(
-            '<td class="cell1"><a id="1" href="#1" '
-            'data-line-number="1"></a></td>' in output_text
-            or '<td class="cell1"><a data-line-number="1" '
-            'href="#1" id="1"></a></td>' in output_text
-        )
-        self.assertIn(
-            '<td class="cell2"><pre>initial commit</pre></td>', output_text
-        )
+        self.assertIn("<strong>initial commit</strong>", output_text)
         data = self.regex.findall(output_text)
         self.assertEqual(len(data), 1)
 
@@ -156,16 +129,7 @@ class PagureFlaskRepoViewHistoryFiletests(tests.Modeltests):
         output = self.app.get("/test/history/sources?identifier=feature")
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
-        self.assertIn('<table class="code_table">', output_text)
-        self.assertTrue(
-            '<td class="cell1"><a id="1" href="#1" '
-            'data-line-number="1"></a></td>' in output_text
-            or '<td class="cell1"><a data-line-number="1" '
-            'href="#1" id="1"></a></td>' in output_text
-        )
-        self.assertIn(
-            '<td class="cell2"><pre>bar</pre></td>', output_text
-        )
+        self.assertIn("<strong>bar</strong>", output_text)
         data = self.regex.findall(output_text)
         self.assertEqual(len(data), 3)
 
@@ -185,16 +149,7 @@ class PagureFlaskRepoViewHistoryFiletests(tests.Modeltests):
         output = self.app.get("/test/history/sources?identifier=v1.0")
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
-        self.assertIn('<table class="code_table">', output_text)
-        self.assertTrue(
-            '<td class="cell1"><a id="1" href="#1" '
-            'data-line-number="1"></a></td>' in output_text
-            or '<td class="cell1"><a data-line-number="1" '
-            'href="#1" id="1"></a></td>' in output_text
-        )
-        self.assertIn(
-            '<td class="cell2"><pre>initial commit</pre></td>', output_text
-        )
+        self.assertIn("<strong>initial commit</strong>", output_text)
         data = self.regex.findall(output_text)
         self.assertEqual(len(data), 1)
 
@@ -207,7 +162,7 @@ class PagureFlaskRepoViewHistoryFiletests(tests.Modeltests):
         output = self.app.get("/test/history/test.jpg")
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
-        self.assertIn("<td class=\"cell2\"><pre>Add a fake image file</pre></td>", output_text)
+        self.assertIn("<strong>Add a fake image file</strong>", output_text)
 
     def test_view_history_file_non_ascii_name(self):
         """ Test the view_history_file endpoint """
@@ -223,17 +178,7 @@ class PagureFlaskRepoViewHistoryFiletests(tests.Modeltests):
             output.headers["Content-Type"].lower(), "text/html; charset=utf-8"
         )
         self.assertIn("</span>&nbsp; Šource", output_text)
-        self.assertIn('<table class="code_table">', output_text)
-        self.assertTrue(
-            '<td class="cell1"><a id="1" href="#1" '
-            'data-line-number="1"></a></td>' in output_text
-            or '<td class="cell1"><a data-line-number="1" '
-            'href="#1" id="1"></a></td>' in output_text
-        )
-        self.assertIn(
-            '<td class="cell2"><pre>Add row 0 to Šource file</pre></td>',
-            output_text
-        )
+        self.assertIn("<strong>Add row 0 to Šource file</strong>", output_text)
 
     def test_view_history_file_fork_of_a_fork(self):
         """ Test the view_history_file endpoint """
@@ -266,16 +211,8 @@ class PagureFlaskRepoViewHistoryFiletests(tests.Modeltests):
         output = self.app.get("/fork/pingou/test3/history/sources")
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
-        self.assertIn('<table class="code_table">', output_text)
-        self.assertTrue(
-            '<td class="cell1"><a id="1" href="#1" '
-            'data-line-number="1"></a></td>' in output_text
-            or '<td class="cell1"><a data-line-number="1" '
-            'href="#1" id="1"></a></td>' in output_text
-        )
         self.assertIn(
-            '<td class="cell2"><pre>Add row 2 to sources file</pre></td>',
-            output_text,
+            "<strong>Add row 2 to sources file</strong>", output_text
         )
 
     def test_view_history_file_no_file(self):
@@ -283,10 +220,7 @@ class PagureFlaskRepoViewHistoryFiletests(tests.Modeltests):
         output = self.app.get("/test/history/foofile")
         self.assertEqual(output.status_code, 400)
         output_text = output.get_data(as_text=True)
-        self.assertIn(
-            'No history could be found for this file',
-            output_text
-        )
+        self.assertIn("No history could be found for this file", output_text)
 
     def test_view_history_file_folder(self):
         """ Test the view_history_file endpoint """
@@ -298,10 +232,7 @@ class PagureFlaskRepoViewHistoryFiletests(tests.Modeltests):
         output = self.app.get("/test/history/folder1")
         self.assertEqual(output.status_code, 400)
         output_text = output.get_data(as_text=True)
-        self.assertIn(
-            'No history could be found for this file',
-            output_text)
-
+        self.assertIn("No history could be found for this file", output_text)
 
     def test_view_history_file_unborn_head_no_identifier(self):
         repo_obj = pygit2.Repository(
@@ -312,6 +243,4 @@ class PagureFlaskRepoViewHistoryFiletests(tests.Modeltests):
         output = self.app.get("/test/history/sources")
         self.assertEqual(output.status_code, 400)
         output_text = output.get_data(as_text=True)
-        self.assertIn(
-            'No history could be found for this file',
-            output_text)
+        self.assertIn("No history could be found for this file", output_text)
