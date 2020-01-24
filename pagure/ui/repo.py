@@ -805,6 +805,50 @@ def view_blame_file(repo, filename, username=None, namespace=None):
     )
 
 
+@UI_NS.route("/<repo>/history/<path:filename>")
+@UI_NS.route("/<namespace>/<repo>/history/<path:filename>")
+@UI_NS.route("/fork/<username>/<repo>/history/<path:filename>")
+@UI_NS.route("/fork/<username>/<namespace>/<repo>/history/<path:filename>")
+def view_history_file(repo, filename, username=None, namespace=None):
+    """ Displays the history of a file or a tree for the specified repo.
+    """
+    repo = flask.g.repo
+    repo_obj = flask.g.repo_obj
+
+    branchname = flask.request.args.get("identifier")
+
+    if repo_obj.is_empty:
+        flask.abort(404, description="Empty repo cannot have a file")
+
+    try:
+        log = pagure.lib.repo.PagureRepo.log(
+            flask.g.reponame,
+            log_options=["--pretty=oneline", "--abbrev-commit"],
+            target=filename,
+            fromref=branchname,
+        )
+        if log.strip():
+            log = [l.split(" ", 1) for l in log.strip().split("\n")]
+        else:
+            log = []
+    except Exception:
+        log = []
+    if not log:
+        flask.abort(400, description="No history could be found for this file")
+
+    return flask.render_template(
+        "file_history.html",
+        select="tree",
+        repo=repo,
+        origin="view_file",
+        username=username,
+        filename=filename,
+        branchname=branchname,
+        output_type="history",
+        log=log,
+    )
+
+
 @UI_NS.route("/<repo>/c/<commitid>/")
 @UI_NS.route("/<repo>/c/<commitid>")
 @UI_NS.route("/<namespace>/<repo>/c/<commitid>/")
