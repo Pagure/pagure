@@ -84,6 +84,7 @@ class TestStyle(unittest.TestCase):
             "-l",
             "79",
             "--check",
+            "--diff",
             "--exclude",
             '"/(\.eggs|\.git|\.hg|\.mypy_cache|\.nox|\.tox|\.venv|_build|buck-out|build|dist)/"',
             REPO_PATH,
