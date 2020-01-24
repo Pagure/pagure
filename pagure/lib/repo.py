@@ -28,10 +28,12 @@ def get_pygit2_version():
     return tuple([int(i) for i in pygit2.__version__.split(".")])
 
 
-def run_command(command):
+def run_command(command, cwd=None):
     _log.info("Running command: %s", command)
     try:
-        out = subprocess.check_output(command, stderr=subprocess.STDOUT)
+        out = subprocess.check_output(
+            command, stderr=subprocess.STDOUT, cwd=cwd
+        ).decode("utf-8")
         _log.info("   command ran successfully")
         _log.debug("Output: %s" % out)
     except subprocess.CalledProcessError as err:
@@ -44,6 +46,7 @@ def run_command(command):
         raise pagure.exceptions.PagureException(
             "Did not manage to rebase this pull-request"
         )
+    return out
 
 
 class PagureRepo(pygit2.Repository):
