@@ -156,3 +156,39 @@ class PagureRepo(pygit2.Repository):
             cmd.extend(["--", target])
 
         return run_command(cmd, cwd=path)
+
+    @staticmethod
+    def get_active_branches(path, nbranch=8, catch_exception=False):
+        """ Returns the active branches in the git repo at the specified
+        location.
+
+        :arg path: the location of the git repo
+        :type path: str
+        :kwarg nbranch: the number of active branches to consider, defaults to
+            6
+        :type nbranch: int
+        :kwarg catch_exception: Whether or not this method should silently
+            ignore all exception raised when running the git command and return
+            an empty list in those situations. Defaults to False.
+        :type catch_exception: boolean
+        """
+        cmd = [
+            "git",
+            "for-each-ref",
+            "--count=%s" % nbranch,
+            "--sort=-committerdate",
+            "refs/heads/",
+        ]
+        output = []
+        try:
+            cmd_output = run_command(cmd, path)
+            for row in cmd_output.split("\n"):
+                output.append(
+                    row.replace("\t", " ")
+                    .rsplit(" ", 1)[-1]
+                    .replace("refs/heads/", "")
+                )
+        except Exception:
+            if not catch_exception:
+                raise
+        return output

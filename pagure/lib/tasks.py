@@ -1117,7 +1117,8 @@ def pull_request_ready_branch(self, session, namespace, name, user):
     repo = pagure.lib.query._get_project(
         session, name, user=user, namespace=namespace
     )
-    repo_obj = pygit2.Repository(pagure.utils.get_repo_path(repo))
+    repo_path = pagure.utils.get_repo_path(repo)
+    repo_obj = pygit2.Repository(repo_path)
 
     if repo.is_fork and repo.parent:
         parentreponame = pagure.utils.get_repo_path(repo.parent)
@@ -1127,7 +1128,13 @@ def pull_request_ready_branch(self, session, namespace, name, user):
 
     branches = {}
     if not repo_obj.is_empty and len(repo_obj.listall_branches()) > 0:
-        for branchname in repo_obj.listall_branches():
+        branch_names = (
+            pagure.lib.repo.PagureRepo.get_active_branches(
+                repo_path, catch_exception=True
+            )
+            or repo_obj.listall_branches()
+        )
+        for branchname in branch_names:
             compare_branch = None
             if (
                 not parent_repo_obj.is_empty
