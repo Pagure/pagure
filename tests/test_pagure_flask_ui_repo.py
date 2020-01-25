@@ -2282,6 +2282,44 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertIn("<title>Commits - test - Pagure</title>", output_text)
         self.assertEqual(output_text.count('<span id="commit-actions">'), 1)
 
+    def test_view_commit_from_tag(self):
+        """ Test the view_commit endpoint given a tag. """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
+
+        # Add a README to the git repo - First commit
+        tests.add_readme_git_repo(os.path.join(self.path, "repos", "test.git"))
+        repo = pygit2.Repository(os.path.join(self.path, "repos", "test.git"))
+        first_commit = repo.revparse_single("HEAD")
+        tagger = pygit2.Signature("Alice Doe", "adoe@example.com", 12347, 0)
+        repo.create_tag(
+            "0.0.1",
+            first_commit.oid.hex,
+            pygit2.GIT_OBJ_COMMIT,
+            tagger,
+            "Release 0.0.1",
+        )
+
+        tests.add_readme_git_repo(os.path.join(self.path, "repos", "test.git"))
+        repo = pygit2.Repository(os.path.join(self.path, "repos", "test.git"))
+        project = pagure.lib.query.get_authorized_project(self.session, "test")
+        tags = pagure.lib.git.get_git_tags_objects(project)
+        tag_id = tags[0]["object"].oid
+        commit_id = tags[0]["object"].peel(pygit2.Commit).hex
+
+        output = self.app.get("/test/c/%s" % tag_id)
+        self.assertEqual(output.status_code, 302)
+
+        output = self.app.get("/test/c/%s" % tag_id, follow_redirects=True)
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        self.assertIn(first_commit.oid.hex, output_text)
+        self.assertIn(
+            "<title>Commit - test - %s - Pagure</title>" % commit_id,
+            output_text,
+        )
+
     def test_compare_commits(self):
         """ Test the compare_commits endpoint. """
 

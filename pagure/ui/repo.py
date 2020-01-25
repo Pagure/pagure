@@ -889,6 +889,18 @@ def view_commit(repo, commitid, username=None, namespace=None):
     if isinstance(commit, pygit2.Blob):
         flask.abort(404, description="Commit not found")
 
+    if isinstance(commit, pygit2.Tag):
+        commit = commit.peel(pygit2.Commit)
+        return flask.redirect(
+            flask.url_for(
+                "ui_ns.view_commit",
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace,
+                commitid=commit.hex,
+            )
+        )
+
     if commit.parents:
         diff = repo_obj.diff(commit.parents[0], commit)
     else:
