@@ -47,11 +47,15 @@ def main(check=False, debug=False):
             user_email = user.default_email
             days_left = (token.expiration - datetime.utcnow()).days
             subject = "Pagure API key expiration date is near!"
+            base_url = _config["APP_URL"].rstrip('/')
             if token.project:
+                url = "%s/%s/settings#apikeys-tab" % (
+                    base_url, token.project.fullname)
                 text = """Hi %s,
 Your Pagure API key %s linked to the project %s
 will expire in %s day(s).
-Please get a new key for non-interrupted service.
+Please get a new key at: %s
+for non-interrupted service.
 
 Thanks,
 Your Pagure Admin. """ % (
@@ -59,17 +63,22 @@ Your Pagure Admin. """ % (
                     token.description,
                     token.project.fullname,
                     days_left,
+                    url,
                 )
             else:
+                url = "%s/settings#nav-api-tab" % (base_url)
                 text = """Hi %s,
 Your Pagure API key %s will expire in %s day(s).
-Please get a new key for non-interrupted service.
+Please get a new key at: %s
+for non-interrupted service.
+
 
 Thanks,
 Your Pagure Admin. """ % (
                     username,
                     token.description,
                     days_left,
+                    url,
                 )
             if not check:
                 msg = pagure.lib.notify.send_email(text, subject, user_email)
