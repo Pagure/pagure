@@ -4297,7 +4297,9 @@ def get_acls(session, restrict=None):
     return query.all()
 
 
-def add_token_to_user(session, project, acls, username, description=None):
+def add_token_to_user(
+    session, project, acls, username, expiration_date, description=None
+):
     """ Create a new token for the specified user on the specified project
     with the given ACLs.
     """
@@ -4305,12 +4307,19 @@ def add_token_to_user(session, project, acls, username, description=None):
 
     user = search_user(session, username=username)
 
+    if expiration_date > (
+        datetime.date.today() + datetime.timedelta(days=730)
+    ):
+        raise pagure.exceptions.PagureException(
+            "API tokens can only be created up to 2 years"
+        )
+
     token = pagure.lib.model.Token(
         id=pagure.lib.login.id_generator(64),
         user_id=user.id,
         project_id=project.id if project else None,
         description=description,
-        expiration=datetime.datetime.utcnow() + datetime.timedelta(days=60),
+        expiration=expiration_date,
     )
     session.add(token)
     session.flush()

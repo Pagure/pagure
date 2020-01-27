@@ -2269,7 +2269,7 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertIn("Token created", output_text)
             self.assertEqual(
                 output_text.count(
-                    '<small class="font-weight-bold text-success input-group-text">Active until'
+                    '<small class="font-weight-bold">Active until'
                 ),
                 1,
             )
@@ -2325,7 +2325,7 @@ class PagureFlaskApptests(tests.Modeltests):
             )
             self.assertEqual(
                 output_text.count(
-                    '<small class="font-weight-bold text-success input-group-text">Active until'
+                    '<small class="font-weight-bold">Active until'
                 ),
                 1,
             )
@@ -2349,7 +2349,7 @@ class PagureFlaskApptests(tests.Modeltests):
             )
             self.assertEqual(
                 output_text.count(
-                    '<small class="font-weight-bold text-success input-group-text">Active until'
+                    '<small class="font-weight-bold">Active until'
                 ),
                 0,
             )
@@ -2371,7 +2371,7 @@ class PagureFlaskApptests(tests.Modeltests):
             )
             self.assertEqual(
                 output_text.count(
-                    '<small class="font-weight-bold text-success input-group-text">Active until'
+                    '<small class="font-weight-bold">Active until'
                 ),
                 0,
             )
@@ -2589,7 +2589,6 @@ class PagureFlaskAppNoTicketstests(tests.Modeltests):
 
 
 class PagureFlaskAppRenewUserApiTokentests(tests.Modeltests):
-
     @patch("pagure.decorators.admin_session_timedout")
     def setUp(self, ast):
         """ Constructor """
@@ -2598,7 +2597,7 @@ class PagureFlaskAppRenewUserApiTokentests(tests.Modeltests):
         self.ast = ast
         self.ast.return_value = False
 
-        user = tests.FakeUser(username = "pingou")
+        user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
             output = self.app.get("/settings/token/new")
             self.assertEqual(output.status_code, 200)
@@ -2608,10 +2607,7 @@ class PagureFlaskAppRenewUserApiTokentests(tests.Modeltests):
             self.csrf_token = self.get_csrf(output=output)
 
             # Create a token to renew
-            data = {
-                "csrf_token": self.csrf_token,
-                "acls": ["modify_project"]
-            }
+            data = {"csrf_token": self.csrf_token, "acls": ["modify_project"]}
             output = self.app.post(
                 "/settings/token/new/", data=data, follow_redirects=True
             )
@@ -2625,7 +2621,7 @@ class PagureFlaskAppRenewUserApiTokentests(tests.Modeltests):
         self.assertEqual(
             userobj.tokens[0].expiration.date(),
             datetime.datetime.utcnow().date()
-            + datetime.timedelta(days=60),
+            + datetime.timedelta(days=(30 * 6)),
         )
 
         self.token = userobj.tokens[0].id
@@ -2641,7 +2637,7 @@ class PagureFlaskAppRenewUserApiTokentests(tests.Modeltests):
         """ Test the renew_api_token endpoint. """
         ast.return_value = True
 
-        user = tests.FakeUser(username = "pingou")
+        user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
             data = {"csrf_token": self.csrf_token}
 
@@ -2656,7 +2652,7 @@ class PagureFlaskAppRenewUserApiTokentests(tests.Modeltests):
     def test_renew_api_token_invalid_token(self):
         """ Test the renew_api_token endpoint. """
 
-        user = tests.FakeUser(username = "pingou")
+        user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
             output = self.app.post(
                 "/settings/token/renew/123",
@@ -2669,7 +2665,7 @@ class PagureFlaskAppRenewUserApiTokentests(tests.Modeltests):
     def test_renew_api_token(self):
         """ Test the renew_api_token endpoint. """
 
-        user = tests.FakeUser(username = "pingou")
+        user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
 
             output = self.app.post(
@@ -2679,7 +2675,7 @@ class PagureFlaskAppRenewUserApiTokentests(tests.Modeltests):
             )
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                "<title>pingou\'s settings - Pagure</title>", output_text
+                "<title>pingou's settings - Pagure</title>", output_text
             )
             self.assertIn("Token created", output_text)
             self.assertEqual(output_text.count('title="Revoke token">'), 2)
@@ -2687,7 +2683,9 @@ class PagureFlaskAppRenewUserApiTokentests(tests.Modeltests):
             self.session.commit()
 
             # Existing token has been renewed
-            userobj = pagure.lib.query.search_user(self.session, username="pingou")
+            userobj = pagure.lib.query.search_user(
+                self.session, username="pingou"
+            )
             self.assertEqual(len(userobj.tokens), 2)
             self.assertEqual(
                 userobj.tokens[0].expiration.date(),
@@ -2695,7 +2693,7 @@ class PagureFlaskAppRenewUserApiTokentests(tests.Modeltests):
             )
             self.assertEqual(
                 userobj.tokens[0].created.date(),
-                userobj.tokens[1].created.date()
+                userobj.tokens[1].created.date(),
             )
             self.assertEqual(userobj.tokens[0].acls, userobj.tokens[1].acls)
             self.assertEqual(

@@ -2397,13 +2397,19 @@ def api_project_create_api_token(repo, namespace=None, username=None):
     if form.validate_on_submit():
         acls = form.acls.data
         description = form.description.data
+        expiration_date = form.expiration_date.data
     else:
         raise pagure.exceptions.APIError(
             400, error_code=APIERROR.EINVALIDREQ, errors=form.errors
         )
 
     token = pagure.lib.query.add_token_to_user(
-        flask.g.session, project, acls, flask.g.fas_user.user, description
+        flask.g.session,
+        project=project,
+        acls=acls,
+        username=flask.g.fas_user.user,
+        description=description,
+        expiration_date=expiration_date,
     )
     output = {"token": {"description": token.description, "id": token.id}}
 

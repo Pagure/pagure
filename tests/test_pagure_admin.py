@@ -49,7 +49,13 @@ class PagureAdminAdminTokenEmptytests(tests.Modeltests):
         """ Test the do_create_admin_token function of pagure-admin without
         user.
         """
-        args = munch.Munch({"user": "pingou"})
+        exp_date = datetime.date.today() + datetime.timedelta(days=300)
+        args = munch.Munch(
+            {
+                "user": "pingou",
+                "expiration_date": exp_date.strftime("%Y-%m-%d"),
+            }
+        )
         with self.assertRaises(pagure.exceptions.PagureException) as cm:
             pagure.cli.admin.do_create_admin_token(args)
         self.assertEqual(cm.exception.args[0], 'No user "pingou" found')
@@ -239,7 +245,13 @@ class PagureAdminAdminTokentests(tests.Modeltests):
         conf.return_value = True
         rinp.return_value = "1,2,3"
 
-        args = munch.Munch({"user": "pingou"})
+        exp_date = datetime.date.today() + datetime.timedelta(days=300)
+        args = munch.Munch(
+            {
+                "user": "pingou",
+                "expiration_date": exp_date.strftime("%Y-%m-%d"),
+            }
+        )
         pagure.cli.admin.do_create_admin_token(args)
 
         # Check the outcome
@@ -267,7 +279,13 @@ class PagureAdminAdminTokentests(tests.Modeltests):
         conf.return_value = True
         rinp.return_value = "1,2,3"
 
-        args = munch.Munch({"user": "pingou"})
+        exp_date = datetime.date.today() + datetime.timedelta(days=300)
+        args = munch.Munch(
+            {
+                "user": "pingou",
+                "expiration_date": exp_date.strftime("%Y-%m-%d"),
+            }
+        )
         pagure.cli.admin.do_create_admin_token(args)
 
         # Retrieve all tokens
@@ -305,11 +323,13 @@ class PagureAdminAdminTokentests(tests.Modeltests):
     def test_do_list_admin_token_non_admin_acls(self):
         """ Test the do_list_admin_token function of pagure-admin for a token
         without any admin ACL. """
+        exp_date = datetime.date.today() + datetime.timedelta(days=300)
         pagure.lib.query.add_token_to_user(
             self.session,
             project=None,
             acls=["issue_assign", "pull_request_subscribe"],
             username="pingou",
+            expiration_date=exp_date,
         )
 
         # Retrieve all admin tokens
@@ -352,7 +372,13 @@ class PagureAdminAdminTokentests(tests.Modeltests):
         conf.return_value = True
         rinp.return_value = "2,4,5"
 
-        args = munch.Munch({"user": "pingou"})
+        exp_date = datetime.date.today() + datetime.timedelta(days=300)
+        args = munch.Munch(
+            {
+                "user": "pingou",
+                "expiration_date": exp_date.strftime("%Y-%m-%d"),
+            }
+        )
         pagure.cli.admin.do_create_admin_token(args)
 
         # Retrieve the token
@@ -391,11 +417,13 @@ class PagureAdminAdminTokentests(tests.Modeltests):
     def test_do_info_admin_token_non_admin_acl(self):
         """ Test the do_info_admin_token function of pagure-admin for a
         token not having any admin ACL. """
+        exp_date = datetime.date.today() + datetime.timedelta(days=300)
         pagure.lib.query.add_token_to_user(
             self.session,
             project=None,
             acls=["issue_assign", "pull_request_subscribe"],
             username="pingou",
+            expiration_date=exp_date,
         )
 
         # Retrieve the token
@@ -438,7 +466,13 @@ class PagureAdminAdminTokentests(tests.Modeltests):
         conf.return_value = True
         rinp.return_value = "1,2,3"
 
-        args = munch.Munch({"user": "pingou"})
+        exp_date = datetime.date.today() + datetime.timedelta(days=300)
+        args = munch.Munch(
+            {
+                "user": "pingou",
+                "expiration_date": exp_date.strftime("%Y-%m-%d"),
+            }
+        )
         pagure.cli.admin.do_create_admin_token(args)
 
         # Retrieve the token
@@ -506,11 +540,13 @@ class PagureAdminAdminTokentests(tests.Modeltests):
         conf.return_value = True
         rinp.return_value = "1,2,3"
 
+        exp_date = datetime.date.today() + datetime.timedelta(days=300)
         pagure.lib.query.add_token_to_user(
             self.session,
             project=None,
             acls=["issue_assign", "pull_request_subscribe"],
             username="pingou",
+            expiration_date=exp_date,
         )
 
         # Retrieve all tokens to get the one of interest
@@ -561,7 +597,13 @@ class PagureAdminAdminTokentests(tests.Modeltests):
         conf.return_value = True
         rinp.return_value = "1,2,3"
 
-        args = munch.Munch({"user": "pingou"})
+        exp_date = datetime.date.today() + datetime.timedelta(days=300)
+        args = munch.Munch(
+            {
+                "user": "pingou",
+                "expiration_date": exp_date.strftime("%Y-%m-%d"),
+            }
+        )
         pagure.cli.admin.do_create_admin_token(args)
 
         # Retrieve the token
@@ -602,7 +644,13 @@ class PagureAdminAdminTokentests(tests.Modeltests):
         conf.return_value = True
         rinp.return_value = "1,2,3"
 
-        args = munch.Munch({"user": "pingou"})
+        exp_date = datetime.date.today() + datetime.timedelta(days=300)
+        args = munch.Munch(
+            {
+                "user": "pingou",
+                "expiration_date": exp_date.strftime("%Y-%m-%d"),
+            }
+        )
         pagure.cli.admin.do_create_admin_token(args)
 
         # Retrieve the token
@@ -645,7 +693,13 @@ class PagureAdminAdminTokentests(tests.Modeltests):
         conf.return_value = True
         rinp.return_value = "1,2,3"
 
-        args = munch.Munch({"user": "pingou"})
+        exp_date = datetime.date.today() + datetime.timedelta(days=300)
+        args = munch.Munch(
+            {
+                "user": "pingou",
+                "expiration_date": exp_date.strftime("%Y-%m-%d"),
+            }
+        )
         pagure.cli.admin.do_create_admin_token(args)
 
         # Retrieve the token
@@ -691,7 +745,13 @@ class PagureAdminAdminTokentests(tests.Modeltests):
         conf.return_value = True
         rinp.return_value = "1,2,3"
 
-        args = munch.Munch({"user": "pingou"})
+        exp_date = datetime.date.today() + datetime.timedelta(days=300)
+        args = munch.Munch(
+            {
+                "user": "pingou",
+                "expiration_date": exp_date.strftime("%Y-%m-%d"),
+            }
+        )
         pagure.cli.admin.do_create_admin_token(args)
 
         # Retrieve the token
@@ -773,11 +833,13 @@ class PagureAdminAdminTokentests(tests.Modeltests):
         conf.return_value = True
         rinp.return_value = "1,2,3"
 
+        exp_date = datetime.date.today() + datetime.timedelta(days=300)
         pagure.lib.query.add_token_to_user(
             self.session,
             project=None,
             acls=["issue_assign", "pull_request_subscribe"],
             username="pingou",
+            expiration_date=exp_date,
         )
 
         # Retrieve all tokens to get the one of interest

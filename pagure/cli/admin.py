@@ -191,6 +191,9 @@ def _parser_admin_token_create(subparser):
         "create", help="Create a new API token"
     )
     local_parser.add_argument("user", help="User to associate with the token")
+    local_parser.add_argument(
+        "expiration_date", help="Expiration date for the new token"
+    )
     local_parser.set_defaults(func=do_create_admin_token)
 
 
@@ -828,6 +831,19 @@ def do_create_admin_token(args):
     # Validate user first
     pagure.lib.query.get_user(session, args.user)
 
+    # Validate the expiration date
+    try:
+        expiration_date = arrow.get(
+            args.expiration_date, "YYYY-MM-DD"
+        ).replace(tzinfo="UTC")
+        expiration_date = expiration_date.date()
+    except Exception as err:
+        _log.exception(err)
+        raise pagure.exceptions.PagureException(
+            "Invalid expiration date submitted: %s, not of the format "
+            "YYYY-MM-DD" % args.expiration_date
+        )
+
     acls_list = pagure.config.config["ADMIN_API_ACLS"]
     for idx, acl in enumerate(acls_list):
         print("%s.  %s" % (idx, acl))
@@ -844,7 +860,13 @@ def do_create_admin_token(args):
     print("Do you want to create this API token?")
     if _ask_confirmation():
         print(
-            pagure.lib.query.add_token_to_user(session, None, acls, args.user)
+            pagure.lib.query.add_token_to_user(
+                session,
+                project=None,
+                acls=acls,
+                username=args.user,
+                expiration_date=expiration_date,
+            )
         )
 
 

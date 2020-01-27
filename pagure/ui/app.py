@@ -1498,12 +1498,15 @@ def add_api_user_token():
                 description=form.description.data.strip() or None,
                 acls=form.acls.data,
                 username=user.username,
+                expiration_date=form.expiration_date.data,
             )
             flask.g.session.commit()
             flask.flash("Token created")
             return flask.redirect(
                 flask.url_for("ui_ns.user_settings") + "#nav-api-tab"
             )
+        except pagure.exceptions.PagureException as err:
+            flask.flash(str(err), "error")
         except SQLAlchemyError as err:  # pragma: no cover
             flask.g.session.rollback()
             _log.exception(err)
@@ -1582,6 +1585,8 @@ def renew_api_user_token(token_id):
                 description=token.description or None,
                 acls=acls,
                 username=flask.g.fas_user.username,
+                expiration_date=datetime.date.today()
+                + datetime.timedelta(days=(30 * 6)),
             )
             flask.g.session.commit()
             flask.flash("Token created")

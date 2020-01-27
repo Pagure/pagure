@@ -35,6 +35,8 @@
           {% endif %}
           {{ render_bootstrap_field(
               form.description, field_description="Small description of this API token") }}
+          {{ render_bootstrap_field(
+              form.expiration_date, field_description="Expiration date for this API token, maximum 2 year, format: YYYY-MM-DD") }}
           <strong><label for="acls">ACLs</label></strong><br/>
 
           {% for acl in acls %}

@@ -2349,6 +2349,7 @@ def add_token(repo, username=None, namespace=None):
                 description=form.description.data.strip() or None,
                 acls=form.acls.data,
                 username=flask.g.fas_user.username,
+                expiration_date=form.expiration_date.data,
             )
             flask.g.session.commit()
             flask.flash("Token created")
@@ -2418,6 +2419,8 @@ def renew_api_token(repo, token_id, username=None, namespace=None):
                 description=token.description or None,
                 acls=acls,
                 username=flask.g.fas_user.username,
+                expiration_date=datetime.date.today()
+                + datetime.timedelta(days=(30 * 6)),
             )
             flask.g.session.commit()
             flask.flash("Token created")
@@ -2430,6 +2433,8 @@ def renew_api_token(repo, token_id, username=None, namespace=None):
                 )
                 + "#apikeys-tab"
             )
+        except pagure.exceptions.PagureException as err:
+            flask.flash(str(err), "error")
         except SQLAlchemyError as err:  # pragma: no cover
             flask.g.session.rollback()
             _log.exception(err)

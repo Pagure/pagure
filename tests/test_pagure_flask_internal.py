@@ -60,8 +60,9 @@ class PagureFlaskInternaltests(tests.Modeltests):
         )
         self.assertEqual(output.status_code, 401)
         # correct token => will work
+        exp_date = datetime.date.today() + datetime.timedelta(days=300)
         pagure.lib.query.add_token_to_user(
-            self.session, None, ["internal_access"], "pingou"
+            self.session, None, ["internal_access"], "pingou", exp_date
         )
         token = pagure.lib.query.search_token(
             self.session, acls=["internal_access"], user="pingou"

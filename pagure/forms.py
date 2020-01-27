@@ -442,6 +442,11 @@ class NewTokenForm(PagureForm):
     description = wtforms.StringField(
         "description", [wtforms.validators.Optional()]
     )
+    expiration_date = wtforms.DateField(
+        "expiration date",
+        [wtforms.validators.DataRequired()],
+        default=datetime.date.today() + datetime.timedelta(days=(30 * 6)),
+    )
     acls = wtforms.SelectMultipleField(
         "ACLs", [wtforms.validators.DataRequired()], choices=[]
     )

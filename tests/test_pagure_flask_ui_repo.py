@@ -5588,10 +5588,7 @@ index 0000000..fb7093d
             )
             self.assertIn("<strong> Test token</strong>", output_text)
             self.assertIn(
-                '<span class="input-group-text text-success">'
-                '\n                    <small class="font-weight-bold">'
-                "Active until",
-                output_text,
+                '<small class="font-weight-bold">Active until', output_text
             )
 
     @patch("pagure.decorators.admin_session_timedout")
@@ -5663,7 +5660,7 @@ index 0000000..fb7093d
             self.assertEqual(
                 repo.tokens[0].expiration.date(),
                 datetime.datetime.utcnow().date()
-                + datetime.timedelta(days=60),
+                + datetime.timedelta(days=(30 * 6)),
             )
 
             token = repo.tokens[0].id
@@ -5763,7 +5760,7 @@ index 0000000..fb7093d
             self.assertEqual(
                 repo.tokens[0].expiration.date(),
                 datetime.datetime.utcnow().date()
-                + datetime.timedelta(days=60),
+                + datetime.timedelta(days=(30 * 6)),
             )
 
             token = repo.tokens[0].id
@@ -5778,7 +5775,7 @@ index 0000000..fb7093d
             )
             self.assertIn("Token created", output_text)
             self.assertEqual(output_text.count('title="Revoke token">'), 2)
-            self.assertEqual(output_text.count('title="Renew token">'), 0)
+            self.assertEqual(output_text.count('title="Renew token">'), 2)
 
             # Existing token has been renewed
             self.session.commit()

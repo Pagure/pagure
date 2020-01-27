@@ -4017,8 +4017,13 @@ class PagureFlaskApiProjectCreateAPITokenTests(tests.Modeltests):
         self.session.commit()
 
         # Create modify_project token for foo user
+        exp_date = datetime.date.today() + datetime.timedelta(days=300)
         token = pagure.lib.query.add_token_to_user(
-            self.session, project=None, acls=["modify_project"], username="foo"
+            self.session,
+            project=None,
+            acls=["modify_project"],
+            username="foo",
+            expiration_date=exp_date,
         )
 
         # Call the connector with foo user token and verify content
@@ -4060,8 +4065,13 @@ class PagureFlaskApiProjectCreateAPITokenTests(tests.Modeltests):
         self.session.commit()
 
         # Create modify_project token for foo user
+        exp_date = datetime.date.today() + datetime.timedelta(days=300)
         pagure.lib.query.add_token_to_user(
-            self.session, project=None, acls=["create_branch"], username="foo"
+            self.session,
+            project=None,
+            acls=["create_branch"],
+            username="foo",
+            expiration_date=exp_date,
         )
         mtoken = pagure.lib.query.search_token(
             self.session, ["create_branch"], user="foo"
@@ -4099,8 +4109,13 @@ class PagureFlaskApiProjectCreateAPITokenTests(tests.Modeltests):
         self.session.commit()
 
         # Create modify_project token for foo user
+        exp_date = datetime.date.today() + datetime.timedelta(days=300)
         pagure.lib.query.add_token_to_user(
-            self.session, project=None, acls=["modify_project"], username="foo"
+            self.session,
+            project=None,
+            acls=["modify_project"],
+            username="foo",
+            expiration_date=exp_date,
         )
         mtoken = pagure.lib.query.search_token(
             self.session, ["modify_project"], user="foo"
@@ -4140,11 +4155,13 @@ class PagureFlaskApiProjectConnectorTests(tests.Modeltests):
         project = pagure.lib.query._get_project(self.session, "test")
 
         # Create witness project Token for pingou user
+        exp_date = datetime.date.today() + datetime.timedelta(days=300)
         pagure.lib.query.add_token_to_user(
             self.session,
             project=project,
             acls=["pull_request_merge"],
             username="pingou",
+            expiration_date=exp_date,
         )
         ctokens = pagure.lib.query.search_token(
             self.session, ["pull_request_merge"], user="pingou"
@@ -4190,19 +4207,26 @@ class PagureFlaskApiProjectConnectorTests(tests.Modeltests):
         self.session.commit()
 
         # Create modify_project token for foo user
+        exp_date = datetime.date.today() + datetime.timedelta(days=300)
         pagure.lib.query.add_token_to_user(
-            self.session, project=None, acls=["modify_project"], username="foo"
+            self.session,
+            project=None,
+            acls=["modify_project"],
+            username="foo",
+            expiration_date=exp_date,
         )
         mtoken = pagure.lib.query.search_token(
             self.session, ["modify_project"], user="foo"
         )[0]
 
         # Create witness project Token for foo user
+        exp_date = datetime.date.today() + datetime.timedelta(days=300)
         pagure.lib.query.add_token_to_user(
             self.session,
             project=project,
             acls=["pull_request_merge"],
             username="foo",
+            expiration_date=exp_date,
         )
         ctokens = pagure.lib.query.search_token(
             self.session, ["pull_request_merge"], user="foo"
@@ -4250,8 +4274,13 @@ class PagureFlaskApiProjectConnectorTests(tests.Modeltests):
         self.session.commit()
 
         # Create modify_project token for foo user
+        exp_date = datetime.date.today() + datetime.timedelta(days=300)
         pagure.lib.query.add_token_to_user(
-            self.session, project=None, acls=["create_project"], username="foo"
+            self.session,
+            project=None,
+            acls=["create_project"],
+            username="foo",
+            expiration_date=exp_date,
         )
         mtoken = pagure.lib.query.search_token(
             self.session, ["create_project"], user="foo"
@@ -4280,8 +4309,13 @@ class PagureFlaskApiProjectConnectorTests(tests.Modeltests):
         self.session.commit()
 
         # Create modify_project token for foo user
+        exp_date = datetime.date.today() + datetime.timedelta(days=300)
         pagure.lib.query.add_token_to_user(
-            self.session, project=None, acls=["modify_project"], username="foo"
+            self.session,
+            project=None,
+            acls=["modify_project"],
+            username="foo",
+            expiration_date=exp_date,
         )
         mtoken = pagure.lib.query.search_token(
             self.session, ["modify_project"], user="foo"
