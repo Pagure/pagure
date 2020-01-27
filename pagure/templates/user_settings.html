@@ -1,6 +1,7 @@
 {% extends "master.html" %}
 {% from "_formhelper.html" import render_bootstrap_field %}
 {% from "_projectstring.html" import projectstring, projecticon %}
+{% from "_api_token.html" import render_api_token %}
 
 {% block title %}{{ user.user }}'s settings{% endblock %}
 {% set tag = "users"%}
@@ -122,15 +123,25 @@
           </div>
         </div>
         <div class="tab-pane fade" id="nav-api" role="tabpanel" aria-labelledby="nav-api-tab">
-          <h3 class="font-weight-bold mb-3">
+         <div class="row mb-3">
+          <h3 class="col-6 font-weight-bold mb-3">
             API Keys
-                <a href="{{ url_for('ui_ns.add_api_user_token') }}" method="post" class="icon float-right">
-                <button class="btn btn-sm btn-outline-primary" type="submit"
-                  title="Generate a new API token">
-                  Create new API Key
-                </button>
-                </a>
           </h3>
+          <div class="col-6 text-right">
+            <div class="btn-group">
+              <a href="{{ url_for('ui_ns.add_api_user_token') }}"
+                  class="btn btn-sm btn-outline-primary"
+                  title="Generate a new API token">
+                Create new API Key
+              </a>
+              <div class="btn-group">
+                <a method="post" class="btn btn-sm btn-outline-primary class"
+                  title="Show old API token" id="show_old_keys">
+                  Show old API Keys
+                </a>
+              </div>
+            </div>
+          </div>
           <div class="row">
             <div class="col">
                     <p>
@@ -151,51 +162,7 @@
                   {% if user.tokens %}
                   {% for token in user.tokens %}
                     {% if not token.project %}
-                        <div class="form-group">
-                          <div class="input-group">
-                            <div class="input-group-prepend font-weight-bold">
-                              <span class="input-group-text">
-                                <span class="fa fa-key fa-fw"></span>
-                                {{ token.description or '' }}
-                              </span>
-                            </div>
-                            <div class="input-group-prepend">
-                              <span class="input-group-text">
-                              {% for acl in token.acls_list %}
-                                {% if acl == 'create_project' %}
-                                  <span title="This key has ACLs to create new {{projectstring(plural=True)}}"><i class="fa fa-fw fa-plus text-muted"></i></span>
-                                {% elif acl == 'fork_project' %}
-                                <span title="This key has ACLs to fork {{projectstring(plural=True)}}"><i class="fa fa-fw fa-code-fork text-muted"></i></span>
-                                {% elif acl == 'modify_project' %}
-                                <span title="This key has ACLs to modify {{projectstring(plural=True)}}"><i class="fa fa-fw fa-pencil-square-o text-muted"></i></span>
-                                {% endif %}
-                              {% endfor %}
-                              </span>
-                            </div>
-                            <input class="form-control bg-white font-monospace"
-                                type="text" value="{{ token.id }}" readonly>
-                            {% if token.expired %}
-                              <span class="input-group-prepend">
-                                <small class="font-weight-bold text-danger input-group-text">Expired on {{ token.expiration.date() }}</small>
-                              </span>
-                            {% else %}
-                              <span class="input-group-prepend">
-                                <small class="font-weight-bold text-success input-group-text">Active until {{ token.expiration.date() }}</small>
-                              </span>
-                            {% endif %}
-                            {% if not token.expired %}
-                            <form action="{{ url_for(
-                                'ui_ns.revoke_api_user_token', token_id=token.id) }}"
-                              method="post" class="icon">
-                              <button class="btn btn-outline-danger remote-token-btn" type="submit"
-                                  title="Revoke token">
-                                <i class="fa fa-trash"></i>
-                              </button>
-                              {{ form.csrf_token }}
-                            </form>
-                            {% endif %}
-                          </div>
-                        </div>
+                      {{ render_api_token(token, repo, username, form) }}
                     {% endif %}
                   {% endfor %}
                   {% endif %}
@@ -365,6 +332,17 @@
 
     $(".ssh_key_btn").click(function() {
       $(".ssh_key_block").toggle();
+    });
+
+    $('#show_old_keys').click(function(e) {
+      var _el = $('.expired_api_keys')
+      if (_el.css('display') == 'none'){
+        _el.css('display', 'flex');
+        $('#show_old_keys').text('Hide old API keys');
+      } else {
+        $('#show_old_keys').text('Show old API keys');
+       _el.hide();
+      }
     });
   });
 </script>

@@ -1,0 +1,93 @@
+{% macro render_api_token(token, repo, username, form) -%}
+<div class="form-group{% if token.expired %} expired_api_keys{% endif %}">
+    <div class="input-group">
+      <div class="input-group-prepend">
+        <span class="input-group-text">
+          <span class="fa fa-key"></span>
+          <strong> {{ token.description or '' }}</strong>
+        </span>
+      </div>
+      <div class="input-group-prepend">
+        <span class="input-group-text">
+          <a href="#"
+            data-toggle="modal" data-target="#acls{{ token.id }}">
+            {{token.acls_list_pretty|length}} ACLs
+          </a>
+        </span>
+        <div class="modal fade" id="acls{{ token.id }}" tabindex="-1"
+              role="dialog" aria-labelledby="ACLs" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                  <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel">ACLs</h4>
+              </div>
+              <div class="modal-body">
+                <ul>
+                  {% for acl in token.acls_list_pretty %}
+                    <li>{{ acl }}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <input class="form-control bg-white font-monospace" type="text" value="{{ token.id }}" readonly>
+      {% if token.expired %}
+        <span class="input-group-prepend">
+          <span class="input-group-text text-danger">
+            <small class="font-weight-bold">Expired on {{ token.expiration.date() }}</small>
+          </span>
+        </span>
+      {% else %}
+        <span class="input-group-prepend">
+          <span class="input-group-text text-success">
+            <small class="font-weight-bold">Active until {{ token.expiration.date() }}</small>
+          </span>
+        </span>
+      {% endif %}
+      {% if not token.expired %}
+        {% if repo %}
+          <form action="{{ url_for(
+            'ui_ns.revoke_api_token',
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace,
+            token_id=token.id) }}"
+            method="post" class="icon">
+        {% else %}
+          <form action="{{ url_for(
+                'ui_ns.revoke_api_user_token', token_id=token.id) }}"
+            method="post" class="icon">
+        {% endif %}
+        <button class="btn btn-outline-danger revoke_token_btn" type="submit"
+            title="Revoke token">
+          <i class="fa fa-trash"></i>
+        </button>
+        {{ form.csrf_token }}
+      </form>
+      {% endif %}
+      {% if repo %}
+      <form action="{{ url_for(
+          'ui_ns.renew_api_token',
+          repo=repo.name,
+          username=username,
+          namespace=repo.namespace,
+          token_id=token.id) }}"
+          method="post" class="icon">
+      {% endif %}
+      <button class="btn btn-outline-primary renew_token_btn" type="submit"
+          title="Renew token">
+        <i class="fa fa-refresh"></i>
+      </button>
+      {{ form.csrf_token }}
+      </form>
+    </div>
+  </div>
+{%- endmacro %}
+
