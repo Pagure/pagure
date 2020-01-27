@@ -80,6 +80,9 @@
           namespace=repo.namespace,
           token_id=token.id) }}"
           method="post" class="icon">
+      {% else %}
+      <form action="{{ url_for('ui_ns.renew_api_user_token', token_id=token.id) }}"
+          method="post" class="icon">
       {% endif %}
       <button class="btn btn-outline-primary renew_token_btn" type="submit"
           title="Renew token">

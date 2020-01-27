@@ -1555,6 +1555,49 @@ def revoke_api_user_token(token_id):
     )
 
 
+@UI_NS.route("/settings/token/renew/<token_id>/", methods=["POST"])
+@UI_NS.route("/settings/token/renew/<token_id>", methods=["POST"])
+@login_required
+def renew_api_user_token(token_id):
+    """ Renew a user token (ie: not project specific).
+    """
+    if admin_session_timedout():
+        flask.flash("Action canceled, try it again", "error")
+        url = flask.url_for(".user_settings")
+        return flask.redirect(flask.url_for("auth_login", next=url))
+
+    token = pagure.lib.query.get_api_token(flask.g.session, token_id)
+
+    if not token or token.user.username != flask.g.fas_user.username:
+        flask.abort(404, description="Token not found")
+
+    form = pagure.forms.ConfirmationForm()
+
+    if form.validate_on_submit():
+        acls = [acl.name for acl in token.acls]
+        try:
+            pagure.lib.query.add_token_to_user(
+                flask.g.session,
+                project=None,
+                description=token.description or None,
+                acls=acls,
+                username=flask.g.fas_user.username,
+            )
+            flask.g.session.commit()
+            flask.flash("Token created")
+            return flask.redirect(
+                flask.url_for("ui_ns.user_settings") + "#nav-api-tab"
+            )
+        except SQLAlchemyError as err:  # pragma: no cover
+            flask.g.session.rollback()
+            _log.exception(err)
+            flask.flash("API token could not be renewed", "error")
+
+    return flask.redirect(
+        flask.url_for("ui_ns.user_settings") + "#nav-api-tab"
+    )
+
+
 @UI_NS.route("/settings/forcelogout/", methods=("POST",))
 @UI_NS.route("/settings/forcelogout", methods=("POST",))
 @login_required

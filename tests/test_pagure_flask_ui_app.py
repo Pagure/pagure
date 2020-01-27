@@ -2588,5 +2588,120 @@ class PagureFlaskAppNoTicketstests(tests.Modeltests):
         )
 
 
+class PagureFlaskAppRenewUserApiTokentests(tests.Modeltests):
+
+    @patch("pagure.decorators.admin_session_timedout")
+    def setUp(self, ast):
+        """ Constructor """
+        super(PagureFlaskAppRenewUserApiTokentests, self).setUp()
+
+        self.ast = ast
+        self.ast.return_value = False
+
+        user = tests.FakeUser(username = "pingou")
+        with tests.user_set(self.app.application, user):
+            output = self.app.get("/settings/token/new")
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn("<strong>Create a new token</strong>", output_text)
+
+            self.csrf_token = self.get_csrf(output=output)
+
+            # Create a token to renew
+            data = {
+                "csrf_token": self.csrf_token,
+                "acls": ["modify_project"]
+            }
+            output = self.app.post(
+                "/settings/token/new/", data=data, follow_redirects=True
+            )
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn("Token created", output_text)
+
+        # 1 token associated with the user, expires in 60 days
+        userobj = pagure.lib.query.search_user(self.session, username="pingou")
+        self.assertEqual(len(userobj.tokens), 1)
+        self.assertEqual(
+            userobj.tokens[0].expiration.date(),
+            datetime.datetime.utcnow().date()
+            + datetime.timedelta(days=60),
+        )
+
+        self.token = userobj.tokens[0].id
+
+    def test_renew_api_token_not_in(self):
+        """ Test the renew_api_token endpoint. """
+        # User not logged in
+        output = self.app.post("/settings/token/renew/123")
+        self.assertEqual(output.status_code, 302)
+
+    @patch("pagure.ui.app.admin_session_timedout")
+    def test_renew_api_token_session_old(self, ast):
+        """ Test the renew_api_token endpoint. """
+        ast.return_value = True
+
+        user = tests.FakeUser(username = "pingou")
+        with tests.user_set(self.app.application, user):
+            data = {"csrf_token": self.csrf_token}
+
+            # Test when the session timed-out
+            output = self.app.post("/settings/token/renew/123", data=data)
+            self.assertEqual(output.status_code, 302)
+            output = self.app.get("/", follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn("Action canceled, try it again", output_text)
+
+    def test_renew_api_token_invalid_token(self):
+        """ Test the renew_api_token endpoint. """
+
+        user = tests.FakeUser(username = "pingou")
+        with tests.user_set(self.app.application, user):
+            output = self.app.post(
+                "/settings/token/renew/123",
+                data={"csrf_token": self.csrf_token},
+            )
+            self.assertEqual(output.status_code, 404)
+            output_text = output.get_data(as_text=True)
+            self.assertIn("<p>Token not found</p>", output_text)
+
+    def test_renew_api_token(self):
+        """ Test the renew_api_token endpoint. """
+
+        user = tests.FakeUser(username = "pingou")
+        with tests.user_set(self.app.application, user):
+
+            output = self.app.post(
+                "/settings/token/renew/%s" % self.token,
+                data={"csrf_token": self.csrf_token},
+                follow_redirects=True,
+            )
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                "<title>pingou\'s settings - Pagure</title>", output_text
+            )
+            self.assertIn("Token created", output_text)
+            self.assertEqual(output_text.count('title="Revoke token">'), 2)
+            self.assertEqual(output_text.count('title="Renew token">'), 2)
+            self.session.commit()
+
+            # Existing token has been renewed
+            userobj = pagure.lib.query.search_user(self.session, username="pingou")
+            self.assertEqual(len(userobj.tokens), 2)
+            self.assertEqual(
+                userobj.tokens[0].expiration.date(),
+                userobj.tokens[1].expiration.date(),
+            )
+            self.assertEqual(
+                userobj.tokens[0].created.date(),
+                userobj.tokens[1].created.date()
+            )
+            self.assertEqual(userobj.tokens[0].acls, userobj.tokens[1].acls)
+            self.assertEqual(
+                userobj.tokens[0].description, userobj.tokens[1].description
+            )
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
