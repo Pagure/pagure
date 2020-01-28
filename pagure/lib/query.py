@@ -3997,7 +3997,7 @@ def search_groups(
 
     """
     query = session.query(model.PagureGroup).order_by(
-        model.PagureGroup.group_type
+        model.PagureGroup.group_type, model.PagureGroup.group_name
     )
 
     if pattern:

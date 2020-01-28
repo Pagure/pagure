@@ -84,7 +84,7 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
         output = self.app.get("/api/0/groups")
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
-        self.assertEqual(data["groups"], ["some_group", "group1", "rel-eng"])
+        self.assertEqual(data["groups"], ["group1", "rel-eng", "some_group"])
         self.assertEqual(
             sorted(data.keys()), ["groups", "pagination", "total_groups"]
         )
@@ -130,9 +130,9 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
             data,
             {
                 "groups": [
-                    {"description": None, "name": "some_group"},
                     {"description": None, "name": "group1"},
                     {"description": None, "name": "rel-eng"},
+                    {"description": None, "name": "some_group"},
                 ],
                 "pagination": {
                     "first": "http://localhost...",
