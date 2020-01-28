@@ -137,7 +137,7 @@ class TestStarProjectUI(tests.SimplePagureTest):
         # now, test if pingou's name comes in repo stargazers
         output = self.app.get("/test/stargazers/")
         self.assertIn(
-            "<title>Stargazers of test  - Pagure</title>",
+            "<title>Stargazers of test - Pagure</title>",
             output.get_data(as_text=True),
         )
         self.assertIn(
@@ -165,7 +165,7 @@ class TestStarProjectUI(tests.SimplePagureTest):
         # it shouldn't because, he just unstarred
         output = self.app.get("/test/stargazers/")
         self.assertIn(
-            "<title>Stargazers of test  - Pagure</title>",
+            "<title>Stargazers of test - Pagure</title>",
             output.get_data(as_text=True),
         )
         self.assertNotIn(
