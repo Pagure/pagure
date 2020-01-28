@@ -29,6 +29,7 @@ from pagure.utils import is_true
 
 @API.route("/groups/")
 @API.route("/groups")
+@api_method
 def api_groups():
     """
     List groups
