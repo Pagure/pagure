@@ -45,7 +45,7 @@
               </div>
             </div>
             <div class="bg-light border-top py-1 px-2 mt-0">
-                <small>Formed {{ group.created |humanize }}</small>
+                <small>Formed {{ group.created |humanize_tooltip | safe }}</small>
               <div class="float-right text-muted">
                 <span title="{{projectstring(plural=True)}}" data-toggle="tooltip" class="mr-1">
                   <span class="fa {{projecticon()}} pr-1"></span>

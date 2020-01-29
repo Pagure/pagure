@@ -42,9 +42,7 @@
           </div>
 
           <div class="bg-light border-top py-1 px-2 mt-0">
-              <small>joined <span title="{{
-                user.created | format_datetime }}">{{
-                user.created | humanize }}</span></small>
+              <small>joined {{ user.created | humanize_tooltip | safe }}</small>
             <div class="float-right text-muted">
               <span title="{{projectstring(plural=True)}}" data-toggle="tooltip">
                 <span class="fa {{projecticon()}} pr-1"></span>

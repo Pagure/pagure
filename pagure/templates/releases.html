@@ -66,10 +66,10 @@
                     <i class="fa fa-fw fa-tags text-muted"></i> {{tag['tagname']}}
                     </a>
               </div>
-              <div>{{ tag['head_msg'] }} &bull; {{tag['date'] | humanize}}</div>
+              <div>{{ tag['head_msg'] }} &bull; {{tag['date'] | humanize_tooltip | safe}}</div>
             {% else %}
               <div><strong><i class="fa fa-fw fa-tags text-muted"></i> {{tag['tagname']}}</strong></div>
-              <div>{{tag['date'] | humanize}}</div>
+              <div>{{tag['date'] | humanize_tooltip | safe}}</div>
             {% endif %}
           </div>
           <div class="col-xs-auto pr-2">

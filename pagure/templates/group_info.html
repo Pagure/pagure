@@ -21,7 +21,7 @@
           <h3 class="mb-0 font-weight-bold">{{group.display_name }}</h3>
           {% if group.description %}<div>{{ group.description }}</div>{% endif %}
           <div><small>
-              formed {{ group.created |humanize }},
+              formed {{ group.created |humanize_tooltip | safe }},
               administered by <a href="{{ url_for('ui_ns.view_user', username=group.creator.user)}}">{{ group.creator.user }}</a></small>
           </div>
         </div>

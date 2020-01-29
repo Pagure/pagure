@@ -64,15 +64,15 @@
                 namespace=repo.parent.namespace)}}">
                 {{ repo.parent.fullname }}
               </a>
-              {{repo.date_created|humanize}}
+              {{repo.date_created|humanize_tooltip | safe}}
             </span>
             {% elif repo.is_fork and not repo.parent %}
             <span class="text-muted">
-                Forked from a deleted repository {{repo.date_created|humanize}}
+                Forked from a deleted repository {{repo.date_created|humanize_tooltip | safe}}
             </span>
             {% endif %}
             {% if not repo.is_fork %}
-            <div class="text-muted">Created {{repo.date_created|humanize}}</div>
+            <div class="text-muted">Created {{repo.date_created|humanize_tooltip | safe}}</div>
             <div class="text-muted">
             Maintained by
             <a href="{{ url_for('ui_ns.view_user', username=repo.user.user)}}">
@@ -284,7 +284,7 @@
                         </a>
                       </div>
                       <div class="ml-auto">
-                          <span><span class="font-weight-bold">{{ commit.author | author2avatar(20) | safe }} {{commit.author.name}}</span> committed {{ commit.commit_time|humanize }}</span>
+                          <span><span class="font-weight-bold">{{ commit.author | author2avatar(20) | safe }} {{commit.author.name}}</span> committed {{ commit.commit_time|humanize_tooltip | safe }}</span>
                       </div>
                     </div>
                     {% endif %}

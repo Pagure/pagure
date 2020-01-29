@@ -88,9 +88,8 @@ def humanize_with_tooltip(date):
     if date:
         humanized = humanize_date(date)
         utc = format_ts(date)
-        output = '<span title="{utc}s">{humanized}</span>'.format(
-            utc=utc, humanized=humanized
-        )
+        output = '<span title="{utc}" data-toggle="tooltip">{humanized}</span>'
+        output = output.format(utc=utc, humanized=humanized)
         return output
     return ""
 

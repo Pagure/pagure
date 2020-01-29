@@ -4360,7 +4360,8 @@ More information</textarea>
             # Checking if Edited by User is there or not
             pattern = (
                 re.escape("<small>Edited ")
-                + "(just now|seconds ago)"
+                + '<span title="[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:'
+                + '[0-9]{2} UTC" data-toggle="tooltip">(just now|seconds ago)</span>'
                 + re.escape(" by pingou </small>")
             )
             self.assertIsNotNone(re.search(pattern, output_text))

@@ -77,7 +77,7 @@
                                 {{render_reponame(log.project)}}
                                 </div>
                                 <div class="ml-auto">
-                                    {{log.date_created|humanize}}
+                                    {{log.date_created|humanize_tooltip | safe}}
                                 </div>
                             </div>
                             <div class="list-group mt-2">
@@ -99,7 +99,7 @@
                                     {{render_reponame(log.project)}}
                                 </div>
                                 <div class="ml-auto">
-                                    {{log.date_created|humanize}}
+                                    {{log.date_created|humanize_tooltip | safe}}
                                 </div>
                             </div>
                             <div class="list-group mt-2">
@@ -113,7 +113,7 @@
                                     {{render_reponame(log.project)}}
                                 </div>
                                 <div class="ml-auto">
-                                    {{log.date_created|humanize}}
+                                    {{log.date_created|humanize_tooltip | safe}}
                                 </div>
                             </div>
                         {% elif self.log_type == 'committed' %}

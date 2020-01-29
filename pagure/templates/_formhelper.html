@@ -207,7 +207,7 @@
   <div class="card-footer bg-transparent d-flex align-items-center border-0 p-0">
     {% if comment.edited_on %}
     <div class="issue_actions ml-3">
-      <small>Edited {{ comment.edited_on | humanize }} by {{ comment.editor.username }} </small>
+      <small>Edited {{ comment.edited_on | humanize_tooltip | safe }} by {{ comment.editor.username }} </small>
       </div>
     {% endif %}
 
@@ -340,7 +340,7 @@
           <a href="{{ attachment[0] }}?raw=1" title="{{attachment[2]}}" data-toggle="tooltip">{{ attachment[2] }}</a>
         </div>
         <div><small>
-          Attached {{ attachment[3] | humanize}}
+          Attached {{ attachment[3] | humanize_tooltip | safe}}
           {% if attachment[4] is not none %}
           <a href="#comment-{{ attachment[4] }}" class="pull-right">View Comment</a>
           {% else %}

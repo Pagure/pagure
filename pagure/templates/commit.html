@@ -37,9 +37,7 @@
               {% else %}
                 Merged and Committed by {{ commit.author | author2user |safe }}
               {% endif %}
-              <span data-toggle="tooltip" title="{{ commit.commit_time | format_ts }}">
-                {{ commit.commit_time | humanize }}
-              </span>
+              {{ commit.commit_time | humanize_tooltip | safe }}
             {% else %}
               <a href="#" id="diff_list_link">{{ diff|count}} file{{'s' if diff|count > 1 }}</a>
               {% if commit.parents | length == 1 %}
@@ -47,13 +45,9 @@
               {% else %}
                 Merged by {{ commit.author | author2user |safe }}
               {% endif %}
-              <span data-toggle="tooltip" title="{{ commit.commit_time | format_ts }}">
-                {{ commit.commit_time | humanize }}
-              </span>,
+              {{ commit.commit_time | humanize_tooltip | safe }},
               Committed by {{ commit.committer | author2user |safe }}
-              <span data-toggle="tooltip" title="{{ commit.commit_time | format_ts }}">
-                {{ commit.commit_time | humanize }}
-              </span>,
+              {{ commit.commit_time | humanize_tooltip | safe }},
             {% endif%}
           </h5>
       </div>
@@ -245,7 +239,7 @@
                         flag.date_created == flag.date_updated -%}
                           Created at {% else -%} Updated at {% endif -%}
                       {{ flag.date_updated }}" class="pull-xs-right">
-                      {{ flag.date_updated | humanize }}</div>
+                      {{ flag.date_updated | humanize_tooltip | safe }}</div>
                 </div>
                 </small>
               </li>

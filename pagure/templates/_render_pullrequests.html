@@ -64,38 +64,26 @@
                     {% if request.status|lower == 'merged'%}
                         <small>
                             <span class="text-info font-weight-bold">Merged</span>
-                            <span data-toggle="tooltip" title="{{
-                            request.closed_at | format_datetime
-                          }}">{{ request.closed_at | humanize}}</span>.
+                            {{ request.closed_at | humanize_tooltip | safe }}.
 
-                          Opened <span data-toggle="tooltip" title="{{
-                            request.date_created | format_datetime
-                          }}">{{ request.date_created | humanize}}</span> by <span title="{{
+                          Opened {{ request.date_created | humanize_tooltip | safe }} by <span title="{{
                           request.user.html_title }}">{{ request.user.user }}</span>.
 
                         </small>
                     {% elif request.status|lower == 'closed' %}
                         <small>
                             <span class="text-danger font-weight-bold">Cancelled</span>
-                            <span data-toggle="tooltip" title="{{
-                            request.closed_at | format_datetime
-                          }}">{{ request.closed_at | humanize}}</span>.
-                          Opened <span data-toggle="tooltip" title="{{
-                            request.date_created | format_datetime
-                          }}">{{ request.date_created | humanize}}</span> by <span title="{{
+                            {{ request.closed_at | humanize_tooltip | safe }}.
+                          Opened {{ request.date_created | humanize_tooltip | safe }} by <span title="{{
                           request.user.html_title }}">{{ request.user.user }}</span>.
                         </small>
                     {% else %}
                     <small>
                         <span class="text-success font-weight-bold">Opened</span>
-                        <span data-toggle="tooltip" title="{{
-                        request.date_created | format_datetime
-                      }}">{{ request.date_created | humanize}}</span> by <span title="{{
+                        {{ request.date_created | humanize_tooltip | safe }} by <span title="{{
                       request.user.html_title }}">{{ request.user.user }}</span>.
-                      Modified <span data-toggle="tooltip" title="{{
-                        request.updated_on | format_datetime
-                      }}">{{ request.updated_on | humanize}}</span>
-                      </small>
+                      Modified {{ request.updated_on | humanize_tooltip | safe }}
+                    </small>
                     {% endif %}
                     {% if showproject %}
                       <small class="ml-auto mt-1">

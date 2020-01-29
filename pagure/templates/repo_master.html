@@ -74,11 +74,11 @@
                 namespace=repo.parent.namespace)}}">
                 {{ repo.parent.fullname }}
               </a>
-              {{repo.date_created|humanize}}
+              {{repo.date_created|humanize_tooltip | safe}}
             </span>
             {% elif repo.is_fork and not repo.parent %}
             <span class="text-muted">
-                Forked from a deleted repository {{repo.date_created|humanize}}
+                Forked from a deleted repository {{repo.date_created|humanize_tooltip | safe}}
             </span>
             {% endif %}
         </div>
