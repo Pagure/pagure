@@ -80,6 +80,21 @@ def format_ts(string):
     return arr.strftime("%Y-%m-%d %H:%M:%S %Z")
 
 
+@UI_NS.app_template_filter("humanize_tooltip")
+def humanize_with_tooltip(date):
+    """ Template filter returning a human readable time string with an
+    UTC timestamp tooltip
+    """
+    if date:
+        humanized = humanize_date(date)
+        utc = format_ts(date)
+        output = '<span title="{utc}s">{humanized}</span>'.format(
+            utc=utc, humanized=humanized
+        )
+        return output
+    return ""
+
+
 @UI_NS.app_template_filter("linkify")
 def linkify_text(text):
     """ escape all html tags with bleach, then use bleach to linkify
