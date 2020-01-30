@@ -143,9 +143,12 @@ def get_request_data():
     return flask.request.form or flask.request.get_json() or {}
 
 
-def api_login_required(acls=None):
+def api_login_required(acls=None, optional=False):
     """ Decorator used to indicate that authentication is required for some
     API endpoint.
+
+    :arg acls: A list of access control
+    :arg optional: Only check the API token is valid. Skip the ACL validation.
     """
 
     def decorator(function):
@@ -155,7 +158,7 @@ def api_login_required(acls=None):
         def decorated_function(*args, **kwargs):
             """ Actually does the job with the arguments provided. """
 
-            response = check_api_acls(acls)
+            response = check_api_acls(acls, optional)
             if response:
                 return response
 
@@ -514,6 +517,9 @@ def api():
         project.api_modify_project_options
     )
     api_project_block_user_doc = load_doc(project.api_project_block_user)
+    api_get_project_webhook_token_doc = load_doc(
+        project.api_get_project_webhook_token
+    )
 
     issues = []
     if pagure_config.get("ENABLE_TICKETS", True):
@@ -608,6 +614,7 @@ def api():
             api_get_project_options_doc,
             api_modify_project_options_doc,
             api_project_block_user_doc,
+            api_get_project_webhook_token_doc,
         ],
         issues=issues,
         requests=[

@@ -2242,6 +2242,62 @@ def api_get_project_connector(repo, username=None, namespace=None):
     return flask.jsonify({"connector": connector, "status": "ok"})
 
 
+@API.route("/<repo>/webhook/token", methods=["GET"])
+@API.route("/<namespace>/<repo>/webhook/token", methods=["GET"])
+@API.route("/fork/<username>/<repo>/webhook/token", methods=["GET"])
+@API.route(
+    "/fork/<username>/<namespace>/<repo>/webhook/token", methods=["GET"]
+)
+@api_method
+@api_login_required(acls=[], optional=True)
+def api_get_project_webhook_token(repo, username=None, namespace=None):
+    """
+    Get project webhook token
+    -------------------------
+    Allow project collaborators to retrieve the project webhook token.
+
+    ::
+
+        GET /api/0/<repo>/webhook/token
+        GET /api/0/<namespace>/<repo>/webhook/token
+
+    ::
+
+        GET /api/0/fork/<username>/<repo>/webhook/token
+        GET /api/0/fork/<username>/<namespace>/<repo>/webhook/token
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "webhook": {
+              "token": "aaabbbccc",
+          },
+          "status": "ok"
+        }
+
+    """
+    project = _get_repo(repo, username, namespace)
+    _check_token(project, project_token=False)
+
+    authorized_users = [project.user.username]
+    # All collaborators are authorized to read the token
+    for access_type in project.access_users.keys():
+        authorized_users.extend(
+            [user.user for user in project.access_users[access_type]]
+        )
+    if flask.g.fas_user.user not in authorized_users:
+        raise pagure.exceptions.APIError(
+            401, error_code=APIERROR.ENOTHIGHENOUGH
+        )
+
+    webhook_token = {"token": project.hook_token}
+
+    return flask.jsonify({"webhook": webhook_token, "status": "ok"})
+
+
 def _check_value(value):
     """ Convert the provided value into a boolean, an int or leave it as it.
     """

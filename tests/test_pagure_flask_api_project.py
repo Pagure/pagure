@@ -4327,5 +4327,84 @@ class PagureFlaskApiProjectConnectorTests(tests.Modeltests):
         self.assertEqual(output.status_code, 401)
 
 
+class PagureFlaskApiProjectWebhookTokenTests(tests.Modeltests):
+    """ Tests for the flask API of pagure for getting webhook token of a project
+    """
+
+    maxDiff = None
+
+    def setUp(self):
+        """ Set up the environnment, ran before every tests. """
+        super(PagureFlaskApiProjectWebhookTokenTests, self).setUp()
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session, project_id=None)
+        # Set a default ACL to avoid get all rights set on
+        tests.create_tokens_acl(self.session, "aaabbbcccddd", "issue_assign")
+
+    def test_api_get_project_webhook_token_as_owner(self):
+        """ Test accessing webhook token as project owner. """
+
+        project = pagure.lib.query._get_project(self.session, "test")
+
+        # Call the endpoint with pingou user token and verify content
+        headers = {"Authorization": "token aaabbbcccddd"}
+        output = self.app.get("/api/0/test/webhook/token", headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(
+            data, {"webhook": {"token": project.hook_token}, "status": "ok"}
+        )
+
+    def test_api_get_project_webhook_token_as_collaborator(self):
+        """ Test accessing webhook token as project collaborator. """
+
+        project = pagure.lib.query._get_project(self.session, "test")
+
+        # Set the foo user as test project collaborator ticket access level
+        pagure.lib.query.add_user_to_project(
+            self.session,
+            project,
+            new_user="foo",
+            user="pingou",
+            access="ticket",
+        )
+        self.session.commit()
+
+        # Create token for foo user with a default ACL
+        mtoken = pagure.lib.query.add_token_to_user(
+            self.session,
+            project=None,
+            acls=["issue_assign"],
+            username="foo",
+            expiration_date=datetime.date.today() + datetime.timedelta(days=1),
+        )
+
+        # Call the endpoint with foo user token and verify content
+        headers = {"Authorization": "token %s" % mtoken.id}
+        output = self.app.get("/api/0/test/webhook/token", headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(
+            data, {"webhook": {"token": project.hook_token}, "status": "ok"}
+        )
+
+    def test_api_get_project_webhook_token_as_not_collaborator(self):
+        """ Test accessing webhook token as not a project collaborator. """
+
+        # Create token for foo user with a default ACL
+        mtoken = pagure.lib.query.add_token_to_user(
+            self.session,
+            project=None,
+            acls=["issue_assign"],
+            username="foo",
+            expiration_date=datetime.date.today() + datetime.timedelta(days=1),
+        )
+
+        # Call the endpoint with pingou user token and verify content
+        headers = {"Authorization": "token %s" % mtoken.id}
+        output = self.app.get("/api/0/test/webhook/token", headers=headers)
+        self.assertEqual(output.status_code, 401)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

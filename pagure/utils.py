@@ -68,6 +68,9 @@ def api_authenticated():
 def check_api_acls(acls, optional=False):
     """ Checks if the user provided an API token with its request and if
     this token allows the user to access the endpoint desired.
+
+    :arg acls: A list of access control
+    :arg optional: Only check the API token is valid. Skip the ACL validation.
     """
     import pagure.api
     import pagure.lib.query
