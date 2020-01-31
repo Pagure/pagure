@@ -2271,12 +2271,8 @@ def regenerate_git(repo, username=None, namespace=None):
                     project=repo, repofolder=pagure_config["REQUESTS_FOLDER"]
                 )
             for request in repo.requests:
-                pagure.lib.git.update_git(
-                    request,
-                    repo=repo,
-                    repofolder=pagure_config["REQUESTS_FOLDER"],
-                )
-            flask.flash("Requests git repo updated")
+                pagure.lib.git.update_git(request, repo=repo)
+            flask.flash("Requests git repo updating")
 
         elif (
             regenerate.lower() == "tickets"
@@ -2291,12 +2287,8 @@ def regenerate_git(repo, username=None, namespace=None):
                     project=repo, repofolder=pagure_config["TICKETS_FOLDER"]
                 )
             for ticket in repo.issues:
-                pagure.lib.git.update_git(
-                    ticket,
-                    repo=repo,
-                    repofolder=pagure_config["TICKETS_FOLDER"],
-                )
-            flask.flash("Tickets git repo updated")
+                pagure.lib.git.update_git(ticket, repo=repo)
+            flask.flash("Tickets git repo updating")
 
     return flask.redirect(
         flask.url_for(

@@ -4671,99 +4671,6 @@ index 0000000..fb7093d
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
         self.assertNotEqual(repo.hook_token, "aaabbbccc")
 
-    @patch("pagure.lib.notify.send_email")
-    @patch("pagure.decorators.admin_session_timedout")
-    @patch("pagure.lib.git.update_git")
-    def test_regenerate_git(self, upgit, ast, sendmail):
-        """ Test the regenerate_git endpoint. """
-        ast.return_value = False
-        upgit.return_value = True
-        sendmail.return_value = True
-        tests.create_projects(self.session)
-        tests.create_projects_git(os.path.join(self.path, "repos"))
-
-        user = tests.FakeUser()
-        with tests.user_set(self.app.application, user):
-            output = self.app.get("/new/")
-            self.assertEqual(output.status_code, 200)
-            output_text = output.get_data(as_text=True)
-            self.assertIn("<strong>Create new Project</strong>", output_text)
-
-            csrf_token = output_text.split(
-                'name="csrf_token" type="hidden" value="'
-            )[1].split('">')[0]
-
-            output = self.app.post("/foo/regenerate")
-            self.assertEqual(output.status_code, 404)
-
-            output = self.app.post("/test/regenerate")
-            self.assertEqual(output.status_code, 403)
-
-            ast.return_value = True
-            output = self.app.post("/test/regenerate")
-            self.assertEqual(output.status_code, 302)
-            ast.return_value = False
-
-        user.username = "pingou"
-        with tests.user_set(self.app.application, user):
-            output = self.app.post("/test/regenerate")
-            self.assertEqual(output.status_code, 400)
-
-            data = {"csrf_token": csrf_token}
-
-            output = self.app.post("/test/regenerate", data=data)
-            self.assertEqual(output.status_code, 400)
-
-            data["regenerate"] = "ticket"
-            output = self.app.post("/test/regenerate", data=data)
-            self.assertEqual(output.status_code, 400)
-
-            # Create an issue to play with
-            repo = pagure.lib.query.get_authorized_project(
-                self.session, "test"
-            )
-            msg = pagure.lib.query.new_issue(
-                session=self.session,
-                repo=repo,
-                title="Test issue",
-                content="We should work on this",
-                user="pingou",
-            )
-            self.session.commit()
-            self.assertEqual(msg.title, "Test issue")
-
-            data["regenerate"] = "tickets"
-            output = self.app.post(
-                "/test/regenerate", data=data, follow_redirects=True
-            )
-            self.assertEqual(output.status_code, 200)
-            output_text = output.get_data(as_text=True)
-            self.assertIn("Tickets git repo updated", output_text)
-
-            # Create a request to play with
-            repo = pagure.lib.query.get_authorized_project(
-                self.session, "test"
-            )
-            msg = pagure.lib.query.new_pull_request(
-                session=self.session,
-                repo_from=repo,
-                branch_from="branch",
-                repo_to=repo,
-                branch_to="master",
-                title="Test pull-request",
-                user="pingou",
-            )
-            self.session.commit()
-            self.assertEqual(msg.title, "Test pull-request")
-
-            data["regenerate"] = "requests"
-            output = self.app.post(
-                "/test/regenerate", data=data, follow_redirects=True
-            )
-            self.assertEqual(output.status_code, 200)
-            output_text = output.get_data(as_text=True)
-            self.assertIn("Requests git repo updated", output_text)
-
     def test_view_tags(self):
         """ Test the view_tags endpoint. """
         output = self.app.get("/foo/releases")
@@ -6571,6 +6478,137 @@ class PagureFlaskRepoTestHooktests(tests.Modeltests):
             data = {"csrf_token": self.get_csrf()}
             output = self.app.post("/test/settings/test_hook", data=data)
             self.assertEqual(output.status_code, 302)
+
+
+class PagureFlaskRepoTestRegenerateGittests(tests.Modeltests):
+    """ Tests for the regenerate git repo function """
+
+    @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
+    @patch(
+        "pagure.decorators.admin_session_timedout",
+        MagicMock(return_value=False),
+    )
+    def setUp(self):
+        """ Set up the environnment, ran before every tests. """
+        super(PagureFlaskRepoTestRegenerateGittests, self).setUp()
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, "repos"))
+
+        user = tests.FakeUser()
+        with tests.user_set(self.app.application, user):
+            self.csrf_token = self.get_csrf()
+
+    def test_regenerate_git_invalid_project(self):
+        """ Test the regenerate_git endpoint. """
+        user = tests.FakeUser()
+        with tests.user_set(self.app.application, user):
+            output = self.app.post("/foo/regenerate")
+            self.assertEqual(output.status_code, 404)
+
+    def test_regenerate_git_invalid_user(self):
+        """ Test the regenerate_git endpoint. """
+        user = tests.FakeUser()
+        with tests.user_set(self.app.application, user):
+            output = self.app.post("/test/regenerate")
+            self.assertEqual(output.status_code, 403)
+
+    @patch(
+        "pagure.decorators.admin_session_timedout",
+        MagicMock(return_value=True),
+    )
+    def test_regenerate_git_user_session_timeout(self):
+        """ Test the regenerate_git endpoint. """
+        user = tests.FakeUser()
+        with tests.user_set(self.app.application, user):
+            output = self.app.post("/test/regenerate")
+            self.assertEqual(output.status_code, 302)
+
+    def test_regenerate_git_no_csrf(self):
+        """ Test the regenerate_git endpoint. """
+        user = tests.FakeUser(username="pingou")
+        with tests.user_set(self.app.application, user):
+            output = self.app.post("/test/regenerate")
+            self.assertEqual(output.status_code, 400)
+
+    def test_regenerate_git_missing_repo_type(self):
+        """ Test the regenerate_git endpoint. """
+        user = tests.FakeUser(username="pingou")
+        with tests.user_set(self.app.application, user):
+            data = {"csrf_token": self.csrf_token}
+
+            output = self.app.post("/test/regenerate", data=data)
+            self.assertEqual(output.status_code, 400)
+
+    def test_regenerate_git_missing_invalid_regenerate(self):
+        """ Test the regenerate_git endpoint. """
+        user = tests.FakeUser(username="pingou")
+        with tests.user_set(self.app.application, user):
+            data = {"csrf_token": self.csrf_token, "regenerate": "ticket"}
+            output = self.app.post("/test/regenerate", data=data)
+            self.assertEqual(output.status_code, 400)
+
+    @patch("pagure.lib.git._update_git")
+    def test_regenerate_git_tickets(self, upgit):
+        """ Test the regenerate_git endpoint. """
+        upgit.return_value = True
+
+        user = tests.FakeUser(username="pingou")
+        with tests.user_set(self.app.application, user):
+            # Create an issue to play with
+            repo = pagure.lib.query.get_authorized_project(
+                self.session, "test"
+            )
+            msg = pagure.lib.query.new_issue(
+                session=self.session,
+                repo=repo,
+                title="Test issue",
+                content="We should work on this",
+                user="pingou",
+            )
+            self.session.commit()
+            self.assertEqual(msg.title, "Test issue")
+
+            data = {"csrf_token": self.csrf_token, "regenerate": "tickets"}
+            output = self.app.post(
+                "/test/regenerate", data=data, follow_redirects=True
+            )
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn("Tickets git repo updating", output_text)
+        self.assertEqual(upgit.call_count, 2)
+
+    @patch("pagure.lib.git._update_git")
+    def test_regenerate_git_requests(self, upgit):
+        """ Test the regenerate_git endpoint. """
+        # upgit.return_value = True
+
+        user = tests.FakeUser(username="pingou")
+        with tests.user_set(self.app.application, user):
+            # Create a request to play with
+            repo = pagure.lib.query.get_authorized_project(
+                self.session, "test"
+            )
+            msg = pagure.lib.query.new_pull_request(
+                session=self.session,
+                repo_from=repo,
+                branch_from="branch",
+                repo_to=repo,
+                branch_to="master",
+                title="Test pull-request",
+                user="pingou",
+            )
+            self.session.commit()
+            self.assertEqual(msg.title, "Test pull-request")
+
+            data = {"csrf_token": self.csrf_token, "regenerate": "requests"}
+            output = self.app.post(
+                "/test/regenerate", data=data, follow_redirects=True
+            )
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn("Requests git repo updating", output_text)
+        self.assertEqual(upgit.call_count, 1)
 
 
 if __name__ == "__main__":
