@@ -972,9 +972,15 @@ class Project(BASE):
         """ Return a dictionary with all user access
         """
         return {
-            "admin": self.get_project_users(access="admin", combine=False),
-            "commit": self.get_project_users(access="commit", combine=False),
-            "ticket": self.get_project_users(access="ticket", combine=False),
+            "admin": sorted(
+                self.get_project_users(access="admin", combine=False)
+            ),
+            "commit": sorted(
+                self.get_project_users(access="commit", combine=False)
+            ),
+            "ticket": sorted(
+                self.get_project_users(access="ticket", combine=False)
+            ),
         }
 
     @property
@@ -1002,9 +1008,18 @@ class Project(BASE):
         """ Return a dictionary with all group access
         """
         return {
-            "admin": self.get_project_groups(access="admin", combine=False),
-            "commit": self.get_project_groups(access="commit", combine=False),
-            "ticket": self.get_project_groups(access="ticket", combine=False),
+            "admin": sorted(
+                self.get_project_groups(access="admin", combine=False),
+                key=lambda x: x.group_name,
+            ),
+            "commit": sorted(
+                self.get_project_groups(access="commit", combine=False),
+                key=lambda x: x.group_name,
+            ),
+            "ticket": sorted(
+                self.get_project_groups(access="ticket", combine=False),
+                key=lambda x: x.group_name,
+            ),
         }
 
     def lock(self, ltype):
