@@ -317,6 +317,193 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
             output = pagure.utils.is_repo_committer(repo)
             self.assertFalse(output)
 
+    def test_is_repo_collaborator_logged_out(self):
+        """ Test is_repo_committer in pagure when there is no logged in user.
+        """
+        repo = pagure.lib.query._get_project(self.session, "test")
+        with self.app.application.app_context():
+            output = pagure.utils.is_repo_collaborator(repo, "master")
+        self.assertFalse(output)
+
+    def test_is_repo_collaborator_logged_in(self):
+        """ Test is_repo_collaborator in pagure with the appropriate user logged
+        in. """
+        repo = pagure.lib.query._get_project(self.session, "test")
+
+        g = munch.Munch()
+        g.fas_user = tests.FakeUser(username="pingou")
+        g.authenticated = True
+        g.session = self.session
+        with mock.patch("flask.g", g):
+            output = pagure.utils.is_repo_collaborator(
+                repo, "refs/heads/master"
+            )
+            self.assertTrue(output)
+
+    def test_is_repo_collaborator_invalid_username(self):
+        """ Test is_repo_collaborator in pagure with the appropriate user logged
+        in. """
+        repo = pagure.lib.query._get_project(self.session, "test")
+
+        g = munch.Munch()
+        g.fas_user = tests.FakeUser(username="invalid")
+        g.authenticated = True
+        g.session = self.session
+        with mock.patch("flask.g", g):
+            output = pagure.utils.is_repo_collaborator(
+                repo, "refs/heads/master"
+            )
+            self.assertFalse(output)
+
+    @mock.patch.dict("pagure.config.config", {"PAGURE_ADMIN_USERS": ["foo"]})
+    def test_is_repo_collaborator_admin_user(self):
+        """ Test is_repo_collaborator in pagure with the appropriate user logged
+        in. """
+        repo = pagure.lib.query._get_project(self.session, "test")
+
+        g = munch.Munch()
+        g.fas_user = tests.FakeUser(username="foo")
+        g.authenticated = True
+        g.session = self.session
+        with mock.patch("flask.g", g):
+            output = pagure.utils.is_repo_collaborator(
+                repo, "refs/heads/master"
+            )
+            self.assertTrue(output)
+
+    def test_is_repo_collaborator_not_in_project(self):
+        """ Test is_repo_collaborator in pagure with the appropriate user logged
+        in. """
+        repo = pagure.lib.query._get_project(self.session, "test")
+
+        g = munch.Munch()
+        g.fas_user = tests.FakeUser(username="foo")
+        g.authenticated = True
+        g.session = self.session
+        with mock.patch("flask.g", g):
+            output = pagure.utils.is_repo_collaborator(
+                repo, "refs/heads/master"
+            )
+            self.assertFalse(output)
+
+    def test_is_repo_collaborator_in_project(self):
+        """ Test is_repo_collaborator in pagure with the appropriate user logged
+        in. """
+        repo = pagure.lib.query._get_project(self.session, "test")
+
+        # Add user foo to project test
+        msg = pagure.lib.query.add_user_to_project(
+            self.session,
+            project=repo,
+            new_user="foo",
+            user="pingou",
+            access="collaborator",
+            branches="epel*",
+        )
+        self.session.commit()
+
+        g = munch.Munch()
+        g.fas_user = tests.FakeUser(username="foo")
+        g.authenticated = True
+        g.session = self.session
+        with mock.patch("flask.g", g):
+            # Collaborator trying to read the project
+            output = pagure.utils.is_repo_collaborator(repo, None)
+            self.assertTrue(output)
+
+            # Collaborator trying to write to the project
+            output = pagure.utils.is_repo_collaborator(
+                repo, "refs/heads/master"
+            )
+            self.assertFalse(output)
+
+            output = pagure.utils.is_repo_collaborator(repo, "refs/heads/epel")
+            self.assertTrue(output)
+
+            output = pagure.utils.is_repo_collaborator(
+                repo, "refs/heads/epel8"
+            )
+            self.assertTrue(output)
+
+            output = pagure.utils.is_repo_collaborator(
+                repo, "refs/heads/epel8-sig-foobar"
+            )
+            self.assertTrue(output)
+
+    def test_is_repo_collaborator_logged_in_in_group(self):
+        """ Test is_repo_committer in pagure with the appropriate user logged
+        in. """
+        # Create group
+        msg = pagure.lib.query.add_group(
+            self.session,
+            group_name="packager",
+            display_name="packager",
+            description="The Fedora packager groups",
+            group_type="user",
+            user="pingou",
+            is_admin=False,
+            blacklist=[],
+        )
+        self.session.commit()
+        self.assertEqual(msg, "User `pingou` added to the group `packager`.")
+
+        # Add user to group
+        group = pagure.lib.query.search_groups(
+            self.session, group_name="packager"
+        )
+        msg = pagure.lib.query.add_user_to_group(
+            self.session,
+            username="foo",
+            group=group,
+            user="pingou",
+            is_admin=True,
+        )
+        self.session.commit()
+        self.assertEqual(msg, "User `foo` added to the group `packager`.")
+
+        # Add group packager to project test
+        project = pagure.lib.query._get_project(self.session, "test")
+        msg = pagure.lib.query.add_group_to_project(
+            self.session,
+            project=project,
+            new_group="packager",
+            user="pingou",
+            access="collaborator",
+            branches="epel*",
+        )
+        self.session.commit()
+        self.assertEqual(msg, "Group added")
+
+        repo = pagure.lib.query._get_project(self.session, "test")
+
+        g = munch.Munch()
+        g.fas_user = tests.FakeUser(username="foo")
+        g.authenticated = True
+        g.session = self.session
+        with mock.patch("flask.g", g):
+            # Collaborator in the group trying to read the project
+            output = pagure.utils.is_repo_collaborator(repo, None)
+            self.assertTrue(output)
+
+            # Collaborator in the group trying to write to the project
+            output = pagure.utils.is_repo_collaborator(
+                repo, "refs/heads/master"
+            )
+            self.assertFalse(output)
+
+            output = pagure.utils.is_repo_collaborator(repo, "refs/heads/epel")
+            self.assertTrue(output)
+
+            output = pagure.utils.is_repo_collaborator(
+                repo, "refs/heads/epel8"
+            )
+            self.assertTrue(output)
+
+            output = pagure.utils.is_repo_collaborator(
+                repo, "refs/heads/epel8-sig-foobar"
+            )
+            self.assertTrue(output)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

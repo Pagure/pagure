@@ -152,9 +152,15 @@ class PagureFlaskApiProjectDeleteProjecttests(tests.Modeltests):
             {
                 "message": "Project deleted",
                 "project": {
-                    "access_groups": {"admin": [], "commit": [], "ticket": []},
+                    "access_groups": {
+                        "admin": [],
+                        "collaborator": [],
+                        "commit": [],
+                        "ticket": [],
+                    },
                     "access_users": {
                         "admin": [],
+                        "collaborator": [],
                         "commit": [],
                         "owner": ["pingou"],
                         "ticket": [],

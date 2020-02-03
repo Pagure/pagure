@@ -63,6 +63,17 @@ class PagureLibGitAuthPagureGitAuthtests(tests.Modeltests):
         self.session.add(push_dkey)
         self.session.commit()
 
+        # Allow the user foo to commit to project test on epel* branches
+        msg = pagure.lib.query.add_user_to_project(
+            self.session,
+            project=project,
+            new_user="foo",
+            user="pingou",
+            access="collaborator",
+            branches="epel*",
+        )
+        self.session.commit()
+
     def create_fork(self):
         # Create fork
         headers = {"Authorization": "token aaabbbcccddd"}
@@ -82,6 +93,7 @@ class PagureLibGitAuthPagureGitAuthtests(tests.Modeltests):
             "project_pr_only": False,
             "global_pr_only": False,
             "project": {"name": "acltest"},
+            "ref": "refs/heads/master",
             "repotype": "main",
             "expected_messages": ["Internal push allowed"],
             "expected_result": True,
@@ -93,6 +105,7 @@ class PagureLibGitAuthPagureGitAuthtests(tests.Modeltests):
             "project_pr_only": False,
             "global_pr_only": True,
             "project": {"name": "acltest"},
+            "ref": "refs/heads/master",
             "repotype": "main",
             "expected_messages": ["Pull request required"],
             "expected_result": False,
@@ -104,6 +117,7 @@ class PagureLibGitAuthPagureGitAuthtests(tests.Modeltests):
             "project_pr_only": False,
             "global_pr_only": True,
             "project": {"name": "acltest", "user": "pingou"},
+            "ref": "refs/heads/master",
             "repotype": "main",
             "expected_messages": ["Has commit access: False"],
             "expected_result": False,
@@ -115,6 +129,7 @@ class PagureLibGitAuthPagureGitAuthtests(tests.Modeltests):
             "project_pr_only": True,
             "global_pr_only": False,
             "project": {"name": "acltest"},
+            "ref": "refs/heads/master",
             "repotype": "main",
             "expected_messages": ["Pull request required"],
             "expected_result": False,
@@ -126,6 +141,7 @@ class PagureLibGitAuthPagureGitAuthtests(tests.Modeltests):
             "project_pr_only": True,
             "global_pr_only": False,
             "project": {"name": "acltest"},
+            "ref": "refs/heads/master",
             "repotype": "ticket",
             "expected_messages": ["Has commit access: False"],
             "expected_result": False,
@@ -137,6 +153,7 @@ class PagureLibGitAuthPagureGitAuthtests(tests.Modeltests):
             "project_pr_only": False,
             "global_pr_only": False,
             "project": {"name": "acltest"},
+            "ref": "refs/heads/master",
             "repotype": "main",
             "expected_messages": [
                 "Deploykey used. Push access: False",
@@ -151,6 +168,7 @@ class PagureLibGitAuthPagureGitAuthtests(tests.Modeltests):
             "project_pr_only": False,
             "global_pr_only": False,
             "project": {"name": "acltest"},
+            "ref": "refs/heads/master",
             "repotype": "main",
             "expected_messages": [
                 "Deploykey used. Push access: True",
@@ -165,6 +183,7 @@ class PagureLibGitAuthPagureGitAuthtests(tests.Modeltests):
             "project_pr_only": False,
             "global_pr_only": False,
             "project": {"name": "acltest"},
+            "ref": "refs/heads/master",
             "repotype": "main",
             "expected_messages": ["Has commit access: False"],
             "expected_result": False,
@@ -176,6 +195,43 @@ class PagureLibGitAuthPagureGitAuthtests(tests.Modeltests):
             "project_pr_only": False,
             "global_pr_only": False,
             "project": {"name": "acltest"},
+            "ref": "refs/heads/master",
+            "repotype": "main",
+            "expected_messages": ["Has commit access: True"],
+            "expected_result": True,
+        },
+        # Contributor invalid branch
+        {
+            "internal": False,
+            "username": "foo",
+            "project_pr_only": False,
+            "global_pr_only": False,
+            "project": {"name": "acltest"},
+            "ref": "refs/heads/master",
+            "repotype": "main",
+            "expected_messages": ["Has commit access: False"],
+            "expected_result": False,
+        },
+        # Contributor valid branch epel-foo
+        {
+            "internal": False,
+            "username": "foo",
+            "project_pr_only": False,
+            "global_pr_only": False,
+            "project": {"name": "acltest"},
+            "ref": "refs/heads/epel-foo",
+            "repotype": "main",
+            "expected_messages": ["Has commit access: True"],
+            "expected_result": True,
+        },
+        # Contributor valid branch epel
+        {
+            "internal": False,
+            "username": "foo",
+            "project_pr_only": False,
+            "global_pr_only": False,
+            "project": {"name": "acltest"},
+            "ref": "refs/heads/epel",
             "repotype": "main",
             "expected_messages": ["Has commit access: True"],
             "expected_result": True,
@@ -210,7 +266,7 @@ class PagureLibGitAuthPagureGitAuthtests(tests.Modeltests):
                 session=self.session,
                 project=project,
                 username=case["username"],
-                refname="refs/heads/master",
+                refname=case["ref"],
                 pull_request=None,
                 repotype=case["repotype"],
                 is_internal=case["internal"],

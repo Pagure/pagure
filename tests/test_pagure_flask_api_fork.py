@@ -422,11 +422,13 @@ class PagureFlaskApiForktests(tests.Modeltests):
                     "project": {
                         "access_groups": {
                             "admin": [],
+                            "collaborator": [],
                             "commit": [],
                             "ticket": [],
                         },
                         "access_users": {
                             "admin": [],
+                            "collaborator": [],
                             "commit": [],
                             "owner": ["pingou"],
                             "ticket": [],
@@ -460,11 +462,13 @@ class PagureFlaskApiForktests(tests.Modeltests):
                     "repo_from": {
                         "access_groups": {
                             "admin": [],
+                            "collaborator": [],
                             "commit": [],
                             "ticket": [],
                         },
                         "access_users": {
                             "admin": [],
+                            "collaborator": [],
                             "commit": [],
                             "owner": ["pingou"],
                             "ticket": [],
@@ -763,9 +767,15 @@ class PagureFlaskApiForktests(tests.Modeltests):
             "initial_comment": None,
             "last_updated": "1431414800",
             "project": {
-                "access_groups": {"admin": [], "commit": [], "ticket": []},
+                "access_groups": {
+                    "admin": [],
+                    "collaborator": [],
+                    "commit": [],
+                    "ticket": [],
+                },
                 "access_users": {
                     "admin": [],
+                    "collaborator": [],
                     "commit": [],
                     "owner": ["pingou"],
                     "ticket": [],
@@ -797,9 +807,15 @@ class PagureFlaskApiForktests(tests.Modeltests):
             },
             "remote_git": None,
             "repo_from": {
-                "access_groups": {"admin": [], "commit": [], "ticket": []},
+                "access_groups": {
+                    "admin": [],
+                    "collaborator": [],
+                    "commit": [],
+                    "ticket": [],
+                },
                 "access_users": {
                     "admin": [],
+                    "collaborator": [],
                     "commit": [],
                     "owner": ["pingou"],
                     "ticket": [],
@@ -921,9 +937,15 @@ class PagureFlaskApiForktests(tests.Modeltests):
             "initial_comment": None,
             "last_updated": "1431414800",
             "project": {
-                "access_groups": {"admin": [], "commit": [], "ticket": []},
+                "access_groups": {
+                    "admin": [],
+                    "collaborator": [],
+                    "commit": [],
+                    "ticket": [],
+                },
                 "access_users": {
                     "admin": [],
+                    "collaborator": [],
                     "commit": [],
                     "owner": ["pingou"],
                     "ticket": [],
@@ -955,9 +977,15 @@ class PagureFlaskApiForktests(tests.Modeltests):
             },
             "remote_git": None,
             "repo_from": {
-                "access_groups": {"admin": [], "commit": [], "ticket": []},
+                "access_groups": {
+                    "admin": [],
+                    "collaborator": [],
+                    "commit": [],
+                    "ticket": [],
+                },
                 "access_users": {
                     "admin": [],
+                    "collaborator": [],
                     "commit": [],
                     "owner": ["pingou"],
                     "ticket": [],
@@ -3036,9 +3064,15 @@ class PagureFlaskApiForktests(tests.Modeltests):
                 "initial_comment": "Nothing much, the changes speak for themselves",
                 "last_updated": "1516348115",
                 "project": {
-                    "access_groups": {"admin": [], "commit": [], "ticket": []},
+                    "access_groups": {
+                        "admin": [],
+                        "collaborator": [],
+                        "commit": [],
+                        "ticket": [],
+                    },
                     "access_users": {
                         "admin": [],
+                        "collaborator": [],
                         "commit": [],
                         "owner": ["pingou"],
                         "ticket": [],
@@ -3070,9 +3104,15 @@ class PagureFlaskApiForktests(tests.Modeltests):
                 },
                 "remote_git": None,
                 "repo_from": {
-                    "access_groups": {"admin": [], "commit": [], "ticket": []},
+                    "access_groups": {
+                        "admin": [],
+                        "collaborator": [],
+                        "commit": [],
+                        "ticket": [],
+                    },
                     "access_users": {
                         "admin": [],
+                        "collaborator": [],
                         "commit": [],
                         "owner": ["pingou"],
                         "ticket": [],
@@ -3173,9 +3213,15 @@ class PagureFlaskApiForktests(tests.Modeltests):
                 "initial_comment": None,
                 "last_updated": "1516348115",
                 "project": {
-                    "access_groups": {"admin": [], "commit": [], "ticket": []},
+                    "access_groups": {
+                        "admin": [],
+                        "collaborator": [],
+                        "commit": [],
+                        "ticket": [],
+                    },
                     "access_users": {
                         "admin": [],
+                        "collaborator": [],
                         "commit": [],
                         "owner": ["pingou"],
                         "ticket": [],
@@ -3207,9 +3253,15 @@ class PagureFlaskApiForktests(tests.Modeltests):
                 },
                 "remote_git": None,
                 "repo_from": {
-                    "access_groups": {"admin": [], "commit": [], "ticket": []},
+                    "access_groups": {
+                        "admin": [],
+                        "collaborator": [],
+                        "commit": [],
+                        "ticket": [],
+                    },
                     "access_users": {
                         "admin": [],
+                        "collaborator": [],
                         "commit": [],
                         "owner": ["pingou"],
                         "ticket": [],
@@ -3532,9 +3584,15 @@ class PagureApiThresholdReachedTests(tests.Modeltests):
             "initial_comment": "Nothing much, the changes speak for themselves",
             "last_updated": "1516348115",
             "project": {
-                "access_groups": {"admin": [], "commit": [], "ticket": []},
+                "access_groups": {
+                    "admin": [],
+                    "collaborator": [],
+                    "commit": [],
+                    "ticket": [],
+                },
                 "access_users": {
                     "admin": [],
+                    "collaborator": [],
                     "commit": [],
                     "owner": ["pingou"],
                     "ticket": [],
@@ -3566,9 +3624,15 @@ class PagureApiThresholdReachedTests(tests.Modeltests):
             },
             "remote_git": None,
             "repo_from": {
-                "access_groups": {"admin": [], "commit": [], "ticket": []},
+                "access_groups": {
+                    "admin": [],
+                    "collaborator": [],
+                    "commit": [],
+                    "ticket": [],
+                },
                 "access_users": {
                     "admin": [],
+                    "collaborator": [],
                     "commit": [],
                     "owner": ["pingou"],
                     "ticket": [],

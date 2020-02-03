@@ -290,11 +290,13 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
                 {
                     "access_groups": {
                         "admin": ["some_group"],
+                        "collaborator": [],
                         "commit": [],
                         "ticket": [],
                     },
                     "access_users": {
                         "admin": [],
+                        "collaborator": [],
                         "commit": [],
                         "owner": ["pingou"],
                         "ticket": [],
@@ -368,11 +370,13 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
                 {
                     "access_groups": {
                         "admin": ["some_group"],
+                        "collaborator": [],
                         "commit": [],
                         "ticket": [],
                     },
                     "access_users": {
                         "admin": [],
+                        "collaborator": [],
                         "commit": [],
                         "owner": ["pingou"],
                         "ticket": [],
@@ -438,11 +442,13 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
                 {
                     "access_groups": {
                         "admin": ["some_group"],
+                        "collaborator": [],
                         "commit": [],
                         "ticket": [],
                     },
                     "access_users": {
                         "admin": [],
+                        "collaborator": [],
                         "commit": [],
                         "owner": ["pingou"],
                         "ticket": [],

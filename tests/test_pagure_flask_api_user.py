@@ -139,9 +139,15 @@ class PagureFlaskApiUSertests(tests.Modeltests):
             },
             "repos": [
                 {
-                    "access_groups": {"admin": [], "commit": [], "ticket": []},
+                    "access_groups": {
+                        "admin": [],
+                        "collaborator": [],
+                        "commit": [],
+                        "ticket": [],
+                    },
                     "access_users": {
                         "admin": [],
+                        "collaborator": [],
                         "commit": [],
                         "owner": ["pingou"],
                         "ticket": [],
@@ -172,9 +178,15 @@ class PagureFlaskApiUSertests(tests.Modeltests):
                     },
                 },
                 {
-                    "access_groups": {"admin": [], "commit": [], "ticket": []},
+                    "access_groups": {
+                        "admin": [],
+                        "collaborator": [],
+                        "commit": [],
+                        "ticket": [],
+                    },
                     "access_users": {
                         "admin": [],
+                        "collaborator": [],
                         "commit": [],
                         "owner": ["pingou"],
                         "ticket": [],
@@ -205,9 +217,15 @@ class PagureFlaskApiUSertests(tests.Modeltests):
                     },
                 },
                 {
-                    "access_groups": {"admin": [], "commit": [], "ticket": []},
+                    "access_groups": {
+                        "admin": [],
+                        "collaborator": [],
+                        "commit": [],
+                        "ticket": [],
+                    },
                     "access_users": {
                         "admin": [],
+                        "collaborator": [],
                         "commit": [],
                         "owner": ["pingou"],
                         "ticket": [],
@@ -1759,11 +1777,13 @@ class PagureFlaskApiUsertestissues(tests.Modeltests):
                         "project": {
                             "access_groups": {
                                 "admin": [],
+                                "collaborator": [],
                                 "commit": [],
                                 "ticket": [],
                             },
                             "access_users": {
                                 "admin": [],
+                                "collaborator": [],
                                 "commit": [],
                                 "owner": ["pingou"],
                                 "ticket": [],

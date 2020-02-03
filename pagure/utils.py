@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2017 - Copyright Red Hat Inc
+ (c) 2017-2020 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -11,6 +11,7 @@
 from __future__ import unicode_literals, absolute_import
 
 import datetime
+import fnmatch
 import logging
 import logging.config
 import os
@@ -266,6 +267,63 @@ def is_repo_committer(repo_obj, username=None, session=None):
 
     # The user is not in an external_committer group that grants access, and
     # not a direct committer -> You have no power here
+    return False
+
+
+def is_repo_collaborator(repo_obj, refname, username=None, session=None):
+    """ Return whether the user has commit on the specified branch of the
+    provided repo. """
+    committer = is_repo_committer(repo_obj, username=username, session=session)
+    if committer:
+        _log.debug("User is a committer")
+        return committer
+
+    import pagure.lib.query
+
+    if username is None:
+        if not authenticated():
+            return False
+        if is_admin():
+            return True
+        username = flask.g.fas_user.username
+        usergroups = set(flask.g.fas_user.groups)
+
+    if not session:
+        session = flask.g.session
+    try:
+        user = pagure.lib.query.get_user(session, username)
+        usergroups = set(user.groups)
+    except pagure.exceptions.PagureException:
+        return False
+
+    # If they are in the list of committers -> maybe
+    for user in repo_obj.collaborators:
+        if user.user.username == username:
+            # if branch is None when the user tries to read,
+            # so we'll allow that
+            if refname is None:
+                return True
+            # If the branch is specified: the user is trying to write, we'll
+            # check if they are allowed to
+            for pattern in user.branches.split(","):
+                pattern = "refs/heads/{}".format(pattern.strip())
+                if fnmatch.fnmatch(refname, pattern):
+                    return True
+
+    # If they are in a group that has commit access -> maybe
+    for project_group in repo_obj.collaborator_groups:
+        if project_group.group.group_name in usergroups:
+            # if branch is None when the user tries to read,
+            # so we'll allow that
+            if refname is None:
+                return True
+            # If the branch is specified: the user is trying to write, we'll
+            # check if they are allowed to
+            for pattern in project_group.branches.split(","):
+                pattern = "refs/heads/{}".format(pattern.strip())
+                if fnmatch.fnmatch(refname, pattern):
+                    return True
+
     return False
 
 

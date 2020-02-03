@@ -2081,6 +2081,7 @@ def add_user(repo, username=None, namespace=None):
                 new_user=form.user.data,
                 user=flask.g.fas_user.username,
                 access=form.access.data,
+                branches=form.branches.data,
                 required_groups=pagure_config.get("REQUIRED_GROUPS"),
             )
             flask.g.session.commit()
@@ -2241,6 +2242,7 @@ def add_group_project(repo, username=None, namespace=None):
                 new_group=form.group.data,
                 user=flask.g.fas_user.username,
                 access=form.access.data,
+                branches=form.branches.data,
                 create=pagure_config.get("ENABLE_GROUP_MNGT", False),
                 is_admin=pagure.utils.is_admin(),
             )

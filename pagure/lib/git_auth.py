@@ -27,7 +27,7 @@ import pagure.lib.model_base
 import pagure.lib.query
 from pagure.config import config as pagure_config
 from pagure.lib import model
-from pagure.utils import is_repo_committer, lookup_deploykey
+from pagure.utils import is_repo_collaborator, lookup_deploykey
 
 
 # logging.config.dictConfig(pagure_config.get('LOGGING') or {'version': 1})
@@ -901,7 +901,9 @@ class PagureGitAuth(GitAuthHelper):
             return False
 
         # Determine whether the current user is allowed to push
-        is_committer = is_repo_committer(project, username, session)
+        is_committer = is_repo_collaborator(
+            project, refname, username, session
+        )
         deploykey = lookup_deploykey(project, username)
         if deploykey is not None:
             self.info("Deploykey used. Push access: %s" % deploykey.pushaccess)

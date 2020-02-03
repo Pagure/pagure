@@ -1098,7 +1098,13 @@ def add_sshkey_to_project_or_user(
 
 
 def add_user_to_project(
-    session, project, new_user, user, access="admin", required_groups=None
+    session,
+    project,
+    new_user,
+    user,
+    access="admin",
+    branches=None,
+    required_groups=None,
 ):
     """ Add a specified user to a specified project with a specified access
     """
@@ -1127,15 +1133,20 @@ def add_user_to_project(
     )
     users.add(project.user.user)
 
-    if new_user in users:
+    if new_user in users and access != "collaborator":
         raise pagure.exceptions.PagureException(
             "This user is already listed on this project with the same access"
         )
+
+    # Reset the branches to None if the user isn't a collaborator
+    if access != "collaborator":
+        branches = None
 
     # user has some access on project, so update to new access
     if new_user_obj in project.users:
         access_obj = get_obj_access(session, project, new_user_obj)
         access_obj.access = access
+        access_obj.branches = branches
         project.date_modified = datetime.datetime.utcnow()
         update_read_only_mode(session, project, read_only=True)
         session.add(access_obj)
@@ -1149,6 +1160,7 @@ def add_user_to_project(
                 project=project.to_json(public=True),
                 new_user=new_user_obj.username,
                 new_access=access,
+                new_branches=branches,
                 agent=user_obj.username,
             ),
         )
@@ -1156,7 +1168,10 @@ def add_user_to_project(
         return "User access updated"
 
     project_user = model.ProjectUser(
-        project_id=project.id, user_id=new_user_obj.id, access=access
+        project_id=project.id,
+        user_id=new_user_obj.id,
+        access=access,
+        branches=branches,
     )
     project.date_modified = datetime.datetime.utcnow()
     session.add(project_user)
@@ -1173,6 +1188,7 @@ def add_user_to_project(
             project=project.to_json(public=True),
             new_user=new_user_obj.username,
             access=access,
+            branches=branches,
             agent=user_obj.username,
         ),
     )
@@ -1186,6 +1202,7 @@ def add_group_to_project(
     new_group,
     user,
     access="admin",
+    branches=None,
     create=False,
     is_admin=False,
 ):
@@ -1228,15 +1245,20 @@ def add_group_to_project(
         ]
     )
 
-    if new_group in groups:
+    if new_group in groups and access != "collaborator":
         raise pagure.exceptions.PagureException(
             "This group already has this access on this project"
         )
+
+    # Reset the branches to None if the group isn't a collaborator
+    if access != "collaborator":
+        branches = None
 
     # the group already has some access, update to new access
     if group_obj in project.groups:
         access_obj = get_obj_access(session, project, group_obj)
         access_obj.access = access
+        access_obj.branches = branches
         session.add(access_obj)
         project.date_modified = datetime.datetime.utcnow()
         update_read_only_mode(session, project, read_only=True)
@@ -1250,6 +1272,7 @@ def add_group_to_project(
                 project=project.to_json(public=True),
                 new_group=group_obj.group_name,
                 new_access=access,
+                new_branches=branches,
                 agent=user,
             ),
         )
@@ -1257,7 +1280,10 @@ def add_group_to_project(
         return "Group access updated"
 
     project_group = model.ProjectGroup(
-        project_id=project.id, group_id=group_obj.id, access=access
+        project_id=project.id,
+        group_id=group_obj.id,
+        access=access,
+        branches=branches,
     )
     session.add(project_group)
     # Make sure we won't have SQLAlchemy error before we continue
@@ -1274,6 +1300,7 @@ def add_group_to_project(
             project=project.to_json(public=True),
             new_group=group_obj.group_name,
             access=access,
+            branches=branches,
             agent=user,
         ),
     )
@@ -2380,6 +2407,7 @@ def search_projects(
                 sqlalchemy.or_(
                     model.ProjectUser.access == "admin",
                     model.ProjectUser.access == "commit",
+                    model.ProjectUser.access == "collaborator",
                 ),
             )
         )
@@ -2394,6 +2422,7 @@ def search_projects(
                 sqlalchemy.or_(
                     model.ProjectGroup.access == "admin",
                     model.ProjectGroup.access == "commit",
+                    model.ProjectGroup.access == "collaborator",
                 ),
             )
         )
@@ -2409,6 +2438,7 @@ def search_projects(
                 sqlalchemy.or_(
                     model.ProjectGroup.access == "admin",
                     model.ProjectGroup.access == "commit",
+                    model.ProjectGroup.access == "collaborator",
                 ),
             )
         )
@@ -2455,6 +2485,7 @@ def search_projects(
                 sqlalchemy.or_(
                     model.ProjectUser.access == "admin",
                     model.ProjectUser.access == "commit",
+                    model.ProjectUser.access == "collaborator",
                 ),
             )
         )
@@ -2470,6 +2501,7 @@ def search_projects(
                 sqlalchemy.or_(
                     model.ProjectGroup.access == "admin",
                     model.ProjectGroup.access == "commit",
+                    model.ProjectGroup.access == "collaborator",
                 ),
             )
         )
@@ -2486,6 +2518,7 @@ def search_projects(
                 sqlalchemy.or_(
                     model.ProjectGroup.access == "admin",
                     model.ProjectGroup.access == "commit",
+                    model.ProjectGroup.access == "collaborator",
                 ),
             )
         )
@@ -2591,7 +2624,7 @@ def list_users_projects(
     projects = session.query(sqlalchemy.distinct(model.Project.id))
 
     if acls is None:
-        acls = ["main admin", "admin", "commit", "ticket"]
+        acls = ["main admin", "admin", "collaborator", "commit", "ticket"]
 
     if username is not None:
 

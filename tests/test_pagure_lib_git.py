@@ -1683,7 +1683,7 @@ new file mode 100644
 index 0000000..60f7480
 --- /dev/null
 +++ b/456
-@@ -0,0 +1,152 @@
+@@ -0,0 +1,156 @@
 +{
 +    "assignee": null,
 +    "branch": "master",
@@ -1701,11 +1701,13 @@ index 0000000..60f7480
 +    "project": {
 +        "access_groups": {
 +            "admin": [],
++            "collaborator": [],
 +            "commit": [],
 +            "ticket": []
 +        },
 +        "access_users": {
 +            "admin": [],
++            "collaborator": [],
 +            "commit": [],
 +            "owner": [
 +                "pingou"
@@ -1762,11 +1764,13 @@ index 0000000..60f7480
 +    "repo_from": {
 +        "access_groups": {
 +            "admin": [],
++            "collaborator": [],
 +            "commit": [],
 +            "ticket": []
 +        },
 +        "access_users": {
 +            "admin": [],
++            "collaborator": [],
 +            "commit": [],
 +            "owner": [
 +                "pingou"

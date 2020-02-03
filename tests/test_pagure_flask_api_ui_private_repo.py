@@ -1396,11 +1396,13 @@ class PagurePrivateRepotest(tests.Modeltests):
                         {
                             "access_groups": {
                                 "admin": [],
+                                "collaborator": [],
                                 "commit": [],
                                 "ticket": [],
                             },
                             "access_users": {
                                 "admin": [],
+                                "collaborator": [],
                                 "commit": [],
                                 "owner": ["pingou"],
                                 "ticket": [],
@@ -1454,11 +1456,13 @@ class PagurePrivateRepotest(tests.Modeltests):
                         {
                             "access_groups": {
                                 "admin": [],
+                                "collaborator": [],
                                 "commit": [],
                                 "ticket": [],
                             },
                             "access_users": {
                                 "admin": [],
+                                "collaborator": [],
                                 "commit": [],
                                 "owner": ["pingou"],
                                 "ticket": [],
@@ -1588,11 +1592,13 @@ class PagurePrivateRepotest(tests.Modeltests):
                             "project": {
                                 "access_groups": {
                                     "admin": [],
+                                    "collaborator": [],
                                     "commit": [],
                                     "ticket": [],
                                 },
                                 "access_users": {
                                     "admin": [],
+                                    "collaborator": [],
                                     "commit": [],
                                     "owner": ["pingou"],
                                     "ticket": [],
@@ -1621,11 +1627,13 @@ class PagurePrivateRepotest(tests.Modeltests):
                             "repo_from": {
                                 "access_groups": {
                                     "admin": [],
+                                    "collaborator": [],
                                     "commit": [],
                                     "ticket": [],
                                 },
                                 "access_users": {
                                     "admin": [],
+                                    "collaborator": [],
                                     "commit": [],
                                     "owner": ["pingou"],
                                     "ticket": [],
@@ -1719,11 +1727,13 @@ class PagurePrivateRepotest(tests.Modeltests):
                     "project": {
                         "access_groups": {
                             "admin": [],
+                            "collaborator": [],
                             "commit": [],
                             "ticket": [],
                         },
                         "access_users": {
                             "admin": [],
+                            "collaborator": [],
                             "commit": [],
                             "owner": ["pingou"],
                             "ticket": [],
@@ -1752,11 +1762,13 @@ class PagurePrivateRepotest(tests.Modeltests):
                     "repo_from": {
                         "access_groups": {
                             "admin": [],
+                            "collaborator": [],
                             "commit": [],
                             "ticket": [],
                         },
                         "access_users": {
                             "admin": [],
+                            "collaborator": [],
                             "commit": [],
                             "owner": ["pingou"],
                             "ticket": [],

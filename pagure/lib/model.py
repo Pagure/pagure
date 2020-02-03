@@ -142,7 +142,7 @@ def create_default_status(session, acls=None):
             session.rollback()
             _log.debug("ACL %s could not be added", acl)
 
-    for access in ["ticket", "commit", "admin"]:
+    for access in ["ticket", "collaborator", "commit", "admin"]:
         access_obj = AccessLevels(access=access)
         session.add(access_obj)
         try:
@@ -443,6 +443,13 @@ class Project(BASE):
         viewonly=True,
     )
 
+    collaborators = relation(
+        "ProjectUser",
+        primaryjoin="and_(projects.c.id==user_projects.c.project_id,\
+                    user_projects.c.access=='collaborator')",
+        viewonly=True,
+    )
+
     groups = relation(
         "PagureGroup",
         secondary="projects_groups",
@@ -476,6 +483,13 @@ class Project(BASE):
                 or_(projects_groups.c.access=='admin',\
                     projects_groups.c.access=='commit'))",
         order_by="PagureGroup.group_name.asc()",
+        viewonly=True,
+    )
+
+    collaborator_groups = relation(
+        "ProjectGroup",
+        primaryjoin="and_(projects.c.id==projects_groups.c.project_id,\
+                    projects_groups.c.access=='collaborator')",
         viewonly=True,
     )
 
@@ -905,7 +919,7 @@ class Project(BASE):
         :type combine: boolean
         """
 
-        if access not in ["admin", "commit", "ticket"]:
+        if access not in ["admin", "commit", "collaborator", "ticket"]:
             raise pagure.exceptions.AccessLevelNotFound(
                 "The access level does not exist"
             )
@@ -915,6 +929,8 @@ class Project(BASE):
                 return self.admins
             elif access == "commit":
                 return self.committers
+            elif access == "collaborator":
+                return [u.user for u in self.collaborators]
             elif access == "ticket":
                 return self.users
         else:
@@ -924,11 +940,20 @@ class Project(BASE):
                 committers = set(self.committers)
                 admins = set(self.admins)
                 return list(committers - admins)
-            elif access == "ticket":
-                committers = set(self.committers)
+            elif access == "collaborator":
                 admins = set(self.admins)
+                committers = set(self.committers)
+                return list(
+                    set([u.user for u in self.collaborators])
+                    - committers
+                    - admins
+                )
+            elif access == "ticket":
+                admins = set(self.admins)
+                committers = set(self.committers)
+                collaborators = set([u.user for u in self.collaborators])
                 users = set(self.users)
-                return list(users - committers - admins)
+                return list(users - collaborators - committers - admins)
 
     def get_project_groups(self, access, combine=True):
         """ Returns the list of groups of the project according
@@ -951,7 +976,7 @@ class Project(BASE):
         :type combine: boolean
         """
 
-        if access not in ["admin", "commit", "ticket"]:
+        if access not in ["admin", "commit", "collaborator", "ticket"]:
             raise pagure.exceptions.AccessLevelNotFound(
                 "The access level does not exist"
             )
@@ -961,6 +986,8 @@ class Project(BASE):
                 return self.admin_groups
             elif access == "commit":
                 return self.committer_groups
+            elif access == "collaborator":
+                return self.collaborator_groups
             elif access == "ticket":
                 return self.groups
         else:
@@ -970,11 +997,18 @@ class Project(BASE):
                 committers = set(self.committer_groups)
                 admins = set(self.admin_groups)
                 return list(committers - admins)
+            elif access == "collaborator":
+                committers = set(self.committer_groups)
+                admins = set(self.admin_groups)
+                return list(
+                    set(self.collaborator_groups) - committers - admins
+                )
             elif access == "ticket":
                 committers = set(self.committer_groups)
                 admins = set(self.admin_groups)
+                collaborators = set(self.collaborator_groups)
                 groups = set(self.groups)
-                return list(groups - committers - admins)
+                return list(groups - collaborators - committers - admins)
 
     @property
     def access_users(self):
@@ -988,6 +1022,9 @@ class Project(BASE):
             "commit": sorted(
                 self.get_project_users(access="commit", combine=False),
                 key=lambda u: u.user,
+            ),
+            "collaborator": sorted(
+                self.get_project_users(access="collaborator", combine=False)
             ),
             "ticket": sorted(
                 self.get_project_users(access="ticket", combine=False),
@@ -1027,6 +1064,9 @@ class Project(BASE):
             "commit": sorted(
                 self.get_project_groups(access="commit", combine=False),
                 key=lambda x: x.group_name,
+            ),
+            "collaborator": sorted(
+                self.get_project_groups(access="collaborator", combine=False)
             ),
             "ticket": sorted(
                 self.get_project_groups(access="ticket", combine=False),
@@ -1171,6 +1211,7 @@ class ProjectUser(BASE):
         ),
         nullable=False,
     )
+    branches = sa.Column(sa.Text, nullable=True,)
 
     project = relation(
         "Project",
@@ -2707,6 +2748,7 @@ class ProjectGroup(BASE):
         ),
         nullable=False,
     )
+    branches = sa.Column(sa.Text, nullable=True,)
 
     project = relation(
         "Project",

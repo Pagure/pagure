@@ -4413,7 +4413,9 @@ class PagureLibtests(tests.Modeltests):
         """ Test the get_access_levels method in pagure.lib """
 
         acls = pagure.lib.query.get_access_levels(self.session)
-        self.assertEqual(sorted(["admin", "commit", "ticket"]), sorted(acls))
+        self.assertEqual(
+            sorted(["admin", "collaborator", "commit", "ticket"]), sorted(acls)
+        )
 
     def test_get_project_users(self):
         """ Test the get_project_users method when combine is True

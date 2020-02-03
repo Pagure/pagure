@@ -126,7 +126,7 @@ def lookup_ssh_key():
 @PV.route("/ssh/checkaccess/", methods=["POST"])
 @internal_access_only
 def check_ssh_access():
-    """ Determines whether a user has any access to the requested repo. """
+    """ Determines whether a user has read access to the requested repo. """
     gitdir = flask.request.form["gitdir"]
     remoteuser = flask.request.form["username"]
     _auth_log.info(
@@ -192,8 +192,9 @@ def check_ssh_access():
         )
         return flask.jsonify({"access": False})
 
-    _log.info("Access granted to %s on: %s" % (remoteuser, project.fullname))
-
+    _log.info(
+        "Read access granted to %s on: %s" % (remoteuser, project.fullname)
+    )
     return flask.jsonify(
         {
             "access": True,

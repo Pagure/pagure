@@ -395,6 +395,11 @@ def set_request():
         flask.g.repo_obj = pygit2.Repository(flask.g.reponame)
         flask.g.repo_admin = pagure.utils.is_repo_admin(flask.g.repo)
         flask.g.repo_committer = pagure.utils.is_repo_committer(flask.g.repo)
+        if flask.g.authenticated and not flask.g.repo_committer:
+            flask.g.repo_committer = flask.g.fas_user.username in [
+                u.user.username for u in flask.g.repo.collaborators
+            ]
+
         flask.g.repo_user = pagure.utils.is_repo_user(flask.g.repo)
         flask.g.branches = sorted(flask.g.repo_obj.listall_branches())
 
