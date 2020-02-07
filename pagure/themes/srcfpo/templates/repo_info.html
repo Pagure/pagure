@@ -341,13 +341,20 @@
                 </div>
 
                 <div class="btn-group">
-                  <a class="bugz"
-                    href="https://apps.fedoraproject.org/packages/{{ repo.name }}/bugs">
-                    <button type="button"
+                  {% if repo.namespace in ['rpms', 'container', 'modules'] %}
+                  {% if repo.namespace == 'rpms' %}
+                  <a class="bugz" href="https://bugzilla.redhat.com/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&classification=Fedora&product=Fedora&component={{ repo.name }}">
+                  {% elif repo.namespace == 'container' %}
+                  <a class="bugz" href="https://bugzilla.redhat.com/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&classification=Fedora&product=Fedora Container Images&component={{ repo.name }}">
+                  {% elif repo.namespace == 'modules' %}
+                  <a class="bugz" href="https://bugzilla.redhat.com/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&classification=Fedora&product=Fedora Modules&component={{ repo.name }}">
+                  {% endif %}
+                  <button type="button"
                       class="btn btn-sm btn-outline-primary font-weight-bold">
                       Bug Reports
                     </button>
                   </a>
+                  {% endif %}
                 </div>
 
                 <div class="btn-group">
