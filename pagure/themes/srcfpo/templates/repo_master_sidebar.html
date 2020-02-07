@@ -123,7 +123,7 @@
     <h6>Orphaned:</h6>
     <div class="btn-group">
       <a href="#" title="Adopt this orphaned package"
-          class="btn btn-sm btn-outline-primary"
+          class="btn btn-sm btn-outline-primary disabled"
           id="take-orphan-button">
         <i id="take-orphan-icon" class="fa fa-fw fa-hand-paper-o"></i>
         Take
@@ -341,8 +341,8 @@
         type: 'GET',
         dataType: 'json',
         success: function(res) {
+          var _btn = $("#take-orphan-button");
           if (!res.active){
-            var _btn = $("#take-orphan-button");
             _btn.off("click");
             _btn.click(function(){
                 window.open(
@@ -351,6 +351,8 @@
             });
             _btn.prop( "title", "Package retired - Open a releng ticket to adopt it" );
             _btn.html("Retired");
+          } else {
+            _btn.removeClass('disabled');
           }
         }
       });
