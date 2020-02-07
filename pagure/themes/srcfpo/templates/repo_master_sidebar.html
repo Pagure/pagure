@@ -108,6 +108,7 @@
         </div>
       </a>
     </div>
+    <div id="monitoring_feedback"></div>
     {% else %}
     <button title="Monitoring status" class="btn btn-sm btn-outline-primary disabled"
         id="monitoring-button">
@@ -246,6 +247,7 @@
 
       {% if g.authenticated %}
       $(".monitoring-menu a").click(function(){
+        $("#monitoring_feedback").attr('class', '');
         var selectedValue = $(this).attr('id');
         var _status = "no-monitoring";
         if (selectedValue === "monitoring_option_button") {
@@ -263,6 +265,7 @@
           dataType: 'json',
           success: function(res) {
             set_up_monitoring(res.monitoring)
+            $("#monitoring_feedback").attr("class", "fa fa-fw fa-check")
           },
           error: function() {
             alert('Unable to change the monitoring status!');
