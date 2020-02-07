@@ -18,7 +18,7 @@ import os
 
 import flask
 import pygit2
-import werkzeug
+import werkzeug.utils
 
 from functools import wraps
 from sqlalchemy.exc import SQLAlchemyError
@@ -108,7 +108,7 @@ def lookup_ssh_key():
         result["username"] = key.user.username
     elif key.project:
         result["username"] = "deploykey_%s_%s" % (
-            werkzeug.secure_filename(key.project.fullname),
+            werkzeug.utils.secure_filename(key.project.fullname),
             key.id,
         )
     else:

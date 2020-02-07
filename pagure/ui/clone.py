@@ -17,7 +17,7 @@ import os
 
 import flask
 import requests
-import werkzeug
+import werkzeug.wsgi
 
 import pagure.exceptions
 import pagure.lib.git

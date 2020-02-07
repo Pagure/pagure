@@ -17,7 +17,7 @@ import stat
 import struct
 
 import six
-import werkzeug
+import werkzeug.utils
 
 from celery import Celery
 from cryptography import utils
@@ -117,7 +117,7 @@ def setup_mirroring(self, session, username, namespace, name):
         session, namespace=namespace, name=name, user=username
     )
 
-    public_key_name = werkzeug.secure_filename(project.fullname)
+    public_key_name = werkzeug.utils.secure_filename(project.fullname)
     ssh_folder = pagure_config["MIRROR_SSHKEYS_FOLDER"]
 
     if not os.path.exists(ssh_folder):
@@ -173,7 +173,7 @@ def teardown_mirroring(self, session, username, namespace, name):
 
     ssh_folder = pagure_config["MIRROR_SSHKEYS_FOLDER"]
 
-    public_key_name = werkzeug.secure_filename(project.fullname)
+    public_key_name = werkzeug.utils.secure_filename(project.fullname)
     private_key_file = os.path.join(ssh_folder, public_key_name)
     public_key_file = os.path.join(ssh_folder, "%s.pub" % public_key_name)
 
@@ -207,7 +207,7 @@ def mirror_project(self, session, username, namespace, name):
         return
 
     ssh_folder = pagure_config["MIRROR_SSHKEYS_FOLDER"]
-    public_key_name = werkzeug.secure_filename(project.fullname)
+    public_key_name = werkzeug.utils.secure_filename(project.fullname)
     private_key_file = os.path.join(ssh_folder, public_key_name)
 
     if not os.path.exists(private_key_file):

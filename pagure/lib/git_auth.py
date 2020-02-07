@@ -18,7 +18,7 @@ import subprocess
 import tempfile
 from io import open
 
-import werkzeug
+import werkzeug.utils
 from six import with_metaclass
 from six.moves import dbm_gnu
 
@@ -270,7 +270,7 @@ class Gitolite2Auth(GitAuthHelper):
                     "  %s = deploykey_%s_%s"
                     % (
                         access,
-                        werkzeug.secure_filename(project.fullname),
+                        werkzeug.utils.secure_filename(project.fullname),
                         deploykey.id,
                     )
                 )

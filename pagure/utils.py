@@ -21,7 +21,7 @@ from functools import wraps
 import flask
 import pygit2
 import six
-import werkzeug
+import werkzeug.utils
 
 from pagure.exceptions import (
     PagureException,
@@ -595,7 +595,7 @@ def get_remote_repo_path(remote_git, branch_from, ignore_non_exist=False):
     """
     repopath = os.path.join(
         pagure_config["REMOTE_GIT_FOLDER"],
-        werkzeug.secure_filename("%s_%s" % (remote_git, branch_from)),
+        werkzeug.utils.secure_filename("%s_%s" % (remote_git, branch_from)),
     )
 
     if not os.path.exists(repopath) and not ignore_non_exist:
@@ -787,7 +787,7 @@ def lookup_deploykey(project, username):
         return None
     username = username[len("deploykey_") :]
     rest, keyid = username.rsplit("_", 1)
-    if rest != werkzeug.secure_filename(project.fullname):
+    if rest != werkzeug.utils.secure_filename(project.fullname):
         # This is not a deploykey for the specified project
         return None
     keyid = int(keyid)

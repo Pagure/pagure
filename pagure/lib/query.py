@@ -44,7 +44,7 @@ import redis
 import six
 import sqlalchemy
 import sqlalchemy.schema
-import werkzeug
+import werkzeug.utils
 
 from six.moves.urllib_parse import urlparse, urlencode, parse_qsl
 from sqlalchemy import asc, desc, func, cast, Text
@@ -292,7 +292,7 @@ def create_deploykeys_ssh_keys_on_disk(project, gitolite_keydir):
     # First remove deploykeys that no longer exist
     keyfiles = [
         "deploykey_%s_%s.pub"
-        % (werkzeug.secure_filename(project.fullname), key.id)
+        % (werkzeug.utils.secure_filename(project.fullname), key.id)
         for key in project.deploykeys
     ]
 
@@ -311,7 +311,7 @@ def create_deploykeys_ssh_keys_on_disk(project, gitolite_keydir):
         # See the comment in lib/git.py:write_gitolite_acls about why this
         # name for a file is sane and does not inject a new security risk.
         keyfile = "deploykey_%s_%s.pub" % (
-            werkzeug.secure_filename(project.fullname),
+            werkzeug.utils.secure_filename(project.fullname),
             deploykey.id,
         )
         if not os.path.exists(os.path.join(project_key_dir, keyfile)):
@@ -3472,13 +3472,13 @@ def add_attachment(repo, issue, attachmentfolder, user, filename, filestream):
     _log.info(
         "Adding file: %s to the git repo: %s",
         repo.path,
-        werkzeug.secure_filename(filename),
+        werkzeug.utils.secure_filename(filename),
     )
 
     # Prefix the filename with a timestamp:
     filename = "%s-%s" % (
         hashlib.sha256(filestream.read()).hexdigest(),
-        werkzeug.secure_filename(filename),
+        werkzeug.utils.secure_filename(filename),
     )
     filedir = os.path.join(attachmentfolder, repo.fullname, "files")
     filepath = os.path.join(filedir, filename)

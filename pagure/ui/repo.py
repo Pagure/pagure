@@ -30,7 +30,7 @@ import flask
 import pygit2
 import kitchen.text.converters as ktc
 import six
-import werkzeug
+import werkzeug.utils
 
 from six import BytesIO
 from PIL import Image
@@ -1191,7 +1191,7 @@ def new_release(repo, username=None, namespace=None):
         filenames = []
         error = False
         for filestream in flask.request.files.getlist("filestream"):
-            filename = werkzeug.secure_filename(filestream.filename)
+            filename = werkzeug.utils.secure_filename(filestream.filename)
             filenames.append(filename)
             try:
                 folder = os.path.join(
@@ -3559,7 +3559,7 @@ def generate_project_archive(
         _log.debug("%s no in %s", extension, extensions)
         flask.abort(400, description="Invalid archive format specified")
 
-    name = werkzeug.secure_filename(name)
+    name = werkzeug.utils.secure_filename(name)
 
     repo_obj = flask.g.repo_obj
 
@@ -3589,7 +3589,7 @@ def generate_project_archive(
     tag_path = ""
     tag_filename = None
     if tag:
-        tag_filename = werkzeug.secure_filename(ref)
+        tag_filename = werkzeug.utils.secure_filename(ref)
         tag_path = os.path.join("tags", tag_filename)
 
     path = os.path.join(
