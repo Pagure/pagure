@@ -818,6 +818,22 @@ the default branch of the repo will be the default target of all pull requests.
 
 Defaults to: ``False``.
 
+
+SSH_ACCESS_GROUPS
+~~~~~~~~~~~~~~~~~
+
+Some instances of pagure are deployed in such a way that only the members of
+certain groups are allowed to commit via ssh. This configuration key allows
+to specify which groups have commit access and thus let pagure hide the ssh
+URL from the drop-down "Clone" menu for all the person who are not in one of
+these groups.
+If this configuration key is not defined or left empty, it is assume that there
+is no such group restriction and everyone can commit via ssh (default behavior).
+
+
+Defaults to: ``[]``
+
+
 SMTP configuration
 ~~~~~~~~~~~~~~~~~~
 

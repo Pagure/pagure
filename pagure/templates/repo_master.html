@@ -6,6 +6,8 @@
     <a href="{{ url_for('ui_ns.user_settings') + '#nav-ssh-tab' }}">
       You need to upload SSH key to be able to clone over SSH
     </a>
+  {% elif not (current_user | user_group_can_ssh_commit) %}
+    Only members of the {{ config["SSH_ACCESS_GROUPS"] | join(", ") }} group(s) can clone via ssh
   {% elif repo.read_only %}
      The permissions on this repository are being updated.
      Cloning over SSH is disabled.

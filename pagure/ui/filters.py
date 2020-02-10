@@ -813,6 +813,24 @@ def user_can_clone_ssh(username):
     return always_render or has_ssh_keys
 
 
+@UI_NS.app_template_filter("user_group_can_ssh_commit")
+def user_group_can_ssh_commit(username):
+    """ Returns whether the user is in a group that has ssh access. """
+    ssh_access_groups = pagure_config.get("SSH_ACCESS_GROUPS") or []
+    if not ssh_access_groups:
+        # ssh access is not restricted to one or more groups
+        return True
+
+    user_obj = pagure.lib.query.search_user(flask.g.session, username=username)
+    if not user_obj:
+        # user not found
+        return False
+
+    user_grps = set(user_obj.groups)
+    req_grps = set(pagure_config.get("SSH_ACCESS_GROUPS"))
+    return len(user_grps.intersection(req_grps)) > 0
+
+
 @UI_NS.app_template_filter("git_url_ssh")
 def get_git_url_ssh(complement=""):
     """ Return the GIT SSH URL to be displayed in the UI based on the

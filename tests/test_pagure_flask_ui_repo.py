@@ -6611,5 +6611,130 @@ class PagureFlaskRepoTestRegenerateGittests(tests.Modeltests):
         self.assertEqual(upgit.call_count, 1)
 
 
+class PagureFlaskRepoTestGitSSHURL(tests.Modeltests):
+    """ Tests the display of the SSH url in the UI """
+
+    def setUp(self):
+        """ Set up the environnment, ran before every tests. """
+        super(PagureFlaskRepoTestGitSSHURL, self).setUp()
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, "repos"))
+        pingou = pagure.lib.query.get_user(self.session, "pingou")
+
+        # Make the repo not read-only
+        repo = pagure.lib.query._get_project(self.session, "test")
+        pagure.lib.query.update_read_only_mode(
+            self.session, repo, read_only=False
+        )
+        self.session.commit()
+
+        # Add a group and make pingou a member of it
+        item = pagure.lib.model.PagureGroup(
+            group_name="packager",
+            group_type="user",
+            display_name="User group",
+            user_id=1,  # pingou
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        pagure.lib.query.add_user_to_group(
+            self.session, pingou.username, item, pingou.username, True
+        )
+
+        # Add a SSH key for pingou so that he is allowed to push via ssh
+        msg = pagure.lib.query.add_sshkey_to_project_or_user(
+            session=self.session,
+            user=pingou,
+            ssh_key="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDAzBMSIlvPRaEiLOTVInErkRIw9CzQQcnslDekAn1jFnGf+SNa1acvbTiATbCX71AA03giKrPxPH79dxcC7aDXerc6zRcKjJs6MAL9PrCjnbyxCKXRNNZU5U9X/DLaaL1b3caB+WD6OoorhS3LTEtKPX8xyjOzhf3OQSzNjhJp5Q==",
+            pushaccess=True,
+            creator=pingou,
+        )
+        self.session.commit()
+        self.assertEqual(msg, "SSH key added")
+
+    def test_logged_out(self):
+        """ Test the default behavior with the user logged out. """
+
+        output = self.app.get("/test")
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        self.assertIn("<strong>Source Code</strong>", output_text)
+        self.assertIn(
+            '<div class="input-group-prepend"><span class="input-group-text">'
+            "GIT</span></div>",
+            output_text,
+        )
+        self.assertNotIn(
+            '<div class="input-group-prepend"><span class="input-group-text">'
+            "SSH</span></div>",
+            output_text,
+        )
+
+    def test_logged_in(self):
+        """ Test the default behavior with the user logged in. """
+        user = tests.FakeUser(username="pingou")
+        with tests.user_set(self.app.application, user):
+            output = self.app.get("/test")
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn("<strong>Source Code</strong>", output_text)
+            self.assertIn(
+                '<div class="input-group-prepend"><span class="input-group-text">'
+                "GIT</span></div>",
+                output_text,
+            )
+            self.assertIn(
+                '<div class="input-group-prepend"><span class="input-group-text">'
+                "SSH</span></div>",
+                output_text,
+            )
+
+    @patch.dict("pagure.config.config", {"SSH_ACCESS_GROUPS": ["packager"]})
+    def test_ssh_restricted_user_member(self):
+        """ Test when ssh is restricted and the user has access. """
+        user = tests.FakeUser(username="pingou")
+        with tests.user_set(self.app.application, user):
+            output = self.app.get("/test")
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn("<strong>Source Code</strong>", output_text)
+            self.assertIn(
+                '<div class="input-group-prepend"><span class="input-group-text">'
+                "GIT</span></div>",
+                output_text,
+            )
+            self.assertIn(
+                '<div class="input-group-prepend"><span class="input-group-text">'
+                "SSH</span></div>",
+                output_text,
+            )
+
+    @patch.dict("pagure.config.config", {"SSH_ACCESS_GROUPS": ["invalid"]})
+    def test_ssh_restricted_user_non_member(self):
+        """ Test when ssh is restricted and the user does not have access. """
+        user = tests.FakeUser(username="pingou")
+        with tests.user_set(self.app.application, user):
+            output = self.app.get("/test")
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn("<strong>Source Code</strong>", output_text)
+            self.assertIn(
+                '<div class="input-group-prepend"><span class="input-group-text">'
+                "GIT</span></div>",
+                output_text,
+            )
+            self.assertIn(
+                "Only members of the invalid group(s) can clone via ssh",
+                output_text,
+            )
+            self.assertNotIn(
+                '<div class="input-group-prepend"><span class="input-group-text">'
+                "SSH</span></div>",
+                output_text,
+            )
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
