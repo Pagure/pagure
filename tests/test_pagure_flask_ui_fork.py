@@ -1529,7 +1529,7 @@ class PagureFlaskForktests(tests.Modeltests):
         pr_one = pagure.lib.query.search_pull_requests(
             self.session, project_id=1, requestid=1
         )
-        pr_one.last_updated = datetime.utcnow() + timedelta(seconds=2)
+        pr_one.updated_on = datetime.utcnow() + timedelta(seconds=2)
         self.session.add(pr_one)
         self.session.commit()
 

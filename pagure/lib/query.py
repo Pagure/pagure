@@ -3230,7 +3230,9 @@ def search_pull_requests(
     column = model.PullRequest.date_created
 
     if order_key == "last_updated":
-        column = model.PullRequest.last_updated
+        # We actually want to order on updated_on and not last_updated
+        # https://pagure.io/pagure/issue/4464#comment-624915
+        column = model.PullRequest.updated_on
 
     if requestid:
         query = query.filter(model.PullRequest.id == requestid)
