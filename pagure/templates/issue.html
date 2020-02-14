@@ -620,7 +620,7 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
                   namespace=pr.project.namespace,
                   requestid=pr.id) }}">#{{pr.id}}</a>
               {{ pr.status if pr.status != 'Open' else 'Last updated'
-                }} {{ pr.last_updated | humanize }}
+                }} {{ pr.updated_on | humanize }}
             </li>
             {% endfor %}
           </ul>
