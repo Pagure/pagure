@@ -54,6 +54,16 @@ def _get_commits(output):
     return commits
 
 
+MERGED_PATTERN = (
+    re.escape('<span class="text-info font-weight-bold">Merged</span> ')
+    + "(just now|seconds ago)\n"
+    + re.escape(
+        "            </span>\n            by\n"
+        '            <span title="PY C (pingou)">pingou.</span>\n'
+    )
+)
+
+
 def set_up_git_repo(
     session,
     path,
@@ -926,11 +936,8 @@ class PagureFlaskForktests(tests.Modeltests):
 
             # Check if the closing notification was added
             output = self.app.get("/test/pull-request/1")
-            self.assertIn(
-                '<span class="text-info font-weight-bold">Merged</span> just now\n'
-                "            </span>\n            by\n"
-                '            <span title="PY C (pingou)">pingou.</span>\n',
-                output.get_data(as_text=True),
+            self.assertIsNotNone(
+                re.search(MERGED_PATTERN, output.get_data(as_text=True))
             )
 
     @patch("pagure.lib.notify.send_email")
@@ -972,11 +979,8 @@ class PagureFlaskForktests(tests.Modeltests):
 
             # Check if the closing notification was added
             output = self.app.get("/test/pull-request/1")
-            self.assertIn(
-                '<span class="text-info font-weight-bold">Merged</span> just now\n'
-                "            </span>\n            by\n"
-                '            <span title="PY C (pingou)">pingou.</span>\n',
-                output.get_data(as_text=True),
+            self.assertIsNotNone(
+                re.search(MERGED_PATTERN, output.get_data(as_text=True))
             )
 
     @patch("pagure.lib.notify.send_email")
@@ -1028,12 +1032,7 @@ class PagureFlaskForktests(tests.Modeltests):
             # Check if the closing notification was added
             output = self.app.get("/test/pull-request/1")
             output_text = output.get_data(as_text=True)
-            self.assertIn(
-                '<span class="text-info font-weight-bold">Merged</span> just now\n'
-                "            </span>\n            by\n"
-                '            <span title="PY C (pingou)">pingou.</span>\n',
-                output_text,
-            )
+            self.assertIsNotNone(re.search(MERGED_PATTERN, output_text))
             self.assertIn(
                 "Thanks for the review and the suggestions!", output_text
             )
@@ -1218,12 +1217,8 @@ class PagureFlaskForktests(tests.Modeltests):
 
             # Check if the closing notification was added
             output = self.app.get("/test/pull-request/1")
-            self.assertIn(
-                '<span class="text-info font-weight-bold">Merged</span> just now\n'
-                "            </span>\n            by\n"
-                '            <span title="PY C (pingou)">pingou.</span>\n',
-                output.get_data(as_text=True),
-            )
+            output_text = output.get_data(as_text=True)
+            self.assertIsNotNone(re.search(MERGED_PATTERN, output_text))
 
     @patch("pagure.lib.notify.send_email")
     def test_request_pull_close(self, send_email):
@@ -1235,12 +1230,7 @@ class PagureFlaskForktests(tests.Modeltests):
         output = self.app.get("/test/pull-request/1")
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
-
-        self.assertIn(
-            '<span class="text-info font-weight-bold">Merged</span> '
-            "just now\n            </span>\n            by\n",
-            output_text,
-        )
+        self.assertIsNotNone(re.search(MERGED_PATTERN, output_text))
         self.assertIn(
             'title="View file as of 2a552b">sources</a>', output_text
         )
@@ -4348,11 +4338,12 @@ More information</textarea>
                 output_text,
             )
             # Checking if Edited by User is there or not
-            self.assertTrue(
-                "<small>Edited just now by pingou </small>" in output_text
-                or "<small>Edited seconds ago by pingou </small>"
-                in output_text
+            pattern = (
+                re.escape("<small>Edited ")
+                + "(just now|seconds ago)"
+                + re.escape(" by pingou </small>")
             )
+            self.assertIsNotNone(re.search(pattern, output_text))
             self.assertIn("Comment updated", output_text)
 
             #  Project w/o pull-request
@@ -4466,12 +4457,8 @@ More information</textarea>
 
             # Check if the closing notification was added
             output = self.app.get("/test/pull-request/1")
-            self.assertIn(
-                '<span class="text-info font-weight-bold">Merged</span> just now\n'
-                "            </span>\n            by\n"
-                '            <span title="PY C (pingou)">pingou.</span>\n',
-                output.get_data(as_text=True),
-            )
+            output_text = output.get_data(as_text=True)
+            self.assertIsNotNone(re.search(MERGED_PATTERN, output_text))
 
     @patch("pagure.lib.notify.send_email")
     def test_internal_endpoint_main_ahead(self, send_email):
