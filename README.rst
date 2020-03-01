@@ -177,7 +177,7 @@ Manually
                      libjpeg-devel gcc libffi-devel redhat-rpm-config
 
   .. note:: Do note the version of libgit2 that you install, for example
-            in ``libgit2-0.23.4-1`` you need to keep in mind the ``0.23``
+            in ``libgit2-0.26.8-1`` you need to keep in mind the ``0.26``
 
   .. note:: On RHEL and derivative (CentOS, Scientific Linux) there is no
             `python3` package. Just `python36` or `python34` available in
@@ -191,7 +191,7 @@ Manually
 
 * Install dependencies
 
-  * create the virtual environment (use `pytohn3.X` explicitly on EPEL)::
+  * create the virtual environment (use `python3.X` explicitly on EPEL)::
 
       python3 -m venv pagure_env
       source ./pagure_env/bin/activate
@@ -202,7 +202,7 @@ Manually
 
     So in our example::
 
-      pip install pygit2==0.23.*
+      pip install pygit2==0.26.*
 
   * Install the rest of the dependencies::
 
