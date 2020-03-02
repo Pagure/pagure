@@ -465,10 +465,13 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         """
         tests.create_projects(self.session)
 
-        today = datetime.datetime.utcnow().date()
-        # 02-15 on current year could be in the future, so use last year date
-        # always to ensure that 02-15 is not a future date
-        year = today.year - 1
+        today = datetime.datetime.utcnow()
+        # stats/activty returns data for now()-1year time range, so alter
+        # year as needed to select 15th feb of current or previous year
+        if today < datetime.datetime(today.year, 2, 15, 3, 30):
+            year = today.year - 1
+        else:
+            year = today.year
 
         dateobj = datetime.datetime(year, 2, 15, 3, 30)
         utcdate = "%s-02-15" % year
@@ -579,10 +582,13 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         """
         tests.create_projects(self.session)
 
-        today = datetime.datetime.utcnow().date()
-        # 02-15 on current year could be in the future, so use last year date
-        # always to ensure that 02-15 is not a future date
-        year = today.year - 1
+        today = datetime.datetime.utcnow()
+        # stats/activty returns data for now()-1year time range, so alter
+        # year as needed to select 15th feb of current or previous year
+        if today < datetime.datetime(today.year, 2, 15, 3, 30):
+            year = today.year - 1
+        else:
+            year = today.year
 
         dateobj = datetime.datetime(year, 2, 15, 22, 30)
         utcdate = "%s-02-15" % year
