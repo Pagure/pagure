@@ -4202,7 +4202,8 @@ class PagureLibtests(tests.Modeltests):
             markdown_v = markdown.__version__.version_info
         except AttributeError:  # pragma: no cover
             markdown_v = markdown.__version_info__
-        old_markdown = markdown_v < (2, 6, 0)
+        # python-markdown >= 3.2.0 returns to the old behavior on img tag trailing slash
+        old_markdown = markdown_v < (2, 6, 0) or markdown_v >= (3, 2, 0)
 
         texts = [
             "foo bar test#1 see?",
