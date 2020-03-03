@@ -2702,6 +2702,101 @@ class PagureFlaskAppNewProjecttests(tests.Modeltests):
             )
         )
 
+    @patch.dict("pagure.config.config", {"USER_NAMESPACE": True})
+    def test_new_project_user_namespaced(self):
+        """ Test the new_project with a user namespaced enabled.
+        """
+
+        user = tests.FakeUser(username="foo")
+        with tests.user_set(self.app.application, user):
+            output = self.app.get("/new/")
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+
+            csrf_token = self.get_csrf(output=output)
+
+            data = {
+                "description": "Project #1",
+                "name": "project-1",
+                "csrf_token": csrf_token,
+            }
+
+            output = self.app.post("/new/", data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                "<title>Overview - foo/project-1 - Pagure</title>", output_text
+            )
+            self.assertIn(
+                '<div class="projectinfo my-3">\nProject #1', output_text
+            )
+            self.assertIn("<p>This repo is brand new!</p>", output_text)
+
+        # After
+        projects = pagure.lib.query.search_projects(self.session)
+        self.assertEqual(len(projects), 1)
+        self.assertTrue(
+            os.path.exists(
+                os.path.join(self.path, "repos", "foo", "project-1.git")
+            )
+        )
+        self.assertTrue(
+            os.path.exists(
+                os.path.join(
+                    self.path, "repos", "tickets", "foo", "project-1.git"
+                )
+            )
+        )
+        self.assertTrue(
+            os.path.exists(
+                os.path.join(
+                    self.path, "repos", "docs", "foo", "project-1.git"
+                )
+            )
+        )
+        self.assertTrue(
+            os.path.exists(
+                os.path.join(
+                    self.path, "repos", "requests", "foo", "project-1.git"
+                )
+            )
+        )
+
+    @patch.dict("pagure.config.config", {"USER_NAMESPACE": True})
+    def test_new_project_user_namespaced_invalid_user(self):
+        """ Test the new_project with a user namespaced enabled.
+        """
+        tests.create_user(self.session, "docs", "evil docs", ["docs@bar.com"])
+
+        user = tests.FakeUser(username="docs")
+        with tests.user_set(self.app.application, user):
+            output = self.app.get("/new/")
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+
+            csrf_token = self.get_csrf(output=output)
+
+            data = {
+                "description": "Project #1",
+                "name": "project-1",
+                "csrf_token": csrf_token,
+            }
+
+            output = self.app.post("/new/", data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn("<title>New project - Pagure</title>", output_text)
+            self.assertIn(
+                "</i> No project &#34;docs/project-1&#34; are allowed to be "
+                "created due to potential conflicts in URLs with pagure "
+                "itself</div>",
+                output_text,
+            )
+
+        # After
+        projects = pagure.lib.query.search_projects(self.session)
+        self.assertEqual(len(projects), 0)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

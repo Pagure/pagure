@@ -1568,7 +1568,7 @@ class PagureLibtests(tests.Modeltests):
             name="static",
             repospanner_region=None,
             blacklist=["space/*"],
-            allowed_prefix=[],
+            allowed_prefix=["space"],
             description="description for static",
             parent_id=None,
         )

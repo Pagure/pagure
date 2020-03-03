@@ -1621,14 +1621,6 @@ def new_project(
 
     Is an async operation, and returns task ID.
     """
-    ns_name = name if not namespace else "%s/%s" % (namespace, name)
-    matched = any(map(functools.partial(fnmatch.fnmatch, ns_name), blacklist))
-    if matched:
-        raise pagure.exceptions.ProjectBlackListedException(
-            'No project "%s" are allowed to be created due to potential '
-            "conflicts in URLs with pagure itself" % ns_name
-        )
-
     user_obj = get_user(session, user)
     allowed_prefix = allowed_prefix + [grp for grp in user_obj.groups]
     if user_ns:
@@ -1646,6 +1638,15 @@ def new_project(
             "name of a group of which you are a member."
         )
 
+    path = name if not namespace else "%s/%s" % (namespace, name)
+
+    matched = any(map(functools.partial(fnmatch.fnmatch, path), blacklist))
+    if matched:
+        raise pagure.exceptions.ProjectBlackListedException(
+            'No project "%s" are allowed to be created due to potential '
+            "conflicts in URLs with pagure itself" % path
+        )
+
     if len(name) == 40 and prevent_40_chars:
         # We must block project with a name <foo>/<bar> where the length
         # of <bar> is exactly 40 characters long as this would otherwise
@@ -1657,10 +1658,6 @@ def new_project(
             "Your project name cannot have exactly 40 characters after "
             "the `/`"
         )
-
-    path = name
-    if namespace:
-        path = "%s/%s" % (namespace, name)
 
     # Repo exists in the DB
     repo = _get_project(session, name, namespace=namespace)
