@@ -240,31 +240,30 @@ tests_state = {
 }
 
 
+def create_user(session, username, fullname, emails):
+    """ Create an user with the provided information.
+    Note that `emails` should be a list of emails.
+    """
+    user = pagure.lib.model.User(
+        user=username,
+        fullname=fullname,
+        password=b"foo",
+        default_email=emails[0],
+    )
+    session.add(user)
+    session.flush()
+    for email in emails:
+        item = pagure.lib.model.UserEmail(user_id=user.id, email=email)
+        session.add(item)
+    session.commit()
+
+
 def _populate_db(session):
     # Create a couple of users
-    item = pagure.lib.model.User(
-        user="pingou",
-        fullname="PY C",
-        password=b"foo",
-        default_email="bar@pingou.com",
+    create_user(
+        session, "pingou", "PY C", ["bar@pingou.com", "foo@pingou.com"]
     )
-    session.add(item)
-    item = pagure.lib.model.UserEmail(user_id=1, email="bar@pingou.com")
-    session.add(item)
-    item = pagure.lib.model.UserEmail(user_id=1, email="foo@pingou.com")
-    session.add(item)
-
-    item = pagure.lib.model.User(
-        user="foo",
-        fullname="foo bar",
-        password=b"foo",
-        default_email="foo@bar.com",
-    )
-    session.add(item)
-    item = pagure.lib.model.UserEmail(user_id=2, email="foo@bar.com")
-    session.add(item)
-
-    session.commit()
+    create_user(session, "foo", "foo bar", ["foo@bar.com"])
 
 
 def store_eager_results(*args, **kwargs):
