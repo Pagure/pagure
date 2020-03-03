@@ -180,431 +180,6 @@ class PagureFlaskApptests(tests.Modeltests):
             output_text,
         )
 
-    @patch.dict("pagure.config.config", {"ENABLE_UI_NEW_PROJECTS": False})
-    def test_new_project_when_turned_off_in_the_ui(self):
-        """ Test the new_project endpoint when new project creation is
-        not allowed in the UI of this pagure instance. """
-
-        user = tests.FakeUser(username="foo")
-        with tests.user_set(self.app.application, user):
-            output = self.app.get("/new/")
-            self.assertEqual(output.status_code, 404)
-
-            data = {"description": "Project #1", "name": "project-1"}
-
-            output = self.app.post("/new/", data=data, follow_redirects=True)
-            self.assertEqual(output.status_code, 404)
-
-    @patch.dict("pagure.config.config", {"ENABLE_UI_NEW_PROJECTS": False})
-    def test_new_project_button_when_turned_off_in_the_ui_no_project(self):
-        """ Test the index endpoint when new project creation is
-        not allowed in the UI of this pagure instance. """
-
-        user = tests.FakeUser(username="foo")
-        with tests.user_set(self.app.application, user):
-            output = self.app.get("/", follow_redirects=True)
-            self.assertEqual(output.status_code, 200)
-            output_text = output.get_data(as_text=True)
-            self.assertIn(
-                '<h4 class="font-weight-bold mb-0">My Projects</h4>',
-                output_text,
-            )
-            # master template
-            self.assertNotIn(
-                '<span class="oi" data-glyph="plus" title="Create New"',
-                output_text,
-            )
-            # index_auth template
-            self.assertNotIn(
-                'title="Create New Project" aria-hidden="true">', output_text
-            )
-
-    @patch.dict("pagure.config.config", {"ENABLE_UI_NEW_PROJECTS": False})
-    def test_new_project_button_when_turned_off_in_the_ui_w_project(self):
-        """ Test the index endpoint when new project creation is
-        not allowed in the UI of this pagure instance. """
-        tests.create_projects(self.session)
-
-        user = tests.FakeUser(username="pingou")
-        with tests.user_set(self.app.application, user):
-            output = self.app.get("/", follow_redirects=True)
-            self.assertEqual(output.status_code, 200)
-            output_text = output.get_data(as_text=True)
-            self.assertIn(
-                '<h4 class="font-weight-bold mb-0">My Projects</h4>',
-                output_text,
-            )
-            # master template
-            self.assertNotIn(
-                '<span class="oi" data-glyph="plus" title="Create New"',
-                output_text,
-            )
-            # index_auth template
-            self.assertNotIn(
-                'title="Create New Project" aria-hidden="true">', output_text
-            )
-
-    def test_new_project_with_dot(self):
-        """ Test the new_project endpoint when new project contains a dot.
-        """
-        # Before
-        projects = pagure.lib.query.search_projects(self.session)
-        self.assertEqual(len(projects), 0)
-
-        user = tests.FakeUser(username="foo")
-        with tests.user_set(self.app.application, user):
-            csrf_token = self.get_csrf()
-
-            data = {
-                "description": "Project #1.",
-                "name": "project.1",
-                "csrf_token": csrf_token,
-            }
-            output = self.app.post("/new/", data=data, follow_redirects=True)
-            self.assertEqual(output.status_code, 200)
-            output_text = output.get_data(as_text=True)
-            self.assertIn(
-                "<title>Overview - project.1 - Pagure</title>", output_text
-            )
-            self.assertIn(
-                '<a href="/project.1"><strong>project.1</strong></a>',
-                output_text,
-            )
-
-        # After
-        projects = pagure.lib.query.search_projects(self.session)
-        self.assertEqual(len(projects), 1)
-
-    def test_new_project_with_plus(self):
-        """ Test the new_project endpoint when new project contains a plus sign.
-        """
-        # Before
-        projects = pagure.lib.query.search_projects(self.session)
-        self.assertEqual(len(projects), 0)
-
-        user = tests.FakeUser(username="foo")
-        with tests.user_set(self.app.application, user):
-            csrf_token = self.get_csrf()
-
-            data = {
-                "description": "Project #1.",
-                "name": "project+1",
-                "csrf_token": csrf_token,
-            }
-            output = self.app.post("/new/", data=data, follow_redirects=True)
-            self.assertEqual(output.status_code, 200)
-            output_text = output.get_data(as_text=True)
-            self.assertIn(
-                "<title>Overview - project+1 - Pagure</title>", output_text
-            )
-            self.assertTrue(
-                '<a href="/project+1"><strong>project+1</strong></a>'
-                in output_text
-                or '<a href="/project%2B1"><strong>project+1</strong></a>'
-                in output_text
-            )
-
-        # After
-        projects = pagure.lib.query.search_projects(self.session)
-        self.assertEqual(len(projects), 1)
-
-    def test_new_project_when_turned_off(self):
-        """ Test the new_project endpoint when new project creation is
-        not allowed in the pagure instance. """
-
-        # turn the project creation off
-        pagure.config.config["ENABLE_NEW_PROJECTS"] = False
-
-        # Before
-        projects = pagure.lib.query.search_projects(self.session)
-        self.assertEqual(len(projects), 0)
-        self.assertFalse(
-            os.path.exists(os.path.join(self.path, "repos", "project-1.git"))
-        )
-        self.assertFalse(
-            os.path.exists(
-                os.path.join(self.path, "repos", "tickets", "project-1.git")
-            )
-        )
-        self.assertFalse(
-            os.path.exists(
-                os.path.join(self.path, "repos", "docs", "project-1.git")
-            )
-        )
-        self.assertFalse(
-            os.path.exists(
-                os.path.join(self.path, "repos", "requests", "project-1.git")
-            )
-        )
-
-        user = tests.FakeUser()
-        with tests.user_set(self.app.application, user):
-            output = self.app.get("/new/")
-            self.assertEqual(output.status_code, 404)
-
-            # just get the csrf token
-            pagure.config.config["ENABLE_NEW_PROJECTS"] = True
-            output = self.app.get("/new/")
-            pagure.config.config["ENABLE_NEW_PROJECTS"] = False
-
-            csrf_token = (
-                output.get_data(as_text=True)
-                .split('name="csrf_token" type="hidden" value="')[1]
-                .split('">')[0]
-            )
-
-            data = {"description": "Project #1", "name": "project-1"}
-
-        user.username = "foo"
-        with tests.user_set(self.app.application, user):
-            data["csrf_token"] = csrf_token
-            output = self.app.post("/new/", data=data, follow_redirects=True)
-            self.assertEqual(output.status_code, 404)
-
-        # After
-        projects = pagure.lib.query.search_projects(self.session)
-        self.assertEqual(len(projects), 0)
-        self.assertFalse(
-            os.path.exists(os.path.join(self.path, "repos", "project-1.git"))
-        )
-        self.assertFalse(
-            os.path.exists(
-                os.path.join(self.path, "repos", "tickets", "project-1.git")
-            )
-        )
-        self.assertFalse(
-            os.path.exists(
-                os.path.join(self.path, "repos", "docs", "project-1.git")
-            )
-        )
-        self.assertFalse(
-            os.path.exists(
-                os.path.join(self.path, "repos", "requests", "project-1.git")
-            )
-        )
-
-        pagure.config.config["ENABLE_NEW_PROJECTS"] = True
-
-    def test_new_project_mirrored_invalid_url(self):
-        """ Test the new_project with a mirrored repo but an invalid URL. """
-
-        user = tests.FakeUser(username="foo")
-        with tests.user_set(self.app.application, user):
-            output = self.app.get("/new/")
-            self.assertEqual(output.status_code, 200)
-
-            csrf_token = self.get_csrf(output=output)
-
-            data = {
-                "description": "Project #1",
-                "name": "project-1",
-                "mirrored_from": "abcd",
-                "csrf_token": csrf_token,
-            }
-
-            output = self.app.post("/new/", data=data, follow_redirects=True)
-            self.assertEqual(output.status_code, 200)
-            output_text = output.get_data(as_text=True)
-            self.assertIn("<title>New project - Pagure</title>", output_text)
-            self.assertIn("Invalid input.&nbsp;", output_text)
-
-    def test_new_project_mirrored_invalid_sshurl(self):
-        """ Test the new_project with a mirrored repo but an invalid
-        SSH-like url.
-        """
-
-        user = tests.FakeUser(username="foo")
-        with tests.user_set(self.app.application, user):
-            output = self.app.get("/new/")
-            self.assertEqual(output.status_code, 200)
-
-            csrf_token = self.get_csrf(output=output)
-
-            data = {
-                "description": "Project #1",
-                "name": "project-1",
-                "mirrored_from": "ssh://git@server.org/foo/bar.git",
-                "csrf_token": csrf_token,
-            }
-
-            output = self.app.post("/new/", data=data, follow_redirects=True)
-            self.assertEqual(output.status_code, 200)
-            output_text = output.get_data(as_text=True)
-            self.assertIn("<title>New project - Pagure</title>", output_text)
-            self.assertIn("Invalid input.&nbsp;", output_text)
-
-    def test_new_project_mirrored_valid_url(self):
-        """ Test the new_project with a mirrored repo with a valid url. """
-
-        user = tests.FakeUser(username="foo")
-        with tests.user_set(self.app.application, user):
-            output = self.app.get("/new/")
-            self.assertEqual(output.status_code, 200)
-            output_text = output.get_data(as_text=True)
-            self.assertIn(
-                '<strong><label for="mirrored_from">Mirror from URL'
-                "</label></strong>",
-                output_text,
-            )
-
-            csrf_token = self.get_csrf(output=output)
-
-            data = {
-                "description": "Project #1",
-                "name": "project-1",
-                "mirrored_from": "https://example.com/foo/bar.git",
-                "csrf_token": csrf_token,
-            }
-
-            output = self.app.post("/new/", data=data, follow_redirects=True)
-            self.assertEqual(output.status_code, 200)
-            output_text = output.get_data(as_text=True)
-            self.assertIn(
-                "<title>Overview - project-1 - Pagure</title>", output_text
-            )
-            self.assertIn(
-                "<p>This repo is brand new and meant to be mirrored from "
-                "https://example.com/foo/bar.git !</p>",
-                output_text,
-            )
-
-    @patch.dict("pagure.config.config", {"DISABLE_MIRROR_IN": True})
-    def test_new_project_mirrored_mirror_disabled(self):
-        """ Test the new_project with a mirrored repo when that feature is
-        disabled.
-        """
-
-        user = tests.FakeUser(username="foo")
-        with tests.user_set(self.app.application, user):
-            output = self.app.get("/new/")
-            self.assertEqual(output.status_code, 200)
-            output_text = output.get_data(as_text=True)
-            self.assertNotIn(
-                '<strong><label for="mirrored_from">Mirror from URL'
-                "</label></strong>",
-                output_text,
-            )
-
-            csrf_token = self.get_csrf(output=output)
-
-            data = {
-                "description": "Project #1",
-                "name": "project-1",
-                "mirrored_from": "https://example.com/foo/bar.git",
-                "csrf_token": csrf_token,
-            }
-
-            output = self.app.post("/new/", data=data, follow_redirects=True)
-            self.assertEqual(output.status_code, 200)
-            output_text = output.get_data(as_text=True)
-            self.assertIn("<title>New project - Pagure</title>", output_text)
-            self.assertIn(
-                "</i> Mirroring in projects has been disabled in "
-                "this instance</div>",
-                output_text,
-            )
-
-    def test_new_project(self):
-        """ Test the new_project endpoint. """
-        # Before
-        projects = pagure.lib.query.search_projects(self.session)
-        self.assertEqual(len(projects), 0)
-        self.assertFalse(
-            os.path.exists(os.path.join(self.path, "repos", "project#1.git"))
-        )
-        self.assertFalse(
-            os.path.exists(
-                os.path.join(self.path, "repos", "tickets", "project#1.git")
-            )
-        )
-        self.assertFalse(
-            os.path.exists(
-                os.path.join(self.path, "repos", "docs", "project#1.git")
-            )
-        )
-        self.assertFalse(
-            os.path.exists(
-                os.path.join(self.path, "repos", "requests", "project#1.git")
-            )
-        )
-
-        user = tests.FakeUser()
-        with tests.user_set(self.app.application, user):
-            output = self.app.get("/new/")
-            self.assertEqual(output.status_code, 200)
-            output_text = output.get_data(as_text=True)
-            self.assertIn("<strong>Create new Project</strong>", output_text)
-
-            csrf_token = output_text.split(
-                'name="csrf_token" type="hidden" value="'
-            )[1].split('">')[0]
-
-            data = {"description": "Project #1"}
-
-            output = self.app.post("/new/", data=data)
-            self.assertEqual(output.status_code, 200)
-            output_text = output.get_data(as_text=True)
-            self.assertIn("<strong>Create new Project</strong>", output_text)
-            self.assertIn(
-                "<small>\n            This field is required.&nbsp;\n"
-                "          </small>",
-                output_text,
-            )
-
-            data["name"] = "project-1"
-            output = self.app.post("/new/", data=data)
-            self.assertEqual(output.status_code, 200)
-            output_text = output.get_data(as_text=True)
-            self.assertIn("<strong>Create new Project</strong>", output_text)
-            self.assertNotIn(
-                "<small>\n            This field is required.&nbsp;\n"
-                "          </small>",
-                output_text,
-            )
-
-            data["csrf_token"] = csrf_token
-            output = self.app.post("/new/", data=data)
-            self.assertEqual(output.status_code, 200)
-            output_text = output.get_data(as_text=True)
-            self.assertIn("<strong>Create new Project</strong>", output_text)
-            self.assertIn("No user " "&#34;username&#34; found", output_text)
-
-        user.username = "foo"
-        with tests.user_set(self.app.application, user):
-            data["csrf_token"] = csrf_token
-            output = self.app.post("/new/", data=data, follow_redirects=True)
-            self.assertEqual(output.status_code, 200)
-            output_text = output.get_data(as_text=True)
-            self.assertIn(
-                '<div class="projectinfo my-3">\nProject #1', output_text
-            )
-            self.assertIn("<p>This repo is brand new!</p>", output_text)
-            self.assertIn(
-                "<title>Overview - project-1 - Pagure</title>", output_text
-            )
-
-        # After
-        projects = pagure.lib.query.search_projects(self.session)
-        self.assertEqual(len(projects), 1)
-        self.assertTrue(
-            os.path.exists(os.path.join(self.path, "repos", "project-1.git"))
-        )
-        self.assertTrue(
-            os.path.exists(
-                os.path.join(self.path, "repos", "tickets", "project-1.git")
-            )
-        )
-        self.assertTrue(
-            os.path.exists(
-                os.path.join(self.path, "repos", "docs", "project-1.git")
-            )
-        )
-        self.assertTrue(
-            os.path.exists(
-                os.path.join(self.path, "repos", "requests", "project-1.git")
-            )
-        )
-
     @patch.dict(
         "pagure.config.config",
         {
@@ -1116,7 +691,6 @@ class PagureFlaskApptests(tests.Modeltests):
     def test_user_settings(self, ast):
         """ Test the user_settings endpoint. """
         ast.return_value = False
-        self.test_new_project()
 
         user = tests.FakeUser()
         with tests.user_set(self.app.application, user):
@@ -1455,7 +1029,6 @@ class PagureFlaskApptests(tests.Modeltests):
     def test_remove_user_email(self, ast):
         """ Test the remove_user_email endpoint. """
         ast.return_value = False
-        self.test_new_project()
 
         user = tests.FakeUser()
         with tests.user_set(self.app.application, user):
@@ -1557,7 +1130,6 @@ class PagureFlaskApptests(tests.Modeltests):
         """ Test the add_api_user_email endpoint. """
         send_email.return_value = True
         ast.return_value = False
-        self.test_new_project()
 
         user = tests.FakeUser()
         with tests.user_set(self.app.application, user):
@@ -1693,7 +1265,6 @@ class PagureFlaskApptests(tests.Modeltests):
         """ Test the set_default_email endpoint. """
         send_email.return_value = True
         ast.return_value = False
-        self.test_new_project()
 
         user = tests.FakeUser()
         with tests.user_set(self.app.application, user):
@@ -1771,7 +1342,6 @@ class PagureFlaskApptests(tests.Modeltests):
         """ Test the reconfirm_email endpoint. """
         send_email.return_value = True
         ast.return_value = False
-        self.test_new_project()
 
         # Add a pending email to pingou
         userobj = pagure.lib.query.search_user(self.session, username="pingou")
@@ -2189,7 +1759,6 @@ class PagureFlaskApptests(tests.Modeltests):
     def test_add_user_token(self, ast):
         """ Test the add_user_token endpoint. """
         ast.return_value = False
-        self.test_new_project()
 
         user = tests.FakeUser()
         with tests.user_set(self.app.application, user):
@@ -2282,7 +1851,6 @@ class PagureFlaskApptests(tests.Modeltests):
     def test_revoke_api_user_token(self, ast):
         """ Test the revoke_api_user_token endpoint. """
         ast.return_value = False
-        self.test_new_project()
 
         user = tests.FakeUser()
         with tests.user_set(self.app.application, user):
@@ -2699,6 +2267,440 @@ class PagureFlaskAppRenewUserApiTokentests(tests.Modeltests):
             self.assertEqual(
                 userobj.tokens[0].description, userobj.tokens[1].description
             )
+
+
+class PagureFlaskAppNewProjecttests(tests.Modeltests):
+    """ Tests creating new project via the flask app controller of pagure """
+
+    def setUp(self):
+        """ Setup the environment. """
+        super(PagureFlaskAppNewProjecttests, self).setUp()
+
+        # Before
+        projects = pagure.lib.query.search_projects(self.session)
+        self.assertEqual(len(projects), 0)
+        self.assertFalse(
+            os.path.exists(os.path.join(self.path, "repos", "project#1.git"))
+        )
+        self.assertFalse(
+            os.path.exists(
+                os.path.join(self.path, "repos", "tickets", "project#1.git")
+            )
+        )
+        self.assertFalse(
+            os.path.exists(
+                os.path.join(self.path, "repos", "docs", "project#1.git")
+            )
+        )
+        self.assertFalse(
+            os.path.exists(
+                os.path.join(self.path, "repos", "requests", "project#1.git")
+            )
+        )
+
+    @patch.dict("pagure.config.config", {"ENABLE_UI_NEW_PROJECTS": False})
+    def test_new_project_when_turned_off_in_the_ui(self):
+        """ Test the new_project endpoint when new project creation is
+        not allowed in the UI of this pagure instance. """
+
+        user = tests.FakeUser(username="foo")
+        with tests.user_set(self.app.application, user):
+            output = self.app.get("/new/")
+            self.assertEqual(output.status_code, 404)
+
+            data = {"description": "Project #1", "name": "project-1"}
+
+            output = self.app.post("/new/", data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+    @patch.dict("pagure.config.config", {"ENABLE_UI_NEW_PROJECTS": False})
+    def test_new_project_button_when_turned_off_in_the_ui_no_project(self):
+        """ Test the index endpoint when new project creation is
+        not allowed in the UI of this pagure instance. """
+
+        user = tests.FakeUser(username="foo")
+        with tests.user_set(self.app.application, user):
+            output = self.app.get("/", follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<h4 class="font-weight-bold mb-0">My Projects</h4>',
+                output_text,
+            )
+            # master template
+            self.assertNotIn(
+                '<span class="oi" data-glyph="plus" title="Create New"',
+                output_text,
+            )
+            # index_auth template
+            self.assertNotIn(
+                'title="Create New Project" aria-hidden="true">', output_text
+            )
+
+    @patch.dict("pagure.config.config", {"ENABLE_UI_NEW_PROJECTS": False})
+    def test_new_project_button_when_turned_off_in_the_ui_w_project(self):
+        """ Test the index endpoint when new project creation is
+        not allowed in the UI of this pagure instance. """
+        tests.create_projects(self.session)
+
+        user = tests.FakeUser(username="pingou")
+        with tests.user_set(self.app.application, user):
+            output = self.app.get("/", follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<h4 class="font-weight-bold mb-0">My Projects</h4>',
+                output_text,
+            )
+            # master template
+            self.assertNotIn(
+                '<span class="oi" data-glyph="plus" title="Create New"',
+                output_text,
+            )
+            # index_auth template
+            self.assertNotIn(
+                'title="Create New Project" aria-hidden="true">', output_text
+            )
+
+    def test_new_project_with_dot(self):
+        """ Test the new_project endpoint when new project contains a dot.
+        """
+        # Before
+        projects = pagure.lib.query.search_projects(self.session)
+        self.assertEqual(len(projects), 0)
+
+        user = tests.FakeUser(username="foo")
+        with tests.user_set(self.app.application, user):
+            csrf_token = self.get_csrf()
+
+            data = {
+                "description": "Project #1.",
+                "name": "project.1",
+                "csrf_token": csrf_token,
+            }
+            output = self.app.post("/new/", data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                "<title>Overview - project.1 - Pagure</title>", output_text
+            )
+            self.assertIn(
+                '<a href="/project.1"><strong>project.1</strong></a>',
+                output_text,
+            )
+
+        # After
+        projects = pagure.lib.query.search_projects(self.session)
+        self.assertEqual(len(projects), 1)
+
+    def test_new_project_with_plus(self):
+        """ Test the new_project endpoint when new project contains a plus sign.
+        """
+        # Before
+        projects = pagure.lib.query.search_projects(self.session)
+        self.assertEqual(len(projects), 0)
+
+        user = tests.FakeUser(username="foo")
+        with tests.user_set(self.app.application, user):
+            csrf_token = self.get_csrf()
+
+            data = {
+                "description": "Project #1.",
+                "name": "project+1",
+                "csrf_token": csrf_token,
+            }
+            output = self.app.post("/new/", data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                "<title>Overview - project+1 - Pagure</title>", output_text
+            )
+            self.assertTrue(
+                '<a href="/project+1"><strong>project+1</strong></a>'
+                in output_text
+                or '<a href="/project%2B1"><strong>project+1</strong></a>'
+                in output_text
+            )
+
+        # After
+        projects = pagure.lib.query.search_projects(self.session)
+        self.assertEqual(len(projects), 1)
+
+    def test_new_project_when_turned_off(self):
+        """ Test the new_project endpoint when new project creation is
+        not allowed in the pagure instance. """
+
+        # turn the project creation off
+        pagure.config.config["ENABLE_NEW_PROJECTS"] = False
+
+        # Before
+        projects = pagure.lib.query.search_projects(self.session)
+        self.assertEqual(len(projects), 0)
+        self.assertFalse(
+            os.path.exists(os.path.join(self.path, "repos", "project-1.git"))
+        )
+        self.assertFalse(
+            os.path.exists(
+                os.path.join(self.path, "repos", "tickets", "project-1.git")
+            )
+        )
+        self.assertFalse(
+            os.path.exists(
+                os.path.join(self.path, "repos", "docs", "project-1.git")
+            )
+        )
+        self.assertFalse(
+            os.path.exists(
+                os.path.join(self.path, "repos", "requests", "project-1.git")
+            )
+        )
+
+        user = tests.FakeUser()
+        with tests.user_set(self.app.application, user):
+            output = self.app.get("/new/")
+            self.assertEqual(output.status_code, 404)
+
+            # just get the csrf token
+            pagure.config.config["ENABLE_NEW_PROJECTS"] = True
+            output = self.app.get("/new/")
+            pagure.config.config["ENABLE_NEW_PROJECTS"] = False
+
+            csrf_token = (
+                output.get_data(as_text=True)
+                .split('name="csrf_token" type="hidden" value="')[1]
+                .split('">')[0]
+            )
+
+            data = {"description": "Project #1", "name": "project-1"}
+
+        user.username = "foo"
+        with tests.user_set(self.app.application, user):
+            data["csrf_token"] = csrf_token
+            output = self.app.post("/new/", data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+        # After
+        projects = pagure.lib.query.search_projects(self.session)
+        self.assertEqual(len(projects), 0)
+        self.assertFalse(
+            os.path.exists(os.path.join(self.path, "repos", "project-1.git"))
+        )
+        self.assertFalse(
+            os.path.exists(
+                os.path.join(self.path, "repos", "tickets", "project-1.git")
+            )
+        )
+        self.assertFalse(
+            os.path.exists(
+                os.path.join(self.path, "repos", "docs", "project-1.git")
+            )
+        )
+        self.assertFalse(
+            os.path.exists(
+                os.path.join(self.path, "repos", "requests", "project-1.git")
+            )
+        )
+
+        pagure.config.config["ENABLE_NEW_PROJECTS"] = True
+
+    def test_new_project_mirrored_invalid_url(self):
+        """ Test the new_project with a mirrored repo but an invalid URL. """
+
+        user = tests.FakeUser(username="foo")
+        with tests.user_set(self.app.application, user):
+            output = self.app.get("/new/")
+            self.assertEqual(output.status_code, 200)
+
+            csrf_token = self.get_csrf(output=output)
+
+            data = {
+                "description": "Project #1",
+                "name": "project-1",
+                "mirrored_from": "abcd",
+                "csrf_token": csrf_token,
+            }
+
+            output = self.app.post("/new/", data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn("<title>New project - Pagure</title>", output_text)
+            self.assertIn("Invalid input.&nbsp;", output_text)
+
+    def test_new_project_mirrored_invalid_sshurl(self):
+        """ Test the new_project with a mirrored repo but an invalid
+        SSH-like url.
+        """
+
+        user = tests.FakeUser(username="foo")
+        with tests.user_set(self.app.application, user):
+            output = self.app.get("/new/")
+            self.assertEqual(output.status_code, 200)
+
+            csrf_token = self.get_csrf(output=output)
+
+            data = {
+                "description": "Project #1",
+                "name": "project-1",
+                "mirrored_from": "ssh://git@server.org/foo/bar.git",
+                "csrf_token": csrf_token,
+            }
+
+            output = self.app.post("/new/", data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn("<title>New project - Pagure</title>", output_text)
+            self.assertIn("Invalid input.&nbsp;", output_text)
+
+    def test_new_project_mirrored_valid_url(self):
+        """ Test the new_project with a mirrored repo with a valid url. """
+
+        user = tests.FakeUser(username="foo")
+        with tests.user_set(self.app.application, user):
+            output = self.app.get("/new/")
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<strong><label for="mirrored_from">Mirror from URL'
+                "</label></strong>",
+                output_text,
+            )
+
+            csrf_token = self.get_csrf(output=output)
+
+            data = {
+                "description": "Project #1",
+                "name": "project-1",
+                "mirrored_from": "https://example.com/foo/bar.git",
+                "csrf_token": csrf_token,
+            }
+
+            output = self.app.post("/new/", data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                "<title>Overview - project-1 - Pagure</title>", output_text
+            )
+            self.assertIn(
+                "<p>This repo is brand new and meant to be mirrored from "
+                "https://example.com/foo/bar.git !</p>",
+                output_text,
+            )
+
+    @patch.dict("pagure.config.config", {"DISABLE_MIRROR_IN": True})
+    def test_new_project_mirrored_mirror_disabled(self):
+        """ Test the new_project with a mirrored repo when that feature is
+        disabled.
+        """
+
+        user = tests.FakeUser(username="foo")
+        with tests.user_set(self.app.application, user):
+            output = self.app.get("/new/")
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertNotIn(
+                '<strong><label for="mirrored_from">Mirror from URL'
+                "</label></strong>",
+                output_text,
+            )
+
+            csrf_token = self.get_csrf(output=output)
+
+            data = {
+                "description": "Project #1",
+                "name": "project-1",
+                "mirrored_from": "https://example.com/foo/bar.git",
+                "csrf_token": csrf_token,
+            }
+
+            output = self.app.post("/new/", data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn("<title>New project - Pagure</title>", output_text)
+            self.assertIn(
+                "</i> Mirroring in projects has been disabled in "
+                "this instance</div>",
+                output_text,
+            )
+
+    def test_new_project(self):
+        """ Test the new_project endpoint. """
+
+        user = tests.FakeUser()
+        with tests.user_set(self.app.application, user):
+            output = self.app.get("/new/")
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn("<strong>Create new Project</strong>", output_text)
+
+            csrf_token = output_text.split(
+                'name="csrf_token" type="hidden" value="'
+            )[1].split('">')[0]
+
+            data = {"description": "Project #1"}
+
+            output = self.app.post("/new/", data=data)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn("<strong>Create new Project</strong>", output_text)
+            self.assertIn(
+                "<small>\n            This field is required.&nbsp;\n"
+                "          </small>",
+                output_text,
+            )
+
+            data["name"] = "project-1"
+            output = self.app.post("/new/", data=data)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn("<strong>Create new Project</strong>", output_text)
+            self.assertNotIn(
+                "<small>\n            This field is required.&nbsp;\n"
+                "          </small>",
+                output_text,
+            )
+
+            data["csrf_token"] = csrf_token
+            output = self.app.post("/new/", data=data)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn("<strong>Create new Project</strong>", output_text)
+            self.assertIn("No user " "&#34;username&#34; found", output_text)
+
+        user.username = "foo"
+        with tests.user_set(self.app.application, user):
+            data["csrf_token"] = csrf_token
+            output = self.app.post("/new/", data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<div class="projectinfo my-3">\nProject #1', output_text
+            )
+            self.assertIn("<p>This repo is brand new!</p>", output_text)
+            self.assertIn(
+                "<title>Overview - project-1 - Pagure</title>", output_text
+            )
+
+        # After
+        projects = pagure.lib.query.search_projects(self.session)
+        self.assertEqual(len(projects), 1)
+        self.assertTrue(
+            os.path.exists(os.path.join(self.path, "repos", "project-1.git"))
+        )
+        self.assertTrue(
+            os.path.exists(
+                os.path.join(self.path, "repos", "tickets", "project-1.git")
+            )
+        )
+        self.assertTrue(
+            os.path.exists(
+                os.path.join(self.path, "repos", "docs", "project-1.git")
+            )
+        )
+        self.assertTrue(
+            os.path.exists(
+                os.path.join(self.path, "repos", "requests", "project-1.git")
+            )
+        )
 
 
 if __name__ == "__main__":
