@@ -311,7 +311,9 @@ BLACKLISTED_PROJECTS = [
     "c",
     "wait",
     "dashboard",
-    "docs/*, tickets/*, requests/*",
+    "docs/*",
+    "tickets/*",
+    "requests/*",
 ]
 
 # List of prefix allowed in project names
