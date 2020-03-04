@@ -353,6 +353,7 @@ ACLS = {
     ),
     "update_watch_status": "Update the watch status on a project",
     "pull_request_rebase": "Rebase a pull-request",
+    "tag_project": "Allows adding git tags to a project",
 }
 
 # List of ACLs which a regular user is allowed to associate to an API token
@@ -385,6 +386,7 @@ ADMIN_API_ACLS = [
     "generate_acls_project",
     "commit_flag",
     "create_branch",
+    "tag_project",
 ]
 
 # List of the type of CI service supported by this pagure instance

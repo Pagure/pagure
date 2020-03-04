@@ -688,26 +688,35 @@ def create_projects_git(folder, bare=False):
     return repos
 
 
-def create_tokens(session, user_id=1, project_id=1):
+def create_tokens(session, user_id=1, project_id=1, suffix=None):
     """ Create some tokens for the project in the database. """
+    token = "aaabbbcccddd"
+    if suffix:
+        token += suffix
     item = pagure.lib.model.Token(
-        id="aaabbbcccddd",
+        id=token,
         user_id=user_id,
         project_id=project_id,
         expiration=datetime.utcnow() + timedelta(days=30),
     )
     session.add(item)
 
+    token = "foo_token"
+    if suffix:
+        token += suffix
     item = pagure.lib.model.Token(
-        id="foo_token",
+        id=token,
         user_id=user_id,
         project_id=project_id,
         expiration=datetime.utcnow() + timedelta(days=30),
     )
     session.add(item)
 
+    token = "expired_token"
+    if suffix:
+        token += suffix
     item = pagure.lib.model.Token(
-        id="expired_token",
+        id=token,
         user_id=user_id,
         project_id=project_id,
         expiration=datetime.utcnow() - timedelta(days=1),

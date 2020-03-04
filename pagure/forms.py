@@ -931,3 +931,18 @@ class TriggerCIPRForm(PagureForm):
     comment = wtforms.SelectField(
         "comment", [wtforms.validators.Required()], choices=[]
     )
+
+
+class AddGitTagForm(PagureForm):
+    """ Form to create a new git tag. """
+
+    tagname = wtforms.StringField(
+        'Name of the tag<span class="error">*</span>',
+        [wtforms.validators.DataRequired()],
+    )
+    commit_hash = wtforms.StringField(
+        "Hash of the commit to tag", [wtforms.validators.DataRequired()]
+    )
+    message = wtforms.TextAreaField(
+        "Annotation message", [wtforms.validators.Optional()]
+    )

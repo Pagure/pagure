@@ -344,6 +344,107 @@ def api_git_tags(repo, username=None, namespace=None):
     return jsonout
 
 
+@API.route("/<repo>/git/tags", methods=["POST"])
+@API.route("/<namespace>/<repo>/git/tags", methods=["POST"])
+@API.route("/fork/<username>/<repo>/git/tags", methods=["POST"])
+@API.route("/fork/<username>/<namespace>/<repo>/git/tags", methods=["POST"])
+@api_login_required(acls=["modify_project", "tag_project"])
+@api_method
+def api_new_git_tags(repo, username=None, namespace=None):
+    """
+    Create new git tags
+    -------------------
+    Create a new tag on the project Git repository.
+
+    ::
+
+        POST /api/0/<repo>/git/tags
+        POST /api/0/<namespace>/<repo>/git/tags
+
+    ::
+
+        POST /api/0/fork/<username>/<repo>/git/tags
+        POST /api/0/fork/<username>/<namespace>/<repo>/git/tags
+
+    Parameters
+    ^^^^^^^^^^
+
+    +-----------------+----------+---------------+--------------------------+
+    | Key             | Type     | Optionality   | Description              |
+    +=================+==========+===============+==========================+
+    | ``tagname``     | string   | Mandatory     | | Name of the tag to     |
+    |                 |          |               |   create in the git repo |
+    +-----------------+----------+---------------+--------------------------+
+    | ``commit_hash`` | string   | Mandatory     | | Hash of the commit/    |
+    |                 |          |               |   reference to tag       |
+    +-----------------+----------+---------------+--------------------------+
+    | ``message``     | string   | Optional      | | Message to include in  |
+    |                 |          |               |   the annotation of the  |
+    |                 |          |               |   git tag                |
+    +-----------------+----------+---------------+--------------------------+
+    | ``with_commits``| string   | Optional      | | Include the commit hash|
+    |                 |          |               |   corresponding to the   |
+    |                 |          |               |   tags found in the repo |
+    |                 |          |               |   in the data returned   |
+    +-----------------+----------+---------------+--------------------------+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "total_tags": 2,
+          "tags": ["0.0.1", "0.0.2"],
+        }
+
+
+        {
+          "total_tags": 2,
+          "tags": {
+            "0.0.1": "bb8fa2aa199da08d6085e1c9badc3d83d188d38c",
+            "0.0.2": "d16fe107eca31a1bdd66fb32c6a5c568e45b627e"
+          },
+        }
+
+    """
+    repo = _get_repo(repo, username, namespace)
+    _check_token(repo, project_token=False)
+
+    with_commits = pagure.utils.is_true(
+        flask.request.values.get("with_commits", False)
+    )
+
+    form = pagure.forms.AddGitTagForm(csrf_enabled=False)
+    if form.validate_on_submit():
+        user_obj = pagure.lib.query.get_user(
+            flask.g.session, flask.g.fas_user.username
+        )
+        try:
+            pagure.lib.git.new_git_tag(
+                project=repo,
+                tagname=form.tagname.data,
+                target=form.commit_hash.data,
+                user=user_obj,
+                message=form.message.data,
+            )
+        except GitError as err:
+            _log.exception(err)
+            raise pagure.exceptions.APIError(
+                400, error_code=APIERROR.EGITERROR, error=str(err)
+            )
+
+    else:
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.EINVALIDREQ, errors=form.errors
+        )
+
+    tags = pagure.lib.git.get_git_tags(repo, with_commits=with_commits)
+
+    jsonout = flask.jsonify({"total_tags": len(tags), "tags": tags})
+    return jsonout
+
+
 @API.route("/<repo>/watchers")
 @API.route("/<namespace>/<repo>/watchers")
 @API.route("/fork/<username>/<repo>/watchers")

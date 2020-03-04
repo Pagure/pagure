@@ -5650,6 +5650,7 @@ foo bar
                 "pull_request_rebase",
                 "pull_request_subscribe",
                 "pull_request_update",
+                "tag_project",
                 "update_watch_status",
             ],
         )
