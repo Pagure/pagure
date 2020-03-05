@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014-2016 - Copyright Red Hat Inc
+ (c) 2014-2020 - Copyright Red Hat Inc
 
  Authors:
    Ralph Bean <rbean@redhat.com>
    Pierre-Yves Chibon <pingou@pingoured.fr>
+   Julen Landa Alustiza <jlanda@fedoraproject.org>
 
 """
 
@@ -125,3 +126,25 @@ def load_doc(endpoint):
 
     api_docs = markupsafe.Markup(api_docs)
     return api_docs
+
+
+def load_doc_title(endpoint):
+    """ Utility to load docstring title from a method """
+    rst = modify_rst(textwrap.dedent(endpoint.__doc__))
+
+    parts = docutils.examples.html_parts(rst)
+    fragment = parts["title"]
+
+    return fragment
+
+
+def load_doc_title_and_name(endpoint):
+    """ Utility to load the HTML doc version and the title from a method. """
+
+    result = {
+        "doc": load_doc(endpoint),
+        "title": load_doc_title(endpoint),
+        "name": endpoint.__name__,
+    }
+
+    return result
