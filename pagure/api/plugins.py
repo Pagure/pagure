@@ -345,7 +345,7 @@ def api_view_plugins():
                 },
             ],
             'total_issues': 3
-    }
+        }
 
     """
     plugins = plugins_lib.get_plugin_names()
