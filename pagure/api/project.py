@@ -288,8 +288,8 @@ def api_project_tag_delete(repo, tag, username=None, namespace=None):
 @api_method
 def api_git_tags(repo, username=None, namespace=None):
     """
-    Project git tags
-    ----------------
+    List git tags
+    -------------
     List the tags made on the project Git repository.
 
     ::
@@ -598,8 +598,8 @@ def api_project_git_urls(repo, username=None, namespace=None):
 @api_method
 def api_git_branches(repo, username=None, namespace=None):
     """
-    List project branches
-    ---------------------
+    List git branches
+    -----------------
     List the branches associated with a Pagure git repository
 
     ::
@@ -1524,8 +1524,8 @@ def api_generate_acls(repo, username=None, namespace=None):
 @api_method
 def api_new_branch(repo, username=None, namespace=None):
     """
-    Create a new git branch on a project
-    ------------------------------------
+    Create a new git branch
+    -----------------------
     Create a new git branch on a project
 
     ::
