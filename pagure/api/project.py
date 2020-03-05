@@ -254,6 +254,7 @@ def api_project_tag_delete(repo, tag, username=None, namespace=None):
     ^^^^^^^^^^^^^^^
 
     ::
+
         {
             "message": "Tag blue has been deleted"
         }
