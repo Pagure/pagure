@@ -175,20 +175,5 @@
     </script>
     {% endblock %}
 
-{% if config['FEDMENU_URL'] %}
-<script type="text/javascript" nonce="{{ g.nonce }}" src="{{ config['FEDMENU_URL'] }}/js/fedmenu.js"></script>
-<script type="text/javascript" nonce="{{ g.nonce }}" src="{{ config['FEDMENU_URL'] }}/js/fedora-libravatar.js"></script>
-<script type="text/javascript" nonce="{{ g.nonce }}">
-  fedmenu({
-    'url': '{{ config["FEDMENU_DATA_URL"] }}',
-    'mimeType': 'application/javascript',
-    'position': 'bottom-right',
-    {% if user -%}
-    'user': '{{ user.username }}',
-    {%- endif %}
-  });
-</script>
-{% endif %}
-
 </body>
 </html>
