@@ -8,11 +8,11 @@ On December 2, 2019 (release 5.8.1) the list looks as follow:
 =================  ===========
 Number of commits  Contributor
 =================  ===========
-  6672              Pierre-Yves Chibon <pingou@pingoured.fr>
+  6674              Pierre-Yves Chibon <pingou@pingoured.fr>
    328              Ryan Lerch <rlerch@redhat.com>
    172              Vivek Anand <vivekanand1101@gmail.com>
+   140              Julen Landa Alustiza <jlanda@fedoraproject.org>
    139              farhaanbukhsh <farhaan.bukhsh@gmail.com>
-   135              Julen Landa Alustiza <jlanda@fedoraproject.org>
    134              Clement Verna <cverna@tutanota.com>
    133              Patrick Uiterwijk <puiterwijk@redhat.com>
     98              Patrick Uiterwijk <patrick@puiterwijk.org>
