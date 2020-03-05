@@ -1,6 +1,17 @@
 Upgrading Pagure
 ================
 
+From 5.8 to 5.9
+---------------
+
+The 5.9 release does not contain any database schema changes.
+
+
+New configuration key added:
+
+* SSH_ACCESS_GROUPS
+
+
 From 5.7 to 5.8
 ---------------
 
