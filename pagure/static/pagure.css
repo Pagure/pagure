@@ -534,3 +534,19 @@ th[data-sort] {
   display: inline;
   position: relative;
 }
+
+.api-doc .accordion {
+  padding-bottom: 13px;
+}
+
+.api-doc nav {
+  height: 100%;
+}
+
+.api-doc .nav-sidetabs {
+  border-bottom: 0;
+}
+
+.api-doc .card-body h2.title {
+  display: none;
+}

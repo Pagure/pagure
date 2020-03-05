@@ -33,7 +33,11 @@ API = flask.Blueprint("api_ns", __name__, url_prefix="/api/0")
 import pagure.lib.query  # noqa: E402
 import pagure.lib.tasks  # noqa: E402
 from pagure.config import config as pagure_config  # noqa: E402
-from pagure.doc_utils import load_doc, modify_rst, modify_html  # noqa: E402
+from pagure.doc_utils import (
+    load_doc_title_and_name,
+    modify_rst,
+    modify_html,
+)  # noqa: E402
 from pagure.exceptions import APIError  # noqa: E402
 from pagure.utils import authenticated, check_api_acls  # noqa: E402
 
@@ -57,6 +61,17 @@ def preload_docs(endpoint):
 
 
 APIDOC = preload_docs("api")
+
+
+def build_docs_section(name, endpoints):
+    """ Utility to build a documentation section to feed the template. """
+
+    result = {"name": name, "endpoints": []}
+
+    for endpoint in endpoints:
+        result["endpoints"].append(load_doc_title_and_name(endpoint))
+
+    return result
 
 
 class APIERROR(enum.Enum):
@@ -492,160 +507,109 @@ def api_error_codes():
 @API.route("/")
 def api():
     """ Display the api information page. """
-    api_project_doc = load_doc(project.api_project)
-    api_projects_doc = load_doc(project.api_projects)
-    api_project_watchers_doc = load_doc(project.api_project_watchers)
-    api_project_tags_doc = load_doc(project.api_project_tags)
-    api_project_tags_new_doc = load_doc(project.api_project_tags_new)
-    api_project_tag_delete_doc = load_doc(project.api_project_tag_delete)
-    api_git_tags_doc = load_doc(project.api_git_tags)
-    api_project_git_urls_doc = load_doc(project.api_project_git_urls)
-    api_git_branches_doc = load_doc(project.api_git_branches)
-    api_new_project_doc = load_doc(project.api_new_project)
-    api_modify_project_doc = load_doc(project.api_modify_project)
-    api_fork_project_doc = load_doc(project.api_fork_project)
-    api_modify_acls_doc = load_doc(project.api_modify_acls)
-    api_generate_acls_doc = load_doc(project.api_generate_acls)
-    api_new_branch_doc = load_doc(project.api_new_branch)
-    api_commit_flags_doc = load_doc(project.api_commit_flags)
-    api_commit_add_flag_doc = load_doc(project.api_commit_add_flag)
-    api_update_project_watchers_doc = load_doc(
-        project.api_update_project_watchers
-    )
-    api_get_project_options_doc = load_doc(project.api_get_project_options)
-    api_modify_project_options_doc = load_doc(
-        project.api_modify_project_options
-    )
-    api_project_block_user_doc = load_doc(project.api_project_block_user)
-    api_get_project_webhook_token_doc = load_doc(
-        project.api_get_project_webhook_token
-    )
 
-    issues = []
+    sections = []
+
+    projects_methods = [
+        project.api_new_project,
+        project.api_modify_project,
+        project.api_project,
+        project.api_projects,
+        project.api_project_tags,
+        project.api_project_tags_new,
+        project.api_project_tag_delete,
+        project.api_git_tags,
+        project.api_new_git_tags,
+        project.api_project_git_urls,
+        project.api_project_watchers,
+        project.api_git_branches,
+        project.api_new_branch,
+        project.api_fork_project,
+        project.api_modify_acls,
+        project.api_generate_acls,
+        project.api_commit_flags,
+        project.api_commit_add_flag,
+        project.api_update_project_watchers,
+        project.api_get_project_options,
+        project.api_modify_project_options,
+        project.api_project_block_user,
+        project.api_get_project_webhook_token,
+    ]
+    sections.append(build_docs_section("projects", projects_methods))
+
     if pagure_config.get("ENABLE_TICKETS", True):
-        issues.append(load_doc(issue.api_new_issue))
-        issues.append(load_doc(issue.api_issue_update))
-        issues.append(load_doc(issue.api_view_issues))
-        issues.append(load_doc(issue.api_view_issue))
-        issues.append(load_doc(issue.api_view_issue_comment))
-        issues.append(load_doc(issue.api_comment_issue))
-        issues.append(load_doc(issue.api_update_custom_field))
-        issues.append(load_doc(issue.api_update_custom_fields))
-        issues.append(load_doc(issue.api_change_status_issue))
-        issues.append(load_doc(issue.api_change_milestone_issue))
-        issues.append(load_doc(issue.api_assign_issue))
-        issues.append(load_doc(issue.api_subscribe_issue))
-        issues.append(load_doc(user.api_view_user_issues))
+        issues_methods = [
+            issue.api_new_issue,
+            issue.api_issue_update,
+            issue.api_view_issues,
+            issue.api_view_issue,
+            issue.api_view_issue_comment,
+            issue.api_comment_issue,
+            issue.api_update_custom_field,
+            issue.api_update_custom_fields,
+            issue.api_change_status_issue,
+            issue.api_change_milestone_issue,
+            issue.api_assign_issue,
+            issue.api_subscribe_issue,
+            user.api_view_user_issues,
+        ]
+        sections.append(build_docs_section("issues", issues_methods))
 
-    ci_doc = []
+    pull_requests_methods = [
+        fork.api_pull_request_create,
+        fork.api_pull_request_views,
+        fork.api_pull_request_view,
+        fork.api_pull_request_diffstats,
+        fork.api_pull_request_by_uid_view,
+        fork.api_pull_request_merge,
+        fork.api_pull_request_rebase,
+        fork.api_pull_request_close,
+        fork.api_pull_request_add_comment,
+        fork.api_pull_request_add_flag,
+        fork.api_pull_request_assign,
+        fork.api_pull_request_update,
+    ]
+    sections.append(build_docs_section("pull_requests", pull_requests_methods))
+
+    users_methods = [
+        api_users,
+        user.api_view_user,
+        user.api_view_user_activity_stats,
+        user.api_view_user_activity_date,
+        user.api_view_user_requests_filed,
+        user.api_view_user_requests_actionable,
+    ]
+    sections.append(build_docs_section("users", users_methods))
+
+    groups_methods = [group.api_groups, group.api_view_group]
+    sections.append(build_docs_section("groups", groups_methods))
+
+    plugins_methods = [
+        plugins.api_install_plugin,
+        plugins.api_remove_plugin,
+        plugins.api_view_plugins_project,
+        plugins.api_view_plugins,
+    ]
+    sections.append(build_docs_section("plugins", plugins_methods))
+
     if pagure_config.get("PAGURE_CI_SERVICES", False):
+        ci_methods = []
         if "jenkins" in pagure_config["PAGURE_CI_SERVICES"]:
-            ci_doc.append(load_doc(jenkins.jenkins_ci_notification))
+            ci_methods.append(jenkins.jenkins_ci_notification)
 
-    api_pull_request_create_doc = load_doc(fork.api_pull_request_create)
-    api_pull_request_views_doc = load_doc(fork.api_pull_request_views)
-    api_pull_request_view_doc = load_doc(fork.api_pull_request_view)
-    api_pull_request_diffstats_doc = load_doc(fork.api_pull_request_diffstats)
-    api_pull_request_by_uid_view_doc = load_doc(
-        fork.api_pull_request_by_uid_view
-    )
-    api_pull_request_merge_doc = load_doc(fork.api_pull_request_merge)
-    api_pull_request_rebase_doc = load_doc(fork.api_pull_request_rebase)
-    api_pull_request_close_doc = load_doc(fork.api_pull_request_close)
-    api_pull_request_add_comment_doc = load_doc(
-        fork.api_pull_request_add_comment
-    )
-    api_pull_request_add_flag_doc = load_doc(fork.api_pull_request_add_flag)
-    api_pull_request_assign_doc = load_doc(fork.api_pull_request_assign)
-    api_pull_request_update_doc = load_doc(fork.api_pull_request_update)
+        if ci_methods:
+            sections.append(
+                build_docs_section(
+                    "continous_integration_services", ci_methods
+                )
+            )
 
-    api_version_doc = load_doc(api_version)
-    api_whoami_doc = load_doc(api_whoami)
-    api_users_doc = load_doc(api_users)
-    api_view_user_doc = load_doc(user.api_view_user)
-    api_view_user_activity_stats_doc = load_doc(
-        user.api_view_user_activity_stats
-    )
-    api_view_user_activity_date_doc = load_doc(
-        user.api_view_user_activity_date
-    )
-    api_view_user_requests_filed_doc = load_doc(
-        user.api_view_user_requests_filed
-    )
-    api_view_user_requests_actionable_doc = load_doc(
-        user.api_view_user_requests_actionable
-    )
-
-    api_view_group_doc = load_doc(group.api_view_group)
-    api_groups_doc = load_doc(group.api_groups)
-
-    api_install_plugin_doc = load_doc(plugins.api_install_plugin)
-    api_remove_plugin_doc = load_doc(plugins.api_remove_plugin)
-    api_view_plugins_project_doc = load_doc(plugins.api_view_plugins_project)
-    api_view_plugins_doc = load_doc(plugins.api_view_plugins)
-
-    api_error_codes_doc = load_doc(api_error_codes)
-
-    extras = [api_whoami_doc, api_version_doc, api_error_codes_doc]
+    extras_methods = [api_whoami, api_version, api_error_codes]
+    sections.append(build_docs_section("extras", extras_methods))
 
     return flask.render_template(
         "api.html",
         version=pagure.__api_version__,
         api_doc=APIDOC,
-        projects=[
-            api_new_project_doc,
-            api_modify_project_doc,
-            api_project_doc,
-            api_projects_doc,
-            api_project_tags_doc,
-            api_project_tags_new_doc,
-            api_project_tag_delete_doc,
-            api_git_tags_doc,
-            api_project_git_urls_doc,
-            api_project_watchers_doc,
-            api_git_branches_doc,
-            api_fork_project_doc,
-            api_modify_acls_doc,
-            api_generate_acls_doc,
-            api_new_branch_doc,
-            api_commit_flags_doc,
-            api_commit_add_flag_doc,
-            api_update_project_watchers_doc,
-            api_get_project_options_doc,
-            api_modify_project_options_doc,
-            api_project_block_user_doc,
-            api_get_project_webhook_token_doc,
-        ],
-        issues=issues,
-        requests=[
-            api_pull_request_create_doc,
-            api_pull_request_views_doc,
-            api_pull_request_view_doc,
-            api_pull_request_diffstats_doc,
-            api_pull_request_by_uid_view_doc,
-            api_pull_request_merge_doc,
-            api_pull_request_rebase_doc,
-            api_pull_request_close_doc,
-            api_pull_request_add_comment_doc,
-            api_pull_request_add_flag_doc,
-            api_pull_request_assign_doc,
-            api_pull_request_update_doc,
-        ],
-        users=[
-            api_users_doc,
-            api_view_user_doc,
-            api_view_user_activity_stats_doc,
-            api_view_user_activity_date_doc,
-            api_view_user_requests_filed_doc,
-            api_view_user_requests_actionable_doc,
-        ],
-        groups=[api_groups_doc, api_view_group_doc],
-        plugins=[
-            api_install_plugin_doc,
-            api_remove_plugin_doc,
-            api_view_plugins_project_doc,
-            api_view_plugins_doc,
-        ],
-        ci=ci_doc,
-        extras=extras,
+        sections=sections,
     )

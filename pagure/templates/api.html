@@ -5,130 +5,84 @@
 {% set tag = "index" %}
 
 {% block content %}
-<div class="p-t-2 api">
-  <div class="container">
-    <header>
-        <h2 class="repo-name m-b-0">
-            <span class="fa fa-th"></span>
-            &nbsp; Pagure API Reference
-        </h2>
-        <div class="m-t-0">
-          This documentation describes the Pagure API v{{ version[0] }}
-          revision {{ version[1] }}.
+<div class="p-t-2 api-doc container">
+  <div class="row">
+    <div class="col-3">
+      <nav>
+        <div class="nav nav-tabs nav-sidetabs flex-column" id="nav-tab" role="tablist">
+          <h5 class="pl-2 font-weight-bold text-muted">Pagure API Reference</h5>
+          <a class="nav-item nav-link active" id="general" data-toggle="tab"
+            href="#general-tab" role="tab" aria-controls="general" aria-selected="true">General</a>
+          {% for section in sections %}
+          <a class="nav-item nav-link text-capitalize" id="{{ section.name }}" data-toggle="tag"
+            href="#{{ section.name }}-tab" role="tab" aria-controls="{{ section.name }}">{{ section.name | replace('_', ' ')}}</a>
+          {% endfor %}
         </div>
-        <div class="projectinfo m-t-1">
+      </nav>
+    </div>
+    <div class="col-9">
+      <div class="tab-content mt-4" id="nav-tagContent">
+        <div class="tab-pane fade active show" id="general-tab" role="tabpanel" aria-labelledby="general-tab">
+          <h1 class="font-weight-bold mb-3">
+            General
+          </h1>
+          <p>
+            This documentation describes the Pagure API v{{ version[0] }} revision {{ version[1] }}
+          </p>
+          <div>
+            {{ api_doc | replace('h1', 'h2') }}
+          </div>
         </div>
-    </header>
-    <div class="row">
-      <div class="col-md-10">
-
-        {{ api_doc |replace('h1', 'h2') }}
-
-        <h1>List of the API endpoints:</h1>
-
-        <h2>
-            Projects
-            <a name="projects" title="Permalink to this headline" href="#projects">
-              <span class="fa fa-link"></span>
-            </a>
-        </h2>
-        <div class="accordion">
-        {% for html in projects %}
-        {{ html | InsertDiv | safe }}
-        {% endfor %}
-        </div>
-
-        {% if issues %}
-        <h2>
-            Issues
-            <a name="users" title="Permalink to this headline" href="#issues">
-              <span class="fa fa-link"></span>
-            </a>
-        </h2>
-        <div class="accordion">
-        {% for html in issues %}
-        {{ html | InsertDiv | safe }}
-        {% endfor %}
-        </div>
-        {% endif %}
-
-        <h2>
-            Pull-requests
-            <a name="users"title="Permalink to this headline" href="#pull-requests">
-              <span class="fa fa-link"></span>
-            </a>
-        </h2>
-        <div class="accordion">
-        {% for html in requests %}
-        {{ html | InsertDiv | safe }}
-        {% endfor %}
-        </div>
-
-        <h2>
-            Users
-            <a name="users" title="Permalink to this headline" href="#users">
-              <span class="fa fa-link"></span>
-            </a>
-        </h2>
-        <div class="accordion">
-        {% for html in users %}
-        {{ html | InsertDiv | safe }}
-        {% endfor %}
-        </div>
-
-        <h2>
-            Groups
-            <a name="groups" title="Permalink to this headline" href="#groups">
-              <span class="fa fa-link"></span>
-            </a>
-        </h2>
-        <div class="accordion">
-        {% for html in groups %}
-        {{ html | InsertDiv | safe }}
-        {% endfor %}
-        </div>
-
-        <h2>
-            Plugins
-            <a name="plugins" title="Permalink to this headline" href="#plugins">
-                <span class="fa fa-link"></span>
-            </a>
-        </h2>
-        <div class="accordion">
-            {% for html in plugins %}
-            {{ html | InsertDiv | safe }}
+        {% for section in sections %}
+        <div class="tab-pane" id="{{ section.name }}-tab" role="tabpanel" aria-labelledby="{{ section.name }}-tab">
+          <h3 class="font-weight-bold mb-3 text-capitalize">{{ section.name | replace('_', ' ') }}</h3>
+          <div class="accordion" id="accordion-{{ section.name }}">
+            {% for endpoint in section.endpoints %}
+            <div class="card">
+              <div class="card-header" id="heading-{{ section.name }}-{{ endpoint.name }}">
+                <h3 class="mb-0">
+                  <button class="btn btn-link" data-toggle="collapse" data-target="#{{ section.name }}-{{ endpoint.name }}" aria-expanded="false" aria-controls="{{ section.name }}-{{ endpoint.name }}">
+                    {{ endpoint.title }}
+                  </button>
+                </h3>
+              </div>
+              <div id="{{ section.name }}-{{ endpoint.name }}" class="collapse" aria-labelledby="heading-{{ section.name }}-{{ endpoint.name }}" data-parent="#accordion-{{ section.name }}">
+                <div class="card-body">
+                  {{ endpoint.doc | replace('h1', 'h2') }}
+                </div>
+              </div>
+            </div>
             {% endfor %}
+          </div>
         </div>
-
-        {% if config.get('PAGURE_CI_SERVICES') %}
-        <h2>
-            Continous Integration Services
-            <a name="ci" title="Permalink to this headline" href="#ci">
-              <span class="fa fa-link"></span>
-            </a>
-        </h2>
-
-        <div class="accordion">
-        {% for html in ci %}
-        {{ html | InsertDiv |safe }}
         {% endfor %}
-        {% endif %}
-
-        <h2>
-            Extras
-            <a name="extras" title="Permalink to this headline" href="#extras">
-              <span class="fa fa-link"></span>
-            </a>
-        </h2>
-
-        <div class="accordion">
-        {% for html in extras %}
-        {{ html | InsertDiv |safe }}
-        {% endfor %}
-        </div>
-
       </div>
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block jscripts %}
+{{ super() }}
+
+<script type="text/javascript" nonce="{{ g.nonce }}">
+  $(document).ready(function() {
+    $('#nav-tab a.nav-link').on('shown.bs.tab', function (e) {
+      window.location.hash = e.target.hash;
+      window.scrollTo(0,0);
+    });
+
+    if (!window.location.hash){
+      window.location.hash = "#general-tab"
+    }
+
+    window.onhashchange = function () {
+      $(window.location.hash.slice(0,-4)).tab('show');
+    }
+    const _anchor = window.location.hash.slice(0,-4);
+    console.log(_anchor);
+    $(_anchor).tab('show');
+    window.scrollTo(0,0);
+  });
+</script>
 {% endblock %}

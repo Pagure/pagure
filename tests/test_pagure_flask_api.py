@@ -39,9 +39,7 @@ class PagureFlaskApitests(tests.SimplePagureTest):
         output = self.app.get("/api/0/")
         output_text = output.get_data(as_text=True)
         self.assertIn("<title> API | pagure  - Pagure</title>\n", output_text)
-        self.assertIn(
-            "&nbsp; Pagure API Reference\n        </h2>\n", output_text
-        )
+        self.assertIn(">Pagure API Reference</h5>\n", output_text)
 
     def test_api_doc_authenticated(self):
         """ Test the API documentation page. """
@@ -52,9 +50,7 @@ class PagureFlaskApitests(tests.SimplePagureTest):
             self.assertIn(
                 "<title> API | pagure  - Pagure</title>\n", output_text
             )
-            self.assertIn(
-                "&nbsp; Pagure API Reference\n        </h2>\n", output_text
-            )
+            self.assertIn(">Pagure API Reference</h5>\n", output_text)
 
     def test_api_get_request_data(self):
         data = {"foo": "bar"}
