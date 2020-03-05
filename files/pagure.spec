@@ -16,7 +16,7 @@
 
 
 Name:               pagure
-Version:            5.8.1
+Version:            5.9.0
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -491,6 +491,9 @@ done
 
 
 %changelog
+* Tue Mar 24 2020 Pierre-Yves Chibon <pingou@pingoured.fr> - 5.9.0-1
+- Update to 5.9.0
+
 * Mon Dec 02 2019 Pierre-Yves Chibon <pingou@pingoured.fr> - 5.8.1-1
 - Update to 5.8.1
 

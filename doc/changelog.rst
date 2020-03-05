@@ -3,6 +3,59 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
+5.9 (2020-03-24)
+----------------
+- Swap "Add" and "Cancel" button ordering for access management (Ken Dreyer)
+- Add API to manage plugins (ie: git hooks) (Michal Konečný)
+- Fix querying mdapi from within the srcfpo theme (Karsten Hopp)
+- Add support for pygit2 1.0.0 (Julen Landa Alustiza)
+- Fix activity stats api tests when running the tests at the beginning of
+  the year (Julen Landa Alustiza)
+- Add logic to set bugzilla assignee overrides from within the srcfpo theme
+  (Karsten Hopp)
+- Multiple fixes and improvements to the API endpoints to retrieve the tags
+  used in a project (Julen Landa Alustiza)
+- Add a new API endpoint to add tags to a project (Julen Landa Alustiza)
+- Add a new API endpoint to delete tags of a project (Julen Landa Alustiza)
+- Add a new API endpoint to edit/update an existing issue/ticket(Julen Landa
+  Alustiza)
+- Add a new page to see a file's history in git (linked from the file's view page
+  and the blame page)
+- Only consider the 6 most recently active branch in the drop-down to create
+  new PR
+- Fix the view_commit endpoint when the identifier provided is a git tag
+- Add an endpoint to renew user API token
+- Include a link to where the token can be renewed in the email about API
+  token nearing expiration
+- Allow users to set their own expiration date on API token (up to 2 years)
+- Fix the /groups API endpoint and order the output by group name
+- Add a new API endpoint to retrieve a project's webhook token (Fabien
+  Boucher)
+- Expose related_prs on issue API (Lenka Segura)
+- Fix the regenerate-repo actions
+- Reword "Maintained by orphan" to "Package is currently unmaintained" in
+  the srcfpo theme (Fabio Valentini)
+- Add support for werkzeug 1.0
+- Only enable the "Take" button once we know the package is active in the
+  srcfpo theme
+- Make the "Issue" link in the info page point to bugzilla in the srcfpo
+  theme
+- Provide some feedback to the user when changing monitoring worked
+- Hide the SSH clone URL if the user is not in one of the group with ssh
+  access
+- Order pull requests based on updated_on column when we want to order based
+  on last updated time (Julen Landa Alustiza)
+- Update README to reference correct minimum version of pygit2 (Neal Gompa)
+- Support python markdown >= 3.2.0 (Julen Landa Alustiza)
+- Fix taking into account the blacklisted patterns
+- Add a new API endpoint to add git tags to a project remotely
+- Rework/fix the API documentation page (Julen Landa Alustiza)
+- Allow deploy keys to commit to the doc git repository of a project
+- Increase a lot the logging when someone asks for access to a git repo
+- In the src.fp.o theme adjust the links to bugzilla to include the Fedora and
+  EPEL bug reports instead of just the Fedora ones
+
+
 5.8.1 (2019-12-02)
 ------------------
 - Fix the link to the container namespace in srcfpo
