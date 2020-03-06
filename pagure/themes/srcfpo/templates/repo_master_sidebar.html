@@ -295,7 +295,6 @@
              'fedora_assignee': $('#fedora_assignee').val()
           },
           success: function(res) {
-            console.log("Successfully changed the bugzilla assignees");
             $("#fedora_assignee_txt").text(res.fedora_assignee);
             $("#epel_assignee_txt").text(res.epel_assignee);
             $('#modal_assignee').modal('hide');
@@ -303,6 +302,7 @@
             $('#update_assignees').attr('disabled', false);
             $('#update_assignees').text('Update');
             $('html').css('cursor', 'default');
+            console.log("Successfully changed the bugzilla assignees");
             return false;
           },
           error: function(res) {
