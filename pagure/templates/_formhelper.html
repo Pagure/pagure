@@ -159,7 +159,9 @@
 
 
             {% if g.fas_user %}
-              <button class="reply btn btn-outline-primary border-0" type="button" title="Reply to this comment - lose formatting">
+                <button class="reply btn btn-outline-primary border-0" type="button"
+                    data-comment="{{ comment.id }}"
+                    title="Reply to this comment">
                 <span class="fa fa-share-square-o"></span>
             </button>
             {% endif %}
@@ -250,7 +252,7 @@
           <div class="btn-group" role="group" aria-label="Basic example">
             {% if g.fas_user %}
               <a class="reply btn btn-outline-primary border-0 pointer" data-toggle="tooltip"
-                  title="Reply to this comment - lose formatting"
+                  title="Reply to this comment">
                 <span class="fa fa-share-square-o"></span>
               </a>
             {% endif %}

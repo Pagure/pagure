@@ -799,27 +799,46 @@ function setup_reply_btns() {
   $(".reply").unbind();
   $( ".reply" ).click(
     function() {
-      var _section = $(this).closest('.card');
-      if (!_section.length) {
-        var _section = $(this).closest('#original_comment_box');
+      var commentid = $( this ).attr('data-comment');
+      var _url = "{{ url_for(
+          'api_ns.api_view_issue',
+          repo=repo.name,
+          username=username,
+          namespace=repo.namespace,
+          issueid=issueid) }}";
+      if (commentid) {
+          var _key = 'comment';
+          _url = _url + '/comment/' + commentid;
+      } else {
+          var _key = 'content';
       }
-      var _comment = _section.find('.comment_body');
-      var _text = _comment.text().split("\n");
-      var _output = new Array();
-      for (cnt = 0; cnt < _text.length ; cnt ++) {
-          _output[cnt] = '> ' + $.trim(_text[cnt]);
-      }
-      var _prev = $.trim($( "#comment" ).val());
-      if (_prev.length > 0){
-          _prev += "\n\n";
-      }
-      $( "#comment" ).val(_prev + _output.join("\n"));
+      $.ajax({
+          url: _url,
+          type: 'GET',
+          dataType: 'json',
+          success: function(res) {
+            var _text = res[_key].split("\n");
+            var _output = new Array();
+            for (cnt = 0; cnt < _text.length ; cnt ++) {
+                _output[cnt] = '> ' + $.trim(_text[cnt]);
+            }
+            var _prev = $.trim($( "#comment" ).val());
+            if (_prev.length > 0){
+                _prev += "\n\n";
+            }
+            $( "#comment" ).val(_prev + _output.join("\n") + "\n\n");
+            $( "#comment" ).focus();
+          },
+          error: function() {
+              alert('Failed to retrieve comment text');
+          }
+      });
     }
   ).click(function(){
     $('html, body').animate({
         scrollTop: $("#comment").offset().top
     }, 2000);
-});
+  });
 };
 
 $(document).ready(function() {

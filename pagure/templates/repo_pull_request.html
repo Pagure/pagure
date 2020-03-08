@@ -804,21 +804,47 @@ function setup_reply_btns() {
   $(".reply").unbind();
   $( ".reply" ).click(
     function() {
-      var _section = $(this).closest('.card');
-      var _comment = _section.find('.comment_body');
-      var _text = _comment.text().split("\n");
-      var _output = new Array();
-      for (var cnt=0; cnt < _text.length; cnt++) {
-          _output[cnt] = '> ' + _text[cnt];
-      }
-      var _prev = $.trim($( "#comment" ).val());
-      if (_prev.length > 0){
-          _prev += "\n\n";
-      }
-      $( "#comment" ).val(_prev + _output.join("\n") + "\n\n");
-      $( "#comment" ).focus();
+      var commentid = $( this ).attr('data-comment');
+      var _url = "{{ url_for(
+          'api_ns.api_pull_request_view',
+          repo=repo.name,
+          requestid=requestid,
+          username=username,
+          namespace=repo.namespace) }}";
+      $.ajax({
+          url: _url,
+          type: 'GET',
+          dataType: 'json',
+          success: function(res) {
+            var _text;
+            if (commentid) {
+                _text = res['comments'].find(
+                    element => element['id'] == commentid)['comment'];
+            } else {
+                _text = res['initial_comment'];
+            }
+            _text = _text.split("\n");
+            var _output = new Array();
+            for (cnt = 0; cnt < _text.length ; cnt ++) {
+                _output[cnt] = '> ' + $.trim(_text[cnt]);
+            }
+            var _prev = $.trim($( "#comment" ).val());
+            if (_prev.length > 0){
+                _prev += "\n\n";
+            }
+            $( "#comment" ).val(_prev + _output.join("\n") + "\n\n");
+            $( "#comment" ).focus();
+          },
+          error: function() {
+              alert('Failed to retrieve comment text');
+          }
+      });
     }
-  );
+  ).click(function(){
+    $('html, body').animate({
+        scrollTop: $("#comment").offset().top
+    }, 2000);
+  });
 };
 
 
