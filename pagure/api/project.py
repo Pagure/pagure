@@ -20,6 +20,7 @@ from pygit2 import GitError, Repository
 try:
     from pygit2 import AlreadyExistsError
 except ImportError:
+    # Older version of pygit2 do not have the AlreadyExistsError defined
     AlreadyExistsError = ValueError
 
 import pagure

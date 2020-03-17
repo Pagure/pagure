@@ -4204,6 +4204,7 @@ class PagureLibtests(tests.Modeltests):
             markdown_v = markdown.__version_info__
         # python-markdown >= 3.2.0 returns to the old behavior on img tag trailing slash
         old_markdown = markdown_v < (2, 6, 0) or markdown_v >= (3, 2, 0)
+        mk_321 = markdown_v >= (3, 2, 0)
 
         texts = [
             "foo bar test#1 see?",
@@ -4334,7 +4335,22 @@ class PagureLibtests(tests.Modeltests):
             '<div class="markdown"><p>but not someone@pingou.com</p></div>',
         ]
 
-        if old_markdown:
+        if mk_321:
+            print("**** Markdown 3.2.1+ behavior")
+            expected.append(
+                # '[![Fedora_infinity_small.png]'
+                # '(/test/issue/raw/Fedora_infinity_small.png)]'
+                # '(/test/issue/raw/Fedora_infinity_small.png)',
+                '<div class="markdown"><p><a href="/test/issue/raw/Fedora_infinity_small.png"><span>'
+                '<img alt="Fedora_infinity_small.png" class="lazyload" '
+                'data-src="/test/issue/raw/Fedora_infinity_small.png" src="">'
+                "<noscript>"
+                '&lt;img alt="Fedora_infinity_small.png" '
+                'src="/test/issue/raw/Fedora_infinity_small.png" /&gt;'
+                "</noscript></span></a></p></div>"
+            )
+        elif old_markdown:
+            print("**** Old markdown behavior")
             expected.append(
                 # '[![Fedora_infinity_small.png]'
                 # '(/test/issue/raw/Fedora_infinity_small.png)]'
@@ -4348,6 +4364,7 @@ class PagureLibtests(tests.Modeltests):
                 "</noscript></span></a></p></div>"
             )
         else:
+            print("**** Not old but no longer new markdown")
             expected.append(
                 # '[![Fedora_infinity_small.png]'
                 # '(/test/issue/raw/Fedora_infinity_small.png)]'
