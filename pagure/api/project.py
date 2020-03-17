@@ -17,6 +17,11 @@ from sqlalchemy.exc import SQLAlchemyError
 from six import string_types
 from pygit2 import GitError, Repository
 
+try:
+    from pygit2 import AlreadyExistsError
+except ImportError:
+    AlreadyExistsError = ValueError
+
 import pagure
 import pagure.forms
 import pagure.exceptions
@@ -356,6 +361,9 @@ def api_new_git_tags(repo, username=None, namespace=None):
     Create new git tags
     -------------------
     Create a new tag on the project Git repository.
+    If the request tried to create a git tag that already existed, the JSON
+    returned will include ``"tag_created": false``, otherwise, this field will
+    be ``true``.
 
     ::
 
@@ -397,6 +405,7 @@ def api_new_git_tags(repo, username=None, namespace=None):
         {
           "total_tags": 2,
           "tags": ["0.0.1", "0.0.2"],
+          "tag_created": true,
         }
 
 
@@ -406,6 +415,7 @@ def api_new_git_tags(repo, username=None, namespace=None):
             "0.0.1": "bb8fa2aa199da08d6085e1c9badc3d83d188d38c",
             "0.0.2": "d16fe107eca31a1bdd66fb32c6a5c568e45b627e"
           },
+          "tag_created": false,
         }
 
     """
@@ -417,6 +427,7 @@ def api_new_git_tags(repo, username=None, namespace=None):
     )
 
     form = pagure.forms.AddGitTagForm(csrf_enabled=False)
+    created = None
     if form.validate_on_submit():
         user_obj = pagure.lib.query.get_user(
             flask.g.session, flask.g.fas_user.username
@@ -429,6 +440,9 @@ def api_new_git_tags(repo, username=None, namespace=None):
                 user=user_obj,
                 message=form.message.data,
             )
+            created = True
+        except AlreadyExistsError:
+            created = False
         except GitError as err:
             _log.exception(err)
             raise pagure.exceptions.APIError(
@@ -442,7 +456,9 @@ def api_new_git_tags(repo, username=None, namespace=None):
 
     tags = pagure.lib.git.get_git_tags(repo, with_commits=with_commits)
 
-    jsonout = flask.jsonify({"total_tags": len(tags), "tags": tags})
+    jsonout = flask.jsonify(
+        {"total_tags": len(tags), "tags": tags, "tag_created": created}
+    )
     return jsonout
 
 

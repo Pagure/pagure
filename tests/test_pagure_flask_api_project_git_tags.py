@@ -96,9 +96,12 @@ class PagureFlaskApiProjectGitTagstests(tests.Modeltests):
         )
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
-        self.assertEqual(sorted(data.keys()), ["tags", "total_tags"])
+        self.assertEqual(
+            sorted(data.keys()), ["tag_created", "tags", "total_tags"]
+        )
         self.assertEqual(data["tags"], ["test-tag-no-message"])
         self.assertEqual(data["total_tags"], 1)
+        self.assertEqual(data["tag_created"], True)
 
         output = self.app.get("/api/0/test/git/tags?with_commits=t")
         self.assertEqual(output.status_code, 200)
@@ -135,11 +138,14 @@ class PagureFlaskApiProjectGitTagstests(tests.Modeltests):
         )
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
-        self.assertEqual(sorted(data.keys()), ["tags", "total_tags"])
+        self.assertEqual(
+            sorted(data.keys()), ["tag_created", "tags", "total_tags"]
+        )
         self.assertEqual(
             data["tags"], {"test-tag-no-message": latest_commit.oid.hex}
         )
         self.assertEqual(data["total_tags"], 1)
+        self.assertEqual(data["tag_created"], True)
 
     def test_api_new_git_tag_with_message(self):
         """ Test the api_new_git_tags function.  """
@@ -166,9 +172,63 @@ class PagureFlaskApiProjectGitTagstests(tests.Modeltests):
         )
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
-        self.assertEqual(sorted(data.keys()), ["tags", "total_tags"])
+        self.assertEqual(
+            sorted(data.keys()), ["tag_created", "tags", "total_tags"]
+        )
         self.assertEqual(data["tags"], ["test-tag-no-message"])
         self.assertEqual(data["total_tags"], 1)
+        self.assertEqual(data["tag_created"], True)
+
+    def test_api_new_git_tag_with_message_twice(self):
+        """ Test the api_new_git_tags function.  """
+
+        # Before
+        output = self.app.get("/api/0/test/git/tags")
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(sorted(data.keys()), ["tags", "total_tags"])
+        self.assertEqual(data["tags"], [])
+        self.assertEqual(data["total_tags"], 0)
+
+        # Add a tag so that we can list it
+        repo = pygit2.Repository(os.path.join(self.path, "repos", "test.git"))
+        latest_commit = repo.revparse_single("HEAD")
+        data = {
+            "tagname": "test-tag-no-message",
+            "commit_hash": latest_commit.oid.hex,
+            "message": "This is a long annotation\nover multiple lines\n for testing",
+        }
+
+        output = self.app.post(
+            "/api/0/test/git/tags", headers=self.headers, data=data
+        )
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(
+            sorted(data.keys()), ["tag_created", "tags", "total_tags"]
+        )
+        self.assertEqual(data["tags"], ["test-tag-no-message"])
+        self.assertEqual(data["total_tags"], 1)
+        self.assertEqual(data["tag_created"], True)
+
+        # Submit the same request/tag a second time to the same commit
+        data = {
+            "tagname": "test-tag-no-message",
+            "commit_hash": latest_commit.oid.hex,
+            "message": "This is a long annotation\nover multiple lines\n for testing",
+        }
+
+        output = self.app.post(
+            "/api/0/test/git/tags", headers=self.headers, data=data
+        )
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(
+            sorted(data.keys()), ["tag_created", "tags", "total_tags"]
+        )
+        self.assertEqual(data["tags"], ["test-tag-no-message"])
+        self.assertEqual(data["total_tags"], 1)
+        self.assertEqual(data["tag_created"], False)
 
     def test_api_new_git_tag_user_no_access(self):
         """ Test the api_new_git_tags function.  """
@@ -240,6 +300,9 @@ class PagureFlaskApiProjectGitTagstests(tests.Modeltests):
         )
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
-        self.assertEqual(sorted(data.keys()), ["tags", "total_tags"])
+        self.assertEqual(
+            sorted(data.keys()), ["tag_created", "tags", "total_tags"]
+        )
         self.assertEqual(data["tags"], ["test-tag-no-message"])
         self.assertEqual(data["total_tags"], 1)
+        self.assertEqual(data["tag_created"], True)
