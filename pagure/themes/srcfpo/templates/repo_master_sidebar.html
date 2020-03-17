@@ -355,9 +355,8 @@
             });
             _btn.prop( "title", "Package retired - Open a releng ticket to adopt it" );
             _btn.html("Retired");
-          } else {
-            _btn.removeClass('disabled');
           }
+          _btn.removeClass('disabled');
         }
       });
       {% endif %}
