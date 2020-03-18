@@ -946,3 +946,8 @@ class AddGitTagForm(PagureForm):
     message = wtforms.TextAreaField(
         "Annotation message", [wtforms.validators.Optional()]
     )
+    force = wtforms.BooleanField(
+        "Force the creation of the git tag",
+        [wtforms.validators.optional()],
+        false_values=FALSE_VALUES,
+    )

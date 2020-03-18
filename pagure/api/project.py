@@ -396,6 +396,13 @@ def api_new_git_tags(repo, username=None, namespace=None):
     |                 |          |               |   tags found in the repo |
     |                 |          |               |   in the data returned   |
     +-----------------+----------+---------------+--------------------------+
+    | ``force``       | boolean  | Optional      | | If a similar git tag   |
+    |                 |          |               |   already exists, remove |
+    |                 |          |               |   it from the repo and   |
+    |                 |          |               |   create the specified   |
+    |                 |          |               |   one, thus forcing it   |
+    +-----------------+----------+---------------+--------------------------+
+
 
     Sample response
     ^^^^^^^^^^^^^^^
@@ -439,6 +446,7 @@ def api_new_git_tags(repo, username=None, namespace=None):
                 target=form.commit_hash.data,
                 user=user_obj,
                 message=form.message.data,
+                force=form.force.data,
             )
             created = True
         except AlreadyExistsError:

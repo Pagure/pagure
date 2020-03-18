@@ -2352,7 +2352,7 @@ def get_git_tags(project, with_commits=False):
     return tags
 
 
-def new_git_tag(project, tagname, target, user, message=None):
+def new_git_tag(project, tagname, target, user, message=None, force=False):
     """ Create a new git tag in the git repositorie of the specified project.
 
     :arg project: the project in which we want to create a git tag
@@ -2363,6 +2363,9 @@ def new_git_tag(project, tagname, target, user, message=None):
     :type user: pagure.lib.model.User
     :kwarg message: the message to include in the annotation of the tag
     :type message: str or None
+    :kwarg force: a boolean specifying wether to force the creation of
+        the git tag or not
+    :type message: bool
     """
     repopath = pagure.utils.get_repo_path(project)
     repo_obj = PagureRepo(repopath)
@@ -2370,6 +2373,11 @@ def new_git_tag(project, tagname, target, user, message=None):
     target_obj = repo_obj.get(target)
     if not target_obj:
         raise pygit2.GitError("Unknown target: %s" % target)
+
+    if force:
+        existing_tag = repo_obj.lookup_reference("refs/tags/%s" % tagname)
+        if existing_tag:
+            existing_tag.delete()
 
     tag = repo_obj.create_tag(
         tagname,
