@@ -439,6 +439,10 @@ def api_new_git_tags(repo, username=None, namespace=None):
         user_obj = pagure.lib.query.get_user(
             flask.g.session, flask.g.fas_user.username
         )
+        force = form.force.data
+        if not pagure_config.get("ALLOW_API_UPDATE_GIT_TAGS", True):
+            force = False
+
         try:
             pagure.lib.git.new_git_tag(
                 project=repo,
@@ -446,7 +450,7 @@ def api_new_git_tags(repo, username=None, namespace=None):
                 target=form.commit_hash.data,
                 user=user_obj,
                 message=form.message.data,
-                force=form.force.data,
+                force=force,
             )
             created = True
         except AlreadyExistsError:

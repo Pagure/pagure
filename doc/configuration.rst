@@ -1714,6 +1714,18 @@ the highlighting language/category to use as values.
 Defaults to: ``{".spec": "specfile", ".patch": "diff"}``
 
 
+ALLOW_API_UPDATE_GIT_TAGS
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This configuration key determines whether users are allowed to update
+existing git tags via the API.
+When set to ``False``, this essentially makes the API ignore whether the
+``force`` argument is set or not.
+
+
+Default to: ``True``
+
+
 RepoSpanner Options
 -------------------
 
