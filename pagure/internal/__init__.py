@@ -126,14 +126,22 @@ def check_ssh_access():
 
     # Build a fake path so we can use get_repo_info_from_path
     path = os.path.join(pagure_config["GIT_FOLDER"], gitdir)
+    _log.info(
+        "%s asks to access %s (path: %s) via ssh" % (remoteuser, gitdir, path)
+    )
     (
         repotype,
         project_user,
         namespace,
         repo,
     ) = pagure.lib.git.get_repo_info_from_path(path, hide_notfound=True)
+    _log.info(
+        "%s asks to access the %s repo of %s/%s from user %s"
+        % (remoteuser, repotype, namespace, repo, project_user)
+    )
 
     if repo is None:
+        _log.info("Project name could not be extracted from path")
         return flask.jsonify({"access": False})
 
     project = pagure.lib.query.get_authorized_project(
@@ -145,14 +153,19 @@ def check_ssh_access():
     )
 
     if not project:
+        _log.info("Project not found with this path")
         return flask.jsonify({"access": False})
+    _log.info("Checking ACLs on project: %s" % project.fullname)
 
     if repotype not in ["main", "doc"] and not pagure.utils.is_repo_user(
         project, remoteuser
     ):
         # Deploy keys are not allowed on ticket and PR repos but they are
         # allowed for main and doc repos.
+        _log.info("%s is not a contributor to this project" % remoteuser)
         return flask.jsonify({"access": False})
+
+    _log.info("Access granted to %s on: %s" % (remoteuser, project.fullname))
 
     return flask.jsonify(
         {
