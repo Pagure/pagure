@@ -147,9 +147,11 @@ def check_ssh_access():
     if not project:
         return flask.jsonify({"access": False})
 
-    if repotype != "main" and not pagure.utils.is_repo_user(
+    if repotype not in ["main", "doc"] and not pagure.utils.is_repo_user(
         project, remoteuser
     ):
+        # Deploy keys are not allowed on ticket and PR repos but they are
+        # allowed for main and doc repos.
         return flask.jsonify({"access": False})
 
     return flask.jsonify(
