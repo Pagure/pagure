@@ -343,7 +343,7 @@
                 <div class="btn-group">
                   {% if repo.namespace in ['rpms', 'container', 'modules'] %}
                   {% if repo.namespace == 'rpms' %}
-                  <a class="bugz" href="https://bugzilla.redhat.com/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&classification=Fedora&product=Fedora&component={{ repo.name }}">
+                  <a class="bugz" href="https://bugzilla.redhat.com/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&classification=Fedora&product=Fedora&product=Fedora EPEL&component={{ repo.name }}">
                   {% elif repo.namespace == 'container' %}
                   <a class="bugz" href="https://bugzilla.redhat.com/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&classification=Fedora&product=Fedora Container Images&component={{ repo.name }}">
                   {% elif repo.namespace == 'modules' %}

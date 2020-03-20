@@ -31,7 +31,7 @@
     {% if repo.namespace in ['rpms', 'container', 'modules'] %}
     <li class="nav-item mr-2 text-dark">
         {% if repo.namespace == 'rpms' %}
-        <a class="nav-link" href="https://bugzilla.redhat.com/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&classification=Fedora&product=Fedora&component={{ repo.name }}">
+        <a class="nav-link" href="https://bugzilla.redhat.com/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&classification=Fedora&product=Fedora&product=Fedora EPEL&component={{ repo.name }}">
         {% elif repo.namespace == 'container' %}
         <a class="nav-link" href="https://bugzilla.redhat.com/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&classification=Fedora&product=Fedora Container Images&component={{ repo.name }}">
         {% elif repo.namespace == 'modules' %}
