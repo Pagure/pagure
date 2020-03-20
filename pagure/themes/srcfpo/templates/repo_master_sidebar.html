@@ -306,7 +306,11 @@
             return false;
           },
           error: function(res) {
-            alert("Unable to update the bugzilla assignee(s)");
+            var msg = '';
+            if(res.responseJSON.errors){
+              msg = ': ' + res.responseJSON.errors.join(', ');
+            }
+            alert("Unable to update the bugzilla assignee(s)" + msg);
             $('html').css('cursor', 'default');
             $('#reset_assignees').attr('disabled', false);
             $('#update_assignees').attr('disabled', false);
