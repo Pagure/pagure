@@ -163,11 +163,11 @@
       </dl>
       {% if g.authenticated and repo.user.user == g.fas_user.username or pagure_admin %}
         <div class="btn-group">
-          <a href="#" title="Update the bugzill assignee(s)"
+          <a href="#" title="Update the bugzilla assignee(s)"
               class="btn btn-sm btn-outline-primary"
               data-toggle="modal" data-target="#modal_assignee">
             <i id="update-bz-icon" class="fa fa-fw fa-refresh"></i>
-            Update
+            Edit
           </a>
         </div>
       {% endif %}
