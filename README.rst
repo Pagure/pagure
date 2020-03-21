@@ -48,7 +48,8 @@ Install it `with these instructions <https://docs.docker.com/compose/install/>`_
 For more information about docker-compose cli, see: https://docs.docker.com/compose/reference/.
 
 Once installed, create the folder that will receive the projects, forks, docs,
-requests and tickets' git repo. Run this command exactly as it appears::
+requests and tickets' git repo. Run this command exactly as it appears from 
+within the cloned git repo folder::
 
     $ mkdir -p lcl/{repos,remotes,attachments,releases}
 
@@ -64,7 +65,8 @@ Once all the containers are built, run the following command to start the contai
 Once all the containers have started, you can access pagure on http://localhost:5000.
 To stop the containers, press Ctrl+C.
 
-To populate the container with test data and create a new account, run ::
+Once the containers are up and running after running the previous command, run 
+this command to populate the container with test data and create a new account ::
 
     $ docker-compose -f dev/docker-compose.yml exec web python dev-data.py --all
 
