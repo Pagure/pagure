@@ -1266,8 +1266,8 @@ def read_output(cmd, abspath, input=None, keepends=False, error=False, **kw):
         cwd=abspath,
         **kw
     )
-    retcode = procs.wait()
     (out, err) = procs.communicate(input)
+    retcode = procs.wait()
     if isinstance(out, six.binary_type):
         out = out.decode("utf-8")
     if isinstance(err, six.binary_type):

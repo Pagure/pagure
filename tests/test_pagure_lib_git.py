@@ -3169,6 +3169,13 @@ index 0000000..60f7480
             )
         )
 
+    def test_read_output(self):
+        here = os.path.dirname(os.path.realpath(__file__))
+        # This should't block
+        self.assertTrue(
+            pagure.lib.git.read_output(["git", "rev-list", "--all"], here)
+        )
+
     @patch("pagure.utils.get_repo_path")
     def test_update_pull_ref(self, get_repo_path):
         fake_pr = MagicMock()
