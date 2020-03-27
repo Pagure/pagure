@@ -32,7 +32,7 @@ parser.add_argument(
 
 args = parser.parse_args()
 
-env = {}
+env = os.environ
 if args.config:
     config = args.config
     if not config.startswith("/"):
