@@ -123,50 +123,50 @@
           </div>
         </div>
         <div class="tab-pane fade" id="nav-api" role="tabpanel" aria-labelledby="nav-api-tab">
-         <div class="row mb-3">
-          <h3 class="col-6 font-weight-bold mb-3">
-            API Keys
-          </h3>
-          <div class="col-6 text-right">
-            <div class="btn-group">
-              <a href="{{ url_for('ui_ns.add_api_user_token') }}"
-                  class="btn btn-sm btn-outline-primary"
-                  title="Generate a new API token">
-                Create new API Key
-              </a>
+          <div class="row mb-3">
+            <h3 class="col-6 font-weight-bold mb-3">
+              API Keys
+            </h3>
+            <div class="col-6 text-right">
               <div class="btn-group">
-                <a method="post" class="btn btn-sm btn-outline-primary class"
-                  title="Show old API token" id="show_old_keys">
-                  Show old API Keys
+                <a href="{{ url_for('ui_ns.add_api_user_token') }}"
+                    class="btn btn-sm btn-outline-primary"
+                    title="Generate a new API token">
+                  Create new API Key
                 </a>
+                <div class="btn-group">
+                  <a method="post" class="btn btn-sm btn-outline-primary class"
+                    title="Show old API token" id="show_old_keys">
+                    Show old API Keys
+                  </a>
+                </div>
               </div>
             </div>
           </div>
-         </div>
           <div class="row">
             <div class="col">
-                    <p>
-                      API keys are tokens used to authenticate you on pagure. They can also
-                      be used to grant access to 3rd party application to behave on all
-                      {{projectstring(plural=True)}} in your name.
-                    </p>
-                    <p>
-                      These are your personal tokens; they are not visible to others.
-                    </p>
-                    <p>
-                      These keys are valid for <span class="strong">60</span> days.
-                    </p>
-                    <p>
-                      These keys are private, make sure to store in a safe place and
-                      do not share it.
-                    </p>
-                  {% if user.tokens %}
-                  {% for token in user.tokens %}
-                    {% if not token.project %}
-                      {{ render_api_token(token, repo, username, form) }}
-                    {% endif %}
-                  {% endfor %}
-                  {% endif %}
+              <p>
+                API keys are tokens used to authenticate you on pagure. They can also
+                be used to grant access to 3rd party application to behave on all
+                {{projectstring(plural=True)}} in your name.
+              </p>
+              <p>
+                These are your personal tokens; they are not visible to others.
+              </p>
+              <p>
+                These keys are valid for <span class="strong">60</span> days.
+              </p>
+              <p>
+                These keys are private, make sure to store in a safe place and
+                do not share it.
+              </p>
+              {% if user.tokens %}
+              {% for token in user.tokens %}
+                {% if not token.project %}
+                  {{ render_api_token(token, repo, username, form) }}
+                {% endif %}
+              {% endfor %}
+              {% endif %}
           </div>
         </div>
         </div>
