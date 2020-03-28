@@ -234,6 +234,21 @@ class PagureFlaskRepoViewHistoryFiletests(tests.Modeltests):
         output_text = output.get_data(as_text=True)
         self.assertIn("No history could be found for this file", output_text)
 
+    def test_view_history_file_existing_folder(self):
+        """ Test the view_history_file endpoint """
+        tests.add_content_to_git(
+            os.path.join(self.path, "repos", "test.git"), folders="foo/bar"
+        )
+
+        output = self.app.get("/test/history/foo/bar/")
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        self.assertIn(
+            "<strong>Add content to file foo/bar/sources</strong>", output_text
+        )
+        data = self.regex.findall(output_text)
+        self.assertEqual(len(data), 1)
+
     def test_view_history_file_unborn_head_no_identifier(self):
         repo_obj = pygit2.Repository(
             os.path.join(self.path, "repos", "test.git")
@@ -243,4 +258,4 @@ class PagureFlaskRepoViewHistoryFiletests(tests.Modeltests):
         output = self.app.get("/test/history/sources")
         self.assertEqual(output.status_code, 400)
         output_text = output.get_data(as_text=True)
-        self.assertIn("No history could be found for this file", output_text)
+        self.assertIn("Invalid repository", output_text)

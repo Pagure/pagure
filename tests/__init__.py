@@ -1000,6 +1000,7 @@ def add_tag_git_repo(folder, tagname, obj_hash, message):
 def add_content_to_git(
     folder,
     branch="master",
+    folders=None,
     filename="sources",
     content="foo",
     message=None,
@@ -1012,9 +1013,13 @@ def add_content_to_git(
     )
 
     # Create a file in that git repo
-    with open(
-        os.path.join(newfolder, filename), "a", encoding="utf-8"
-    ) as stream:
+    if folders:
+        if not os.path.exists(os.path.join(newfolder, folders)):
+            os.makedirs(os.path.join(newfolder, folders))
+        filename = os.path.join(folders, filename)
+
+    filepath = os.path.join(newfolder, filename)
+    with open(filepath, "a", encoding="utf-8") as stream:
         stream.write("%s\n" % content)
     repo.index.add(filename)
     repo.index.write()

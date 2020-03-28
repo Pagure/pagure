@@ -829,9 +829,15 @@ def view_history_file(repo, filename, username=None, namespace=None):
     repo_obj = flask.g.repo_obj
 
     branchname = flask.request.args.get("identifier")
-
     if repo_obj.is_empty:
         flask.abort(404, description="Empty repo cannot have a file")
+
+    if not branchname:
+        try:
+            branch = repo_obj.lookup_branch(repo_obj.head.shorthand)
+            branchname = branch.branch_name
+        except pygit2.GitError:
+            flask.abort(400, description="Invalid repository")
 
     try:
         log = pagure.lib.repo.PagureRepo.log(
