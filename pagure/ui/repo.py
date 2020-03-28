@@ -322,6 +322,14 @@ def view_commits(repo, branchname=None, username=None, namespace=None):
         if isinstance(commit, pygit2.Tag):
             commit = commit.peel(pygit2.Commit)
             branchname = commit.oid.hex
+        elif isinstance(commit, pygit2.Blob):
+            try:
+                commit = commit.peel(pygit2.Commit)
+                branchname = commit.oid.hex
+            except Exception:
+                flask.abort(
+                    404, description="Invalid branch/identifier provided"
+                )
     elif not repo_obj.is_empty and not repo_obj.head_is_unborn:
         branch = repo_obj.lookup_branch(repo_obj.head.shorthand)
         commit = branch.peel(pygit2.Commit)

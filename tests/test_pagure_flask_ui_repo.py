@@ -31,6 +31,7 @@ sys.path.insert(
 import pagure.lib.query
 import tests
 from pagure.lib.repo import PagureRepo
+from pagure.utils import __get_file_in_tree as get_file_in_tree
 
 
 class PagureFlaskRepotests(tests.Modeltests):
@@ -2281,6 +2282,28 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertNotIn(latest_commit.oid.hex, output_text)
         self.assertIn("<title>Commits - test - Pagure</title>", output_text)
         self.assertEqual(output_text.count('<span id="commit-actions">'), 1)
+
+    def test_view_commits_from_blob(self):
+        """ Test the view_commits endpoint given a blob. """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
+
+        tests.add_content_to_git(os.path.join(self.path, "repos", "test.git"))
+
+        # Retrieve the blob of the `sources` file in head
+        repo_obj = pygit2.Repository(
+            os.path.join(self.path, "repos", "test.git")
+        )
+        commit = repo_obj[repo_obj.head.target]
+        content = get_file_in_tree(
+            repo_obj, commit.tree, ["sources"], bail_on_tree=True
+        )
+
+        output = self.app.get("/test/commits/%s" % content.oid.hex)
+        self.assertEqual(output.status_code, 404)
+        output_text = output.get_data(as_text=True)
+        self.assertIn("Invalid branch/identifier provided", output_text)
 
     def test_view_commit_from_tag(self):
         """ Test the view_commit endpoint given a tag. """
