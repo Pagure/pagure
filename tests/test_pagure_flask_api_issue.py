@@ -4524,6 +4524,37 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.assertEqual(data["total_issues_assigned_pages"], 1)
         self.assertEqual(data["total_issues_created_pages"], 1)
 
+    def api_api_view_issue_user_token(self):
+        """ Testhe the api view issues of the flask api with valid user token """
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, "tickets", bare=True)
+        )
+        tests.create_tokens(self.session, project_id=None)
+        tests.create_tokens_acl(self.session)
+
+        headers = {"Authorization": "token aaabbbcccddd"}
+
+        # Create issue
+        repo = pagure.lib.query.get_authorized_project(self.session, "test")
+        msg = pagure.lib.query.new_issue(
+            session=self.session,
+            repo=repo,
+            title="Test issue #1",
+            content="We should work on this",
+            user="pingou",
+            private=False,
+            issue_uid="aaabbbccc1",
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, "Test issue #1")
+        self.assertEqual(msg.related_prs, [])
+        self.assertEqual(msg.id, 1)
+
+        # Check issue
+        output = self.app.get("/api/0/test/issue/1")
+        self.assertEqual(output.status_code, 200)
+
 
 if __name__ == "__main__":
     SUITE = unittest.TestLoader().loadTestsFromTestCase(

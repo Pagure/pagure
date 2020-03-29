@@ -564,7 +564,7 @@ def api_view_issue(repo, issueid, username=None, namespace=None):
 
     repo = _get_repo(repo, username, namespace)
     _check_issue_tracker(repo)
-    _check_token(repo)
+    _check_token(repo, project_token=False)
 
     issue_id = issue_uid = None
     try:
