@@ -3,6 +3,15 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
+
+5.9.1 (2020-03-30)
+------------------
+- Add a missing </div> that broke the user's settings page
+- Do not block when waiting for subprocess to finish (Michal Srb)
+- Fix git blame when the identifier provided is a blob
+- Fix view_commits when the identified provided is a blob
+- When viewing file's history, use the default branch if needed
+
 5.9 (2020-03-24)
 ----------------
 - Swap "Add" and "Cancel" button ordering for access management (Ken Dreyer)
