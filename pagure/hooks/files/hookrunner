@@ -6,6 +6,12 @@
 
  Authors:
    Patrick Uiterwijk <puiterwijk@redhat.com>
+ 
+ Notes:
+   If you've installed Pagure with a virtual environment, replace the
+   interpreter path like this:
+   
+   #!/path/to/pagure_env/bin/python
 
 """
 
@@ -13,6 +19,7 @@ from __future__ import unicode_literals, absolute_import
 
 import os
 import sys
+ 
 # The following is only needed if you did not install pagure
 # as a python module (for example if you run it from a git clone).
 #sys.path.insert(0, '/path/to/pagure/')
