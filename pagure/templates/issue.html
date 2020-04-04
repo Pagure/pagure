@@ -676,6 +676,9 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
   url_for('static', filename='vendor/jquery.atwho/jquery.atwho.min.js') }}?version={{ g.version}}"></script>
 <script type="text/javascript" nonce="{{ g.nonce }}" src="{{
   url_for('static', filename='tags.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='comments.js') }}?version={{ g.version}}"></script>
+
 
 <script type="text/javascript" nonce="{{ g.nonce }}">
 
@@ -795,52 +798,6 @@ function cancel_edit_btn() {
     });
 };
 
-function setup_reply_btns() {
-  $(".reply").unbind();
-  $( ".reply" ).click(
-    function() {
-      var commentid = $( this ).attr('data-comment');
-      var _url = "{{ url_for(
-          'api_ns.api_view_issue',
-          repo=repo.name,
-          username=username,
-          namespace=repo.namespace,
-          issueid=issueid) }}";
-      if (commentid) {
-          var _key = 'comment';
-          _url = _url + '/comment/' + commentid;
-      } else {
-          var _key = 'content';
-      }
-      $.ajax({
-          url: _url,
-          type: 'GET',
-          dataType: 'json',
-          success: function(res) {
-            var _text = res[_key].split("\n");
-            var _output = new Array();
-            for (cnt = 0; cnt < _text.length ; cnt ++) {
-                _output[cnt] = '> ' + $.trim(_text[cnt]);
-            }
-            var _prev = $.trim($( "#comment" ).val());
-            if (_prev.length > 0){
-                _prev += "\n\n";
-            }
-            $( "#comment" ).val(_prev + _output.join("\n") + "\n\n");
-            $( "#comment" ).focus();
-          },
-          error: function() {
-              alert('Failed to retrieve comment text');
-          }
-      });
-    }
-  ).click(function(){
-    $('html, body').animate({
-        scrollTop: $("#comment").offset().top
-    }, 2000);
-  });
-};
-
 $(document).ready(function() {
   var cur_hash = null;
 
@@ -887,7 +844,14 @@ $(document).ready(function() {
   $(window).on('hashchange', highlight_comment);
   cancel_edit_btn();
   setup_edit_btns();
-  setup_reply_btns();
+
+  var url = "{{ url_for(
+      'api_ns.api_view_issue',
+      repo=repo.name,
+      username=username,
+      namespace=repo.namespace,
+      issueid=issueid) }}";
+  setup_issue_reply_btns(url);
 
 });
 </script>

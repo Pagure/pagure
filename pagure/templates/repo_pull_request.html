@@ -752,6 +752,8 @@
   url_for('static', filename='request_ev.js') }}?version={{ g.version}}"></script>
 <script type="text/javascript" nonce="{{ g.nonce }}" src="{{
   url_for('static', filename='tags.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='comments.js') }}?version={{ g.version}}"></script>
 
 <script type="text/javascript" nonce="{{ g.nonce }}">
 function cancel_edit_btn() {
@@ -799,54 +801,6 @@ function setup_edit_btns() {
     return false;
   });
 };
-
-function setup_reply_btns() {
-  $(".reply").unbind();
-  $( ".reply" ).click(
-    function() {
-      var commentid = $( this ).attr('data-comment');
-      var _url = "{{ url_for(
-          'api_ns.api_pull_request_view',
-          repo=repo.name,
-          requestid=requestid,
-          username=username,
-          namespace=repo.namespace) }}";
-      $.ajax({
-          url: _url,
-          type: 'GET',
-          dataType: 'json',
-          success: function(res) {
-            var _text;
-            if (commentid) {
-                _text = res['comments'].find(
-                    element => element['id'] == commentid)['comment'];
-            } else {
-                _text = res['initial_comment'];
-            }
-            _text = _text.split("\n");
-            var _output = new Array();
-            for (cnt = 0; cnt < _text.length ; cnt ++) {
-                _output[cnt] = '> ' + $.trim(_text[cnt]);
-            }
-            var _prev = $.trim($( "#comment" ).val());
-            if (_prev.length > 0){
-                _prev += "\n\n";
-            }
-            $( "#comment" ).val(_prev + _output.join("\n") + "\n\n");
-            $( "#comment" ).focus();
-          },
-          error: function() {
-              alert('Failed to retrieve comment text');
-          }
-      });
-    }
-  ).click(function(){
-    $('html, body').animate({
-        scrollTop: $("#comment").offset().top
-    }, 2000);
-  });
-};
-
 
 function showTab(){
   $('#pr-tabs a[href="#request_diff"]').tab('show')
@@ -1150,7 +1104,14 @@ $(document).ready(function() {
   );
 
   setup_edit_btns();
-  setup_reply_btns();
+
+  var url = "{{ url_for(
+      'api_ns.api_pull_request_view',
+      repo=repo.name,
+      requestid=requestid,
+      username=username,
+      namespace=repo.namespace) }}";
+  setup_pr_reply_btns(url);
 
 {% endif %}
 
