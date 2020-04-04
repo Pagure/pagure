@@ -417,7 +417,6 @@ class Project(BASE):
         primaryjoin="projects.c.id==user_projects.c.project_id",
         secondaryjoin="and_(users.c.id==user_projects.c.user_id,\
                 user_projects.c.access=='admin')",
-        backref="co_projects_admins",
         viewonly=True,
     )
 
@@ -428,7 +427,6 @@ class Project(BASE):
         secondaryjoin="and_(users.c.id==user_projects.c.user_id,\
                 or_(user_projects.c.access=='commit',\
                     user_projects.c.access=='admin'))",
-        backref="co_projects_committers",
         viewonly=True,
     )
 
@@ -453,7 +451,6 @@ class Project(BASE):
         primaryjoin="projects.c.id==projects_groups.c.project_id",
         secondaryjoin="and_(pagure_group.c.id==projects_groups.c.group_id,\
                 projects_groups.c.access=='admin')",
-        backref="projects_admin_groups",
         order_by="PagureGroup.group_name.asc()",
         viewonly=True,
     )
@@ -465,7 +462,6 @@ class Project(BASE):
         secondaryjoin="and_(pagure_group.c.id==projects_groups.c.group_id,\
                 or_(projects_groups.c.access=='admin',\
                     projects_groups.c.access=='commit'))",
-        backref="projects_committer_groups",
         order_by="PagureGroup.group_name.asc()",
         viewonly=True,
     )
