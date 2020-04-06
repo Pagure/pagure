@@ -22,6 +22,8 @@ function setup_reply_btns(url, initial_comment_key) {
             var comment_url = url;
             if (commentid) {
                 comment_url = comment_url + '/comment/' + commentid;
+            } else {
+                comment_url = comment_url + '?comments=false';
             }
 
             $.ajax({

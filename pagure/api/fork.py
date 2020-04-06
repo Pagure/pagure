@@ -387,12 +387,15 @@ def api_pull_request_view(repo, requestid, username=None, namespace=None):
         }
 
     """
+    comments = is_true(flask.request.args.get("comments", True))
 
     repo = _get_repo(repo, username, namespace)
     _check_pull_request(repo)
     request = _get_request(repo, requestid)
 
-    jsonout = flask.jsonify(request.to_json(public=True, api=True))
+    jsonout = flask.jsonify(
+        request.to_json(public=True, api=True, with_comments=comments)
+    )
     return jsonout
 
 
