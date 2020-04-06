@@ -1,18 +1,3 @@
-function get_comment_text_from_issue_data(data, commentid) {
-    if (commentid) {
-        return data['comment'];
-    }
-    return data['content'];
-}
-
-function get_comment_text_from_pr_data(data, commentid) {
-    if (commentid) {
-        return data['comments'].find(
-            element => element['id'] == commentid)['comment'];
-    }
-    return data['initial_comment'];
-}
-
 function reply(quote) {
     var text = $.trim($( "#comment" ).val());
     if (text.length > 0) {
@@ -28,15 +13,15 @@ function reply(quote) {
     $( "#comment" ).focus();
 }
 
-function setup_reply_btns(url, get_comment_text, comment_url_path) {
+function setup_reply_btns(url, initial_comment_key) {
     $(".reply").unbind();
     $( ".reply" ).click(
         function() {
             var commentid = $( this ).attr('data-comment');
 
             var comment_url = url;
-            if (comment_url_path && commentid) {
-                comment_url = comment_url + comment_url_path + commentid;
+            if (commentid) {
+                comment_url = comment_url + '/comment/' + commentid;
             }
 
             $.ajax({
@@ -44,7 +29,7 @@ function setup_reply_btns(url, get_comment_text, comment_url_path) {
                 type: 'GET',
                 dataType: 'json',
                 success: function(res) {
-                    var quote = get_comment_text(res, commentid);
+                    var quote = res[commentid ? 'comment' : initial_comment_key];
                     reply(quote)
                 },
                 error: function() {
@@ -62,9 +47,9 @@ function setup_reply_btns(url, get_comment_text, comment_url_path) {
 };
 
 function setup_issue_reply_btns(url) {
-    setup_reply_btns(url, get_comment_text_from_issue_data, '/comment/');
+    setup_reply_btns(url, 'content');
 }
 
 function setup_pr_reply_btns(url) {
-    setup_reply_btns(url, get_comment_text_from_pr_data, '');
+    setup_reply_btns(url, 'initial_comment');
 }

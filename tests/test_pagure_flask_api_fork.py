@@ -3851,5 +3851,78 @@ class PagureApiThresholdReachedTests(tests.Modeltests):
         self.assertDictEqual(data, self.expected_data)
 
 
+class PagureFlaskApiForkGetCommenttests(tests.Modeltests):
+    """ Tests for the flask API of pagure for the comment endpoint of PRs
+    """
+
+    maxDiff = None
+
+    def setUp(self):
+        """ Set up the environment, ran before every tests. """
+        super(PagureFlaskApiForkGetCommenttests, self).setUp()
+
+        pagure.config.config["REQUESTS_FOLDER"] = None
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
+        tests.create_projects_git(
+            os.path.join(self.path, "requests"), bare=True
+        )
+        tests.add_readme_git_repo(os.path.join(self.path, "repos", "test.git"))
+        tests.add_commit_git_repo(
+            os.path.join(self.path, "repos", "test.git"), ncommits=5
+        )
+        tests.add_commit_git_repo(
+            os.path.join(self.path, "repos", "test.git"), branch="test"
+        )
+
+        # Create the pull-request
+        repo = pagure.lib.query.get_authorized_project(self.session, "test")
+        req = pagure.lib.query.new_pull_request(
+            session=self.session,
+            repo_from=repo,
+            branch_from="test",
+            repo_to=repo,
+            branch_to="master",
+            title="test pull-request",
+            user="pingou",
+        )
+
+        pagure.lib.query.add_pull_request_comment(
+            session=self.session,
+            request=req,
+            commit=None,
+            tree_id=None,
+            filename=None,
+            row=None,
+            comment="+1",
+            user="pingou",
+            notify=False,
+            notification=True,
+        )
+
+        self.session.commit()
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, "test pull-request")
+        self.assertEqual(len(req.comments), 1)
+        self.assertEqual(req.comments[0].id, 1)
+
+    def test_api_pull_request_get_comment_not_found(self):
+        """ Test the api_pull_request_get_comment method of the flask api. """
+        output = self.app.get("/api/0/test/pull-request/1/comment/2")
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(
+            data, {"error": "Comment not found", "error_code": "ENOCOMMENT"}
+        )
+
+    def test_api_pull_request_get_comment(self):
+        """ Test the api_pull_request_get_comment method of the flask api. """
+        output = self.app.get("/api/0/test/pull-request/1/comment/1")
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(data["comment"], "+1")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

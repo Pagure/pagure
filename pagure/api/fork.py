@@ -1739,3 +1739,84 @@ def api_pull_request_assign(repo, requestid, username=None, namespace=None):
 
     jsonout = flask.jsonify(output)
     return jsonout
+
+
+@API.route(
+    "/<repo>/pull-request/<int:requestid>/comment/<int:commentid>",
+    methods=["GET"],
+)
+@API.route(
+    "/<namespace>/<repo>/pull-request/<int:requestid>/comment/<int:commentid>",
+    methods=["GET"],
+)
+@API.route(
+    "/fork/<username>/<repo>/pull-request/<int:requestid>/comment/"
+    "<int:commentid>",
+    methods=["GET"],
+)
+@API.route(
+    "/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/comment/"
+    "<int:commentid>",
+    methods=["GET"],
+)
+@api_method
+def api_pull_request_get_comment(
+    repo, requestid, commentid, username=None, namespace=None
+):
+    """
+    Comment of a pull-request
+    -------------------------
+    Retrieve a specific comment of a pull-request.
+
+    ::
+
+        GET /api/0/<repo>/pull-request/<request id>/comment/<int:commentid>
+        GET /api/0/<namespace>/<repo>/pull-request/<request id>/comment/<int:commentid>
+
+    ::
+
+        GET /api/0/fork/<username>/<repo>/pull-request/<request id>/comment/<int:commentid>
+        GET /api/0/fork/<username>/<namespace>/<repo>/pull-request/<request id>/comment/<int:commentid>
+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "comment": "Fix indentation.",
+          "commit": "f2345d6c164f704d9afb91f8dc2f5bd0cf3202e7",
+          "date_created": "1519735412",
+          "edited_on": null,
+          "editor": null,
+          "filename": "pagure/default_config.py",
+          "id": 46372,
+          "line": 8,
+          "notification": false,
+          "parent": null,
+          "reactions": {},
+          "tree": "cc781b3cb8896e85bd9e4b02655ef3af42c0bd11",
+          "user": {
+            "fullname": "Alice A.",
+            "name": "alice"
+          }
+        }
+
+    """  # noqa
+
+    output = {}
+
+    repo = _get_repo(repo, username, namespace)
+    _check_pull_request(repo)
+    request = _get_request(repo, requestid)
+
+    comment = pagure.lib.query.get_request_comment(
+        flask.g.session, request.uid, commentid
+    )
+    if not comment:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOCOMMENT)
+
+    output = comment.to_json(public=True)
+    jsonout = flask.jsonify(output)
+    return jsonout
