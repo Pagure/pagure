@@ -38,6 +38,7 @@ from pagure.api.utils import (
     _get_request,
     _check_pull_request,
     _check_pull_request_access,
+    _check_private_pull_request_access,
 )
 
 
@@ -392,6 +393,7 @@ def api_pull_request_view(repo, requestid, username=None, namespace=None):
     repo = _get_repo(repo, username, namespace)
     _check_pull_request(repo)
     request = _get_request(repo, requestid)
+    _check_private_pull_request_access(request)
 
     jsonout = flask.jsonify(
         request.to_json(public=True, api=True, with_comments=comments)
@@ -1813,6 +1815,7 @@ def api_pull_request_get_comment(
     repo = _get_repo(repo, username, namespace)
     _check_pull_request(repo)
     request = _get_request(repo, requestid)
+    _check_private_pull_request_access(request)
 
     comment = pagure.lib.query.get_request_comment(
         flask.g.session, request.uid, commentid
