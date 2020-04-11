@@ -27,6 +27,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
  # config.vm.synced_folder ".", "/vagrant", type: "nfs", nfs_version: 4, nfs_udp: false
  config.vm.synced_folder ".", "/vagrant", disabled: true
  config.vm.synced_folder ".", "/srv/pagure",
+     ssh_opts_append: "-o IdentitiesOnly=yes",
      type: "sshfs"
 
  # To cache update packages (which is helpful if frequently doing `vagrant destroy && vagrant up`)
