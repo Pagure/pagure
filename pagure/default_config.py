@@ -454,7 +454,6 @@ LOGGING = {
     "filters": {"myfilter": {"()": ContextInjector}},
     "handlers": {
         "console": {
-            "level": "INFO",
             "formatter": "standard",
             "class": "logging.StreamHandler",
             "stream": "ext://sys.stdout",
