@@ -10,13 +10,19 @@ Here are some tips:
 
 * You can populate the database with `python dev-data.py --all`
 
-* Run `pstart` to start the development server and `pstop` to stop it.
-
 * Logs for the server are available with `journalctl`; the services are run
   as systemd user units in ~/.config/systemd/user/
 
 * To run the tests you need python3 virtualenv: `workon python3-pagure`.
   Then you can run them with `./runtests.py run`.
+
+Here is a list of command and alias you may find useful:
+
+* pstart: to start all the services
+* pstop:  to stop all the services
+* prestart: to restart all the services
+* plog:   to access the logs of the `pagure` service (the web server)
+
 
 Once you start the server you can navigate to http://localhost:5000/
 in your browser on the host to access your Pagure development environment.

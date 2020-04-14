@@ -41,3 +41,5 @@ pstatus (){
     systemctl --user status pagure.service pagure-docs.service pagure_ci.service\
         pagure_ev.service pagure_webhook.service pagure_worker.service
 }
+
+alias plog="journalctl --user -lu pagure.service"
