@@ -39,6 +39,7 @@ def proxy_raw_git():
     This should get called after it is determined the requested project
     is not on repoSpanner.
     """
+    _log.debug("Raw git clone proxy started")
     # We are going to shell out to gitolite-shell. Prepare the env it needs.
     gitenv = {
         "PATH": os.environ["PATH"],
@@ -93,8 +94,10 @@ def proxy_raw_git():
             raise ValueError("Value for key %s unknown" % key)
 
     if gitolite:
+        _log.debug("Running git via: %s", gitolite)
         cmd = [gitolite]
     else:
+        _log.debug("Running git via git directly")
         cmd = ["/usr/bin/git", "http-backend"]
 
     # Note: using a temporary files to buffer the input contents
@@ -111,6 +114,7 @@ def proxy_raw_git():
             infile.write(block)
         infile.seek(0)
 
+        _log.debug("Calling: %s", cmd)
         proc = subprocess.Popen(
             cmd, stdin=infile, stdout=subprocess.PIPE, stderr=None, env=gitenv
         )
