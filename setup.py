@@ -63,6 +63,7 @@ setup(
     gitolite2 = pagure.lib.git_auth:Gitolite2Auth
     gitolite3 = pagure.lib.git_auth:Gitolite3Auth
     pagure = pagure.lib.git_auth:PagureGitAuth
+    pagure_authorized_keys = pagure.lib.git_auth:PagureGitAuth
     """,
     classifiers=[
         "License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)",

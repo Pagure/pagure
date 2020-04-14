@@ -1248,3 +1248,49 @@ def generate_archive(
         namespace=project.namespace,
         username=project.user.user if project.is_fork else None,
     )
+
+
+@conn.task(queue=pagure_config.get("AUTHORIZED_KEYS_QUEUE", None), bind=True)
+@pagure_task
+def add_key_to_authorized_keys(self, session, ssh_folder, username, sshkey):
+    """ Add the specified key to the the `authorized_keys` file of the
+    specified ssh folder.
+    """
+    if not os.path.exists(ssh_folder):
+        _log.info("No folder '%s' found", ssh_folder)
+        return
+
+    fullpath = os.path.join(ssh_folder, "authorized_keys")
+    _log.info("Add ssh key for user %s to %s", username, fullpath)
+    with open(fullpath, "a") as stream:
+        stream.write("\n")
+        stream.write(
+            "{0} {1}".format(
+                pagure_config["SSH_KEYS_OPTIONS"] % {"username": username},
+                sshkey.strip(),
+            )
+        )
+
+
+@conn.task(queue=pagure_config.get("AUTHORIZED_KEYS_QUEUE", None), bind=True)
+@pagure_task
+def remove_key_from_authorized_keys(self, session, ssh_folder, sshkey):
+    """ Remove the specified key from the the `authorized_keys` file of the
+    specified ssh folder.
+    """
+    if not os.path.exists(ssh_folder):
+        _log.info("No folder '%s' found", ssh_folder)
+        return
+
+    fullpath = os.path.join(ssh_folder, "authorized_keys")
+    _log.info("Removing ssh key in %s", fullpath)
+    output = []
+    with open(fullpath, "r") as stream:
+        for row in stream.readlines():
+            row = row.strip()
+            if sshkey in row:
+                continue
+            output.append(row)
+
+    with open(fullpath, "w") as stream:
+        stream.write("\n".join(output))

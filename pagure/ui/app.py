@@ -21,6 +21,7 @@ from sqlalchemy.exc import SQLAlchemyError
 import pagure.exceptions
 import pagure.lib.git
 import pagure.lib.query
+import pagure.lib.tasks
 import pagure.forms
 import pagure.ui.filters
 from pagure.config import config as pagure_config
@@ -1201,6 +1202,16 @@ def add_user_sshkey():
                 user, pagure_config.get("GITOLITE_KEYDIR", None)
             )
             pagure.lib.tasks.gitolite_post_compile_only.delay()
+            if (
+                pagure_config.get("GIT_AUTH_BACKEND")
+                == "pagure_authorized_keys"
+            ):
+                _log.info("SSH FOLDER: %s", pagure_config.get("SSH_FOLDER"))
+                pagure.lib.tasks.add_key_to_authorized_keys.delay(
+                    ssh_folder=pagure_config.get("SSH_FOLDER"),
+                    username=flask.g.fas_user.username,
+                    sshkey=form.ssh_key.data,
+                )
             flask.flash(msg)
             return flask.redirect(
                 flask.url_for("ui_ns.user_settings") + "#nav-ssh-tab"
@@ -1234,8 +1245,10 @@ def remove_user_sshkey(keyid):
     if form.validate_on_submit():
         user = _get_user(username=flask.g.fas_user.username)
         found = False
+        sshkey = None
         for key in user.sshkeys:
             if key.id == keyid:
+                sshkey = key.public_ssh_key
                 flask.g.session.delete(key)
                 found = True
                 break
@@ -1252,6 +1265,14 @@ def remove_user_sshkey(keyid):
                 user, pagure_config.get("GITOLITE_KEYDIR", None)
             )
             pagure.lib.tasks.gitolite_post_compile_only.delay()
+            if (
+                pagure_config.get("GIT_AUTH_BACKEND")
+                == "pagure_authorized_keys"
+            ):
+                _log.info("SSH FOLDER: %s", pagure_config.get("SSH_FOLDER"))
+                pagure.lib.tasks.remove_key_from_authorized_keys.delay(
+                    ssh_folder=pagure_config.get("SSH_FOLDER"), sshkey=sshkey
+                )
             flask.flash("SSH key removed")
         except SQLAlchemyError as err:  # pragma: no cover
             flask.g.session.rollback()

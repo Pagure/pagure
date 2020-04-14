@@ -1833,8 +1833,10 @@ def remove_deploykey(repo, keyid, username=None, namespace=None):
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
         found = False
+        sshkey = None
         for key in repo.deploykeys:
             if key.id == keyid:
+                sshkey = key.public_ssh_key
                 flask.g.session.delete(key)
                 found = True
                 break
@@ -1857,6 +1859,14 @@ def remove_deploykey(repo, keyid, username=None, namespace=None):
                 repo, pagure_config.get("GITOLITE_KEYDIR", None)
             )
             pagure.lib.tasks.gitolite_post_compile_only.delay()
+            if (
+                pagure_config.get("GIT_AUTH_BACKEND")
+                == "pagure_authorized_keys"
+            ):
+                _log.info("SSH FOLDER: %s", pagure_config.get("SSH_FOLDER"))
+                pagure.lib.tasks.remove_key_from_authorized_keys.delay(
+                    ssh_folder=pagure_config.get("SSH_FOLDER"), sshkey=sshkey
+                )
             flask.flash("Deploy key removed")
         except SQLAlchemyError as err:  # pragma: no cover
             flask.g.session.rollback()
@@ -1981,6 +1991,16 @@ def add_deploykey(repo, username=None, namespace=None):
                 repo, pagure_config.get("GITOLITE_KEYDIR", None)
             )
             pagure.lib.tasks.gitolite_post_compile_only.delay()
+            if (
+                pagure_config.get("GIT_AUTH_BACKEND")
+                == "pagure_authorized_keys"
+            ):
+                _log.info("SSH FOLDER: %s", pagure_config.get("SSH_FOLDER"))
+                pagure.lib.tasks.add_key_to_authorized_keys.delay(
+                    ssh_folder=pagure_config.get("SSH_FOLDER"),
+                    username=flask.g.fas_user.username,
+                    sshkey=form.ssh_key.data,
+                )
             flask.flash(msg)
             return flask.redirect(
                 flask.url_for(
