@@ -5652,7 +5652,7 @@ def update_read_only_mode(session, repo, read_only=True):
         session.add(repo)
 
 
-def issues_history_stats(session, project):
+def issues_history_stats(session, project, detailed=False):
     """ Returns the number of opened issues on the specified project over
     the last 365 days
 
@@ -5675,23 +5675,35 @@ def issues_history_stats(session, project):
     tomorrow = datetime.datetime.utcnow() + datetime.timedelta(days=1)
     output = {}
     for week in range(53):
-        start = tomorrow - datetime.timedelta(days=(week * 7))
+        end = tomorrow - datetime.timedelta(days=(week * 7))
+        start = end - datetime.timedelta(days=7)
         closed_ticket = (
             session.query(model.Issue)
             .filter(model.Issue.project_id == project.id)
             .filter(model.Issue.closed_at >= start)
-            .filter(model.Issue.date_created <= start)
-        )
-        open_ticket = (
+            .filter(model.Issue.closed_at < end)
+        ).count()
+        query_open = (
             session.query(model.Issue)
             .filter(model.Issue.project_id == project.id)
-            .filter(model.Issue.status == "Open")
-            .filter(model.Issue.date_created <= start)
+            .filter(model.Issue.date_created >= start)
+            .filter(model.Issue.date_created < end)
         )
-        cnt = open_ticket.count() + closed_ticket.count() - to_ignore
+        # For backward compatibility
+        if detailed is False:
+            query_open = query_open.filter(model.Issue.status == "Open")
+        open_ticket = query_open.count()
+        cnt = open_ticket + closed_ticket - to_ignore
         if cnt < 0:
             cnt = 0
-        output[start.isoformat()] = cnt
+        if detailed is False:
+            output[start.isoformat()] = cnt
+        else:
+            output[start.isoformat()] = {
+                "open_ticket": open_ticket,
+                "closed_ticket": closed_ticket,
+                "count": cnt,
+            }
 
     return output
 

@@ -4230,7 +4230,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         """ Test the api_view_issues_history_stats method of the flask api. """
         self.test_api_new_issue()
 
-        # Create private issue
+        # Create private issue, closed and without a closed_at date
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
         msg = pagure.lib.query.new_issue(
             session=self.session,
@@ -4254,6 +4254,27 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.assertEqual(data["stats"][last_key], 0)
         for k in sorted(data["stats"].keys())[:-1]:
             self.assertEqual(data["stats"][k], 0)
+
+    def test_api_view_issues_history_stats_detailed(self):
+        """ Test the api_view_issues_history_stats method of the flask api. """
+        self.test_api_new_issue()
+
+        output = self.app.get("/api/0/test/issues/history/detailed_stats")
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+
+        self.assertEqual(list(data.keys()), ["stats"])
+        self.assertEqual(len(data["stats"]), 53)
+        last_key = sorted(data["stats"].keys())[-1]
+        self.assertEqual(
+            data["stats"][last_key],
+            {"closed_ticket": 0, "count": 0, "open_ticket": 1},
+        )
+        for k in sorted(data["stats"].keys())[:-1]:
+            self.assertEqual(
+                data["stats"][k],
+                {"closed_ticket": 0, "count": 0, "open_ticket": 0},
+            )
 
     def test_api_view_user_issues_pingou(self):
         """ Test the api_view_user_issues method of the flask api for pingou.

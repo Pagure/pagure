@@ -1532,6 +1532,68 @@ def api_view_issues_history_stats(repo, username=None, namespace=None):
     repo = _get_repo(repo, username, namespace)
     _check_issue_tracker(repo)
 
-    stats = pagure.lib.query.issues_history_stats(flask.g.session, repo)
+    stats = pagure.lib.query.issues_history_stats(
+        flask.g.session, repo, detailed=False
+    )
+    jsonout = flask.jsonify({"stats": stats})
+    return jsonout
+
+
+@API.route("/<repo>/issues/history/detailed_stats")
+@API.route("/<namespace>/<repo>/issues/history/detailed_stats")
+@API.route("/fork/<username>/<repo>/issues/history/detailed_stats")
+@API.route("/fork/<username>/<namespace>/<repo>/issues/history/detailed_stats")
+@api_method
+def api_view_issues_history_detailed_stats(
+    repo, username=None, namespace=None
+):
+    """
+    List project's detailed statistical issues history.
+    ---------------------------------------------------
+    Provides the number of opened issues over the last year of the
+    project.
+
+    ::
+
+        GET /api/0/<repo>/issues/history/detailed_stats
+        GET /api/0/<namespace>/<repo>/issues/history/detailed_stats
+
+    ::
+
+        GET /api/0/fork/<username>/<repo>/issues/history/detailed_stats
+        GET /api/0/fork/<username>/<namespace>/<repo>/issues/history/detailed_stats
+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+        {
+          "stats": {
+            "2020-03-26T19:21:51.348451": {
+              "closed_ticket": 0,
+              "count": 0,
+              "open_ticket": 0
+            },
+            "2020-04-02T19:21:51.348451": {
+              "closed_ticket": 0,
+              "count": 0,
+              "open_ticket": 0
+            },
+            "2020-04-09T19:21:51.348451": {
+              "closed_ticket": 1,
+              "count": 0,
+              "open_ticket": 2
+            }
+          }
+        }
+
+    """  # noqa
+    repo = _get_repo(repo, username, namespace)
+    _check_issue_tracker(repo)
+
+    stats = pagure.lib.query.issues_history_stats(
+        flask.g.session, repo, detailed=True
+    )
     jsonout = flask.jsonify({"stats": stats})
     return jsonout
