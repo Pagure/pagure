@@ -1,64 +1,69 @@
-function issues_history_stats_plot(url, _b, _s) {
-  var svg = d3.select("svg"),
-      margin = {top: 20, right: 20, bottom: 30, left: 50},
-      width = $('#stats').width() - margin.left - margin.right,
-      height = +svg.attr("height") - margin.top - margin.bottom,
-      g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+window.chartColors = {
+  red: 'rgb(255, 99, 132)',
+  orange: 'rgb(255, 159, 64)',
+  yellow: 'rgb(255, 205, 86)',
+  green: 'rgb(75, 192, 192)',
+  blue: 'rgb(54, 162, 235)',
+  purple: 'rgb(153, 102, 255)',
+  grey: 'rgb(201, 203, 207)'
+};
 
-  var parseTime = d3.timeParse("%Y-%m-%d");
 
-  var x = d3.scaleTime()
-      .rangeRound([0, width]);
+function issues_history_stats_plot(data) {
+  $("#data_list").hide();
+  var color = Chart.helpers.color;
 
-  var y = d3.scaleLinear()
-      .rangeRound([height, 0]);
-
-  var area = d3.area()
-      .x(function(d) { return x(d.date); })
-      .y1(function(d) { return y(d.value); });
-
-  function draw_graph(data) {
-
-    x.domain(d3.extent(data, function(d) { return d.date; }));
-    y.domain([0, d3.max(data, function(d) { return d.value; })]);
-    area.y0(y(0));
-
-    g.append("path")
-        .datum(data)
-        .attr("fill", "steelblue")
-        .attr("d", area);
-
-    g.append("g")
-        .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisBottom(x));
-
-    g.append("g")
-        .call(d3.axisLeft(y))
-      .append("text")
-        .attr("fill", "#000")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 6)
-        .attr("dy", "0.71em")
-        .attr("text-anchor", "end")
-        .text("Open Issues");
+  var _open_tickets = [];
+  var _close_tickets = [];
+  var _lbl = []
+  for (var _d in data.stats) {
+    _lbl.push(_d.split('T', 1)[0]);
+    _open_tickets.push(data.stats[_d].open_ticket);
+    _close_tickets.push(data.stats[_d].closed_ticket);
   }
 
-  d3.json(url, function(d) {
-    var _out = [];
-    for (var _d in d.stats) {
-      var t = {};
-      t.date = parseTime(_d.split('T', 1)[0]);
-      t.value = d.stats[_d];
-      _out.push(t);
+  var barChartData = {
+    labels: _lbl,
+    datasets: [{
+      label: 'Tickets opened',
+      backgroundColor: color(window.chartColors.blue).alpha(0.5).rgbString(),
+      borderColor: window.chartColors.blue,
+      borderWidth: 1,
+      data: _open_tickets
+    }, {
+      label: 'Tickets closed',
+      backgroundColor: color(window.chartColors.red).alpha(0.5).rgbString(),
+      borderColor: window.chartColors.red,
+      borderWidth: 1,
+      data: _close_tickets
+    }]
+
+  };
+
+  window.myBar = new Chart("data_stats", {
+    type: 'bar',
+    data: barChartData,
+    options: {
+      responsive: true,
+      legend: {
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: 'Tickets opened and closed per week'
+      }
     }
-    draw_graph(_out);
-    _b.show();
-    _s.hide();
   });
+
+  $("#data_stats_spinner").hide();
+  var _b = $("#data_stats");
+  _b.show();
+
 }
 
 function show_commits_authors(data) {
-  var _b = $("#data_stats");
+  $("#data_stats").hide();
+  var _b = $("#data_list");
   var html = '<h2>Authors stats</h2><p> Since '
     + new Date(data.results[3]*1000) + ' there has been '
     + data.results[0] + ' commits found in this repo, from '
@@ -82,61 +87,53 @@ function show_commits_authors(data) {
 }
 
 function show_commits_history(data) {
-  var _b = $("#data_stats");
+  $("#data_list").hide();
+  var color = Chart.helpers.color;
 
-  var parseTime = d3.timeParse("%Y-%m-%d");
-
-  var _out = data.results.map(function(x){
-    var t = {};
-    t.date = parseTime(x[0]);
-    t.value = x[1];
-    return t;
-  });
-
-  var svg = d3.select("svg"),
-      margin = {top: 20, right: 20, bottom: 30, left: 50},
-      width = $('#stats').width() - margin.left - margin.right,
-      height = +svg.attr("height") - margin.top - margin.bottom,
-      g = svg.append("g").attr(
-        "transform", "translate(" + margin.left + "," + margin.top + ")");
-
-  var x = d3.scaleTime()
-      .rangeRound([0, width]);
-
-  var y = d3.scaleLinear()
-      .rangeRound([height, 0]);
-
-  var area = d3.area()
-      .x(function(d) { return x(d.date); })
-      .y1(function(d) { return y(d.value); });
-
-  function draw_graph(data) {
-
-    x.domain(d3.extent(data, function(d) { return d.date; }));
-    y.domain([0, d3.max(data, function(d) { return d.value; })]);
-    area.y0(y(0));
-
-    g.append("path")
-        .datum(data)
-        .attr("fill", "steelblue")
-        .attr("d", area);
-
-    g.append("g")
-        .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisBottom(x));
-
-    g.append("g")
-        .call(d3.axisLeft(y))
-      .append("text")
-        .attr("fill", "#000")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 6)
-        .attr("dy", "0.71em")
-        .attr("text-anchor", "end")
-        .text("Number of commits");
+  var _data = [];
+  var _lbl = []
+  for (var _d in data.results) {
+    _lbl.push(data.results[_d][0]);
+    _data.push(data.results[_d][1]);
   }
 
-  draw_graph(_out);
+  var data = {
+    labels: _lbl,
+    datasets: [{
+      label: 'Number of commits per week',
+      backgroundColor: color(window.chartColors.blue).alpha(0.5).rgbString(),
+      borderColor: window.chartColors.blue,
+      borderWidth: 1,
+      pointRadius: 0,
+      data: _data
+    }]
+  };
+
+  var options = {
+    scales: {
+      yAxes: [{
+        stacked: true
+      }]
+    },
+    plugins: {
+      filler: {
+        propagate: true
+      },
+    },
+    title: {
+      display: true,
+      text: 'Evolution of the number of commits over the last year'
+    }
+  };
+
+  var chart = new Chart('data_stats', {
+    type: 'line',
+    data: data,
+    options: options
+  });
+
+  $("#data_stats_spinner").hide();
+  var _b = $("#data_stats");
   _b.show();
 }
 
