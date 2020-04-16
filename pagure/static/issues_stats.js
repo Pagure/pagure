@@ -10,37 +10,72 @@ window.chartColors = {
 
 
 function issues_history_stats_plot(data) {
-  $("#data_list").hide();
+  $("#commiter_list").hide();
+  $(".commit_trend").hide();
   var color = Chart.helpers.color;
 
   var _open_tickets = [];
   var _close_tickets = [];
+  var _total = []
   var _lbl = []
   for (var _d in data.stats) {
     _lbl.push(_d.split('T', 1)[0]);
     _open_tickets.push(data.stats[_d].open_ticket);
     _close_tickets.push(data.stats[_d].closed_ticket);
+    _total.push(data.stats[_d].count);
   }
 
   var barChartData = {
     labels: _lbl,
     datasets: [{
-      label: 'Tickets opened',
+      label: 'Tickets opened that week',
       backgroundColor: color(window.chartColors.blue).alpha(0.5).rgbString(),
       borderColor: window.chartColors.blue,
       borderWidth: 1,
       data: _open_tickets
     }, {
-      label: 'Tickets closed',
+      label: 'Tickets closed that week',
       backgroundColor: color(window.chartColors.red).alpha(0.5).rgbString(),
       borderColor: window.chartColors.red,
       borderWidth: 1,
       data: _close_tickets
     }]
-
   };
 
-  window.myBar = new Chart("data_stats", {
+  var lineData = {
+    labels: _lbl,
+    datasets: [{
+      label: 'Tickets open (total)',
+      backgroundColor: color(window.chartColors.blue).alpha(0.5).rgbString(),
+      borderColor: window.chartColors.blue,
+      borderWidth: 1,
+      pointRadius: 0,
+      data: _total
+    }]
+  };
+
+  new Chart('total_issue_trend_graph', {
+    type: 'line',
+    data: lineData,
+    options: {
+      scales: {
+        yAxes: [{
+          stacked: true
+        }]
+      },
+      plugins: {
+        filler: {
+          propagate: true
+        },
+      },
+      title: {
+        display: true,
+        text: 'Evolution of the number of commits over the last year'
+      }
+    }
+  });
+
+  new Chart("issue_trend_graph", {
     type: 'bar',
     data: barChartData,
     options: {
@@ -56,14 +91,13 @@ function issues_history_stats_plot(data) {
   });
 
   $("#data_stats_spinner").hide();
-  var _b = $("#data_stats");
-  _b.show();
-
+  $(".issue_trend").show();
 }
 
 function show_commits_authors(data) {
-  $("#data_stats").hide();
-  var _b = $("#data_list");
+  $(".commit_trend").hide();
+  $(".issue_trend").hide();
+  var _b = $("#commiter_list");
   var html = '<h2>Authors stats</h2><p> Since '
     + new Date(data.results[3]*1000) + ' there has been '
     + data.results[0] + ' commits found in this repo, from '
@@ -83,11 +117,14 @@ function show_commits_authors(data) {
   }
   html += '</div>';
   _b.html(html);
+  $("#data_stats_spinner").hide();
   _b.show();
 }
 
 function show_commits_history(data) {
-  $("#data_list").hide();
+  $("#commiter_list").hide();
+  $(".issue_trend").hide();
+
   var color = Chart.helpers.color;
 
   var _data = [];
@@ -126,15 +163,14 @@ function show_commits_history(data) {
     }
   };
 
-  var chart = new Chart('data_stats', {
+  var chart = new Chart('commit_trend_graph', {
     type: 'line',
     data: data,
     options: options
   });
 
   $("#data_stats_spinner").hide();
-  var _b = $("#data_stats");
-  _b.show();
+  $(".commit_trend").show();
 }
 
 function process_async(url, _data, callback) {

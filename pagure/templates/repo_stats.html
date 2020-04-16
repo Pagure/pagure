@@ -28,9 +28,11 @@
     </div>
     <div class="col-10">
       <section id="stats">
-        <span id="data_stats_spinner" class="hidden"></span>
-        <canvas nonce="{{ g.nonce }}" id="data_stats" class="hidden"></canvas>
-        <span id="data_list" class="hidden"></span>
+        <section id="data_stats_spinner" class="hidden"></section>
+        <span id="commiter_list" class="hidden"></span>
+        <canvas nonce="{{ g.nonce }}" id="commit_trend_graph" class="hidden commit_trend"></canvas>
+        <canvas nonce="{{ g.nonce }}" id="issue_trend_graph" class="hidden issue_trend"></canvas>
+        <canvas nonce="{{ g.nonce }}" id="total_issue_trend_graph" class="hidden issue_trend"></canvas>
       </section>
     </div>
   </div>
@@ -56,8 +58,11 @@ var view_commits_url = "{{ url_for('ui_ns.view_commits',
                     username=username,
                     namespace=repo.namespace,
                     author='---') }}";
+
 {% if g.issues_enabled %}
 issues_history_stats_plot_call = function() {
+  $("#commiter_list").hide();
+  $(".commit_trend").hide();
   var _stats_url = "{{ url_for(
     'api_ns.api_view_issues_history_stats',
     repo=g.repo.name,
@@ -78,7 +83,8 @@ issues_history_stats_plot_call = function() {
 
 commits_authors_call = function() {
   if (repo_exists){
-    $("#data_stats").hide();
+    $(".commit_trend").hide();
+    $(".issue_trend").hide();
     var _stats_url = "{{ url_for('internal_ns.get_stats_commits') }}";
     var _b = $("#data_list");
     var _s = $("#data_stats_spinner");
@@ -104,7 +110,8 @@ commits_authors_call = function() {
 
 commits_history_call = function() {
   if (repo_exists){
-    $("#data_list").hide();
+    $("#commiter_list").hide();
+    $(".issue_trend").hide();
     var _stats_url = "{{ url_for('internal_ns.get_stats_commits_trend') }}";
     var _b = $("#data_stats");
     var _s = $("#data_stats_spinner");
@@ -124,11 +131,11 @@ commits_history_call = function() {
     }
     process_async(_stats_url, data, show_commits_history);
   } else {
-    var _b = $("#data_stats");
+    var _b = $("#commiter_list");
     var html = '<h2>Commits stats</h2>'
     html += '<div class="alert alert-info">This project\'s repo is empty. No stats available.</div>';
-  _b.html(html);
-  _b.show();
+    _b.html(html);
+    _b.show();
   }
 };
 
@@ -136,8 +143,6 @@ commits_history_call = function() {
 $(document).ready(function() {
   $('.stats_btn').click(function(ev){
     ev.preventDefault();
-    var _b = $("#data_stats");
-    _b.hide();
     $('.stats_btn').removeClass('active');
     if ($(this).attr('name') == 'issues') {
       {% if g.issues_enabled %}
