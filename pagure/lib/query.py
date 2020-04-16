@@ -5660,19 +5660,40 @@ def issues_history_stats(session, project, detailed=False):
     :arg repo: model.Project object to get the issues stats about
 
     """
-
-    # Some ticket got imported as closed but without a closed_at date, so
-    # let's ignore them all
-    to_ignore = (
+    tomorrow = datetime.datetime.utcnow() + datetime.timedelta(days=1)
+    current_open = (
         session.query(model.Issue)
         .filter(model.Issue.project_id == project.id)
-        .filter(model.Issue.closed_at == None)  # noqa
-        .filter(model.Issue.status == "Closed")
+        .filter(model.Issue.status == "Open")
         .count()
     )
 
+    # Check if the oldest ticket with a closed_at date is older than a year
+    # ago, if it is, we will assume that all tickets that were closed last year
+    # have a closed_at date set.
+    oldest_closed = (
+        session.query(model.Issue)
+        .filter(model.Issue.project_id == project.id)
+        .filter(model.Issue.closed_at != None)  # noqa
+        .order_by(sqlalchemy.asc(model.Issue.closed_at))
+        .first()
+    )
+    a_year_ago = tomorrow - datetime.timedelta(days=(53 * 7))
+    if oldest_closed and oldest_closed.closed_at < a_year_ago:
+        to_ignore = 0
+    else:
+        # Some ticket got imported as closed but without a closed_at date, so
+        # let's ignore them all
+        to_ignore = (
+            session.query(model.Issue)
+            .filter(model.Issue.project_id == project.id)
+            .filter(model.Issue.closed_at == None)  # noqa
+            .filter(model.Issue.status == "Closed")
+            .count()
+        )
+
     # For each week from tomorrow, get the number of open tickets
-    tomorrow = datetime.datetime.utcnow() + datetime.timedelta(days=1)
+
     output = {}
     for week in range(53):
         end = tomorrow - datetime.timedelta(days=(week * 7))
@@ -5694,6 +5715,10 @@ def issues_history_stats(session, project, detailed=False):
             query_open = query_open.filter(model.Issue.status == "Open")
         open_ticket = query_open.count()
         cnt = open_ticket + closed_ticket - to_ignore
+        current_open = current_open - open_ticket + closed_ticket
+
+        if current_open < 0:
+            current_open = 0
         if cnt < 0:
             cnt = 0
         if detailed is False:
@@ -5702,7 +5727,7 @@ def issues_history_stats(session, project, detailed=False):
             output[start.isoformat()] = {
                 "open_ticket": open_ticket,
                 "closed_ticket": closed_ticket,
-                "count": cnt,
+                "count": current_open,
             }
 
     return output
