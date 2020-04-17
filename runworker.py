@@ -23,6 +23,19 @@ parser.add_argument(
     help="Expand the level of data returned.",
 )
 parser.add_argument(
+    "--queue",
+    dest="queue",
+    default=None,
+    help="Name of the queue to run the worker against.",
+)
+
+parser.add_argument(
+    "--tasks",
+    dest="tasks",
+    default="pagure.lib.tasks",
+    help="Class used by the workers.",
+)
+parser.add_argument(
     "--noinfo",
     dest="noinfo",
     action="store_true",
@@ -40,7 +53,10 @@ if args.config:
         config = os.path.join(here, config)
     env["PAGURE_CONFIG"] = config
 
-cmd = [sys.executable, "-m", "celery", "worker", "-A", "pagure.lib.tasks"]
+cmd = [sys.executable, "-m", "celery", "worker", "-A", args.tasks]
+
+if args.queue:
+    cmd.extend(["-Q", args.queue])
 
 if args.debug:
     cmd.append("--loglevel=debug")
