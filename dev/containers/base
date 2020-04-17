@@ -1,0 +1,25 @@
+FROM registry.fedoraproject.org/fedora:31
+LABEL maintainers="Patrick Uiterwijk <patrick@puiterwijk.org>, Andrew Engelbrecht <andrew@engelbrecht.io>"
+
+# using distro packages instead of pip, for a stable base image
+
+RUN dnf -y update && \
+    dnf -y install findutils gcc git libgit2-devel python3-alembic \
+                   python3-arrow python3-bcrypt python3-beautifulsoup4 \
+                   python3-binaryornot python3-black python3-bleach \
+                   python3-blinker python3-celery python3-chardet \
+                   python3-coverage python3-cryptography python3-devel \
+                   python3-docutils python3-eventlet python3-fedmsg \
+                   python3-fedora python3-fedora-flask python3-filelock \
+                   python3-flake8 python3-flask python3-flask-oidc \
+                   python3-flask-wtf python3-funcsigs python3-jinja2 \
+                   python3-kitchen python3-markdown python3-mock \
+                   python3-munch python3-nose python3-nose-xcover \
+                   python3-openid python3-openid-cla python3-openid-teams \
+                   python3-pillow python3-psutil python3-psycopg2 \
+                   python3-pygit2 python3-redis python3-requests \
+                   python3-setuptools python3-six python3-sqlalchemy \
+                   python3-straight-plugin python3-trololio \
+                   python-unversioned-command python3-wtforms which && \
+    dnf clean all
+

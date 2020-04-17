@@ -1,23 +1,15 @@
-FROM registry.fedoraproject.org/fedora:28
-MAINTAINER Patrick Uiterwijk <patrick@puiterwijk.org>
+FROM pagure-base:latest
+LABEL maintainers="Patrick Uiterwijk <patrick@puiterwijk.org>, Andrew Engelbrecht <andrew@engelbrecht.io>"
 
 VOLUME ["/repos"]
 RUN mkdir /code
+WORKDIR /code
 
-RUN dnf install -y python2-devel python-setuptools python-nose python2-bcrypt python-alembic \
-                   python-arrow python-binaryornot python-bleach python-blinker \
-                   python-chardet python-cryptography python-docutils python-flask \
-                   python-flask-wtf python-markdown python-psutil \
-                   python-pygit2 python-fedora python-openid python-openid-cla \
-                   python-openid-teams python-straight-plugin python-wtforms python-munch \
-                   python-enum34 python-redis python-sqlalchemy systemd gitolite3 python-filelock \
-                   python-fedora-flask python2-pillow python2-psycopg2 python2-celery \
-                   findutils
 COPY web-run /run.sh
 
-WORKDIR /code
 # Openshift: --no-debug
 ENTRYPOINT ["/usr/bin/bash", "/run.sh"]
+
 EXPOSE 5000
 
 # Code injection is last to make optimal use of caches
