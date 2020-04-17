@@ -2122,7 +2122,9 @@ index 0000000..60f7480
         self.assertIsNone(repo.issues[0].closed_at)
 
         data = {
-            "status": "Open",
+            "status": "Closed",
+            "close_status": "Fixed",
+            "closed_at": "1426595225",
             "title": "Rename pagure",
             "private": False,
             "content": "This is too much of a conflict with the book",
@@ -2194,6 +2196,8 @@ index 0000000..60f7480
         self.assertEqual(repo.issues[0].title, "fake issue for tests")
         self.assertEqual(repo.issues[0].depending_text, [20])
         self.assertEqual(repo.issues[0].blocking_text, [])
+        self.assertEqual(repo.issues[0].status, "Open")
+        self.assertIsNone(repo.issues[0].close_status)
         self.assertIsNone(repo.issues[0].closed_at)
         # New one
         self.assertEqual(repo.issues[1].uid, "foobar2")
@@ -2201,7 +2205,9 @@ index 0000000..60f7480
         self.assertEqual(repo.issues[1].depending_text, [])
         self.assertEqual(repo.issues[1].blocking_text, [1])
         self.assertEqual(repo.issues[1].milestone, "Future")
-        self.assertIsNone(repo.issues[1].closed_at)
+        self.assertEqual(repo.issues[1].status, "Closed")
+        self.assertEqual(repo.issues[1].close_status, "Fixed")
+        self.assertIsNotNone(repo.issues[1].closed_at)
         self.assertDictEqual(
             repo.milestones,
             {

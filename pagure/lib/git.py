@@ -553,11 +553,34 @@ def update_ticket_from_git(
     # ticket creator
     agent = pagure.lib.query.search_user(session, username=agent) or user
 
+    status = json_data.get("status")
+    close_status = json_data.get("close_status")
+    if status and status.lower() not in ["open", "closed"]:
+        if status.lower() != "open" and close_status is None:
+            close_status = status
+            status = "Closed"
+        elif status.lower() != "open" and close_status is not None:
+            status = "Closed"
+    elif status:
+        status = status.capitalize()
+
+    if close_status and close_status not in repo.close_status:
+        close_status = repo.close_status
+        close_status.append(close_status)
+        repo.close_status = close_status
+        session.add(repo)
+        session.commit()
+
     issue = pagure.lib.query.get_issue_by_uid(session, issue_uid=issue_uid)
     messages = []
     if not issue:
+        date_created = None
+        if json_data.get("date_created"):
+            date_created = datetime.datetime.utcfromtimestamp(
+                float(json_data.get("date_created"))
+            )
         # Create new issue
-        pagure.lib.query.new_issue(
+        issue = pagure.lib.query.new_issue(
             session,
             repo=repo,
             title=json_data.get("title"),
@@ -567,13 +590,16 @@ def update_ticket_from_git(
             issue_id=json_data.get("id"),
             issue_uid=issue_uid,
             private=json_data.get("private"),
-            status=json_data.get("status"),
-            close_status=json_data.get("close_status"),
-            date_created=datetime.datetime.utcfromtimestamp(
-                float(json_data.get("date_created"))
-            ),
+            status=status,
+            close_status=close_status,
+            date_created=date_created,
             notify=False,
         )
+
+        if json_data.get("closed_at"):
+            issue.closed_at = datetime.datetime.utcfromtimestamp(
+                float(json_data.get("date_created"))
+            )
 
     else:
         # Edit existing issue
@@ -584,10 +610,14 @@ def update_ticket_from_git(
             title=json_data.get("title"),
             content=json_data.get("content"),
             priority=json_data.get("priority"),
-            status=json_data.get("status"),
-            close_status=json_data.get("close_status"),
+            status=status,
+            close_status=close_status,
             private=json_data.get("private"),
         )
+        if json_data.get("closed_at"):
+            issue.closed_at = datetime.datetime.utcfromtimestamp(
+                float(json_data.get("date_created"))
+            )
         if msgs:
             messages.extend(msgs)
 
