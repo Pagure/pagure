@@ -26,7 +26,8 @@ pstart (){
         pagure_ci.service \
         pagure_ev.service \
         pagure_webhook.service \
-        pagure_worker.service
+        pagure_worker.service \
+        pagure_authorized_keys_worker.service
     echo 'The application is running on http://localhost:5000/'
 }
 
@@ -36,7 +37,8 @@ pstop (){
         pagure_ci.service \
         pagure_ev.service \
         pagure_webhook.service \
-        pagure_worker.service
+        pagure_worker.service \
+        pagure_authorized_keys_worker.service
 }
 
 prestart (){
@@ -45,7 +47,8 @@ prestart (){
         pagure_ci.service \
         pagure_ev.service \
         pagure_webhook.service \
-        pagure_worker.service
+        pagure_worker.service \
+        pagure_authorized_keys_worker.service
     echo 'The application is running on http://localhost:5000/'
 }
 
@@ -55,7 +58,8 @@ pstatus (){
         pagure_ci.service \
         pagure_ev.service \
         pagure_webhook.service \
-        pagure_worker.service
+        pagure_worker.service \
+        pagure_authorized_keys_worker.service
 }
 
 alias plog="sudo journalctl -lu pagure.service"

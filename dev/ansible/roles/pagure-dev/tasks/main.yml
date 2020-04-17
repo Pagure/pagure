@@ -198,6 +198,7 @@
     - pagure_ev.service
     - pagure_webhook.service
     - pagure_worker.service
+    - pagure_authorized_keys_worker.service
 
 - name: let paguremirroring read the pagure config
   command: /usr/bin/setfacl -m user:paguremirroring:rx /etc/pagure/pagure.cfg
@@ -238,3 +239,4 @@
     - pagure_ev
     - pagure_webhook
     - pagure_worker
+    - pagure_authorized_keys_worker

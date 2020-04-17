@@ -1,0 +1,15 @@
+[Unit]
+Description=Pagure worker for managing the authorized_keys file
+After=redis.target
+Documentation=https://pagure.io/pagure
+
+Service]
+ExecStart=/usr/bin/celery worker -A pagure.lib.tasks --loglevel=info -c 1 -Q authorized_keys_queue
+Environment="PAGURE_CONFIG=/etc/pagure/pagure.cfg"
+Type=simple
+User=git
+Group=git
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
