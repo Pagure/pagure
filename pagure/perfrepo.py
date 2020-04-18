@@ -19,7 +19,11 @@ import types
 
 import six
 import pygit2
-import _pygit2
+
+try:
+    import _pygit2
+except ImportError:
+    from pygit2 import _pygit2
 
 
 real_pygit2_repository = pygit2.Repository
