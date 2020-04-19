@@ -21,16 +21,12 @@
 - name: Install Pagure development packages
   dnf:
     name:
-      - gcc
-      - libgit2-devel
-      - libffi-devel
-      - libjpeg-devel
-      - make
       - python3-alembic
       - python3-arrow
       - python3-binaryornot
       - python3-bleach
       - python3-blinker
+      - python3-celery
       - python3-chardet
       - python3-cryptography
       - python3-docutils
@@ -41,8 +37,10 @@
       - python3-jinja2
       - python3-markdown
       - python3-munch
+      - python3-mock
       - python3-openid-cla
       - python3-openid-teams
+      - python3-pillow
       - python3-pip
       - python3-psutil
       - python3-pygit2
@@ -53,10 +51,9 @@
       - python3-wtforms
       - python3-devel
       - python3-devel
-      - redhat-rpm-config
       - python3-bcrypt
-      - python3-virtualenv
-    state: present
+      - redhat-rpm-config
+    state: latest
 
 # Add various helpful configuration files
 - name: Install a custom bashrc
@@ -77,56 +74,6 @@
 - name: populate bash history
   become_user: "{{ ansible_env.SUDO_USER }}"
   copy: src=bash_history dest=/home/{{ ansible_env.SUDO_USER }}/.bash_history
-
-- name: register the libgit2 version installed
-  shell: rpm -q libgit2|cut -d \- -f 2| cut -d \. -f 1,2
-  register: libgit2_version
-  args:
-    warn: false
-
-# Install Pagure inside a virtualenv and configure it
-- name: Install pygit2 in the virtualenv
-  become_user: "{{ ansible_env.SUDO_USER }}"
-  pip:
-    name:
-      - "pygit2=={{ libgit2_version.stdout_lines[0] }}.*"
-    virtualenv: /home/{{ ansible_env.SUDO_USER }}/.virtualenvs/python3-pagure/
-    virtualenv_python: python3
-    virtualenv_command: virtualenv
-
-- name: Install Pagure Python dependencies into a virtualenv
-  become_user: "{{ ansible_env.SUDO_USER }}"
-  pip:
-    requirements: /home/{{ ansible_env.SUDO_USER }}/devel/{{ item }}
-    virtualenv: /home/{{ ansible_env.SUDO_USER }}/.virtualenvs/python3-pagure/
-    virtualenv_command: virtualenv
-    virtualenv_python: python3
-    virtualenv_site_packages: yes
-    extra_args: --no-use-pep517
-  with_items:
-    - "requirements.txt"
-    - "requirements-ev.txt"
-    - "requirements-testing.txt"
-
-- name: Hotfix python-fedora to make flask_fas_openid compatible with flask >= 1.0
-  become: "{{ ansible_env.SUDO_USER }}"
-  lineinfile:
-    path: /home/{{ ansible_env.SUDO_USER }}/.virtualenvs/python3-pagure/lib/python3.7/site-packages/flask_fas_openid.py
-    regexp: '^        if assume_recent or \(major >'
-    line: '        if assume_recent or (major > 0 or minor >= 10):'
-
-- name: Install Pagure package into a virtualenv
-  become_user: "{{ ansible_env.SUDO_USER }}"
-  pip:
-    name: /home/{{ ansible_env.SUDO_USER }}/devel/
-    extra_args: '-e'
-    virtualenv: /home/{{ ansible_env.SUDO_USER }}/.virtualenvs/python3-pagure/
-    virtualenv_command: virtualenv
-
-- name: Install Pagure package into /usr/lib
-  pip:
-    name: /home/{{ ansible_env.SUDO_USER }}/devel/
-    extra_args: '-e'
 
 - name: Install the pagure configuration
   become_user: "{{ ansible_env.SUDO_USER }}"
@@ -166,14 +113,14 @@
 
 - name: Create the Pagure database
   become_user: "{{ ansible_env.SUDO_USER }}"
-  command: .virtualenvs/python3-pagure/bin/python devel/createdb.py
+  command: python3 devel/createdb.py
   args:
     creates: /home/{{ ansible_env.SUDO_USER }}/pagure_data/pagure_dev.sqlite
     chdir: "/home/{{ ansible_env.SUDO_USER }}/"
 
 - name: Stamp the database with its current migration
   become_user: "{{ ansible_env.SUDO_USER }}"
-  shell: /home/{{ ansible_env.SUDO_USER }}/.virtualenvs/python3-pagure/bin/alembic stamp $(/home/{{ ansible_env.SUDO_USER }}/.virtualenvs/python3-pagure/bin/alembic heads | awk '{ print $1 }')
+  shell: PYTHONPATH=/home/{{ ansible_env.SUDO_USER }}/devel/ alembic-3 stamp $(PYTHONPATH=/home/{{ ansible_env.SUDO_USER }}/devel/ alembic-3 heads | awk '{ print $1 }')
   args:
     chdir: "/home/{{ ansible_env.SUDO_USER }}/"
 

@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 Environment="PAGURE_CONFIG=/home/vagrant/pagure.cfg"
-ExecStart=/home/vagrant/.virtualenvs/python3-pagure/bin/python %h/devel/runserver.py --host 0.0.0.0 --debug
+ExecStart=python3 %h/devel/runserver.py --host 0.0.0.0 --debug
 Type=simple
 
 [Install]

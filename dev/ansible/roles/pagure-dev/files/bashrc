@@ -5,8 +5,7 @@ if [ -f /etc/bashrc ]; then
     . /etc/bashrc
 fi
 
-# Always use the virtualenv
-workon python3-pagure
+cat /etc/motd
 
 # To avoid confusion, start in the `devel` directory
 cd devel

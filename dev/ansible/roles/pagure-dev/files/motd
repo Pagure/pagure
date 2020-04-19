@@ -3,18 +3,13 @@ Welcome to the Pagure development environment!
 
 Here are some tips:
 
-* Pagure is installed in a Python virtualenv. Use `deactivate` to leave it,
-  or `workon python3-pagure` to get back in.
 
 * The code for Pagure is located at ~/devel/
-
 * You can populate the database with `python dev-data.py --all`
-
 * Logs for the server are available with `journalctl`; the services are run
   as systemd user units in ~/.config/systemd/user/
 
-* To run the tests you need python3 virtualenv: `workon python3-pagure`.
-  Then you can run them with `./runtests.py run`.
+* To run the tests run: `~/devel/runtests.py run`.
 
 Here is a list of command and alias you may find useful:
 
