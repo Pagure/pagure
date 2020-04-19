@@ -5,7 +5,11 @@ if [ -f /etc/bashrc ]; then
     . /etc/bashrc
 fi
 
-cat /etc/motd
+echo "Reminder of the commands:
+ * pstart: to start all the services
+ * pstop:  to stop all the services
+ * prestart: to restart all the services
+ * plog:   to access the logs of the 'pagure' service (the web server)"
 
 # To avoid confusion, start in the `devel` directory
 cd devel
