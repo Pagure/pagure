@@ -516,6 +516,7 @@ def api():
         project.api_project,
         project.api_projects,
         project.api_project_tags,
+        project.api_project_tag_view,
         project.api_project_tags_new,
         project.api_project_tag_delete,
         project.api_git_tags,
@@ -531,6 +532,7 @@ def api():
         project.api_commit_add_flag,
         project.api_update_project_watchers,
         project.api_get_project_options,
+        project.api_get_project_connector,
         project.api_modify_project_options,
         project.api_project_block_user,
         project.api_get_project_webhook_token,
@@ -548,6 +550,8 @@ def api():
             issue.api_comment_issue,
             issue.api_update_custom_field,
             issue.api_update_custom_fields,
+            issue.api_view_issues_history_stats,
+            issue.api_view_issues_history_detailed_stats,
             issue.api_change_status_issue,
             issue.api_change_milestone_issue,
             issue.api_assign_issue,
@@ -567,8 +571,10 @@ def api():
         fork.api_pull_request_close,
         fork.api_pull_request_add_comment,
         fork.api_pull_request_add_flag,
+        fork.api_pull_request_get_flag,
         fork.api_pull_request_assign,
         fork.api_pull_request_update,
+        fork.api_subscribe_pull_request,
     ]
     sections.append(build_docs_section("pull_requests", pull_requests_methods))
 
@@ -577,6 +583,7 @@ def api():
         user.api_view_user,
         user.api_view_user_activity_stats,
         user.api_view_user_activity_date,
+        user.api_view_user_issues,
         user.api_view_user_requests_filed,
         user.api_view_user_requests_actionable,
     ]
