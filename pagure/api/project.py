@@ -129,8 +129,8 @@ def api_project_tag_view(repo, tag, username=None, namespace=None):
         GET /api/0/fork/<username>/<repo>/tag/<tag>
         GET /api/0/fork/<username>/<namespace>/tag/<tag>
 
-        Sample response
-        ----------------
+    Sample response
+    ^^^^^^^^^^^^^^^
 
     ::
 
