@@ -969,13 +969,16 @@ class Project(BASE):
         """
         return {
             "admin": sorted(
-                self.get_project_users(access="admin", combine=False)
+                self.get_project_users(access="admin", combine=False),
+                key=lambda u: u.user,
             ),
             "commit": sorted(
-                self.get_project_users(access="commit", combine=False)
+                self.get_project_users(access="commit", combine=False),
+                key=lambda u: u.user,
             ),
             "ticket": sorted(
-                self.get_project_users(access="ticket", combine=False)
+                self.get_project_users(access="ticket", combine=False),
+                key=lambda u: u.user,
             ),
         }
 
