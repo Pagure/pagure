@@ -11,6 +11,7 @@ chardet
 cryptography
 docutils
 enum34;python_version<"3.4"
+email_validator
 flask
 flask-wtf
 kitchen

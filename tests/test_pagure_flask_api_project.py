@@ -2859,6 +2859,8 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
             "error_code": "EINVALIDREQ",
             "errors": {"status": ["Not a valid choice"]},
         }
+        if self.get_wtforms_version() >= (2, 3):
+            expected_output["errors"]["status"] = ["This field is required."]
         self.assertEqual(data, expected_output)
 
     def test_flag_commit_missing_username(self):
@@ -3421,6 +3423,10 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
                 "user_type": ["Not a valid choice"],
             },
         }
+        if self.get_wtforms_version() >= (2, 3):
+            expected_output["errors"]["user_type"] = [
+                "This field is required."
+            ]
         self.assertEqual(data, expected_output)
 
     def test_api_modify_acls_invalid_acl(self):
