@@ -1917,9 +1917,6 @@ def api_update_project_watchers(repo, username=None, namespace=None):
     +------------------+---------+--------------+---------------------------+
     | Key              | Type    | Optionality  | Description               |
     +==================+=========+==============+===========================+
-    | ``repo``         | string  | Mandatory    | | The name of the project |
-    |                  |         |              |   to fork.                |
-    +------------------+---------+--------------+---------------------------+
     | ``status``       | string  | Mandatory    | | The new watch status to |
     |                  |         |              |   set on that project.    |
     |                  |         |              |   (See options below)     |
@@ -1927,12 +1924,6 @@ def api_update_project_watchers(repo, username=None, namespace=None):
     | ``watcher``      | string  | Mandatory    | | The name of the user    |
     |                  |         |              |   changing their watch    |
     |                  |         |              |   status.                 |
-    +------------------+---------+--------------+---------------------------+
-    | ``namespace``    | string  | Optional     | | The namespace of the    |
-    |                  |         |              |   project to fork.        |
-    +------------------+---------+--------------+---------------------------+
-    | ``username``     | string  | Optional     | | The username of the user|
-    |                  |         |              |   of the fork.            |
     +------------------+---------+--------------+---------------------------+
 
     Watch Status
