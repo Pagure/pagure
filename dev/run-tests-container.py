@@ -40,6 +40,21 @@ def setup_parser():
         "of running the tests",
     )
 
+    parser.add_argument(
+        "--repo",
+        dest="repo",
+        default="https://pagure.io/pagure.git",
+        help="URL of the public repo to use as source, can be overridden using "
+        "the REPO environment variable",
+    )
+    parser.add_argument(
+        "--branch",
+        dest="branch",
+        default="master",
+        help="Branch of the repo to use as source, can be overridden using "
+        "the BRANCH environment variable",
+    )
+
     return parser
 
 
@@ -72,25 +87,22 @@ if __name__ == "__main__":
     for idx, container_name in enumerate(container_names):
         if args.skip_build is not False:
             print("------ Building Container Image -----")
-            output_code = sp.call(
-                [
-                    "podman",
-                    "build",
-                    "--build-arg",
-                    "branch={}".format(os.environ.get("BRANCH") or "master"),
-                    "--build-arg",
-                    "repo={}".format(
-                        os.environ.get("REPO")
-                        or "https://pagure.io/pagure.git"
-                    ),
-                    "--rm",
-                    "-t",
-                    container_name,
-                    "-f",
-                    "dev/containers/%s" % container_files[idx],
-                    "dev/containers",
-                ]
-            )
+            cmd = [
+                "podman",
+                "build",
+                "--build-arg",
+                "branch={}".format(os.environ.get("BRANCH") or args.branch),
+                "--build-arg",
+                "repo={}".format(os.environ.get("REPO") or args.repo),
+                "--rm",
+                "-t",
+                container_name,
+                "-f",
+                "dev/containers/%s" % container_files[idx],
+                "dev/containers",
+            ]
+            print(" ".join(cmd))
+            output_code = sp.call(cmd)
             if output_code:
                 print("Failed building: %s", container_name)
                 break
@@ -113,11 +125,9 @@ if __name__ == "__main__":
                     os.getcwd(), container_files[idx]
                 ),
                 "-e",
-                "BRANCH={}".format(os.environ.get("BRANCH") or "master"),
+                "BRANCH={}".format(os.environ.get("BRANCH") or args.branch),
                 "-e",
-                "REPO={}".format(
-                    os.environ.get("REPO") or "https://pagure.io/pagure.git"
-                ),
+                "REPO={}".format(os.environ.get("REPO") or args.repo),
                 "--entrypoint=/bin/bash",
                 container_name,
             ]
@@ -136,11 +146,9 @@ if __name__ == "__main__":
                     os.getcwd(), container_files[idx]
                 ),
                 "-e",
-                "BRANCH={}".format(os.environ.get("BRANCH") or "master"),
+                "BRANCH={}".format(os.environ.get("BRANCH") or args.branch),
                 "-e",
-                "REPO={}".format(
-                    os.environ.get("REPO") or "https://pagure.io/pagure.git"
-                ),
+                "REPO={}".format(os.environ.get("REPO") or args.repo),
                 "-e",
                 "TESTCASE={}".format(args.test_case or ""),
                 container_name,
