@@ -66,19 +66,19 @@ if __name__ == "__main__":
         container_names = ["pagure-c7-rpms-py2"]
         container_files = ["centos7-rpms-py2"]
     elif args.fedora is True:
-        container_names = ["pagure-f29-rpms-py3"]
-        container_files = ["f29-rpms-py3"]
+        container_names = ["pagure-f31-rpms-py3"]
+        container_files = ["f31-rpms-py3"]
     elif args.pip is True:
         container_names = ["pagure-fedora-pip-py3"]
         container_files = ["fedora-pip-py3"]
     else:
         container_names = [
-            "pagure-f29-rpms-py3",
+            "pagure-f31-rpms-py3",
             "pagure-c7-rpms-py2",
             "pagure-fedora-pip-py3",
         ]
         container_files = [
-            "f29-rpms-py3",
+            "f31-rpms-py3",
             "centos7-rpms-py2",
             "fedora-pip-py3",
         ]
