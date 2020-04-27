@@ -75,6 +75,10 @@ Requires:           python%{python_pkgversion}-straight-plugin
 Requires:           python%{python_pkgversion}-wtforms
 %endif
 
+%if 0%{?rhel} && 0%{?rhel} >= 8
+Requires:           python%{python_pkgversion}-email-validator
+%endif
+
 %if 0%{?rhel} && 0%{?rhel} < 8
 Requires:           mod_wsgi
 %else
