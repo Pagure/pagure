@@ -45,7 +45,7 @@ Recommends:         python%{python_pkgversion}-fedora-flask
 # We require OpenSSH 7.4+ for SHA256 support
 Requires:           openssh >= 7.4
 
-%if 0%{?rhel} && 0%{?rhel} < 8
+%if %{undefined python_enable_dependency_generator} && %{undefined python_disable_dependency_generator}
 Requires:           python%{python_pkgversion}-alembic
 Requires:           python%{python_pkgversion}-arrow
 Requires:           python%{python_pkgversion}-bcrypt
@@ -56,6 +56,9 @@ Requires:           python%{python_pkgversion}-celery
 Requires:           python%{python_pkgversion}-chardet
 Requires:           python%{python_pkgversion}-cryptography
 Requires:           python%{python_pkgversion}-docutils
+%if ! (0%{?rhel} && 0%{?rhel} < 8)
+Requires:           python%{python_pkgversion}-email-validator
+%endif
 Requires:           python%{python_pkgversion}-enum34
 Requires:           python%{python_pkgversion}-flask
 Requires:           python%{python_pkgversion}-flask-wtf
@@ -73,10 +76,6 @@ Requires:           python%{python_pkgversion}-six
 Requires:           python%{python_pkgversion}-sqlalchemy >= 0.8
 Requires:           python%{python_pkgversion}-straight-plugin
 Requires:           python%{python_pkgversion}-wtforms
-%endif
-
-%if 0%{?rhel} && 0%{?rhel} >= 8
-Requires:           python%{python_pkgversion}-email-validator
 %endif
 
 %if 0%{?rhel} && 0%{?rhel} < 8
@@ -212,6 +211,8 @@ of this pagure instance.
 # Fix requirements.txt for EL7 setuptools
 ## Remove environment markers, as they're not supported
 sed -e "s/;python_version.*$//g" -i requirements.txt
+## Drop email-validator requirement
+sed -e "s/^email_validator.*//g" -i requirements.txt
 ## Drop python3-openid requirement
 sed -e "s/^python3-openid$//g" -i requirements.txt
 %endif
