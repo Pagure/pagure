@@ -128,6 +128,7 @@ def proxy_raw_git():
             if not line:
                 break
             header = line.split(b": ", 1)
+            header[0] = header[0].decode("utf-8")
             headers[header[0].lower()] = header[1]
 
         if len(headers) == 0:
@@ -135,7 +136,7 @@ def proxy_raw_git():
 
         if "status" not in headers:
             # If no status provided, assume 200 OK as per RFC3875
-            headers["status"] = "200 OK"
+            headers[str("status")] = "200 OK"
 
         respcode, respmsg = headers.pop("status").split(" ", 1)
         wrapout = werkzeug.wsgi.wrap_file(flask.request.environ, out)
