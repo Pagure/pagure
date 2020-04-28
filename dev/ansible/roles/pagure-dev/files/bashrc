@@ -11,9 +11,6 @@ echo "Reminder of the commands:
  * prestart: to restart all the services
  * plog:   to access the logs of the 'pagure' service (the web server)"
 
-# To avoid confusion, start in the `devel` directory
-cd devel
-
 # Uncomment the following line if you don't like systemctl's auto-paging feature:
 # export SYSTEMD_PAGER=
 
@@ -24,25 +21,25 @@ cd devel
 export PAGURE_CONFIG=~/pagure.cfg
 
 pstart (){
-    systemctl --user start pagure.service pagure-docs.service pagure_ci.service\
+    sudo systemctl start pagure.service pagure-docs.service pagure_ci.service\
         pagure_ev.service pagure_webhook.service pagure_worker.service
     echo 'The application is running on http://localhost:5000/'
 }
 
 pstop (){
-    systemctl --user stop pagure.service pagure-docs.service pagure_ci.service\
+    sudo systemctl stop pagure.service pagure-docs.service pagure_ci.service\
         pagure_ev.service pagure_webhook.service pagure_worker.service
 }
 
 prestart (){
-    systemctl --user restart pagure.service pagure-docs.service pagure_ci.service\
+    sudo systemctl restart pagure.service pagure-docs.service pagure_ci.service\
         pagure_ev.service pagure_webhook.service pagure_worker.service
     echo 'The application is running on http://localhost:5000/'
 }
 
 pstatus (){
-    systemctl --user status pagure.service pagure-docs.service pagure_ci.service\
+    sudo systemctl status pagure.service pagure-docs.service pagure_ci.service\
         pagure_ev.service pagure_webhook.service pagure_worker.service
 }
 
-alias plog="journalctl --user -lu pagure.service"
+alias plog="sudo journalctl -lu pagure.service"

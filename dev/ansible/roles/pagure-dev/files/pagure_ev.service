@@ -4,10 +4,11 @@ After=redis.target
 Documentation=https://pagure.io/pagure
 
 [Service]
-Environment="PAGURE_CONFIG=/home/vagrant/pagure.cfg"
-ExecStart=/home/vagrant/.virtualenvs/python3-pagure/bin/python \
-          /home/vagrant/devel/pagure-ev/pagure_stream_server.py
+Environment="PAGURE_CONFIG=/etc/pagure/pagure.cfg"
+ExecStart=python3 /srv/pagure/pagure-ev/pagure_stream_server.py
 Type=simple
+User=git
+Group=git
 
 [Install]
-WantedBy=default.target
+WantedBy=multi-user.target

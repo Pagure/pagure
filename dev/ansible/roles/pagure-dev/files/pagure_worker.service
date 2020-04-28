@@ -4,10 +4,12 @@ After=redis.target
 Documentation=https://pagure.io/pagure
 
 [Service]
-ExecStart=/home/vagrant/.virtualenvs/python3-pagure/bin/celery worker -A pagure.lib.tasks --loglevel=info
-Environment="PAGURE_CONFIG=/home/vagrant/pagure.cfg"
+Environment="PAGURE_CONFIG=/etc/pagure/pagure.cfg"
+ExecStart=celery worker -A pagure.lib.tasks --loglevel=info
 Type=simple
+User=git
+Group=git
 Restart=on-failure
 
 [Install]
-WantedBy=default.target
+WantedBy=multi-user.target

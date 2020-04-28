@@ -26,7 +26,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
  # If you would prefer to use NFS to share the directory uncomment this and configure NFS
  # config.vm.synced_folder ".", "/vagrant", type: "nfs", nfs_version: 4, nfs_udp: false
  config.vm.synced_folder ".", "/vagrant", disabled: true
- config.vm.synced_folder ".", "/home/vagrant/devel",
+ config.vm.synced_folder ".", "/srv/pagure",
      type: "sshfs"
 
  # To cache update packages (which is helpful if frequently doing `vagrant destroy && vagrant up`)
@@ -38,7 +38,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
  #   sshfs_opts_append: "-o nonempty"
 
  # Comment this line if you would like to disable the automatic update during provisioning
- config.vm.provision "shell", inline: "sudo dnf upgrade -y"
+ config.vm.provision "shell", inline: "sudo dnf upgrade -y || true"
 
  # bootstrap and run with ansible
  config.vm.provision "ansible" do |ansible|

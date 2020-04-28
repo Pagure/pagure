@@ -3,9 +3,11 @@ Description=The Pagure web service
 After=network.target
 
 [Service]
-Environment="PAGURE_CONFIG=/home/vagrant/pagure.cfg"
-ExecStart=python3 %h/devel/runserver.py --host 0.0.0.0 --debug
+Environment="PAGURE_CONFIG=/etc/pagure/pagure.cfg"
+ExecStart=python3 /srv/pagure/runserver.py --host 0.0.0.0 --debug
 Type=simple
+User=git
+Group=git
 
 [Install]
-WantedBy=default.target
+WantedBy=multi-user.target

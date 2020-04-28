@@ -2,7 +2,7 @@
 
 - include: clamav.yml
 - include: eventsource.yml
-- include: gitolite.yml
+#- include: gitolite.yml
 - include: milter.yml
 - include: postgres.yml
 
@@ -16,6 +16,8 @@
       - tmux
       - tree
       - vim-enhanced
+      - python3-pip
+      - httpd
     state: present
 
 - name: Install Pagure development packages
@@ -30,6 +32,7 @@
       - python3-chardet
       - python3-cryptography
       - python3-docutils
+      - python3-email-validator
       - python3-eventlet
       - python3-fedora-flask
       - python3-flask
@@ -55,6 +58,11 @@
       - redhat-rpm-config
     state: latest
 
+- name: Install pagure for dev
+  command: pip3 install -e .
+  args:
+    chdir: "/srv/pagure/"
+
 # Add various helpful configuration files
 - name: Install a custom bashrc
   become_user: "{{ ansible_env.SUDO_USER }}"
@@ -75,66 +83,107 @@
   become_user: "{{ ansible_env.SUDO_USER }}"
   copy: src=bash_history dest=/home/{{ ansible_env.SUDO_USER }}/.bash_history
 
-- name: Install the pagure configuration
-  become_user: "{{ ansible_env.SUDO_USER }}"
-  copy: src=pagure.cfg dest=/home/{{ ansible_env.SUDO_USER }}/pagure.cfg
 
-- name: Creates pagure data directories
-  become_user: "{{ ansible_env.SUDO_USER }}"
-  file: path=/home/{{ ansible_env.SUDO_USER }}/pagure_data/{{ item }} state=directory
+# Configure pagure
+
+- name: Create the git user and group
+  command: useradd --create-home --home-dir=/srv/git/ git
+           creates=/srv/git/
+
+- name: create the /attachments folder
+  file: state=directory
+        path=/srv/attachments
+        owner=git group=git mode=0775
+
+- name: Adjust owner of /srv/git
+  file: name=/srv/git state=directory recurse=yes owner=git group=git
+
+- name: create all the directories used by pagure
+  file: state=directory
+        path={{ item }}
+        owner=git group=git mode=0775
   with_items:
-    - forks
-    - docs
-    - tickets
-    - requests
-    - remotes
-    - repos
+  - /srv/git/repositories/
+  - /srv/git/repositories/forks
+  - /srv/git/repositories/docs
+  - /srv/git/repositories/tickets
+  - /srv/git/repositories/requests
+  - /srv/git/remotes
+  - /var/www/releases
+  - /var/www/archives
+  - /srv/tmp
+
+- name: create the /etc/pagure folder for the config
+  file: state=directory
+        path=/etc/pagure
+        owner=git group=git mode=0775
+
+
+# Set things up for the mirroring feature
+
+- name: create the `paguremirroring` group
+  group:
+      name: paguremirroring
+      state: present
+
+- name: create the `paguremirroring` user
+  user:
+      name: paguremirroring
+      group: paguremirroring
+      groups: paguremirroring,git
+      shell: /bin/nologin
+      home: /srv/mirror
+
+
+# Configure the web app
+
+- name: Install the pagure configuration
+  copy:
+    src: pagure.cfg
+    dest: /etc/pagure/pagure.cfg
+    owner: git
+    group: git
+    mode: 0644
 
 - name: Add a working copy of alembic.ini
-  become_user: "{{ ansible_env.SUDO_USER }}"
   copy:
-    src: /home/{{ ansible_env.SUDO_USER }}/devel/files/alembic.ini
-    dest: /home/{{ ansible_env.SUDO_USER }}/alembic.ini
+    src: /srv/pagure/files/alembic.ini
+    dest: /etc/pagure/alembic.ini
+    owner: git
+    group: git
+    mode: 0644
     remote_src: True
 
 - name: Configure alembic to use our development database
-  become_user: "{{ ansible_env.SUDO_USER }}"
   replace:
-    dest: /home/{{ ansible_env.SUDO_USER }}/alembic.ini
+    dest: /etc/pagure/alembic.ini
     regexp: "sqlalchemy.url = sqlite:////var/tmp/pagure_dev.sqlite"
-    replace: "sqlalchemy.url = sqlite:////home/{{ ansible_env.SUDO_USER }}/pagure_data/pagure_dev.sqlite"
+    replace: "sqlalchemy.url = sqlite:////srv/git/pagure_dev.sqlite"
 
 - name: Configure alembic to point to the pagure migration folder
-  become_user: "{{ ansible_env.SUDO_USER }}"
   replace:
-    dest: /home/{{ ansible_env.SUDO_USER }}/alembic.ini
+    dest: /etc/pagure/alembic.ini
     regexp: "script_location = /usr/share/pagure/alembic"
-    replace: "script_location = /home/vagrant/devel/alembic/"
+    replace: "script_location = /srv/pagure/alembic/"
 
 - name: Create the Pagure database
-  become_user: "{{ ansible_env.SUDO_USER }}"
-  command: python3 devel/createdb.py
+  become_user: git
+  command: python3 /srv/pagure/createdb.py
+  environment:
+      PAGURE_CONFIG: /etc/pagure/pagure.cfg
   args:
-    creates: /home/{{ ansible_env.SUDO_USER }}/pagure_data/pagure_dev.sqlite
-    chdir: "/home/{{ ansible_env.SUDO_USER }}/"
+    creates: /srv/git/pagure_dev.sqlite
 
 - name: Stamp the database with its current migration
-  become_user: "{{ ansible_env.SUDO_USER }}"
-  shell: PYTHONPATH=/home/{{ ansible_env.SUDO_USER }}/devel/ alembic-3 stamp $(PYTHONPATH=/home/{{ ansible_env.SUDO_USER }}/devel/ alembic-3 heads | awk '{ print $1 }')
+  become_user: git
+  shell: alembic-3 stamp $(alembic-3 heads | awk '{ print $1 }')
   args:
-    chdir: "/home/{{ ansible_env.SUDO_USER }}/"
-
-- name: Create systemd user unit directory
-  become_user: "{{ ansible_env.SUDO_USER }}"
-  file:
-    path: /home/{{ ansible_env.SUDO_USER }}/.config/systemd/user/
-    state: directory
+    chdir: "/etc/pagure"
 
 - name: Install the Pagure service files for systemd
-  become_user: "{{ ansible_env.SUDO_USER }}"
   copy:
     src: "{{ item }}"
-    dest: /home/{{ ansible_env.SUDO_USER }}/.config/systemd/user/{{ item }}
+    dest: /etc/systemd/system/{{ item }}
   with_items:
     - pagure.service
     - pagure-docs.service
@@ -143,15 +192,39 @@
     - pagure_webhook.service
     - pagure_worker.service
 
-- name: Enable and start the Pagure systemd services
-  become: False
+- name: let paguremirroring read the pagure config
+  command: /usr/bin/setfacl -m user:paguremirroring:rx /etc/pagure/pagure.cfg
+
+- name: Add default facl so apache can read git repos
+  acl: default=yes etype=user entity=apache permissions="rx" name=/srv/git state=present
+  register: acl_updates
+
+- name: Manually fix current default ACLs since Ansible doesnt know recursive acls
+  when: acl_updates.changed
+  command: /usr/bin/setfacl -Rdm user:apache:rx /srv/git
+
+- name: Manually fix current ACLs since Ansible doesnt know recursive acls
+  when: acl_updates.changed
+  command: /usr/bin/setfacl -Rm user:apache:rx /srv/git
+
+- name: Turn off SELinux, this dev box is doing too many unwdily things
+  command: setenforce 0
+
+- name: Turn off SELinux accross reboot
+  replace:
+    dest: /etc/selinux/config
+    regexp: "SELINUX=enforcing"
+    replace: "SELINUX=permissive"
+
+- name: Enable and start the all services needed
   systemd:
     daemon_reload: yes
     name: "{{ item }}"
     enabled: True
     state: started
-    scope: user
   with_items:
+    - httpd
+    - redis
     - pagure
     - pagure-docs
     - pagure_ci

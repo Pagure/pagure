@@ -3,10 +3,11 @@ Description=Runs the Pagure documentation server
 After=network.target
 
 [Service]
-Environment="PAGURE_CONFIG=/home/vagrant/pagure.cfg"
-ExecStart=/home/vagrant/.virtualenvs/python3-pagure/bin/python \
-          /home/vagrant/devel/rundocserver.py --host 0.0.0.0
+Environment="PAGURE_CONFIG=/etc/pagure/pagure.cfg"
+ExecStart=python3 /srv/pagure/rundocserver.py --host 0.0.0.0
 Type=simple
+User=git
+Group=git
 
 [Install]
-WantedBy=default.target
+WantedBy=multi-user.target
