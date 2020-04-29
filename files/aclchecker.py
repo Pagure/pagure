@@ -64,8 +64,8 @@ if gitdir[0] == "/":
 if not gitdir.endswith(".git"):
     gitdir = gitdir + ".git"
 
-
-url = "%s/pv/ssh/checkaccess/" % pagure_config["APP_URL"]
+pagure_url = pagure_config["APP_URL"].rstrip("/")
+url = "%s/pv/ssh/checkaccess/" % pagure_url
 data = {"gitdir": gitdir, "username": remoteuser}
 headers = {}
 if pagure_config.get("SSH_ADMIN_TOKEN"):

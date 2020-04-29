@@ -61,7 +61,8 @@ if not username_lookup:
         sys.exit(0)
 
 
-url = "%s/pv/ssh/lookupkey/" % pagure_config["APP_URL"]
+pagure_url = pagure_config["APP_URL"].rstrip("/")
+url = "%s/pv/ssh/lookupkey/" % pagure_url
 data = {"search_key": fingerprint}
 if username_lookup:
     data["username"] = username
