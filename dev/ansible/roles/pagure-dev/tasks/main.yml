@@ -58,10 +58,17 @@
       - redhat-rpm-config
     state: latest
 
-- name: Install pagure for dev
-  command: pip3 install -e .
-  args:
-    chdir: "/srv/pagure/"
+- name: Create symbolic link for pagure to be in the python path
+  file:
+    src: /srv/pagure
+    dest: /usr/local/lib/python3.7/site-packages/pagure
+    state: link
+
+- name: Create symbolic link for python to be py3 by default
+  file:
+    src: /usr/bin/python3
+    dest: /usr/bin/python
+    state: link
 
 # Add various helpful configuration files
 - name: Install a custom bashrc
