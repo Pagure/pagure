@@ -31,7 +31,8 @@ RUN sed -i "/Requires:           python%{python_pkgversion}-enum34/d" /pagure/fi
     awk '{split($0, a, " "); print a[2]}' |grep -v "%{name}" | \
     sed -e "s|%{python_pkgversion}|3|"` && \
     dnf clean all && \
-    cd /pagure && python setup.py build
+    cd /pagure && \
+    python3 setup.py build
 
 WORKDIR /pagure
 ENTRYPOINT ["/pagure/dev/containers/runtests_py3.sh"]
