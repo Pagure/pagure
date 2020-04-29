@@ -54,7 +54,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         # Season to taste
         domain.cpus = 4
         domain.graphics_type = "spice"
-        domain.memory = 2048
+        domain.memory = 3072
         domain.video_type = "qxl"
 
         # Uncomment the following line if you would like to enable libvirt's unsafe cache
