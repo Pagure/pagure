@@ -252,13 +252,87 @@ By default pagure provides the following backends:
 - `test_auth`: simple debugging backend printing and returning the string ``Called GitAuthTestHelper.generate_acls()``
 - `gitolite2`: allows deploying pagure on the top of gitolite 2
 - `gitolite3`: allows deploying pagure on the top of gitolite 3
-- `pagure`: Pagure git auth implementation (using keyhelper.py and aclchecker.py)
+- `pagure`: Pagure git auth implementation (using keyhelper.py and aclchecker.py) that is used via sshd AuthorizedKeysCommand
+- `pagure_authorized_keys`: Pagure git auth implementation that writes to authorized_keys file
 
 Defaults to: ``gitolite3``
 
 .. note:: The option GITOLITE_BACKEND is the legacy name, and for backwards compatibility reasons will override this setting
 
 .. note:: These options can be expended, cf :ref:`custom-gitolite`.
+
+
+Configure Pagure Auth
+---------------------
+
+Pagure offers a simple, but extensible internal authentication mechanism
+for Git repositories. It relies on `SSH <https://en.wikipedia.org/wiki/Secure_Shell>`_
+for authentication. In other words, SSH lets you in and Pagure checks if
+you are allowed to do what you are trying to do once you are inside.
+
+This authentication mechanism uses ``keyhelper.py`` and ``aclchecker.py`` to
+check the Pagure database for user registered SSH keys to do the authentication.
+
+The integrated authentication mechanism has two modes of operation: one
+where it is configured as the ``AuthorizedKeysCommand`` for the SSH user (preferred)
+and one where it is configured to manage the ``authorized_keys`` file for
+the SSH user.
+
+In the preferred mode, when you attempt to do an action with a remote Git repo
+over SSH (e.g. ``git clone ssh://git@localhost.localdomain/repository.git``),
+the SSH server will ask Pagure to validate the SSH user key. This has the
+advantage of performance (no racey and slow file I/O) but has the disadvantage
+of requiring changes to the system's ``sshd_config`` file to use it.
+
+To use this variant, set the following in ``pagure.cfg``:
+
+::
+
+    GIT_AUTH_BACKEND = "pagure"
+
+    HTTP_REPO_ACCESS_GITOLITE = None
+
+    SSH_KEYS_USERNAME_EXPECT = "git"
+
+    SSH_COMMAND_NON_REPOSPANNER = ([
+        "/usr/bin/%(cmd)s",
+        "/srv/git/repositories/%(reponame)s",
+    ], {"GL_USER": "%(username)s"})
+
+
+Setting the following in ``/etc/ssh/sshd_config`` is also required:
+
+::
+
+    Match User git
+        AuthorizedKeysCommand /usr/libexec/pagure/keyhelper.py "%u" "%h" "%t" "%f"
+        AuthorizedKeysCommandUser git
+
+
+If you do not have the ability to modify the sshd configuration to set up
+the ``pagure`` backend, then you need to use the ``pagure_authorized_keys``
+alternative backend. This backend will write to the git user's  ``authorized_keys``
+file instead. This is slower than the preferred mode and also has the
+disadvantage of making it impossible to scale to multiple Pagure frontend
+instances on top of a shared Git storage without causing races and triggering
+inconsistencies. It also adds to the I/O contention on a heavily used system,
+but for most smaller setups with few users, the trade-off is not noticeable.
+
+To use this variant, enable the ``pagure_authorized_keys_worker`` service and
+set the following to ``pagure.cfg``:
+
+::
+
+    SSH_FOLDER = "/srv/git/.ssh"
+
+    GIT_AUTH_BACKEND = "pagure_authorized_keys"
+
+    HTTP_REPO_ACCESS_GITOLITE = None
+
+    SSH_COMMAND_NON_REPOSPANNER = ([
+        "/usr/bin/%(cmd)s",
+        "/srv/git/repositories/%(reponame)s",
+    ], {"GL_USER": "%(username)s"})
 
 
 Configure Gitolite
@@ -272,6 +346,26 @@ you are allowed to do what you are trying to do once you are inside.
 Pagure supports both gitolite 2 and gitolite 3 and the code generating
 the gitolite configuration can be customized for easier integration with
 other systems (cf :ref:`custom-gitolite`).
+
+Using Gitolite also requires setting the following in ``pagure.cfg``:
+
+::
+
+    HTTP_REPO_ACCESS_GITOLITE = "/usr/share/gitolite3/gitolite-shell"
+
+    SSH_COMMAND_NON_REPOSPANNER = (
+        [
+            "/usr/share/gitolite3/gitolite-shell",
+            "%(username)s",
+            "%(cmd)s",
+            "%(reponame)s",
+        ],
+        {},
+    )
+
+
+This ensures that the Gitolite environment is used for interacting with
+Git repositories. Further customizations are listed below.
 
 
 **gitolite 2 and 3**
