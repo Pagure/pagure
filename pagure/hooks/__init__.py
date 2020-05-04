@@ -320,11 +320,7 @@ def run_project_hooks(
     # First we run dynamic ACLs
     authbackend = get_git_auth_helper()
 
-    if (
-        is_internal
-        and username == "pagure"
-        and repotype in ("tickets", "requests")
-    ):
+    if is_internal and username == "pagure":
         if debug:
             print("This is an internal push, dynamic ACL is pre-approved")
     elif not authbackend.is_dynamic:

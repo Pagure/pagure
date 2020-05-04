@@ -60,7 +60,7 @@ class PagureLibGitMirrorProjecttests(tests.Modeltests):
         tmp = MagicMock()
         tmp.communicate.return_value = ("", "")
         popen_mock.return_value = tmp
-        ck_out_mock.return_value = "all good"
+        ck_out_mock.return_value = b"all good"
 
         output = pagure.lib.git.mirror_pull_project(self.session, self.project)
 

@@ -3036,13 +3036,14 @@ def mirror_pull_project(session, project, debug=False):
         env = os.environ.copy()
         env["GL_USER"] = "pagure"
         env["GL_BYPASS_ACCESS_CHECKS"] = "1"
+        env["internal"] = "yes"
         if pagure_config.get("GITOLITE_HOME"):
             env["HOME"] = pagure_config["GITOLITE_HOME"]
         env.update(environ)
         env.update(extra)
         out = subprocess.check_output(
             command, cwd=repopath, stderr=subprocess.STDOUT, env=env
-        )
+        ).decode("utf-8")
         log = "Output from %s:" % command
         logs.append(log)
         logs.append(out)
