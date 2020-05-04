@@ -161,7 +161,7 @@
         </dd>
         {% endif %}
       </dl>
-      {% if g.authenticated and repo.user.user == g.fas_user.username or pagure_admin %}
+      {% if g.authenticated and (repo.user.user == g.fas_user.username or g.repo_admin) %}
         <div class="btn-group">
           <a href="#" title="Update the bugzilla assignee(s)"
               class="btn btn-sm btn-outline-primary"
