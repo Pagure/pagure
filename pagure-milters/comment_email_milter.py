@@ -18,6 +18,7 @@ from multiprocessing import Process as Thread, Queue
 
 import Milter
 import requests
+import six
 
 from Milter.utils import parse_addr
 
@@ -130,7 +131,10 @@ class PagureMilter(Milter.Base):
     def eom(self):
         """ End of Message """
         self.fp.seek(0)
-        msg = email.message_from_file(self.fp)
+        if six.PY3:
+            msg = email.message_from_binary_file(self.fp)
+        else:
+            msg = email.message_from_file(self.fp)
 
         msg_id = msg.get("In-Reply-To", None)
         if msg_id is None:
@@ -172,7 +176,14 @@ class PagureMilter(Milter.Base):
 
         hashes = []
         for email_obj in user.emails:
-            m = hashlib.sha512("%s%s%s" % (msg_id, salt, email_obj.email))
+            m = hashlib.sha512(
+                b"%s%s%s"
+                % (
+                    msg_id.encode("utf-8"),
+                    salt.encode("utf-8"),
+                    email_obj.email.encode("utf-8"),
+                )
+            )
             hashes.append(m.hexdigest())
 
         tohash = email_address.split("@")[0].split("+")[-1]
