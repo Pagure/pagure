@@ -49,14 +49,34 @@ def _get_remote_user():
                 auth_token = auth.split("Basic ", 1)[-1]
                 info = base64.b64decode(auth_token).decode("utf-8")
                 if ":" in info:
-                    _, token_str = info.split(":")
-                    token = pagure.lib.query.get_api_token(
-                        flask.g.session, token_str
-                    )
-                    if token:
-                        if not token.expired:
-                            flask.g.authenticated = True
-                            remote_user = token.user.username
+                    username, token_str = info.split(":")
+                    auth = pagure_config.get("PAGURE_AUTH", None)
+                    if auth == "local":
+                        import pagure.lib.login
+
+                        try:
+                            pagure.lib.login.check_username_and_password(
+                                flask.g.session, username, token_str
+                            )
+                        except pagure.exceptions.PagureException as ex:
+                            _log.exception(ex)
+                        else:
+                            remote_user = username
+
+                    # We're doing a second check here, if the user/password
+                    # approach above didn't work, the user may still be
+                    # using an API token, so we want to check that as well.
+                    if not remote_user:
+                        token = pagure.lib.query.get_api_token(
+                            flask.g.session, token_str
+                        )
+                        if token:
+                            if (
+                                not token.expired
+                                and username == token.user.username
+                            ):
+                                flask.g.authenticated = True
+                                remote_user = token.user.username
 
     return remote_user
 
