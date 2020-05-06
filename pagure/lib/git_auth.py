@@ -897,6 +897,9 @@ class PagureGitAuth(GitAuthHelper):
                 self.info("Pull request required")
                 return False
 
+        if username is None:
+            return False
+
         # Determine whether the current user is allowed to push
         is_committer = is_repo_committer(project, username, session)
         deploykey = lookup_deploykey(project, username)

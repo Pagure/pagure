@@ -10,6 +10,7 @@
 
 from __future__ import unicode_literals, absolute_import
 
+import base64
 import logging
 import subprocess
 import tempfile
@@ -33,6 +34,33 @@ from pagure.ui import UI_NS
 _log = logging.getLogger(__name__)
 
 
+def _get_remote_user():
+    """ Returns the remote user using either the content of
+    ``flask.g.remote_user`` or checking the headers for ``Authorization``
+    and check if the provided API token is valid.
+    """
+    remote_user = flask.request.remote_user
+
+    if not remote_user:
+        # Check the headers
+        if "Authorization" in flask.request.headers:
+            auth = flask.request.headers["Authorization"]
+            if "Basic" in auth:
+                auth_token = auth.split("Basic ", 1)[-1]
+                info = base64.b64decode(auth_token).decode("utf-8")
+                if ":" in info:
+                    _, token_str = info.split(":")
+                    token = pagure.lib.query.get_api_token(
+                        flask.g.session, token_str
+                    )
+                    if token:
+                        if not token.expired:
+                            flask.g.authenticated = True
+                            remote_user = token.user.username
+
+    return remote_user
+
+
 def proxy_raw_git():
     """ Proxy a request to Git or gitolite3 via a subprocess.
 
@@ -40,13 +68,14 @@ def proxy_raw_git():
     is not on repoSpanner.
     """
     _log.debug("Raw git clone proxy started")
+    remote_user = _get_remote_user()
     # We are going to shell out to gitolite-shell. Prepare the env it needs.
     gitenv = {
         "PATH": os.environ["PATH"],
         # These are the vars git-http-backend needs
         "PATH_INFO": flask.request.path,
-        "REMOTE_USER": flask.request.remote_user,
-        "USER": flask.request.remote_user,
+        "REMOTE_USER": remote_user,
+        "USER": remote_user,
         "REMOTE_ADDR": flask.request.remote_addr,
         "CONTENT_TYPE": flask.request.content_type,
         "QUERY_STRING": flask.request.query_string,
@@ -74,8 +103,8 @@ def proxy_raw_git():
                 "HOME": pagure_config["GITOLITE_HOME"],
             }
         )
-    elif flask.request.remote_user:
-        gitenv.update({"GL_USER": flask.request.remote_user})
+    elif remote_user:
+        gitenv.update({"GL_USER": remote_user})
 
     # These keys are optional
     for key in (
@@ -236,9 +265,21 @@ def clone_proxy(project, username=None, namespace=None):
         if not pagure_config["ALLOW_HTTP_PUSH"]:
             # Pushing (git-receive-pack) over HTTP is not allowed
             flask.abort(403, description="HTTP pushing disabled")
-        if not flask.request.remote_user:
+
+        remote_user = _get_remote_user()
+        if not remote_user:
             # Anonymous pushing... nope
-            flask.abort(403, description="Unauthenticated push not allowed")
+            headers = {
+                "WWW-Authenticate": 'Basic realm="pagure"',
+                "X-Frame-Options": "DENY",
+            }
+            response = flask.Response(
+                response="Authorization Required",
+                status=401,
+                headers=headers,
+                content_type="text/plain",
+            )
+            flask.abort(response)
 
     project = pagure.lib.query.get_authorized_project(
         flask.g.session,
@@ -250,7 +291,7 @@ def clone_proxy(project, username=None, namespace=None):
     if not project:
         _log.info(
             "%s could not find project: %s for user %s and namespace %s",
-            flask.request.remote_user,
+            remote_user,
             project,
             username,
             namespace,

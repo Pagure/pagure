@@ -354,6 +354,7 @@ ACLS = {
     "update_watch_status": "Update the watch status on a project",
     "pull_request_rebase": "Rebase a pull-request",
     "tag_project": "Allows adding git tags to a project",
+    "commit": "Commit to a git repository via http(s)",
 }
 
 # List of ACLs which a regular user is allowed to associate to an API token
@@ -372,6 +373,7 @@ CROSS_PROJECT_ACLS = [
     "modify_project",
     "update_watch_status",
     "pull_request_create",
+    "commit",
 ]
 
 # ACLs with which admins are allowed to create project-less API tokens

@@ -105,8 +105,8 @@ class PagureFlaskAppClonetests(tests.Modeltests):
         output = self.app.get(
             "/clonetest.git/info/refs?service=git-receive-pack"
         )
-        self.assertEqual(output.status_code, 403)
-        self.assertIn("Unauthenticated push", output.get_data(as_text=True))
+        self.assertEqual(output.status_code, 401)
+        self.assertIn("Authorization Required", output.get_data(as_text=True))
 
     @patch.dict("pagure.config.config", {"ALLOW_HTTP_PULL_PUSH": True})
     def test_http_clone_private_project_unauthed(self):

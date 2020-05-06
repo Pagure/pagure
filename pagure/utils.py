@@ -50,7 +50,13 @@ def set_up_logging(app=None, force=False):
 def authenticated():
     """ Utility function checking if the current user is logged in or not.
     """
-    return hasattr(flask.g, "fas_user") and flask.g.fas_user is not None
+    fas_user = None
+    try:
+        fas_user = flask.g.fas_user
+    except (RuntimeError, AttributeError):
+        pass
+
+    return fas_user is not None
 
 
 def api_authenticated():

@@ -5643,6 +5643,7 @@ foo bar
         self.assertEqual(
             sorted([a.name for a in acls]),
             [
+                "commit",
                 "commit_flag",
                 "create_branch",
                 "create_project",
