@@ -338,8 +338,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
             output.get_data(as_text=True),
         )
         self.assertIn(
-            "Username or password of invalid format.",
-            output.get_data(as_text=True),
+            "Username or password invalid.", output.get_data(as_text=True),
         )
 
         # Check the password is still not of a known version

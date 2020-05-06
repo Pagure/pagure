@@ -15,11 +15,11 @@ import datetime
 import logging
 
 import flask
-import six
 from sqlalchemy.exc import SQLAlchemyError
 from six.moves.urllib.parse import urljoin
 
 import pagure.login_forms as forms
+import pagure.config
 import pagure.lib.login
 import pagure.lib.model as model
 import pagure.lib.model_base
@@ -98,68 +98,41 @@ def do_login():
 
     if form.validate_on_submit():
         username = form.username.data
+        try:
+            pagure.lib.login.check_username_and_password(
+                flask.g.session, username, form.password.data
+            )
+        except pagure.exceptions.PagureException as ex:
+            _log.exception(ex)
+            flask.flash(str(ex), "error")
+            return flask.redirect(flask.url_for("auth_login"))
+
         user_obj = pagure.lib.query.search_user(
             flask.g.session, username=username
         )
-        if not user_obj:
-            flask.flash("Username or password invalid.", "error")
-            return flask.redirect(flask.url_for("auth_login"))
-
+        visit_key = pagure.lib.login.id_generator(40)
+        now = datetime.datetime.utcnow()
+        expiry = now + datetime.timedelta(days=30)
+        session = model.PagureUserVisit(
+            user_id=user_obj.id,
+            user_ip=flask.request.remote_addr,
+            visit_key=visit_key,
+            expiry=expiry,
+        )
+        flask.g.session.add(session)
         try:
-            password_checks = check_password(
-                form.password.data,
-                user_obj.password,
-                seed=pagure.config.config.get("PASSWORD_SEED", None),
-            )
-        except pagure.exceptions.PagureException as err:
-            _log.exception(err)
-            flask.flash("Username or password of invalid format.", "error")
-            return flask.redirect(flask.url_for("auth_login"))
-
-        if not password_checks:
-            flask.flash("Username or password invalid.", "error")
-            return flask.redirect(flask.url_for("auth_login"))
-
-        elif user_obj.token:
+            flask.g.session.commit()
+            flask.g.fas_user = user_obj
+            flask.g.fas_session_id = visit_key
+            flask.g.fas_user.login_time = now
+            flask.flash("Welcome %s" % user_obj.username)
+        except SQLAlchemyError as err:  # pragma: no cover
             flask.flash(
-                "Invalid user, did you confirm the creation with the url "
-                "provided by email?",
+                "Could not set the session in the db, "
+                "please report this error to an admin",
                 "error",
             )
-            return flask.redirect(flask.url_for("auth_login"))
-
-        else:
-            password = user_obj.password
-            if not isinstance(password, six.text_type):
-                password = password.decode("utf-8")
-            if not password.startswith("$2$"):
-                user_obj.password = generate_hashed_value(form.password.data)
-                flask.g.session.add(user_obj)
-                flask.g.session.flush()
-
-            visit_key = pagure.lib.login.id_generator(40)
-            now = datetime.datetime.utcnow()
-            expiry = now + datetime.timedelta(days=30)
-            session = model.PagureUserVisit(
-                user_id=user_obj.id,
-                user_ip=flask.request.remote_addr,
-                visit_key=visit_key,
-                expiry=expiry,
-            )
-            flask.g.session.add(session)
-            try:
-                flask.g.session.commit()
-                flask.g.fas_user = user_obj
-                flask.g.fas_session_id = visit_key
-                flask.g.fas_user.login_time = now
-                flask.flash("Welcome %s" % user_obj.username)
-            except SQLAlchemyError as err:  # pragma: no cover
-                flask.flash(
-                    "Could not set the session in the db, "
-                    "please report this error to an admin",
-                    "error",
-                )
-                _log.exception(err)
+            _log.exception(err)
 
         return flask.redirect(next_url)
     else:

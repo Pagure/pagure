@@ -20,12 +20,13 @@ except ImportError:
 
     random = random.SystemRandom()
     random_choice = random.choice
+
 import string
 import hashlib
 import bcrypt
 import six
 
-import pagure
+import pagure.config
 from pagure.lib import model
 from cryptography.hazmat.primitives import constant_time
 
@@ -112,3 +113,47 @@ def check_password(entered_password, user_password, seed=None):
         )
 
     return constant_time.bytes_eq(password, user_password)
+
+
+def check_username_and_password(session, username, password):
+    """ Check if the provided username and password match what is in the
+    database and raise an pagure.exceptions.PagureException if that is
+    not the case.
+    """
+
+    user_obj = pagure.lib.query.search_user(session, username=username)
+    if not user_obj:
+        raise pagure.exceptions.PagureException(
+            "Username or password invalid."
+        )
+
+    try:
+        password_checks = check_password(
+            password,
+            user_obj.password,
+            seed=pagure.config.config.get("PASSWORD_SEED", None),
+        )
+    except pagure.exceptions.PagureException:
+        raise pagure.exceptions.PagureException(
+            "Username or password invalid."
+        )
+
+    if not password_checks:
+        raise pagure.exceptions.PagureException(
+            "Username or password invalid."
+        )
+
+    elif user_obj.token:
+        raise pagure.exceptions.PagureException(
+            "Invalid user, did you confirm the creation with the url "
+            "provided by email?"
+        )
+
+    else:
+        password = user_obj.password
+        if not isinstance(password, six.text_type):
+            password = password.decode("utf-8")
+        if not password.startswith("$2$"):
+            user_obj.password = generate_hashed_value(password)
+            session.add(user_obj)
+            session.flush()

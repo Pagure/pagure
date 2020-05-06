@@ -252,6 +252,7 @@ def clone_proxy(project, username=None, namespace=None):
         flask.abort(403, description="HTTP pull/push is not allowed")
 
     service = None
+    remote_user = _get_remote_user()
     if flask.request.path.endswith("/info/refs"):
         service = flask.request.args.get("service")
         if not service:
@@ -266,7 +267,6 @@ def clone_proxy(project, username=None, namespace=None):
             # Pushing (git-receive-pack) over HTTP is not allowed
             flask.abort(403, description="HTTP pushing disabled")
 
-        remote_user = _get_remote_user()
         if not remote_user:
             # Anonymous pushing... nope
             headers = {
@@ -286,7 +286,7 @@ def clone_proxy(project, username=None, namespace=None):
         project,
         user=username,
         namespace=namespace,
-        asuser=flask.request.remote_user,
+        asuser=remote_user,
     )
     if not project:
         _log.info(
