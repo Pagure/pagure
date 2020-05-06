@@ -29,6 +29,7 @@ sys.path.insert(
     0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 )
 
+import pagure.config
 import pagure.lib.query
 import tests
 
@@ -3704,7 +3705,10 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
 
         # Give `issue_change_status` to this token when `issue_comment`
         # is required
-        item = pagure.lib.model.TokenAcl(token_id="pingou_foo", acl_id=8)
+        acl_id = (
+            sorted(pagure.config.config["ACLS"]).index("issue_comment") + 1
+        )
+        item = pagure.lib.model.TokenAcl(token_id="pingou_foo", acl_id=acl_id)
         self.session.add(item)
         self.session.commit()
 
