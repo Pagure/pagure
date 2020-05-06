@@ -162,6 +162,7 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
             "description": None,
             "creator": {
                 "fullname": "PY C",
+                "url_path": "user/pingou",
                 "default_email": "bar@pingou.com",
                 "emails": ["bar@pingou.com", "foo@pingou.com"],
                 "name": "pingou",
@@ -185,7 +186,11 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
         exp = {
             "display_name": "Some Group",
             "description": None,
-            "creator": {"fullname": "PY C", "name": "pingou"},
+            "creator": {
+                "fullname": "PY C",
+                "name": "pingou",
+                "url_path": "user/pingou",
+            },
             "members": ["pingou"],
             "date_created": "1492020239",
             "group_type": "user",
@@ -232,6 +237,7 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
                 "default_email": "bar@pingou.com",
                 "emails": ["bar@pingou.com", "foo@pingou.com"],
                 "name": "pingou",
+                "url_path": "user/pingou",
             },
             "members": ["pingou", "mprahl"],
             "date_created": "1492020239",
@@ -274,6 +280,7 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
                 "default_email": "bar@pingou.com",
                 "emails": ["bar@pingou.com", "foo@pingou.com"],
                 "name": "pingou",
+                "url_path": "user/pingou",
             },
             "members": ["pingou"],
             "date_created": "1492020239",
@@ -311,7 +318,11 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
                     "priorities": {},
                     "tags": [],
                     "url_path": "test2",
-                    "user": {"fullname": "PY C", "name": "pingou"},
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
                 }
             ],
         }
@@ -344,7 +355,11 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
         exp = {
             "display_name": "Some Group",
             "description": None,
-            "creator": {"fullname": "PY C", "name": "pingou"},
+            "creator": {
+                "fullname": "PY C",
+                "name": "pingou",
+                "url_path": "user/pingou",
+            },
             "members": ["pingou"],
             "date_created": "1492020239",
             "group_type": "user",
@@ -381,7 +396,11 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
                     "priorities": {},
                     "tags": [],
                     "url_path": "test2",
-                    "user": {"fullname": "PY C", "name": "pingou"},
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
                 }
             ],
         }
@@ -406,7 +425,11 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
         exp = {
             "display_name": "Some Group",
             "description": None,
-            "creator": {"fullname": "PY C", "name": "pingou"},
+            "creator": {
+                "fullname": "PY C",
+                "name": "pingou",
+                "url_path": "user/pingou",
+            },
             "members": ["pingou"],
             "date_created": "1492020239",
             "group_type": "user",
@@ -443,7 +466,11 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
                     "priorities": {},
                     "tags": [],
                     "url_path": "test2",
-                    "user": {"fullname": "PY C", "name": "pingou"},
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
                 }
             ],
         }
@@ -480,7 +507,11 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
         exp = {
             "display_name": "Some Group",
             "description": None,
-            "creator": {"fullname": "PY C", "name": "pingou"},
+            "creator": {
+                "fullname": "PY C",
+                "name": "pingou",
+                "url_path": "user/pingou",
+            },
             "members": ["pingou"],
             "date_created": "1492020239",
             "group_type": "user",
@@ -514,7 +545,11 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
         exp = {
             "display_name": "Some Group",
             "description": None,
-            "creator": {"fullname": "PY C", "name": "pingou"},
+            "creator": {
+                "fullname": "PY C",
+                "name": "pingou",
+                "url_path": "user/pingou",
+            },
             "members": ["pingou"],
             "date_created": "1492020239",
             "group_type": "user",
@@ -546,7 +581,11 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
         exp = {
             "display_name": "Release engineering group",
             "description": None,
-            "creator": {"fullname": "PY C", "name": "pingou"},
+            "creator": {
+                "fullname": "PY C",
+                "name": "pingou",
+                "url_path": "user/pingou",
+            },
             "members": [],
             "date_created": "1492020239",
             "group_type": "user",

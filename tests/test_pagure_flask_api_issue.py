@@ -53,10 +53,18 @@ FULL_ISSUE_LIST = [
         "status": "Closed",
         "tags": [],
         "title": "Test issue",
-        "user": {"fullname": "PY C", "name": "pingou"},
+        "user": {
+            "fullname": "PY C",
+            "name": "pingou",
+            "url_path": "user/pingou",
+        },
     },
     {
-        "assignee": {"fullname": "foo bar", "name": "foo"},
+        "assignee": {
+            "fullname": "foo bar",
+            "name": "foo",
+            "url_path": "user/foo",
+        },
         "blocks": [],
         "close_status": None,
         "closed_at": None,
@@ -75,7 +83,11 @@ FULL_ISSUE_LIST = [
         "status": "Open",
         "tags": [],
         "title": "test issue1",
-        "user": {"fullname": "PY C", "name": "pingou"},
+        "user": {
+            "fullname": "PY C",
+            "name": "pingou",
+            "url_path": "user/pingou",
+        },
     },
     {
         "assignee": None,
@@ -97,7 +109,11 @@ FULL_ISSUE_LIST = [
         "status": "Open",
         "tags": [],
         "title": "test issue",
-        "user": {"fullname": "PY C", "name": "pingou"},
+        "user": {
+            "fullname": "PY C",
+            "name": "pingou",
+            "url_path": "user/pingou",
+        },
     },
     {
         "assignee": None,
@@ -119,7 +135,11 @@ FULL_ISSUE_LIST = [
         "status": "Open",
         "tags": [],
         "title": "test issue",
-        "user": {"fullname": "PY C", "name": "pingou"},
+        "user": {
+            "fullname": "PY C",
+            "name": "pingou",
+            "url_path": "user/pingou",
+        },
     },
     {
         "assignee": None,
@@ -141,7 +161,11 @@ FULL_ISSUE_LIST = [
         "status": "Open",
         "tags": [],
         "title": "test issue",
-        "user": {"fullname": "PY C", "name": "pingou"},
+        "user": {
+            "fullname": "PY C",
+            "name": "pingou",
+            "url_path": "user/pingou",
+        },
     },
     {
         "assignee": None,
@@ -163,7 +187,11 @@ FULL_ISSUE_LIST = [
         "status": "Open",
         "tags": [],
         "title": "test issue",
-        "user": {"fullname": "PY C", "name": "pingou"},
+        "user": {
+            "fullname": "PY C",
+            "name": "pingou",
+            "url_path": "user/pingou",
+        },
     },
     {
         "assignee": None,
@@ -185,7 +213,11 @@ FULL_ISSUE_LIST = [
         "status": "Open",
         "tags": [],
         "title": "test issue",
-        "user": {"fullname": "PY C", "name": "pingou"},
+        "user": {
+            "fullname": "PY C",
+            "name": "pingou",
+            "url_path": "user/pingou",
+        },
     },
     {
         "assignee": None,
@@ -207,7 +239,11 @@ FULL_ISSUE_LIST = [
         "status": "Open",
         "tags": [],
         "title": "test issue",
-        "user": {"fullname": "PY C", "name": "pingou"},
+        "user": {
+            "fullname": "PY C",
+            "name": "pingou",
+            "url_path": "user/pingou",
+        },
     },
     {
         "assignee": None,
@@ -229,7 +265,11 @@ FULL_ISSUE_LIST = [
         "status": "Open",
         "tags": [],
         "title": "test issue",
-        "user": {"fullname": "PY C", "name": "pingou"},
+        "user": {
+            "fullname": "PY C",
+            "name": "pingou",
+            "url_path": "user/pingou",
+        },
     },
 ]
 
@@ -255,7 +295,11 @@ LCL_ISSUES = [
         "status": "Open",
         "tags": [],
         "title": "Issue #2",
-        "user": {"fullname": "PY C", "name": "pingou"},
+        "user": {
+            "fullname": "PY C",
+            "name": "pingou",
+            "url_path": "user/pingou",
+        },
     },
     {
         "assignee": None,
@@ -277,7 +321,11 @@ LCL_ISSUES = [
         "status": "Open",
         "tags": [],
         "title": "Issue #1",
-        "user": {"fullname": "PY C", "name": "pingou"},
+        "user": {
+            "fullname": "PY C",
+            "name": "pingou",
+            "url_path": "user/pingou",
+        },
     },
 ]
 
@@ -2497,7 +2545,11 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                         "status": "Open",
                         "tags": [],
                         "title": "Issue #3",
-                        "user": {"fullname": "PY C", "name": "pingou"},
+                        "user": {
+                            "fullname": "PY C",
+                            "name": "pingou",
+                            "url_path": "user/pingou",
+                        },
                     }
                 ],
                 "pagination": {
@@ -2561,7 +2613,11 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                 "status": "Open",
                 "tags": [],
                 "title": "test issue",
-                "user": {"fullname": "PY C", "name": "pingou"},
+                "user": {
+                    "fullname": "PY C",
+                    "name": "pingou",
+                    "url_path": "user/pingou",
+                },
             },
         )
 
@@ -2661,7 +2717,11 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                 "status": "Open",
                 "tags": [],
                 "title": "Test issue",
-                "user": {"fullname": "PY C", "name": "pingou"},
+                "user": {
+                    "fullname": "PY C",
+                    "name": "pingou",
+                    "url_path": "user/pingou",
+                },
             },
         )
 
@@ -2693,7 +2753,11 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                 "status": "Open",
                 "tags": [],
                 "title": "Test issue",
-                "user": {"fullname": "PY C", "name": "pingou"},
+                "user": {
+                    "fullname": "PY C",
+                    "name": "pingou",
+                    "url_path": "user/pingou",
+                },
             },
         )
 
@@ -3303,7 +3367,11 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                 "id": 1,
                 "parent": None,
                 "reactions": {},
-                "user": {"fullname": "PY C", "name": "pingou"},
+                "user": {
+                    "fullname": "PY C",
+                    "name": "pingou",
+                    "url_path": "user/pingou",
+                },
             },
         )
 
@@ -3327,7 +3395,11 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                 "id": 1,
                 "parent": None,
                 "reactions": {},
-                "user": {"fullname": "PY C", "name": "pingou"},
+                "user": {
+                    "fullname": "PY C",
+                    "name": "pingou",
+                    "url_path": "user/pingou",
+                },
             },
         )
 
@@ -3422,7 +3494,11 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                 "id": 1,
                 "parent": None,
                 "reactions": {},
-                "user": {"fullname": "foo bar", "name": "foo"},
+                "user": {
+                    "fullname": "foo bar",
+                    "name": "foo",
+                    "url_path": "user/foo",
+                },
             },
         )
 

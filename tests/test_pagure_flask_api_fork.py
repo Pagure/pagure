@@ -450,7 +450,11 @@ class PagureFlaskApiForktests(tests.Modeltests):
                         "parent": None,
                         "priorities": {},
                         "tags": [],
-                        "user": {"fullname": "PY C", "name": "pingou"},
+                        "user": {
+                            "fullname": "PY C",
+                            "name": "pingou",
+                            "url_path": "user/pingou",
+                        },
                     },
                     "remote_git": None,
                     "repo_from": {
@@ -484,7 +488,11 @@ class PagureFlaskApiForktests(tests.Modeltests):
                         "parent": None,
                         "priorities": {},
                         "tags": [],
-                        "user": {"fullname": "PY C", "name": "pingou"},
+                        "user": {
+                            "fullname": "PY C",
+                            "name": "pingou",
+                            "url_path": "user/pingou",
+                        },
                     },
                     "status": "Open",
                     "tags": [],
@@ -492,7 +500,11 @@ class PagureFlaskApiForktests(tests.Modeltests):
                     "title": "test pull-request",
                     "uid": "1431414800",
                     "updated_on": "1431414800",
-                    "user": {"fullname": "PY C", "name": "pingou"},
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
                 }
             ],
             "total_requests": 1,
@@ -777,7 +789,11 @@ class PagureFlaskApiForktests(tests.Modeltests):
                 "parent": None,
                 "priorities": {},
                 "tags": [],
-                "user": {"fullname": "PY C", "name": "pingou"},
+                "user": {
+                    "fullname": "PY C",
+                    "name": "pingou",
+                    "url_path": "user/pingou",
+                },
             },
             "remote_git": None,
             "repo_from": {
@@ -807,7 +823,11 @@ class PagureFlaskApiForktests(tests.Modeltests):
                 "parent": None,
                 "priorities": {},
                 "tags": [],
-                "user": {"fullname": "PY C", "name": "pingou"},
+                "user": {
+                    "fullname": "PY C",
+                    "name": "pingou",
+                    "url_path": "user/pingou",
+                },
             },
             "status": "Open",
             "tags": [],
@@ -815,7 +835,11 @@ class PagureFlaskApiForktests(tests.Modeltests):
             "title": "test pull-request",
             "uid": "1431414800",
             "updated_on": "1431414800",
-            "user": {"fullname": "PY C", "name": "pingou"},
+            "user": {
+                "fullname": "PY C",
+                "name": "pingou",
+                "url_path": "user/pingou",
+            },
         }
         self.assertDictEqual(data, expected_data)
 
@@ -923,7 +947,11 @@ class PagureFlaskApiForktests(tests.Modeltests):
                 "parent": None,
                 "priorities": {},
                 "tags": [],
-                "user": {"fullname": "PY C", "name": "pingou"},
+                "user": {
+                    "fullname": "PY C",
+                    "name": "pingou",
+                    "url_path": "user/pingou",
+                },
             },
             "remote_git": None,
             "repo_from": {
@@ -953,7 +981,11 @@ class PagureFlaskApiForktests(tests.Modeltests):
                 "parent": None,
                 "priorities": {},
                 "tags": [],
-                "user": {"fullname": "PY C", "name": "pingou"},
+                "user": {
+                    "fullname": "PY C",
+                    "name": "pingou",
+                    "url_path": "user/pingou",
+                },
             },
             "status": "Open",
             "tags": [],
@@ -961,7 +993,11 @@ class PagureFlaskApiForktests(tests.Modeltests):
             "title": "test pull-request",
             "uid": uid,
             "updated_on": "1431414800",
-            "user": {"fullname": "PY C", "name": "pingou"},
+            "user": {
+                "fullname": "PY C",
+                "name": "pingou",
+                "url_path": "user/pingou",
+            },
         }
         self.assertDictEqual(data, expected_data)
 
@@ -3026,7 +3062,11 @@ class PagureFlaskApiForktests(tests.Modeltests):
                     "priorities": {},
                     "tags": [],
                     "url_path": "test",
-                    "user": {"fullname": "PY C", "name": "pingou"},
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
                 },
                 "remote_git": None,
                 "repo_from": {
@@ -3056,7 +3096,11 @@ class PagureFlaskApiForktests(tests.Modeltests):
                     "priorities": {},
                     "tags": [],
                     "url_path": "test",
-                    "user": {"fullname": "PY C", "name": "pingou"},
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
                 },
                 "status": "Open",
                 "tags": [],
@@ -3064,7 +3108,11 @@ class PagureFlaskApiForktests(tests.Modeltests):
                 "title": "Test PR",
                 "uid": "e8b68df8711648deac67c3afed15a798",
                 "updated_on": "1516348115",
-                "user": {"fullname": "PY C", "name": "pingou"},
+                "user": {
+                    "fullname": "PY C",
+                    "name": "pingou",
+                    "url_path": "user/pingou",
+                },
             },
         )
 
@@ -3151,7 +3199,11 @@ class PagureFlaskApiForktests(tests.Modeltests):
                     "priorities": {},
                     "tags": [],
                     "url_path": "test",
-                    "user": {"fullname": "PY C", "name": "pingou"},
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
                 },
                 "remote_git": None,
                 "repo_from": {
@@ -3181,7 +3233,11 @@ class PagureFlaskApiForktests(tests.Modeltests):
                     "priorities": {},
                     "tags": [],
                     "url_path": "test",
-                    "user": {"fullname": "PY C", "name": "pingou"},
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
                 },
                 "status": "Open",
                 "tags": [],
@@ -3189,7 +3245,11 @@ class PagureFlaskApiForktests(tests.Modeltests):
                 "title": "Test PR",
                 "uid": "e8b68df8711648deac67c3afed15a798",
                 "updated_on": "1516348115",
-                "user": {"fullname": "PY C", "name": "pingou"},
+                "user": {
+                    "fullname": "PY C",
+                    "name": "pingou",
+                    "url_path": "user/pingou",
+                },
             },
         )
 
@@ -3498,7 +3558,11 @@ class PagureApiThresholdReachedTests(tests.Modeltests):
                 "priorities": {},
                 "tags": [],
                 "url_path": "test",
-                "user": {"fullname": "PY C", "name": "pingou"},
+                "user": {
+                    "fullname": "PY C",
+                    "name": "pingou",
+                    "url_path": "user/pingou",
+                },
             },
             "remote_git": None,
             "repo_from": {
@@ -3528,7 +3592,11 @@ class PagureApiThresholdReachedTests(tests.Modeltests):
                 "priorities": {},
                 "tags": [],
                 "url_path": "test",
-                "user": {"fullname": "PY C", "name": "pingou"},
+                "user": {
+                    "fullname": "PY C",
+                    "name": "pingou",
+                    "url_path": "user/pingou",
+                },
             },
             "status": "Open",
             "tags": [],
@@ -3536,7 +3604,11 @@ class PagureApiThresholdReachedTests(tests.Modeltests):
             "title": "Test PR",
             "uid": "e8b68df8711648deac67c3afed15a798",
             "updated_on": "1516348115",
-            "user": {"fullname": "PY C", "name": "pingou"},
+            "user": {
+                "fullname": "PY C",
+                "name": "pingou",
+                "url_path": "user/pingou",
+            },
         }
 
     def test_api_pull_request_no_comments(self):

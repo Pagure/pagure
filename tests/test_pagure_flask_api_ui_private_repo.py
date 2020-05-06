@@ -42,7 +42,11 @@ FULL_ISSUE_LIST = [
         "status": "Open",
         "tags": [],
         "title": "Test issue",
-        "user": {"fullname": "PY C", "name": "pingou"},
+        "user": {
+            "fullname": "PY C",
+            "name": "pingou",
+            "url_path": "user/pingou",
+        },
     },
     {
         "assignee": None,
@@ -64,7 +68,11 @@ FULL_ISSUE_LIST = [
         "status": "Open",
         "tags": [],
         "title": "test issue",
-        "user": {"fullname": "PY C", "name": "pingou"},
+        "user": {
+            "fullname": "PY C",
+            "name": "pingou",
+            "url_path": "user/pingou",
+        },
     },
     {
         "assignee": None,
@@ -86,7 +94,11 @@ FULL_ISSUE_LIST = [
         "status": "Open",
         "tags": [],
         "title": "test issue",
-        "user": {"fullname": "PY C", "name": "pingou"},
+        "user": {
+            "fullname": "PY C",
+            "name": "pingou",
+            "url_path": "user/pingou",
+        },
     },
     {
         "assignee": None,
@@ -108,7 +120,11 @@ FULL_ISSUE_LIST = [
         "status": "Open",
         "tags": [],
         "title": "test issue",
-        "user": {"fullname": "PY C", "name": "pingou"},
+        "user": {
+            "fullname": "PY C",
+            "name": "pingou",
+            "url_path": "user/pingou",
+        },
     },
     {
         "assignee": None,
@@ -130,7 +146,11 @@ FULL_ISSUE_LIST = [
         "status": "Open",
         "tags": [],
         "title": "test issue",
-        "user": {"fullname": "PY C", "name": "pingou"},
+        "user": {
+            "fullname": "PY C",
+            "name": "pingou",
+            "url_path": "user/pingou",
+        },
     },
     {
         "assignee": None,
@@ -152,7 +172,11 @@ FULL_ISSUE_LIST = [
         "status": "Open",
         "tags": [],
         "title": "test issue",
-        "user": {"fullname": "PY C", "name": "pingou"},
+        "user": {
+            "fullname": "PY C",
+            "name": "pingou",
+            "url_path": "user/pingou",
+        },
     },
     {
         "assignee": None,
@@ -174,7 +198,11 @@ FULL_ISSUE_LIST = [
         "status": "Open",
         "tags": [],
         "title": "test issue",
-        "user": {"fullname": "PY C", "name": "pingou"},
+        "user": {
+            "fullname": "PY C",
+            "name": "pingou",
+            "url_path": "user/pingou",
+        },
     },
     {
         "assignee": None,
@@ -196,7 +224,11 @@ FULL_ISSUE_LIST = [
         "status": "Open",
         "tags": [],
         "title": "test issue",
-        "user": {"fullname": "PY C", "name": "pingou"},
+        "user": {
+            "fullname": "PY C",
+            "name": "pingou",
+            "url_path": "user/pingou",
+        },
     },
 ]
 
@@ -1387,7 +1419,11 @@ class PagurePrivateRepotest(tests.Modeltests):
                             "parent": None,
                             "priorities": {},
                             "tags": ["infra"],
-                            "user": {"fullname": "PY C", "name": "pingou"},
+                            "user": {
+                                "fullname": "PY C",
+                                "name": "pingou",
+                                "url_path": "user/pingou",
+                            },
                         }
                     ],
                 },
@@ -1441,7 +1477,11 @@ class PagurePrivateRepotest(tests.Modeltests):
                             "parent": None,
                             "priorities": {},
                             "tags": ["infra"],
-                            "user": {"fullname": "PY C", "name": "pingou"},
+                            "user": {
+                                "fullname": "PY C",
+                                "name": "pingou",
+                                "url_path": "user/pingou",
+                            },
                         }
                     ],
                 },
@@ -1571,7 +1611,11 @@ class PagurePrivateRepotest(tests.Modeltests):
                                 "parent": None,
                                 "priorities": {},
                                 "tags": [],
-                                "user": {"fullname": "PY C", "name": "pingou"},
+                                "user": {
+                                    "fullname": "PY C",
+                                    "name": "pingou",
+                                    "url_path": "user/pingou",
+                                },
                             },
                             "remote_git": None,
                             "repo_from": {
@@ -1600,7 +1644,11 @@ class PagurePrivateRepotest(tests.Modeltests):
                                 "parent": None,
                                 "priorities": {},
                                 "tags": [],
-                                "user": {"fullname": "PY C", "name": "pingou"},
+                                "user": {
+                                    "fullname": "PY C",
+                                    "name": "pingou",
+                                    "url_path": "user/pingou",
+                                },
                             },
                             "status": "Open",
                             "tags": [],
@@ -1608,7 +1656,11 @@ class PagurePrivateRepotest(tests.Modeltests):
                             "title": "test pull-request",
                             "uid": "1431414800",
                             "updated_on": "1431414800",
-                            "user": {"fullname": "PY C", "name": "pingou"},
+                            "user": {
+                                "fullname": "PY C",
+                                "name": "pingou",
+                                "url_path": "user/pingou",
+                            },
                         }
                     ],
                     "total_requests": 1,
@@ -1690,7 +1742,11 @@ class PagurePrivateRepotest(tests.Modeltests):
                         "parent": None,
                         "priorities": {},
                         "tags": [],
-                        "user": {"fullname": "PY C", "name": "pingou"},
+                        "user": {
+                            "fullname": "PY C",
+                            "name": "pingou",
+                            "url_path": "user/pingou",
+                        },
                     },
                     "remote_git": None,
                     "repo_from": {
@@ -1719,7 +1775,11 @@ class PagurePrivateRepotest(tests.Modeltests):
                         "parent": None,
                         "priorities": {},
                         "tags": [],
-                        "user": {"fullname": "PY C", "name": "pingou"},
+                        "user": {
+                            "fullname": "PY C",
+                            "name": "pingou",
+                            "url_path": "user/pingou",
+                        },
                     },
                     "status": "Open",
                     "tags": [],
@@ -1727,7 +1787,11 @@ class PagurePrivateRepotest(tests.Modeltests):
                     "title": "test pull-request",
                     "uid": "1431414800",
                     "updated_on": "1431414800",
-                    "user": {"fullname": "PY C", "name": "pingou"},
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
                 },
             )
 
@@ -1983,6 +2047,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                         "emails": ["bar@pingou.com", "foo@pingou.com"],
                         "fullname": "PY C",
                         "name": "pingou",
+                        "url_path": "user/pingou",
                     },
                     "username": "Jenkins",
                 },
@@ -2036,6 +2101,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                         "emails": ["bar@pingou.com", "foo@pingou.com"],
                         "fullname": "PY C",
                         "name": "pingou",
+                        "url_path": "user/pingou",
                     },
                     "username": "Jenkins",
                 },
@@ -2489,7 +2555,11 @@ class PagurePrivateRepotest(tests.Modeltests):
                             "status": "Open",
                             "tags": [],
                             "title": "test issue",
-                            "user": {"fullname": "PY C", "name": "pingou"},
+                            "user": {
+                                "fullname": "PY C",
+                                "name": "pingou",
+                                "url_path": "user/pingou",
+                            },
                         }
                     ],
                     "pagination": {
@@ -2566,7 +2636,11 @@ class PagurePrivateRepotest(tests.Modeltests):
                             "status": "Open",
                             "tags": [],
                             "title": "Test issue",
-                            "user": {"fullname": "PY C", "name": "pingou"},
+                            "user": {
+                                "fullname": "PY C",
+                                "name": "pingou",
+                                "url_path": "user/pingou",
+                            },
                         },
                         {
                             "assignee": None,
@@ -2588,7 +2662,11 @@ class PagurePrivateRepotest(tests.Modeltests):
                             "status": "Open",
                             "tags": [],
                             "title": "test issue",
-                            "user": {"fullname": "PY C", "name": "pingou"},
+                            "user": {
+                                "fullname": "PY C",
+                                "name": "pingou",
+                                "url_path": "user/pingou",
+                            },
                         },
                     ],
                     "pagination": {
@@ -2658,7 +2736,11 @@ class PagurePrivateRepotest(tests.Modeltests):
                         "status": "Open",
                         "tags": [],
                         "title": "Test issue",
-                        "user": {"fullname": "PY C", "name": "pingou"},
+                        "user": {
+                            "fullname": "PY C",
+                            "name": "pingou",
+                            "url_path": "user/pingou",
+                        },
                     },
                     {
                         "assignee": None,
@@ -2680,7 +2762,11 @@ class PagurePrivateRepotest(tests.Modeltests):
                         "status": "Open",
                         "tags": [],
                         "title": "test issue",
-                        "user": {"fullname": "PY C", "name": "pingou"},
+                        "user": {
+                            "fullname": "PY C",
+                            "name": "pingou",
+                            "url_path": "user/pingou",
+                        },
                     },
                 ],
                 "pagination": {
@@ -2821,7 +2907,11 @@ class PagurePrivateRepotest(tests.Modeltests):
                         "status": "Open",
                         "tags": [],
                         "title": "Test issue",
-                        "user": {"fullname": "PY C", "name": "pingou"},
+                        "user": {
+                            "fullname": "PY C",
+                            "name": "pingou",
+                            "url_path": "user/pingou",
+                        },
                     },
                     {
                         "assignee": None,
@@ -2843,7 +2933,11 @@ class PagurePrivateRepotest(tests.Modeltests):
                         "status": "Open",
                         "tags": [],
                         "title": "test issue",
-                        "user": {"fullname": "PY C", "name": "pingou"},
+                        "user": {
+                            "fullname": "PY C",
+                            "name": "pingou",
+                            "url_path": "user/pingou",
+                        },
                     },
                 ],
                 "pagination": {
@@ -2920,7 +3014,11 @@ class PagurePrivateRepotest(tests.Modeltests):
                     "status": "Open",
                     "tags": [],
                     "title": "test issue",
-                    "user": {"fullname": "PY C", "name": "pingou"},
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
                 },
             )
 
@@ -2969,7 +3067,11 @@ class PagurePrivateRepotest(tests.Modeltests):
                 "status": "Open",
                 "tags": [],
                 "title": "test issue",
-                "user": {"fullname": "PY C", "name": "pingou"},
+                "user": {
+                    "fullname": "PY C",
+                    "name": "pingou",
+                    "url_path": "user/pingou",
+                },
             },
         )
 
@@ -3275,7 +3377,11 @@ class PagurePrivateRepotest(tests.Modeltests):
                     "id": 1,
                     "parent": None,
                     "reactions": {},
-                    "user": {"fullname": "PY C", "name": "pingou"},
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
                 },
             )
 
@@ -3299,7 +3405,11 @@ class PagurePrivateRepotest(tests.Modeltests):
                     "id": 1,
                     "parent": None,
                     "reactions": {},
-                    "user": {"fullname": "PY C", "name": "pingou"},
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
                 },
             )
 

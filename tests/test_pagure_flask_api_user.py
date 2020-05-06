@@ -94,6 +94,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
             "user": {
                 "fullname": "PY C",
                 "name": "pingou",
+                "url_path": "user/pingou",
                 "avatar_url": "https://seccdn.libravatar.org/avatar/...",
             },
         }
@@ -164,7 +165,11 @@ class PagureFlaskApiUSertests(tests.Modeltests):
                     "parent": None,
                     "priorities": {},
                     "tags": [],
-                    "user": {"fullname": "PY C", "name": "pingou"},
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
                 },
                 {
                     "access_groups": {"admin": [], "commit": [], "ticket": []},
@@ -193,7 +198,11 @@ class PagureFlaskApiUSertests(tests.Modeltests):
                     "parent": None,
                     "priorities": {},
                     "tags": [],
-                    "user": {"fullname": "PY C", "name": "pingou"},
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
                 },
                 {
                     "access_groups": {"admin": [], "commit": [], "ticket": []},
@@ -222,7 +231,11 @@ class PagureFlaskApiUSertests(tests.Modeltests):
                     "parent": None,
                     "priorities": {},
                     "tags": [],
-                    "user": {"fullname": "PY C", "name": "pingou"},
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
                 },
             ],
             "repos_pagination": {
@@ -237,6 +250,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
             "user": {
                 "fullname": "PY C",
                 "name": "pingou",
+                "url_path": "user/pingou",
                 "avatar_url": "https://seccdn.libravatar.org/avatar/...",
             },
         }
@@ -387,7 +401,11 @@ class PagureFlaskApiUSertests(tests.Modeltests):
                     "id": 1,
                     "ref_id": "1",
                     "type": "created",
-                    "user": {"fullname": "PY C", "name": "pingou"},
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
                 },
                 {
                     "date": date,
@@ -397,7 +415,11 @@ class PagureFlaskApiUSertests(tests.Modeltests):
                     "id": 2,
                     "ref_id": "1",
                     "type": "commented",
-                    "user": {"fullname": "PY C", "name": "pingou"},
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
                 },
                 {
                     "date": date,
@@ -407,7 +429,11 @@ class PagureFlaskApiUSertests(tests.Modeltests):
                     "id": 3,
                     "ref_id": "1",
                     "type": "closed",
-                    "user": {"fullname": "PY C", "name": "pingou"},
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
                 },
                 {
                     "date": date,
@@ -417,7 +443,11 @@ class PagureFlaskApiUSertests(tests.Modeltests):
                     "id": 4,
                     "ref_id": "1",
                     "type": "commented",
-                    "user": {"fullname": "PY C", "name": "pingou"},
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
                 },
             ],
             "date": date,
@@ -1757,13 +1787,21 @@ class PagureFlaskApiUsertestissues(tests.Modeltests):
                             "priorities": {},
                             "tags": [],
                             "url_path": "test",
-                            "user": {"fullname": "PY C", "name": "pingou"},
+                            "user": {
+                                "fullname": "PY C",
+                                "name": "pingou",
+                                "url_path": "user/pingou",
+                            },
                         },
                         "related_prs": [],
                         "status": "Open",
                         "tags": [],
                         "title": "Test issue",
-                        "user": {"fullname": "PY C", "name": "pingou"},
+                        "user": {
+                            "fullname": "PY C",
+                            "name": "pingou",
+                            "url_path": "user/pingou",
+                        },
                     }
                 ],
                 "pagination_issues_assigned": {

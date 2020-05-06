@@ -230,6 +230,13 @@ class User(BASE):
         return self.user
 
     @property
+    def url_path(self):
+        """ Return the path at which this user can be accessed in the web UI.
+        """
+
+        return "user/%s" % (self.user)
+
+    @property
     def html_title(self):
         """ Return the ``fullname (username)`` or simply ``username`` to be
         used in the html templates.
@@ -275,7 +282,12 @@ class User(BASE):
 
     def to_json(self, public=False):
         """ Return a representation of the User in a dictionary. """
-        output = {"name": self.user, "fullname": self.fullname}
+        output = {
+            "name": self.user,
+            "fullname": self.fullname,
+            "url_path": self.url_path,
+        }
+
         if not public:
             output["default_email"] = self.default_email
             output["emails"] = sorted([email.email for email in self.emails])

@@ -338,7 +338,11 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "parent": None,
                     "priorities": {},
                     "tags": [],
-                    "user": {"fullname": "PY C", "name": "pingou"},
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
                 }
             ],
             "total_projects": 1,
@@ -550,7 +554,11 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "parent": None,
                     "priorities": {},
                     "tags": ["infra"],
-                    "user": {"fullname": "PY C", "name": "pingou"},
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
                 }
             ],
             "total_projects": 1,
@@ -607,7 +615,11 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "parent": None,
                     "priorities": {},
                     "tags": ["infra"],
-                    "user": {"fullname": "PY C", "name": "pingou"},
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
                 },
                 {
                     "access_groups": {"admin": [], "commit": [], "ticket": []},
@@ -636,7 +648,11 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "parent": None,
                     "priorities": {},
                     "tags": [],
-                    "user": {"fullname": "PY C", "name": "pingou"},
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
                 },
                 {
                     "access_groups": {"admin": [], "commit": [], "ticket": []},
@@ -665,7 +681,11 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "parent": None,
                     "priorities": {},
                     "tags": [],
-                    "user": {"fullname": "PY C", "name": "pingou"},
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
                 },
             ],
             "total_projects": 3,
@@ -722,7 +742,11 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "parent": None,
                     "priorities": {},
                     "tags": ["infra"],
-                    "user": {"fullname": "PY C", "name": "pingou"},
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
                 },
                 {
                     "access_groups": {"admin": [], "commit": [], "ticket": []},
@@ -751,7 +775,11 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "parent": None,
                     "priorities": {},
                     "tags": [],
-                    "user": {"fullname": "PY C", "name": "pingou"},
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
                 },
                 {
                     "access_groups": {"admin": [], "commit": [], "ticket": []},
@@ -780,7 +808,11 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "parent": None,
                     "priorities": {},
                     "tags": [],
-                    "user": {"fullname": "PY C", "name": "pingou"},
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
                 },
             ],
             "total_projects": 3,
@@ -833,7 +865,11 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "parent": None,
                     "priorities": {},
                     "tags": ["infra"],
-                    "user": {"fullname": "PY C", "name": "pingou"},
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
                 }
             ],
             "total_projects": 1,
@@ -886,7 +922,11 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "parent": None,
                     "priorities": {},
                     "tags": [],
-                    "user": {"fullname": "PY C", "name": "pingou"},
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
                 }
             ],
             "total_projects": 1,
@@ -955,7 +995,11 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             "parent": None,
             "priorities": {},
             "tags": ["infra"],
-            "user": {"fullname": "PY C", "name": "pingou"},
+            "user": {
+                "fullname": "PY C",
+                "name": "pingou",
+                "url_path": "user/pingou",
+            },
         }
         self.assertDictEqual(data, expected_data)
 
@@ -1044,7 +1088,11 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             "parent": None,
             "priorities": {},
             "tags": ["infra"],
-            "user": {"fullname": "PY C", "name": "pingou"},
+            "user": {
+                "fullname": "PY C",
+                "name": "pingou",
+                "url_path": "user/pingou",
+            },
         }
         self.assertDictEqual(data, expected_data)
 
@@ -1101,7 +1149,11 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             "parent": None,
             "priorities": {},
             "tags": ["infra"],
-            "user": {"fullname": "PY C", "name": "pingou"},
+            "user": {
+                "fullname": "PY C",
+                "name": "pingou",
+                "url_path": "user/pingou",
+            },
         }
         self.assertDictEqual(data, expected_data)
 
@@ -1162,7 +1214,11 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "parent": None,
                     "priorities": {},
                     "tags": [],
-                    "user": {"fullname": "PY C", "name": "pingou"},
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
                 },
                 {
                     "access_groups": {"admin": [], "commit": [], "ticket": []},
@@ -1191,7 +1247,11 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "parent": None,
                     "priorities": {},
                     "tags": [],
-                    "user": {"fullname": "PY C", "name": "pingou"},
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
                 },
                 {
                     "access_groups": {"admin": [], "commit": [], "ticket": []},
@@ -1220,7 +1280,11 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "parent": None,
                     "priorities": {},
                     "tags": [],
-                    "user": {"fullname": "PY C", "name": "pingou"},
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
                 },
             ],
             "total_projects": 3,
@@ -1287,7 +1351,11 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "parent": None,
                     "priorities": {},
                     "tags": [],
-                    "user": {"fullname": "PY C", "name": "pingou"},
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
                 }
             ],
             "total_projects": 3,
@@ -1446,6 +1514,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 "emails": ["foo@bar.com"],
                 "fullname": "foo bar",
                 "name": "foo",
+                "url_path": "user/foo",
             },
         }
         self.assertEqual(data, expected_output)
@@ -1500,6 +1569,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 "emails": ["foo@bar.com"],
                 "fullname": "foo bar",
                 "name": "foo",
+                "url_path": "user/foo",
             },
         }
         self.assertEqual(data, expected_output)
@@ -1564,6 +1634,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 "emails": ["foo@bar.com"],
                 "fullname": "foo bar",
                 "name": "foo",
+                "url_path": "user/foo",
             },
         }
         self.assertEqual(data, expected_output)
@@ -1620,6 +1691,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 "emails": ["foo@bar.com"],
                 "fullname": "foo bar",
                 "name": "foo",
+                "url_path": "user/foo",
             },
         }
         self.assertEqual(data, expected_output)
@@ -1678,6 +1750,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 "emails": ["foo@bar.com"],
                 "fullname": "foo bar",
                 "name": "foo",
+                "url_path": "user/foo",
             },
         }
         self.assertEqual(data, expected_output)
@@ -3040,6 +3113,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
                     "emails": ["bar@pingou.com", "foo@pingou.com"],
                     "fullname": "PY C",
                     "name": "pingou",
+                    "url_path": "user/pingou",
                 },
                 "username": "Jenkins",
             },
@@ -3091,6 +3165,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
                     "emails": ["bar@pingou.com", "foo@pingou.com"],
                     "fullname": "PY C",
                     "name": "pingou",
+                    "url_path": "user/pingou",
                 },
                 "username": "Jenkins",
             },
@@ -3149,6 +3224,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
                     "emails": ["bar@pingou.com", "foo@pingou.com"],
                     "fullname": "PY C",
                     "name": "pingou",
+                    "url_path": "user/pingou",
                 },
                 "username": "Jenkins",
             },
@@ -3286,7 +3362,11 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
                     "percent": None,
                     "status": "pending",
                     "url": "https://koji.fp.o/koji...",
-                    "user": {"fullname": "foo bar", "name": "foo"},
+                    "user": {
+                        "fullname": "foo bar",
+                        "name": "foo",
+                        "url_path": "user/foo",
+                    },
                     "username": "simple-koji-ci",
                 },
                 {
@@ -3297,7 +3377,11 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
                     "percent": None,
                     "status": "success",
                     "url": "https://koji.fp.o/koji...",
-                    "user": {"fullname": "foo bar", "name": "foo"},
+                    "user": {
+                        "fullname": "foo bar",
+                        "name": "foo",
+                        "url_path": "user/foo",
+                    },
                     "username": "complex-koji-ci",
                 },
             ],
@@ -3488,7 +3572,11 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
             "priorities": {},
             "tags": [],
             "url_path": "test",
-            "user": {"fullname": "PY C", "name": "pingou"},
+            "user": {
+                "fullname": "PY C",
+                "name": "pingou",
+                "url_path": "user/pingou",
+            },
         }
         self.assertEqual(data, expected_output)
 
@@ -3548,7 +3636,11 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
             "priorities": {},
             "tags": [],
             "url_path": "test",
-            "user": {"fullname": "PY C", "name": "pingou"},
+            "user": {
+                "fullname": "PY C",
+                "name": "pingou",
+                "url_path": "user/pingou",
+            },
         }
         self.assertEqual(data, expected_output)
 
@@ -3663,7 +3755,11 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
             "priorities": {},
             "tags": [],
             "url_path": "test",
-            "user": {"fullname": "PY C", "name": "pingou"},
+            "user": {
+                "fullname": "PY C",
+                "name": "pingou",
+                "url_path": "user/pingou",
+            },
         }
 
         self.assertEqual(data, expected_output)
@@ -3726,7 +3822,11 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
             "priorities": {},
             "tags": [],
             "url_path": "test",
-            "user": {"fullname": "PY C", "name": "pingou"},
+            "user": {
+                "fullname": "PY C",
+                "name": "pingou",
+                "url_path": "user/pingou",
+            },
         }
 
         self.assertEqual(data, expected_output)

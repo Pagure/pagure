@@ -282,7 +282,11 @@ class PagureFlaskApiForkUpdatetests(tests.SimplePagureTest):
                     "priorities": {},
                     "tags": [],
                     "url_path": "test",
-                    "user": {"fullname": "PY C", "name": "pingou"},
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
                 },
                 "remote_git": None,
                 "repo_from": {
@@ -334,12 +338,20 @@ class PagureFlaskApiForkUpdatetests(tests.SimplePagureTest):
                         "priorities": {},
                         "tags": [],
                         "url_path": "test",
-                        "user": {"fullname": "PY C", "name": "pingou"},
+                        "user": {
+                            "fullname": "PY C",
+                            "name": "pingou",
+                            "url_path": "user/pingou",
+                        },
                     },
                     "priorities": {},
                     "tags": [],
                     "url_path": "fork/pingou/test",
-                    "user": {"fullname": "PY C", "name": "pingou"},
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
                 },
                 "status": "Open",
                 "tags": [],
@@ -347,7 +359,11 @@ class PagureFlaskApiForkUpdatetests(tests.SimplePagureTest):
                 "title": "edited test PR",
                 "uid": "a2bddecc8ea548e88c22a0df77670092",
                 "updated_on": "1551276260",
-                "user": {"fullname": "PY C", "name": "pingou"},
+                "user": {
+                    "fullname": "PY C",
+                    "name": "pingou",
+                    "url_path": "user/pingou",
+                },
             },
         )
 
@@ -422,7 +438,11 @@ class PagureFlaskApiForkUpdatetests(tests.SimplePagureTest):
                     "priorities": {},
                     "tags": [],
                     "url_path": "test",
-                    "user": {"fullname": "PY C", "name": "pingou"},
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
                 },
                 "remote_git": None,
                 "repo_from": {
@@ -474,12 +494,20 @@ class PagureFlaskApiForkUpdatetests(tests.SimplePagureTest):
                         "priorities": {},
                         "tags": [],
                         "url_path": "test",
-                        "user": {"fullname": "PY C", "name": "pingou"},
+                        "user": {
+                            "fullname": "PY C",
+                            "name": "pingou",
+                            "url_path": "user/pingou",
+                        },
                     },
                     "priorities": {},
                     "tags": [],
                     "url_path": "fork/pingou/test",
-                    "user": {"fullname": "PY C", "name": "pingou"},
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
                 },
                 "status": "Open",
                 "tags": [],
@@ -487,7 +515,11 @@ class PagureFlaskApiForkUpdatetests(tests.SimplePagureTest):
                 "title": "edited test PR",
                 "uid": "a2bddecc8ea548e88c22a0df77670092",
                 "updated_on": "1551276260",
-                "user": {"fullname": "PY C", "name": "pingou"},
+                "user": {
+                    "fullname": "PY C",
+                    "name": "pingou",
+                    "url_path": "user/pingou",
+                },
             },
         )
 
@@ -582,7 +614,11 @@ class PagureFlaskApiForkUpdatetests(tests.SimplePagureTest):
                     "priorities": {},
                     "tags": [],
                     "url_path": "test",
-                    "user": {"fullname": "PY C", "name": "pingou"},
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
                 },
                 "remote_git": None,
                 "repo_from": {
@@ -634,12 +670,20 @@ class PagureFlaskApiForkUpdatetests(tests.SimplePagureTest):
                         "priorities": {},
                         "tags": [],
                         "url_path": "test",
-                        "user": {"fullname": "PY C", "name": "pingou"},
+                        "user": {
+                            "fullname": "PY C",
+                            "name": "pingou",
+                            "url_path": "user/pingou",
+                        },
                     },
                     "priorities": {},
                     "tags": [],
                     "url_path": "fork/pingou/test",
-                    "user": {"fullname": "PY C", "name": "pingou"},
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
                 },
                 "status": "Open",
                 "tags": [],
@@ -647,7 +691,11 @@ class PagureFlaskApiForkUpdatetests(tests.SimplePagureTest):
                 "title": "edited test PR",
                 "uid": "a2bddecc8ea548e88c22a0df77670092",
                 "updated_on": "1551276260",
-                "user": {"fullname": "PY C", "name": "pingou"},
+                "user": {
+                    "fullname": "PY C",
+                    "name": "pingou",
+                    "url_path": "user/pingou",
+                },
             },
         )
 

@@ -1411,7 +1411,7 @@ new file mode 100644
 index 0000000..60f7480
 --- /dev/null
 +++ b/456
-@@ -0,0 +1,30 @@
+@@ -0,0 +1,31 @@
 +{
 +    "assignee": null,
 +    "blocks": [],
@@ -1438,7 +1438,8 @@ index 0000000..60f7480
 +            "foo@pingou.com"
 +        ],
 +        "fullname": "PY C",
-+        "name": "pingou"
++        "name": "pingou",
++        "url_path": "user/pingou"
 +    }
 +}
 \ No newline at end of file
@@ -1512,7 +1513,7 @@ diff --git a/123 b/456
 index 458821a..77674a8
 --- a/123
 +++ b/456
-@@ -4,13 +4,32 @@
+@@ -4,13 +4,33 @@
      "close_status": null,
      "closed_at": null,
 -    "comments": [],
@@ -1532,7 +1533,8 @@ index 458821a..77674a8
 +                    "foo@bar.com"
 +                ],
 +                "fullname": "foo bar",
-+                "name": "foo"
++                "name": "foo",
++                "url_path": "user/foo"
 +            }
 +        }
 +    ],
@@ -1681,7 +1683,7 @@ new file mode 100644
 index 0000000..60f7480
 --- /dev/null
 +++ b/456
-@@ -0,0 +1,147 @@
+@@ -0,0 +1,150 @@
 +{
 +    "assignee": null,
 +    "branch": "master",
@@ -1751,7 +1753,8 @@ index 0000000..60f7480
 +                "foo@pingou.com"
 +            ],
 +            "fullname": "PY C",
-+            "name": "pingou"
++            "name": "pingou",
++            "url_path": "user/pingou"
 +        }
 +    },
 +    "remote_git": null,
@@ -1810,7 +1813,8 @@ index 0000000..60f7480
 +                "foo@pingou.com"
 +            ],
 +            "fullname": "PY C",
-+            "name": "pingou"
++            "name": "pingou",
++            "url_path": "user/pingou"
 +        }
 +    },
 +    "status": "Open",
@@ -1826,7 +1830,8 @@ index 0000000..60f7480
 +            "foo@pingou.com"
 +        ],
 +        "fullname": "PY C",
-+        "name": "pingou"
++        "name": "pingou",
++        "url_path": "user/pingou"
 +    }
 +}
 \ No newline at end of file
