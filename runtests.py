@@ -27,9 +27,12 @@ NUMREMAINING = None
 PRINTLOCK = None
 RUNNING = []
 FAILED = []
+
 NUMPROCS = multiprocessing.cpu_count() - 1
 if os.environ.get("BUILD_ID"):
     NUMPROCS = multiprocessing.cpu_count()
+if NUMPROCS < 1:
+    NUMPROCS = 1
 
 HERE = os.path.join(os.path.dirname(os.path.abspath(__file__)))
 LOG = logging.getLogger(__name__)
