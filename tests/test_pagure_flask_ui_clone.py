@@ -10,6 +10,7 @@
 
 from __future__ import unicode_literals, absolute_import
 
+import base64
 import datetime
 import unittest
 import shutil
@@ -201,3 +202,117 @@ class PagureFlaskAppClonetests(tests.Modeltests):
         output_text = output.get_data(as_text=True)
         self.assertIn("# service=git-receive-pack", output_text)
         self.assertIn(" refs/heads/master\x00", output_text)
+
+    @patch.dict(
+        "pagure.config.config",
+        {
+            "ALLOW_HTTP_PULL_PUSH": True,
+            "ALLOW_HTTP_PUSH": True,
+            "HTTP_REPO_ACCESS_GITOLITE": None,
+        },
+    )
+    def test_http_push_api_token(self):
+        """ Test that the HTTP push gets accepted. """
+
+        headers = {
+            "Authorization": b"Basic %s"
+            % base64.b64encode(b"pingou:aaabbbcccddd")
+        }
+        output = self.app.get(
+            "/clonetest.git/info/refs?service=git-receive-pack",
+            headers=headers,
+        )
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        self.assertIn("# service=git-receive-pack", output_text)
+        self.assertIn(" refs/heads/master\x00", output_text)
+
+    @patch.dict(
+        "pagure.config.config",
+        {
+            "ALLOW_HTTP_PULL_PUSH": True,
+            "ALLOW_HTTP_PUSH": True,
+            "HTTP_REPO_ACCESS_GITOLITE": None,
+        },
+    )
+    def test_http_push_api_token_invalid_user(self):
+        """ Test that the HTTP push gets accepted. """
+
+        headers = {
+            "Authorization": b"Basic %s"
+            % base64.b64encode(b"invalid:aaabbbcccddd")
+        }
+        output = self.app.get(
+            "/clonetest.git/info/refs?service=git-receive-pack",
+            headers=headers,
+        )
+        self.assertEqual(output.status_code, 401)
+        self.assertIn("Authorization Required", output.get_data(as_text=True))
+
+    @patch.dict(
+        "pagure.config.config",
+        {
+            "ALLOW_HTTP_PULL_PUSH": True,
+            "ALLOW_HTTP_PUSH": True,
+            "HTTP_REPO_ACCESS_GITOLITE": None,
+        },
+    )
+    def test_http_push_invalid_api_token(self):
+        """ Test that the HTTP push gets accepted. """
+
+        headers = {
+            "Authorization": b"Basic %s"
+            % base64.b64encode(b"pingou:invalid_token")
+        }
+        output = self.app.get(
+            "/clonetest.git/info/refs?service=git-receive-pack",
+            headers=headers,
+        )
+        self.assertEqual(output.status_code, 401)
+        self.assertIn("Authorization Required", output.get_data(as_text=True))
+
+    @patch.dict(
+        "pagure.config.config",
+        {
+            "ALLOW_HTTP_PULL_PUSH": True,
+            "ALLOW_HTTP_PUSH": True,
+            "HTTP_REPO_ACCESS_GITOLITE": None,
+            "PAGURE_AUTH": "local",
+        },
+    )
+    def test_http_push_local_auth(self):
+        """ Test that the HTTP push gets accepted. """
+
+        headers = {
+            "Authorization": b"Basic %s" % base64.b64encode(b"pingou:foo")
+        }
+        output = self.app.get(
+            "/clonetest.git/info/refs?service=git-receive-pack",
+            headers=headers,
+        )
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        self.assertIn("# service=git-receive-pack", output_text)
+        self.assertIn(" refs/heads/master\x00", output_text)
+
+    @patch.dict(
+        "pagure.config.config",
+        {
+            "ALLOW_HTTP_PULL_PUSH": True,
+            "ALLOW_HTTP_PUSH": True,
+            "HTTP_REPO_ACCESS_GITOLITE": None,
+            "PAGURE_AUTH": "local",
+        },
+    )
+    def test_http_push_local_auth_invalid_username(self):
+        """ Test that the HTTP push gets accepted. """
+
+        headers = {
+            "Authorization": b"Basic %s" % base64.b64encode(b"invalid:foo")
+        }
+        output = self.app.get(
+            "/clonetest.git/info/refs?service=git-receive-pack",
+            headers=headers,
+        )
+        self.assertEqual(output.status_code, 401)
+        self.assertIn("Authorization Required", output.get_data(as_text=True))

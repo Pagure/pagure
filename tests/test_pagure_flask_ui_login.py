@@ -895,7 +895,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
             )
 
             data = {
-                "old_password": "foo",
+                "old_password": "bfoo",
                 "password": "foo",
                 "confirm_password": "foo",
             }
@@ -958,7 +958,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
             )
 
             data = {
-                "old_password": "foo",
+                "old_password": "bfoo",
                 "password": "foo",
                 "confirm_password": "foo",
             }

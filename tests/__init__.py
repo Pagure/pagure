@@ -58,6 +58,7 @@ import pagure.api
 from pagure.api.ci import jenkins
 import pagure.flask_app
 import pagure.lib.git
+import pagure.lib.login
 import pagure.lib.model
 import pagure.lib.query
 import pagure.lib.tasks_mirror
@@ -247,7 +248,7 @@ def create_user(session, username, fullname, emails):
     user = pagure.lib.model.User(
         user=username,
         fullname=fullname,
-        password=b"foo",
+        password=pagure.lib.login.generate_hashed_value("foo"),
         default_email=emails[0],
     )
     session.add(user)
