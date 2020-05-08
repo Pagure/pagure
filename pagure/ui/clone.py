@@ -289,8 +289,11 @@ def clone_proxy(project, username=None, namespace=None):
 
         if not remote_user:
             # Anonymous pushing... nope
+            realm = "Pagure API token"
+            if pagure_config.get("PAGURE_AUTH") == "local":
+                realm = "Pagure password or API token"
             headers = {
-                "WWW-Authenticate": 'Basic realm="pagure"',
+                "WWW-Authenticate": 'Basic realm="%s"' % realm,
                 "X-Frame-Options": "DENY",
             }
             response = flask.Response(
