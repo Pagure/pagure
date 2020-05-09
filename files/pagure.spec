@@ -227,7 +227,7 @@ sed -e "s/^python3-openid$//g" -i requirements.txt
 
 # Install apache configuration file
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/httpd/conf.d/
-install -p -m 644 files/pagure.conf $RPM_BUILD_ROOT/%{_sysconfdir}/httpd/conf.d/pagure.conf
+install -p -m 644 files/pagure-apache-httpd.conf $RPM_BUILD_ROOT/%{_sysconfdir}/httpd/conf.d/pagure.conf
 
 # Install configuration file
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/pagure
