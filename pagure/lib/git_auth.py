@@ -74,6 +74,7 @@ def get_git_auth_helper(backend=None):
             "gitolite2": Gitolite2Auth,
             "gitolite3": Gitolite3Auth,
             "pagure": PagureGitAuth,
+            "pagure_authorized_keys": PagureGitAuth,
         }[backend]
     else:
         cls = classes[backend].load()
