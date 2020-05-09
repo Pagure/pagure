@@ -354,27 +354,33 @@ def send_confirmation_email(user):
     if not user.emails:
         return
 
-    url = pagure.config.config.get("APP_URL", flask.request.url_root)
+    # The URL of this instance
+    instance_url = pagure.config.config.get("APP_URL", flask.request.url_root)
 
-    url = urljoin(
-        url or flask.request.url_root,
-        flask.url_for("ui_ns.confirm_user", token=user.token),
+    # A link with a secret token to confirm the registration
+    confirmation_url = urljoin(
+        instance_url, flask.url_for("ui_ns.confirm_user", token=user.token),
     )
 
-    message = """ Dear %(username)s,
+    message = """Dear %(username)s,
 
-Thank you for registering on pagure at %(url)s.
+Thank you for registering on pagure at %(instance_url)s.
 
 To finish your registration, please click on the following link or copy/paste
 it in your browser:
-  %(url)s
 
-You account will not be activated until you finish this step.
+    %(confirmation_url)s
+
+Your account will not be activated until you finish this step.
 
 Sincerely,
 Your pagure admin.
 """ % (
-        {"username": user.username, "url": url}
+        {
+            "username": user.username,
+            "instance_url": instance_url,
+            "confirmation_url": confirmation_url,
+        }
     )
 
     pagure.lib.notify.send_email(
