@@ -46,6 +46,7 @@ def proxy_raw_git():
         # These are the vars git-http-backend needs
         "PATH_INFO": flask.request.path,
         "REMOTE_USER": flask.request.remote_user,
+        "USER": flask.request.remote_user,
         "REMOTE_ADDR": flask.request.remote_addr,
         "CONTENT_TYPE": flask.request.content_type,
         "QUERY_STRING": flask.request.query_string,
@@ -79,6 +80,7 @@ def proxy_raw_git():
     # These keys are optional
     for key in (
         "REMOTE_USER",
+        "USER",
         "REMOTE_ADDR",
         "CONTENT_TYPE",
         "QUERY_STRING",
