@@ -78,12 +78,6 @@ Requires:           python%{python_pkgversion}-straight-plugin
 Requires:           python%{python_pkgversion}-wtforms
 %endif
 
-%if 0%{?rhel} && 0%{?rhel} < 8
-Requires:           mod_wsgi
-%else
-Requires:           python%{python_pkgversion}-mod_wsgi
-%endif
-
 %{?systemd_requires}
 
 # No dependency of the app per se, but required to make it working.
@@ -95,6 +89,32 @@ Pagure is a light-weight git-centered forge based on pygit2.
 Currently, Pagure offers a web-interface for git repositories, a ticket
 system and possibilities to create new projects, fork existing ones and
 create/merge pull-requests across or within projects.
+
+
+%package            web-apache-httpd
+Summary:            Apache HTTPD configuration for Pagure
+BuildArch:          noarch
+Requires:           %{name} = %{version}-%{release}
+Requires:           httpd-filesystem
+%if 0%{?rhel} && 0%{?rhel} < 8
+Requires:           mod_wsgi
+%else
+Requires:           python%{python_pkgversion}-mod_wsgi
+%endif
+%description        web-apache-httpd
+This package provides the configuration files for deploying
+a Pagure server using the Apache HTTPD server.
+
+
+%package            web-nginx
+Summary:            Nginx configuration for Pagure
+BuildArch:          noarch
+Requires:           %{name} = %{version}-%{release}
+Requires:           nginx-filesystem
+Requires:           python%{python_pkgversion}-gunicorn
+%description        web-nginx
+This package provides the configuration files for deploying
+a Pagure server using the Nginx web server.
 
 
 %package            theme-pagureio
@@ -229,6 +249,10 @@ sed -e "s/^python3-openid$//g" -i requirements.txt
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/httpd/conf.d/
 install -p -m 644 files/pagure-apache-httpd.conf $RPM_BUILD_ROOT/%{_sysconfdir}/httpd/conf.d/pagure.conf
 
+# Install nginx configuration file
+mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/nginx/conf.d/
+install -p -m 644 files/pagure-nginx.conf $RPM_BUILD_ROOT/%{_sysconfdir}/nginx/conf.d/pagure.conf
+
 # Install configuration file
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/pagure
 install -p -m 644 files/pagure.cfg.sample $RPM_BUILD_ROOT/%{_sysconfdir}/pagure/pagure.cfg
@@ -257,6 +281,16 @@ install -p -m 644 files/alembic.ini $RPM_BUILD_ROOT/%{_sysconfdir}/pagure/alembi
 
 # Install the alembic revisions
 cp -r alembic $RPM_BUILD_ROOT/%{_datadir}/pagure
+
+# Install the systemd file for the web frontend
+mkdir -p $RPM_BUILD_ROOT/%{_unitdir}
+install -p -m 644 files/pagure_web.service \
+    $RPM_BUILD_ROOT/%{_unitdir}/pagure_web.service
+
+# Install the systemd file for the docs web frontend
+mkdir -p $RPM_BUILD_ROOT/%{_unitdir}
+install -p -m 644 files/pagure_docs_web.service \
+    $RPM_BUILD_ROOT/%{_unitdir}/pagure_docs_web.service
 
 # Install the systemd file for the worker
 mkdir -p $RPM_BUILD_ROOT/%{_unitdir}
@@ -332,15 +366,31 @@ sed -e "s|#!/usr/bin/env python|#!%{__python}|" -i \
 sed -e "s|/usr/bin/python|%{__python}|g" -i $RPM_BUILD_ROOT/%{_unitdir}/*.service
 
 %if 0%{?rhel} && 0%{?rhel} < 8
-# Change to correct static file path for apache httpd
-sed -e "s/pythonX.Y/python%{python2_version}/g" -i $RPM_BUILD_ROOT/%{_sysconfdir}/httpd/conf.d/pagure.conf
+# Change to correct static file path for apache httpd and nginx
+sed -e "s/pythonX.Y/python%{python2_version}/g" -i \
+    $RPM_BUILD_ROOT/%{_sysconfdir}/httpd/conf.d/pagure.conf \
+    $RPM_BUILD_ROOT/%{_sysconfdir}/nginx/conf.d/pagure.conf
 %else
 # Switch all systemd units to use the correct celery
 sed -e "s|/usr/bin/celery|/usr/bin/celery-3|g" -i $RPM_BUILD_ROOT/%{_unitdir}/*.service
 
-# Change to correct static file path for apache httpd
-sed -e "s/pythonX.Y/python%{python3_version}/g" -i $RPM_BUILD_ROOT/%{_sysconfdir}/httpd/conf.d/pagure.conf
+# Switch all systemd units to use the correct gunicorn
+sed -e "s|/usr/bin/gunicorn|/usr/bin/gunicorn-3|g" -i $RPM_BUILD_ROOT/%{_unitdir}/*.service
+
+# Change to correct static file path for apache httpd and nginx
+sed -e "s/pythonX.Y/python%{python3_version}/g" -i \
+    $RPM_BUILD_ROOT/%{_sysconfdir}/httpd/conf.d/pagure.conf \
+    $RPM_BUILD_ROOT/%{_sysconfdir}/nginx/conf.d/pagure.conf
 %endif
+
+# Make log directories
+mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/log/pagure
+logfiles="web docs_web"
+
+for logfile in $logfiles; do
+   touch $RPM_BUILD_ROOT/%{_localstatedir}/log/pagure/access_${logfile}.log
+   touch $RPM_BUILD_ROOT/%{_localstatedir}/log/pagure/error_${logfile}.log
+done
 
 # Regenerate missing symlinks (really needed for upgrades from pagure < 5.0)
 runnerhooks="post-receive pre-receive"
@@ -355,6 +405,9 @@ done
 %systemd_post pagure_gitolite_worker.service
 %systemd_post pagure_api_key_expire_mail.timer
 %systemd_post pagure_mirror_project_in.timer
+%post web-nginx
+%systemd_post pagure_web.service
+%systemd_post pagure_docs_web.service
 %post milters
 %systemd_post pagure_milter.service
 %post ev
@@ -375,6 +428,9 @@ done
 %systemd_preun pagure_gitolite_worker.service
 %systemd_preun pagure_api_key_expire_mail.timer
 %systemd_preun pagure_mirror_project_in.timer
+%preun web-nginx
+%systemd_preun pagure_web.service
+%systemd_preun pagure_docs_web.service
 %preun milters
 %systemd_preun pagure_milter.service
 %preun ev
@@ -395,6 +451,9 @@ done
 %systemd_postun_with_restart pagure_gitolite_worker.service
 %systemd_postun pagure_api_key_expire_mail.timer
 %systemd_postun pagure_mirror_project_in.timer
+%postun web-nginx
+%systemd_postun_with_restart pagure_web.service
+%systemd_postun_with_restart pagure_docs_web.service
 %postun milters
 %systemd_postun_with_restart pagure_milter.service
 %postun ev
@@ -414,12 +473,10 @@ done
 %files
 %doc README.rst UPGRADING.rst doc/
 %license LICENSE
-%config(noreplace) %{_sysconfdir}/httpd/conf.d/pagure.conf
 %config(noreplace) %{_sysconfdir}/pagure/pagure.cfg
 %config(noreplace) %{_sysconfdir}/pagure/alembic.ini
 %dir %{_sysconfdir}/pagure/
 %dir %{_datadir}/pagure/
-%config(noreplace) %{_datadir}/pagure/*.wsgi
 %{_datadir}/pagure/*.py*
 %if ! (0%{?rhel} && 0%{?rhel} < 8)
 %{_datadir}/pagure/__pycache__/
@@ -438,6 +495,21 @@ done
 %{_unitdir}/pagure_api_key_expire_mail.timer
 %{_unitdir}/pagure_mirror_project_in.service
 %{_unitdir}/pagure_mirror_project_in.timer
+
+
+%files web-apache-httpd
+%license LICENSE
+%config(noreplace) %{_sysconfdir}/httpd/conf.d/pagure.conf
+%config(noreplace) %{_datadir}/pagure/*.wsgi
+
+
+%files web-nginx
+%license LICENSE
+%config(noreplace) %{_sysconfdir}/nginx/conf.d/pagure.conf
+%{_unitdir}/pagure_web.service
+%{_unitdir}/pagure_docs_web.service
+%dir %{_localstatedir}/log/pagure
+%ghost %{_localstatedir}/log/pagure/*.log
 
 
 %files theme-pagureio

@@ -1,0 +1,16 @@
+[Unit]
+Description=Pagure web application
+After=postgresql.service mariadb.service mysqld.service redis.target
+Documentation=https://pagure.io/pagure
+
+
+[Service]
+ExecStart=/usr/bin/gunicorn --workers 4 --env PAGURE_CONFIG=/etc/pagure/pagure.cfg --access-logfile /var/log/pagure/access_web.log --error-logfile /var/log/pagure/error_web.log --bind unix:/tmp/pagure_web.sock "pagure.flask_app:create_app()"
+Type=simple
+User=git
+Group=git
+Restart=on-failure
+
+
+[Install]
+WantedBy=multi-user.target
