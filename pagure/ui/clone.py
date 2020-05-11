@@ -74,6 +74,7 @@ def _get_remote_user():
                             if (
                                 not token.expired
                                 and username == token.user.username
+                                and "commit" in token.acls_list
                             ):
                                 flask.g.authenticated = True
                                 remote_user = token.user.username

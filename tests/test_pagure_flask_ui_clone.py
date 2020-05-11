@@ -277,6 +277,31 @@ class PagureFlaskAppClonetests(tests.Modeltests):
             "ALLOW_HTTP_PULL_PUSH": True,
             "ALLOW_HTTP_PUSH": True,
             "HTTP_REPO_ACCESS_GITOLITE": None,
+        },
+    )
+    def test_http_push_invalid_acl_on_token(self):
+        """ Test that the HTTP push gets accepted. """
+        tests.create_tokens(self.session, suffix="2")
+        tests.create_tokens_acl(
+            self.session, token_id="aaabbbcccddd2", acl_name="commit_flag"
+        )
+
+        headers = {
+            "Authorization": b"Basic %s"
+            % base64.b64encode(b"pingou:aaabbbcccddd2")
+        }
+        output = self.app.get(
+            "/test.git/info/refs?service=git-receive-pack", headers=headers,
+        )
+        self.assertEqual(output.status_code, 401)
+        self.assertIn("Authorization Required", output.get_data(as_text=True))
+
+    @patch.dict(
+        "pagure.config.config",
+        {
+            "ALLOW_HTTP_PULL_PUSH": True,
+            "ALLOW_HTTP_PUSH": True,
+            "HTTP_REPO_ACCESS_GITOLITE": None,
             "PAGURE_AUTH": "local",
         },
     )
