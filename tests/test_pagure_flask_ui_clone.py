@@ -38,6 +38,10 @@ class PagureFlaskAppClonetests(tests.Modeltests):
         super(PagureFlaskAppClonetests, self).setUp()
 
         tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
+        tests.add_content_git_repo(
+            os.path.join(self.path, "repos", "test.git")
+        )
         tests.create_tokens(self.session)
         tests.create_tokens_acl(self.session)
         self.create_project_full("clonetest", {"create_readme": "y"})
@@ -219,6 +223,33 @@ class PagureFlaskAppClonetests(tests.Modeltests):
             % base64.b64encode(b"pingou:aaabbbcccddd")
         }
         output = self.app.get(
+            "/test.git/info/refs?service=git-receive-pack", headers=headers,
+        )
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        self.assertIn("# service=git-receive-pack", output_text)
+        self.assertIn(" refs/heads/master\x00", output_text)
+
+    @patch.dict(
+        "pagure.config.config",
+        {
+            "ALLOW_HTTP_PULL_PUSH": True,
+            "ALLOW_HTTP_PUSH": True,
+            "HTTP_REPO_ACCESS_GITOLITE": None,
+        },
+    )
+    def test_http_push_projectless_api_token(self):
+        """ Test that the HTTP push gets accepted. """
+        tests.create_tokens(self.session, project_id=None, suffix="2")
+        tests.create_tokens_acl(
+            self.session, token_id="aaabbbcccddd2", acl_name="commit"
+        )
+
+        headers = {
+            "Authorization": b"Basic %s"
+            % base64.b64encode(b"pingou:aaabbbcccddd2")
+        }
+        output = self.app.get(
             "/clonetest.git/info/refs?service=git-receive-pack",
             headers=headers,
         )
@@ -226,6 +257,28 @@ class PagureFlaskAppClonetests(tests.Modeltests):
         output_text = output.get_data(as_text=True)
         self.assertIn("# service=git-receive-pack", output_text)
         self.assertIn(" refs/heads/master\x00", output_text)
+
+    @patch.dict(
+        "pagure.config.config",
+        {
+            "ALLOW_HTTP_PULL_PUSH": True,
+            "ALLOW_HTTP_PUSH": True,
+            "HTTP_REPO_ACCESS_GITOLITE": None,
+        },
+    )
+    def test_http_push__invalid_project_for_api_token(self):
+        """ Test that the HTTP push gets accepted. """
+
+        headers = {
+            "Authorization": b"Basic %s"
+            % base64.b64encode(b"pingou:aaabbbcccddd")
+        }
+        output = self.app.get(
+            "/clonetest.git/info/refs?service=git-receive-pack",
+            headers=headers,
+        )
+        self.assertEqual(output.status_code, 401)
+        self.assertIn("Authorization Required", output.get_data(as_text=True))
 
     @patch.dict(
         "pagure.config.config",

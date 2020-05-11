@@ -34,7 +34,7 @@ from pagure.ui import UI_NS
 _log = logging.getLogger(__name__)
 
 
-def _get_remote_user():
+def _get_remote_user(project):
     """ Returns the remote user using either the content of
     ``flask.g.remote_user`` or checking the headers for ``Authorization``
     and check if the provided API token is valid.
@@ -76,20 +76,28 @@ def _get_remote_user():
                                 and username == token.user.username
                                 and "commit" in token.acls_list
                             ):
+                                if (
+                                    project
+                                    and token.project
+                                    and token.project.fullname
+                                    != project.fullname
+                                ):
+                                    return remote_user
+
                                 flask.g.authenticated = True
                                 remote_user = token.user.username
 
     return remote_user
 
 
-def proxy_raw_git():
+def proxy_raw_git(project):
     """ Proxy a request to Git or gitolite3 via a subprocess.
 
     This should get called after it is determined the requested project
     is not on repoSpanner.
     """
     _log.debug("Raw git clone proxy started")
-    remote_user = _get_remote_user()
+    remote_user = _get_remote_user(project)
     # We are going to shell out to gitolite-shell. Prepare the env it needs.
     gitenv = {
         "PATH": os.environ["PATH"],
@@ -273,7 +281,14 @@ def clone_proxy(project, username=None, namespace=None):
         flask.abort(403, description="HTTP pull/push is not allowed")
 
     service = None
-    remote_user = _get_remote_user()
+    # name it p1 so there is no risk of variable shadowing, we do not want
+    # this to be used elsewhere since there is no check here if the user
+    # is allowed to access this project (this is done lower down)
+    p1 = pagure.lib.query.get_authorized_project(
+        flask.g.session, project, user=username, namespace=namespace
+    )
+    remote_user = _get_remote_user(p1)
+
     if flask.request.path.endswith("/info/refs"):
         service = flask.request.args.get("service")
         if not service:
@@ -325,7 +340,7 @@ def clone_proxy(project, username=None, namespace=None):
     if project.is_on_repospanner:
         return proxy_repospanner(project, service)
     else:
-        return proxy_raw_git()
+        return proxy_raw_git(project)
 
 
 def add_clone_proxy_cmds():
