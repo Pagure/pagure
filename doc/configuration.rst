@@ -792,6 +792,7 @@ Source: https://en.wikipedia.org/wiki/Content_Security_Policy
 Defaults to:
 
 ::
+
     CSP_HEADERS = (
         "default-src 'self' https:; "
         "script-src 'self' 'nonce-{nonce}'; "
@@ -1244,7 +1245,7 @@ FEDORA_MESSAGING_NOTIFICATIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This configuration key can be used to turn on or off sending notifications via
-`fedora-messaging <>`_.
+`fedora-messaging <https://fedora-messaging.readthedocs.io/en/stable/>`_.
 
 Defaults to: ``False``.
 

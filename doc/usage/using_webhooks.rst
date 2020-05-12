@@ -6,7 +6,7 @@ Basically, pagure will make a HTTP POST request to one or more third party
 server/application with information about what is or just happened.
 
 Activating web-hooks notifications
---------------------------------
+----------------------------------
 
 To set-up a web-hook, simply go to the settings page of your project and
 enter the URL to the server/endpoint that will receive the notifications.
