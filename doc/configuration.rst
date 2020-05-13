@@ -492,7 +492,6 @@ running.
          below)
 
 
-
 Web-hooks notifications
 -----------------------
 
@@ -509,6 +508,7 @@ Defaults to: ``False``.
 
 
 .. _redis-section:
+
 
 Redis options
 -------------
@@ -536,7 +536,6 @@ This configuration key indicates the name of the redis database to use for
 communicating with the EventSource server.
 
 Defaults to: ``0``.
-
 
 
 Authentication options
@@ -602,7 +601,6 @@ This will be used for tasks such as updating the ticket git repo based on
 the content posted in the user interface.
 
 Defaults to: ``None``.
-
 
 
 Stomp Options
@@ -2086,6 +2084,13 @@ notifications on commits made on all projects in a pagure instance.
 Defaults to: ``False``.
 
 
+PAGURE_PLUGINS_CONFIG
+~~~~~~~~~~~~~~~~~~~~~~
+
+This option can be used to specify the configuration file used for loading
+plugins. It is not set by default, instead if must be declared explicitly.
+Also see the documentation on plugins at :ref:`plugins`.
+
 
 Deprecated configuration keys
 -----------------------------
@@ -2188,3 +2193,12 @@ GITOLITE_BACKEND
 This configuration key allowed specifying the gitolite backend.
 This has now been replaced by GIT_AUTH_BACKEND, please see that option
 for information on valid values.
+
+PAGURE_PLUGIN
+~~~~~~~~~~~~~
+
+This configuration key allows to specify the path to the plugins configuration
+file. It is set as an environment variable. It has been replaced by
+PAGURE_PLUGINS_CONFIG. The new variable does not modify the behavior of the old
+variable, however unlike PAGURE_PLUGIN it can be set in the main Pagure
+configuration.

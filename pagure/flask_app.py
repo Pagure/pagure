@@ -16,6 +16,7 @@ import logging
 import string
 import time
 import os
+import warnings
 
 import flask
 import pygit2
@@ -132,7 +133,30 @@ def create_app(config=None):
     # Import 3rd party blueprints
     plugin_config = flask.config.Config("")
     if "PAGURE_PLUGIN" in os.environ:
+        # Warn the user about deprecated variable (defaults to stderr)
+        warnings.warn(
+            "The environment variable PAGURE_PLUGIN is deprecated and will be "
+            "removed in future releases of Pagure. Please replace it with "
+            "PAGURE_PLUGINS_CONFIG instead.",
+            FutureWarning,
+        )
+
+        # Log usage of deprecated variable
+        logger.warning(
+            "Using deprecated variable PAGURE_PLUGIN. "
+            "You should use PAGURE_PLUGINS_CONFIG instead."
+        )
+
         plugin_config.from_envvar("PAGURE_PLUGIN")
+
+    elif "PAGURE_PLUGINS_CONFIG" in os.environ:
+        plugin_config.from_envvar("PAGURE_PLUGINS_CONFIG")
+
+    elif "PAGURE_PLUGINS_CONFIG" in app.config:
+        # If the os.environ["PAGURE_PLUGINS_CONFIG"] is not set, we try to load
+        # it from the pagure config file.
+        plugin_config.from_pyfile(app.config.get("PAGURE_PLUGINS_CONFIG"))
+
     for blueprint in plugin_config.get("PLUGINS") or []:
         logger.info("Loading blueprint: %s", blueprint.name)
         app.register_blueprint(blueprint)

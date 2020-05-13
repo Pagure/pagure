@@ -241,3 +241,7 @@ REPOSPANNER_ADMIN_MIGRATION = False
 #             'push_cert': {'cert': '',
 #                           'key': ''}}
 REPOSPANNER_REGIONS = {}
+
+# Path to the plugins configuration file that is used to load plugins. Please
+# look at files/plugins.cfg.sample for a configuration example.
+# PAGURE_PLUGINS_CONFIG = "/etc/pagure/plugins.cfg"

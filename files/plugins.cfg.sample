@@ -1,0 +1,35 @@
+# This file demonstrates how to load plugins in pagure.
+# Pagure uses Flask Blueprints as plugins, so what we need to do is import all
+# the Blueprints into a variable called PLUGINS.
+# See the "Plugins" section in the pagure documentation for more information.
+###############################################################################
+
+
+import os
+import sys
+
+
+# For plugins that are already available in sys.path, for example packages that
+# have been installed on the system, we simply import them
+import plugin1
+import plugin2
+...
+
+
+# For any other custom plugin that is *not* in sys.path we need to add our
+# folder to sys.path first
+PLUGINS_PATH = "/path/to/plugins/folder/"
+if PLUGINS_PATH not in sys.path:
+    sys.path.append(PLUGINS_PATH)
+
+
+# Then we can import all the plugins
+import myplugin1
+import myplugin2
+...
+
+
+# Finally, create the PLUGINS list of Blueprints that we want pagure to register
+PLUGINS = [ plugin1.APP,
+            myplugin2.APP,
+            ... ]

@@ -1,11 +1,16 @@
 #!/usr/bin/env python
 
+###############################################################################
+# Please note that this script is only used for development purposes.         #
+# Do not start the Flask app with this script in a production environment,    #
+# use files/pagure.wsgi instead!                                              #
+###############################################################################
+
 from __future__ import unicode_literals, absolute_import
 
 import argparse
 import sys
 import os
-
 
 parser = argparse.ArgumentParser(description="Run the Pagure app")
 parser.add_argument(
@@ -15,7 +20,12 @@ parser.add_argument(
     help="Configuration file to use for pagure.",
 )
 parser.add_argument(
-    "--plugins", dest="plugins", help="Configuration file for pagure plugin."
+    "--plugins",
+    dest="plugins",
+    help="Configuration file for pagure plugins. This argument takes "
+    "precedence over the environment variable PAGURE_PLUGINS_CONFIG, which in "
+    "turn takes precedence over the configuration variable "
+    "PAGURE_PLUGINS_CONFIG.",
 )
 parser.add_argument(
     "--debug",
@@ -65,7 +75,12 @@ if args.plugins:
     if not config.startswith("/"):
         here = os.path.join(os.path.dirname(os.path.abspath(__file__)))
         config = os.path.join(here, config)
-    os.environ["PAGURE_PLUGIN"] = config
+    os.environ["PAGURE_PLUGINS_CONFIG"] = config
+    
+    # If this script is ran with the deprecated env. variable PAGURE_PLUGIN
+    # and --plugins, we need to override it too.
+    if "PAGURE_PLUGIN" in os.environ:
+        os.environ["PAGURE_PLUGIN"] = config
 
 if args.perfverbose:
     os.environ["PAGURE_PERFREPO"] = "true"

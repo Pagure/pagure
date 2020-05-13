@@ -40,6 +40,7 @@ Contents:
    install_pagure_logcom
    install_crons
    configuration
+   plugins
    custom_gitolite_conf
    development
    contributing
