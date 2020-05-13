@@ -704,11 +704,11 @@ class Gitolite2Auth(GitAuthHelper):
         of lines as returned by _process_project.
         """
         repos = []
-        for l in lines:
-            if l.startswith("repo "):
-                repos.append([l])
+        for line in lines:
+            if line.startswith("repo "):
+                repos.append([line])
             else:
-                repos[-1].append(l)
+                repos[-1].append(line)
         for i, repo_lines in enumerate(repos):
             repos[i] = "\n".join(repo_lines)
         return repos

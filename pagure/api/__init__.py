@@ -33,7 +33,7 @@ API = flask.Blueprint("api_ns", __name__, url_prefix="/api/0")
 import pagure.lib.query  # noqa: E402
 import pagure.lib.tasks  # noqa: E402
 from pagure.config import config as pagure_config  # noqa: E402
-from pagure.doc_utils import (
+from pagure.doc_utils import (  # noqa: E402
     load_doc_title_and_name,
     modify_rst,
     modify_html,

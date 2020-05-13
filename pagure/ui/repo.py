@@ -847,7 +847,7 @@ def view_history_file(repo, filename, username=None, namespace=None):
             fromref=branchname,
         )
         if log.strip():
-            log = [l.split(" ", 1) for l in log.strip().split("\n")]
+            log = [line.split(" ", 1) for line in log.strip().split("\n")]
         else:
             log = []
     except Exception:

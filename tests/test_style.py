@@ -41,7 +41,7 @@ class TestStyle(unittest.TestCase):
             sys.executable,
             "-m",
             "flake8",
-            "--ignore=E712,W503,E203",
+            "--ignore=E712,W503,E203,E902",
             REPO_PATH,
         ]
 

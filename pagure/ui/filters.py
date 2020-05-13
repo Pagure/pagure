@@ -374,7 +374,12 @@ def format_loc(
                     "%(comment)s"
                     "</div>"
                     "</section>"
-                    "</div></div>"
+                    "</div>"
+                    '<div class="card-footer bg-transparent d-flex '
+                    'align-items-center border-0 p-0">'
+                    "%(templ_edited)s"
+                    "</div>"
+                    "</div>"
                     "</td></tr>"
                     % (
                         {
