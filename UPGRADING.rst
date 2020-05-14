@@ -1,6 +1,24 @@
 Upgrading Pagure
 ================
 
+From 5.9 to 5.10
+----------------
+
+The 5.10 release does not contain any database schema changes.
+
+The 5.10 release does include a new API ACL, so you may still want to re-run the
+createdb script which populates the database with the ACL set in the
+configuration file.
+
+New environment variable and configuration key added:
+
+* PAGURE_PLUGIN_CONFIG
+
+Deprecated environment variable:
+
+* PAGURE_PLUGIN
+
+
 From 5.8 to 5.9
 ---------------
 

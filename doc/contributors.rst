@@ -3,15 +3,15 @@ Contributors to pagure
 
 Pagure would be nothing without its contributors.
 
-On March 30, 2019 (release 5.9.1) the list looks as follow:
+On May 14, 2019 (release 5.10.0) the list looks as follow:
 
 =================  ===========
 Number of commits  Contributor
 =================  ===========
-  6690              Pierre-Yves Chibon <pingou@pingoured.fr>
+  6742              Pierre-Yves Chibon <pingou@pingoured.fr>
    328              Ryan Lerch <rlerch@redhat.com>
    172              Vivek Anand <vivekanand1101@gmail.com>
-   141              Julen Landa Alustiza <jlanda@fedoraproject.org>
+   142              Julen Landa Alustiza <jlanda@fedoraproject.org>
    139              farhaanbukhsh <farhaan.bukhsh@gmail.com>
    134              Clement Verna <cverna@tutanota.com>
    133              Patrick Uiterwijk <puiterwijk@redhat.com>
@@ -24,7 +24,7 @@ Number of commits  Contributor
     32              Lubomír Sedlář <lsedlar@redhat.com>
     32              Matt Prahl <mprahl@redhat.com>
     32              Pradeep CE (cep) <breathingcode@gmail.com>
-    26              Neal Gompa <ngompa13@gmail.com>
+    31              Neal Gompa <ngompa13@gmail.com>
     25              Lubomír Sedlář <lubomir.sedlar@gmail.com>
     23              rahul Bajaj <you@example.com>
     20              Jeremy Cline <jeremy@jcline.org>
@@ -52,6 +52,7 @@ Number of commits  Contributor
      6              Michael Scherer <misc@redhat.com>
      6              Sergio Durigan Junior <sergiodj@sergiodj.net>
      6              ymdatta <ymdatta@protonmail.com>
+     5              Fabio Valentini <decathorpe@gmail.com>
      5              Mike McLean <mikem@redhat.com>
      5              Oliver Gutierrez <ogutierrez@redhat.com>
      5              Shaily <shaily15297@yahoo.com>
@@ -59,11 +60,13 @@ Number of commits  Contributor
      5              jingjing <sanri.ok@163.com>
      5              vanzhiganov <vanzhiganov@ya.ru>
      5              yangl1996 <yltt1234512@gmail.com>
+     5              zPlus <zplus@peers.community>
      4              Alex Gleason <alex@alexgleason.me>
      4              Eric Barbour <ebarbour@redhat.com>
      4              Maciej Lasyk <maciek@lasyk.info>
      4              clime <clime@redhat.com>
      3              Akanksha <akanksha_mishra01@yahoo.com>
+     3              Andrew Engelbrecht <andrew@engelbrecht.io>
      3              Ankush Behl <cloudbehl@gmail.com>
      3              Anthony Lackey <alackey96@gmail.com>
      3              Chenxiong Qi <cqi@redhat.com>
@@ -126,7 +129,6 @@ Number of commits  Contributor
      1              David Caro <dcaroest@redhat.com>
      1              Devesh Kumar Singh <deveshkusingh@gmail.com>
      1              Eashan <eashankadam@gmail.com>
-     1              Fabio Valentini <decathorpe@gmail.com>
      1              Felix Yan <felixonmars@users.sf.net>
      1              Filip Valder <fvalder@redhat.com>
      1              Frank Dana (FeRD) <ferdnyc@gmail.com>

@@ -3,6 +3,49 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
+5.10.0 (2020-05-14)
+-------------------
+- Allow viewing issues via the API using project-less API token (Julen Landa
+  Alustiza)
+- Rename Koshei to Koschei in the srcfpo theme (Fabio Valentini)
+- Make pagure work with recent sqlalchemy versions (>= 1.3.0)
+- Improve the vagrant-based dev environment for pagure developers
+- Add a new API endpoint to retrieve detailed stats about the issues
+- Improve the graphs displayed in the stats tab of each projects
+  - Remove dependency on d3.js
+  - Add dependency on chartjs
+- Add a new graph tracking the number of open issues throughout the year
+- Upgrade the container based development environment for pagure developers
+  (Andrew Engelbrecht)
+- Improve loading tickets from git
+- Support pygit2 >= 1.1.0 (Andrew Engelbrecht)
+- Add missing endpoints to the API documentation (Fabio Valentini)
+- Add support for wtforms >= 2.3
+  - Add dependency on email_validator in such case
+- Fix sorting users by their username when using python3
+- Correct the API documentation for updating the watchers of a project (Fabio
+  Valentini)
+- Ensure the name of the headers are always of the correct type (especially when
+  using python3)
+- Ensure aclchecker and keyhelper can work with APP_URL having a trailing slash
+- Add a new git auth backend which can manage the .ssh/authorized_keys file
+  directly
+- Update information about supported Git auth backends (Neal Gompa)
+- Add support for arrow >= 0.15.6
+- Allow repo admins to change the bugzilla overrides (srcfpo theme)
+- Fix getting the milter running with python3
+- Fix mirroring project hosted remotely
+- Add url_path property to class User (and thus in the API) (zPlus)
+- Improve email text for new user registration (zPlus)
+- Set the USER environment variable when pushing over http
+- Add support for git push via http using basic auth relying on API token
+- If pagure is set up for local auth, allow git push via https to use it
+- Add an example nginx configuration file for pagure (Neal Gompa)
+- Create two subpackages in the pagure for the apache and nginx configuration
+  files (Neal Gompa)
+- Add some documentation on how git push over http works in pagure
+- Make pagure compatible with the latest version of flake8
+- Add PAGURE_PLUGINS_CONFIG setting in pagure configuration file (zPlus)
 
 5.9.1 (2020-03-30)
 ------------------

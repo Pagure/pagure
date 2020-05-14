@@ -16,7 +16,7 @@
 
 
 Name:               pagure
-Version:            5.9.1
+Version:            5.10.0
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -400,6 +400,13 @@ for runnerhook in $runnerhooks; do
    ln -sf hookrunner $RPM_BUILD_ROOT/%{python_sitelib}/pagure/hooks/files/$runnerhook
 done
 
+%if 0%{?fedora} || 0%{?rhel} >= 8
+# Byte compile everything not in sitelib
+%py_byte_compile %{__python} %{buildroot}%{_datadir}/pagure/
+%py_byte_compile %{__python} %{buildroot}%{_libexecdir}/pagure/
+%py_byte_compile %{__python} %{buildroot}%{_libexecdir}/pagure-ev/
+%endif
+
 %post
 %systemd_post pagure_worker.service
 %systemd_post pagure_gitolite_worker.service
@@ -568,6 +575,9 @@ done
 
 
 %changelog
+* Thu May 14 2020 Pierre-Yves Chibon <pingou@pingoured.fr> - 5.10.0-1
+- Update to 5.10.0
+
 * Mon Mar 30 2020 Pierre-Yves Chibon <pingou@pingoured.fr> - 5.9.1-1
 - Update to 5.9.1
 
