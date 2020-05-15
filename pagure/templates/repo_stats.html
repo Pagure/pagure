@@ -64,11 +64,10 @@ issues_history_stats_plot_call = function() {
   $("#commiter_list").hide();
   $(".commit_trend").hide();
   var _stats_url = "{{ url_for(
-    'api_ns.api_view_issues_history_stats',
+    'api_ns.api_view_issues_history_detailed_stats',
     repo=g.repo.name,
     username=username,
-    namespace=g.repo.namespace,
-    detailed=True) }}";
+    namespace=g.repo.namespace) }}";
   var _s = $("#data_stats_spinner");
   _s.html(
     "<img id='spinnergif' src='{{ url_for('static', filename='images/spinner.gif') }}?version={{ g.version}}'>"
