@@ -961,6 +961,33 @@ should be secured over SSL.
 Defaults to: ``False``
 
 
+SMTP_STARTTLS
+^^^^^^^^^^^^^
+
+This configuration key specifies instructs pagure to starts connecting to
+the SMTP server via a `starttls` command.
+
+Defaults to: ``False``
+
+
+SMTP_KEYFILE
+^^^^^^^^^^^^
+
+This configuration key allows to specify a key file to be used in the
+`starttls` command when connecting to the smtp server.
+
+Defaults to: ``None``
+
+
+SMTP_CERTFILE
+^^^^^^^^^^^^
+
+This configuration key allows to specify a certificate file to be used in
+the `starttls` command when connecting to the smtp server.
+
+Defaults to: ``None``
+
+
 SMTP_USERNAME
 ^^^^^^^^^^^^^
 

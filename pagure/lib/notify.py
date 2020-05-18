@@ -505,6 +505,20 @@ def send_email(
                         pagure_config["SMTP_SERVER"],
                         pagure_config["SMTP_PORT"],
                     )
+
+            if pagure_config["SMTP_STARTTLS"]:
+                context = ssl.create_default_context()
+                keyfile = pagure_config.get("SMTP_KEYFILE") or None
+                certfile = pagure_config.get("SMTP_CERTFILE") or None
+                respcode, _ = smtp.starttls(
+                    keyfile=keyfile, certfile=certfile, context=context,
+                )
+                if respcode != 220:
+                    _log.warning(
+                        "The starttls command did not return the 220 "
+                        "response code expected."
+                    )
+
             if (
                 pagure_config["SMTP_USERNAME"]
                 and pagure_config["SMTP_PASSWORD"]
