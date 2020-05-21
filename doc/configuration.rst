@@ -938,6 +938,8 @@ sending emails.
 
 Defaults to: ``localhost``.
 
+See also the SMTP_STARTTLS section.
+
 
 SMTP_PORT
 ^^^^^^^^^
@@ -966,6 +968,13 @@ SMTP_STARTTLS
 
 This configuration key specifies instructs pagure to starts connecting to
 the SMTP server via a `starttls` command.
+
+When enabling STARTTLS in conjunction with a local smtp server, you should
+replace ``localhost`` with a host name that is included in the server's
+certificate. If the server only relays messages originating from ``localhost``,
+then you should also ensure that the above host name resolves to the same
+tcp address as ``localhost``, for instance by adding an appropriate record
+to */etc/hosts*.
 
 Defaults to: ``False``
 
