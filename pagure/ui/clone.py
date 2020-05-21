@@ -32,6 +32,7 @@ from pagure.config import config as pagure_config
 from pagure.ui import UI_NS
 
 _log = logging.getLogger(__name__)
+_auth_log = logging.getLogger("pagure.auth")
 
 
 def _get_remote_user(project):
@@ -120,6 +121,17 @@ def proxy_raw_git(project):
         # "safe", as in they don't allow for other issues.
         "HTTP_CONTENT_ENCODING": flask.request.content_encoding,
     }
+
+    _auth_log.info(
+        "Serving git to |user: %s|IP: %s|method: %s|repo: %s|query: %s"
+        % (
+            remote_user,
+            flask.request.remote_addr,
+            flask.request.method,
+            project.path,
+            flask.request.query_string,
+        )
+    )
 
     gitolite = pagure_config["HTTP_REPO_ACCESS_GITOLITE"]
     if gitolite:
@@ -278,6 +290,16 @@ def clone_proxy(project, username=None, namespace=None):
     access to the attempted repository.
     """
     if not pagure_config["ALLOW_HTTP_PULL_PUSH"]:
+        _auth_log.info(
+            "User tried to access the git repo via http but this is not "
+            "enabled -- |user: N/A|IP: %s|method: %s|repo: %s|query: %s"
+            % (
+                flask.request.remote_addr,
+                flask.request.method,
+                project,
+                flask.request.query_string,
+            )
+        )
         flask.abort(403, description="HTTP pull/push is not allowed")
 
     service = None
@@ -287,6 +309,9 @@ def clone_proxy(project, username=None, namespace=None):
     p1 = pagure.lib.query.get_authorized_project(
         flask.g.session, project, user=username, namespace=namespace
     )
+    p1_path = "invalid repo"
+    if p1:
+        p1_path = p1.path
     remote_user = _get_remote_user(p1)
 
     if flask.request.path.endswith("/info/refs"):
@@ -294,12 +319,45 @@ def clone_proxy(project, username=None, namespace=None):
         if not service:
             # This is a Git client older than 1.6.6, and it doesn't work with
             # the smart protocol. We do not support the old protocol via HTTP.
+            _auth_log.info(
+                "User is using a git client to old (pre-1.6.6) -- "
+                "|user: %s|IP: %s|method: %s|repo: %s|query: %s"
+                % (
+                    remote_user,
+                    flask.request.remote_addr,
+                    flask.request.method,
+                    p1_path,
+                    flask.request.query_string,
+                )
+            )
             flask.abort(400, description="Please switch to newer Git client")
         if service not in ("git-upload-pack", "git-receive-pack"):
+            _auth_log.info(
+                "User asked for an unknown service "
+                "|user: %s|IP: %s|method: %s|repo: %s|query: %s"
+                % (
+                    remote_user,
+                    flask.request.remote_addr,
+                    flask.request.method,
+                    p1_path,
+                    flask.request.query_string,
+                )
+            )
             flask.abort(400, description="Unknown service requested")
 
     if "git-receive-pack" in flask.request.full_path:
         if not pagure_config["ALLOW_HTTP_PUSH"]:
+            _auth_log.info(
+                "User tried a git push over http while this is not enabled -- "
+                "|user: %s|IP: %s|method: %s|repo: %s|query: %s"
+                % (
+                    remote_user,
+                    flask.request.remote_addr,
+                    flask.request.method,
+                    p1_path,
+                    flask.request.query_string,
+                )
+            )
             # Pushing (git-receive-pack) over HTTP is not allowed
             flask.abort(403, description="HTTP pushing disabled")
 
@@ -312,6 +370,17 @@ def clone_proxy(project, username=None, namespace=None):
                 "WWW-Authenticate": 'Basic realm="%s"' % realm,
                 "X-Frame-Options": "DENY",
             }
+            _auth_log.info(
+                "User tried a git push over http but was not authenticated -- "
+                "|user: %s|IP: %s|method: %s|repo: %s|query: %s"
+                % (
+                    remote_user,
+                    flask.request.remote_addr,
+                    flask.request.method,
+                    p1_path,
+                    flask.request.query_string,
+                )
+            )
             response = flask.Response(
                 response="Authorization Required",
                 status=401,
@@ -328,6 +397,17 @@ def clone_proxy(project, username=None, namespace=None):
         asuser=remote_user,
     )
     if not project:
+        _auth_log.info(
+            "User asked to access a git repo that they are not allowed to "
+            "access -- |user: %s|IP: %s|method: %s|repo: %s|query: %s"
+            % (
+                remote_user,
+                flask.request.remote_addr,
+                flask.request.method,
+                p1.path,
+                flask.request.query_string,
+            )
+        )
         _log.info(
             "%s could not find project: %s for user %s and namespace %s",
             remote_user,

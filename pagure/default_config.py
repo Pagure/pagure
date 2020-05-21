@@ -460,6 +460,11 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "stream": "ext://sys.stdout",
         },
+        "auth_handler": {
+            "formatter": "standard",
+            "class": "logging.StreamHandler",
+            "stream": "ext://sys.stdout",
+        },
         "email": {
             "level": "ERROR",
             "formatter": "email_format",
@@ -479,6 +484,11 @@ LOGGING = {
             "handlers": ["console"],
             "level": "DEBUG",
             "propagate": True,
+        },
+        "pagure_auth": {
+            "handlers": ["auth_handler"],
+            "level": "DEBUG",
+            "propagate": False,
         },
         "flask": {
             "handlers": ["console"],

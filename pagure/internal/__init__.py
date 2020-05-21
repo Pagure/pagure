@@ -37,6 +37,7 @@ from pagure.config import config as pagure_config  # noqa: E402
 
 
 _log = logging.getLogger(__name__)
+_auth_log = logging.getLogger("pagure.auth")
 
 
 MERGE_OPTIONS = {
@@ -97,6 +98,11 @@ def lookup_ssh_key():
     """ Looks up an SSH key by search_key for keyhelper.py """
     search_key = flask.request.form["search_key"]
     username = flask.request.form.get("username")
+    _auth_log.info(
+        "User is trying to access pagure using the ssh key: %s -- "
+        "|user: %s|IP: %s|method: N/A|repo: N/A|query: N/A"
+        % (search_key, username, flask.request.remote_addr)
+    )
     key = pagure.lib.query.find_ssh_key(flask.g.session, search_key, username)
 
     if not key:
@@ -123,6 +129,11 @@ def check_ssh_access():
     """ Determines whether a user has any access to the requested repo. """
     gitdir = flask.request.form["gitdir"]
     remoteuser = flask.request.form["username"]
+    _auth_log.info(
+        "User is asking to access a project via ssh -- "
+        "|user: %s|IP: %s|method: N/A|repo: %s|query: N/A"
+        % (remoteuser, flask.request.remote_addr, gitdir)
+    )
 
     # Build a fake path so we can use get_repo_info_from_path
     path = os.path.join(pagure_config["GIT_FOLDER"], gitdir)
@@ -142,6 +153,12 @@ def check_ssh_access():
 
     if repo is None:
         _log.info("Project name could not be extracted from path")
+        _auth_log.info(
+            "The path specified by the user could not be matched with a "
+            "project -- "
+            "|user: %s|IP: %s|method: N/A|repo: %s|query: N/A"
+            % (remoteuser, flask.request.remote_addr, gitdir)
+        )
         return flask.jsonify({"access": False})
 
     project = pagure.lib.query.get_authorized_project(
@@ -153,6 +170,11 @@ def check_ssh_access():
     )
 
     if not project:
+        _auth_log.info(
+            "User tried to access a private project they don't have access "
+            "to -- |user: %s|IP: %s|method: N/A|repo: %s|query: N/A"
+            % (remoteuser, flask.request.remote_addr, gitdir)
+        )
         _log.info("Project not found with this path")
         return flask.jsonify({"access": False})
     _log.info("Checking ACLs on project: %s" % project.fullname)
@@ -163,6 +185,11 @@ def check_ssh_access():
         # Deploy keys are not allowed on ticket and PR repos but they are
         # allowed for main and docs repos.
         _log.info("%s is not a contributor to this project" % remoteuser)
+        _auth_log.info(
+            "User tried to access a projec they do not have access to -- "
+            "|user: %s|IP: %s|method: N/A|repo: %s|query: N/A"
+            % (remoteuser, flask.request.remote_addr, gitdir)
+        )
         return flask.jsonify({"access": False})
 
     _log.info("Access granted to %s on: %s" % (remoteuser, project.fullname))
