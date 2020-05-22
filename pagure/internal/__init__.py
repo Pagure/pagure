@@ -157,11 +157,11 @@ def check_ssh_access():
         return flask.jsonify({"access": False})
     _log.info("Checking ACLs on project: %s" % project.fullname)
 
-    if repotype not in ["main", "doc"] and not pagure.utils.is_repo_user(
+    if repotype not in ["main", "docs"] and not pagure.utils.is_repo_user(
         project, remoteuser
     ):
         # Deploy keys are not allowed on ticket and PR repos but they are
-        # allowed for main and doc repos.
+        # allowed for main and docs repos.
         _log.info("%s is not a contributor to this project" % remoteuser)
         return flask.jsonify({"access": False})
 
