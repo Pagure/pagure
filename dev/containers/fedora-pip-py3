@@ -1,4 +1,4 @@
-FROM fedora:30
+FROM fedora:32
 
 ARG repo=https://pagure.io/pagure.git
 ARG branch=master
