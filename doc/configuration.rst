@@ -811,73 +811,84 @@ The default value is:
 
 ::
 
-    LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'formatters': {
-            'standard': {
-                'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
+   LOGGING = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "standard": {
+                "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
             },
-            'email_format': {
-                'format': MSG_FORMAT
-            }
+            "email_format": {"format": MSG_FORMAT},
         },
-        'filters': {
-            'myfilter': {
-                '()': ContextInjector,
-            }
-        },
-        'handlers': {
-            'console': {
-                'level': 'INFO',
-                'formatter': 'standard',
-                'class': 'logging.StreamHandler',
-                'stream': 'ext://sys.stdout',
+        "filters": {"myfilter": {"()": ContextInjector}},
+        "handlers": {
+            "console": {
+                "formatter": "standard",
+                "class": "logging.StreamHandler",
+                "stream": "ext://sys.stdout",
             },
-            'email': {
-                'level': 'ERROR',
-                'formatter': 'email_format',
-                'class': 'logging.handlers.SMTPHandler',
-                'mailhost': 'localhost',
-                'fromaddr': 'pagure@localhost',
-                'toaddrs': 'root@localhost',
-                'subject': 'ERROR on pagure',
-                'filters': ['myfilter'],
+            "auth_handler": {
+                "formatter": "standard",
+                "class": "logging.StreamHandler",
+                "stream": "ext://sys.stdout",
+            },
+            "email": {
+                "level": "ERROR",
+                "formatter": "email_format",
+                "class": "logging.handlers.SMTPHandler",
+                "mailhost": "localhost",
+                "fromaddr": "pagure@localhost",
+                "toaddrs": "root@localhost",
+                "subject": "ERROR on pagure",
+                "filters": ["myfilter"],
             },
         },
         # The root logger configuration; this is a catch-all configuration
         # that applies to all log messages not handled by a different logger
-        'root': {
-            'level': 'INFO',
-            'handlers': ['console'],
+        "root": {"level": "INFO", "handlers": ["console"]},
+        "loggers": {
+            "pagure": {
+                "handlers": ["console"],
+                "level": "DEBUG",
+                "propagate": True,
+            },
+            "pagure_auth": {
+                "handlers": ["auth_handler"],
+                "level": "DEBUG",
+                "propagate": False,
+            },
+            "flask": {
+                "handlers": ["console"],
+                "level": "INFO",
+                "propagate": False,
+            },
+            "sqlalchemy": {
+                "handlers": ["console"],
+                "level": "WARN",
+                "propagate": False,
+            },
+            "binaryornot": {
+                "handlers": ["console"],
+                "level": "WARN",
+                "propagate": True,
+            },
+            "MARKDOWN": {
+                "handlers": ["console"],
+                "level": "WARN",
+                "propagate": True,
+            },
+            "PIL": {"handlers": ["console"], "level": "WARN", "propagate": True},
+            "chardet": {
+                "handlers": ["console"],
+                "level": "WARN",
+                "propagate": True,
+            },
+            "pagure.lib.encoding_utils": {
+                "handlers": ["console"],
+                "level": "WARN",
+                "propagate": False,
+            },
         },
-        'loggers': {
-            'pagure': {
-                'handlers': ['console'],
-                'level': 'DEBUG',
-                'propagate': True
-            },
-            'flask': {
-                'handlers': ['console'],
-                'level': 'INFO',
-                'propagate': False
-            },
-            'sqlalchemy': {
-                'handlers': ['console'],
-                'level': 'WARN',
-                'propagate': False
-            },
-            'binaryornot': {
-                'handlers': ['console'],
-                'level': 'WARN',
-                'propagate': True
-            },
-            'pagure.lib.encoding_utils': {
-                'handlers': ['console'],
-                'level': 'WARN',
-                'propagate': False
-            },
-        }
     }
 
 .. note:: as you can see there is an ``email`` handler defined. It's not used
@@ -887,6 +898,22 @@ The default value is:
     ::
 
         'handlers': ['console', 'email'],
+
+.. note:: The ``pagure_auth`` logger is a special one logging all activities
+    regarding read/write access to git repositories. It will be a pretty
+    important log for auditing if needed.
+    You can separate this log into its own file if you like by using the
+    following handler:
+    ::
+
+        "auth_handler": {
+            "formatter": "standard",
+            "class": "logging.FileHandler",
+            "filename": "/var/log/pagure/pagure_auth.log",
+        }
+
+    Beware if you do this that you will also likely want to enable logrotate
+    on the system.
 
 
 ITEM_PER_PAGE
