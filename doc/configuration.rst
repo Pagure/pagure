@@ -1016,7 +1016,7 @@ Defaults to: ``None``
 
 
 SMTP_CERTFILE
-^^^^^^^^^^^^
+^^^^^^^^^^^^^
 
 This configuration key allows to specify a certificate file to be used in
 the `starttls` command when connecting to the smtp server.
