@@ -389,14 +389,14 @@ def clone_proxy(project, username=None, namespace=None):
             )
             flask.abort(response)
 
-    project = pagure.lib.query.get_authorized_project(
+    project_obj = pagure.lib.query.get_authorized_project(
         flask.g.session,
         project,
         user=username,
         namespace=namespace,
         asuser=remote_user,
     )
-    if not project:
+    if not project_obj:
         _auth_log.info(
             "User asked to access a git repo that they are not allowed to "
             "access -- |user: %s|IP: %s|method: %s|repo: %s|query: %s"
@@ -404,7 +404,7 @@ def clone_proxy(project, username=None, namespace=None):
                 remote_user,
                 flask.request.remote_addr,
                 flask.request.method,
-                p1.path,
+                p1_path,
                 flask.request.query_string,
             )
         )
@@ -417,10 +417,10 @@ def clone_proxy(project, username=None, namespace=None):
         )
         flask.abort(404, description="Project not found")
 
-    if project.is_on_repospanner:
-        return proxy_repospanner(project, service)
+    if project_obj.is_on_repospanner:
+        return proxy_repospanner(project_obj, service)
     else:
-        return proxy_raw_git(project)
+        return proxy_raw_git(project_obj)
 
 
 def add_clone_proxy_cmds():
