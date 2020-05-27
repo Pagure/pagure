@@ -1568,6 +1568,7 @@ def api_view_issues_history_detailed_stats(
     ^^^^^^^^^^^^^^^
 
     ::
+
         {
           "stats": {
             "2020-03-26T19:21:51.348451": {
