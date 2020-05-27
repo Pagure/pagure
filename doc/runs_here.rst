@@ -1,8 +1,8 @@
 Runs Here
 =========
 
-List of locations that Pagure is currently in use
--------------------------------------------------
+List of locations where Pagure is currently used
+------------------------------------------------
 
 Please add yourself here if you run a local version of Pagure. Please also
 describe what you are using it for.
