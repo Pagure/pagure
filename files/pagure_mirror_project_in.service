@@ -1,3 +1,9 @@
+# This service is responsible for PULLing external repositories into local
+# repositories. It's used by repositories that are created with a "mirror"
+# option.
+# For mirroring local repositories to external repositories, see pagure_mirror.service.
+
+
 [Unit]
 Description=Pagure service to mirror in projects
 Documentation=https://pagure.io/pagure
