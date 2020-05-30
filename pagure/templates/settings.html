@@ -160,6 +160,15 @@
                         <span class="c-indicator"></span>
                     </fieldset>
                 {% endif %}
+                {% if repo.mirrored_from %}
+                    <fieldset class="form-group">
+                      <label for="tags">Mirrored from</label>
+                      <input class="form-control" name="mirrored_from" value="{{ repo.mirrored_from }}" />
+                      <small class="text-muted">
+                        The (public) url from which this repository is mirrored.
+                      </small>
+                    </fieldset>
+                {% endif %}
                 <button class="btn btn-primary" type="submit" title="Update description">
                   Update
                 </button>

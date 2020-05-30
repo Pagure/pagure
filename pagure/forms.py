@@ -159,6 +159,10 @@ class ProjectFormSimplified(PagureForm):
     private = wtforms.BooleanField(
         "Private", [wtforms.validators.Optional()], false_values=FALSE_VALUES
     )
+    mirrored_from = wtforms.StringField(
+        "Mirrored from",
+        [wtforms.validators.optional(), wtforms.validators.Length(max=255)],
+    )
 
 
 class ProjectForm(ProjectFormSimplified):

@@ -1421,6 +1421,8 @@ def update_project(repo, username=None, namespace=None):
             repo.url = form.url.data.strip()
             if repo.private:
                 repo.private = form.private.data
+            if repo.mirrored_from:
+                repo.mirrored_from = form.mirrored_from.data
             pagure.lib.query.update_tags(
                 flask.g.session,
                 repo,
