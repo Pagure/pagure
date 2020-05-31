@@ -33,6 +33,7 @@ sqlalchemy >= 0.8
 # 1.4.0 is broken, 1.4.0-post-1 works but gives odd results on newer setuptools
 # the latest version 1.5.0 is also known to work
 straight.plugin
+whitenoise
 wtforms
 
 # Required only for the `oidc` authentication backend

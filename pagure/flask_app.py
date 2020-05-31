@@ -21,6 +21,8 @@ import warnings
 import flask
 import pygit2
 
+from whitenoise import WhiteNoise
+
 import pagure.doc_utils
 import pagure.exceptions
 import pagure.forms
@@ -187,6 +189,11 @@ def create_app(config=None):
     ]
     app.jinja_loader = jinja2.ChoiceLoader(templ_loaders)
     app.register_blueprint(themeblueprint)
+
+    # Setup WhiteNoise for serving static files
+    app.wsgi_app = WhiteNoise(
+        app.wsgi_app, root=os.path.join(here, "static"), prefix="/static"
+    )
 
     app.before_request(set_request)
     app.after_request(after_request)

@@ -17,6 +17,7 @@ import flask
 import pygit2
 
 from binaryornot.helpers import is_binary_string
+from whitenoise import WhiteNoise
 
 import pagure.config
 import pagure.doc_utils
@@ -28,6 +29,14 @@ import pagure.forms
 
 # Create the application.
 APP = flask.Flask(__name__)
+
+# Setup WhiteNoise for serving static files
+here = os.path.abspath(
+    os.path.join(os.path.dirname(os.path.abspath(__file__)))
+)
+APP.wsgi_app = WhiteNoise(
+    APP.wsgi_app, root=os.path.join(here, "static"), prefix="/static"
+)
 
 # set up FAS
 APP.config = pagure.config.reload_config()

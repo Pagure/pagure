@@ -75,6 +75,7 @@ Requires:           python%{python_pkgversion}-requests
 Requires:           python%{python_pkgversion}-six
 Requires:           python%{python_pkgversion}-sqlalchemy >= 0.8
 Requires:           python%{python_pkgversion}-straight-plugin
+Requires:           python%{python_pkgversion}-whitenoise
 Requires:           python%{python_pkgversion}-wtforms
 %endif
 
@@ -365,22 +366,12 @@ sed -e "s|#!/usr/bin/env python|#!%{__python}|" -i \
 # Switch interpreter for systemd units
 sed -e "s|/usr/bin/python|%{__python}|g" -i $RPM_BUILD_ROOT/%{_unitdir}/*.service
 
-%if 0%{?rhel} && 0%{?rhel} < 8
-# Change to correct static file path for apache httpd and nginx
-sed -e "s/pythonX.Y/python%{python2_version}/g" -i \
-    $RPM_BUILD_ROOT/%{_sysconfdir}/httpd/conf.d/pagure.conf \
-    $RPM_BUILD_ROOT/%{_sysconfdir}/nginx/conf.d/pagure.conf
-%else
+%if ! (0%{?rhel} && 0%{?rhel} < 8)
 # Switch all systemd units to use the correct celery
 sed -e "s|/usr/bin/celery|/usr/bin/celery-3|g" -i $RPM_BUILD_ROOT/%{_unitdir}/*.service
 
 # Switch all systemd units to use the correct gunicorn
 sed -e "s|/usr/bin/gunicorn|/usr/bin/gunicorn-3|g" -i $RPM_BUILD_ROOT/%{_unitdir}/*.service
-
-# Change to correct static file path for apache httpd and nginx
-sed -e "s/pythonX.Y/python%{python3_version}/g" -i \
-    $RPM_BUILD_ROOT/%{_sysconfdir}/httpd/conf.d/pagure.conf \
-    $RPM_BUILD_ROOT/%{_sysconfdir}/nginx/conf.d/pagure.conf
 %endif
 
 # Make log directories
