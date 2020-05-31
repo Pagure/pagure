@@ -44,7 +44,7 @@
             <label class="c-input c-checkbox">
               <input type="checkbox" name="acls" value="{{ acl.name }}">
               <span class="c-indicator"></span>
-              {{ acl.description }}
+              {{ acl.description }} <span class="small">({{ acl.name }})</span>
             </label>
           </div>
           {% endfor %}
