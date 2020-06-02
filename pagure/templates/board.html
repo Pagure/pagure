@@ -1,0 +1,285 @@
+{% extends "repo_master.html" %}
+{% from "_render_issues.html" import render_issue_row %}
+{% block title %}Board {{ board.name | noJS(ignore="img") | safe }} - {{ repo.name }}{% endblock %}
+{% set tag = "boards" %}
+
+{% block header %}
+<link rel="stylesheet" nonce="{{ g.nonce }}" href="{{
+  url_for('static', filename='vendor/selectize/selectize.bootstrap3.css') }}?version={{ g.version}}"/>
+<link rel="stylesheet" nonce="{{ g.nonce }}" href="{{
+  url_for('static', filename='pagure_boards.css') }}?version={{ g.version}}"/>
+{% endblock %}
+
+{% block widerepo %}
+<div class="container-fluid">
+<div class="row">
+  <div class="col-sm-11" id="title_row">
+    <h3 class="font-weight-bold inline">
+        {{ board.name }}
+    </h3>
+  </div>
+  {% if g.repo_committer %}
+  <div class="col-sm-1">
+    <a class="btn btn-outline-info pointer" title="Configure the board"
+        href="{{ url_for('ui_ns.view_board_settings', repo=repo.name,
+                username=username, namespace=repo.namespace, board_name=board.name) }}"><i class="fa fa-wrench"></i></a>
+  </div>
+  {% endif %}
+</div>
+
+  <div class="drag-container">
+    <ul class="drag-list">
+
+      {% for status in board.statuses | sort(attribute='rank') %}
+      <li class="drag-column drag-column-{{ loop.index }}">
+        <span class="drag-column-header" data-bg-color="{{ status.bg_color }}">
+          <h2>{{ status.name }} <small>({{ status.visible_tickets(private) | length }})</small></h2>
+          {% if status.close %}
+          <i class="btn show_hidden fa fa-eye right" title="Show all closed tickets"></i>
+          {% endif %}
+          <i class="btn add_ticket fa fa-plus-square right" title="Add a ticket to this column" data-cnt="{{ loop.index }}"></i>
+        </span>
+
+        <ul class="drag-inner-list column-item" id="{{loop.index}}" data-cnt="{{ loop.index }}" data-status="{{ status.name }}" data-close="{{ status.close }}">
+
+          <li class="hidden" id="add_ticket_field_{{ loop.index }}">
+            <input class="form-control add_ticket_field" type="text"
+              placeholder="Ticket id" name="toadd" value="" />
+            <button class="btn btn-primary add_ticket_btn" data-cnt="{{ loop.index }}">Ok</button>
+          </li>
+
+          {% for bissue in status.visible_tickets(private)  %}
+            {% if status.close and loop.index0 >= 5 %}
+              <li class="drag-item hidden" data-issue-uid="{{ bissue.issue.uid }}">
+            {% else %}
+              <li class="drag-item" data-issue-uid="{{ bissue.issue.uid }}">
+            {% endif %}
+            {% if bissue.issue.private %}
+              <span title="Private ticket" class="text-danger fa fa-fw fa-lock"></span>
+            {% endif %}
+            <a href="{{ url_for('ui_ns.view_issue', repo=repo.name, username=username,
+              namespace=repo.namespace, issueid=bissue.issue.id) }}" title="{{ bissue.issue.title }}">
+            {% if bissue.issue.status == 'Open' %}
+              <span class="fa fa-fw text-success fa-exclamation-circle pt-1 icon_id"></span>
+              <span class="text-success font-weight-bold id_txt">#{{ bissue.issue.id }}</span>
+            {% elif bissue.issue.status == 'Closed' %}
+              <span class="fa fa-fw text-danger fa-exclamation-circle pt-1 icon_id"></span>
+              <span class="text-danger font-weight-bold id_txt">#{{ bissue.issue.id }}</span>
+            {% endif %}
+              - {{ bissue.issue.title | truncate(80, False, '...') }}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </li>
+    {% endfor %}
+
+    </ul>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block jscripts %}
+{{ super() }}
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='vendor/dragula/dragula.min.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='tags.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}"></script>
+
+<script type="text/javascript" nonce="{{ g.nonce }}">
+
+$(document).ready(function() {
+  $("[data-bg-color").each(function(ind, obj) {
+    $(obj, '.is-moved').css('background-color', $(obj).attr('data-bg-color'));
+  });
+});
+
+/*
+Code related to showing hidden tickets in a column
+*/
+
+$('.show_hidden').click(function(e) {
+
+  $('.show_hidden').parent().parent().find('.drag-item').each(function(idx, di){
+    if (idx >= 5){
+      $(di).toggle();
+    }
+  });
+});
+
+{% if g.repo_committer %}
+/*
+Code related to drag & drop of the ticket in the different columns
+*/
+
+dragula([
+  document.getElementById('0'),
+  {% for status in board.statuses %}
+  document.getElementById('{{ loop.index }}'),
+  {% endfor %}
+])
+
+.on('drag', function(el) {
+  // add 'is-moving' class to element being dragged
+  el.classList.add('is-moving');
+})
+
+.on('dragend', function(el) {
+
+  // remove 'is-moving' class from element after dragging has stopped
+  el.classList.remove('is-moving');
+
+  // color the tile but only for 300ms then remove it
+  window.setTimeout(function() {
+    el.classList.add('is-moved');
+    var bg_color = $(el).parent().parent().find('.drag-column-header').attr('data-bg-color');
+    $(el).css('background-color', bg_color);
+
+    window.setTimeout(function() {
+      $(el).css('background-color', '');
+    }, 300);
+  }, 100);
+
+  // Update the db for the change in that column
+  var _status = $(el).parent().attr("data-status");
+  var _close = $(el).parent().attr("data-close");
+  data = {};
+  $(el).parent().find(".drag-item").each(function(idx, di){
+    var _issue_uid = $(di).attr("data-issue-uid");
+    var _rank = $(di).index();
+    console.log(_issue_uid + ' - ' + _status + ' - ' + _rank);
+    data[_issue_uid] = {"status": _status, "rank": _rank};
+  });
+
+  $.ajax({
+      url: "{{ url_for('api_ns.api_board_ticket_update_status', repo=repo.name,
+                username=username, namespace=repo.namespace, board_name=board.name) }}" ,
+      type: 'POST',
+      data: JSON.stringify(data),
+      contentType: 'application/json; charset=utf-8',
+      dataType: 'json',
+      success: function(res) {
+        var _html = ''
+            + '<span id="temp_notification" class="text-success"">'
+            + '  <i class="fa fa-fw fa-info-circle"></i>Updated'
+            + '</span>';
+        $('#title_row').append(_html);
+        window.setTimeout(function() {
+          $('#temp_notification').remove();
+        }, 1200);
+
+        if (_close == "True") {
+          $(el).find(".icon_id").removeClass("text-success").addClass("text-danger");
+          $(el).find(".id_txt").removeClass("text-success").addClass("text-danger");
+        } else  {
+          $(el).find(".icon_id").removeClass("text-danger").addClass("text-success");
+          $(el).find(".id_txt").removeClass("text-danger").addClass("text-success");
+        };
+      },
+      error: function(res) {
+        console.log(res);
+        alert('Request failed');
+      }
+  });
+
+});
+
+/*
+Code related to adding tickets to the board
+*/
+
+$('.add_ticket').click(function(e) {
+  var _f = "#add_ticket_field_" + $(this).attr("data-cnt")
+  console.log($(this));
+  console.log(_f);
+  console.log($(_f));
+  $(_f).toggle();
+  $(_f).find(".selectize-control").show();
+});
+
+function _get_issues(url, callback){
+  $.getJSON(
+      url,
+      function( data ) {
+        callback(data.issues);
+        if (data.pagination.next){
+          _get_issues(data.pagination.next, callback)
+        }
+      }
+    );
+};
+
+$('.add_ticket_field').selectize({
+  plugins: ['remove_button'],
+  valueField: 'id',
+  labelField: 'id',
+  searchField: ['id', 'title'],
+  preload: 'focus',
+  render: {
+    option: function(item, escape) {
+      return '<div><span>'+escape(item.id)+'</span> <span>'+escape(item.title)+'</span></div>';
+    },
+    item: function(item, escape) {
+      return '<div><span>#'+escape(item.id)+'</span></div>';
+    },
+  },
+  create: false,
+  load: function(query, callback) {
+    if (!query){
+      callback();
+      return;
+    };
+    var _url = "{{ url_for('api_ns.api_view_issues',
+          repo=repo.name,
+          username=username,
+          namespace=repo.namespace) }}" + "?query_id=" + query;
+    _get_issues(_url, callback);
+  }
+});
+
+$('.add_ticket_btn').click(function(e){
+  var _cnt = $(this).attr("data-cnt");
+  var _f = "#add_ticket_field_" + _cnt;
+  var _ids = $(_f).find('input[name=toadd]').val().split(',');
+
+  var _rank = $('#' + _cnt).children().length -1;
+  var _status = $('#' + _cnt).attr('data-status');
+  data = {}
+  $(_ids).each(function(idx, el){
+    _rank += 1;
+    data[el] = {"rank": _rank, "status": _status};
+  });
+
+  $.ajax({
+      url: "{{ url_for('api_ns.api_board_ticket_add_status', repo=repo.name,
+                username=username, namespace=repo.namespace, board_name=board.name) }}" ,
+      type: 'POST',
+      data: JSON.stringify(data),
+      contentType: 'application/json; charset=utf-8',
+      dataType: 'json',
+      success: function(res) {
+        var _html = ''
+            + '<span id="temp_notification" class="text-success"">'
+            + '  <i class="fa fa-fw fa-info-circle"></i>Updated'
+            + '</span>';
+        $('#title_row').append(_html);
+        window.setTimeout(function() {
+          $('#temp_notification').remove();
+        }, 1200);
+        location.reload();
+      },
+      error: function(res) {
+        console.log(res);
+        alert('Request failed');
+      }
+  });
+
+});
+
+{% endif %}
+
+</script>
+{% endblock %}

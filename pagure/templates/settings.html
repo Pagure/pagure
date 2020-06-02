@@ -60,6 +60,8 @@
                 href="#customfields-tab" role="tab" aria-controls="customfields">Custom Issue Fields</a>
           <a class="nav-item nav-link" id="reports" data-toggle="tab"
                 href="#reports-tab" role="tab" aria-controls="reports">Reports</a>
+          <a class="nav-item nav-link" id="boards" data-toggle="tab"
+                href="#boards-tab" role="tab" aria-controls="boards">Boards</a>
           {% endif %}
 
          {% if g.issues_enabled or repo.settings.get('pull_requests', True) %}
@@ -852,6 +854,10 @@
                           </ul>
                       </div>
                     </div>
+                </div>
+
+                <div class="tab-pane fade" id="boards-tab" role="tabpanel" aria-labelledby="boards-tab">
+                  {% include 'settings_boards.html' %}
                 </div>
 
           {% endif %}

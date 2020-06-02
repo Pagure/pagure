@@ -83,6 +83,26 @@
     </li>
     {% endif %}
 
+    {% if repo.active_boards  %}
+    <li class="nav-item mr-2 text-dark">
+    <div class="btn-group">
+      <a href="#" class="btn btn-outline nav-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <span class="d-none d-md-inline">Boards&nbsp;</span>
+      </a>
+      <div class="dropdown-menu dropdown-menu-right">
+        {% for board in repo.active_boards %}
+          <a href="{{ url_for(
+            'ui_ns.view_board',
+            repo=repo.name,
+            board_name=board.name,
+            username=username,
+            namespace=repo.namespace) }}" class="dropdown-item">{{ board.name }}</a>
+        {% endfor %}
+      </div>
+    </div>
+    </li>
+    {% endif %}
+
     <li class="nav-item mr-2 text-dark">
       <a {%
         if select == 'stats' %}class="active nav-link" {%

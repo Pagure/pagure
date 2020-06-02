@@ -326,6 +326,7 @@ def get_per_page():
 
 if pagure_config.get("ENABLE_TICKETS", True):
     from pagure.api import issue  # noqa: E402
+    from pagure.api import boards  # noqa: E402, F401
 from pagure.api import fork  # noqa: E402
 from pagure.api import project  # noqa: E402
 from pagure.api import user  # noqa: E402

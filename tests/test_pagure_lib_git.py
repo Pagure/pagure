@@ -1683,7 +1683,7 @@ new file mode 100644
 index 0000000..60f7480
 --- /dev/null
 +++ b/456
-@@ -0,0 +1,150 @@
+@@ -0,0 +1,152 @@
 +{
 +    "assignee": null,
 +    "branch": "master",
@@ -1712,6 +1712,7 @@ index 0000000..60f7480
 +            ],
 +            "ticket": []
 +        },
++        "boards": [],
 +        "close_status": [],
 +        "custom_keys": [],
 +        "date_created": null,
@@ -1772,6 +1773,7 @@ index 0000000..60f7480
 +            ],
 +            "ticket": []
 +        },
++        "boards": [],
 +        "close_status": [],
 +        "custom_keys": [],
 +        "date_created": null,
@@ -2594,6 +2596,294 @@ index 0000000..60f7480
             namespaced_repo.requests[0].title,
             "test request to namespaced repo",
         )
+
+    def test_update_ticket_from_git_with_boards(self):
+        """ Test the update_ticket_from_git method from pagure.lib.git. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, "repos"))
+
+        repo = pagure.lib.query._get_project(self.session, "test")
+        namespaced_repo = pagure.lib.query._get_project(
+            self.session, "test3", namespace="somenamespace"
+        )
+
+        # Before
+        self.assertEqual(len(repo.issues), 0)
+        self.assertEqual(repo.issues, [])
+        self.assertEqual(len(namespaced_repo.issues), 0)
+        self.assertEqual(namespaced_repo.issues, [])
+        self.assertEqual(namespaced_repo.boards, [])
+
+        data = {
+            "assignee": None,
+            "blocks": [],
+            "boards": [
+                {
+                    "board": {
+                        "active": True,
+                        "name": "dev",
+                        "status": [
+                            {
+                                "bg_color": "#FFB300",
+                                "close": False,
+                                "close_status": None,
+                                "default": True,
+                                "name": "Backlog",
+                            },
+                            {
+                                "bg_color": "#ca0eef",
+                                "close": False,
+                                "close_status": None,
+                                "default": False,
+                                "name": "In Progress",
+                            },
+                            {
+                                "bg_color": "#34d240",
+                                "close": True,
+                                "close_status": "Fixed",
+                                "default": False,
+                                "name": "Done",
+                            },
+                        ],
+                        "tag": {
+                            "tag": "dev",
+                            "tag_color": "DeepBlueSky",
+                            "tag_description": "",
+                        },
+                    },
+                    "rank": 2,
+                    "status": {
+                        "bg_color": "#ca0eef",
+                        "close": False,
+                        "close_status": None,
+                        "name": "In Progress",
+                    },
+                }
+            ],
+            "close_status": None,
+            "closed_at": None,
+            "closed_by": None,
+            "comments": [
+                {
+                    "comment": "Issue tagged with: dev",
+                    "date_created": "1594654596",
+                    "edited_on": None,
+                    "editor": None,
+                    "id": 1,
+                    "notification": True,
+                    "parent": None,
+                    "reactions": {},
+                    "user": {
+                        "default_email": "bar@pingou.com",
+                        "emails": ["bar@pingou.com", "foo@pingou.com"],
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
+                }
+            ],
+            "content": "We should work on this for the second time",
+            "custom_fields": [],
+            "date_created": "1594654596",
+            "depends": [],
+            "id": 2,
+            "last_updated": "1594654596",
+            "milestone": None,
+            "priority": None,
+            "private": False,
+            "related_prs": [],
+            "status": "Open",
+            "tags": ["dev"],
+            "title": "Test issue #2",
+            "user": {
+                "default_email": "foo@bar.com",
+                "emails": ["foo@bar.com"],
+                "fullname": "foo bar",
+                "name": "foo",
+                "url_path": "user/foo",
+            },
+        }
+
+        pagure.lib.git.update_ticket_from_git(
+            self.session,
+            reponame="test3",
+            namespace="somenamespace",
+            username=None,
+            issue_uid="d4182a2ac2d541d884742d3037c26e57",
+            json_data=data,
+            agent="pingou",
+        )
+        self.session.commit()
+
+        # After insertion
+        self.assertEqual(len(namespaced_repo.issues), 1)
+        self.assertEqual(namespaced_repo.issues[0].id, 2)
+        self.assertEqual(
+            namespaced_repo.issues[0].uid, "d4182a2ac2d541d884742d3037c26e57"
+        )
+        self.assertEqual(namespaced_repo.issues[0].title, "Test issue #2")
+        self.assertEqual(len(namespaced_repo.issues[0].comments), 2)
+        self.assertEqual(namespaced_repo.issues[0].tags_text, ["dev"])
+        self.assertEqual(len(namespaced_repo.issues[0].boards_issues), 1)
+        self.assertEqual(len(namespaced_repo.boards), 1)
+
+    def test_update_ticket_from_git_with_boards_twice(self):
+        """ Test the update_ticket_from_git method from pagure.lib.git. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, "repos"))
+
+        repo = pagure.lib.query._get_project(self.session, "test")
+        namespaced_repo = pagure.lib.query._get_project(
+            self.session, "test3", namespace="somenamespace"
+        )
+
+        # Before
+        self.assertEqual(len(repo.issues), 0)
+        self.assertEqual(repo.issues, [])
+        self.assertEqual(len(namespaced_repo.issues), 0)
+        self.assertEqual(namespaced_repo.issues, [])
+        self.assertEqual(namespaced_repo.boards, [])
+
+        data = {
+            "assignee": None,
+            "blocks": [],
+            "boards": [
+                {
+                    "board": {
+                        "active": True,
+                        "name": "dev",
+                        "status": [
+                            {
+                                "bg_color": "#FFB300",
+                                "close": False,
+                                "close_status": None,
+                                "default": True,
+                                "name": "Backlog",
+                            },
+                            {
+                                "bg_color": "#ca0eef",
+                                "close": False,
+                                "close_status": None,
+                                "default": False,
+                                "name": "In Progress",
+                            },
+                            {
+                                "bg_color": "#34d240",
+                                "close": True,
+                                "close_status": "Fixed",
+                                "default": False,
+                                "name": "Done",
+                            },
+                        ],
+                        "tag": {
+                            "tag": "dev",
+                            "tag_color": "DeepBlueSky",
+                            "tag_description": "",
+                        },
+                    },
+                    "rank": 2,
+                    "status": {
+                        "bg_color": "#ca0eef",
+                        "close": False,
+                        "close_status": None,
+                        "name": "In Progress",
+                    },
+                }
+            ],
+            "close_status": None,
+            "closed_at": None,
+            "closed_by": None,
+            "comments": [
+                {
+                    "comment": "Issue tagged with: dev",
+                    "date_created": "1594654596",
+                    "edited_on": None,
+                    "editor": None,
+                    "id": 1,
+                    "notification": True,
+                    "parent": None,
+                    "reactions": {},
+                    "user": {
+                        "default_email": "bar@pingou.com",
+                        "emails": ["bar@pingou.com", "foo@pingou.com"],
+                        "fullname": "PY C",
+                        "name": "pingou",
+                        "url_path": "user/pingou",
+                    },
+                }
+            ],
+            "content": "We should work on this for the second time",
+            "custom_fields": [],
+            "date_created": "1594654596",
+            "depends": [],
+            "id": 2,
+            "last_updated": "1594654596",
+            "milestone": None,
+            "priority": None,
+            "private": False,
+            "related_prs": [],
+            "status": "Open",
+            "tags": ["dev"],
+            "title": "Test issue #2",
+            "user": {
+                "default_email": "foo@bar.com",
+                "emails": ["foo@bar.com"],
+                "fullname": "foo bar",
+                "name": "foo",
+                "url_path": "user/foo",
+            },
+        }
+
+        pagure.lib.git.update_ticket_from_git(
+            self.session,
+            reponame="test3",
+            namespace="somenamespace",
+            username=None,
+            issue_uid="d4182a2ac2d541d884742d3037c26e57",
+            json_data=data,
+            agent="pingou",
+        )
+        self.session.commit()
+
+        # After first run
+        self.assertEqual(len(namespaced_repo.issues), 1)
+        self.assertEqual(namespaced_repo.issues[0].id, 2)
+        self.assertEqual(
+            namespaced_repo.issues[0].uid, "d4182a2ac2d541d884742d3037c26e57"
+        )
+        self.assertEqual(namespaced_repo.issues[0].title, "Test issue #2")
+        self.assertEqual(len(namespaced_repo.issues[0].comments), 2)
+        self.assertEqual(namespaced_repo.issues[0].tags_text, ["dev"])
+        self.assertEqual(len(namespaced_repo.issues[0].boards_issues), 1)
+        self.assertEqual(namespaced_repo.issues[0].boards_issues[0].rank, 2)
+        self.assertEqual(len(namespaced_repo.boards), 1)
+
+        # Second run with a different rank
+        data["boards"][0]["rank"] = 7
+
+        pagure.lib.git.update_ticket_from_git(
+            self.session,
+            reponame="test3",
+            namespace="somenamespace",
+            username=None,
+            issue_uid="d4182a2ac2d541d884742d3037c26e57",
+            json_data=data,
+            agent="pingou",
+        )
+        self.session.commit()
+
+        # After insertion
+        self.assertEqual(len(namespaced_repo.issues), 1)
+        self.assertEqual(namespaced_repo.issues[0].id, 2)
+        self.assertEqual(
+            namespaced_repo.issues[0].uid, "d4182a2ac2d541d884742d3037c26e57"
+        )
+        self.assertEqual(namespaced_repo.issues[0].title, "Test issue #2")
+        self.assertEqual(len(namespaced_repo.issues[0].comments), 2)
+        self.assertEqual(namespaced_repo.issues[0].tags_text, ["dev"])
+        self.assertEqual(len(namespaced_repo.issues[0].boards_issues), 1)
+        self.assertEqual(namespaced_repo.issues[0].boards_issues[0].rank, 7)
+        self.assertEqual(len(namespaced_repo.boards), 1)
 
     def test_update_request_from_git(self):
         """ Test the update_request_from_git method from pagure.lib.git. """

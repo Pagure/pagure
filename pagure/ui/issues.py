@@ -333,6 +333,37 @@ def update_issue(repo, issueid, username=None, namespace=None):
                 )
                 messages = messages.union(set(msgs))
 
+                # Update the boards the ticket is in
+                in_boards = set()
+                for board in repo.boards:
+                    if board.tag.tag in tags:
+                        in_boards.add(board)
+                cur_boards = set([bi.board for bi in issue.boards_issues])
+
+                add_boards = in_boards - cur_boards
+                _log.info("Adding issue to boards: %s", add_boards)
+                for board in add_boards:
+                    if board.active:
+                        pagure.lib.query.update_ticket_board_status(
+                            flask.g.session,
+                            board=board,
+                            user=flask.g.fas_user.username,
+                            rank=None,
+                            status_name=None,
+                            ticket_uid=issue.uid,
+                        )
+                    else:
+                        _log.debug("Skipping inactive board %s", board)
+
+                rm_boards = cur_boards - in_boards
+                _log.info("Removing issue from boards: %s", rm_boards)
+                pagure.lib.query.remove_issue_from_boards(
+                    flask.g.session,
+                    issue=issue,
+                    board_names=[b.name for b in rm_boards],
+                    user=flask.g.fas_user.username,
+                )
+
             flask.g.session.commit()
 
             # New comment

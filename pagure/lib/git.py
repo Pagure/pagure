@@ -680,6 +680,71 @@ def update_ticket_from_git(
     if msgs:
         messages.extend(msgs)
 
+    # Update boards
+    boards = json_data.get("boards") or []
+    _log.debug("Loading %s boards", len(boards))
+
+    # Go over the boards and add them
+    try:
+        for board_issue in boards:
+            board = board_issue["board"]
+            _log.debug("Loading board: %s", board["name"])
+            tag_obj = pagure.lib.query.get_colored_tag(
+                session, board["tag"]["tag"], issue.project.id
+            )
+            if not tag_obj:
+                _log.debug("Creating tag: %s", board["tag"]["tag"])
+                pagure.lib.query.new_tag(
+                    session,
+                    tag_name=board["tag"]["tag"],
+                    tag_description=board["tag"]["tag_description"],
+                    tag_color=board["tag"]["tag_color"],
+                    project_id=issue.project.id,
+                )
+            board_obj = None
+            for b in repo.boards:
+                if b.name == board["name"]:
+                    board_obj = b
+                    break
+            if not board_obj:
+                _log.debug("Creating board: %s", board["name"])
+                board_obj = pagure.lib.query.create_board(
+                    session,
+                    project=issue.project,
+                    name=board["name"],
+                    active=board["active"],
+                    tag=board["tag"]["tag"],
+                )
+                session.flush()
+            for idx, status in enumerate(board["status"]):
+                _log.debug("Updating status: %s", status["name"])
+                pagure.lib.query.update_board_status(
+                    session,
+                    board=board_obj,
+                    name=status["name"],
+                    rank=idx,
+                    default=status["default"],
+                    close=status["close"],
+                    close_status=status["close_status"],
+                    bg_color=status["bg_color"],
+                )
+            session.flush()
+
+            _log.debug("Updating ticket in board")
+            pagure.lib.query.update_ticket_board_status(
+                session,
+                board=board_obj,
+                user=agent,
+                rank=board_issue["rank"],
+                status_name=board_issue["status"]["name"],
+                ticket_uid=issue.uid,
+                ticket_id=None,
+            )
+            session.flush()
+    except SQLAlchemyError:
+        _log.exception("An error occured while loading the boards")
+        session.rollback()
+
     # Update assignee
     assignee = get_user_from_json(session, json_data, key="assignee")
     if assignee:

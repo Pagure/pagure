@@ -444,6 +444,12 @@ class SimplePagureTest(unittest.TestCase):
 
     def _clear_database(self):
         tables = reversed(pagure.lib.model_base.BASE.metadata.sorted_tables)
+        # This seems to be needed to load the tables in memory or so and
+        # without this, clearing the database fails with the error:
+        # ``sqlite3.OperationalError: foreign key mismatch - "board_statuses"
+        # referencing "boards"``
+        # for reasons that are really not quite understood...
+        [t for t in tables]
         if self.dbpath.startswith("postgresql"):
             self.session.execute(
                 "TRUNCATE %s CASCADE" % ", ".join([t.name for t in tables])

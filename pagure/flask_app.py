@@ -529,6 +529,9 @@ def end_request(exception=None):
 
 def after_request(response):
     """ After request callback, adjust the headers returned """
+    if not hasattr(flask.g, "nonce"):
+        return response
+
     csp_headers = pagure_config["CSP_HEADERS"]
     try:
         style_csp = "nonce-" + flask.g.nonce

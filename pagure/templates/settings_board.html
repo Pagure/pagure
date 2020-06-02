@@ -1,0 +1,310 @@
+{% extends "repo_master.html" %}
+
+{% block title %}Settings Board {{ board.name | noJS(ignore="img") | safe }} - {{ repo.name }}{% endblock %}
+{% set tag = "home" %}
+
+{% block header %}
+<link rel="stylesheet" nonce="{{ g.nonce }}" href="{{
+  url_for('static', filename='pagure_boards.css') }}?version={{ g.version}}"/>
+{% endblock %}
+
+{% block repo %}
+<div class="row">
+  <div class="col-sm-11">
+    <h3 class="font-weight-bold">
+        {{ board.name }}
+    </h3>
+  </div>
+  <div class="col-sm-1">
+    <a class="btn btn-outline-info pointer" title="See the board"
+        href="{{ url_for('ui_ns.view_board', repo=repo.name,
+                username=username, namespace=repo.namespace, board_name=board.name)}}"><i class="fa fa-eye"></i></a>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <strong>Statuses</strong>
+  </div>
+</div>
+
+<form action="{{ url_for(
+  'api_ns.api_board_status',
+  repo=repo.name,
+  board_name=board.name,
+  username=username,
+  namespace=repo.namespace) }}"
+    method="post" class="icon" id="update_status_form">
+  <div class="form-group">
+    <div class="row">
+      <div class="col-sm-1" >
+        Order
+      </div>
+
+      <div class="col-sm-5" >
+        <p>Status name</p>
+      </div>
+
+      <div class="col-sm-1" >
+        <p>Default</p>
+      </div>
+
+      <div class="col-sm-1" >
+        <p>Close</p>
+      </div>
+
+      {% if repo.close_status %}
+        <div class="col-sm-2" >
+          <p>Close status</p>
+        </div>
+      {% endif %}
+
+      <div class="col-sm-1">
+        <p>Color</p>
+      </div>
+
+      <div class="col-sm-1">
+        <p>Delete</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group settings-field-rows" id="statuses-list">
+    <div class="row hidden blank-field">
+      <div class="col-sm-1" >
+        <i class="fa fa-expand"></i>
+      </div>
+
+      <div class="col-sm-5" >
+        <input type="text" name="name" value="" class="form-control"/>
+      </div>
+
+      <div class="col-sm-1" >
+        <input type="radio" name="default" value="1" class="form-control"/>
+      </div>
+
+      <div class="col-sm-1" >
+        <input type="checkbox" name="close" value="1" class="form-control"/>
+      </div>
+
+      {% if repo.close_status %}
+        <div class="col-sm-2" >
+          <select class="form-control" name="close_status">
+            <option> </option>
+            {% for close_status in repo.close_status %}
+            <option>{{ close_status }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      {% endif %}
+
+      <div class="col-sm-1">
+        <input type="color" name="bg_color" class="form-control c-select" />
+      </div>
+
+      <div class="col-sm-1">
+        <a class="btn btn-outline-danger remove-settings-field-row pointer"><i class="fa fa-trash"></i></a>
+      </div>
+    </div>
+
+    {% for status in board.statuses | sort(attribute='rank') %}
+      <div class="row">
+        <div class="col-sm-1" >
+          <i class="fa fa-expand"></i>
+        </div>
+
+        <div class="col-sm-5" >
+          <input type="text" name="name" value="{{ status.name }}" class="form-control"/>
+        </div>
+
+        <div class="col-sm-1" >
+          {% if status.default %}
+            <input type="radio" name="default" value="1" class="form-control" checked/>
+          {% else %}
+            <input type="radio" name="default" value="1" class="form-control"/>
+          {% endif %}
+        </div>
+
+        <div class="col-sm-1" >
+          {% if status.close %}
+            <input type="checkbox" name="close" value="1" class="form-control" checked/>
+          {% else %}
+            <input type="checkbox" name="close" value="1" class="form-control"/>
+          {% endif %}
+        </div>
+
+        {% if repo.close_status %}
+        <div class="col-sm-2" >
+          <select class="form-control" name="close_status">
+            <option> </option>
+            {% for close_status in repo.close_status %}
+              {% if close_status == status.close_status %}
+                <option selected>{{ close_status }}</option>
+              {% else %}
+                <option>{{ close_status }}</option>
+              {% endif %}
+            {% endfor %}
+          </select>
+        </div>
+        {% endif %}
+
+      <div class="col-sm-1">
+        <input type="color" name="bg_color" class="form-control c-select"
+               value="{{ status.bg_color }}"/>
+      </div>
+
+        <div class="col-sm-1">
+          <a class="btn btn-outline-danger remove-settings-field-row pointer"
+            title="Delete this status"><i class="fa fa-trash"></i></a>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+  <a class="btn btn-outline-primary pt-2 btn-sm btn-block add-settings-field-row pointer" data-target="#statuses-list">
+      <i class="fa fa-plus"></i> Add new status
+  </a>
+  <a class="btn btn-outline-secondary btn-sm btn-block pointer" id="default_board_statuses">
+      Populate with defaults
+  </a>
+
+  <div class="row p-t-1">
+  </div>
+  <div class="row p-t-1">
+    <div class="col-sm-12">
+      <button class="btn btn-primary float-right mt-3" type="submit"
+          title="Update the boards" id="board_update_btn">
+        Update
+      </button>
+    </div>
+  </div>
+</form>
+
+
+{% endblock %}
+
+{% block jscripts %}
+{{ super() }}
+
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='vendor/selectize/selectize.min.js') }}?version={{ g.version}}"></script>
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+  url_for('static', filename='vendor/dragula/dragula.min.js') }}?version={{ g.version}}"></script>
+
+<script type="text/javascript" nonce="{{ g.nonce }}">
+function updateform() {
+  $('.custom-keys').change(function() {
+    field_type = $(this).val();
+    if(field_type == "list") {
+       $(this).parent().parent().find('.custom-keys-list').removeClass("hidden");
+     } else {
+       $(this).parent().parent().find('.custom-keys-list').addClass("hidden");
+    }
+  });
+};
+
+$('#default_board_statuses').click(function(e) {
+  let row = $('#statuses-list .blank-field');
+  var def_status = ['Backlog', 'Triaged', 'In Progress', 'In Review', 'Done', 'Blocked'];
+  var colors = ['#FFB300', '#F4FF64', '#99D200', '#3C7BFF', '#15D415', '#E80909'];
+  for (var cnt = 0; cnt < def_status.length; cnt++) {
+    let f = row.clone();
+    f.removeClass("hidden");
+    f.removeClass("blank-field");
+    f.find("[name=name]").val(def_status[cnt]);
+    f.find("[name=bg_color]").val(colors[cnt]);
+    if (def_status[cnt] == 'Backlog'){
+        f.find("[name=default]").prop('checked', true);
+    }
+    if (def_status[cnt] == 'Done'){
+        f.find("[name=close]").prop('checked', true);
+        f.find("[name=close_status]").val("Fixed");
+    }
+    $('.remove-settings-field-row', f).click(function(e) {
+    $(this).parent().parent().remove();
+  });
+    $('#statuses-list').append(f);
+  }
+  $(e.target).hide();
+});
+
+$('.add-settings-field-row').click(function(e) {
+  let target = $(this).attr("data-target");
+  let row = $(target + ".settings-field-rows .blank-field").clone();
+  row.removeClass("hidden");
+  row.removeClass("blank-field");
+  $('.remove-settings-field-row', row).click(function(e) {
+    $(this).parent().parent().remove();
+  });
+  $(target + ".settings-field-rows").append(row);
+  updateform();
+  console.log(row);
+});
+
+$('.remove-settings-field-row').click(function(e) {
+  $(this).parent().parent().remove();
+});
+
+$('#board_update_btn').click(function(e) {
+  _form = $("#update_status_form");
+  data = {};
+  cnt = 0;
+  $("#statuses-list .row").each(function(idx, el){
+    if (!$(el).hasClass("hidden")) {
+      var _name = $(el).find('input[name=name]').val();
+      if (_name) {
+        cnt += 1;
+        var _close = $(el).find('input[name=close]')[0].checked;
+        var _default = $(el).find('input[name=default]')[0].checked;
+        var _close_status = $(el).find('select[name=close_status]').val();
+        var _bg_color = $(el).find('input[name=bg_color]').val();
+        data[_name] = {
+            "default": _default,
+            "rank": cnt,
+            "bg_color": _bg_color,
+            "close": _close,
+            "close_status": _close_status
+          };
+      }
+    }
+  });
+
+  $.ajax({
+      url: _form.prop('action') ,
+      type: 'POST',
+      data: JSON.stringify(data),
+      contentType: 'application/json; charset=utf-8',
+      dataType: 'json',
+      success: function(res) {
+
+        var _html = '<div class="container pt-2">'
+            + '  <div class="alert alert-info border border-secondary bg-white alert-dismissible" role="alert">'
+            + '      <button type="button" class="close" data-dismiss="alert" aria-label="Close">'
+            + '      <span aria-hidden="true">×</span>'
+            + '      <span class="sr-only">Close</span>'
+            + '    </button>'
+            + '    <div class="text-info font-weight-bold">'
+            + '      <i class="fa fa-fw fa-info-circle"></i>Status updated'
+            + '    </div>'
+            + '  </div>'
+            + '</div>';
+        $('.bodycontent').prepend(_html)
+      },
+      error: function(res) {
+        console.log(res);
+        data = res.responseJSON;
+        if (data.errors.message) {
+            alert('Request failed: ' + data.errors.message);
+        } else {
+            alert('Request failed');
+        }
+      }
+  });
+  return false;
+});
+
+dragula([
+  document.getElementById('statuses-list'),
+])
+
+</script>
+{% endblock %}

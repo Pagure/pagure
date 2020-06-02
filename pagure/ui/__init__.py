@@ -23,6 +23,7 @@ import pagure.ui.groups  # noqa: E402
 
 if pagure.config.config.get("ENABLE_TICKETS", True):
     import pagure.ui.issues  # noqa: E402
+    import pagure.ui.boards  # noqa: E402
 import pagure.ui.plugins  # noqa: E402
 import pagure.ui.repo  # noqa: E402
 

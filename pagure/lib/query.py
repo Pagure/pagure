@@ -5858,3 +5858,320 @@ def remove_user_of_project(session, user, project, agent):
     )
 
     return "User removed"
+
+
+def create_board(session, project, name, active, tag):
+    """ Create a board on a given project.
+
+    :arg session: the session with which to connect to the database.
+    :arg project: the model.Project of the project that is creating the
+        board.
+    :arg name: the name of the board to create.
+    :arg active: a boolean specifying if the board is active or not.
+    :arg tag: the name of the tag associated with this board.
+
+    """
+    tag_obj = get_colored_tag(session=session, tag=tag, project_id=project.id)
+    if not tag_obj:
+        raise pagure.exceptions.PagureException(
+            "No tag found with the name %s" % tag
+        )
+
+    board = model.Board(
+        project_id=project.id, name=name, active=active, tag_id=tag_obj.id
+    )
+    session.add(board)
+
+    return board
+
+
+def edit_board(session, project, name, active, tag, bg_color=None):
+    """ Edit an existing board on a given project.
+
+    :arg session: the session with which to connect to the database.
+    :arg project: the model.Project of the project that is creating the
+        board.
+    :arg name: the name of the board to create.
+    :arg active: a boolean specifying if the board is active or not.
+    :arg tag: the name of the tag associated with this board.
+
+    """
+    tag_obj = get_colored_tag(session=session, tag=tag, project_id=project.id)
+    if not tag_obj:
+        raise pagure.exceptions.PagureException(
+            "No tag found with the name %s" % tag
+        )
+
+    board_obj = None
+    for board in project.boards:
+        if board.name == name:
+            board_obj = board
+            break
+
+    if not board_obj:
+        raise pagure.exceptions.PagureException(
+            'Could not find the board "%s"' % name
+        )
+
+    board.active = active
+    board.tag_id = tag_obj.id
+    if bg_color:
+        board.bg_colar = bg_color
+
+    session.add(board)
+
+    return board
+
+
+def delete_board(session, project, names):
+    """ Delete boards of a given project.
+
+    :arg session: the session with which to connect to the database.
+    :arg project: the model.Project of the project that is creating the
+        board.
+    :arg names: a list of the name of the boards to remove.
+
+    """
+    for name in names:
+        board_obj = None
+        for board in project.boards:
+            if board.name == name:
+                board_obj = board
+                break
+
+        if board_obj:
+            session.delete(board_obj)
+
+
+def update_board_status(
+    session, board, name, rank, default, close, close_status, bg_color
+):
+    """ Create or update the board statuses of a project.
+
+    :arg session: the session with which to connect to the database.
+    :arg board: the model.Board of the board being updated.
+    :arg name: the name of the status.
+    :arg rank: the position of the status on the board, the lower the value,
+        the more to the left the status.
+    :arg default: whether tickets are added to this status by default.
+    :arg close: boolean indicating if ticket reaching this status should
+        be closed or not
+    :arg close_status: the close_status ticket reaching this status should
+        be close as.
+    :arg bg_color: the background color of the status on the board.
+
+    """
+
+    status = (
+        session.query(model.BoardStatus)
+        .filter(model.BoardStatus.board_id == board.id)
+        .filter(model.BoardStatus.name == name)
+        .first()
+    )
+    if status:
+        status.default = default
+        status.rank = rank
+        status.bg_color = bg_color
+        status.close = close
+        status.close_status = close_status
+    else:
+        status = model.BoardStatus(
+            board_id=board.id,
+            name=name,
+            rank=rank,
+            default=default,
+            bg_color=bg_color,
+            close=close,
+            close_status=close_status,
+        )
+    session.add(status)
+
+    return status
+
+
+def add_issue_to_boards(
+    session, issue, board_name, user, status_id=None, rank=None
+):
+    """ Add the given issue to the boards specified.
+
+    :arg session: the session with which to connect to the database.
+    :arg issue: the model.Issue of the issue to add to the boards.
+    :arg board_names: a list of board name to which the issue should be added.
+    :arg user: the username of the user performing the action
+    :kwarg rank: the rank of the issue on the status.
+    :kwarg rank: the rank of the issue on the status.
+
+    """
+    get_user(session, user)
+
+    board_obj = None
+    for board in issue.project.boards:
+        if board.name == board_name:
+            board_obj = board
+            break
+
+    if not board_obj:
+        _log.info(
+            "Could not add issue %s to %s : board not found", issue, board_name
+        )
+        raise pagure.exceptions.PagureException("Board not found")
+
+    status = (
+        session.query(model.BoardStatus)
+        .filter(model.BoardStatus.id == status_id)
+        .first()
+    )
+    if not status:
+        status = board.default_status
+
+    if not status:
+        raise pagure.exceptions.PagureException(
+            "No status provided or default status found"
+        )
+
+    if rank is None:
+        rank = len(status.boards_issues) + 1
+
+    board_issue = model.BoardIssues(
+        issue_uid=issue.uid, status_id=status.id, rank=rank,
+    )
+    session.add(board_issue)
+
+
+def remove_issue_from_boards(session, issue, board_names, user):
+    """ Remove the given issue from the specified boards.
+
+    :arg session: the session with which to connect to the database.
+    :arg issue: the model.Issue of the issue to add to the boards.
+    :arg board_names: a list of board name to which the issue should be added.
+    :arg user: the username of the user performing the action
+
+    """
+    get_user(session, user)
+
+    for board_issue in issue.boards_issues:
+        if board_issue.board.active and board_issue.board.name in board_names:
+            _log.debug("Removing %s from %s", board_issue, issue)
+            session.delete(board_issue)
+
+
+def update_ticket_board_status(
+    session,
+    board,
+    user,
+    rank=None,
+    status_name=None,
+    ticket_uid=None,
+    ticket_id=None,
+):
+    """ Set the status of a ticket on a given board.
+    """
+    if not ticket_uid and not ticket_id:
+        raise pagure.exceptions.PagureException(
+            "One of ticket_id/ticket_uid must be provided"
+        )
+
+    if ticket_uid:
+        _log.debug(
+            "Looking to add ticket %s to board %s with status %s (rank %s)",
+            ticket_uid,
+            board.name,
+            status_name,
+            rank,
+        )
+        ticket = get_issue_by_uid(session, ticket_uid)
+    else:
+        _log.debug(
+            "Looking to add ticket %s to board %s with status %s (rank %s)",
+            ticket_id,
+            board.name,
+            status_name,
+            rank,
+        )
+        ticket = search_issues(session, board.project, issueid=ticket_id)
+
+    if not ticket:
+        raise pagure.exceptions.PagureException(
+            "No ticket found with this identifier"
+        )
+
+    _log.debug("Ticket found")
+
+    status = (
+        session.query(model.BoardStatus)
+        .filter(model.BoardStatus.board_id == board.id)
+        .filter(model.BoardStatus.name == status_name)
+        .first()
+    )
+    if not status:
+        _log.debug(
+            "No status found with %s, using the default status" % status_name
+        )
+        status = board.default_status
+
+    if not status:
+        raise pagure.exceptions.PagureException(
+            "No status provided or default status found"
+        )
+
+    if rank is None:
+        rank = len(status.boards_issues) + 1
+
+    comments = []
+    seen = []
+    if ticket.boards_issues:
+        for board_issue in ticket.boards_issues:
+            if board_issue.status.board.name == board.name:
+                _log.debug("Updating existing board")
+                board_issue.status_id = status.id
+                board_issue.rank = rank
+                session.add(board_issue)
+                seen.append(board.name)
+                break
+
+    if board.name not in seen:
+        _log.debug("Adding to a new board")
+        board_issue = model.BoardIssues(
+            issue_uid=ticket.uid, status_id=status.id, rank=rank,
+        )
+        session.add(board_issue)
+
+        # Flag the ticket if needed
+        if board.tag.tag not in ticket.tags_text:
+            add_tag_obj(session, obj=ticket, tags=board.tag.tag, user=user)
+            comments.append(
+                "%s tagged with: %s" % (ticket.isa.capitalize(), board.tag.tag)
+            )
+
+    if status.close and ticket.status == "Open":
+        _log.debug(
+            "Closing ticket %s as the new status on the board is "
+            "set to close tickets",
+            ticket,
+        )
+        comments.extend(
+            edit_issue(
+                session=session,
+                issue=ticket,
+                user=user,
+                status="Closed",
+                close_status=status.close_status or None,
+            )
+        )
+        session.add(ticket)
+    elif not status.close and ticket.status != "Open":
+        comments.extend(
+            edit_issue(
+                session=session, issue=ticket, user=user, status="Open",
+            )
+        )
+        session.add(ticket)
+
+    if comments:
+        add_issue_comment(
+            session=session,
+            issue=ticket,
+            comment="\n".join(comments),
+            user=user,
+            notification=True,
+        )

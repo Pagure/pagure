@@ -1,0 +1,207 @@
+
+<h3 class="font-weight-bold mb-3">
+    Project's Boards
+</h3>
+<p>
+  In this page you can create and configure the boards your project wish to
+  use.
+</p>
+<form action="{{ url_for(
+  'api_ns.api_board_create',
+  repo=repo.name,
+  username=username,
+  namespace=repo.namespace) }}"
+    method="post" class="icon">
+    <div class="row">
+      <div class="col-sm-12">
+        <strong>Boards</strong>
+      </div>
+    </div>
+  <input type="hidden" name="all" value="1">
+  <div class="form-group">
+    <div class="row">
+      <div class="col-sm-6" >
+        Board name
+      </div>
+
+      <div class="col-sm-3" >
+        <p>Tag</p>
+      </div>
+
+      <div class="col-sm-1" >
+        <p>Active</p>
+      </div>
+
+      <div class="col-sm-1">
+        <p>Configure</p>
+      </div>
+
+      <div class="col-sm-1">
+        <p>Delete</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group settings-field-rows" id="boards-list">
+    <div class="row hidden blank-field">
+      <div class="col-sm-6" >
+        <input type="text" name="name" value="" class="form-control"/>
+      </div>
+      <div class="col-sm-3" >
+        <select name="tag" class="form-control custom-keys">
+          {% for tag in repo.tags_colored %}
+          <option value="{{ tag.tag }}">{{ tag.tag }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-sm-1" >
+        <input type="checkbox" name="active" value="1" class="form-control" checked/>
+      </div>
+
+      <div class="col-sm-1">
+        <a class="btn btn-outline-info configure-board pointer disabled" title="Configure the board"><i class="fa fa-wrench"></i></a>
+      </div>
+      <div class="col-sm-1">
+        <a class="btn btn-outline-danger remove-settings-field-row pointer"
+            title="Delete this board"><i class="fa fa-trash"></i></a>
+      </div>
+    </div>
+    {% for board in repo.boards %}
+      <div class="row">
+        <div class="col-sm-6" >
+          <input type="text" name="name" value="{{ board.name }}" class="form-control"/>
+        </div>
+        <div class="col-sm-3" >
+          <select name="tag" class="form-control custom-keys">
+            {% for tag in repo.tags_colored %}
+              <option value="{{ tag.tag }}" {% if tag.tag == board.tag.tag %}selected{% endif %}>{{ tag.tag }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-sm-1" >
+          <input type="checkbox" name="active" value="1" class="form-control"{% if board.active %} checked{% endif %}/>
+        </div>
+
+        <div class="col-sm-1">
+          <a class="btn btn-outline-info configure-board pointer" title="Configure the board"
+            href="{{ url_for('ui_ns.view_board_settings', repo=repo.name, username=username, namespace=repo.namespace, board_name=board.name)}}"><i class="fa fa-wrench"></i></a>
+        </div>
+        <div class="col-sm-1">
+          <a class="btn btn-outline-danger remove-settings-field-row pointer"
+            title="Delete this board"><i class="fa fa-trash"></i></a>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+  <a class="btn btn-secondary pt-2 btn-sm btn-block add-settings-field-row pointer" data-target="#boards-list">
+      <i class="fa fa-plus"></i> Add new board
+  </a>
+
+  <div class="row p-t-1">
+  </div>
+  <div class="row p-t-1">
+    <div class="col-sm-12">
+      <button class="btn btn-primary float-right mt-3" id="boards_update_btn" type="submit"
+          title="Update the boards">
+        Update
+      </button>
+    </div>
+  </div>
+</form>
+
+<div>
+  <h4>How do boards work?</h4>
+
+  <p>
+    Boards are a very simplified representation of kanban boards. They allow you
+    to see tickets in columns where each column has a different status (state).
+  </p>
+  <p>
+    In pagure, each board is associated with a tag. Tagging a ticket will
+    automatically make it show on the board in the default column (status) defined
+    in the boards' settings. Similarly, un-tagging the ticket, will remove it
+    from the board.
+  </p>
+  <p>
+    If a Status is set to "Close", then tickets reaching it will be closed and
+    if a "Close status" is defined, tickets will be closed with that status.
+  </p>
+  <p>
+    Status set to "Close" tickets will only show 5 tickets by default, the small
+    "eye" icon at the top will allow to toggle that setting and show all the
+    tickets in that status if needed.
+  </p>
+  <p>
+    You can create as many boards as you want/need and you can de-activate boards
+    that you no longer use. Boards that are de-activated will no longer show in
+    the "Boards" drop-down in the menu. It is also not possible to add or remove
+    tickets in a board that has been deactivated.
+  </p>
+</div>
+
+<script type="text/javascript" nonce="{{ g.nonce }}">
+
+$('#boards_update_btn').click(function(e) {
+  _form = $(this).closest('form');
+
+  data = {};
+  $("#boards-list .row").each(function(idx, el){
+    if (!$(el).hasClass("hidden")) {
+      var _name = $(el).find('input[name=name]').val();
+      var _active = $(el).find('input[name=active]')[0].checked;
+      var _tag = $(el).find('select[name=tag]').find(":selected").val();
+      if (_name) {
+        data[_name] = {
+          "active": _active,
+          "tag": _tag,
+        };
+      }
+    }
+  });
+
+  $.ajax({
+      url: _form.prop('action') ,
+      type: 'POST',
+      contentType: 'application/json; charset=utf-8',
+      data: JSON.stringify(data),
+      dataType: 'json',
+      success: function(res) {
+
+        var _url = "{{ url_for('ui_ns.view_board_settings', repo=repo.name, username=username, namespace=repo.namespace, board_name='----') }}";
+        $(".configure-board").each(function(idx, el){
+          if (!$(el).attr("href")){
+            var _gparent = $(el).parent().parent();
+            if (!_gparent.hasClass("hidden")) {
+              var _name = $(el).parent().parent().find('input[name=name]').val();
+              if (_name) {
+                var _t_url = _url.replace('----', _name);
+                $(el).attr("href", _t_url)
+                $(el).removeClass("disabled");
+              }
+            }
+          }
+        });
+
+        var _html = '<div class="container pt-2">'
+            + '  <div class="alert alert-info border border-secondary bg-white alert-dismissible" role="alert">'
+            + '      <button type="button" class="close" data-dismiss="alert" aria-label="Close">'
+            + '      <span aria-hidden="true">×</span>'
+            + '      <span class="sr-only">Close</span>'
+            + '    </button>'
+            + '    <div class="text-info font-weight-bold">'
+            + '      <i class="fa fa-fw fa-info-circle"></i>Boards created/updated'
+            + '    </div>'
+            + '  </div>'
+            + '</div>';
+        $('.bodycontent').prepend(_html)
+      },
+      error: function(res) {
+        console.log(res);
+        alert('Request failed');
+      }
+  });
+  return false;
+});
+
+</script>
+

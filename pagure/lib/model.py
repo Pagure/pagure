@@ -19,6 +19,7 @@ import operator
 import re
 import pygit2
 import os
+from operator import attrgetter
 
 import six
 import sqlalchemy as sa
@@ -1033,6 +1034,11 @@ class Project(BASE):
             ),
         }
 
+    @property
+    def active_boards(self):
+        """ Returns the list of active boards. """
+        return [board for board in self.boards if board.active]
+
     def lock(self, ltype):
         """ Get a SQL lock of type ltype for the current project.
         """
@@ -1066,6 +1072,7 @@ class Project(BASE):
         }
         if not api and not public:
             output["settings"] = self.settings
+            output["boards"] = [b.to_json() for b in self.boards]
 
         return output
 
@@ -1472,6 +1479,15 @@ class Issue(BASE):
         be sorted using this attribute. """
         return self.priority if self.priority else ""
 
+    @property
+    def boards_name(self):
+        """ Return the list of boards the issue is part of
+        """
+        out = []
+        for status_board in self.boards_issues:
+            out.append(status_board.board.name)
+        return out
+
     def to_json(self, public=False, with_comments=True, with_project=False):
         """ Returns a dictionary representation of the issue.
 
@@ -1525,6 +1541,11 @@ class Issue(BASE):
 
         if with_project:
             output["project"] = self.project.to_json(public=public, api=True)
+
+        if self.boards_issues:
+            output["boards"] = [
+                board_issue.to_json() for board_issue in self.boards_issues
+            ]
 
         return output
 
@@ -3128,6 +3149,239 @@ class TokenAcl(BASE):
 
     # Constraints
     __table_args__ = (sa.UniqueConstraint("token_id", "acl_id"),)
+
+
+#
+# Class and tables specific for the project's boards
+#
+
+
+class Board(BASE):
+    """
+    Table listing the boards of a project
+    """
+
+    __tablename__ = "boards"
+
+    id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
+    project_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey("projects.id", onupdate="CASCADE", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    name = sa.Column(sa.Text(), nullable=False)
+    active = sa.Column(sa.Boolean, nullable=False, default=True)
+    tag_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey("tags_colored.id", onupdate="CASCADE"),
+        nullable=False,
+    )
+
+    created = sa.Column(
+        sa.DateTime, nullable=False, default=datetime.datetime.utcnow
+    )
+    date_updated = sa.Column(
+        sa.DateTime,
+        nullable=False,
+        default=datetime.datetime.utcnow,
+        onupdate=datetime.datetime.utcnow,
+    )
+
+    __table_args__ = (
+        sa.UniqueConstraint(
+            "project_id", "name", name="boards_project_id_name_uix"
+        ),
+    )
+
+    project = relation(
+        "Project",
+        backref=backref("boards", cascade="delete, delete-orphan"),
+        foreign_keys=[project_id],
+        remote_side=[Project.id],
+    )
+    tag = relation(
+        "TagColored", foreign_keys=[tag_id], remote_side=[TagColored.id]
+    )
+
+    boards_issues = relation(
+        "BoardIssues",
+        secondary="board_statuses",
+        primaryjoin="boards.c.id==board_statuses.c.board_id",
+        secondaryjoin="board_statuses.c.id==boards_issues.c.status_id",
+    )
+
+    @property
+    def default_status(self):
+        """ Returns the default status of the board. """
+        out = None
+        for status in self.statuses:
+            if status.default:
+                out = status
+                break
+        return out
+
+    def __repr__(self):
+        """ Return a string representation of this object. """
+
+        return "Board: %s - name %s" % (self.id, self.name,)
+
+    def to_json(self):
+        """ The JSON representation of a board. """
+        return {
+            "name": self.name,
+            "active": self.active,
+            "status": [status.to_json() for status in self.statuses],
+            "tag": self.tag.to_json(),
+        }
+
+
+class BoardStatus(BASE):
+    """
+    Table listing the status a board can have
+    """
+
+    __tablename__ = "board_statuses"
+
+    id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
+    board_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey("boards.id", onupdate="CASCADE", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    name = sa.Column(sa.String(128), nullable=False)
+    rank = sa.Column(sa.Integer, nullable=False)
+    default = sa.Column(sa.Boolean, nullable=False, default=False)
+    bg_color = sa.Column(sa.String(32), nullable=False)
+    close = sa.Column(sa.Boolean, nullable=False, default=False)
+    close_status = sa.Column(sa.Text, nullable=True)
+    created = sa.Column(
+        sa.DateTime, nullable=False, default=datetime.datetime.utcnow
+    )
+
+    __table_args__ = (
+        sa.UniqueConstraint(
+            "board_id", "name", name="board_statuses_board_id_name_uix"
+        ),
+    )
+
+    board = relation(
+        "Board",
+        backref=backref(
+            "statuses",
+            cascade="delete, delete-orphan",
+            order_by=str("(board_statuses.c.rank).asc()"),
+        ),
+        foreign_keys=[board_id],
+        remote_side=[Board.id],
+    )
+
+    def __repr__(self):
+        """ Return a string representation of this object. """
+
+        return "BoardStatus: %s - board: %s - name %s" % (
+            self.id,
+            self.board_id,
+            self.name,
+        )
+
+    def visible_tickets(self, watching_user):
+        """ Returns the sorted list of tickets visible to the user currently
+        watching.
+
+        If the user currently watching (ie: ``watching_user``) is False, do not
+        show any of the private tickets.
+        If it is None, show all the tickets regardless of their private status.
+        Otherwise, only show the private tickets if the user watching is the
+        user who created it.
+        """
+        return [
+            bissue
+            for bissue in sorted(self.boards_issues, key=attrgetter("rank"))
+            if (
+                not bissue.issue.private
+                or (
+                    watching_user is None
+                    or bissue.issue.user.username == watching_user
+                )
+            )
+        ]
+
+    def to_json(self):
+        """ The JSON representation of these objects. """
+        return {
+            "name": self.name,
+            "bg_color": self.bg_color,
+            "close": self.close,
+            "close_status": self.close_status,
+            "default": self.default,
+        }
+
+
+class BoardIssues(BASE):
+    """
+    Association table linking the boards to the issues
+    """
+
+    __tablename__ = "boards_issues"
+
+    issue_uid = sa.Column(
+        sa.String(32),
+        sa.ForeignKey("issues.uid", ondelete="CASCADE", onupdate="CASCADE"),
+        primary_key=True,
+    )
+    status_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey(
+            "board_statuses.id", onupdate="CASCADE", ondelete="CASCADE"
+        ),
+        primary_key=True,
+    )
+    rank = sa.Column(sa.Integer, nullable=False)
+    created = sa.Column(
+        sa.DateTime, nullable=False, default=datetime.datetime.utcnow
+    )
+
+    # Constraints
+    __table_args__ = (
+        sa.UniqueConstraint(
+            "status_id",
+            "issue_uid",
+            name="boards_issues_status_id_issue_uid_uix",
+        ),
+    )
+
+    issue = relation(
+        "Issue",
+        backref=backref("boards_issues", cascade="delete, delete-orphan"),
+        foreign_keys=[issue_uid],
+        remote_side=[Issue.uid],
+    )
+
+    status = relation(
+        "BoardStatus",
+        backref=backref("boards_issues", cascade="delete, delete-orphan"),
+        foreign_keys=[status_id],
+        remote_side=[BoardStatus.id],
+    )
+
+    board = relation(
+        "Board",
+        secondary="board_statuses",
+        primaryjoin="boards_issues.c.status_id==board_statuses.c.id",
+        secondaryjoin="board_statuses.c.board_id==boards.c.id",
+    )
+
+    def to_json(self):
+        """ The JSON representation of these objects. """
+        return {
+            "board": [bs.to_json() for bs in self.board][0]
+            if self.board
+            else [],
+            "status": self.status.to_json(),
+            "rank": self.rank,
+        }
 
 
 # ##########################################################

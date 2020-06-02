@@ -545,6 +545,33 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
       </div>
     </div>
 
+    {% if issue.boards_issues %}
+      <div class="mt-3">
+        <h5 class="d-flex align-items-center font-weight-bold border-bottom">
+          <div class="py-2 text-uppercase font-size-09">
+            Boards
+            <span class="badge badge-secondary badge-pill font-size-09 ml-1" id="boards-count">{{ issue.boards_issues |count}}</span>
+          </div>
+        </h5>
+        <div class="list-group list-group-flush">
+        {% for board_issue in issue.boards_issues %}
+          <div class="list-group-item list-group-item-action border-0 pl-2">
+            <div class="ellipsis font-size-09">
+              <a href="{{ url_for(
+                 'ui_ns.view_board',
+                 repo=repo.name,
+                 board_name=board_issue.status.board.name,
+                 username=username,
+                 namespace=repo.namespace) }}"
+                title="{{ board_issue.status.board.name }}" class="font-weight-bold" data-toggle="tooltip">{{ board_issue.status.board.name }}</a>
+              <span class="font-weight-bold">Status:</span> {{ board_issue.status.name }}
+            </div>
+          </div>
+        {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
     {% if attachments %}
       <div class="mt-3">
         <h5 class="d-flex align-items-center font-weight-bold border-bottom">
@@ -552,15 +579,6 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
               Attachments
               <span class="badge badge-secondary badge-pill font-size-09 ml-1" id="attachments-count">{{attachments|count}}</span>
             </div>
-            {#<div class="ml-auto">
-                <a href="#" class="btn btn-sm btn-link" id="subcribe-btn"
-                {% if g.fas_user.username in subscribers -%}
-                  title="Unsubscribe from this issue">Unsubscribe
-                {%- else -%}
-                  title="Subscribe to this issue">Subscribe
-                {%- endif -%}
-              </a>
-            </div>#}
           </h5>
           {{ show_attachments(attachments) }}
       </div>
