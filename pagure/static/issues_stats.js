@@ -70,7 +70,7 @@ function issues_history_stats_plot(data) {
       },
       title: {
         display: true,
-        text: 'Evolution of the number of commits over the last year'
+        text: 'Evolution of the number of open tickets over the last year'
       }
     }
   });
