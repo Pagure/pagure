@@ -205,7 +205,7 @@ def proxy_raw_git(project):
                 break
             header = line.split(b": ", 1)
             header[0] = header[0].decode("utf-8")
-            headers[header[0].lower()] = header[1]
+            headers[str(header[0].lower())] = header[1]
 
         if len(headers) == 0:
             raise Exception("No response at all received")
