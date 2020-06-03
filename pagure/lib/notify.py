@@ -506,7 +506,7 @@ def send_email(
                         pagure_config["SMTP_PORT"],
                     )
 
-            if pagure_config["SMTP_STARTTLS"]:
+            if pagure_config.get("SMTP_STARTTLS"):
                 context = ssl.create_default_context()
                 keyfile = pagure_config.get("SMTP_KEYFILE") or None
                 certfile = pagure_config.get("SMTP_CERTFILE") or None
