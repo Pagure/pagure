@@ -1270,6 +1270,7 @@ def add_key_to_authorized_keys(self, session, ssh_folder, username, sshkey):
                 sshkey.strip(),
             )
         )
+    os.chmod(fullpath, 0o600)
 
 
 @conn.task(queue=pagure_config.get("AUTHORIZED_KEYS_QUEUE", None), bind=True)
@@ -1294,3 +1295,4 @@ def remove_key_from_authorized_keys(self, session, ssh_folder, sshkey):
 
     with open(fullpath, "w") as stream:
         stream.write("\n".join(output))
+    os.chmod(fullpath, 0o600)
