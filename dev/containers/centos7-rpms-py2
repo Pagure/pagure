@@ -51,6 +51,7 @@ RUN \
     sed -i -e "s|python3-openid;python_version>=\"3.0\"||" \
        /pagure/requirements.txt && \
     sed -i "/^email_validator.*/d" /pagure/requirements.txt && \
+    sed -i -e 's|"alembic-3"|"alembic"|' /pagure/tests/test_alembic.py && \
     cd /pagure && python setup.py build
 
 

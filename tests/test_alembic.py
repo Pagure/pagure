@@ -31,7 +31,7 @@ class TestAlembic(unittest.TestCase):
         """
 
         proc1 = subprocess.Popen(
-            ["alembic", "history"], cwd=REPO_PATH, stdout=subprocess.PIPE
+            ["alembic-3", "history"], cwd=REPO_PATH, stdout=subprocess.PIPE
         )
         proc2 = subprocess.Popen(
             ["grep", " (head), "], stdin=proc1.stdout, stdout=subprocess.PIPE

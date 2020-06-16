@@ -179,7 +179,7 @@ class PagureRepoSpannerTests(tests.Modeltests):
         # TODO: Find free ports
         configvals = {
             "path": self.path,
-            "crosspath": tests.tests_state["path"],
+            "crosspath": self.dbfolder,
             "gitport": 8443 + sys.version_info.major,
             "rpcport": 8445 + sys.version_info.major,
             "codepath": codepath,

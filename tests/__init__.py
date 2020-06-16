@@ -233,14 +233,6 @@ def user_set(APP, user, keep_get_user=False):
     pagure.flask_app._get_user = old_get_user
 
 
-tests_state = {
-    "path": tempfile.mkdtemp(prefix="pagure-tests-"),
-    "broker": None,
-    "broker_client": None,
-    "results": {},
-}
-
-
 def create_user(session, username, fullname, emails):
     """ Create an user with the provided information.
     Note that `emails` should be a list of emails.
@@ -267,61 +259,6 @@ def _populate_db(session):
     create_user(session, "foo", "foo bar", ["foo@bar.com"])
 
 
-def store_eager_results(*args, **kwargs):
-    """A wrapper for EagerResult that stores the instance."""
-    result = EagerResult(*args, **kwargs)
-    tests_state["results"][result.id] = result
-    return result
-
-
-def setUp():
-    # In order to save time during local test execution, we create sqlite DB
-    # file only once and then we populate it and empty it for every test case
-    # (as opposed to creating DB file for every test case).
-    session = pagure.lib.model.create_tables(
-        "sqlite:///%s/db.sqlite" % tests_state["path"],
-        acls=pagure_config.get("ACLS", {}),
-    )
-    tests_state["db_session"] = session
-
-    # Create a broker
-    broker_url = os.path.join(tests_state["path"], "broker")
-
-    tests_state["broker"] = broker = subprocess.Popen(
-        [
-            "/usr/bin/redis-server",
-            "--unixsocket",
-            broker_url,
-            "--port",
-            "0",
-            "--loglevel",
-            "warning",
-            "--logfile",
-            "/dev/null",
-        ],
-        stdout=None,
-        stderr=None,
-    )
-    broker.poll()
-    if broker.returncode is not None:
-        raise Exception("Broker failed to start")
-    tests_state["broker_client"] = redis.Redis(unix_socket_path=broker_url)
-
-    # Store the EagerResults to be able to retrieve them later
-    tests_state["eg_patcher"] = mock.patch("celery.app.task.EagerResult")
-    eg_mock = tests_state["eg_patcher"].start()
-    eg_mock.side_effect = store_eager_results
-
-
-def tearDown():
-    tests_state["db_session"].close()
-    tests_state["eg_patcher"].stop()
-    broker = tests_state["broker"]
-    broker.kill()
-    broker.wait()
-    shutil.rmtree(tests_state["path"])
-
-
 class SimplePagureTest(unittest.TestCase):
     """
     Simple Test class that does not set a broker/worker
@@ -329,6 +266,12 @@ class SimplePagureTest(unittest.TestCase):
 
     populate_db = True
     config_values = {}
+
+    def store_eager_results(self, *args, **kwargs):
+        """A wrapper for EagerResult that stores the instance."""
+        result = EagerResult(*args, **kwargs)
+        self.results[result.id] = result
+        return result
 
     @mock.patch("pagure.lib.notify.fedmsg_publish", mock.MagicMock())
     def __init__(self, method_name="runTest"):
@@ -338,6 +281,7 @@ class SimplePagureTest(unittest.TestCase):
         self.path = None
         self.gitrepo = None
         self.gitrepos = None
+        self.results = {}
 
     def perfMaxWalks(self, max_walks, max_steps):
         """ Check that we have not performed too many walks/steps. """
@@ -366,15 +310,41 @@ class SimplePagureTest(unittest.TestCase):
         perfrepo.REQUESTS = []
 
     def setUp(self):
-        if self.path:
-            # This prevents test state leakage.
-            # This should be None if the previous runs' tearDown didn't finish,
-            # leaving behind a self.path.
-            # If we continue in this case, not only did the previous worker and
-            # redis instances not exit, we also might accidentally use the
-            # old database connection.
-            # @pingou, don't delete this again... :)
-            raise Exception("Previous test failed!")
+
+        self.dbfolder = tempfile.mkdtemp(prefix="pagure-tests-")
+        self.dbpath = "sqlite:///%s/db.sqlite" % self.dbfolder
+        session = pagure.lib.model.create_tables(
+            self.dbpath, acls=pagure_config.get("ACLS", {}),
+        )
+        self.db_session = session
+
+        # Create a broker
+        broker_url = os.path.join(self.dbfolder, "broker")
+
+        self.broker = broker = subprocess.Popen(
+            [
+                "/usr/bin/redis-server",
+                "--unixsocket",
+                broker_url,
+                "--port",
+                "0",
+                "--loglevel",
+                "warning",
+                "--logfile",
+                "/dev/null",
+            ],
+            stdout=None,
+            stderr=None,
+        )
+        broker.poll()
+        if broker.returncode is not None:
+            raise Exception("Broker failed to start")
+        self.broker_client = redis.Redis(unix_socket_path=broker_url)
+
+        # Store the EagerResults to be able to retrieve them later
+        self.eg_patcher = mock.patch("celery.app.task.EagerResult")
+        eg_mock = self.eg_patcher.start()
+        eg_mock.side_effect = self.store_eager_results
 
         self.perfReset()
 
@@ -399,7 +369,7 @@ class SimplePagureTest(unittest.TestCase):
             "docs_folder": "%s/repos/docs" % self.path,
             "enable_tickets": True,
             "tickets_folder": "%s/repos/tickets" % self.path,
-            "global_path": tests_state["path"],
+            "global_path": self.dbfolder,
             "authbackend": "gitolite3",
             "repobridge_binary": "/usr/libexec/repobridge",
             "repospanner_gitport": str(8443 + sys.version_info.major),
@@ -410,11 +380,11 @@ class SimplePagureTest(unittest.TestCase):
         }
         config_values.update(self.config_values)
         self.config_values = config_values
-        config_path = os.path.join(self.path, "config")
-        if not os.path.exists(config_path):
-            with open(config_path, "w") as f:
+        self.config_path = os.path.join(self.path, "config")
+        if not os.path.exists(self.config_path):
+            with open(self.config_path, "w") as f:
                 f.write(CONFIG_TEMPLATE % self.config_values)
-        os.environ["PAGURE_CONFIG"] = config_path
+        os.environ["PAGURE_CONFIG"] = self.config_path
         pagure_config.update(reload_config())
 
         imp.reload(pagure.lib.tasks)
@@ -426,7 +396,7 @@ class SimplePagureTest(unittest.TestCase):
         self.app = self._app.test_client()
         self.gr_patcher = mock.patch("pagure.lib.tasks.get_result")
         gr_mock = self.gr_patcher.start()
-        gr_mock.side_effect = lambda tid: tests_state["results"][tid]
+        gr_mock.side_effect = lambda tid: self.results[tid]
 
         # Refresh the DB session
         self.session = pagure.lib.query.create_session(self.dbpath)
@@ -436,6 +406,11 @@ class SimplePagureTest(unittest.TestCase):
         self.session.rollback()
         self._clear_database()
 
+        self.db_session.close()
+        self.eg_patcher.stop()
+        self.broker.kill()
+        self.broker.wait()
+
         # Remove testdir
         try:
             shutil.rmtree(self.path)
@@ -444,7 +419,13 @@ class SimplePagureTest(unittest.TestCase):
             # fail during the first attempt. So just try a second time if that's
             # the case.
             shutil.rmtree(self.path)
+        try:
+            shutil.rmtree(self.dbfolder)
+        except:
+            pass
+
         self.path = None
+        self.dbpath = None
 
         del self.app
         del self._app
@@ -454,10 +435,7 @@ class SimplePagureTest(unittest.TestCase):
         return doc or None
 
     def _prepare_db(self):
-        self.dbpath = "sqlite:///%s" % os.path.join(
-            tests_state["path"], "db.sqlite"
-        )
-        self.session = tests_state["db_session"]
+        self.session = self.db_session
         pagure.lib.model.create_default_status(
             self.session, acls=pagure_config.get("ACLS", {})
         )
@@ -551,7 +529,7 @@ class Modeltests(SimplePagureTest):
 
     def tearDown(self):  # pylint: disable=invalid-name
         """ Remove the test.db database if there is one. """
-        tests_state["broker_client"].flushall()
+        self.broker_client.flushall()
         super(Modeltests, self).tearDown()
 
     def create_project_full(self, projectname, extra=None):

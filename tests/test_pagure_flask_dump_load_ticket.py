@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2015 - Copyright Red Hat Inc
+ (c) 2015-2020 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -27,6 +27,8 @@ sys.path.insert(
 
 import pagure.lib.query
 import tests
+
+from pagure.config import config as pagure_config, reload_config
 
 
 class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
@@ -166,8 +168,20 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
         shutil.rmtree(newpath)
 
         # Test reloading the JSON
-        self.tearDown()
-        self.setUp()
+
+        # Re-create the DB from scratch
+        self.session.rollback()
+        self._clear_database()
+        self.db_session.close()
+        del self.session
+        del self.db_session
+
+        os.unlink(os.path.join(self.dbfolder, "db.sqlite"))
+
+        self.db_session = pagure.lib.model.create_tables(
+            self.dbpath, acls=pagure_config.get("ACLS", {}),
+        )
+        self._prepare_db()
         tests.create_projects(self.session)
 
         # Create repo
