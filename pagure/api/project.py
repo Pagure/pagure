@@ -13,9 +13,10 @@ from __future__ import unicode_literals, absolute_import
 import flask
 import logging
 
+import pygit2
+
 from sqlalchemy.exc import SQLAlchemyError
 from six import string_types
-from pygit2 import GitError, Repository
 
 try:
     from pygit2 import AlreadyExistsError
@@ -456,7 +457,7 @@ def api_new_git_tags(repo, username=None, namespace=None):
             created = True
         except AlreadyExistsError:
             created = False
-        except GitError as err:
+        except pygit2.GitError as err:
             _log.exception(err)
             raise pagure.exceptions.APIError(
                 400, error_code=APIERROR.EGITERROR, error=str(err)
@@ -1626,7 +1627,7 @@ def api_new_branch(repo, username=None, namespace=None):
             from_branch=from_branch,
             from_commit=from_commit,
         )
-    except GitError:  # pragma: no cover
+    except pygit2.GitError:  # pragma: no cover
         raise pagure.exceptions.APIError(400, error_code=APIERROR.EGITERROR)
     except pagure.exceptions.PagureException as error:
         raise pagure.exceptions.APIError(
@@ -1700,7 +1701,7 @@ def api_commit_flags(repo, commit_hash, username=None, namespace=None):
     repo = _get_repo(repo, username, namespace)
 
     reponame = pagure.utils.get_repo_path(repo)
-    repo_obj = Repository(reponame)
+    repo_obj = pygit2.Repository(reponame)
     try:
         repo_obj.get(commit_hash)
     except ValueError:
@@ -1834,7 +1835,7 @@ def api_commit_add_flag(repo, commit_hash, username=None, namespace=None):
     output = {}
 
     reponame = pagure.utils.get_repo_path(repo)
-    repo_obj = Repository(reponame)
+    repo_obj = pygit2.Repository(reponame)
     try:
         repo_obj.get(commit_hash)
     except ValueError:
