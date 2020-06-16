@@ -127,6 +127,9 @@ class APIERROR(enum.Enum):
     EINVALIDPERPAGEVALUE = "The per_page value must be between 1 and 100"
     EGITERROR = "An error occurred during a git operation"
     ENOCOMMIT = "No such commit found in this repository"
+    EEMPTYGIT = "This git repository is empty"
+    EBRANCHNOTFOUND = "Branch not found in this git repository"
+    EFILENOTFOUND = "File not found in this git repository"
     ENOTHIGHENOUGH = (
         "You do not have sufficient permissions to perform this action"
     )

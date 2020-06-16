@@ -686,6 +686,220 @@ def api_git_branches(repo, username=None, namespace=None):
     )
 
 
+@API.route("/<repo>/tree")
+@API.route("/<repo>/tree/<path:identifier>")
+@API.route("/<repo>/tree/<path:identifier>/f/<path:filename>")
+@API.route("/<namespace>/<repo>/tree")
+@API.route("/<namespace>/<repo>/tree/<path:identifier>")
+@API.route("/<namespace>/<repo>/tree/<path:identifier>/f/<path:filename>")
+@API.route("/fork/<username>/<repo>/tree")
+@API.route("/fork/<username>/<repo>/tree/<path:identifier>")
+@API.route("/fork/<username>/<repo>/tree/<path:identifier>/f/<path:filename>")
+@API.route("/fork/<username>/<namespace>/<repo>/tree")
+@API.route("/fork/<username>/<namespace>/<repo>/tree/<path:identifier>/")
+@API.route(
+    "/fork/<username>/<namespace>/<repo>/tree/<path:identifier>/"
+    "f/<path:filename>"
+)
+@api_method
+def api_view_file(
+    repo, username=None, namespace=None, identifier=None, filename=None
+):
+    """
+    List files in a project
+    -----------------------
+    Lists the files present in a project or one of its subfolder.
+
+    ::
+
+        GET /api/0/<repo>tree
+        GET /api/0/<repo>tree/master
+        GET /api/0/<repo>tree/master/f/<filename>
+        GET /api/0/<repo>tree/master/f/<folder>/
+        GET /api/0/<repo>tree/master/f/<folder1>/<folder2>/<filename>
+
+
+    ::
+
+        GET /api/0/fork/<username>/<repo>tree
+        GET /api/0/fork/<username>/<repo>tree/master
+        GET /api/0/fork/<username>/<repo>tree/master/f/<filename>
+        GET /api/0/fork/<username>/<repo>tree/master/f/<folder>/
+        GET /api/0/fork/<username>/<repo>tree/master/f/<folder1>/<folder2>/<filename>
+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "content": [
+            {
+              "content_url": "https://pagure.io/api/0/pagure/tree/master/f/alembic",
+              "name": "alembic",
+              "path": "alembic",
+              "type": "folder"
+            },
+            {
+              "content_url": "https://pagure.io/api/0/pagure/tree/master/f/fedmsg.d",
+              "name": "fedmsg.d",
+              "path": "fedmsg.d",
+              "type": "folder"
+            },
+            {
+              "content_url": "https://pagure.io/pagure/raw/master/f/tox.ini",
+              "name": "tox.ini",
+              "path": "tox.ini",
+              "type": "file"
+            }
+          ],
+          "name": null,
+          "type": "folder"
+        }
+
+        {
+          "content": [
+            {
+              "content_url": "https://pagure.io/pagure/raw/master/f/fedmsg.d/pagure.py",
+              "name": "pagure.py",
+              "path": "fedmsg.d/pagure.py",
+              "type": "file"
+            },
+            {
+              "content_url": "https://pagure.io/pagure/raw/master/f/fedmsg.d/pagure_ci.py",
+              "name": "pagure_ci.py",
+              "path": "fedmsg.d/pagure_ci.py",
+              "type": "file"
+            }
+          ],
+          "name": "fedmsg.d",
+          "type": "folder"
+        }
+
+    """  # noqa
+    repo = _get_repo(repo, username, namespace)
+    repopath = pagure.utils.get_repo_path(repo)
+    repo_obj = pygit2.Repository(repopath)
+
+    if repo_obj.is_empty:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.EEMPTYGIT)
+
+    if identifier in repo_obj.listall_branches():
+        branchname = identifier
+        branch = repo_obj.lookup_branch(identifier)
+        commit = branch.peel(pygit2.Commit)
+    else:
+        try:
+            commit = repo_obj.get(identifier)
+            branchname = identifier
+        except (ValueError, TypeError):
+            # If an identifier was provided, bail, the provided info is wrong
+            if identifier:
+                raise pagure.exceptions.APIError(
+                    404, error_code=APIERROR.EFILENOTFOUND
+                )
+            # If it's not a commit id then it's part of the filename
+            if not repo_obj.head_is_unborn:
+                branchname = repo_obj.head.shorthand
+                commit = repo_obj[repo_obj.head.target]
+
+    if isinstance(commit, pygit2.Tag):
+        commit = commit.peel(pygit2.Commit)
+
+    tree = None
+    if isinstance(commit, pygit2.Tree):
+        tree = commit
+    elif isinstance(commit, pygit2.Commit):
+        tree = commit.tree
+
+    if tree and not filename:
+        content = sorted(tree, key=lambda x: x.filemode)
+    elif tree and commit and not isinstance(commit, pygit2.Blob):
+        content = pagure.utils.__get_file_in_tree(
+            repo_obj, tree, filename.split("/"), bail_on_tree=True
+        )
+        if not content:
+            raise pagure.exceptions.APIError(
+                404, error_code=APIERROR.EFILENOTFOUND
+            )
+        content = repo_obj[content.oid]
+    else:
+        content = commit
+
+    if not content:
+        raise pagure.exceptions.APIError(
+            404, error_code=APIERROR.EFILENOTFOUND
+        )
+
+    output_type = "tree"
+    if isinstance(content, pygit2.Blob):
+        output_type = "file"
+    elif isinstance(content, pygit2.Commit):
+        raise pagure.exceptions.APIError(
+            404, error_code=APIERROR.EFILENOTFOUND
+        )
+
+    if output_type == "file":
+        output = {
+            "type": "file",
+            "name": filename,
+            "content_url": flask.url_for(
+                "ui_ns.view_raw_file",
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace,
+                identifier=branchname,
+                filename=filename,
+                _external=True,
+            ),
+        }
+    else:
+        content_list = []
+        for entry in content:
+            path = filename + "/" + entry.name if filename else entry.name
+            url_content = flask.url_for(
+                "api_ns.api_view_file",
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace,
+                identifier=branchname,
+                filename=path,
+                _external=True,
+            )
+            if entry.filemode == 16384:
+                file_type = "folder"
+            elif entry.filemode == 40960:
+                file_type = "link"
+            elif entry.filemode == 57344:
+                file_type = "submodule"
+            else:
+                file_type = "file"
+                url_content = flask.url_for(
+                    "ui_ns.view_raw_file",
+                    repo=repo.name,
+                    username=username,
+                    namespace=repo.namespace,
+                    identifier=branchname,
+                    filename=path,
+                    _external=True,
+                )
+            tmp = {
+                "type": file_type,
+                "name": entry.name,
+                "path": path,
+                "content_url": url_content,
+            }
+            content_list.append(tmp)
+        output = {
+            "type": "folder",
+            "name": filename,
+            "content": content_list,
+        }
+
+    return flask.jsonify(output)
+
+
 @API.route("/projects")
 @api_method
 def api_projects():

@@ -176,13 +176,16 @@ class PagureFlaskApitests(tests.SimplePagureTest):
         output = self.app.get("/api/0/-/error_codes")
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
-        self.assertEqual(len(data), 42)
+        self.assertEqual(len(data), 45)
         self.assertEqual(
             sorted(data.keys()),
             sorted(
                 [
+                    "EBRANCHNOTFOUND",
                     "EDATETIME",
                     "EDBERROR",
+                    "EEMPTYGIT",
+                    "EFILENOTFOUND",
                     "EGITERROR",
                     "EINVALIDISSUEFIELD",
                     "EINVALIDISSUEFIELD_LINK",
