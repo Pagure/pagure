@@ -9,7 +9,7 @@ Here are some tips:
 * Logs for the server are available with `journalctl`; the services are run
   as systemd user units in ~/.config/systemd/user/
 
-* To run the tests run: `~/devel/runtests.py run`.
+* To run the tests run: `tox -c ~/devel/tox.ini`.
 
 Here is a list of command and alias you may find useful:
 

@@ -281,20 +281,19 @@ local pagure instance.
 
 * Run it::
 
-     python runtests.py run
+     tox .
 
-You can also use::
+If you want to run a single interpreter, cou can use::
 
-     python runtests.py  --help
+     tox . -e py38
 
-to see other options supported.
 
 Each unit-tests files (located under ``tests/``) can be called
 by alone, allowing easier debugging of the tests. For example:
 
 ::
 
-  python runtests.py run tests/test_pagure_lib.py
+   pytest-3 tests/test_pagure_lib.py
 
 
 .. note:: In order to have coverage information you might have to install
@@ -302,22 +301,16 @@ by alone, allowing easier debugging of the tests. For example:
 
           ::
 
-            dnf install python-coverage
+            dnf install python3-pytest-cov
 
-          or
-
-          ::
-
-            yum install python-coverage
 
 To run the unit-tests, there is also a container available with all the dependencies needed.
 Use the following command to run the tests ::
 
     $ ./dev/run-tests-container.py
 
-This command will build a fedora based container and execute the test suite. You can also
-limit the tests to unit-test files or single tests similar to the ``python runtests.py``
-options described above. You need set the environment variables REPO and BRANCH if the
-tests are not yet available in the upstream pagure master branch.
-
+This command will build a fedora based container and execute the test suite.
+You can also limit the tests to unit-test files or single tests similar to the 
+options described above. You need set the environment variables REPO and BRANCH
+if the tests are not yet available in the upstream pagure master branch.
 
