@@ -14,14 +14,14 @@ RUN dnf -y --enablerepo=updates-testing install \
     python3-docutils \
     python3-black \
     python3-flake8 \
+    python3-pytest-xdist \
     redis \
     which \
     git
 
 RUN cd / \
     && GIT_TRACE=1 GIT_CURL_VERBOSE=1 git clone -b $BRANCH $REPO \
-    && chmod +x /pagure/dev/containers/runtests_py3.sh \
-    && sed -i -e 's|\["alembic",|\["alembic-3",|' /pagure/tests/test_alembic.py
+    && chmod +x /pagure/dev/containers/runtests_py3.sh
 
 # Install all the requirements from the spec file and replace the macro
 # %{python_pkgversion} by '3' which thus installs all the py3 version of
@@ -35,5 +35,5 @@ RUN sed -i "/Requires:           python%{python_pkgversion}-enum34/d" /pagure/fi
     python3 setup.py build
 
 WORKDIR /pagure
-ENTRYPOINT ["/pagure/dev/containers/runtests_py3.sh"]
+ENTRYPOINT ["pytest-3 -n auto /pagure/tests/"]
 CMD []
