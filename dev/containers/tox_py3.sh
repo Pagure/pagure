@@ -23,4 +23,4 @@ git --no-pager log -2
 fi
 
 export LANG="en_US.UTF-8"
-tox -v --sitepackages -e 'py35-flask100-ci' -- --results=results
+tox -v --sitepackages -e 'py38' -- --results=results

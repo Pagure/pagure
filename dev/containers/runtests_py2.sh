@@ -22,4 +22,5 @@ echo "Last commits:"
 git --no-pager log -2
 fi
 
-tox .  -e py27 $TESTCASE
+export LANG="en_US.UTF-8"
+py.test -n auto tests/ $TESTCASE

@@ -35,5 +35,5 @@ RUN sed -i "/Requires:           python%{python_pkgversion}-enum34/d" /pagure/fi
     python3 setup.py build
 
 WORKDIR /pagure
-ENTRYPOINT ["pytest-3 -n auto /pagure/tests/"]
+ENTRYPOINT ["/pagure/dev/containers/runtests_py3.sh"]
 CMD []

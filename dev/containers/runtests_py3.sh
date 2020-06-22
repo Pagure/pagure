@@ -22,4 +22,4 @@ echo "Last commits:"
 git --no-pager log -2
 fi
 
-tox . -e py38 $TESTCASE
+pytest-3 -n auto tests/ $TESTCASE

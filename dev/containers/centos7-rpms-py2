@@ -23,6 +23,7 @@ RUN yum -y install \
     python-enum \
     python-flask \
     python-flake8 \
+    python2-pytest-xdist \
     redis \
     which \
     git \
