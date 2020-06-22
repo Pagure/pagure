@@ -26,9 +26,10 @@ RUN yum -y install \
     python2-pytest-xdist \
     redis \
     which \
-    git \
-    repoSpanner \
-    repoSpanner-bridge
+    git
+#    git \
+#    repoSpanner \
+#    repoSpanner-bridge
 
 RUN cd / \
     && GIT_TRACE=1 GIT_CURL_VERBOSE=1 git clone -b $BRANCH $REPO \
