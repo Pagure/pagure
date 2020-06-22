@@ -13,8 +13,8 @@ If you're submitting patches to pagure, please observe the following:
   yourself (which is simple: ``black /path/to/pagure``).
 
 - Check that your code doesn't break the test suite.  The test suite can be
-  run using ``tox`` at the top of the sources, you mayuse ``tox . -e py38`` to
-  run a single version of python. You can also run a single file by calling
+  run using ``tox`` at the top of the sources, you mayuse ``tox -e py38 ./test/``
+  to run a single version of python. You can also run a single file by calling
   pytest directly: ``pytest-3 tests/test_style.py``.
   See :doc:`development` for more information about the test suite.
 

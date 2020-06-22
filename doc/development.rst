@@ -281,11 +281,11 @@ local pagure instance.
 
 * Run it::
 
-     tox .
+     tox ./test/
 
 If you want to run a single interpreter, cou can use::
 
-     tox . -e py38
+     tox -e py38 ./test/
 
 
 Each unit-tests files (located under ``tests/``) can be called

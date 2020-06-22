@@ -23,4 +23,4 @@ git --no-pager log -2
 fi
 
 export LANG="en_US.UTF-8"
-tox -v --sitepackages -e 'py38' -- --results=results
+tox -v -e 'py38' -- /pagure/tests/ --results=results
