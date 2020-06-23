@@ -23,7 +23,8 @@ RUN dnf -y install \
 
 RUN cd / \
     && GIT_TRACE=1 GIT_CURL_VERBOSE=1 git clone -b $BRANCH $REPO \
-    && chmod +x /pagure/dev/containers/tox_py3.sh
+    && chmod +x /pagure/dev/containers/tox_py3.sh \
+    && sed -i -e 's|"alembic-3"|"alembic"|' /pagure/tests/test_alembic.py
 
 WORKDIR /pagure
 ENTRYPOINT ["/pagure/dev/containers/tox_py3.sh"]
