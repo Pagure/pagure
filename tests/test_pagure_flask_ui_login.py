@@ -1068,9 +1068,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 200)
 
     @patch("flask.flash")
-    @patch("flask.g")
-    @patch("flask.session")
-    def test_admin_session_timedout(self, session, g, flash):
+    def test_admin_session_timedout(self, flash):
         """ Test the call to admin_session_timedout. """
         lifetime = pagure.config.config.get(
             "ADMIN_SESSION_LIFETIME", datetime.timedelta(minutes=15)
@@ -1079,12 +1077,17 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         # session already expired
         user = tests.FakeUser(username="foo")
         user.login_time = datetime.datetime.utcnow() - lifetime - td1
-        g.fas_user = user
-        self.assertTrue(pagure.flask_app.admin_session_timedout())
+        with self.app.application.app_context() as ctx:
+            ctx.g.session = self.session
+            ctx.g.fas_user = user
+            self.assertTrue(pagure.flask_app.admin_session_timedout())
+
         # session did not expire
         user.login_time = datetime.datetime.utcnow() - lifetime + td1
-        g.fas_user = user
-        self.assertFalse(pagure.flask_app.admin_session_timedout())
+        with self.app.application.app_context() as ctx:
+            ctx.g.session = self.session
+            ctx.g.fas_user = user
+            self.assertFalse(pagure.flask_app.admin_session_timedout())
 
     @patch.dict("pagure.config.config", {"PAGURE_AUTH": "local"})
     def test_force_logout(self):

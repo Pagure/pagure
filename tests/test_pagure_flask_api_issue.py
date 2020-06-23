@@ -1752,7 +1752,9 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.test_api_new_issue()
 
         # Invalid repo
-        output = self.app.get("/api/0/test/issues?since=100000000000000")
+        output = self.app.get(
+            "/api/0/test/issues?since=10000000000000000000000"
+        )
         self.assertEqual(output.status_code, 400)
         data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(

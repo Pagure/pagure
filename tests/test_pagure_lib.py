@@ -18,7 +18,7 @@ import os
 
 import pygit2
 import markdown
-from mock import patch, MagicMock
+from mock import patch, MagicMock, Mock
 
 sys.path.insert(
     0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
@@ -2506,6 +2506,7 @@ class PagureLibtests(tests.Modeltests):
         mockemail.return_value = True
 
         tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
 
         # Create a forked repo
         item = pagure.lib.model.Project(
@@ -4068,13 +4069,11 @@ class PagureLibtests(tests.Modeltests):
         watch_list = [obj.name for obj in watch_list_objs]
         self.assertEqual(watch_list, [])
 
-    @patch("flask.request.url", "http://localhost.localdomain/test/issue/69")
-    @patch("flask.request.url_root", "http://localhost.localdomain/")
-    @patch("flask.request.args.get", return_value=None)
-    @patch("flask.request")
-    @patch("flask.g")
+    @patch("pagure.lib.tasks.update_git", MagicMock(return_value=True))
+    @patch("pagure.lib.tasks.sync_pull_ref", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
-    def test_text2markdown(self, g, req, reqget):
+    @patch("pagure.pfmarkdown._commit_exists", MagicMock(return_value=True))
+    def test_text2markdown(self):
         """ Test the text2markdown method in pagure.lib.query. """
         pagure.config.config["TESTING"] = True
         pagure.config.config["SERVER_NAME"] = "localhost.localdomain"
@@ -4246,52 +4245,51 @@ class PagureLibtests(tests.Modeltests):
         ]
         expected = [
             # 'foo bar test#1 see?',
-            '<div class="markdown"><p>foo bar <a href="http://localhost.localdomain/test/pull-request/1"'
+            '<div class="markdown"><p>foo bar <a href="/test/pull-request/1"'
             ' title="[Open] test pull-request">test#1</a> see?</p></div>',
             # 'foo bar pingou/test#2 I mean, really', -- unknown namespace
             '<div class="markdown"><p>foo bar pingou/test#2 I mean, really</p></div>',
             # 'foo bar fork/pingou/test#2 bouza!',
-            '<div class="markdown"><p>foo bar <a href="http://localhost.localdomain/fork/'
+            '<div class="markdown"><p>foo bar <a href="/fork/'
             'pingou/test/pull-request/2" title="[Open] test pull-request in fork">'
             "pingou/test#2</a> bouza!</p></div>",
             # 'foo bar forks/pingou/test#2 bouza!',  -- the 's' doesn't matter
-            '<div class="markdown"><p>foo bar <a href="http://localhost.localdomain/fork/'
+            '<div class="markdown"><p>foo bar <a href="/fork/'
             'pingou/test/pull-request/2" title="[Open] test pull-request in fork">'
             "pingou/test#2</a> bouza!</p></div>",
             # 'foo bar ns/test3#4 bouza!',
-            '<div class="markdown"><p>foo bar <a href="http://localhost.localdomain/ns/test3/issue/4"'
+            '<div class="markdown"><p>foo bar <a href="/ns/test3/issue/4"'
             ' title="[Open] test issue">ns/test3#4</a> bouza!</p></div>',
             # 'foo bar fork/user/ns/test#5 bouza!', -- unknown fork
             '<div class="markdown"><p>foo bar user/ns/test#5 bouza!</p></div>',
             # 'foo bar fork/pingou/ns/test#7 bouza!',
-            '<div class="markdown"><p>foo bar <a href="http://localhost.localdomain/'
-            'fork/pingou/ns/test/issue/7" title="[Open] test issue #7">'
+            '<div class="markdown"><p>foo bar <a href="/fork/pingou/ns/test/issue/7"'
+            ' title="[Open] test issue #7">'
             "pingou/ns/test#7</a> bouza!</p></div>",
             # 'test#1 bazinga!',
-            '<div class="markdown"><p><a href="http://localhost.localdomain/test/pull-request/1" '
+            '<div class="markdown"><p><a href="/test/pull-request/1" '
             'title="[Open] test pull-request">test#1</a> bazinga!</p></div>',
             # 'pingou opened the PR forks/pingou/test#2'
-            '<div class="markdown"><p>pingou opened the PR <a href="http://localhost.localdomain/'
-            'fork/pingou/test/pull-request/2" '
+            '<div class="markdown"><p>pingou opened the PR <a href="/fork/pingou/test/pull-request/2" '
             'title="[Open] test pull-request in fork">pingou/test#2</a></p></div>',
             # 'fork/pingou/ns/test#8 is private',
-            '<div class="markdown"><p><a href="http://localhost.localdomain/fork/pingou/ns/test/issue/8" '
+            '<div class="markdown"><p><a href="/fork/pingou/ns/test/issue/8" '
             'title="Private issue">pingou/ns/test#8</a> is private</p></div>',
             # 'implicit link to #1',
-            '<div class="markdown"><p>implicit link to <a href="http://localhost.localdomain/test/pull-request/1" title="[Open] test pull-request">#1</a></p></div>',
+            '<div class="markdown"><p>implicit link to <a href="/test/pull-request/1" title="[Open] test pull-request">#1</a></p></div>',
             # 'implicit link .#1. with non-whitespace, non-word characters',
-            '<div class="markdown"><p>implicit link .<a href="http://localhost.localdomain/test/pull-request/1" title="[Open] test pull-request">#1</a>. with non-whitespace, non-word characters</p></div>',
+            '<div class="markdown"><p>implicit link .<a href="/test/pull-request/1" title="[Open] test pull-request">#1</a>. with non-whitespace, non-word characters</p></div>',
             # '#2 - implicit link at start of line',
-            '<div class="markdown"><p><a href="http://localhost.localdomain/test/issue/2" title="[Open] test issue">#2</a> - implicit link at start of line</p></div>',
+            '<div class="markdown"><p><a href="/test/issue/2" title="[Open] test issue">#2</a> - implicit link at start of line</p></div>',
             # '#2. implicit link at start of line with no whitespace after',
-            '<div class="markdown"><p><a href="http://localhost.localdomain/test/issue/2" title="[Open] test issue">#2</a>. implicit link at start of line with no whitespace after</p></div>',
+            '<div class="markdown"><p><a href="/test/issue/2" title="[Open] test issue">#2</a>. implicit link at start of line with no whitespace after</p></div>',
             # '#regular header',
             '<div class="markdown"><h1>regular header</h1></div>',
             # '#34 looks like an implicit link, but no issue 34',
             '<div class="markdown"><h1>34 looks like an implicit link, but no issue 34</h1></div>',
             # 'pingou committed on test#9364354a4555ba17aa60f0dc844d70b74eb1aecd',
-            '<div class="markdown"><p>pingou committed on <a href="http://localhost.localdomain/'
-            'test/c/9364354a4555ba17aa60f0dc844d70b74eb1aecd" '
+            '<div class="markdown"><p>pingou committed on <a href="/test/c/'
+            '9364354a4555ba17aa60f0dc844d70b74eb1aecd" '
             'title="Commit 9364354a4555ba17aa60f0dc844d70b74eb1aecd"'
             ">test#9364354a4555ba17aa60f0dc844d70b74eb1aecd</a></p></div>",
             # 'irc://pagure.io'
@@ -4378,11 +4376,19 @@ class PagureLibtests(tests.Modeltests):
                 "</noscript></span></a></p></div>"
             )
 
-        with self.app.application.app_context():
-            g.session = self.session
-            for idx, text in enumerate(texts):
-                html = pagure.lib.query.text2markdown(text)
-                self.assertEqual(html, expected[idx])
+        with self.app.application.app_context() as ctx:
+            ctx.g.session = self.session
+            with ctx.app.test_request_context() as reqctx:
+                reqctx.request.url_root = "http://localhost.localdomain/"
+                reqctx.request.url = (
+                    "http://localhost.localdomain/test/issue/69"
+                )
+                reqctx.request.args = Mock()
+                reqctx.request.args.get = Mock(return_value=None)
+                for idx, text in enumerate(texts):
+                    print(text)
+                    html = pagure.lib.query.text2markdown(text)
+                    self.assertEqual(html, expected[idx])
 
     def test_text2markdown_exception(self):
         """ Test the text2markdown method in pagure.lib.query. """
@@ -4390,8 +4396,9 @@ class PagureLibtests(tests.Modeltests):
         text = "test#1 bazinga!"
         expected_html = "test#1 bazinga!"
 
-        html = pagure.lib.query.text2markdown(text)
-        self.assertEqual(html, expected_html)
+        with self.app.application.app_context() as ctx:
+            html = pagure.lib.query.text2markdown(text)
+            self.assertEqual(html, expected_html)
 
     def test_text2markdown_empty_string(self):
         """ Test the text2markdown method in pagure.lib.query. """

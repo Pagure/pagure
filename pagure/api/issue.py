@@ -459,7 +459,7 @@ def api_view_issues(repo, username=None, namespace=None):
             # We assume its a timestamp, so convert it to datetime
             try:
                 updated_after = arrow.get(int(since)).datetime
-            except ValueError:
+            except (ValueError, OverflowError):
                 raise pagure.exceptions.APIError(
                     400, error_code=APIERROR.ETIMESTAMP
                 )
