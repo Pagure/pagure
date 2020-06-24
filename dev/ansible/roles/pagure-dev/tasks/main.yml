@@ -51,6 +51,7 @@
       - python3-sqlalchemy
       - python3-straight-plugin
       - python3-virtualenvwrapper
+      - python3-whitenoise
       - python3-wtforms
       - python3-devel
       - python3-devel
@@ -58,9 +59,14 @@
       - redhat-rpm-config
     state: latest
 
+- name: Create the folder where we'll place the symbolic link for pagure
+  file:
+    path: /usr/local/lib/python3.7/site-packages/
+    state: directory
+
 - name: Create symbolic link for pagure to be in the python path
   file:
-    src: /srv/pagure
+    src: /srv/pagure/pagure
     dest: /usr/local/lib/python3.7/site-packages/pagure
     state: link
 

@@ -18,8 +18,6 @@ echo "Reminder of the commands:
 # If adding new functions to this file, note that you can add help text to the function
 # by defining a variable with name _<function>_help containing the help text
 
-export PAGURE_CONFIG=~/pagure.cfg
-
 pstart (){
     sudo systemctl start pagure.service \
         pagure-docs.service \
