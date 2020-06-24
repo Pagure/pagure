@@ -21,6 +21,8 @@ Author: Ralph Bean <rbean@redhat.com>
 
 from __future__ import unicode_literals, absolute_import
 
+import logging
+
 import flask
 
 import markdown.inlinepatterns
@@ -43,6 +45,8 @@ except ImportError:
     from markdown.inlinepatterns import ImageInlineProcessor as ImagePattern
 
     MK_VERSION = 3
+
+_log = logging.getLogger(__name__)
 
 
 # the (?<!\w) (and variants) we use a lot in all these regexes is a
@@ -90,6 +94,8 @@ class MentionPattern(markdown.inlinepatterns.Pattern):
 
     def handleMatch(self, m):
         """ When the pattern matches, update the text. """
+        _log.debug("MentionPattern: %s", m.groups())
+
         name = markdown.util.AtomicString(m.group(2))
         text = "@%s" % name
         user = pagure.lib.query.search_user(flask.g.session, username=name)
@@ -111,6 +117,8 @@ class ExplicitLinkPattern(markdown.inlinepatterns.Pattern):
 
     def handleMatch(self, m):
         """ When the pattern matches, update the text. """
+        _log.debug("ExplicitLinkPattern: %s", m.groups())
+
         is_fork = m.group(2)
         user = m.group(3)
         namespace = m.group(4)
@@ -150,6 +158,8 @@ class CommitLinkPattern(markdown.inlinepatterns.Pattern):
 
     def handleMatch(self, m):
         """ When the pattern matches, update the text. """
+        _log.debug("CommitLinkPattern: %s", m.groups())
+
         is_fork = m.group(2)
         user = m.group(3)
         namespace = m.group(4)
@@ -194,6 +204,7 @@ class ImplicitIssuePreprocessor(markdown.preprocessors.Preprocessor):
         parsing the line as a header. ImplicitIssuePattern will catch
         and parse the text later. Otherwise, we change nothing.
         """
+        _log.debug("ImplicitIssuePreprocessor")
         # match a # character, then any number of digits
         regex = re.compile(r"#([0-9]+)")
         new_lines = []
@@ -231,26 +242,40 @@ class ImplicitIssuePattern(markdown.inlinepatterns.Pattern):
 
     def handleMatch(self, m):
         """ When the pattern matches, update the text. """
+        _log.debug("ImplicitIssuePattern: %s", m.groups())
         idx = markdown.util.AtomicString(m.group(2))
         text = "#%s" % idx
         try:
             idx = int(idx)
         except (ValueError, TypeError):
+            _log.debug("Invalid integer for %s, bailing", idx)
             return text
 
         try:
             namespace, repo, user = _get_ns_repo_user()
         except RuntimeError:
+            _log.debug("No repo found associated with this context, bailing")
             return text
+
+        _log.debug(
+            "Checking ns: %s, name: %s, user:%s for id: %s",
+            namespace,
+            repo,
+            user,
+            idx,
+        )
 
         issue = _issue_exists(user, namespace, repo, idx)
         if issue:
+            _log.debug("Linking to an issue")
             return _obj_anchor_tag(user, namespace, repo, issue, text)
 
         request = _pr_exists(user, namespace, repo, idx)
         if request:
+            _log.debug("Linking to an PR")
             return _obj_anchor_tag(user, namespace, repo, request, text)
 
+        _log.debug("Bailing, return text as is")
         return text
 
 
@@ -259,6 +284,7 @@ class ImplicitPRPattern(markdown.inlinepatterns.Pattern):
 
     def handleMatch(self, m):
         """ When the pattern matches, update the text. """
+        _log.debug("ImplicitPRPattern: %s", m.groups())
         idx = markdown.util.AtomicString(m.group(2))
         text = "PR#%s" % idx
         try:
@@ -287,6 +313,7 @@ class ImplicitCommitPattern(markdown.inlinepatterns.Pattern):
 
     def handleMatch(self, m):
         """ When the pattern matches, update the text. """
+        _log.debug("ImplicitCommitPattern: %s", m.groups())
 
         githash = markdown.util.AtomicString(m.group(2))
         text = "%s" % githash
@@ -309,6 +336,8 @@ class StrikeThroughPattern(markdown.inlinepatterns.Pattern):
 
     def handleMatch(self, m):
         """ When the pattern matches, update the text. """
+        _log.debug("StrikeThroughPattern: %s", m.groups())
+
         text = markdown.util.AtomicString(m.group(2))
 
         element = markdown.util.etree.Element("del")
@@ -325,6 +354,8 @@ class AutolinkPattern2(markdown.inlinepatterns.Pattern):
         :arg m: the matched object
 
         """
+        _log.debug("AutolinkPattern2: %s", m.groups())
+
         url = m.group(2)
         if url.startswith("<"):
             url = url[1:]
@@ -541,6 +572,7 @@ def _get_ns_repo_user():
     repo = flask.request.args.get("repo") or None
 
     if not user and not repo:
+        _log.debug("Extracting repo info from url: %s", url)
         if "fork/" in url:
             user, ext = url.split("fork/")[1].split("/", 1)
         else:
