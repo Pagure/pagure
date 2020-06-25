@@ -407,7 +407,7 @@ class EncapsulateMarkdownPostprocessor(markdown.postprocessors.Postprocessor):
 
 
 class PagureExtension(markdown.extensions.Extension):
-    def extendMarkdown(self, md, md_globals):
+    def extendMarkdown(self, md, *args):
         # First, make it so that bare links get automatically linkified.
         AUTOLINK_RE = "(%s)" % "|".join(
             [
@@ -417,37 +417,96 @@ class PagureExtension(markdown.extensions.Extension):
                 r"\b[Ii][Rr][Cc][Ss]?://[^)<>\s]+[^.,)<>\s]",
             ]
         )
-        markdown.inlinepatterns.AUTOLINK_RE = AUTOLINK_RE
 
-        md.preprocessors["implicit_issue"] = ImplicitIssuePreprocessor()
-
-        md.inlinePatterns["mention"] = MentionPattern(MENTION_RE)
-
-        # Customize the image linking to support lazy loading
-        md.inlinePatterns["image_link"] = ImagePatternLazyLoad(
-            markdown.inlinepatterns.IMAGE_LINK_RE, md
-        )
-
-        md.inlinePatterns["implicit_commit"] = ImplicitCommitPattern(
-            IMPLICIT_COMMIT_RE
-        )
-        md.inlinePatterns["commit_links"] = CommitLinkPattern(COMMIT_LINK_RE)
-        md.inlinePatterns["autolink"] = AutolinkPattern2(AUTOLINK_RE, md)
-
-        if pagure_config.get("ENABLE_TICKETS", True):
-            md.inlinePatterns["implicit_pr"] = ImplicitPRPattern(
-                IMPLICIT_PR_RE
+        def _old_mardkown_way():
+            markdown.inlinepatterns.AUTOLINK_RE = AUTOLINK_RE
+            md.preprocessors["implicit_issue"] = ImplicitIssuePreprocessor()
+            md.inlinePatterns["mention"] = MentionPattern(MENTION_RE)
+            # Customize the image linking to support lazy loading
+            md.inlinePatterns["image_link"] = ImagePatternLazyLoad(
+                markdown.inlinepatterns.IMAGE_LINK_RE, md
             )
-            md.inlinePatterns["explicit_fork_issue"] = ExplicitLinkPattern(
-                EXPLICIT_LINK_RE
+            md.inlinePatterns["implicit_commit"] = ImplicitCommitPattern(
+                IMPLICIT_COMMIT_RE
             )
-            md.inlinePatterns["implicit_issue"] = ImplicitIssuePattern(
-                IMPLICIT_ISSUE_RE
+            md.inlinePatterns["commit_links"] = CommitLinkPattern(
+                COMMIT_LINK_RE
+            )
+            md.inlinePatterns["autolink"] = AutolinkPattern2(AUTOLINK_RE, md)
+            if pagure_config.get("ENABLE_TICKETS", True):
+                md.inlinePatterns["implicit_pr"] = ImplicitPRPattern(
+                    IMPLICIT_PR_RE
+                )
+                md.inlinePatterns["explicit_fork_issue"] = ExplicitLinkPattern(
+                    EXPLICIT_LINK_RE
+                )
+                md.inlinePatterns["implicit_issue"] = ImplicitIssuePattern(
+                    IMPLICIT_ISSUE_RE
+                )
+            md.inlinePatterns["striked"] = StrikeThroughPattern(
+                STRIKE_THROUGH_RE
+            )
+            md.postprocessors[
+                "encapsulate"
+            ] = EncapsulateMarkdownPostprocessor()
+
+        def _new_markdown_way():
+            idx = md.inlinePatterns.get_index_for_name("autolink")
+            md.inlinePatterns[idx].AUTOLINK_RE = AUTOLINK_RE
+
+            # The number at the end is the priority, the highest priorities are
+            # processed first.
+
+            md.preprocessors.register(
+                ImplicitIssuePreprocessor(), "implicit_issue", 100
+            )
+            md.inlinePatterns.register(
+                MentionPattern(MENTION_RE), "mention", 95
+            )
+            # Customize the image linking to support lazy loading
+            md.inlinePatterns.register(
+                ImagePatternLazyLoad(
+                    markdown.inlinepatterns.IMAGE_LINK_RE, md
+                ),
+                "image_link",
+                90,
+            )
+            md.inlinePatterns.register(
+                ImplicitCommitPattern(IMPLICIT_COMMIT_RE),
+                "implicit_commit",
+                85,
+            )
+            md.inlinePatterns.register(
+                CommitLinkPattern(COMMIT_LINK_RE), "autolink2", 80
+            )
+            md.inlinePatterns.register(
+                AutolinkPattern2(AUTOLINK_RE, md), "commit_links", 75
+            )
+            if pagure_config.get("ENABLE_TICKETS", True):
+                md.inlinePatterns.register(
+                    ImplicitPRPattern(IMPLICIT_PR_RE), "implicit_pr", 70
+                )
+                md.inlinePatterns.register(
+                    ExplicitLinkPattern(EXPLICIT_LINK_RE),
+                    "explicit_fork_issue",
+                    65,
+                )
+                md.inlinePatterns.register(
+                    ImplicitIssuePattern(IMPLICIT_ISSUE_RE),
+                    "implicit_issue",
+                    60,
+                )
+            md.inlinePatterns.register(
+                StrikeThroughPattern(STRIKE_THROUGH_RE), "striked", 50
+            )
+            md.postprocessors.register(
+                EncapsulateMarkdownPostprocessor(), "encapsulate", 100
             )
 
-        md.inlinePatterns["striked"] = StrikeThroughPattern(STRIKE_THROUGH_RE)
-
-        md.postprocessors["encapsulate"] = EncapsulateMarkdownPostprocessor()
+        if hasattr(md.inlinePatterns, "get_index_for_name"):
+            _new_markdown_way()
+        else:
+            _old_mardkown_way()
 
         md.registerExtension(self)
 
