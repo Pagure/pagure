@@ -68,6 +68,22 @@ This navbar element is the topbar in Pagure. For example:
     {% set masthead_class = "navbar-dark bg-dark" %}
 
 
+`masthead_navbar_items()` macro
+###############################
+
+A Jinja macro that allows themes to inject custom items in the Pagure navigation
+bar. Example:
+
+::
+
+    {% macro masthead_navbar_items() %}
+        <li class="nav-item ml-3">
+            <a class="nav-link font-weight-bold" href="...">
+                Foobar
+            </a>
+        </li>
+    {% endmacro %}
+
 
 `site_title` variable
 #####################

@@ -23,6 +23,13 @@
              alt="pagure Logo" id="pagureLogo"/>
         </a>
         <ul class="navbar-nav ml-auto">
+
+          {# These two lines allow a theme or a blueprint to inject custom
+           # buttons in the navigation bar.
+           #}
+          {{theme.masthead_navbar_items() if theme.masthead_navbar_items is defined}}
+          {% block masthead_navbar_items %}{% endblock %}
+
           {% if not nologin %}
           {% if g.fas_user %}
           <li class="nav-item ml-3">
