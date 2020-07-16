@@ -3371,14 +3371,14 @@ class BoardIssues(BASE):
         secondary="board_statuses",
         primaryjoin="boards_issues.c.status_id==board_statuses.c.id",
         secondaryjoin="board_statuses.c.board_id==boards.c.id",
+        uselist=False,
+        viewonly=True,
     )
 
     def to_json(self):
         """ The JSON representation of these objects. """
         return {
-            "board": [bs.to_json() for bs in self.board][0]
-            if self.board
-            else [],
+            "board": self.board.to_json() if self.board else None,
             "status": self.status.to_json(),
             "rank": self.rank,
         }

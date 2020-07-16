@@ -289,12 +289,114 @@ class PagureFlaskUiBoardstests(tests.SimplePagureTest):
         # There are 3 columns
         self.assertEqual(output_text.count("drag-inner-list"), 3)
         self.assertEqual(output_text.count("drag-inner"), 3)
-        # One ticket (2 per tickets)
+        # One ticket
         self.assertEqual(output_text.count(" id_txt"), 1)
         self.assertEqual(output_text.count(" text-success"), 1)
         self.assertEqual(output_text.count(" text-danger"), 0)
         # Two (!) in the nav bar on the issues title + the ticket
         self.assertEqual(output_text.count("fa-exclamation-circle"), 2)
+
+    @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
+    @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
+    def test_update_issue_add_tags_check_board_remove_tag_check_board(self):
+        """ Test the update_issue endpoint. """
+
+        # Before update, list tags
+        repo = pagure.lib.query.get_authorized_project(self.session, "test")
+        tags = pagure.lib.query.get_tags_of_project(self.session, repo)
+        self.assertEqual([tag.tag for tag in tags], ["dev", "infra"])
+        self.assertEqual(repo.issues[0].tags_text, [])
+
+        user = tests.FakeUser()
+        user.username = "pingou"
+        with tests.user_set(self.app.application, user):
+            csrf_token = self.get_csrf()
+
+            # Tag to the issue
+            data = {"csrf_token": csrf_token, "tag": "dev"}
+            output = self.app.post(
+                "/test/issue/1/update", data=data, follow_redirects=True
+            )
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                "<title>Issue #1: Test issue - test - Pagure</title>",
+                output_text,
+            )
+            self.assertIn(
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                ' href="/test/issue/1/edit" title="Edit this issue">',
+                output_text,
+            )
+            self.assertIn("</i> Issue tagged with: dev</div>", output_text)
+
+        # After update, list tags
+        self.session = pagure.lib.query.create_session(self.dbpath)
+        repo = pagure.lib.query.get_authorized_project(self.session, "test")
+        tags = pagure.lib.query.get_tags_of_project(self.session, repo)
+        self.assertEqual([tag.tag for tag in tags], ["dev", "infra"])
+        self.assertEqual(repo.issues[0].tags_text, ["dev"])
+        self.assertEqual(repo.issues[1].tags_text, [])
+
+        # Check the board - Ticket added
+        output = self.app.get("/test/boards/dev")
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        # There are 3 columns
+        self.assertEqual(output_text.count("drag-inner-list"), 3)
+        self.assertEqual(output_text.count("drag-inner"), 3)
+        # One ticket
+        self.assertEqual(output_text.count(" id_txt"), 1)
+        self.assertEqual(output_text.count(" text-success"), 1)
+        self.assertEqual(output_text.count(" text-danger"), 0)
+        # Two (!) in the nav bar on the issues title + the ticket
+        self.assertEqual(output_text.count("fa-exclamation-circle"), 2)
+
+        # Now remove the "dev" tag in favor of the "infra" one
+        user = tests.FakeUser()
+        user.username = "pingou"
+        with tests.user_set(self.app.application, user):
+            csrf_token = self.get_csrf()
+
+            # Tag to the issue
+            data = {"csrf_token": csrf_token, "tag": "infra"}
+            output = self.app.post(
+                "/test/issue/1/update", data=data, follow_redirects=True
+            )
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                "<title>Issue #1: Test issue - test - Pagure</title>",
+                output_text,
+            )
+            self.assertIn(
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                ' href="/test/issue/1/edit" title="Edit this issue">',
+                output_text,
+            )
+            self.assertIn("</i> Issue tagged with: infra</div>", output_text)
+
+        # After update, list tags
+        self.session = pagure.lib.query.create_session(self.dbpath)
+        repo = pagure.lib.query.get_authorized_project(self.session, "test")
+        tags = pagure.lib.query.get_tags_of_project(self.session, repo)
+        self.assertEqual([tag.tag for tag in tags], ["dev", "infra"])
+        self.assertEqual(repo.issues[0].tags_text, ["infra"])
+        self.assertEqual(repo.issues[1].tags_text, [])
+
+        # Check the board - Ticket added
+        output = self.app.get("/test/boards/dev")
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        # There are 3 columns
+        self.assertEqual(output_text.count("drag-inner-list"), 3)
+        self.assertEqual(output_text.count("drag-inner"), 3)
+        # 0 ticket
+        self.assertEqual(output_text.count(" id_txt"), 0)
+        self.assertEqual(output_text.count(" text-success"), 0)
+        self.assertEqual(output_text.count(" text-danger"), 0)
+        # One (!) in the nav bar on the issues title
+        self.assertEqual(output_text.count("fa-exclamation-circle"), 1)
 
     def test_view_board_ticket_closed(self):
 
