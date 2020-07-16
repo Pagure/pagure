@@ -49,6 +49,13 @@
       {% endif %}
   {% endif %}
     <div>
+
+        {% if contributing %}
+        <div id="contributing">
+          {{ contributing | markdown | noJS | safe}}
+        </div>
+        {% endif %}
+
         {% if type == 'edit' %}
           {{ form.status(class_="hidden") }}
           <div class="d-flex align-items-center">

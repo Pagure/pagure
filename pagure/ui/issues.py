@@ -1030,6 +1030,7 @@ def new_issue(repo, username=None, namespace=None):
 
     types = None
     default = None
+    contributing = None
     ticketrepopath = repo.repopath("tickets")
     if os.path.exists(ticketrepopath):
         ticketrepo = pygit2.Repository(ticketrepopath)
@@ -1040,7 +1041,11 @@ def new_issue(repo, username=None, namespace=None):
                 ticketrepo, commit.tree, ["templates"], bail_on_tree=True
             )
             if files:
-                types = [f.name.rsplit(".md", 1)[0] for f in files]
+                types = [
+                    f.name.rsplit(".md", 1)[0]
+                    for f in files
+                    if f.name not in ["contributing.md"]
+                ]
 
             default_file = None
             if types and template in types:
@@ -1054,6 +1059,17 @@ def new_issue(repo, username=None, namespace=None):
             if default_file:
                 default, _ = pagure.doc_utils.convert_readme(
                     default_file.data, "md"
+                )
+
+            contributing = __get_file_in_tree(
+                ticketrepo,
+                commit.tree,
+                ["templates", "contributing.md"],
+                bail_on_tree=True,
+            )
+            if contributing:
+                contributing, _ = pagure.doc_utils.convert_readme(
+                    contributing.data, "md"
                 )
 
     tag_list = pagure.lib.query.get_tags_of_project(flask.g.session, repo)
@@ -1082,6 +1098,7 @@ def new_issue(repo, username=None, namespace=None):
         default=default,
         tag_list=tag_list,
         open_access=open_access,
+        contributing=contributing,
     )
 
 

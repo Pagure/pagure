@@ -199,6 +199,35 @@ class PagureFlaskIssuestests(tests.Modeltests):
             )
             self.assertEqual(output.status_code, 404)
 
+    @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
+    @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
+    def test_new_issue_customized(self):
+        """ Test the new_issue endpoint. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
+        tests.create_projects_git(
+            os.path.join(self.path, "repos", "tickets"), bare=True
+        )
+        tests.add_content_to_git(
+            os.path.join(self.path, "repos", "tickets", "test.git"),
+            branch="master",
+            folders="templates",
+            filename="contributing.md",
+            content="This is a text pulled from the contributing template",
+            message="Add a contributing.md template",
+        )
+
+        user = tests.FakeUser()
+        with tests.user_set(self.app.application, user):
+            output = self.app.get("/test/new_issue")
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn("New Issue", output_text)
+            self.assertIn(
+                "This is a text pulled from the contributing template",
+                output_text,
+            )
+
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_new_issue_w_file(self, p_send_email, p_ugt):
