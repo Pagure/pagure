@@ -4512,5 +4512,66 @@ class PagureFlaskApiProjectWebhookTokenTests(tests.Modeltests):
         self.assertEqual(output.status_code, 401)
 
 
+class PagureFlaskApiProjectCommitInfotests(tests.Modeltests):
+    """ Tests for the flask API of pagure for commit info
+    """
+
+    def setUp(self):
+        """ Set up the environnment, ran before every tests. """
+        super(PagureFlaskApiProjectCommitInfotests, self).setUp()
+
+        tests.create_projects(self.session)
+        repo_path = os.path.join(self.path, "repos")
+        self.git_path = os.path.join(repo_path, "test.git")
+        tests.create_projects_git(repo_path, bare=True)
+        tests.add_content_git_repo(self.git_path)
+
+        repo_obj = pygit2.Repository(self.git_path)
+        self.commit = repo_obj.revparse_single("HEAD")
+
+    def test_api_commit_info(self):
+        """ Test flagging a commit with missing precentage. """
+
+        output = self.app.get("/api/0/test/c/%s/info" % self.commit.oid.hex)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        expected_output = {
+            "author": "Alice Author",
+            "commit_time": self.commit.commit_time,
+            "commit_time_offset": self.commit.commit_time_offset,
+            "committer": "Cecil Committer",
+            "hash": self.commit.oid.hex,
+            "message": "Add some directory and a file for more testing",
+            "parent_ids": [self.commit.parent_ids[0].hex],
+            "tree_id": self.commit.tree_id.hex,
+        }
+
+        self.assertEqual(data, expected_output)
+
+    def test_api_commit_info_invalid_commit(self):
+        """ Test flagging a commit with missing username. """
+        output = self.app.get("/api/0/test/c/invalid_commit_hash/info")
+
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(
+            pagure.api.APIERROR.ENOCOMMIT.name, data["error_code"]
+        )
+        self.assertEqual(pagure.api.APIERROR.ENOCOMMIT.value, data["error"])
+
+    def test_api_commit_info_hash_tree(self):
+        """ Test flagging a commit with missing username. """
+        output = self.app.get(
+            "/api/0/test/c/%s/info" % self.commit.tree_id.hex
+        )
+
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(
+            pagure.api.APIERROR.ENOCOMMIT.name, data["error_code"]
+        )
+        self.assertEqual(pagure.api.APIERROR.ENOCOMMIT.value, data["error"])
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

@@ -1928,6 +1928,65 @@ def api_commit_flags(repo, commit_hash, username=None, namespace=None):
     return flask.jsonify({"total_flags": len(flags), "flags": flags})
 
 
+@API.route("/<repo>/c/<commit_hash>/info")
+@API.route("/<namespace>/<repo>/c/<commit_hash>/info")
+@API.route("/fork/<username>/<repo>/c/<commit_hash>/info")
+@API.route("/fork/<username>/<namespace>/<repo>/c/<commit_hash>/info")
+@api_method
+def api_commit_info(repo, commit_hash, username=None, namespace=None):
+    """
+    Get commit information
+    ----------------------
+    Return the metadata we could retrieve about the specified commit
+
+    ::
+
+        GET /api/0/<repo>/c/<commit_hash>/info
+        GET /api/0/<namespace>/<repo>/c/<commit_hash>/info
+
+    ::
+
+        GET /api/0/fork/<username>/<repo>/c/<commit_hash>/info
+        GET /api/0/fork/<username>/<namespace>/<repo>/c/<commit_hash>/info
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "commit": {
+
+          }
+        }
+
+    """
+    repo = _get_repo(repo, username, namespace)
+
+    reponame = pagure.utils.get_repo_path(repo)
+    repo_obj = pygit2.Repository(reponame)
+    commit_obj = None
+    try:
+        commit_obj = repo_obj.get(commit_hash)
+    except ValueError:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOCOMMIT)
+    if not isinstance(commit_obj, pygit2.Commit):
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOCOMMIT)
+
+    info = {
+        "author": commit_obj.author.name,
+        "committer": commit_obj.committer.name,
+        "commit_time": commit_obj.commit_time,
+        "commit_time_offset": commit_obj.commit_time_offset,
+        "hash": commit_obj.hex,
+        "message": commit_obj.message,
+        "parent_ids": [h.hex for h in commit_obj.parent_ids],
+        "tree_id": commit_obj.tree_id.hex,
+    }
+
+    return flask.jsonify(info)
+
+
 @API.route("/<repo>/c/<commit_hash>/flag", methods=["POST"])
 @API.route("/<namespace>/<repo>/c/<commit_hash>/flag", methods=["POST"])
 @API.route("/fork/<username>/<repo>/c/<commit_hash>/flag", methods=["POST"])
