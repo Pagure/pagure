@@ -2896,3 +2896,117 @@ def api_project_block_user(repo, namespace=None, username=None):
 
     jsonout = flask.jsonify(output)
     return jsonout
+
+
+@API.route("/<repo>/delete", methods=["POST"])
+@API.route("/<namespace>/<repo>/delete", methods=["POST"])
+@API.route("/fork/<username>/<repo>/delete", methods=["POST"])
+@API.route("/fork/<username>/<namespace>/<repo>/delete", methods=["POST"])
+@api_login_required(acls=["modify_project"])
+@api_method
+def delete_project(repo, username=None, namespace=None):
+    """
+    Delete a project
+    ----------------
+    Delete a project and its git repositories.
+
+    This is restricted to project admins.
+
+    This action is final and cannot be undone!
+
+    ::
+
+        POST /api/0/<repo>/delete
+        POST /api/0/<namespace>/<repo>/delete
+
+    ::
+
+        POST /api/0/fork/<username>/<repo>/delete
+        POST /api/0/fork/<username>/<namespace>/<repo>/delete
+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+            "message": "Project deleted",
+            "project": {
+                "access_groups": {"admin": [], "commit": [], "ticket": []},
+                "access_users": {
+                    "admin": [],
+                    "commit": [],
+                    "owner": ["pingou"],
+                    "ticket": [],
+                },
+                "close_status": [
+                    "Invalid",
+                    "Insufficient data",
+                    "Fixed",
+                    "Duplicate",
+                ],
+                "custom_keys": [],
+                "date_created": "1595341690",
+                "date_modified": "1595341690",
+                "description": "test project #1",
+                "fullname": "test",
+                "id": 1,
+                "milestones": {},
+                "name": "test",
+                "namespace": None,
+                "parent": None,
+                "priorities": {},
+                "tags": [],
+                "url_path": "test",
+                "user": {
+                    "fullname": "PY C",
+                    "name": "pingou",
+                    "url_path": "user/pingou",
+                },
+            },
+        }
+
+    """
+    project = _get_repo(repo, username, namespace)
+    _check_token(project)
+
+    del_project = pagure_config.get("ENABLE_DEL_PROJECTS", True)
+    del_fork = pagure_config.get("ENABLE_DEL_FORKS", del_project)
+    if (not project.is_fork and not del_project) or (
+        project.is_fork and not del_fork
+    ):
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
+
+    authorized_users = [project.user.username]
+    authorized_users.extend(
+        [user.user for user in project.access_users["admin"]]
+    )
+    if flask.g.fas_user.username not in authorized_users:
+        raise pagure.exceptions.APIError(
+            401, error_code=APIERROR.ENOTHIGHENOUGH
+        )
+
+    if project.read_only:
+        error = (
+            "The ACLs of this project are being refreshed in the backend "
+            "this prevents the project from being deleted. Please wait "
+            "for this task to finish before trying again. Thanks!"
+        )
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.ENOCODE, error=error
+        )
+
+    project_json = project.to_json(public=True, api=True)
+
+    pagure.lib.tasks.delete_project(
+        namespace=project.namespace,
+        name=project.name,
+        user=project.user.user if project.is_fork else None,
+        action_user=flask.g.fas_user.username,
+    )
+
+    jsonout = flask.jsonify(
+        {"message": "Project deleted", "project": project_json}
+    )
+    return jsonout
