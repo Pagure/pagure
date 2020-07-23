@@ -493,6 +493,7 @@ done
 %{_unitdir}/pagure_api_key_expire_mail.timer
 %{_unitdir}/pagure_mirror_project_in.service
 %{_unitdir}/pagure_mirror_project_in.timer
+%dir %{_localstatedir}/log/pagure
 
 
 %files web-apache-httpd
@@ -506,8 +507,8 @@ done
 %config(noreplace) %{_sysconfdir}/nginx/conf.d/pagure.conf
 %{_unitdir}/pagure_web.service
 %{_unitdir}/pagure_docs_web.service
-%dir %{_localstatedir}/log/pagure
-%ghost %{_localstatedir}/log/pagure/*.log
+%ghost %{_localstatedir}/log/pagure/access_*.log
+%ghost %{_localstatedir}/log/pagure/error_*.log
 
 
 %files theme-pagureio
