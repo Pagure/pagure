@@ -32,7 +32,7 @@ from pagure.config import config as pagure_config
 from pagure.ui import UI_NS
 
 _log = logging.getLogger(__name__)
-_auth_log = logging.getLogger("pagure.auth")
+_auth_log = logging.getLogger("pagure_auth")
 
 
 def _get_remote_user(project):

@@ -37,7 +37,7 @@ from pagure.config import config as pagure_config  # noqa: E402
 
 
 _log = logging.getLogger(__name__)
-_auth_log = logging.getLogger("pagure.auth")
+_auth_log = logging.getLogger("pagure_auth")
 
 
 MERGE_OPTIONS = {
