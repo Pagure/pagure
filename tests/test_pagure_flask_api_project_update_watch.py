@@ -43,6 +43,14 @@ class PagureFlaskApiProjectUpdateWatchTests(tests.Modeltests):
         tests.create_projects_git(os.path.join(self.path, "tickets"))
         tests.create_tokens(self.session)
         tests.create_tokens_acl(self.session)
+        tests.create_tokens(
+            self.session, user_id=1, project_id=None, suffix="_project_less"
+        )
+        tests.create_tokens_acl(
+            self.session,
+            token_id="aaabbbcccddd_project_less",
+            acl_name="modify_project",
+        )
 
         # Create normal issue
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
@@ -230,6 +238,37 @@ class PagureFlaskApiProjectUpdateWatchTests(tests.Modeltests):
                 "message": "You are now watching commits on this project",
                 "status": "ok",
             },
+        )
+
+    @patch("pagure.utils.is_admin", MagicMock(return_value=True))
+    def test_api_update_project_watchers_set_then_reset(self):
+        """ Test the api_update_project_watchers method of the flask api. """
+
+        headers = {"Authorization": "token aaabbbcccddd_project_less"}
+        data = {"watcher": "foo", "status": "2"}
+
+        output = self.app.post(
+            "/api/0/test/watchers/update", headers=headers, data=data
+        )
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                "message": "You are now watching commits on this project",
+                "status": "ok",
+            },
+        )
+
+        data = {"watcher": "foo", "status": "-1"}
+
+        output = self.app.post(
+            "/api/0/test/watchers/update", headers=headers, data=data
+        )
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data, {"message": "Watch status reset", "status": "ok"},
         )
 
     @patch("pagure.utils.is_admin", MagicMock(return_value=True))

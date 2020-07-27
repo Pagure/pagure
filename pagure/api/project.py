@@ -2167,7 +2167,7 @@ def api_commit_add_flag(repo, commit_hash, username=None, namespace=None):
 @API.route(
     "/fork/<username>/<namespace>/<repo>/watchers/update", methods=["POST"]
 )
-@api_login_required(acls=["update_watch_status"])
+@api_login_required(acls=["modify_project", "update_watch_status"])
 @api_method
 def api_update_project_watchers(repo, username=None, namespace=None):
     """
@@ -2229,7 +2229,7 @@ def api_update_project_watchers(repo, username=None, namespace=None):
     """
 
     project = _get_repo(repo, username, namespace)
-    _check_token(project)
+    _check_token(project, project_token=False)
 
     # Get the input submitted
     data = get_request_data()
