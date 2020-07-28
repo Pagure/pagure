@@ -908,12 +908,17 @@ The default value is:
 
         "auth_handler": {
             "formatter": "standard",
-            "class": "logging.FileHandler",
+            "class": "logging.handlers.TimedRotatingFileHandler",
             "filename": "/var/log/pagure/pagure_auth.log",
-        }
+            "backupCount": 10,
+            "when": "midnight",
+            "utc": True,
+        },
 
-    Beware if you do this that you will also likely want to enable logrotate
-    on the system.
+    This snippet will automatically make the logs rotate at midnight each day,
+    keep the logs for 10 days and use UTC as timezone for the logs. Depending on
+    how your pagure instance is set-up, you may have to tweak the filesystem
+    permissions on the folder and file so the rotation works properly.
 
 
 ITEM_PER_PAGE
