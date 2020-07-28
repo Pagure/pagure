@@ -139,7 +139,7 @@ class PagureMilter(Milter.Base):
         msg_id = msg.get("In-Reply-To", None)
         if msg_id is None:
             self.log("No In-Reply-To, keep going")
-            return Milter.CONTINUE
+            return Milter.REJECT
 
         # Ensure we don't get extra lines in the message-id
         msg_id = msg_id.split("\n")[0].strip()
@@ -172,7 +172,12 @@ class PagureMilter(Milter.Base):
                 % from_email
             )
             session.remove()
-            return Milter.CONTINUE
+            self.setreply(
+                "550",
+                xcode="5.7.1",
+                msg="The sender address <%s> isn't recognized." % from_email
+            )
+            return Milter.REJECT
 
         hashes = []
         for email_obj in user.emails:
@@ -192,12 +197,12 @@ class PagureMilter(Milter.Base):
             self.log("tohash:    %s" % tohash)
             self.log("Hash does not correspond to the destination")
             session.remove()
-            return Milter.CONTINUE
+            return Milter.REJECT
 
         if msg["From"] and msg["From"] == _config.get("FROM_EMAIL"):
             self.log("Let's not process the email we send")
             session.remove()
-            return Milter.CONTINUE
+            return Milter.REJECT
 
         msg_id = clean_item(msg_id)
 
@@ -243,7 +248,7 @@ class PagureMilter(Milter.Base):
         self.log("Could not add the comment to ticket to pagure")
         self.log(req.text)
 
-        return Milter.CONTINUE
+        return Milter.REJECT
 
     def handle_request_email(self, emailobj, msg_id):
         """ Add the email as a comment on a request. """
@@ -274,7 +279,7 @@ class PagureMilter(Milter.Base):
         self.log("Could not add the comment to PR to pagure")
         self.log(req.text)
 
-        return Milter.CONTINUE
+        return Milter.REJECT
 
 
 def background():
