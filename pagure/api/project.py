@@ -660,13 +660,17 @@ def api_git_branches(repo, username=None, namespace=None):
 
         {
           "total_branches": 2,
-          "branches": ["master", "dev"]
+          "branches": ["main", "dev"]
+          "default": "main"
         }
 
         {
           "total_branches": 2,
+          "default": {
+            "main": "16ae2a4df107658b52750063ae203f978cf02ff7",
+          }
           "branches": {
-            "master": "16ae2a4df107658b52750063ae203f978cf02ff7",
+            "main": "16ae2a4df107658b52750063ae203f978cf02ff7",
             "dev": "8351c460167a41defc393f5b6c1d51fe1b3b82b8"
           }
         }
@@ -680,10 +684,105 @@ def api_git_branches(repo, username=None, namespace=None):
     repo = _get_repo(repo, username, namespace)
 
     branches = pagure.lib.git.get_git_branches(repo, with_commits=with_commits)
+    default_name = default_commit = None
+    try:
+        default_name, default_commit = pagure.lib.git.get_default_git_branches(
+            repo
+        )
+    except pygit2.GitError:
+        pass
 
-    return flask.jsonify(
-        {"total_branches": len(branches), "branches": branches}
-    )
+    output = {
+        "total_branches": len(branches),
+        "branches": branches,
+        "default": {},
+    }
+    if with_commits:
+        if default_name:
+            output["default"] = {default_name: default_commit}
+    else:
+        output["default"] = default_name
+
+    return flask.jsonify(output)
+
+
+@API.route("/<repo>/git/branches", methods=["POST"])
+@API.route("/<namespace>/<repo>/git/branches", methods=["POST"])
+@API.route("/fork/<username>/<repo>/git/branches", methods=["POST"])
+@API.route(
+    "/fork/<username>/<namespace>/<repo>/git/branches", methods=["POST"]
+)
+@api_login_required(acls=["modify_project"])
+@api_method
+def api_set_git_default_branch(repo, username=None, namespace=None):
+    """
+    Set the default git branch
+    --------------------------
+    Set the default git branch of the git repository
+
+    ::
+
+        POST /api/0/<repo>/git/branches
+        POST /api/0/<namespace>/<repo>/git/branches
+
+    ::
+
+        POST /api/0/fork/<username>/<repo>/git/branches
+        POST /api/0/fork/<username>/<namespace>/<repo>/git/branches
+
+    Parameters
+    ^^^^^^^^^^
+
+    +-----------------+----------+---------------+--------------------------+
+    | Key             | Type     | Optionality   | Description              |
+    +=================+==========+===============+==========================+
+    | ``branch_name`` | string   | Mandatory     | | Name of the git branch |
+    |                 |          |               |   to be made the default |
+    |                 |          |               |   branch of the git repo |
+    +-----------------+----------+---------------+--------------------------+
+    | ``with_commits``| boolean  | Optional      | | Include the commit hash|
+    |                 |          |               |   corresponding to the   |
+    |                 |          |               |   HEAD of each branch    |
+    +-----------------+----------+---------------+--------------------------+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "total_branches": 2,
+          "branches": ["main", "dev"]
+          "default": "main"
+        }
+
+        {
+          "total_branches": 2,
+          "default": {
+            "main": "16ae2a4df107658b52750063ae203f978cf02ff7",
+          }
+          "branches": {
+            "main": "16ae2a4df107658b52750063ae203f978cf02ff7",
+            "dev": "8351c460167a41defc393f5b6c1d51fe1b3b82b8"
+          }
+        }
+
+    """
+
+    branch_name = flask.request.values.get("branch_name")
+
+    repo = _get_repo(repo, username, namespace)
+    _check_token(repo, project_token=False)
+
+    try:
+        pagure.lib.git.git_set_ref_head(project=repo, branch=branch_name)
+    except Exception as err:
+        _log.exception(err)
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.EGITERROR, error=str(err)
+        )
+
+    return api_git_branches(repo.name, username=username, namespace=namespace)
 
 
 @API.route("/<repo>/tree")

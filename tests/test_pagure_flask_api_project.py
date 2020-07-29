@@ -117,93 +117,6 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
         shutil.rmtree(newpath)
 
-    def test_api_git_branches(self):
-        """ Test the api_git_branches method of the flask api. """
-        # Create a git repo to add branches to
-        tests.create_projects(self.session)
-        repo_path = os.path.join(self.path, "repos", "test.git")
-        tests.add_content_git_repo(repo_path)
-        new_repo_path = tempfile.mkdtemp(prefix="pagure-api-git-branches-test")
-        clone_repo = pygit2.clone_repository(repo_path, new_repo_path)
-
-        # Create two other branches based on master
-        for branch in ["pats-win-49", "pats-win-51"]:
-            clone_repo.create_branch(branch, clone_repo.head.peel())
-            refname = "refs/heads/{0}:refs/heads/{0}".format(branch)
-            PagureRepo.push(clone_repo.remotes[0], refname)
-
-        # Check that the branches show up on the API
-        output = self.app.get("/api/0/test/git/branches")
-        # Delete the cloned git repo after the API call
-        shutil.rmtree(new_repo_path)
-
-        # Verify the API data
-        self.assertEqual(output.status_code, 200)
-        data = json.loads(output.get_data(as_text=True))
-        self.assertDictEqual(
-            data,
-            {
-                "branches": ["master", "pats-win-49", "pats-win-51"],
-                "total_branches": 3,
-            },
-        )
-
-    def test_api_git_branches_with_commits(self):
-        """ Test the api_git_branches method of the flask api with with_commits=True. """
-        # Create a git repo to add branches to
-        tests.create_projects(self.session)
-        repo_path = os.path.join(self.path, "repos", "test.git")
-        tests.add_content_git_repo(repo_path)
-        new_repo_path = tempfile.mkdtemp(prefix="pagure-api-git-branches-test")
-        clone_repo = pygit2.clone_repository(repo_path, new_repo_path)
-
-        # Create two other branches based on master
-        for branch in ["pats-win-49", "pats-win-51"]:
-            clone_repo.create_branch(branch, clone_repo.head.peel())
-            refname = "refs/heads/{0}:refs/heads/{0}".format(branch)
-            PagureRepo.push(clone_repo.remotes[0], refname)
-
-        # Check that the branches show up on the API
-        output = self.app.get("/api/0/test/git/branches?with_commits=true")
-        # Delete the cloned git repo after the API call
-        shutil.rmtree(new_repo_path)
-
-        # Get the commit hex
-        repo_obj = pygit2.Repository(
-            os.path.join(self.path, "repos", "test.git")
-        )
-        commit = repo_obj[repo_obj.head.target]
-
-        # Verify the API data
-        self.assertEqual(output.status_code, 200)
-        data = json.loads(output.get_data(as_text=True))
-        self.assertDictEqual(
-            data,
-            {
-                "branches": {
-                    "master": commit.hex,
-                    "pats-win-49": commit.hex,
-                    "pats-win-51": commit.hex,
-                },
-                "total_branches": 3,
-            },
-        )
-
-    def test_api_git_branches_empty_repo(self):
-        """ Test the api_git_branches method of the flask api when the repo is
-        empty.
-        """
-        # Create a git repo without any branches
-        tests.create_projects(self.session)
-        repo_base_path = os.path.join(self.path, "repos")
-        tests.create_projects_git(repo_base_path)
-
-        # Check that no branches show up on the API
-        output = self.app.get("/api/0/test/git/branches")
-        self.assertEqual(output.status_code, 200)
-        data = json.loads(output.get_data(as_text=True))
-        self.assertDictEqual(data, {"branches": [], "total_branches": 0})
-
     def test_api_git_branches_no_repo(self):
         """ Test the api_git_branches method of the flask api when there is no
         repo on a project.
@@ -4571,6 +4484,211 @@ class PagureFlaskApiProjectCommitInfotests(tests.Modeltests):
             pagure.api.APIERROR.ENOCOMMIT.name, data["error_code"]
         )
         self.assertEqual(pagure.api.APIERROR.ENOCOMMIT.value, data["error"])
+
+
+class PagureFlaskApiProjectGitBranchestests(tests.Modeltests):
+    """ Tests for the flask API of pagure for git branches
+    """
+
+    maxDiff = None
+
+    def setUp(self):
+        """ Set up the environnment, ran before every tests. """
+        super(PagureFlaskApiProjectGitBranchestests, self).setUp()
+
+        tests.create_projects(self.session)
+        repo_path = os.path.join(self.path, "repos")
+        self.git_path = os.path.join(repo_path, "test.git")
+        tests.create_projects_git(repo_path, bare=True)
+        tests.add_content_git_repo(self.git_path)
+
+        tests.create_tokens(self.session, project_id=None)
+        # Set a default ACL to avoid get all rights set on
+        tests.create_tokens_acl(self.session, "foo_token", "modify_project")
+        tests.create_tokens_acl(self.session, "aaabbbcccddd", "create_branch")
+
+        # Add a couple of branches to the test project
+        repo_obj = pygit2.Repository(self.git_path)
+        self.commit = repo_obj.revparse_single("HEAD")
+
+        new_repo_path = os.path.join(self.path, "lcl_forks")
+        clone_repo = pygit2.clone_repository(self.git_path, new_repo_path)
+
+        # Create two other branches based on master
+        for branch in ["pats-win-49", "pats-win-51"]:
+            clone_repo.create_branch(branch, clone_repo.head.peel())
+            refname = "refs/heads/{0}:refs/heads/{0}".format(branch)
+            PagureRepo.push(clone_repo.remotes[0], refname)
+
+    def test_api_git_branches(self):
+        """ Test the api_git_branches method of the flask api. """
+        # Check that the branches show up on the API
+        output = self.app.get("/api/0/test/git/branches")
+
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                "branches": ["master", "pats-win-49", "pats-win-51"],
+                "default": "master",
+                "total_branches": 3,
+            },
+        )
+
+    def test_api_git_branches_with_commits(self):
+        """ Test the api_git_branches method of the flask api with with_commits=True. """
+        # Check that the branches show up on the API
+        output = self.app.get("/api/0/test/git/branches?with_commits=true")
+
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                "branches": {
+                    "master": self.commit.hex,
+                    "pats-win-49": self.commit.hex,
+                    "pats-win-51": self.commit.hex,
+                },
+                "default": {"master": self.commit.hex,},
+                "total_branches": 3,
+            },
+        )
+
+    def test_api_git_branches_empty_repo(self):
+        """ Test the api_git_branches method of the flask api when the repo is
+        empty.
+        """
+        # Check that no branches show up on the API
+        output = self.app.get("/api/0/test2/git/branches")
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data, {"branches": [], "default": None, "total_branches": 0}
+        )
+
+    def test_api_set_git_default_branch(self):
+        """ Test the api_git_branches method of the flask api. """
+        headers = {"Authorization": "token foo_token"}
+        data = {"branch_name": "pats-win-49"}
+        output = self.app.post(
+            "/api/0/test/git/branches", data=data, headers=headers
+        )
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                "branches": ["master", "pats-win-49", "pats-win-51"],
+                "default": "pats-win-49",
+                "total_branches": 3,
+            },
+        )
+
+    def test_api_set_git_default_branch_with_commits_form(self):
+        """ Test the api_git_branches method of the flask api with with_commits=True. """
+        headers = {"Authorization": "token foo_token"}
+        data = {"branch_name": "pats-win-49", "with_commits": True}
+        output = self.app.post(
+            "/api/0/test/git/branches", data=data, headers=headers
+        )
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                "branches": {
+                    "master": self.commit.hex,
+                    "pats-win-49": self.commit.hex,
+                    "pats-win-51": self.commit.hex,
+                },
+                "default": {"pats-win-49": self.commit.hex,},
+                "total_branches": 3,
+            },
+        )
+
+    def test_api_set_git_default_branch_with_commits_url(self):
+        """ Test the api_git_branches method of the flask api with with_commits=True. """
+        headers = {"Authorization": "token foo_token"}
+        data = {"branch_name": "pats-win-49"}
+        output = self.app.post(
+            "/api/0/test/git/branches?with_commits=1",
+            data=data,
+            headers=headers,
+        )
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                "branches": {
+                    "master": self.commit.hex,
+                    "pats-win-49": self.commit.hex,
+                    "pats-win-51": self.commit.hex,
+                },
+                "default": {"pats-win-49": self.commit.hex,},
+                "total_branches": 3,
+            },
+        )
+
+    def test_api_set_git_default_branch_invalid_branch(self):
+        """ Test the api_git_branches method of the flask api with with_commits=True. """
+        headers = {"Authorization": "token foo_token"}
+        data = {"branch_name": "main"}
+        output = self.app.post(
+            "/api/0/test/git/branches?with_commits=1",
+            data=data,
+            headers=headers,
+        )
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                "error": "An error occurred during a git operation",
+                "error_code": "EGITERROR",
+            },
+        )
+
+    def test_api_set_git_default_branch_invalid_token(self):
+        """ Test the api_git_branches method of the flask api with with_commits=True. """
+        headers = {"Authorization": "token aaabbbcccddd"}
+        data = {"branch_name": "main"}
+        output = self.app.post(
+            "/api/0/test/git/branches", data=data, headers=headers,
+        )
+        self.assertEqual(output.status_code, 401)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                "error": "Invalid or expired token. Please visit "
+                "http://localhost.localdomain/settings#nav-api-tab to get or renew "
+                "your API token.",
+                "error_code": "EINVALIDTOK",
+                "errors": "Missing ACLs: modify_project",
+            },
+        )
+
+    def test_api_set_git_default_branch_empty_repo(self):
+        """ Test the api_git_branches method of the flask api when the repo is
+        empty.
+        """
+        headers = {"Authorization": "token foo_token"}
+        data = {"branch_name": "main"}
+        output = self.app.post(
+            "/api/0/test2/git/branches", data=data, headers=headers
+        )
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                "error": "An error occurred during a git operation",
+                "error_code": "EGITERROR",
+            },
+        )
 
 
 if __name__ == "__main__":

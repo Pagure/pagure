@@ -2608,6 +2608,19 @@ def get_git_branches(project, with_commits=False):
     return branches
 
 
+def get_default_git_branches(project):
+    """ Return a tuple of the default branchname and its head commit hash
+    :arg project: The Project instance to get the branches for
+    """
+    repo_path = pagure.utils.get_repo_path(project)
+    repo_obj = PagureRepo(repo_path)
+    branchname = repo_obj.head.shorthand
+    branch = repo_obj.lookup_branch(branchname)
+    commit = branch.peel(pygit2.Commit)
+
+    return branchname, commit.oid.hex
+
+
 def new_git_branch(
     username, project, branch, from_branch=None, from_commit=None
 ):
