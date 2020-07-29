@@ -1987,155 +1987,6 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 json.loads(output.get_data(as_text=True)), expected_data
             )
 
-    def test_api_new_project(self):
-        """ Test the api_new_project method of the flask api. """
-
-        tests.create_projects(self.session)
-        tests.create_projects_git(os.path.join(self.path, "tickets"))
-        tests.create_tokens(self.session)
-        tests.create_tokens_acl(self.session)
-
-        headers = {"Authorization": "token foo_token"}
-
-        # Invalid token
-        output = self.app.post("/api/0/new", headers=headers)
-        self.assertEqual(output.status_code, 401)
-        data = json.loads(output.get_data(as_text=True))
-        self.assertEqual(
-            sorted(data.keys()), ["error", "error_code", "errors"]
-        )
-        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data["error"])
-        self.assertEqual(
-            pagure.api.APIERROR.EINVALIDTOK.name, data["error_code"]
-        )
-        self.assertEqual(data["errors"], "Missing ACLs: create_project")
-
-        headers = {"Authorization": "token aaabbbcccddd"}
-
-        # No input
-        output = self.app.post("/api/0/new", headers=headers)
-        self.assertEqual(output.status_code, 400)
-        data = json.loads(output.get_data(as_text=True))
-        self.assertDictEqual(
-            data,
-            {
-                "error": "Invalid or incomplete input submitted",
-                "error_code": "EINVALIDREQ",
-                "errors": {
-                    "name": ["This field is required."],
-                    "description": ["This field is required."],
-                },
-            },
-        )
-
-        data = {"name": "test"}
-
-        # Incomplete request
-        output = self.app.post("/api/0/new", data=data, headers=headers)
-        self.assertEqual(output.status_code, 400)
-        data = json.loads(output.get_data(as_text=True))
-        self.assertDictEqual(
-            data,
-            {
-                "error": "Invalid or incomplete input submitted",
-                "error_code": "EINVALIDREQ",
-                "errors": {"description": ["This field is required."]},
-            },
-        )
-
-        data = {"name": "test", "description": "Just a small test project"}
-
-        # Valid request but repo already exists
-        output = self.app.post("/api/0/new/", data=data, headers=headers)
-        self.assertEqual(output.status_code, 400)
-        data = json.loads(output.get_data(as_text=True))
-        self.assertDictEqual(
-            data,
-            {
-                "error": 'It is not possible to create the repo "test"',
-                "error_code": "ENOCODE",
-            },
-        )
-
-        data = {
-            "name": "api1",
-            "description": "Mighty mighty description",
-            "avatar_email": 123,
-        }
-
-        # invalid avatar_email - number
-        output = self.app.post("/api/0/new/", data=data, headers=headers)
-        self.assertEqual(output.status_code, 400)
-        data = json.loads(output.get_data(as_text=True))
-        self.assertDictEqual(
-            data,
-            {
-                "error": "Invalid or incomplete input submitted",
-                "error_code": "EINVALIDREQ",
-                "errors": {"avatar_email": ["avatar_email must be an email"]},
-            },
-        )
-
-        data = {
-            "name": "api1",
-            "description": "Mighty mighty description",
-            "avatar_email": [1, 2, 3],
-        }
-
-        # invalid avatar_email - list
-        output = self.app.post("/api/0/new/", data=data, headers=headers)
-        self.assertEqual(output.status_code, 400)
-        data = json.loads(output.get_data(as_text=True))
-        self.assertDictEqual(
-            data,
-            {
-                "error": "Invalid or incomplete input submitted",
-                "error_code": "EINVALIDREQ",
-                "errors": {"avatar_email": ["avatar_email must be an email"]},
-            },
-        )
-
-        data = {
-            "name": "api1",
-            "description": "Mighty mighty description",
-            "avatar_email": True,
-        }
-
-        # invalid avatar_email - boolean
-        output = self.app.post("/api/0/new/", data=data, headers=headers)
-        self.assertEqual(output.status_code, 400)
-        data = json.loads(output.get_data(as_text=True))
-        self.assertDictEqual(
-            data,
-            {
-                "error": "Invalid or incomplete input submitted",
-                "error_code": "EINVALIDREQ",
-                "errors": {"avatar_email": ["avatar_email must be an email"]},
-            },
-        )
-
-        data = {
-            "name": "api1",
-            "description": "Mighty mighty description",
-            "avatar_email": "mighty@email.com",
-        }
-
-        # valid avatar_email
-        output = self.app.post("/api/0/new/", data=data, headers=headers)
-        self.assertEqual(output.status_code, 200)
-        data = json.loads(output.get_data(as_text=True))
-        self.assertDictEqual(data, {"message": 'Project "api1" created'})
-
-        data = {
-            "name": "test_42",
-            "description": "Just another small test project",
-        }
-
-        # Valid request
-        output = self.app.post("/api/0/new/", data=data, headers=headers)
-        self.assertEqual(output.status_code, 200)
-        data = json.loads(output.get_data(as_text=True))
-        self.assertDictEqual(data, {"message": 'Project "test_42" created'})
 
     @patch.dict(
         "pagure.config.config",
@@ -2193,189 +2044,6 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             data = json.loads(output.get_data(as_text=True))
             self.assertDictEqual(data, {"message": 'Project "test" created'})
-
-    @patch.dict("pagure.config.config", {"PRIVATE_PROJECTS": True})
-    def test_api_new_project_private(self):
-        """ Test the api_new_project method of the flask api to create
-        a private project. """
-
-        tests.create_projects(self.session)
-        tests.create_projects_git(os.path.join(self.path, "tickets"))
-        tests.create_tokens(self.session)
-        tests.create_tokens_acl(self.session)
-
-        headers = {"Authorization": "token aaabbbcccddd"}
-
-        data = {
-            "name": "test",
-            "description": "Just a small test project",
-            "private": True,
-        }
-
-        # Valid request
-        output = self.app.post("/api/0/new/", data=data, headers=headers)
-        self.assertEqual(output.status_code, 200)
-        data = json.loads(output.get_data(as_text=True))
-        self.assertDictEqual(
-            data, {"message": 'Project "pingou/test" created'}
-        )
-
-    def test_api_new_project_user_token(self):
-        """ Test the api_new_project method of the flask api. """
-        tests.create_projects(self.session)
-        tests.create_projects_git(os.path.join(self.path, "tickets"))
-        tests.create_tokens(self.session, project_id=None)
-        tests.create_tokens_acl(self.session)
-
-        headers = {"Authorization": "token foo_token"}
-
-        # Invalid token
-        output = self.app.post("/api/0/new", headers=headers)
-        self.assertEqual(output.status_code, 401)
-        data = json.loads(output.get_data(as_text=True))
-        self.assertEqual(
-            sorted(data.keys()), ["error", "error_code", "errors"]
-        )
-        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data["error"])
-        self.assertEqual(
-            pagure.api.APIERROR.EINVALIDTOK.name, data["error_code"]
-        )
-        self.assertEqual(data["errors"], "Missing ACLs: create_project")
-
-        headers = {"Authorization": "token aaabbbcccddd"}
-
-        # No input
-        output = self.app.post("/api/0/new", headers=headers)
-        self.assertEqual(output.status_code, 400)
-        data = json.loads(output.get_data(as_text=True))
-        self.assertDictEqual(
-            data,
-            {
-                "error": "Invalid or incomplete input submitted",
-                "error_code": "EINVALIDREQ",
-                "errors": {
-                    "name": ["This field is required."],
-                    "description": ["This field is required."],
-                },
-            },
-        )
-
-        data = {"name": "test"}
-
-        # Incomplete request
-        output = self.app.post("/api/0/new", data=data, headers=headers)
-        self.assertEqual(output.status_code, 400)
-        data = json.loads(output.get_data(as_text=True))
-        self.assertDictEqual(
-            data,
-            {
-                "error": "Invalid or incomplete input submitted",
-                "error_code": "EINVALIDREQ",
-                "errors": {"description": ["This field is required."]},
-            },
-        )
-
-        data = {"name": "test", "description": "Just a small test project"}
-
-        # Valid request but repo already exists
-        output = self.app.post("/api/0/new/", data=data, headers=headers)
-        self.assertEqual(output.status_code, 400)
-        data = json.loads(output.get_data(as_text=True))
-        self.assertDictEqual(
-            data,
-            {
-                "error": 'It is not possible to create the repo "test"',
-                "error_code": "ENOCODE",
-            },
-        )
-
-        data = {
-            "name": "test_42",
-            "description": "Just another small test project",
-        }
-
-        # Valid request
-        output = self.app.post("/api/0/new/", data=data, headers=headers)
-        self.assertEqual(output.status_code, 200)
-        data = json.loads(output.get_data(as_text=True))
-        self.assertDictEqual(data, {"message": 'Project "test_42" created'})
-
-        # Project with a namespace
-        pagure.config.config["ALLOWED_PREFIX"] = ["rpms"]
-        data = {
-            "name": "test_42",
-            "namespace": "pingou",
-            "description": "Just another small test project",
-        }
-
-        # Invalid namespace
-        output = self.app.post("/api/0/new/", data=data, headers=headers)
-        self.assertEqual(output.status_code, 400)
-        data = json.loads(output.get_data(as_text=True))
-        self.assertDictEqual(
-            data,
-            {
-                "error": "Invalid or incomplete input submitted",
-                "error_code": "EINVALIDREQ",
-                "errors": {"namespace": ["Not a valid choice"]},
-            },
-        )
-
-        data = {
-            "name": "test_42",
-            "namespace": "rpms",
-            "description": "Just another small test project",
-        }
-
-        # All good
-        output = self.app.post("/api/0/new/", data=data, headers=headers)
-        self.assertEqual(output.status_code, 200)
-        data = json.loads(output.get_data(as_text=True))
-        self.assertDictEqual(
-            data, {"message": 'Project "rpms/test_42" created'}
-        )
-
-    @patch.dict("pagure.config.config", {"USER_NAMESPACE": True})
-    def test_api_new_project_user_ns(self):
-        """ Test the api_new_project method of the flask api. """
-        tests.create_projects(self.session)
-        tests.create_projects_git(os.path.join(self.path, "tickets"))
-        tests.create_tokens(self.session)
-        tests.create_tokens_acl(self.session)
-
-        headers = {"Authorization": "token aaabbbcccddd"}
-
-        # Create a project with the user namespace feature on
-        data = {
-            "name": "testproject",
-            "description": "Just another small test project",
-        }
-
-        # Valid request
-        output = self.app.post("/api/0/new/", data=data, headers=headers)
-        self.assertEqual(output.status_code, 200)
-        data = json.loads(output.get_data(as_text=True))
-        self.assertDictEqual(
-            data, {"message": 'Project "pingou/testproject" created'}
-        )
-
-        # Create a project with a namespace and the user namespace feature on
-        data = {
-            "name": "testproject2",
-            "namespace": "testns",
-            "description": "Just another small test project",
-        }
-
-        # Valid request
-        with patch.dict(
-            "pagure.config.config", {"ALLOWED_PREFIX": ["testns"]}
-        ):
-            output = self.app.post("/api/0/new/", data=data, headers=headers)
-        self.assertEqual(output.status_code, 200)
-        data = json.loads(output.get_data(as_text=True))
-        self.assertDictEqual(
-            data, {"message": 'Project "testns/testproject2" created'}
-        )
 
     def test_api_fork_project(self):
         """ Test the api_fork_project method of the flask api. """
@@ -4688,6 +4356,361 @@ class PagureFlaskApiProjectGitBranchestests(tests.Modeltests):
                 "error": "An error occurred during a git operation",
                 "error_code": "EGITERROR",
             },
+        )
+
+
+class PagureFlaskApiProjectCreateProjectTests(tests.Modeltests):
+    """ Tests for the flask API of pagure for git branches
+    """
+
+    maxDiff = None
+
+    def setUp(self):
+        """ Set up the environnment, ran before every tests. """
+        super(PagureFlaskApiProjectCreateProjectTests, self).setUp()
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, "tickets"))
+        tests.create_tokens(self.session)
+        tests.create_tokens(self.session, suffix="_user", project_id=None)
+        tests.create_tokens_acl(self.session)
+        tests.create_tokens_acl(self.session, token_id="aaabbbcccddd_user")
+
+    def test_api_new_project_invalid_token(self):
+
+        headers = {"Authorization": "token foo_token"}
+
+        # Invalid token
+        output = self.app.post("/api/0/new", headers=headers)
+        self.assertEqual(output.status_code, 401)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(
+            sorted(data.keys()), ["error", "error_code", "errors"]
+        )
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data["error"])
+        self.assertEqual(
+            pagure.api.APIERROR.EINVALIDTOK.name, data["error_code"]
+        )
+        self.assertEqual(data["errors"], "Missing ACLs: create_project")
+
+    def test_api_new_project_no_input(self):
+
+        headers = {"Authorization": "token aaabbbcccddd"}
+
+        # No input
+        output = self.app.post("/api/0/new", headers=headers)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                "error": "Invalid or incomplete input submitted",
+                "error_code": "EINVALIDREQ",
+                "errors": {
+                    "name": ["This field is required."],
+                    "description": ["This field is required."],
+                },
+            },
+        )
+
+    def test_api_new_project_incomplete_request(self):
+
+        headers = {"Authorization": "token aaabbbcccddd"}
+        data = {"name": "test"}
+
+        # Incomplete request
+        output = self.app.post("/api/0/new", data=data, headers=headers)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                "error": "Invalid or incomplete input submitted",
+                "error_code": "EINVALIDREQ",
+                "errors": {"description": ["This field is required."]},
+            },
+        )
+
+    def test_api_new_project_existing_repo(self):
+
+        headers = {"Authorization": "token aaabbbcccddd"}
+        data = {"name": "test", "description": "Just a small test project"}
+
+        # Valid request but repo already exists
+        output = self.app.post("/api/0/new/", data=data, headers=headers)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                "error": 'It is not possible to create the repo "test"',
+                "error_code": "ENOCODE",
+            },
+        )
+
+    def test_api_new_project_invalid_avatar_email_int(self):
+
+        headers = {"Authorization": "token aaabbbcccddd"}
+        data = {
+            "name": "api1",
+            "description": "Mighty mighty description",
+            "avatar_email": 123,
+        }
+
+        # invalid avatar_email - number
+        output = self.app.post("/api/0/new/", data=data, headers=headers)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                "error": "Invalid or incomplete input submitted",
+                "error_code": "EINVALIDREQ",
+                "errors": {"avatar_email": ["avatar_email must be an email"]},
+            },
+        )
+
+    def test_api_new_project_invalid_avatar_email_list(self):
+
+        headers = {"Authorization": "token aaabbbcccddd"}
+        data = {
+            "name": "api1",
+            "description": "Mighty mighty description",
+            "avatar_email": [1, 2, 3],
+        }
+
+        # invalid avatar_email - list
+        output = self.app.post("/api/0/new/", data=data, headers=headers)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                "error": "Invalid or incomplete input submitted",
+                "error_code": "EINVALIDREQ",
+                "errors": {"avatar_email": ["avatar_email must be an email"]},
+            },
+        )
+
+    def test_api_new_project_invalid_avatar_email_bool(self):
+
+        headers = {"Authorization": "token aaabbbcccddd"}
+        data = {
+            "name": "api1",
+            "description": "Mighty mighty description",
+            "avatar_email": True,
+        }
+
+        # invalid avatar_email - boolean
+        output = self.app.post("/api/0/new/", data=data, headers=headers)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                "error": "Invalid or incomplete input submitted",
+                "error_code": "EINVALIDREQ",
+                "errors": {"avatar_email": ["avatar_email must be an email"]},
+            },
+        )
+
+    def test_api_new_project_with_avatar(self):
+
+        headers = {"Authorization": "token aaabbbcccddd"}
+        data = {
+            "name": "api1",
+            "description": "Mighty mighty description",
+            "avatar_email": "mighty@email.com",
+        }
+
+        # valid avatar_email
+        output = self.app.post("/api/0/new/", data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(data, {"message": 'Project "api1" created'})
+
+    def test_api_new_project(self):
+
+        headers = {"Authorization": "token aaabbbcccddd"}
+        data = {
+            "name": "test_42",
+            "description": "Just another small test project",
+        }
+
+        # Valid request
+        output = self.app.post("/api/0/new/", data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(data, {"message": 'Project "test_42" created'})
+
+    @patch.dict("pagure.config.config", {"PRIVATE_PROJECTS": True})
+    def test_api_new_project_private(self):
+        """ Test the api_new_project method of the flask api to create
+        a private project. """
+
+        headers = {"Authorization": "token aaabbbcccddd"}
+
+        data = {
+            "name": "test",
+            "description": "Just a small test project",
+            "private": True,
+        }
+
+        # Valid request
+        output = self.app.post("/api/0/new/", data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data, {"message": 'Project "pingou/test" created'}
+        )
+
+    def test_api_new_project_user_token(self):
+        """ Test the api_new_project method of the flask api. """
+
+        headers = {"Authorization": "token foo_token_user"}
+
+        # Invalid token
+        output = self.app.post("/api/0/new", headers=headers)
+        self.assertEqual(output.status_code, 401)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(
+            sorted(data.keys()), ["error", "error_code", "errors"]
+        )
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data["error"])
+        self.assertEqual(
+            pagure.api.APIERROR.EINVALIDTOK.name, data["error_code"]
+        )
+        self.assertEqual(data["errors"], "Missing ACLs: create_project")
+
+        headers = {"Authorization": "token aaabbbcccddd_user"}
+
+        # No input
+        output = self.app.post("/api/0/new", headers=headers)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                "error": "Invalid or incomplete input submitted",
+                "error_code": "EINVALIDREQ",
+                "errors": {
+                    "name": ["This field is required."],
+                    "description": ["This field is required."],
+                },
+            },
+        )
+
+        data = {"name": "test"}
+
+        # Incomplete request
+        output = self.app.post("/api/0/new", data=data, headers=headers)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                "error": "Invalid or incomplete input submitted",
+                "error_code": "EINVALIDREQ",
+                "errors": {"description": ["This field is required."]},
+            },
+        )
+
+        data = {"name": "test", "description": "Just a small test project"}
+
+        # Valid request but repo already exists
+        output = self.app.post("/api/0/new/", data=data, headers=headers)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                "error": 'It is not possible to create the repo "test"',
+                "error_code": "ENOCODE",
+            },
+        )
+
+        data = {
+            "name": "test_42",
+            "description": "Just another small test project",
+        }
+
+        # Valid request
+        output = self.app.post("/api/0/new/", data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(data, {"message": 'Project "test_42" created'})
+
+        # Project with a namespace
+        pagure.config.config["ALLOWED_PREFIX"] = ["rpms"]
+        data = {
+            "name": "test_42",
+            "namespace": "pingou",
+            "description": "Just another small test project",
+        }
+
+        # Invalid namespace
+        output = self.app.post("/api/0/new/", data=data, headers=headers)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                "error": "Invalid or incomplete input submitted",
+                "error_code": "EINVALIDREQ",
+                "errors": {"namespace": ["Not a valid choice"]},
+            },
+        )
+
+        data = {
+            "name": "test_42",
+            "namespace": "rpms",
+            "description": "Just another small test project",
+        }
+
+        # All good
+        output = self.app.post("/api/0/new/", data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data, {"message": 'Project "rpms/test_42" created'}
+        )
+
+    @patch.dict("pagure.config.config", {"USER_NAMESPACE": True})
+    def test_api_new_project_user_ns(self):
+        """ Test the api_new_project method of the flask api. """
+
+        headers = {"Authorization": "token aaabbbcccddd"}
+
+        # Create a project with the user namespace feature on
+        data = {
+            "name": "testproject",
+            "description": "Just another small test project",
+        }
+
+        # Valid request
+        output = self.app.post("/api/0/new/", data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data, {"message": 'Project "pingou/testproject" created'}
+        )
+
+        # Create a project with a namespace and the user namespace feature on
+        data = {
+            "name": "testproject2",
+            "namespace": "testns",
+            "description": "Just another small test project",
+        }
+
+        # Valid request
+        with patch.dict(
+            "pagure.config.config", {"ALLOWED_PREFIX": ["testns"]}
+        ):
+            output = self.app.post("/api/0/new/", data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data, {"message": 'Project "testns/testproject2" created'}
         )
 
 
