@@ -1616,6 +1616,7 @@ def new_project(
     user_ns=False,
     ignore_existing_repo=False,
     private=False,
+    default_branch=None,
 ):
     """ Create a new project based on the information provided.
 
@@ -1712,7 +1713,12 @@ def new_project(
     )
 
     return pagure.lib.tasks.create_project.delay(
-        user_obj.username, namespace, name, add_readme, ignore_existing_repo
+        user_obj.username,
+        namespace,
+        name,
+        add_readme,
+        ignore_existing_repo,
+        default_branch,
     )
 
 

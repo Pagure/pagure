@@ -658,35 +658,6 @@ class PagureFlaskApptests(tests.Modeltests):
                 )
             )
 
-    @patch.dict("pagure.config.config", {"CASE_SENSITIVE": True})
-    def test_new_project_case_sensitive(self):
-        tests.create_projects(self.session)
-        tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
-
-        output = self.app.get("/test")
-        self.assertEqual(output.status_code, 200)
-
-        output = self.app.get("/TEST")
-        self.assertEqual(output.status_code, 404)
-
-        user = tests.FakeUser()
-        user.username = "foo"
-        with tests.user_set(self.app.application, user):
-            output = self.app.get("/new/")
-            self.assertEqual(output.status_code, 200)
-
-            csrf_token = self.get_csrf(output=output)
-            data = {
-                "description": "TEST",
-                "name": "TEST",
-                "csrf_token": csrf_token,
-                "create_readme": True,
-            }
-            self.app.post("/new/", data=data, follow_redirects=True)
-
-            output = self.app.get("/TEST")
-            self.assertEqual(output.status_code, 200)
-
     @patch("pagure.ui.app.admin_session_timedout")
     def test_user_settings(self, ast):
         """ Test the user_settings endpoint. """
@@ -2298,6 +2269,70 @@ class PagureFlaskAppNewProjecttests(tests.Modeltests):
             )
         )
 
+    @patch.dict("pagure.config.config", {"CASE_SENSITIVE": True})
+    def test_new_project_case_sensitive(self):
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
+
+        output = self.app.get("/test")
+        self.assertEqual(output.status_code, 200)
+
+        output = self.app.get("/TEST")
+        self.assertEqual(output.status_code, 404)
+
+        user = tests.FakeUser()
+        user.username = "foo"
+        with tests.user_set(self.app.application, user):
+            output = self.app.get("/new/")
+            self.assertEqual(output.status_code, 200)
+
+            csrf_token = self.get_csrf(output=output)
+            data = {
+                "description": "TEST",
+                "name": "TEST",
+                "csrf_token": csrf_token,
+                "create_readme": True,
+            }
+            self.app.post("/new/", data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+
+            output = self.app.get("/TEST")
+            self.assertEqual(output.status_code, 200)
+
+    def test_new_project_readme(self):
+        # Before
+        projects = pagure.lib.query.search_projects(self.session)
+        self.assertEqual(len(projects), 0)
+
+        user = tests.FakeUser(username="foo")
+        with tests.user_set(self.app.application, user):
+            csrf_token = self.get_csrf()
+
+            data = {
+                "description": "testproject",
+                "name": "testproject",
+                "csrf_token": csrf_token,
+                "create_readme": True,
+            }
+            output = self.app.post("/new/", data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                "<title>Overview - testproject - Pagure</title>", output_text
+            )
+            self.assertIn(
+                '<a href="/testproject"><strong>testproject</strong></a>',
+                output_text,
+            )
+
+        # After
+        projects = pagure.lib.query.search_projects(self.session)
+        self.assertEqual(len(projects), 1)
+
+        project = pagure.lib.query._get_project(self.session, "testproject")
+        repo = pygit2.Repository(project.repopath("main"))
+        self.assertEqual(repo.listall_branches(), ["master"])
+
     @patch.dict("pagure.config.config", {"ENABLE_UI_NEW_PROJECTS": False})
     def test_new_project_when_turned_off_in_the_ui(self):
         """ Test the new_project endpoint when new project creation is
@@ -2425,6 +2460,45 @@ class PagureFlaskAppNewProjecttests(tests.Modeltests):
         # After
         projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 1)
+
+        repo = pygit2.Repository(projects[0].repopath("main"))
+        self.assertEqual(repo.listall_branches(), [])
+
+    def test_new_project_with_default_branch(self):
+        """ Test the new_project endpoint when new project contains a plus sign.
+        """
+        # Before
+        projects = pagure.lib.query.search_projects(self.session)
+        self.assertEqual(len(projects), 0)
+
+        user = tests.FakeUser(username="foo")
+        with tests.user_set(self.app.application, user):
+            csrf_token = self.get_csrf()
+
+            data = {
+                "description": "Project #1.",
+                "name": "project_main",
+                "csrf_token": csrf_token,
+                "default_branch": "main",
+                "create_readme": True,
+            }
+            output = self.app.post("/new/", data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                "<title>Overview - project_main - Pagure</title>", output_text
+            )
+            self.assertIn(
+                '<a href="/project_main"><strong>project_main</strong></a>',
+                output_text,
+            )
+
+        # After
+        projects = pagure.lib.query.search_projects(self.session)
+        self.assertEqual(len(projects), 1)
+
+        repo = pygit2.Repository(projects[0].repopath("main"))
+        self.assertEqual(repo.listall_branches(), ["main"])
 
     def test_new_project_when_turned_off(self):
         """ Test the new_project endpoint when new project creation is

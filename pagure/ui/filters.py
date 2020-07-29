@@ -17,12 +17,14 @@ from __future__ import unicode_literals, absolute_import
 
 import textwrap
 import logging
+import os
 from os.path import splitext
 
 import arrow
+import bleach
 import flask
 import six
-import bleach
+import pygit2
 
 from six.moves.urllib.parse import urlparse, parse_qsl
 from jinja2 import escape
@@ -861,3 +863,25 @@ def get_patch_stats(patch):
         _log.exception("Failed to get stats on a patch")
         output = {}
     return output
+
+
+@UI_NS.app_template_filter("get_default_branch")
+def get_default_branch(repo):
+    """ Given a pygit2.Repository object, extracts the default branch. """
+    default_branch = None
+
+    try:
+        default_branch = repo.head.shorthand
+    except pygit2.GitError:
+        pass
+
+    if not default_branch:
+        path = repo.path
+        path_head = os.path.join(path, "HEAD")
+        if os.path.exists(path_head):
+            with open(path_head) as stream:
+                data = stream.read().strip()
+            if data:
+                default_branch = data.split("refs/heads/", 1)[-1]
+
+    return default_branch

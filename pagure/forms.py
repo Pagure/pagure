@@ -206,6 +206,9 @@ class ProjectForm(ProjectFormSimplified):
         coerce=convert_value,
         default=pagure_config["REPOSPANNER_NEW_REPO"],
     )
+    default_branch = wtforms.StringField(
+        "Default branch", [wtforms.validators.optional()],
+    )
 
     def __init__(self, *args, **kwargs):
         """ Calls the default constructor with the normal argument but

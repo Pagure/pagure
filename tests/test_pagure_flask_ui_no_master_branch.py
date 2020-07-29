@@ -112,11 +112,8 @@ class PagureFlaskNoMasterBranchtests(tests.SimplePagureTest):
         output = self.app.get("/test")
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
-        self.assertIn('<section class="no-readme">', output_text)
-        self.assertIn(
-            "The test project's README file is empty or unavailable.",
-            output_text,
-        )
+        self.assertIn("<title>Overview - test - Pagure</title>", output_text)
+        self.assertIn("<p>This repo is brand new!</p>", output_text)
         self.assertEqual(
             output_text.count('<a class="dropdown-item" href="/test/branch/'),
             0,

@@ -1074,6 +1074,7 @@ def new_project():
                 ),
                 user_ns=pagure_config.get("USER_NAMESPACE", False),
                 ignore_existing_repo=ignore_existing_repos,
+                default_branch=form.default_branch.data,
             )
             flask.g.session.commit()
             return pagure.utils.wait_for_task(task)

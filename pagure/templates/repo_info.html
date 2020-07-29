@@ -290,23 +290,24 @@
                     {% endif %}
           </div>
       </div>
-    {% if g.repo_obj and g.repo_obj.is_empty and repo.mirrored_from %}
+    {% if g.repo_obj and (g.repo_obj.is_empty or g.repo_obj.head_is_unborn) and repo.mirrored_from %}
         <div class="alert {% if category == 'error' %}alert-warning{% else %}alert-info{%endif%}" role="alert">
           <p>This repo is brand new and meant to be mirrored from {{
                 repo.mirrored_from }} !</p>
           <p>Mirrored projects are refreshed regularly, please seat tight, code will
           come land soon!</p>
         </div>
-    {% elif g.repo_obj and g.repo_obj.is_empty %}
+    {% elif g.repo_obj and (g.repo_obj.is_empty or g.repo_obj.head_is_unborn) %}
         <div class="alert {% if category == 'error' %}alert-warning{% else %}alert-info{%endif%}" role="alert">
           <p>This repo is brand new!</p>
             {% if g.authenticated and g.repo_committer %}
               <p>If you already have a git repo:</p>
               <pre>git remote add origin {{ config.get('GIT_URL_SSH') }}{{ repo.path }}
-git push -u origin master</pre>
+git push -u origin {{ g.repo_obj | get_default_branch or "<your main branch>"}}</pre>
 
               <p>If you have not created your git repo yet:</p>
               <pre>git clone {{ config.get('GIT_URL_SSH') }}{{ repo.path }}
+git checkout -b {{ g.repo_obj | get_default_branch or "<your main branch>"}}
 cd {{ repo.name }}
 touch README.rst
 git add README.rst

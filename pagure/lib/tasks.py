@@ -213,7 +213,14 @@ def delete_project(
 @conn.task(queue=pagure_config.get("FAST_CELERY_QUEUE", None), bind=True)
 @pagure_task
 def create_project(
-    self, session, username, namespace, name, add_readme, ignore_existing_repo
+    self,
+    session,
+    username,
+    namespace,
+    name,
+    add_readme,
+    ignore_existing_repo,
+    default_branch=None,
 ):
     """ Create a project.
 
@@ -231,6 +238,9 @@ def create_project(
     :kwarg ignore_existing_repo: a boolean specifying whether the creation
         of the project should fail if the repo exists on disk or not
     :type ignore_existing_repo: bool
+    :kwarg default_branch: the name of the default branch to create and set
+        as default.
+    :type default_branch: str or None
 
     """
     project = pagure.lib.query._get_project(
@@ -272,12 +282,19 @@ def create_project(
         session.commit()
         raise
 
+    if default_branch:
+        path = project.repopath("main")
+        repo_obj = pygit2.Repository(path)
+        repo_obj.set_head("refs/heads/%s" % default_branch)
+
     if add_readme:
         with project.lock("WORKER"):
             with pagure.lib.git.TemporaryClone(
                 project, "main", "add_readme"
             ) as tempclone:
                 temp_gitrepo = tempclone.repo
+                if default_branch:
+                    temp_gitrepo.set_head("refs/heads/%s" % default_branch)
 
                 # Add README file
                 author = userobj.fullname or userobj.user

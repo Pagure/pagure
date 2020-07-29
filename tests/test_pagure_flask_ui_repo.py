@@ -2067,7 +2067,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         output = self.app.get("/test")
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
-        self.assertNotIn("<p>This repo is brand new!</p>", output_text)
+        self.assertIn("<p>This repo is brand new!</p>", output_text)
         self.assertNotIn("Forked from", output_text)
         self.assertIn("<title>Overview - test - Pagure</title>", output_text)
         self.assertEqual(output_text.count('<span class="commitid">'), 0)
