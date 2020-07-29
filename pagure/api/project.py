@@ -1397,6 +1397,11 @@ def api_new_project():
     |                            |         |              |   projects, confirm this  |
     |                            |         |              |   with your administrators|
     +----------------------------+---------+--------------+---------------------------+
+    | ``mirrored_from``          | stringn | Optional     | | The public URL of a git |
+    |                            |         |              |   repository that this    |
+    |                            |         |              |   project is mirroring on |
+    |                            |         |              |   this pagure instance.   |
+    +----------------------------+---------+--------------+---------------------------+
     | ``ignore_existing_repos``  | boolean | Optional     | | Only available to admins|
     |                            |         |              |   this option allows them |
     |                            |         |              |   to make project creation|
@@ -1472,6 +1477,12 @@ def api_new_project():
         else:
             ignore_existing_repos = False
 
+        mirrored_from = form.mirrored_from.data
+        if mirrored_from and pagure_config.get("DISABLE_MIRROR_IN", False):
+            raise pagure.exceptions.APIError(
+                400, error_code=APIERROR.EMIRRORINGDISABLED
+            )
+
         try:
             task = pagure.lib.query.new_project(
                 flask.g.session,
@@ -1484,6 +1495,7 @@ def api_new_project():
                 url=url,
                 avatar_email=avatar_email,
                 user=flask.g.fas_user.username,
+                mirrored_from=mirrored_from,
                 blacklist=pagure_config["BLACKLISTED_PROJECTS"],
                 allowed_prefix=pagure_config["ALLOWED_PREFIX"],
                 add_readme=create_readme,

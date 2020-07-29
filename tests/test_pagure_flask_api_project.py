@@ -4543,6 +4543,24 @@ class PagureFlaskApiProjectCreateProjectTests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(data, {"message": 'Project "test_42" created'})
 
+    def test_api_new_project_mirrored_from(self):
+
+        headers = {"Authorization": "token aaabbbcccddd"}
+        data = {
+            "name": "test_42",
+            "description": "Just another small test project",
+            "mirrored_from": "https://pagure.io/pagure/pagure.git",
+        }
+
+        # Valid request
+        output = self.app.post("/api/0/new/", data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(data, {"message": 'Project "test_42" created'})
+
+        project = pagure.lib.query.get_authorized_project(self.session, "test_42")
+        self.assertEqual(project.mirrored_from, "https://pagure.io/pagure/pagure.git")
+
     @patch.dict("pagure.config.config", {"PRIVATE_PROJECTS": True})
     def test_api_new_project_private(self):
         """ Test the api_new_project method of the flask api to create

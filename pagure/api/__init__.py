@@ -146,6 +146,9 @@ class APIERROR(enum.Enum):
     EPLUGINCHANGENOTALLOWED = "This plugin cannot be changed"
     EPLUGINNOTINSTALLED = "Project doesn't have this plugin installed"
     ENOTAG = "Tag not found"
+    EMIRRORINGDISABLED = (
+        "Mirroring external project has been disabled in this instance"
+    )
 
 
 def get_authorized_api_project(session, repo, user=None, namespace=None):
