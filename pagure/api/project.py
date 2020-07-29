@@ -1389,6 +1389,10 @@ def api_new_project():
     |                            |         |              |   added to the project on |
     |                            |         |              |   creation.               |
     +----------------------------+---------+--------------+---------------------------+
+    | ``default_branch``         | stringn | Optional     | | Name of the default     |
+    |                            |         |              |   branch of the git       |
+    |                            |         |              |   repository.             |
+    +----------------------------+---------+--------------+---------------------------+
     | ``private``                | boolean | Optional     | | A boolean to specify if |
     |                            |         |              |   the project to create   |
     |                            |         |              |   is private.             |
@@ -1504,6 +1508,7 @@ def api_new_project():
                     "OLD_VIEW_COMMIT_ENABLED", False
                 ),
                 user_ns=pagure_config.get("USER_NAMESPACE", False),
+                default_branch=form.default_branch.data,
             )
             flask.g.session.commit()
             output = {"message": "Project creation queued", "taskid": task.id}
