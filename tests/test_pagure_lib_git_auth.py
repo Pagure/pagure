@@ -230,3 +230,423 @@ class PagureLibGitAuthtests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertEqual(output_text, "foo\n bar\n  baz")
+
+
+class PagureLibGitAuthPagureBackendtests(tests.Modeltests):
+    """ Tests for pagure.lib.git_auth """
+
+    config_values = {"authbackend": "pagure"}
+
+    def setUp(self):
+        super(PagureLibGitAuthPagureBackendtests, self).setUp()
+
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+        self.create_project_full("hooktest")
+
+    def test_edit_no_commit(self):
+
+        user = tests.FakeUser()
+        user.username = "foo"
+        with tests.user_set(self.app.application, user):
+            # Add some content to the git repo
+            tests.add_content_git_repo(
+                os.path.join(self.path, "repos", "hooktest.git")
+            )
+
+            data = {
+                "content": "foo\n bar\n  baz",
+                "commit_title": "test commit",
+                "commit_message": "Online commits from the gure.lib.get",
+                "email": "bar@pingou.com",
+                "branch": "master",
+                "csrf_token": self.get_csrf(),
+            }
+
+            output = self.app.post(
+                "/hooktest/edit/master/f/sources",
+                data=data,
+                follow_redirects=True,
+            )
+            self.assertEqual(output.status_code, 403)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                "You are not allowed to edit files in this project",
+                output_text,
+            )
+
+            # Check file after the commit:
+            output = self.app.get("/hooktest/raw/master/f/sources")
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertEqual(output_text, "foo\n bar")
+
+    def test_edit_ticket_rejected(self):
+        project = pagure.lib.query._get_project(self.session, "hooktest")
+
+        # Add user foo to project test
+        msg = pagure.lib.query.add_user_to_project(
+            self.session,
+            project=project,
+            new_user="foo",
+            user="pingou",
+            access="ticket",
+            branches="epel*",
+        )
+        self.session.commit()
+
+        user = tests.FakeUser()
+        user.username = "foo"
+        with tests.user_set(self.app.application, user):
+            # Add some content to the git repo
+            tests.add_content_git_repo(
+                os.path.join(self.path, "repos", "hooktest.git")
+            )
+
+            data = {
+                "content": "foo\n bar\n  baz",
+                "commit_title": "test commit",
+                "commit_message": "Online commits from the gure.lib.get",
+                "email": "foo@bar.com",
+                "branch": "master",
+                "csrf_token": self.get_csrf(),
+            }
+
+            output = self.app.post(
+                "/hooktest/edit/master/f/sources",
+                data=data,
+                follow_redirects=True,
+            )
+            self.assertEqual(output.status_code, 403)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                "You are not allowed to edit files in this project",
+                output_text,
+            )
+
+            # Check file after the commit:
+            output = self.app.get("/hooktest/raw/master/f/sources")
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertEqual(output_text, "foo\n bar")
+
+    def test_edit_contributor_rejected(self):
+        project = pagure.lib.query._get_project(self.session, "hooktest")
+
+        # Add user foo to project test
+        msg = pagure.lib.query.add_user_to_project(
+            self.session,
+            project=project,
+            new_user="foo",
+            user="pingou",
+            access="collaborator",
+            branches="epel*",
+        )
+        self.session.commit()
+
+        user = tests.FakeUser()
+        user.username = "foo"
+        with tests.user_set(self.app.application, user):
+            # Add some content to the git repo
+            tests.add_content_git_repo(
+                os.path.join(self.path, "repos", "hooktest.git")
+            )
+
+            data = {
+                "content": "foo\n bar\n  baz",
+                "commit_title": "test commit",
+                "commit_message": "Online commits from the gure.lib.get",
+                "email": "foo@bar.com",
+                "branch": "master",
+                "csrf_token": self.get_csrf(),
+            }
+
+            output = self.app.post(
+                "/hooktest/edit/master/f/sources",
+                data=data,
+                follow_redirects=True,
+            )
+            self.assertEqual(output.status_code, 403)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                "You are not allowed to edit files in this project",
+                output_text,
+            )
+
+            # Check file after the commit:
+            output = self.app.get("/hooktest/raw/master/f/sources")
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertEqual(output_text, "foo\n bar")
+
+    def test_edit_contributor_passed_epel8(self):
+        project = pagure.lib.query._get_project(self.session, "hooktest")
+
+        # Add user foo to project test
+        msg = pagure.lib.query.add_user_to_project(
+            self.session,
+            project=project,
+            new_user="foo",
+            user="pingou",
+            access="collaborator",
+            branches="epel*",
+        )
+        self.session.commit()
+
+        user = tests.FakeUser()
+        user.username = "foo"
+        with tests.user_set(self.app.application, user):
+            # Add some content to the git repo
+            tests.add_content_git_repo(
+                os.path.join(self.path, "repos", "hooktest.git")
+            )
+
+            data = {
+                "content": "foo\n bar\n  baz",
+                "commit_title": "test commit",
+                "commit_message": "Online commits from the gure.lib.get",
+                "email": "foo@bar.com",
+                "branch": "epel8",
+                "csrf_token": self.get_csrf(),
+            }
+
+            output = self.app.post(
+                "/hooktest/edit/master/f/sources",
+                data=data,
+                follow_redirects=True,
+            )
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                "<title>Commits - hooktest - Pagure</title>", output_text
+            )
+
+            # Check file after the commit:
+            # master did not change
+            output = self.app.get("/hooktest/raw/master/f/sources")
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertEqual(output_text, "foo\n bar")
+
+            # epel8 did change
+            output = self.app.get("/hooktest/raw/epel8/f/sources")
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertEqual(output_text, "foo\n bar\n  baz")
+
+    def test_edit_commit_passed_epel8(self):
+        project = pagure.lib.query._get_project(self.session, "hooktest")
+
+        # Add user foo to project test
+        msg = pagure.lib.query.add_user_to_project(
+            self.session,
+            project=project,
+            new_user="foo",
+            user="pingou",
+            access="commit",
+            branches="epel*",
+        )
+        self.session.commit()
+
+        user = tests.FakeUser()
+        user.username = "foo"
+        with tests.user_set(self.app.application, user):
+            # Add some content to the git repo
+            tests.add_content_git_repo(
+                os.path.join(self.path, "repos", "hooktest.git")
+            )
+
+            data = {
+                "content": "foo\n bar\n  baz",
+                "commit_title": "test commit",
+                "commit_message": "Online commits from the gure.lib.get",
+                "email": "foo@bar.com",
+                "branch": "epel8",
+                "csrf_token": self.get_csrf(),
+            }
+
+            output = self.app.post(
+                "/hooktest/edit/master/f/sources",
+                data=data,
+                follow_redirects=True,
+            )
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                "<title>Commits - hooktest - Pagure</title>", output_text
+            )
+
+            # Check file after the commit:
+            # master did not change
+            output = self.app.get("/hooktest/raw/master/f/sources")
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertEqual(output_text, "foo\n bar")
+
+            # epel8 did change
+            output = self.app.get("/hooktest/raw/epel8/f/sources")
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertEqual(output_text, "foo\n bar\n  baz")
+
+    def test_edit_contributor_passed_epel(self):
+        # Same test as above but the target branch change
+        project = pagure.lib.query._get_project(self.session, "hooktest")
+
+        # Add user foo to project test
+        msg = pagure.lib.query.add_user_to_project(
+            self.session,
+            project=project,
+            new_user="foo",
+            user="pingou",
+            access="collaborator",
+            branches="epel*",
+        )
+        self.session.commit()
+
+        user = tests.FakeUser()
+        user.username = "foo"
+        with tests.user_set(self.app.application, user):
+            # Add some content to the git repo
+            tests.add_content_git_repo(
+                os.path.join(self.path, "repos", "hooktest.git")
+            )
+
+            data = {
+                "content": "foo\n bar\n  baz",
+                "commit_title": "test commit",
+                "commit_message": "Online commits from the gure.lib.get",
+                "email": "foo@bar.com",
+                "branch": "epel",
+                "csrf_token": self.get_csrf(),
+            }
+
+            output = self.app.post(
+                "/hooktest/edit/master/f/sources",
+                data=data,
+                follow_redirects=True,
+            )
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                "<title>Commits - hooktest - Pagure</title>", output_text
+            )
+
+            # Check file after the commit:
+            # master did not change
+            output = self.app.get("/hooktest/raw/master/f/sources")
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertEqual(output_text, "foo\n bar")
+
+            # epel did change
+            output = self.app.get("/hooktest/raw/epel/f/sources")
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertEqual(output_text, "foo\n bar\n  baz")
+
+    def test_edit_contributor_passed_epel_no_regex(self):
+        # Same test as above but the allowed branch has no regex
+        project = pagure.lib.query._get_project(self.session, "hooktest")
+
+        # Add user foo to project test
+        msg = pagure.lib.query.add_user_to_project(
+            self.session,
+            project=project,
+            new_user="foo",
+            user="pingou",
+            access="collaborator",
+            branches="epel",
+        )
+        self.session.commit()
+
+        user = tests.FakeUser()
+        user.username = "foo"
+        with tests.user_set(self.app.application, user):
+            # Add some content to the git repo
+            tests.add_content_git_repo(
+                os.path.join(self.path, "repos", "hooktest.git")
+            )
+
+            data = {
+                "content": "foo\n bar\n  baz",
+                "commit_title": "test commit",
+                "commit_message": "Online commits from the gure.lib.get",
+                "email": "foo@bar.com",
+                "branch": "epel",
+                "csrf_token": self.get_csrf(),
+            }
+
+            output = self.app.post(
+                "/hooktest/edit/master/f/sources",
+                data=data,
+                follow_redirects=True,
+            )
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                "<title>Commits - hooktest - Pagure</title>", output_text
+            )
+
+            # Check file after the commit:
+            # master did not change
+            output = self.app.get("/hooktest/raw/master/f/sources")
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertEqual(output_text, "foo\n bar")
+
+            # epel did change
+            output = self.app.get("/hooktest/raw/epel/f/sources")
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertEqual(output_text, "foo\n bar\n  baz")
+
+    def test_edit_contributor_denied_epel8_no_regex(self):
+        # Same test as above but the allowed branch has no regex
+        project = pagure.lib.query._get_project(self.session, "hooktest")
+
+        # Add user foo to project test
+        msg = pagure.lib.query.add_user_to_project(
+            self.session,
+            project=project,
+            new_user="foo",
+            user="pingou",
+            access="collaborator",
+            branches="epel",
+        )
+        self.session.commit()
+
+        user = tests.FakeUser()
+        user.username = "foo"
+        with tests.user_set(self.app.application, user):
+            # Add some content to the git repo
+            tests.add_content_git_repo(
+                os.path.join(self.path, "repos", "hooktest.git")
+            )
+
+            data = {
+                "content": "foo\n bar\n  baz",
+                "commit_title": "test commit",
+                "commit_message": "Online commits from the gure.lib.get",
+                "email": "foo@bar.com",
+                "branch": "epel8",
+                "csrf_token": self.get_csrf(),
+            }
+
+            output = self.app.post(
+                "/hooktest/edit/master/f/sources",
+                data=data,
+                follow_redirects=True,
+            )
+            self.assertEqual(output.status_code, 403)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                "You are not allowed to edit files in this project",
+                output_text,
+            )
+
+            # Check file after the commit:
+            # epel not found
+            output = self.app.get("/hooktest/raw/epel8/f/sources")
+            self.assertEqual(output.status_code, 404)

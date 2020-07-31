@@ -2556,21 +2556,14 @@ def revoke_api_token(repo, token_id, username=None, namespace=None):
     methods=("GET", "POST"),
 )
 @login_required
-@is_repo_admin
 def edit_file(repo, branchname, filename, username=None, namespace=None):
     """ Edit a file online.
     """
     repo = flask.g.repo
     repo_obj = flask.g.repo_obj
 
-    user = pagure.lib.query.search_user(
-        flask.g.session, username=flask.g.fas_user.username
-    )
-
     if repo_obj.is_empty:
         flask.abort(404, description="Empty repo cannot have a file")
-
-    form = pagure.forms.EditFileForm(emails=user.emails)
 
     branch = None
     if branchname in repo_obj.listall_branches():
@@ -2578,6 +2571,28 @@ def edit_file(repo, branchname, filename, username=None, namespace=None):
         commit = branch.peel(pygit2.Commit)
     else:
         flask.abort(400, description="Invalid branch specified")
+
+    user = pagure.lib.query.search_user(
+        flask.g.session, username=flask.g.fas_user.username
+    )
+    if not user:
+        flask.abort(
+            403,
+            description="You are not allowed to edit files in this project",
+        )
+
+    form = pagure.forms.EditFileForm(emails=user.emails)
+
+    if not pagure.utils.is_repo_collaborator(
+        repo,
+        refname="refs/heads/%s" % form.branch.data,
+        username=None,
+        session=flask.g.session,
+    ):
+        flask.abort(
+            403,
+            description="You are not allowed to edit files in this project",
+        )
 
     if form.validate_on_submit():
         try:
