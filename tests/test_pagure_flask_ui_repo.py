@@ -2818,13 +2818,13 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertTrue(output_text.startswith(b"\x00\x00\x01\x00"))
 
         # View by image name -- somehow we support this
-        output = self.app.get("/test/raw/sources/f/test.jpg")
+        output = self.app.get("/test/raw/master/f/test.jpg")
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data()
         self.assertTrue(output_text.startswith(b"\x00\x00\x01\x00"))
 
         # View binary file
-        output = self.app.get("/test/raw/sources/f/test_binary")
+        output = self.app.get("/test/raw/master/f/test_binary")
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data()
         self.assertEqual(
@@ -2837,7 +2837,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         # View by image name -- with a non-existant file
-        output = self.app.get("/test/raw/sources/f/testfoo.jpg")
+        output = self.app.get("/test/raw/master/f/testfoo.jpg")
         self.assertEqual(output.status_code, 404)
         output = self.app.get("/test/raw/master/f/folder1/testfoo.jpg")
         self.assertEqual(output.status_code, 404)
@@ -4822,6 +4822,18 @@ index 0000000..fb7093d
         output = self.app.get("/foo/edit/foo/f/sources")
         self.assertEqual(output.status_code, 404)
 
+        # Add some content to the git repo
+        tests.add_content_git_repo(
+            os.path.join(self.path, "repos", "test.git")
+        )
+        tests.add_readme_git_repo(os.path.join(self.path, "repos", "test.git"))
+        tests.add_binary_git_repo(
+            os.path.join(self.path, "repos", "test.git"), "test.jpg"
+        )
+        tests.add_binary_git_repo(
+            os.path.join(self.path, "repos", "test.git"), "test_binary"
+        )
+
         user = tests.FakeUser()
         with tests.user_set(self.app.application, user):
             # No project registered in the DB
@@ -4834,7 +4846,7 @@ index 0000000..fb7093d
             )
 
             # No a repo admin
-            output = self.app.get("/test/edit/foo/f/sources")
+            output = self.app.get("/test/edit/master/f/sources")
             self.assertEqual(output.status_code, 403)
 
         # User not logged in
@@ -4843,24 +4855,6 @@ index 0000000..fb7093d
 
         user.username = "pingou"
         with tests.user_set(self.app.application, user):
-
-            # No such file
-            output = self.app.get("/test/edit/foo/f/sources")
-            self.assertEqual(output.status_code, 404)
-
-            # Add some content to the git repo
-            tests.add_content_git_repo(
-                os.path.join(self.path, "repos", "test.git")
-            )
-            tests.add_readme_git_repo(
-                os.path.join(self.path, "repos", "test.git")
-            )
-            tests.add_binary_git_repo(
-                os.path.join(self.path, "repos", "test.git"), "test.jpg"
-            )
-            tests.add_binary_git_repo(
-                os.path.join(self.path, "repos", "test.git"), "test_binary"
-            )
 
             output = self.app.get("/test/edit/master/foofile")
             self.assertEqual(output.status_code, 404)

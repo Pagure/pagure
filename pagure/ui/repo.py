@@ -693,10 +693,7 @@ def view_raw_file(
         try:
             commit = repo_obj.get(identifier)
         except ValueError:
-            if "master" not in repo_obj.listall_branches():
-                flask.abort(404, description="Branch not found")
-            # If it's not a commit id then it's part of the filename
-            commit = repo_obj[repo_obj.head.target]
+            flask.abort(404, description="Branch not found")
 
     if not commit:
         flask.abort(404, description="Commit %s not found" % (identifier))
