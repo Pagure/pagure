@@ -118,6 +118,21 @@
     {% endif %}
   </div>
 
+  {% if g.authenticated and repo.user.user == g.fas_user.username %}
+  <div id="orphan-section" class="pt-3">
+      <div class="col-xs-2 line-height-1"></div>
+      <h6>Orphaned:</h6>
+      <div class="btn-group">
+          <a href="#" title="Orphan this package"
+             class="btn btn-sm btn-outline-primary"
+             id="orphan-button">
+              <i id="orphan-icon" class="fa fa-fw fa-hand-paper-o"></i>
+              Orphan
+          </a>
+      </div>
+  </div>
+  {% endif %}
+
   {% if g.authenticated and repo.user.user == "orphan" %}
   <div id="take-orphan-section" class="pt-3">
     <div class="col-xs-2 line-height-1"></div>
@@ -331,6 +346,7 @@
           success: function(res) {
             $("#point_of_contact").html("{{ g.fas_user.username }}");
             $("#take-orphan-section").hide();
+            $("#orphan-section").show();
           },
           error: function(res) {
             if (res.responseJSON.errors) {
@@ -365,6 +381,28 @@
       });
       {% endif %}
 
+      {% if g.authenticated and repo.user.user == g.fas_user.username %}
+      $("#orphan-button").click(function(){
+
+        $.ajax({
+          url: "{{ url_for('distgit_ns.orphan_endpoint', repo=repo.name, namespace=repo.namespace) }}",
+          type: 'POST',
+          dataType: 'json',
+          success: function(res) {
+            $("#point_of_contact_div").html("Package is currently unmaintained");
+            $("#orphan-section").hide();
+            $("#take-orphan-section").show();
+          },
+          error: function(res) {
+            if (res.responseJSON.errors) {
+              alert('Unable to orphan the package: ' + res.responseJSON.errors);
+            } else {
+              alert('Unable to orphan the package: ' + res.responseJSON.error);
+            }
+          }
+        });
+      });
+      {% endif %}
     });
   </script>
   {% endif %}

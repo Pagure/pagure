@@ -105,7 +105,7 @@
             {% endif %}
             {% if not repo.is_fork %}
             <div class="text-muted">Created {{repo.date_created|humanize}}</div>
-            <div class="text-muted">
+            <div class="text-muted" id="point_of_contact_div">
               {% if repo.user.user != 'orphan' %}
                 Maintained by
                 <a href="{{ url_for('ui_ns.view_user', username=repo.user.user)}}"
