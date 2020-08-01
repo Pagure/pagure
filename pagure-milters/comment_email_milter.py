@@ -136,28 +136,30 @@ class PagureMilter(Milter.Base):
         else:
             msg = email.message_from_file(self.fp)
 
+        self.log("To %s" % msg["to"])
+        self.log("Cc %s" % msg.get("cc"))
+        self.log("From %s" % msg["From"])
+
+        # First check whether the message is addressed to this milter.
+        email_address = msg["to"]
+        if "reply+" in msg.get("cc", ""):
+            email_address = msg["cc"]
+        if "reply+" not in email_address:
+            # The message is not addressed to this milter so don't touch it.
+            self.log(
+                "No valid recipient email found in To/Cc: %s" % email_address
+            )
+            return Milter.CONTINUE
+
         msg_id = msg.get("In-Reply-To", None)
         if msg_id is None:
-            self.log("No In-Reply-To, keep going")
+            self.log("No In-Reply-To, can't process this message.")
             return Milter.REJECT
 
         # Ensure we don't get extra lines in the message-id
         msg_id = msg_id.split("\n")[0].strip()
 
-        self.log("msg-ig %s" % msg_id)
-        self.log("To %s" % msg["to"])
-        self.log("Cc %s" % msg.get("cc"))
-        self.log("From %s" % msg["From"])
-
-        # Check the email was sent to the right address
-        email_address = msg["to"]
-        if "reply+" in msg.get("cc", ""):
-            email_address = msg["cc"]
-        if "reply+" not in email_address:
-            self.log(
-                "No valid recipient email found in To/Cc: %s" % email_address
-            )
-            return Milter.CONTINUE
+        self.log("msg-id %s" % msg_id)
 
         # Ensure the user replied to his/her own notification, not that
         # they are trying to forge their ID into someone else's
