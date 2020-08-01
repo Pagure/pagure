@@ -151,6 +151,10 @@ class PagureMilter(Milter.Base):
             )
             return Milter.CONTINUE
 
+        if msg["From"] and msg["From"] == _config.get("FROM_EMAIL"):
+            self.log("Let's not process the email we send")
+            return Milter.ACCEPT
+
         msg_id = msg.get("In-Reply-To", None)
         if msg_id is None:
             self.log("No In-Reply-To, can't process this message.")
@@ -198,11 +202,6 @@ class PagureMilter(Milter.Base):
             self.log("hash list: %s" % hashes)
             self.log("tohash:    %s" % tohash)
             self.log("Hash does not correspond to the destination")
-            session.remove()
-            return Milter.REJECT
-
-        if msg["From"] and msg["From"] == _config.get("FROM_EMAIL"):
-            self.log("Let's not process the email we send")
             session.remove()
             return Milter.REJECT
 
