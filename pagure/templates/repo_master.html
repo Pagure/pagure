@@ -36,6 +36,9 @@
             <h3>
             {% if repo.is_fork -%}
             <i class="fa fa-code-fork text-muted"></i>
+            {% elif repo.mirrored_from -%}
+            <i class="fa fa-cloud-download text-muted" title="Mirrored from {{
+                repo.mirrored_from }}"></i>
             {%- else -%}
             <i class="fa {{projecticon()}} text-muted"></i>
             {%- endif -%}

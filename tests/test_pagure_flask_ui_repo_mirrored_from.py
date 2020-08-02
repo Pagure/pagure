@@ -53,6 +53,29 @@ class PagureUiRepoMirroredFromTests(tests.Modeltests):
         self.session.add(self.project)
         self.session.commit()
 
+    def test_custom_projecticon(self):
+        """ Ensure that the customized project icon is shown the main page of
+        the project.
+        """
+        output = self.app.get("/test")
+        output_text = output.get_data(as_text=True)
+        self.assertIn(
+            '<i class="fa fa-cloud-download text-muted" title="Mirrored from '
+            'https://example.com/foo/bar.git"></i>',
+            output_text,
+        )
+
+    def test_regular_projecticon(self):
+        """ Ensure that the customized project icon is shown the main page of
+        the project.
+        """
+        output = self.app.get("/test2")
+        output_text = output.get_data(as_text=True)
+        self.assertNotIn(
+            '<i class="fa fa-cloud-download text-muted" title="Mirrored from ',
+            output_text,
+        )
+
     def test_settings_shows(self):
         """ Ensure that the box to edit the mirrored from value shows up
         in the settings.
