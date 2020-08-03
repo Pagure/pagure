@@ -36,14 +36,14 @@ _log = logging.getLogger(__name__)
 LOGGER_SETUP = False
 
 
-def set_up_logging(app=None, force=False):
+def set_up_logging(app=None, force=False, configkey="LOGGING"):
     global LOGGER_SETUP
     if LOGGER_SETUP and not force:
         _log.info("logging already setup")
         return
 
     logging.basicConfig()
-    logging.config.dictConfig(pagure_config.get("LOGGING") or {"version": 1})
+    logging.config.dictConfig(pagure_config.get(configkey) or {"version": 1})
 
     LOGGER_SETUP = True
 

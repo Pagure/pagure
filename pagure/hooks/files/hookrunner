@@ -37,9 +37,12 @@ if "PAGURE_CONFIG" not in os.environ and os.path.exists(
 
 import pagure.lib
 import pagure.utils
+from pagure.config import config as pagure_config
 from pagure.hooks import run_hook_file
 
-pagure.utils.set_up_logging()
+confkey = "LOGGING_GIT_HOOKS" if "LOGGING_GIT_HOOKS" in pagure_config else "LOGGING"
+
+pagure.utils.set_up_logging(configkey=confkey)
 hooktype = os.path.basename(sys.argv[0])
 
 run_hook_file(hooktype)

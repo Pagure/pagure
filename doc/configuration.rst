@@ -800,6 +800,19 @@ Defaults to:
 Where ``{nonce}`` is dynamically set by pagure.
 
 
+LOGGING_GIT_HOOKS
+~~~~~~~~~~~~~~~~~
+
+This configuration key allows to have a different logging configuration for the
+web application and the git hooks.
+
+If un-specified (default), the logging configuration used by the git hooks will
+be the same as the one for the web application (i.e.: defined in ``LOGGING`` here
+below).
+
+Defaults to: ``None``.
+
+
 LOGGING
 ~~~~~~~
 

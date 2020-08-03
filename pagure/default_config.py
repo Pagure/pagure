@@ -444,6 +444,7 @@ STOMP_CERT_FILE = None
 STOMP_CREDS_PASSWORD = None
 STOMP_HIERARCHY = None
 
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
