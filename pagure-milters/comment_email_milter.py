@@ -158,6 +158,11 @@ class PagureMilter(Milter.Base):
         msg_id = msg.get("In-Reply-To", None)
         if msg_id is None:
             self.log("No In-Reply-To, can't process this message.")
+            self.setreply(
+                "554",
+                xcode="5.5.0",
+                msg="Replies to Pagure must have an In-Reply-To header field."
+            )
             return Milter.REJECT
 
         # Ensure we don't get extra lines in the message-id
@@ -203,6 +208,9 @@ class PagureMilter(Milter.Base):
             self.log("tohash:    %s" % tohash)
             self.log("Hash does not correspond to the destination")
             session.remove()
+            self.setreply("550",
+                          xcode="5.7.1",
+                          msg="Reply authentication failed.")
             return Milter.REJECT
 
         msg_id = clean_item(msg_id)
@@ -249,6 +257,11 @@ class PagureMilter(Milter.Base):
         self.log("Could not add the comment to ticket to pagure")
         self.log(req.text)
 
+        self.setreply("554",
+                      xcode="5.3.0",
+                      msg=("The comment couldn't be added to the issue. " +
+                           "HTTP status: %d %s." %
+                           (req.status_code, req.reason)))
         return Milter.REJECT
 
     def handle_request_email(self, emailobj, msg_id):
@@ -280,6 +293,11 @@ class PagureMilter(Milter.Base):
         self.log("Could not add the comment to PR to pagure")
         self.log(req.text)
 
+        self.setreply("554",
+                      xcode="5.3.0",
+                      msg=("The comment couldn't be added to the pull " +
+                           "request. HTTP status: %d %s." %
+                           (req.status_code, req.reason)))
         return Milter.REJECT
 
 
