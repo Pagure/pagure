@@ -3,6 +3,16 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
+5.11.1 (2020-08-03)
+-------------------
+
+- Increase logging to the pagure_auth logger
+- Make work pagure-admin ensure-project-hooks when the target link exists but is
+  broken
+- Fix sorting collaborators and groups of collaborators
+- Fix git push over http(s)
+
+
 5.11.0 (2020-08-03)
 -------------------
 
