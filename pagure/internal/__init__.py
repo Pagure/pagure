@@ -137,6 +137,9 @@ def check_ssh_access():
 
     # Build a fake path so we can use get_repo_info_from_path
     path = os.path.join(pagure_config["GIT_FOLDER"], gitdir)
+    _auth_log.info(
+        "%s asks to access %s (path: %s) via ssh" % (remoteuser, gitdir, path)
+    )
     _log.info(
         "%s asks to access %s (path: %s) via ssh" % (remoteuser, gitdir, path)
     )
@@ -146,6 +149,11 @@ def check_ssh_access():
         namespace,
         repo,
     ) = pagure.lib.git.get_repo_info_from_path(path, hide_notfound=True)
+
+    _auth_log.info(
+        "%s asks to access the %s repo of %s/%s from user %s"
+        % (remoteuser, repotype, namespace, repo, project_user)
+    )
     _log.info(
         "%s asks to access the %s repo of %s/%s from user %s"
         % (remoteuser, repotype, namespace, repo, project_user)
@@ -177,6 +185,8 @@ def check_ssh_access():
         )
         _log.info("Project not found with this path")
         return flask.jsonify({"access": False})
+
+    _auth_log.info("Checking ACLs on project: %s" % project.fullname)
     _log.info("Checking ACLs on project: %s" % project.fullname)
 
     if repotype not in ["main", "docs"] and not pagure.utils.is_repo_user(
@@ -186,12 +196,15 @@ def check_ssh_access():
         # allowed for main and docs repos.
         _log.info("%s is not a contributor to this project" % remoteuser)
         _auth_log.info(
-            "User tried to access a projec they do not have access to -- "
+            "User tried to access a project they do not have access to -- "
             "|user: %s|IP: %s|method: N/A|repo: %s|query: N/A"
             % (remoteuser, flask.request.remote_addr, gitdir)
         )
         return flask.jsonify({"access": False})
 
+    _auth_log.info(
+        "Read access granted to %s on: %s" % (remoteuser, project.fullname)
+    )
     _log.info(
         "Read access granted to %s on: %s" % (remoteuser, project.fullname)
     )
