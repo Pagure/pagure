@@ -3,8 +3,57 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
+5.11.0 (2020-08-03)
+-------------------
+
+- Change the project icon when the project is mirrored from an external source
+- Allow a theme or a blueprint to inject custom buttons in the navigation bar.
+  (zPlus)
+- Add API endpoint to get a pull-request comment (Lukas Holecek)
+- Omit breaking original comment format in reply on pull-requests (Lukas Holecek)
+- Let the milter announce when it reject an email based on its address
+- Don't Let the milter process the email we send. (Björn Persson)
+- Add a collaborator level to projects
+- Allow collaborators to edit files in the branch that they have access to
+- Add orphan button to project page (Michal Konečný)
+- Allow setting the default git branch when creating projects via the API
+- Allow creating mirrored project from the API
+- Add the possibility to set the default branch at project creation
+- Add API endpoint to set the default git branch and expose it in an existing
+  endpoint
+- Adjust the example configuration for logging to a file
+- Allow project-less API token with the "modify_project" ACL to update watchers
+- spec: Have the log directory owned by the main package (Neal Gompa)
+- Add a new API endpoint to retrieve a commit's metadata/info
+- Add a new API endpoint allowing to delete a project
+- Add support for customizing the new issue page
+- Introducing the boards feature
+- Add an API endpoint to view the content of a git repo
+- Port pagure's markdown extension to the new API
+- Multiple small fixes for the vagrant-based development environment
+- Use WhiteNoise to serve static assets for the Pagure web
+- Fix running the tests on py 3.8
+- Port pagure's test suite to pytest
+- Fix the title of the graph showing the evolution of the number of open tickets
+  on a project
+- Do not assume there is a SMTP_STARTTLS configuration key set
+- Bring back JS library used for the heatmap (Nils Philippsen)
+- Show the ACL name in addition to the description when creating API tokens
+- Allow editing the URL a project is mirrored from
+- Add comments to the mirror service files for clarifying their purpose. (zPlus)
+- Fix warning when compiling the doc
+- Add a dedicated logger for everything that is auth related
+- api: fix apidoc format on api_view_issues_history_detailed_stats Fixes web
+  api doc view template issues (Julen Landa Alustiza)
+- doc: Add a page documenting known Pagure instances (Neal Gompa)
+- starttls support via SMTP_STARTTLS: provide additional documentation. (midipix)
+- Add support for smtp server requiring starttls to work
+- Make the stats page use the new stats API endpoint
+
+
 5.10.0 (2020-05-14)
 -------------------
+
 - Allow viewing issues via the API using project-less API token (Julen Landa
   Alustiza)
 - Rename Koshei to Koschei in the srcfpo theme (Fabio Valentini)
@@ -47,16 +96,20 @@ This document records all notable changes to `Pagure <https://pagure.io>`_.
 - Make pagure compatible with the latest version of flake8
 - Add PAGURE_PLUGINS_CONFIG setting in pagure configuration file (zPlus)
 
+
 5.9.1 (2020-03-30)
 ------------------
+
 - Add a missing </div> that broke the user's settings page
 - Do not block when waiting for subprocess to finish (Michal Srb)
 - Fix git blame when the identifier provided is a blob
 - Fix view_commits when the identified provided is a blob
 - When viewing file's history, use the default branch if needed
 
+
 5.9 (2020-03-24)
 ----------------
+
 - Swap "Add" and "Cancel" button ordering for access management (Ken Dreyer)
 - Add API to manage plugins (ie: git hooks) (Michal Konečný)
 - Fix querying mdapi from within the srcfpo theme (Karsten Hopp)
@@ -110,14 +163,17 @@ This document records all notable changes to `Pagure <https://pagure.io>`_.
 
 5.8.1 (2019-12-02)
 ------------------
+
 - Fix the link to the container namespace in srcfpo
 - Fix checking if the user is a committer of the repo the PR originates from
 - Fix showing the origin of the PR when it originates from the same project
 - Do not hard-code UTF-8 when showing a file
 - Fix the Vagrant setup
 
+
 5.8 (2019-11-15)
 ----------------
+
 - Enable the ctrl-enter keys to submit forms on tickets and PRs (Julen
   Landa Alustiza)
 - Fix spelling errors on doc/. (Sergio Durigan Junior)
@@ -154,6 +210,7 @@ This document records all notable changes to `Pagure <https://pagure.io>`_.
 - Select full text on git|ssh url input boxes when they get focus (Julen
   Landa Alustiza)
 
+
 5.7.9 (2019-09-05)
 ------------------
 
@@ -161,6 +218,7 @@ This document records all notable changes to `Pagure <https://pagure.io>`_.
 - Tweak when we show the merge and the rebase buttons
 - Fix the logic around interacting with read-only databases in hooks
 - Fix .diff and .patch generation for empty commits
+
 
 5.7.8 (2019-08-28)
 ------------------
@@ -174,21 +232,25 @@ This document records all notable changes to `Pagure <https://pagure.io>`_.
 - Fix url on the invalid token error message
 - Fix typo on the pull request merge error message
 
+
 5.7.7 (2019-08-21)
 ------------------
 
 - Allow cross-project API token to open pull-request
 - Move the button to change the anitya status to use POST requests
 
+
 5.7.6 (2019-08-21)
 ------------------
 
 - Allow updating PRs via the API using cross-project tokens
 
+
 5.7.5 (2019-08-21)
 ------------------
 
 - Fix the logic to make the merge button appear on pull-request
+
 
 5.7.4 (2019-08-10)
 ------------------
@@ -199,6 +261,7 @@ This document records all notable changes to `Pagure <https://pagure.io>`_.
   outside resources
 - Improve the support for spec file highlighting
 
+
 5.7.3 (2019-08-02)
 ------------------
 
@@ -206,16 +269,19 @@ This document records all notable changes to `Pagure <https://pagure.io>`_.
   mysql
 - Make the doc build in sphinx with python3 by default
 
+
 5.7.2 (2019-07-30)
 ------------------
 
 - More CSP headers related fixes (Again thanks to Julen Landa Alustiza)
 - Ensures @<username> doesn't overreach to email
 
+
 5.7.1 (2019-07-12)
 ------------------
 
 - More CSP headers fixes (Thanks again to Julen Landa Alustiza for them!)
+
 
 5.7 (2019-07-05)
 ----------------
@@ -236,6 +302,7 @@ This document records all notable changes to `Pagure <https://pagure.io>`_.
 - Bump jquery to latest version, fixing some CSP errors (Julen Landa Alustiza)
 - Fix file view anchor link highlight & scrolling (Julen Landa Alustiza)
 - Focus the comment textarea after hitting the reply button (Julen Landa Alustiza)
+
 
 5.6 (2019-06-04)
 ----------------
@@ -271,8 +338,10 @@ This document records all notable changes to `Pagure <https://pagure.io>`_.
 - Fix giving a project to someone who already had it
 - Ensure the blame view does not render html
 
+
 5.5 (2019-04-08)
 ----------------
+
 - themes/srcfpo: move icons to the theme instead of linking them from other apps
   (Julen Landa Alustiza)
 - Add support for !owner to the API listing projects
@@ -639,6 +708,7 @@ This document records all notable changes to `Pagure <https://pagure.io>`_.
 - Ensure remote PR are opened from a remote URL (CVE-2018-1002158 - reported by
   Patrick Uiterwijk)
 
+
 4.0.4 (2018-07-19)
 ------------------
 
@@ -674,10 +744,12 @@ This document records all notable changes to `Pagure <https://pagure.io>`_.
 - Do not log activity on private projects
 - Drop trollius-redis requirement (Neal Gompa)
 
+
 4.0.3 (2018-05-14)
 ------------------
 
 - Backport utility method from the 4.1 code to fix the 4.0.2 release
+
 
 4.0.2 (2018-05-14)
 ------------------
@@ -692,6 +764,7 @@ This document records all notable changes to `Pagure <https://pagure.io>`_.
 - Fix the requirement on bcrypt, it's optional
 - Make API endpoint for creating new git branch have its own ACL
   fixes CVE-2018-1002151
+
 
 4.0.1 (2018-04-26)
 ------------------
