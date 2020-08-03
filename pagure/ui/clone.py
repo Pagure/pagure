@@ -68,6 +68,8 @@ def _get_remote_user(project):
                     # approach above didn't work, the user may still be
                     # using an API token, so we want to check that as well.
                     if not remote_user:
+                        import pagure.lib.query
+
                         token = pagure.lib.query.get_api_token(
                             flask.g.session, token_str
                         )
