@@ -1024,7 +1024,8 @@ class Project(BASE):
                 key=lambda u: u.user,
             ),
             "collaborator": sorted(
-                self.get_project_users(access="collaborator", combine=False)
+                self.get_project_users(access="collaborator", combine=False),
+                key=lambda u: u.user,
             ),
             "ticket": sorted(
                 self.get_project_users(access="ticket", combine=False),
@@ -1066,7 +1067,8 @@ class Project(BASE):
                 key=lambda x: x.group_name,
             ),
             "collaborator": sorted(
-                self.get_project_groups(access="collaborator", combine=False)
+                self.get_project_groups(access="collaborator", combine=False),
+                key=lambda x: x.group_name,
             ),
             "ticket": sorted(
                 self.get_project_groups(access="ticket", combine=False),

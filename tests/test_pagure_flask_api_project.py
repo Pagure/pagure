@@ -984,6 +984,79 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         }
         self.assertDictEqual(data, expected_data)
 
+    def test_api_project_collaborators(self):
+        """ Test the api_project method of the flask api. """
+        tests.create_projects(self.session)
+        tests.create_user(self.session, "ralph", "Ralph B", ["ralph@b.org"])
+        tests.create_user(self.session, "nils", "Nils P", ["nils@p.net"])
+
+        # Add a couple of collaborators
+        project = pagure.lib.query._get_project(self.session, "test")
+        pagure.lib.query.add_user_to_project(
+            self.session,
+            project,
+            new_user="ralph",
+            user="pingou",
+            access="collaborator",
+            branches="f*,epel*",
+        )
+        pagure.lib.query.add_user_to_project(
+            self.session,
+            project,
+            new_user="nils",
+            user="pingou",
+            access="collaborator",
+            branches="epel*",
+        )
+        self.session.commit()
+
+        # Existing project
+        output = self.app.get("/api/0/test")
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        data["date_created"] = "1436527638"
+        data["date_modified"] = "1436527638"
+        expected_data = {
+            "access_groups": {
+                "admin": [],
+                "collaborator": [],
+                "commit": [],
+                "ticket": [],
+            },
+            "access_users": {
+                "admin": [],
+                "collaborator": ["nils", "ralph"],
+                "commit": [],
+                "owner": ["pingou"],
+                "ticket": [],
+            },
+            "close_status": [
+                "Invalid",
+                "Insufficient data",
+                "Fixed",
+                "Duplicate",
+            ],
+            "custom_keys": [],
+            "date_created": "1436527638",
+            "date_modified": "1436527638",
+            "description": "test project #1",
+            "fullname": "test",
+            "url_path": "test",
+            "id": 1,
+            "milestones": {},
+            "name": "test",
+            "namespace": None,
+            "parent": None,
+            "priorities": {},
+            "tags": [],
+            "user": {
+                "fullname": "PY C",
+                "name": "pingou",
+                "url_path": "user/pingou",
+            },
+        }
+        self.assertDictEqual(data, expected_data)
+
     def test_api_project_group(self):
         """ Test the api_project method of the flask api. """
         tests.create_projects(self.session)
