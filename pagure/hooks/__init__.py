@@ -180,6 +180,8 @@ class BaseHook(object):
                 # Install the main hook file
                 target = os.path.join(hookfolder, hooktype)
                 if not os.path.exists(target):
+                    if os.path.islink(target):
+                        os.unlink(target)
                     os.symlink(os.path.join(hook_files, "hookrunner"), target)
 
     @classmethod
