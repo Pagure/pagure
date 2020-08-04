@@ -1,6 +1,7 @@
 Upgrading Pagure
 ================
 
+
 From 5.10 to 5.11
 -----------------
 
@@ -9,6 +10,10 @@ The 5.11 release contains a database schema updates, so:
 * Update the data schema using alembic: ``alembic upgrade head``
 
 (As usual, do your backups before).
+
+New configuration key added (in 5.11.2):
+
+* LOGGING_GIT_HOOKS
 
 
 From 5.9 to 5.10

@@ -3,6 +3,12 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
+5.11.2 (2020-08-04)
+-------------------
+
+- Allow having a dedicated loggin configuration for the git hooks
+
+
 5.11.1 (2020-08-03)
 -------------------
 

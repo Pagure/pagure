@@ -8,7 +8,7 @@ On May 14, 2019 (release 5.10.0) the list looks as follow:
 =================  ===========
 Number of commits  Contributor
 =================  ===========
-  6794              Pierre-Yves Chibon <pingou@pingoured.fr>
+  6796              Pierre-Yves Chibon <pingou@pingoured.fr>
    328              Ryan Lerch <rlerch@redhat.com>
    172              Vivek Anand <vivekanand1101@gmail.com>
    143              Julen Landa Alustiza <jlanda@fedoraproject.org>
