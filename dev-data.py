@@ -721,4 +721,6 @@ if __name__ == "__main__":
         insert_data(session, user_name, user_email)
 
     if args.delete or args.all:
+        if not session:
+            session = pagure.lib.query.create_session(_config["DB_URL"])
         empty_dev_db(session)

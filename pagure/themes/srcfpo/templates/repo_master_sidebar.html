@@ -118,48 +118,40 @@
     {% endif %}
   </div>
 
-  {% if g.authenticated and repo.user.user == g.fas_user.username %}
+  <div class="col-xs-2 line-height-1"></div>
   <div id="orphan-section" class="pt-3">
       <div class="col-xs-2 line-height-1"></div>
-      <h6>Orphaned:</h6>
-      <div class="btn-group">
+      {% if repo.user.user == "orphan" %}
+      <p>Orphaned for: {{ repo.orphan_reason.reason }}
+      {% if repo.orphan_reason.reason_info %}
+      -- {{ repo.orphan_reason.reason_info }}
+      {% endif %}
+      </p>
+
+      <a href="#" title="Adopt this orphaned package"
+         {% if g.authenticated %}
+         class="btn btn-sm btn-outline-primary"
+         {% else %}
+         class="btn btn-sm btn-outline-primary disabled"
+         {% endif %}
+         id="take_orphan_button">
+           <i id="take_orphan_icon" class="fa fa-fw fa-hand-paper-o"></i>
+           Take
+      </a>
+      {% else %}
+
+      {% if g.authenticated %}
+        <div class="btn-group">
           <a href="#" title="Orphan this package"
              class="btn btn-sm btn-outline-primary"
-             id="orphan-button">
-              <i id="orphan-icon" class="fa fa-fw fa-hand-paper-o"></i>
-              Orphan
+             data-toggle="modal" data-target="#modal_orphan">
+            <i id="orphan_icon-icon" class="fa fa-fw fa-hand-paper-o"></i>
+            Orphan
           </a>
-      </div>
+        </div>
+      {% endif %}
+    {% endif %}
   </div>
-  {% endif %}
-
-  {% if g.authenticated and repo.user.user == "orphan" %}
-  <div id="take-orphan-section" class="pt-3">
-    <div class="col-xs-2 line-height-1"></div>
-    <h6>Orphaned:</h6>
-    <div class="btn-group">
-      <a href="#" title="Adopt this orphaned package"
-          class="btn btn-sm btn-outline-primary disabled"
-          id="take-orphan-button">
-        <i id="take-orphan-icon" class="fa fa-fw fa-hand-paper-o"></i>
-        Take
-      </a>
-    </div>
-  </div>
-  {% elif not g.authenticated and repo.user.user == "orphan" %}
-    <div id="take-orphan-section">
-    <div class="col-xs-2 line-height-1"></div>
-    <h6>Orphaned:</h6>
-    <div class="btn-group">
-      <a href="#" title="Adopt this orphaned package"
-          class="btn btn-sm btn-outline-primary disabled"
-          id="take-orphan-button">
-        <i id="take-orphan-icon" class="fa fa-fw fa-hand-paper-o"></i>
-        Take
-      </a>
-    </div>
-  </div>
-  {% endif %}
 
   <div class="pt-3">
     <div class="col-xs-2 line-height-1">
@@ -228,6 +220,45 @@
             </button>
           </div>
         </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modal_orphan" tabindex="-1"
+          role="dialog" aria-labelledby="Orphan this package" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Orphan package</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            <span class="sr-only">Close</span>
+          </button>
+        </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="reason_menu">Reason</label>
+              <select id="reason_menu" class="form-control">
+              {% for id, text in [('lack_of_time_option_button', 'Lack of time'),
+                                 ('do_not_use_it_option_button', 'Do not use it anymore'),
+                                 ('unmaintained_option_button', 'Unmaintained upstream'),
+                                 ('fails_to_build_option_button', 'Fails to build from source'),
+                                 ('not_fixed_option_button', 'Important bug not fixed'),
+                                 ('other_option_button', 'Other')] %}
+
+                <option id="{{ id }}">{{ text }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          <label for="orphan_reason_info">Additional info</label>
+          <input title="Additional info for orphaning reason"
+                  class="form-control" name="orphan_reason_info" id="orphan_reason_info" value=""/>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-primary" type="submit" title="Orphan this package" id="orphan_button">
+               Update
+            </button>
+          </div>
       </div>
     </div>
   </div>
@@ -336,17 +367,26 @@
         return false;
       });
 
-      {% if g.authenticated and repo.user.user == "orphan" %}
-      $("#take-orphan-button").click(function(){
+      {% if g.authenticated %}
+      $("#take_orphan_button").click(function(){
+        $("#take_orphan_button").attr("disabled", true);
 
         $.ajax({
           url: "{{ url_for('distgit_ns.take_orphan_endpoint', repo=repo.name, namespace=repo.namespace) }}",
           type: 'POST',
           dataType: 'json',
           success: function(res) {
-            $("#point_of_contact").html("{{ g.fas_user.username }}");
-            $("#take-orphan-section").hide();
-            $("#orphan-section").show();
+            $("#point_of_contact_div").html(`
+              Maintained by
+              <a href="{{ url_for('ui_ns.view_user', username=repo.user.user)}}"
+              id="point_of_contact">
+              {{- g.fas_user.username -}}
+              </a>
+            `);
+            $("#orphan-section").html('');
+            $("#orphan_button").attr("class", "btn btn-sm btn-outline-primary");
+            $("#take_orphan_button").attr("class", "btn btn-sm btn-outline-primary d-none");
+            $("#take_orphan_button").attr("disabled", false);
           },
           error: function(res) {
             if (res.responseJSON.errors) {
@@ -354,17 +394,18 @@
             } else {
               alert('Unable to change the point of contact: ' + res.responseJSON.error);
             }
+            $("#take_orphan_button").attr("disabled", false);
           }
         });
       });
       {% endif %}
-      {% if repo.user.user == "orphan" %}
+
       $.ajax({
         url: "{{ url_for('distgit_ns.get_actived_status', repo=repo.name, namespace=repo.namespace) }}",
         type: 'GET',
         dataType: 'json',
         success: function(res) {
-          var _btn = $("#take-orphan-button");
+          var _btn = $("#take_orphan_button");
           if (!res.active){
             _btn.off("click");
             _btn.click(function(){
@@ -379,19 +420,22 @@
           _btn.removeClass('disabled');
         }
       });
-      {% endif %}
 
-      {% if g.authenticated and repo.user.user == g.fas_user.username %}
-      $("#orphan-button").click(function(){
-
+      $("#orphan_button").click(function(){
+        $("#orphan_button").attr("disabled", true);
         $.ajax({
           url: "{{ url_for('distgit_ns.orphan_endpoint', repo=repo.name, namespace=repo.namespace) }}",
           type: 'POST',
           dataType: 'json',
+          data: {
+            'orphan_reason': $('#reason_menu').val(),
+            'orphan_reason_info': $('#orphan_reason_info').val()
+          },
           success: function(res) {
             $("#point_of_contact_div").html("Package is currently unmaintained");
-            $("#orphan-section").hide();
-            $("#take-orphan-section").show();
+            $("#orphan_button").attr("disabled", false);
+            $('#modal_orphan').modal('hide');
+            $('#orphan-section').html('');
           },
           error: function(res) {
             if (res.responseJSON.errors) {
@@ -399,10 +443,10 @@
             } else {
               alert('Unable to orphan the package: ' + res.responseJSON.error);
             }
+            $("#orphan_button").attr("disabled", false);
           }
         });
       });
-      {% endif %}
     });
   </script>
   {% endif %}
