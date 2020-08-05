@@ -96,10 +96,10 @@ create/merge pull-requests across or within projects.
 Summary:            Apache HTTPD configuration for Pagure
 BuildArch:          noarch
 Requires:           %{name} = %{version}-%{release}
-Requires:           httpd-filesystem
 %if 0%{?rhel} && 0%{?rhel} < 8
 Requires:           mod_wsgi
 %else
+Requires:           httpd-filesystem
 Requires:           python%{python_pkgversion}-mod_wsgi
 %endif
 %description        web-apache-httpd
