@@ -215,18 +215,34 @@ class PagureMilter(Milter.Base):
 
         msg_id = clean_item(msg_id)
 
-        if msg_id and "-ticket-" in msg_id:
-            self.log("Processing issue")
-            session.remove()
-            return self.handle_ticket_email(msg, msg_id)
-        elif msg_id and "-pull-request-" in msg_id:
-            self.log("Processing pull-request")
-            session.remove()
-            return self.handle_request_email(msg, msg_id)
-        else:
-            self.log("Not a pagure ticket or pull-request email, let it go")
-            session.remove()
-            return Milter.CONTINUE
+        try:
+            if msg_id and "-ticket-" in msg_id:
+                self.log("Processing issue")
+                session.remove()
+                return self.handle_ticket_email(msg, msg_id)
+            elif msg_id and "-pull-request-" in msg_id:
+                self.log("Processing pull-request")
+                session.remove()
+                return self.handle_request_email(msg, msg_id)
+            else:
+                self.log("Not a pagure ticket or pull-request email, let it go")
+                session.remove()
+                return Milter.CONTINUE
+        except requests.ReadTimeout as e:
+            self.setreply("451",
+                          xcode="4.4.2",
+                          msg="The comment couldn't be added: "+str(e))
+            return Milter.TEMPFAIL
+        except requests.ConnectionError as e:
+            self.setreply("451",
+                          xcode="4.4.1",
+                          msg="The comment couldn't be added: "+str(e))
+            return Milter.TEMPFAIL
+        except requests.RequestException as e:
+            self.setreply("554",
+                          xcode="5.3.0",
+                          msg="The comment couldn't be added: "+str(e))
+            return Milter.REJECT
 
     def handle_ticket_email(self, emailobj, msg_id):
         """ Add the email as a comment on a ticket. """
