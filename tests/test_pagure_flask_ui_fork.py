@@ -302,11 +302,31 @@ class PagureFlaskForktests(tests.Modeltests):
         )
 
         self.assertIn(
-            '<span class="btn btn-success btn-sm font-weight-bold disabled opacity-100">+3</span>',
+            '<span class="btn btn-success btn-sm font-weight-bold disabled'
+            ' opacity-100">+3</span>',
             output_text,
         )
         self.assertIn(
-            '<span class="btn btn-danger btn-sm font-weight-bold disabled opacity-100">-1</span>',
+            '<span class="btn btn-danger btn-sm font-weight-bold disabled '
+            'opacity-100">-1</span>',
+            output_text,
+        )
+
+        # Test if hunk headline is rendered without line numbers
+        self.assertIn(
+            '<td class="cell1"></td><td class="prc border-right"></td>\n<td '
+            'class="cell2 stretch-table-column">                <pre class='
+            '"text-muted"><code>@@ -1,2 +1,4 @@',
+            output_text,
+        )
+        # Tests if line number 1 is displayed
+        self.assertNotIn(
+            '<td class="cell1"><a id="_1__1" href="#_1__1" data-line-number="1" data-file-number="1"></a></td>',
+            output_text,
+        )
+        # Test if line number 2 is displayed
+        self.assertIn(
+            '<td class="cell1"><a id="_1__2" href="#_1__2" data-line-number="2" data-file-number="1"></a></td>',
             output_text,
         )
 

@@ -149,38 +149,33 @@ def format_loc(
     for key in comments:
         comments[key] = sorted(comments[key], key=lambda obj: obj.date_created)
 
-    if not index:
-        index = ""
+    if isinstance(filename, str) and six.PY2:
+        filename = filename.decode("UTF-8")
 
     cnt = 1
     for line in loc.split("\n"):
-        if filename and commit:
-            if isinstance(filename, str) and six.PY2:
-                filename = filename.decode("UTF-8")
-
-            if isprdiff and (
-                line.startswith("@@")
-                or line.startswith("+")
-                or line.startswith("-")
-            ):
-                if line.startswith("@@"):
-                    output.append(
-                        '<tr class="stretch-table-column bg-light"\
-                    id="c-%(commit)s-%(cnt_lbl)s">'
-                        % ({"cnt_lbl": cnt, "commit": commit})
-                    )
-                elif line.startswith("+"):
-                    output.append(
-                        '<tr class="stretch-table-column alert-success" \
-                    id="c-%(commit)s-%(cnt_lbl)s">'
-                        % ({"cnt_lbl": cnt, "commit": commit})
-                    )
-                elif line.startswith("-"):
-                    output.append(
-                        '<tr class="stretch-table-column alert-danger" \
-                    id="c-%(commit)s-%(cnt_lbl)s">'
-                        % ({"cnt_lbl": cnt, "commit": commit})
-                    )
+        if line.startswith("@@"):
+            output.append(
+                '<tr class="stretch-table-column bg-light"\
+            id="c-%(commit)s-%(cnt_lbl)s">'
+                % ({"cnt_lbl": cnt, "commit": commit})
+            )
+            output.append(
+                '<td class="cell1"></td><td class="prc border-right"></td>'
+            )
+        else:
+            if line.startswith("+"):
+                output.append(
+                    '<tr class="stretch-table-column alert-success" \
+                id="c-%(commit)s-%(cnt_lbl)s">'
+                    % ({"cnt_lbl": cnt, "commit": commit})
+                )
+            elif line.startswith("-"):
+                output.append(
+                    '<tr class="stretch-table-column alert-danger" \
+                id="c-%(commit)s-%(cnt_lbl)s">'
+                    % ({"cnt_lbl": cnt, "commit": commit})
+                )
             else:
                 output.append(
                     '<tr id="c-%(commit)s-%(cnt_lbl)s">'
@@ -210,13 +205,6 @@ def format_loc(
                         "tree_id": tree_id,
                     }
                 )
-            )
-        else:
-            output.append(
-                '<tr><td class="cell1">'
-                '<a id="%(cnt)s" href="#%(cnt)s" data-line-number='
-                '"%(cnt_lbl)s"></a></td>'
-                % ({"cnt": "%s_%s" % (index, cnt), "cnt_lbl": cnt})
             )
 
         cnt += 1
@@ -254,29 +242,24 @@ def format_loc(
                         + 'title="Open changed file"></span></a>'
                     )
 
-        if isprdiff and (
-            line.startswith("@@")
-            or line.startswith("+")
-            or line.startswith("-")
-        ):
-            if line.startswith("@@"):
-                output.append(
-                    '<td class="cell2 stretch-table-column">\
-                    <pre class="text-muted"><code>%s</code></pre></td>'
-                    % line
-                )
-            elif line.startswith("+"):
-                output.append(
-                    '<td class="cell2 stretch-table-column">\
-                    <pre class="alert-success"><code>%s</code></pre></td>'
-                    % escape(line)
-                )
-            elif line.startswith("-"):
-                output.append(
-                    '<td class="cell2 stretch-table-column">\
-                    <pre class="alert-danger"><code>%s</code></pre></td>'
-                    % escape(line)
-                )
+        if line.startswith("@@"):
+            output.append(
+                '<td class="cell2 stretch-table-column">\
+                <pre class="text-muted"><code>%s</code></pre></td>'
+                % line
+            )
+        elif line.startswith("+"):
+            output.append(
+                '<td class="cell2 stretch-table-column">\
+                <pre class="alert-success"><code>%s</code></pre></td>'
+                % escape(line)
+            )
+        elif line.startswith("-"):
+            output.append(
+                '<td class="cell2 stretch-table-column">\
+                <pre class="alert-danger"><code>%s</code></pre></td>'
+                % escape(line)
+            )
         else:
             output.append(
                 '<td class="cell2"><pre><code>%s</code></pre></td>'
