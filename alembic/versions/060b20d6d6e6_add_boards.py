@@ -23,7 +23,7 @@ def upgrade():
         sa.Column('id', sa.INTEGER(), nullable=False, autoincrement=True),
         sa.Column('project_id', sa.INTEGER(), nullable=False),
         sa.Column('tag_id', sa.INTEGER(), nullable=False),
-        sa.Column('name', sa.TEXT(), nullable=False),
+        sa.Column('name', sa.String(255), nullable=False),
         sa.Column('active', sa.BOOLEAN(), nullable=False, default=True),
         sa.Column('created', sa.DateTime(), nullable=False, default=datetime.datetime.utcnow),
         sa.Column('date_updated', sa.DateTime(), nullable=False,

@@ -3214,7 +3214,7 @@ class Board(BASE):
         nullable=False,
         index=True,
     )
-    name = sa.Column(sa.Text(), nullable=False)
+    name = sa.Column(sa.String(255), nullable=False)
     active = sa.Column(sa.Boolean, nullable=False, default=True)
     tag_id = sa.Column(
         sa.Integer,
