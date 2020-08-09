@@ -544,6 +544,9 @@ def api():
         project.api_project_block_user,
         project.api_get_project_webhook_token,
         project.api_project_create_api_token,
+        project.api_commit_info,
+        project.api_view_file,
+        project.delete_project,
     ]
     sections.append(build_docs_section("projects", projects_methods))
 
