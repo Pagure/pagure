@@ -3,6 +3,14 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
+5.11.3 (2020-08-11)
+-------------------
+
+- Fix installability of web-apache-httpd subpackage on EL7 (Neal Gompa)
+- Fix the model around the boards so it works with mariadb/mysql
+- Add new endpoints to the API documentation
+
+
 5.11.2 (2020-08-04)
 -------------------
 
