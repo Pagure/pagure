@@ -66,6 +66,9 @@
               <span class="fa fa-fw text-danger fa-exclamation-circle pt-1 icon_id"></span>
               <span class="text-danger font-weight-bold id_txt">#{{ bissue.issue.id }}</span>
             {% endif %}
+            {% if bissue.issue.assignee %}
+            - {{ bissue.issue.assignee.username | avatar(size=20) | safe}}
+            {% endif %}
               - {{ bissue.issue.title | truncate(80, False, '...') }}
               </a>
             </li>
