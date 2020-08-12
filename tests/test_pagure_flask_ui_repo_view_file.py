@@ -135,12 +135,7 @@ class PagureFlaskRepoViewFiletests(LocalBasetests):
         # View what's supposed to be an image
         output = self.app.get("/test/blob/master/f/test.jpg")
         self.assertEqual(output.status_code, 200)
-        output_text = output.get_data(as_text=True)
-        self.assertIn("Binary files cannot be rendered.<br/>", output_text)
-        self.assertIn(
-            '<a href="/test/raw/master/f/test.jpg">view the raw version',
-            output_text,
-        )
+        self.assertNotIn(b"<html", output.data)
 
     def test_view_file_by_commit(self):
         """ Test the view_file in a specific commit. """
@@ -151,29 +146,29 @@ class PagureFlaskRepoViewFiletests(LocalBasetests):
 
         output = self.app.get("/test/blob/%s/f/test.jpg" % commit.oid.hex)
         self.assertEqual(output.status_code, 200)
-        output_text = output.get_data(as_text=True)
-        self.assertIn("Binary files cannot be rendered.<br/>", output_text)
-        self.assertIn('/f/test.jpg">view the raw version', output_text)
+        self.assertNotIn(b"<html", output.data)
 
-    def test_view_file_by_name(self):
+    def test_view_file_invalid_branch(self):
         """ Test the view_file via a image name. """
-
-        # View by image name -- somehow we support this
         output = self.app.get("/test/blob/sources/f/test.jpg")
-        self.assertEqual(output.status_code, 200)
-        output_text = output.get_data(as_text=True)
-        self.assertIn("Binary files cannot be rendered.<br/>", output_text)
-        self.assertIn('/f/test.jpg">view the raw version', output_text)
+        self.assertEqual(output.status_code, 404)
 
-    def test_view_file_binary_file2(self):
+    def test_view_file_invalid_branch2(self):
         """ Test the view_file with a binary file (2). """
-
-        # View binary file
         output = self.app.get("/test/blob/sources/f/test_binary")
+        self.assertEqual(output.status_code, 404)
+
+    def test_view_file_invalid_branch(self):
+        """ Test the view_file via a image name. """
+        output = self.app.get("/test/blob/master/f/test.jpg")
         self.assertEqual(output.status_code, 200)
-        output_text = output.get_data(as_text=True)
-        self.assertIn('/f/test_binary">view the raw version', output_text)
-        self.assertTrue("Binary files cannot be rendered.<br/>" in output_text)
+        self.assertNotIn(b"<html", output.data)
+
+    def test_view_file_invalid_branch2(self):
+        """ Test the view_file with a binary file (2). """
+        output = self.app.get("/test/blob/master/f/test_binary")
+        self.assertEqual(output.status_code, 200)
+        self.assertNotIn(b"<html", output.data)
 
     def test_view_file_for_folder(self):
         """ Test the view_file with a folder. """

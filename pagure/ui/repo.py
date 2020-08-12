@@ -639,7 +639,13 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
         output_type = "tree"
 
     if output_type == "binary":
-        headers[str("Content-Disposition")] = "attachment"
+        return view_raw_file(
+            repo,
+            identifier,
+            filename=filename,
+            username=username,
+            namespace=namespace,
+        )
 
     return flask.Response(
         flask.stream_with_context(

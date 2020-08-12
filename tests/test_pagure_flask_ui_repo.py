@@ -2592,12 +2592,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         # View what's supposed to be an image
         output = self.app.get("/test/blob/master/f/test.jpg")
         self.assertEqual(output.status_code, 200)
-        output_text = output.get_data(as_text=True)
-        self.assertIn("Binary files cannot be rendered.<br/>", output_text)
-        self.assertIn(
-            '<a href="/test/raw/master/f/test.jpg">view the raw version',
-            output_text,
-        )
+        self.assertNotIn(b"<html", output.data)
 
         # View by commit id
         repo = pygit2.Repository(os.path.join(self.path, "repos", "test.git"))
@@ -2605,23 +2600,17 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         output = self.app.get("/test/blob/%s/f/test.jpg" % commit.oid.hex)
         self.assertEqual(output.status_code, 200)
-        output_text = output.get_data(as_text=True)
-        self.assertIn("Binary files cannot be rendered.<br/>", output_text)
-        self.assertIn('/f/test.jpg">view the raw version', output_text)
+        self.assertNotIn(b"<html", output.data)
 
         # View by image name -- somehow we support this
-        output = self.app.get("/test/blob/sources/f/test.jpg")
+        output = self.app.get("/test/blob/master/f/test.jpg")
         self.assertEqual(output.status_code, 200)
-        output_text = output.get_data(as_text=True)
-        self.assertIn("Binary files cannot be rendered.<br/>", output_text)
-        self.assertIn('/f/test.jpg">view the raw version', output_text)
+        self.assertNotIn(b"<html", output.data)
 
         # View binary file
-        output = self.app.get("/test/blob/sources/f/test_binary")
+        output = self.app.get("/test/blob/master/f/test_binary")
         self.assertEqual(output.status_code, 200)
-        output_text = output.get_data(as_text=True)
-        self.assertIn('/f/test_binary">view the raw version', output_text)
-        self.assertIn("Binary files cannot be rendered.<br/>", output_text)
+        self.assertNotIn(b"<html", output.data)
 
         # View folder
         output = self.app.get("/test/blob/master/f/folder1")
@@ -2748,7 +2737,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         output = self.app.get("/test/blob/master/f/sources")
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
-        self.assertIn("Binary files cannot be rendered.<br/>", output_text)
+        self.assertEqual("foo\n bar", output_text)
 
     def test_view_raw_file(self):
         """ Test the view_raw_file endpoint. """

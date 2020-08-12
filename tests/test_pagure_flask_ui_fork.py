@@ -4677,10 +4677,7 @@ More information</textarea>
             # Check fork-edit doesn't show for binary files
             output = self.app.get("/test/blob/master/f/test.jpg")
             self.assertEqual(output.status_code, 200)
-            self.assertNotIn(
-                "Fork and Edit\n                    </button>\n",
-                output.get_data(as_text=True),
-            )
+            self.assertNotIn(b"<html", output.data)
 
             # Check for edit panel
             output = self.app.post(
@@ -4738,8 +4735,7 @@ More information</textarea>
             )
             self.assertEqual(output.status_code, 400)
             self.assertIn(
-                "<p>Cannot edit binary files</p>",
-                output.get_data(as_text=True),
+                b"<p>Cannot edit binary files</p>", output.data,
             )
 
         # Check fork-edit shows when user is not logged in
@@ -4765,10 +4761,7 @@ More information</textarea>
             # Check fork-edit doesn't show for binary
             output = self.app.get("/test/blob/master/f/test.jpg")
             self.assertEqual(output.status_code, 200)
-            self.assertNotIn(
-                "Edit in your fork\n                    </button>\n",
-                output.get_data(as_text=True),
-            )
+            self.assertNotIn(b"<html", output.data)
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_fork_edit_file_namespace(self):
@@ -4866,10 +4859,7 @@ More information</textarea>
                 "/somenamespace/test3/blob/master/f/test.jpg"
             )
             self.assertEqual(output.status_code, 200)
-            self.assertNotIn(
-                "Fork and Edit\n                    </button>\n",
-                output.get_data(as_text=True),
-            )
+            self.assertNotIn(b"<html", output.data)
 
             # Check for edit panel
             output = self.app.post(
