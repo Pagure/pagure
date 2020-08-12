@@ -510,7 +510,9 @@ def api_board_status(repo, board_name, username=None, namespace=None):
 
         try:
             close_status = data[name].get("close_status") or None
-            close = data[name].get("close") or True if close_status else False
+            close = data[name].get("close") or (
+                True if close_status else False
+            )
             if close_status not in repo.close_status:
                 close_status = None
 

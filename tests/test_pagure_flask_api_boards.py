@@ -801,6 +801,87 @@ class PagureFlaskApiBoardsWithBoardtests(tests.SimplePagureTest):
             },
         )
 
+    def test_api_board_api_board_status_no_close_status(self):
+        headers = {
+            "Authorization": "token aaabbbcccddd",
+            "Content-Type": "application/json",
+        }
+
+        data = json.dumps(
+            {
+                "Backlog": {
+                    "close": False,
+                    "close_status": None,
+                    "bg_color": "#FFB300",
+                    "default": True,
+                    "rank": 1,
+                },
+                "Triaged": {
+                    "close": False,
+                    "close_status": None,
+                    "bg_color": "#ca0dcd",
+                    "default": False,
+                    "rank": 2,
+                },
+                "Done": {
+                    "close": True,
+                    "close_status": None,
+                    "bg_color": "#34d240",
+                    "default": False,
+                    "rank": 4,
+                },
+                "  ": {
+                    "close": True,
+                    "close_status": None,
+                    "bg_color": "#34d240",
+                    "default": False,
+                    "rank": 5,
+                },
+            }
+        )
+        output = self.app.post(
+            "/api/0/test/boards/dev/status", headers=headers, data=data
+        )
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                "board": {
+                    "active": True,
+                    "name": "dev",
+                    "status": [
+                        {
+                            "bg_color": "#FFB300",
+                            "close": False,
+                            "close_status": None,
+                            "default": True,
+                            "name": "Backlog",
+                        },
+                        {
+                            "bg_color": "#ca0dcd",
+                            "close": False,
+                            "close_status": None,
+                            "default": False,
+                            "name": "Triaged",
+                        },
+                        {
+                            "name": "Done",
+                            "close": True,
+                            "close_status": None,
+                            "default": False,
+                            "bg_color": "#34d240",
+                        },
+                    ],
+                    "tag": {
+                        "tag": "dev",
+                        "tag_color": "DeepBlueSky",
+                        "tag_description": "",
+                    },
+                }
+            },
+        )
+
     def test_api_board_api_board_status_adding_removing(self):
         headers = {
             "Authorization": "token aaabbbcccddd",
