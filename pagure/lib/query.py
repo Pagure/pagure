@@ -4957,6 +4957,10 @@ def get_watch_list(session, obj):
     # Add the user of the project
     users.add(obj.project.user.username)
 
+    # Add the assignee if there is one
+    if obj.assignee:
+        users.add(obj.assignee.username)
+
     # Add the regular contributors
     for contributor in obj.project.users:
         users.add(contributor.username)
