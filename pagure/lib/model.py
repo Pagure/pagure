@@ -1010,9 +1010,8 @@ class Project(BASE):
             elif access == "collaborator":
                 committers = set(self.committer_groups)
                 admins = set(self.admin_groups)
-                return list(
-                    set(self.collaborator_groups) - committers - admins
-                )
+                collaborators = set(self.collaborator_groups)
+                return list(collaborators - committers - admins)
             elif access == "ticket":
                 committers = set(self.committer_groups)
                 admins = set(self.admin_groups)
