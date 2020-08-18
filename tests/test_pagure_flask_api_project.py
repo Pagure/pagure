@@ -4315,7 +4315,7 @@ class PagureFlaskApiProjectWebhookTokenTests(tests.Modeltests):
             project,
             new_user="foo",
             user="pingou",
-            access="ticket",
+            access="collaborator",
         )
         self.session.commit()
 
