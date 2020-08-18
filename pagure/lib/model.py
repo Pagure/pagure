@@ -487,6 +487,16 @@ class Project(BASE):
     )
 
     collaborator_groups = relation(
+        "PagureGroup",
+        secondary="projects_groups",
+        primaryjoin="projects.c.id==projects_groups.c.project_id",
+        secondaryjoin="and_(pagure_group.c.id==projects_groups.c.group_id,\
+                projects_groups.c.access=='collaborator')",
+        order_by="PagureGroup.group_name.asc()",
+        viewonly=True,
+    )
+
+    collaborator_project_groups = relation(
         "ProjectGroup",
         primaryjoin="and_(projects.c.id==projects_groups.c.project_id,\
                     projects_groups.c.access=='collaborator')",

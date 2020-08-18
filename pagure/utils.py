@@ -311,7 +311,7 @@ def is_repo_collaborator(repo_obj, refname, username=None, session=None):
                     return True
 
     # If they are in a group that has commit access -> maybe
-    for project_group in repo_obj.collaborator_groups:
+    for project_group in repo_obj.collaborator_project_groups:
         if project_group.group.group_name in usergroups:
             # if branch is None when the user tries to read,
             # so we'll allow that

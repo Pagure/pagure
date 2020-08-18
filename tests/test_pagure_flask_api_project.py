@@ -1010,6 +1010,27 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         )
         self.session.commit()
 
+        # Add a collaborator group
+        msg = pagure.lib.query.add_group(
+            self.session,
+            group_name="some_group",
+            display_name="Some Group",
+            description=None,
+            group_type="bar",
+            user="pingou",
+            is_admin=False,
+            blacklist=[],
+        )
+        pagure.lib.query.add_group_to_project(
+            session=self.session,
+            project=project,
+            new_group="some_group",
+            user="pingou",
+            access="collaborator",
+            branches="features/*",
+        )
+        self.session.commit()
+
         # Existing project
         output = self.app.get("/api/0/test")
         self.assertEqual(output.status_code, 200)
@@ -1019,7 +1040,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         expected_data = {
             "access_groups": {
                 "admin": [],
-                "collaborator": [],
+                "collaborator": ["some_group"],
                 "commit": [],
                 "ticket": [],
             },
