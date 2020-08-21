@@ -1353,6 +1353,11 @@ def api_pull_request_create(repo, username=None, namespace=None):
     |                       |          |             | changes are about.     |
     +-----------------------+----------+-------------+------------------------+
 
+    Note: If f the repo you're opening the PR against is not the same as the
+    repo from which the changes originates, you must provide the ``repo_from``
+    and ``repo_from_username`` (and potentially ``repo_from_namespace``)
+    corresponding to the fork.
+
     Sample response
     ^^^^^^^^^^^^^^^
 
