@@ -2596,7 +2596,19 @@ def api_modify_acls(repo, namespace=None, username=None):
                         400, error_code=APIERROR.EINVALIDREQ, errors="%s" % err
                     )
             elif group:
-                pass
+                _log.info(
+                    "Looking at removing group %s from project %s",
+                    group,
+                    project.fullname,
+                )
+                for grp in project.groups:
+                    if grp.id == group_obj.id:
+                        project.groups.remove(grp)
+                        break
+                pagure.lib.query.update_read_only_mode(
+                    flask.g.session, project, read_only=True
+                )
+                pagure.lib.git.generate_gitolite_acls(project=project)
 
         try:
             flask.g.session.commit()

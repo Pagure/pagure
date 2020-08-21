@@ -3680,6 +3680,237 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
             {"admin": [], "collaborator": [], "commit": [], "ticket": []},
         )
 
+    def test_api_modify_acls_add_remove_group(self):
+        """ Test the api_modify_acls method of the flask api for
+        setting an ACL for a group. """
+        headers = {"Authorization": "token aaabbbcccddd"}
+
+        # Create a group
+        msg = pagure.lib.query.add_group(
+            self.session,
+            group_name="baz",
+            display_name="baz group",
+            description=None,
+            group_type="bar",
+            user="foo",
+            is_admin=False,
+            blacklist=[],
+        )
+        self.session.commit()
+        self.assertEqual(msg, "User `foo` added to the group `baz`.")
+
+        # Add the group to the project
+        data = {"user_type": "group", "name": "baz", "acl": "ticket"}
+        output = self.app.post(
+            "/api/0/test/git/modifyacls", headers=headers, data=data
+        )
+
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        data["date_created"] = "1510742565"
+        data["date_modified"] = "1510742566"
+
+        expected_output = {
+            "access_groups": {
+                "admin": [],
+                "collaborator": [],
+                "commit": [],
+                "ticket": ["baz"],
+            },
+            "access_users": {
+                "admin": [],
+                "collaborator": [],
+                "commit": [],
+                "owner": ["pingou"],
+                "ticket": [],
+            },
+            "close_status": [
+                "Invalid",
+                "Insufficient data",
+                "Fixed",
+                "Duplicate",
+            ],
+            "custom_keys": [],
+            "date_created": "1510742565",
+            "date_modified": "1510742566",
+            "description": "test project #1",
+            "fullname": "test",
+            "id": 1,
+            "milestones": {},
+            "name": "test",
+            "namespace": None,
+            "parent": None,
+            "priorities": {},
+            "tags": [],
+            "url_path": "test",
+            "user": {
+                "fullname": "PY C",
+                "name": "pingou",
+                "url_path": "user/pingou",
+            },
+        }
+        self.assertEqual(data, expected_output)
+
+        # Ensure `baz` was properly added
+        self.session = pagure.lib.query.create_session(self.dbpath)
+        project = pagure.lib.query._get_project(self.session, "test")
+        self.assertEquals(
+            project.access_users,
+            {"admin": [], "collaborator": [], "commit": [], "ticket": []},
+        )
+        self.assertNotEquals(
+            project.access_groups,
+            {"admin": [], "collaborator": [], "commit": [], "ticket": []},
+        )
+        self.assertEquals(len(project.access_groups["ticket"]), 1)
+
+        # Remove the group from the project
+        data = {"user_type": "group", "name": "baz", "acl": None}
+        output = self.app.post(
+            "/api/0/test/git/modifyacls", headers=headers, data=data
+        )
+
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        data["date_created"] = "1510742565"
+        data["date_modified"] = "1510742566"
+
+        expected_output = {
+            "access_groups": {
+                "admin": [],
+                "collaborator": [],
+                "commit": [],
+                "ticket": [],
+            },
+            "access_users": {
+                "admin": [],
+                "collaborator": [],
+                "commit": [],
+                "owner": ["pingou"],
+                "ticket": [],
+            },
+            "close_status": [
+                "Invalid",
+                "Insufficient data",
+                "Fixed",
+                "Duplicate",
+            ],
+            "custom_keys": [],
+            "date_created": "1510742565",
+            "date_modified": "1510742566",
+            "description": "test project #1",
+            "fullname": "test",
+            "id": 1,
+            "milestones": {},
+            "name": "test",
+            "namespace": None,
+            "parent": None,
+            "priorities": {},
+            "tags": [],
+            "url_path": "test",
+            "user": {
+                "fullname": "PY C",
+                "name": "pingou",
+                "url_path": "user/pingou",
+            },
+        }
+        self.assertEqual(data, expected_output)
+
+        # Ensure `baz` was properly removed
+        self.session = pagure.lib.query.create_session(self.dbpath)
+        project = pagure.lib.query._get_project(self.session, "test")
+        self.assertEquals(
+            project.access_users,
+            {"admin": [], "collaborator": [], "commit": [], "ticket": []},
+        )
+        self.assertEquals(
+            project.access_groups,
+            {"admin": [], "collaborator": [], "commit": [], "ticket": []},
+        )
+
+    def test_api_modify_acls_remove_group_not_in_project(self):
+        """ Test the api_modify_acls method of the flask api for
+        setting an ACL for a group. """
+        headers = {"Authorization": "token aaabbbcccddd"}
+
+        # Create a group
+        msg = pagure.lib.query.add_group(
+            self.session,
+            group_name="baz",
+            display_name="baz group",
+            description=None,
+            group_type="bar",
+            user="foo",
+            is_admin=False,
+            blacklist=[],
+        )
+        self.session.commit()
+        self.assertEqual(msg, "User `foo` added to the group `baz`.")
+
+        # Remove the group from the project
+        data = {"user_type": "group", "name": "baz", "acl": None}
+        output = self.app.post(
+            "/api/0/test/git/modifyacls", headers=headers, data=data
+        )
+
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        data["date_created"] = "1510742565"
+        data["date_modified"] = "1510742566"
+
+        expected_output = {
+            "access_groups": {
+                "admin": [],
+                "collaborator": [],
+                "commit": [],
+                "ticket": [],
+            },
+            "access_users": {
+                "admin": [],
+                "collaborator": [],
+                "commit": [],
+                "owner": ["pingou"],
+                "ticket": [],
+            },
+            "close_status": [
+                "Invalid",
+                "Insufficient data",
+                "Fixed",
+                "Duplicate",
+            ],
+            "custom_keys": [],
+            "date_created": "1510742565",
+            "date_modified": "1510742566",
+            "description": "test project #1",
+            "fullname": "test",
+            "id": 1,
+            "milestones": {},
+            "name": "test",
+            "namespace": None,
+            "parent": None,
+            "priorities": {},
+            "tags": [],
+            "url_path": "test",
+            "user": {
+                "fullname": "PY C",
+                "name": "pingou",
+                "url_path": "user/pingou",
+            },
+        }
+        self.assertEqual(data, expected_output)
+
+        # Ensure `baz` was properly removed
+        self.session = pagure.lib.query.create_session(self.dbpath)
+        project = pagure.lib.query._get_project(self.session, "test")
+        self.assertEquals(
+            project.access_users,
+            {"admin": [], "collaborator": [], "commit": [], "ticket": []},
+        )
+        self.assertEquals(
+            project.access_groups,
+            {"admin": [], "collaborator": [], "commit": [], "ticket": []},
+        )
+
 
 class PagureFlaskApiProjectOptionsTests(tests.Modeltests):
     """ Tests for the flask API of pagure for modifying options ofs a project
