@@ -146,7 +146,7 @@ All these repositories are stored in different folders that must be
 created manually.
 
 For example you can place them under ``/srv/git/repositories/`` which would
-make ``/srv/git`` the home of your gitolite user.
+make ``/srv/git`` the home of your git user.
 
 You would then create the folders with:
 ::
@@ -180,9 +180,9 @@ Adjust them for your needs
 * Give apache permission to read the repositories owned by the ``git`` user.
 
 For the sake of this document, we assume that the web application runs under
-the ``git`` user, the same user as your gitolite user, but apache itself
+the ``git`` user, the same user as your git user, but apache itself
 runs under the ``httpd`` (or ``apache2``) user. So by default, apache
-will not be allowed to read git repositories created and managed by gitolite.
+will not be allowed to read git repositories created and managed by pagure.
 
 To give apache this permission (required to make git clone via http work),
 we use file access control lists (aka FACL):
@@ -192,7 +192,7 @@ we use file access control lists (aka FACL):
     setfacl -Rdm user:apache:rx /srv/git
     setfacl -Rm user:apache:rx /srv/git
 
-Where ``/srv/git`` is the home of your gitolite user (which will thus need
+Where ``/srv/git`` is the home of your git user (which will thus need
 to be adjusted for your configuration).
 
 
@@ -272,7 +272,7 @@ pagure.
 If you installed by RPM, then enable and start the worker services
 ::
 
-        systemctl enable --now pagure_worker.service pagure_gitolite_worker.service
+        systemctl enable --now pagure_worker.service pagure_authorized_keys_worker.service
         
 
 Set up virus scanning

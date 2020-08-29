@@ -74,6 +74,13 @@ DOC_APP_URL = 'http://docs.localhost.localdomain'
 GIT_URL_SSH = 'ssh://git@localhost.localdomain/'
 GIT_URL_GIT = 'git://localhost.localdomain/'
 
+### Folder containing the pagure user SSH authorized keys
+SSH_FOLDER = os.path.join(
+    os.path.abspath(os.path.dirname(__file__)),
+    '..',
+    '.ssh'
+)
+
 ### Folder containing to the git repos
 GIT_FOLDER = os.path.join(
     os.path.abspath(os.path.dirname(__file__)),
@@ -124,6 +131,15 @@ GL_BINDIR = None
 
 
 # SSH Information
+
+### SSH commend for interacting with repositories
+SSH_COMMAND_NON_REPOSPANNER = (
+    [
+        "/usr/bin/%(cmd)s",
+        os.path.join(GIT_FOLDER, "%(reponame)s"),
+    ],
+    {"GL_USER": "%(username)s"},
+)
 
 ### The ssh certificates of the git server to be provided to the user
 ### /!\ format is important

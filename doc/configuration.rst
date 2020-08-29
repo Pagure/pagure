@@ -255,7 +255,7 @@ By default pagure provides the following backends:
 - `pagure`: Pagure git auth implementation (using keyhelper.py and aclchecker.py) that is used via sshd AuthorizedKeysCommand
 - `pagure_authorized_keys`: Pagure git auth implementation that writes to authorized_keys file
 
-Defaults to: ``gitolite3``
+Defaults to: ``pagure_authorized_keys``
 
 .. note:: The option GITOLITE_BACKEND is the legacy name, and for backwards compatibility reasons will override this setting
 

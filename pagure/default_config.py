@@ -152,6 +152,11 @@ DISABLE_REMOTE_PR = False
 # Folder where to place the ssh keys for the mirroring feature
 MIRROR_SSHKEYS_FOLDER = "/var/lib/pagure/sshkeys/"
 
+# Folder containing the pagure user SSH authorized keys
+SSH_FOLDER = os.path.join(
+    os.path.abspath(os.path.dirname(__file__)), "..", "lcl", ".ssh"
+)
+
 # Folder containing to the git repos
 # Note that this must be exactly the same as GL_REPO_BASE in gitolite.rc
 GIT_FOLDER = os.path.join(
@@ -199,7 +204,7 @@ GITOLITE_KEYDIR = None
 
 # Backend for git auth decisions
 # This may be either a static helper (like gitolite based) or dynamic.
-GIT_AUTH_BACKEND = "gitolite3"
+GIT_AUTH_BACKEND = "pagure_authorized_keys"
 
 # Legacy option name for GIT_AUTH_BACKEND, retained for backwards compatibility
 # This option overrides GIT_AUTH_BACKEND
@@ -564,7 +569,7 @@ ALLOW_HTTP_PULL_PUSH = True
 # Whether to allow pushing via HTTP
 ALLOW_HTTP_PUSH = False
 # Path to Gitolite-shell if using that, None to use Git directly
-HTTP_REPO_ACCESS_GITOLITE = "/usr/share/gitolite3/gitolite-shell"
+HTTP_REPO_ACCESS_GITOLITE = None
 
 # repoSpanner integration settings
 # Path the the repoBridge binary
@@ -634,12 +639,10 @@ SSH_COMMAND_REPOSPANNER = (
 )
 SSH_COMMAND_NON_REPOSPANNER = (
     [
-        "/usr/share/gitolite3/gitolite-shell",
-        "%(username)s",
-        "%(cmd)s",
-        "%(reponame)s",
+        "/usr/bin/%(cmd)s",
+        os.path.join(GIT_FOLDER, "%(reponame)s"),
     ],
-    {},
+    {"GL_USER": "%(username)s"},
 )
 
 CSP_HEADERS = (

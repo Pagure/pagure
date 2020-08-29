@@ -69,9 +69,6 @@ Requires:           python%{python_pkgversion}-wtforms
 
 %{?systemd_requires}
 
-# No dependency of the app per se, but required to make it working.
-Requires:           gitolite3
-
 %description
 Pagure is a light-weight git-centered forge based on pygit2.
 
