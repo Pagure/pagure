@@ -208,9 +208,9 @@ class PagureMilter(Milter.Base):
             self.log("tohash:    %s" % tohash)
             self.log("Hash does not correspond to the destination")
             session.remove()
-            self.setreply("550",
-                          xcode="5.7.1",
-                          msg="Reply authentication failed.")
+            self.setreply(
+                "550", xcode="5.7.1", msg="Reply authentication failed."
+            )
             return Milter.REJECT
 
         msg_id = clean_item(msg_id)
@@ -225,23 +225,31 @@ class PagureMilter(Milter.Base):
                 session.remove()
                 return self.handle_request_email(msg, msg_id)
             else:
-                self.log("Not a pagure ticket or pull-request email, let it go")
+                self.log(
+                    "Not a pagure ticket or pull-request email, let it go"
+                )
                 session.remove()
                 return Milter.CONTINUE
         except requests.ReadTimeout as e:
-            self.setreply("451",
-                          xcode="4.4.2",
-                          msg="The comment couldn't be added: "+str(e))
+            self.setreply(
+                "451",
+                xcode="4.4.2",
+                msg="The comment couldn't be added: " + str(e)
+            )
             return Milter.TEMPFAIL
         except requests.ConnectionError as e:
-            self.setreply("451",
-                          xcode="4.4.1",
-                          msg="The comment couldn't be added: "+str(e))
+            self.setreply(
+                "451",
+                xcode="4.4.1",
+                msg="The comment couldn't be added: " + str(e)
+            )
             return Milter.TEMPFAIL
         except requests.RequestException as e:
-            self.setreply("554",
-                          xcode="5.3.0",
-                          msg="The comment couldn't be added: "+str(e))
+            self.setreply(
+                "554",
+                xcode="5.3.0",
+                msg="The comment couldn't be added: " + str(e)
+            )
             return Milter.REJECT
 
     def handle_ticket_email(self, emailobj, msg_id):
@@ -273,11 +281,14 @@ class PagureMilter(Milter.Base):
         self.log("Could not add the comment to ticket to pagure")
         self.log(req.text)
 
-        self.setreply("554",
-                      xcode="5.3.0",
-                      msg=("The comment couldn't be added to the issue. " +
-                           "HTTP status: %d %s." %
-                           (req.status_code, req.reason)))
+        self.setreply(
+            "554",
+            xcode="5.3.0",
+            msg=(
+                "The comment couldn't be added to the issue. "
+                + "HTTP status: %d %s." % (req.status_code, req.reason)
+            )
+        )
         return Milter.REJECT
 
     def handle_request_email(self, emailobj, msg_id):
@@ -309,11 +320,14 @@ class PagureMilter(Milter.Base):
         self.log("Could not add the comment to PR to pagure")
         self.log(req.text)
 
-        self.setreply("554",
-                      xcode="5.3.0",
-                      msg=("The comment couldn't be added to the pull " +
-                           "request. HTTP status: %d %s." %
-                           (req.status_code, req.reason)))
+        self.setreply(
+            "554",
+            xcode="5.3.0",
+            msg=(
+                "The comment couldn't be added to the pull request. "
+                + "HTTP status: %d %s." % (req.status_code, req.reason)
+            )
+        )
         return Milter.REJECT
 
 
