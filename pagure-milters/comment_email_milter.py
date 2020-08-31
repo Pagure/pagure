@@ -149,7 +149,7 @@ class PagureMilter(Milter.Base):
             self.log(
                 "No valid recipient email found in To/Cc: %s" % email_address
             )
-            return Milter.CONTINUE
+            return Milter.ACCEPT
 
         if msg["From"] and msg["From"] == _config.get("FROM_EMAIL"):
             self.log("Let's not process the email we send")
