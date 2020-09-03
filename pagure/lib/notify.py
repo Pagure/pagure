@@ -35,6 +35,7 @@ import pagure.lib.query
 import pagure.lib.tasks_services
 from pagure.config import config as pagure_config
 from pagure.pfmarkdown import MENTION_RE
+from markdown.extensions.fenced_code import FencedBlockPreprocessor
 
 
 _log = logging.getLogger(__name__)
@@ -234,7 +235,10 @@ def _add_mentioned_users(emails, comment):
     """ Check the comment to see if an user is mentioned in it and if
     so add this user to the list of people to notify.
     """
-    for username in re.findall(MENTION_RE, comment):
+    filtered_comment = re.sub(
+        FencedBlockPreprocessor.FENCED_BLOCK_RE, "", comment
+    )
+    for username in re.findall(MENTION_RE, filtered_comment):
         user = pagure.lib.query.search_user(flask.g.session, username=username)
         if user:
             emails.add(user.default_email)

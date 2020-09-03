@@ -25,6 +25,7 @@ import pagure.lib.model
 import pagure.lib.notify
 import pagure.lib.query
 import tests
+import munch
 
 
 class PagureLibNotifytests(tests.Modeltests):
@@ -542,6 +543,31 @@ X-pagure-assignee: assignee
 RW1haWwgY29udGVudA==
 """
         self.assertEqual(email.as_string(), exp)
+
+    def test_notification_mention(self):
+        g = munch.Munch()
+        g.session = self.session
+        with patch("flask.g", g):
+
+            def _check_mention(comment, exp):
+                emails = set([])
+                emails = pagure.lib.notify._add_mentioned_users(
+                    emails, comment
+                )
+
+                self.assertEqual(emails, exp)
+
+            exp = set(["bar@pingou.com"])
+            comment = "I think we should ask @pingou how to pronounce pagure"
+            _check_mention(comment, exp)
+
+            exp = set([])
+            comment = """Let me quote him:
+~~~~
+ @pingou> Pagure is pronounced 'pa-gure', not 'pagu-re'
+~~~~
+"""
+            _check_mention(comment, exp)
 
 
 if __name__ == "__main__":
