@@ -22,4 +22,4 @@ echo "Last commits:"
 git --no-pager log -2
 fi
 
-pytest-3 -n auto tests/ $TESTCASE
+pytest-3 -n auto ${TESTCASE:-tests/}

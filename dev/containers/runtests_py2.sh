@@ -23,4 +23,4 @@ git --no-pager log -2
 fi
 
 export LANG="en_US.UTF-8"
-py.test -n auto tests/ $TESTCASE
+py.test -n auto ${TESTCASE:-tests/}
