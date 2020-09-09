@@ -256,6 +256,150 @@ http://localhost.localdomain/test/issue/1
         self.assertEqual(kwargs["user_from"], self.user1.fullname)
 
     @mock.patch("pagure.lib.notify.send_email")
+    def test_user_notified_new_comment_not_in_code_block_incline(
+        self, fakemail
+    ):
+        """Ensures that @mention doesn't over-reach in code-blocks."""
+        self.comment1.comment = (
+            "So apparently they said ``@foo.com is awesome`` :)"
+        )
+        g = munch.Munch()
+        g.fas_user = tests.FakeUser(username="pingou")
+        g.authenticated = True
+        g.session = self.session
+        with mock.patch("flask.g", g):
+            pagure.lib.notify.notify_new_comment(self.comment1)
+
+        (_, args, kwargs) = fakemail.mock_calls[0]
+
+        # Mail should be sent to both users
+        self.assertEqual(args[2], "bar@pingou.com")
+
+        # Mail ID should be comment #1's mail ID...
+        self.assertEqual(kwargs["mail_id"], self.comment1.mail_id)
+
+        # In reply to issue #1's mail ID.
+        self.assertEqual(kwargs["in_reply_to"], self.issue1.mail_id)
+
+        # Project name should be...project (full) name.
+        self.assertEqual(kwargs["project_name"], self.project1.fullname)
+
+        # Mail should be from user1 (who wrote the comment).
+        self.assertEqual(kwargs["user_from"], self.user1.fullname)
+
+    @mock.patch("pagure.lib.notify.send_email")
+    def test_user_notified_new_comment_not_in_code_block_4_backtick(
+        self, fakemail
+    ):
+        """Ensures that @mention doesn't over-reach in code-blocks."""
+        self.comment1.comment = """
+So apparently they said
+````
+@foo.com is awesome and @foo is great
+
+We all love @foo !
+````
+:)
+"""
+        g = munch.Munch()
+        g.fas_user = tests.FakeUser(username="pingou")
+        g.authenticated = True
+        g.session = self.session
+        with mock.patch("flask.g", g):
+            pagure.lib.notify.notify_new_comment(self.comment1)
+
+        (_, args, kwargs) = fakemail.mock_calls[0]
+
+        # Mail should be sent to both users
+        self.assertEqual(args[2], "bar@pingou.com")
+
+        # Mail ID should be comment #1's mail ID...
+        self.assertEqual(kwargs["mail_id"], self.comment1.mail_id)
+
+        # In reply to issue #1's mail ID.
+        self.assertEqual(kwargs["in_reply_to"], self.issue1.mail_id)
+
+        # Project name should be...project (full) name.
+        self.assertEqual(kwargs["project_name"], self.project1.fullname)
+
+        # Mail should be from user1 (who wrote the comment).
+        self.assertEqual(kwargs["user_from"], self.user1.fullname)
+
+    @mock.patch("pagure.lib.notify.send_email")
+    def test_user_notified_new_comment_not_in_code_block_3_backticks(
+        self, fakemail
+    ):
+        """Ensures that @mention doesn't over-reach in code-blocks."""
+        self.comment1.comment = """
+So apparently they said
+```
+@foo.com is awesome and @foo is great
+
+We all love @foo !
+```
+:)
+"""
+        g = munch.Munch()
+        g.fas_user = tests.FakeUser(username="pingou")
+        g.authenticated = True
+        g.session = self.session
+        with mock.patch("flask.g", g):
+            pagure.lib.notify.notify_new_comment(self.comment1)
+
+        (_, args, kwargs) = fakemail.mock_calls[0]
+
+        # Mail should be sent to both users
+        self.assertEqual(args[2], "bar@pingou.com")
+
+        # Mail ID should be comment #1's mail ID...
+        self.assertEqual(kwargs["mail_id"], self.comment1.mail_id)
+
+        # In reply to issue #1's mail ID.
+        self.assertEqual(kwargs["in_reply_to"], self.issue1.mail_id)
+
+        # Project name should be...project (full) name.
+        self.assertEqual(kwargs["project_name"], self.project1.fullname)
+
+        # Mail should be from user1 (who wrote the comment).
+        self.assertEqual(kwargs["user_from"], self.user1.fullname)
+
+    @mock.patch("pagure.lib.notify.send_email")
+    def test_user_notified_new_comment_not_in_code_block_tilde(self, fakemail):
+        """Ensures that @mention doesn't over-reach in code-blocks."""
+        self.comment1.comment = """
+So apparently they said
+~~~~
+@foo.com is awesome and @foo is great
+
+We all love @foo !
+~~~~
+:)
+"""
+        g = munch.Munch()
+        g.fas_user = tests.FakeUser(username="pingou")
+        g.authenticated = True
+        g.session = self.session
+        with mock.patch("flask.g", g):
+            pagure.lib.notify.notify_new_comment(self.comment1)
+
+        (_, args, kwargs) = fakemail.mock_calls[0]
+
+        # Mail should be sent to both users
+        self.assertEqual(args[2], "bar@pingou.com")
+
+        # Mail ID should be comment #1's mail ID...
+        self.assertEqual(kwargs["mail_id"], self.comment1.mail_id)
+
+        # In reply to issue #1's mail ID.
+        self.assertEqual(kwargs["in_reply_to"], self.issue1.mail_id)
+
+        # Project name should be...project (full) name.
+        self.assertEqual(kwargs["project_name"], self.project1.fullname)
+
+        # Mail should be from user1 (who wrote the comment).
+        self.assertEqual(kwargs["user_from"], self.user1.fullname)
+
+    @mock.patch("pagure.lib.notify.send_email")
     def test_notify_new_issue_namespaced(
         self, fakemail
     ):  # pylint: disable=invalid-name
