@@ -288,6 +288,9 @@ class PagureMilter(Milter.Base):
             self.log("Comment added")
             # The message is now effectively delivered. Tell the MTA to accept
             # and discard it.
+            # If you want the message to be processed by another milter after
+            # this one, or delivered to a mailbox the usual way, then change
+            # DROP to ACCEPT.
             return Milter.DROP
         self.log("Could not add the comment to ticket to pagure")
         self.log(req.text)
@@ -329,6 +332,9 @@ class PagureMilter(Milter.Base):
             self.log("Comment added on PR")
             # The message is now effectively delivered. Tell the MTA to accept
             # and discard it.
+            # If you want the message to be processed by another milter after
+            # this one, or delivered to a mailbox the usual way, then change
+            # DROP to ACCEPT.
             return Milter.DROP
         self.log("Could not add the comment to PR to pagure")
         self.log(req.text)
