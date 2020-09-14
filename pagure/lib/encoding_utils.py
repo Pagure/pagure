@@ -15,7 +15,12 @@ from __future__ import unicode_literals, division, absolute_import
 from collections import namedtuple
 import logging
 
-from chardet import universaldetector, __version__ as ch_version
+try:
+    import cchardet
+    from cchardet import __version__ as ch_version
+except ImportError:
+    cchardet = None
+    from chardet import universaldetector, __version__ as ch_version
 
 from pagure.exceptions import PagureEncodingException
 
@@ -44,7 +49,10 @@ def detect_encodings(data):
 
     # We can't use ``chardet.detect`` because we want to dig in the internals
     # of the detector to bias the utf-8 result.
-    detector = universaldetector.UniversalDetector()
+    if cchardet is not None:
+        detector = cchardet.UniversalDetector()
+    else:
+        detector = universaldetector.UniversalDetector()
     detector.reset()
     detector.feed(data)
     result = detector.close()

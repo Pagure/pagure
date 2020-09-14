@@ -20,6 +20,12 @@ import tempfile
 import time
 import os
 
+cchardet = None
+try:
+    import cchardet
+except ImportError:
+    pass
+
 import pygit2
 import six
 from mock import ANY, patch, MagicMock
@@ -2763,9 +2769,16 @@ class PagureFlaskRepotests(tests.Modeltests):
         output = self.app.get("/test/raw/master")
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
-        self.assertEqual(
-            output.headers["Content-Type"].lower(), "text/plain; charset=ascii"
-        )
+        if cchardet is not None:
+            self.assertEqual(
+                output.headers["Content-Type"].lower(),
+                "text/plain; charset=utf-8",
+            )
+        else:
+            self.assertEqual(
+                output.headers["Content-Type"].lower(),
+                "text/plain; charset=ascii",
+            )
         self.assertIn(":Author: Pierre-Yves Chibon", output_text)
 
         # Add some more content to the repo
@@ -2784,9 +2797,16 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         # View in a branch
         output = self.app.get("/test/raw/master/f/sources")
-        self.assertEqual(
-            output.headers["Content-Type"].lower(), "text/plain; charset=ascii"
-        )
+        if cchardet is not None:
+            self.assertEqual(
+                output.headers["Content-Type"].lower(),
+                "text/plain; charset=utf-8",
+            )
+        else:
+            self.assertEqual(
+                output.headers["Content-Type"].lower(),
+                "text/plain; charset=ascii",
+            )
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn("foo\n bar", output_text)
@@ -2837,9 +2857,16 @@ class PagureFlaskRepotests(tests.Modeltests):
         output = self.app.get("/test/raw/master")
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
-        self.assertEqual(
-            output.headers["Content-Type"].lower(), "text/plain; charset=ascii"
-        )
+        if cchardet is not None:
+            self.assertEqual(
+                output.headers["Content-Type"].lower(),
+                "text/plain; charset=utf-8",
+            )
+        else:
+            self.assertEqual(
+                output.headers["Content-Type"].lower(),
+                "text/plain; charset=ascii",
+            )
         self.assertTrue(
             output_text.startswith("diff --git a/test_binary b/test_binary\n")
         )
@@ -2877,9 +2904,16 @@ class PagureFlaskRepotests(tests.Modeltests):
         output = self.app.get("/fork/pingou/test3/raw/master/f/sources")
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
-        self.assertEqual(
-            output.headers["Content-Type"].lower(), "text/plain; charset=ascii"
-        )
+        if cchardet is not None:
+            self.assertEqual(
+                output.headers["Content-Type"].lower(),
+                "text/plain; charset=utf-8",
+            )
+        else:
+            self.assertEqual(
+                output.headers["Content-Type"].lower(),
+                "text/plain; charset=ascii",
+            )
         self.assertIn("foo\n bar", output_text)
 
     def test_view_commit(self):

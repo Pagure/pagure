@@ -9,6 +9,12 @@ import os
 import unittest
 import sys
 
+cchardet = None
+try:
+    import cchardet
+except ImportError:
+    pass
+
 from pagure.lib import mimetype
 
 sys.path.insert(
@@ -20,8 +26,18 @@ class TestMIMEType(unittest.TestCase):
     def test_guess_type(self):
         dataset = [
             ("hello.html", None, "text/html", None),
-            ("hello.html", b"#!", "text/html", "ascii"),
-            ("hello", b"#!", "text/plain", "ascii"),
+            (
+                "hello.html",
+                b"#!",
+                "text/html",
+                "ascii" if cchardet is None else "utf-8",
+            ),
+            (
+                "hello",
+                b"#!",
+                "text/plain",
+                "ascii" if cchardet is None else "utf-8",
+            ),
             ("hello.jpg", None, "image/jpeg", None),
             ("hello.jpg", b"#!", "image/jpeg", None),
             ("hello.jpg", b"\0", "image/jpeg", None),
@@ -49,7 +65,13 @@ class TestMIMEType(unittest.TestCase):
 
     def test_get_normal_headers(self):
         dataset = [
-            ("hello", b"#!", "text/plain; charset=ascii"),
+            (
+                "hello",
+                b"#!",
+                "text/plain; charset=ascii"
+                if cchardet is None
+                else "text/plain; charset=utf-8",
+            ),
             ("hello.jpg", None, "image/jpeg"),
             ("hello.jpg", b"#!", "image/jpeg"),
             ("hello.jpg", b"\0", "image/jpeg"),

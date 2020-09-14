@@ -5,10 +5,17 @@ Tests for :module:`pagure.lib.encoding_utils`.
 
 from __future__ import unicode_literals, absolute_import
 
-import chardet
 import os
 import unittest
 import sys
+
+cchardet = None
+try:
+    import cchardet
+except ImportError:
+    pass
+
+import chardet
 
 sys.path.insert(
     0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
@@ -24,7 +31,10 @@ class TestGuessEncoding(unittest.TestCase):
         """
         data = "Twas bryllyg, and the slythy toves did gyre and gymble"
         result = encoding_utils.guess_encoding(data.encode("ascii"))
-        self.assertEqual(result, "ascii")
+        if cchardet is not None:
+            self.assertEqual(result, "utf-8")
+        else:
+            self.assertEqual(result, "ascii")
 
     def test_guess_encoding_favor_utf_8(self):
         """
@@ -56,17 +66,24 @@ class TestGuessEncodings(unittest.TestCase):
         chardet_result = chardet.detect(data)
         if chardet.__version__[0] == "3":
             # The first three have different confidence values
+            if cchardet is not None:
+                expexted_list = ["utf-8"]
+                # The last one in the list (which apparently has only one)
+                self.assertEqual(result[-1].encoding, "utf-8")
+            else:
+                expexted_list = ["utf-8", "ISO-8859-9", "ISO-8859-1"]
+                # This is the one with the least confidence
+                self.assertEqual(result[-1].encoding, "windows-1255")
             self.assertListEqual(
-                [encoding.encoding for encoding in result][:3],
-                ["utf-8", "ISO-8859-9", "ISO-8859-1"],
+                [encoding.encoding for encoding in result][:3], expexted_list
             )
-            # This is the one with the least confidence
-            self.assertEqual(result[-1].encoding, "windows-1255")
+
             # The values in the middle of the list all have the same confidence
             # value and can't be sorted reliably: use sets.
-            self.assertEqual(
-                set([encoding.encoding for encoding in result]),
-                set(
+            if cchardet is not None:
+                expected_list = sorted(["utf-8"])
+            else:
+                expected_list = sorted(
                     [
                         "utf-8",
                         "ISO-8859-9",
@@ -89,7 +106,10 @@ class TestGuessEncodings(unittest.TestCase):
                         "windows-1251",
                         "windows-1255",
                     ]
-                ),
+                )
+            self.assertListEqual(
+                sorted(set([encoding.encoding for encoding in result])),
+                expected_list,
             )
             self.assertEqual(chardet_result["encoding"], "ISO-8859-9")
         else:
