@@ -2324,6 +2324,11 @@ class PagureFlaskAppNewProjecttests(tests.Modeltests):
                 '<a href="/testproject"><strong>testproject</strong></a>',
                 output_text,
             )
+            self.assertIn(
+                '<code class="py-1 px-2 font-weight-bold '
+                'commit_branch">master</code>',
+                output_text,
+            )
 
         # After
         projects = pagure.lib.query.search_projects(self.session)
@@ -2490,6 +2495,11 @@ class PagureFlaskAppNewProjecttests(tests.Modeltests):
             )
             self.assertIn(
                 '<a href="/project_main"><strong>project_main</strong></a>',
+                output_text,
+            )
+            self.assertIn(
+                '<code class="py-1 px-2 font-weight-bold '
+                'commit_branch">main</code>',
                 output_text,
             )
 

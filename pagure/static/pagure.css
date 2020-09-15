@@ -501,6 +501,11 @@ th[data-sort] {
   background: #ddd;
 }
 
+.commit_branch {
+  font-size: 1em;
+  background: #ababab;
+}
+
 .light_gray_bg {
   background-color:#ccc;
 }

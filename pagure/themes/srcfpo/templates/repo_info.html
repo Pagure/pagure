@@ -418,7 +418,8 @@
                 namespace=repo.namespace,
                 commitid=commit.hex, branch=branchname) }}"
                 class="notblue">
-                <code class="py-1 px-2 font-weight-bold commit_hash">{{ commit.hex|short }}</code>
+                <code class="py-1 px-2 font-weight-bold commit_branch">{{ branchname }}</code><code
+                class="py-1 px-2 font-weight-bold commit_hash">{{ commit.hex|short }}</code>
                 <span class="font-weight-bold">{{ commit.message.split('\n')[0] }}</span>
               </a>
             </div>
