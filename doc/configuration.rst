@@ -1117,6 +1117,7 @@ Valid options are ``fas``, ``openid``, ``oidc``, or ``local``.
   the configuration options starting with ``OIDC_`` (see below) to be provided.
 
 * ``local`` causes pagure to use the local pagure database for user management.
+  User registration can be disabled with the ALLOW_USER_REGISTRATION configuration key.
 
 Defaults to: ``local``.
 
@@ -1780,6 +1781,18 @@ ENABLE_USER_MNGT
 This configuration key can be used to turn on or off managing users (adding or
 removing them from a project) in this pagure instance.
 If turned off, users are managed outside of pagure.
+
+Defaults to: ``True``
+
+
+ALLOW_USER_REGISTRATION
+~~~~~~~~~~~~~~~~~~~~~~~
+
+This configuration key can be used to turn on or off user registration
+(that is, the ability for users to create an account) in this pagure instance.
+If turned off, user accounts cannot be created through the UI or API.
+Currently, this key only applies to pagure instances configured with the ``local``
+authentication backend and has no effect with the other authentication backends.
 
 Defaults to: ``True``
 

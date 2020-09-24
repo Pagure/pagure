@@ -18,11 +18,13 @@
         <input class="btn btn-primary btn-block mt-4" type="submit" value="Login">
         {{ form.csrf_token }}
       </form>
+      {% if config.get('ALLOW_USER_REGISTRATION', True) %}
       <div>
         <a class="btn btn-link btn-block" href="{{url_for('ui_ns.new_user') }}">
           Create a new account
         </a>
       </div>
+      {% endif %}
     </div>
   </div>
 </div>

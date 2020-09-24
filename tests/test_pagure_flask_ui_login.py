@@ -150,6 +150,30 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         self.assertEqual(3, len(items))
 
     @patch.dict("pagure.config.config", {"PAGURE_AUTH": "local"})
+    @patch.dict("pagure.config.config", {"ALLOW_USER_REGISTRATION": False})
+    @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
+    def test_new_user_disabled(self):
+        """ Test the disabling of the new_user endpoint. """
+
+        # Check before:
+        items = pagure.lib.query.search_user(self.session)
+        self.assertEqual(2, len(items))
+
+        # Attempt to access the new user page
+        output = self.app.get("/user/new", follow_redirects=True)
+        self.assertEqual(output.status_code, 200)
+        self.assertIn(
+            "<title>Login - Pagure</title>", output.get_data(as_text=True)
+        )
+        self.assertIn(
+            "User registration is disabled.", output.get_data(as_text=True)
+        )
+
+        # Check after:
+        items = pagure.lib.query.search_user(self.session)
+        self.assertEqual(2, len(items))
+
+    @patch.dict("pagure.config.config", {"PAGURE_AUTH": "local"})
     @patch.dict("pagure.config.config", {"CHECK_SESSION_IP": False})
     def test_do_login(self):
         """ Test the do_login endpoint. """

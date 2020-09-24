@@ -38,6 +38,9 @@ _log = logging.getLogger(__name__)
 def new_user():
     """ Create a new user.
     """
+    if not pagure.config.config.get("ALLOW_USER_REGISTRATION", True):
+        flask.flash("User registration is disabled.", "error")
+        return flask.redirect(flask.url_for("auth_login"))
     form = forms.NewUserForm()
     if form.validate_on_submit():
 

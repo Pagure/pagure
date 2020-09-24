@@ -78,6 +78,9 @@ ENABLE_GROUP_MNGT = True
 # Enables / Disables private projects
 PRIVATE_PROJECTS = True
 
+# Enable / Disable user registration (local auth only)
+ALLOW_USER_REGISTRATION = True
+
 # Enable / Disable deleting branches in the UI
 ALLOW_DELETE_BRANCH = True
 
