@@ -4358,6 +4358,52 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                 {"closed_ticket": 0, "count": 0, "open_ticket": 0},
             )
 
+    def test_api_view_issues_history_stats_detailed_invalid_range(self):
+        """ Test the api_view_issues_history_stats method of the flask api. """
+        self.test_api_new_issue()
+
+        output = self.app.get(
+            "/api/0/test/issues/history/detailed_stats?weeks_range=abc"
+        )
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+
+        self.assertEqual(list(data.keys()), ["stats"])
+        self.assertEqual(len(data["stats"]), 53)
+        last_key = sorted(data["stats"].keys())[-1]
+        self.assertEqual(
+            data["stats"][last_key],
+            {"closed_ticket": 0, "count": 0, "open_ticket": 1},
+        )
+        for k in sorted(data["stats"].keys())[:-1]:
+            self.assertEqual(
+                data["stats"][k],
+                {"closed_ticket": 0, "count": 0, "open_ticket": 0},
+            )
+
+    def test_api_view_issues_history_stats_detailed_one_week(self):
+        """ Test the api_view_issues_history_stats method of the flask api. """
+        self.test_api_new_issue()
+
+        output = self.app.get(
+            "/api/0/test/issues/history/detailed_stats?weeks_range=1"
+        )
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+
+        self.assertEqual(list(data.keys()), ["stats"])
+        self.assertEqual(len(data["stats"]), 1)
+        last_key = sorted(data["stats"].keys())[-1]
+        self.assertEqual(
+            data["stats"][last_key],
+            {"closed_ticket": 0, "count": 0, "open_ticket": 1},
+        )
+        for k in sorted(data["stats"].keys())[:-1]:
+            self.assertEqual(
+                data["stats"][k],
+                {"closed_ticket": 0, "count": 0, "open_ticket": 0},
+            )
+
     def test_api_view_user_issues_pingou(self):
         """ Test the api_view_user_issues method of the flask api for pingou.
         """

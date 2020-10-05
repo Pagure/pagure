@@ -1590,11 +1590,17 @@ def api_view_issues_history_detailed_stats(
         }
 
     """  # noqa
+    weeks_range = flask.request.args.get("weeks_range") or 53
+    try:
+        weeks_range = int(weeks_range)
+    except:
+        weeks_range = 53
+
     repo = _get_repo(repo, username, namespace)
     _check_issue_tracker(repo)
 
     stats = pagure.lib.query.issues_history_stats(
-        flask.g.session, repo, detailed=True
+        flask.g.session, repo, detailed=True, weeks_range=weeks_range,
     )
     jsonout = flask.jsonify({"stats": stats})
     return jsonout

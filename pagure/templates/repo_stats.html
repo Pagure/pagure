@@ -60,6 +60,7 @@ var view_commits_url = "{{ url_for('ui_ns.view_commits',
                     author='---') }}";
 
 {% if g.issues_enabled %}
+nweeks = 53;
 issues_history_stats_plot_call = function() {
   $("#commiter_list").hide();
   $(".commit_trend").hide();
@@ -67,7 +68,7 @@ issues_history_stats_plot_call = function() {
     'api_ns.api_view_issues_history_detailed_stats',
     repo=g.repo.name,
     username=username,
-    namespace=g.repo.namespace) }}";
+    namespace=g.repo.namespace) }}?weeks_range=" + nweeks;
   var _s = $("#data_stats_spinner");
   _s.html(
     "<img id='spinnergif' src='{{ url_for('static', filename='images/spinner.gif') }}?version={{ g.version}}'>"

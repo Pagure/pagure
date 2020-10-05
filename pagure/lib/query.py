@@ -5695,7 +5695,7 @@ def update_read_only_mode(session, repo, read_only=True):
         session.add(repo)
 
 
-def issues_history_stats(session, project, detailed=False):
+def issues_history_stats(session, project, detailed=False, weeks_range=53):
     """ Returns the number of opened issues on the specified project over
     the last 365 days
 
@@ -5721,7 +5721,7 @@ def issues_history_stats(session, project, detailed=False):
         .order_by(sqlalchemy.asc(model.Issue.closed_at))
         .first()
     )
-    a_year_ago = tomorrow - datetime.timedelta(days=(53 * 7))
+    a_year_ago = tomorrow - datetime.timedelta(days=(weeks_range * 7))
     if oldest_closed and oldest_closed.closed_at < a_year_ago:
         to_ignore = 0
     else:
@@ -5738,7 +5738,7 @@ def issues_history_stats(session, project, detailed=False):
     # For each week from tomorrow, get the number of open tickets
 
     output = {}
-    for week in range(53):
+    for week in range(weeks_range):
         end = tomorrow - datetime.timedelta(days=(week * 7))
         start = end - datetime.timedelta(days=7)
         closed_ticket = (
