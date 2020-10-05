@@ -128,7 +128,7 @@ class MailRunner(BaseRunner):
         proc = subprocess.Popen(
             [hook_file], cwd=repodir, stdin=subprocess.PIPE
         )
-        proc.communicate(stdin)
+        proc.communicate(stdin.encode())
         ecode = proc.wait()
         if ecode != 0:
             print("git_multimail failed")
