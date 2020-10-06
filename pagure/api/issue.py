@@ -1593,7 +1593,7 @@ def api_view_issues_history_detailed_stats(
     weeks_range = flask.request.args.get("weeks_range") or 53
     try:
         weeks_range = int(weeks_range)
-    except:
+    except Exception:
         weeks_range = 53
 
     repo = _get_repo(repo, username, namespace)
