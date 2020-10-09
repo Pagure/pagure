@@ -2645,7 +2645,7 @@ class PagureFlaskAppNewProjecttests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 '<strong><label for="mirrored_from">Mirror from URL'
-                "</label></strong>",
+                "</label> </strong>",
                 output_text,
             )
 
@@ -2683,7 +2683,7 @@ class PagureFlaskAppNewProjecttests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertNotIn(
                 '<strong><label for="mirrored_from">Mirror from URL'
-                "</label></strong>",
+                "</label> </strong>",
                 output_text,
             )
 

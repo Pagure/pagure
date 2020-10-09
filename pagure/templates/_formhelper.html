@@ -31,7 +31,7 @@
         {% endif %}
     {% else %}
       <div>
-        <strong>{{ field.label }}</strong>
+        <strong>{{ field.label }} {% if field.errors %} <span class="error">*</span> {% endif %}</strong>
       {% if rightlink %}
       <div class="float-right"><a href="{{rightlink['url']}}">{{rightlink['text']}}</a>
       {% endif %}

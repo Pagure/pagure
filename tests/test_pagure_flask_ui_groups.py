@@ -197,7 +197,7 @@ class PagureFlaskGroupstests(tests.Modeltests):
             )
             self.assertIn(
                 '<strong><label for="description">Description'
-                "</label></strong>",
+                "</label> </strong>",
                 output.get_data(as_text=True),
             )
 
@@ -228,7 +228,7 @@ class PagureFlaskGroupstests(tests.Modeltests):
             )
             self.assertIn(
                 '<strong><label for="description">Description'
-                "</label></strong>",
+                "</label> </strong>",
                 output.get_data(as_text=True),
             )
 

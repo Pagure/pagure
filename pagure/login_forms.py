@@ -43,8 +43,7 @@ class LostPasswordForm(FlaskForm):
     """ Form to ask for a password change. """
 
     username = wtforms.StringField(
-        'username  <span class="error">*</span>',
-        [wtforms.validators.DataRequired()],
+        "username", [wtforms.validators.DataRequired()],
     )
 
 
@@ -52,12 +51,10 @@ class ResetPasswordForm(FlaskForm):
     """ Form to reset one's password in the local database. """
 
     password = wtforms.PasswordField(
-        'Password  <span class="error">*</span>',
-        [wtforms.validators.DataRequired()],
+        "Password", [wtforms.validators.DataRequired()],
     )
     confirm_password = wtforms.PasswordField(
-        'Confirm password  <span class="error">*</span>',
-        [wtforms.validators.DataRequired(), same_password],
+        "Confirm password", [wtforms.validators.DataRequired(), same_password],
     )
 
 
@@ -65,12 +62,10 @@ class LoginForm(FlaskForm):
     """ Form to login via the local database. """
 
     username = wtforms.StringField(
-        'username  <span class="error">*</span>',
-        [wtforms.validators.DataRequired()],
+        "username", [wtforms.validators.DataRequired()],
     )
     password = wtforms.PasswordField(
-        'Password  <span class="error">*</span>',
-        [wtforms.validators.DataRequired()],
+        "Password", [wtforms.validators.DataRequired()],
     )
 
 
@@ -78,23 +73,20 @@ class NewUserForm(FlaskForm):
     """ Form to add a new user to the local database. """
 
     user = wtforms.StringField(
-        'username  <span class="error">*</span>',
-        [wtforms.validators.DataRequired()],
+        "username", [wtforms.validators.DataRequired()],
     )
     fullname = wtforms.StringField(
         "Full name", [wtforms.validators.Optional()]
     )
     email_address = wtforms.StringField(
-        'Email address  <span class="error">*</span>',
+        "Email address",
         [wtforms.validators.DataRequired(), wtforms.validators.Email()],
     )
     password = wtforms.PasswordField(
-        'Password  <span class="error">*</span>',
-        [wtforms.validators.DataRequired()],
+        "Password", [wtforms.validators.DataRequired()],
     )
     confirm_password = wtforms.PasswordField(
-        'Confirm password  <span class="error">*</span>',
-        [wtforms.validators.DataRequired(), same_password],
+        "Confirm password", [wtforms.validators.DataRequired(), same_password],
     )
 
 
@@ -102,14 +94,11 @@ class ChangePasswordForm(FlaskForm):
     """ Form to reset one's password in the local database. """
 
     old_password = wtforms.PasswordField(
-        'Old Password  <span class="error">*</span>',
-        [wtforms.validators.DataRequired()],
+        "Old Password", [wtforms.validators.DataRequired()],
     )
     password = wtforms.PasswordField(
-        'Password  <span class="error">*</span>',
-        [wtforms.validators.DataRequired()],
+        "Password", [wtforms.validators.DataRequired()],
     )
     confirm_password = wtforms.PasswordField(
-        'Confirm password  <span class="error">*</span>',
-        [wtforms.validators.DataRequired(), same_password],
+        "Confirm password", [wtforms.validators.DataRequired(), same_password],
     )
