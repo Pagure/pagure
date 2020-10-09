@@ -24,95 +24,112 @@
     <h3 class="font-weight-bold">
     Branches <span class="badge badge-secondary">{{g.branches|length}}</span>
     </h3>
-    <div class="list-group">
-        {% if head %}
-        <div id="branch-{{ head }}" class="list-group-item">
-            <div class="row align-items-center">
-                <div class="col">
-                    <span class="fa fa-random fa-fw text-muted"></span>
-                    <a href="{{ url_for('ui_ns.view_tree',
-                        repo=repo.name,
-                        username=username,
-                        namespace=repo.namespace,
-                        identifier=head) }}"
-                        title="{{ head }}" data-toggle="tooltip"
-                        class="font-weight-bold">
-                        {{ head }}
-                    </a>
-                </div>
-                <div class="col-xs-auto pl-2">
-                    <button class="btn btn-outline-light bg-white border-white" title="this is the default branch for this project">
-                    <span class="fa fa-star fa-fw text-warning"></span>
-                    </button>
-                </div>
-            </div>
-        </div>
-        {% endif %}
 
-        {% for branch in g.branches if branch != head %}
-        <div id="branch-{{ branch | replace('/', '__')}}" class="list-group-item">
-            <div class="row align-items-center">
-                <div class="col">
-                    <span class="fa fa-random fa-fw text-muted"></span>
-                    <a class="font-weight-bold" href="{{ url_for('ui_ns.view_tree',
-                        repo=repo.name,
-                        username=username,
-                        namespace=repo.namespace,
-                        identifier=branch) }}"
-                        title="{{ branch }}" data-toggle="tooltip">{{ branch }}
-                    </a>
-                    <small class="text-muted commits_ahead_label"></small>
-                </div>
-                <div class="col-xs-auto pr-2">
-                    <div class="branch_del">
-                        <div class="btn-group">
-                            <a class="btn btn-outline-primary" href="{{ url_for('ui_ns.view_tree',
-                                repo=repo.name,
-                                username=username,
-                                namespace=repo.namespace,
-                                identifier=branch) }}"
-                                title="view code tree for this branch">
-                            <i class="fa fa-fw fa-file-code-o"></i>
-                            </a>
-                            <a class="btn btn-outline-primary" href="{{ url_for('ui_ns.view_commits',
-                                repo=repo.name,
-                                username=username,
-                                namespace=repo.namespace,
-                                branchname=branch) }}"
-                                title="view commit list for this branch">
-                            <i class="fa fa-fw fa-list-alt"></i>
-                            </a>
-                        </div>
-                        {% if g.repo_committer and branch != head
-                              and (
-                                config.get('ALLOW_DELETE_BRANCH', True)
-                                or repo.is_fork) %}
-                            <form id="delete_branch_form-{{
-                                branch | replace('/', '__') | replace('+', '___')
-                                }}" action="{{
-                                url_for('ui_ns.delete_branch',
-                                        repo=repo.name,
-                                        username=username,
-                                        namespace=repo.namespace,
-                                        branchname=branch)
-                                }}" method="post" class="icon d-inline delete-branch-form" data-branch-name="{{ branch | unicode }}">
-                                {{ g.confirmationform.csrf_token }}
-                                <a title="Remove branch {{ branch }}" href="#"
-                                class="btn btn-outline-danger"
-                                onclick="$('#delete_branch_form-{{
-                                    branch | replace('/', '__') | replace('.', '\\\\.')
-                                    | replace('+', '___')
-                                    }}').submit();">
-                                <i class="fa fa-trash"></i>
-                                </a>
-                            </form>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
+    <div class="mt-3">
+      <h4 class="font-weight-bold">
+        Active branches
+        <span class="badge badge-secondary" id="active_branches_count"></span>
+      </h4>
+      <div class="list-group" id="active_branches">
+          {% if head %}
+          <div id="branch-{{ head }}" class="list-group-item">
+              <div class="row align-items-center">
+                  <div class="col">
+                      <span class="fa fa-random fa-fw text-muted"></span>
+                      <a href="{{ url_for('ui_ns.view_tree',
+                          repo=repo.name,
+                          username=username,
+                          namespace=repo.namespace,
+                          identifier=head) }}"
+                          title="{{ head }}" data-toggle="tooltip"
+                          class="font-weight-bold">
+                          {{ head }}
+                      </a>
+                  </div>
+                  <div class="col-xs-auto pl-2">
+                      <button class="btn btn-outline-light bg-white border-white" title="this is the default branch for this project">
+                      <span class="fa fa-star fa-fw text-warning"></span>
+                      </button>
+                  </div>
+              </div>
+          </div>
+          {% endif %}
+
+          {% for branch in g.branches if branch != head %}
+          <div id="branch-{{ branch | replace('/', '__')}}" class="list-group-item">
+              <div class="row align-items-center">
+                  <div class="col">
+                      <span class="fa fa-random fa-fw text-muted"></span>
+                      <a class="font-weight-bold" href="{{ url_for('ui_ns.view_tree',
+                          repo=repo.name,
+                          username=username,
+                          namespace=repo.namespace,
+                          identifier=branch) }}"
+                          title="{{ branch }}" data-toggle="tooltip">{{ branch }}
+                      </a>
+                      <small class="text-muted commits_ahead_label"></small>
+                  </div>
+                  <div class="col-xs-auto pr-2">
+                      <div class="branch_del">
+                          <div class="btn-group">
+                              <a class="btn btn-outline-primary" href="{{ url_for('ui_ns.view_tree',
+                                  repo=repo.name,
+                                  username=username,
+                                  namespace=repo.namespace,
+                                  identifier=branch) }}"
+                                  title="view code tree for this branch">
+                              <i class="fa fa-fw fa-file-code-o"></i>
+                              </a>
+                              <a class="btn btn-outline-primary" href="{{ url_for('ui_ns.view_commits',
+                                  repo=repo.name,
+                                  username=username,
+                                  namespace=repo.namespace,
+                                  branchname=branch) }}"
+                                  title="view commit list for this branch">
+                              <i class="fa fa-fw fa-list-alt"></i>
+                              </a>
+                          </div>
+                          {% if g.repo_committer and branch != head
+                                and (
+                                  config.get('ALLOW_DELETE_BRANCH', True)
+                                  or repo.is_fork) %}
+                              <form id="delete_branch_form-{{
+                                  branch | replace('/', '__') | replace('+', '___')
+                                  }}" action="{{
+                                  url_for('ui_ns.delete_branch',
+                                          repo=repo.name,
+                                          username=username,
+                                          namespace=repo.namespace,
+                                          branchname=branch)
+                                  }}" method="post" class="icon d-inline delete-branch-form" data-branch-name="{{ branch | unicode }}">
+                                  {{ g.confirmationform.csrf_token }}
+                                  <a title="Remove branch {{ branch }}" href="#"
+                                  class="btn btn-outline-danger"
+                                  onclick="$('#delete_branch_form-{{
+                                      branch | replace('/', '__') | replace('.', '\\\\.')
+                                      | replace('+', '___')
+                                      }}').submit();">
+                                  <i class="fa fa-trash"></i>
+                                  </a>
+                              </form>
+                          {% endif %}
+                      </div>
+                  </div>
+              </div>
+          </div>
+          {% endfor %}
+      </div>
     </div>
+
+    <div class="mt-3">
+      <h4 class="font-weight-bold">
+        Inactive branches
+        <span class="badge badge-secondary" id="inactive_branches_count"></span>
+      </h4>
+      <div class="list-group" id="inactive_branches">
+      </div>
+    </div>
+
   </div>
 </div>
 {% endblock %}
@@ -127,10 +144,13 @@ function disable_branches(){
       type: 'GET',
       dataType: 'json',
       success: function(res) {
+        var act_br = $('#active_branches');
+        var inact_br = $('#inactive_branches');
         for (branch in res.results){
           branch = res.results[branch];
           var _it = $('#branch-' + branch.name);
           _it.addClass('disabled_branch');
+          inact_br.append(_it);
           if (branch.name == 'master') {
             var _t = $('.projectinfo');
             html = ' \
@@ -142,6 +162,9 @@ function disable_branches(){
         if (res.next){
           get_branches(res.next);
         }
+
+        $('#active_branches_count').html($("#active_branches .list-group-item").length)
+        $('#inactive_branches_count').html($("#inactive_branches .list-group-item").length)
       }
     })
   }
