@@ -898,9 +898,59 @@ def view_user_requests(username):
     """
     user = _get_user(username=username)
 
+    pr_type = flask.request.args.get("type", "filed").lower()
+    if pr_type not in ["filed", "actionable"]:
+        flask.flash("Invalid list of PR selected", "error")
+        pr_type = "filed"
+
+    pr_status = flask.request.args.get("status", "open").lower()
+    if pr_status not in ["open", "merged", "cancelled", "all"]:
+        flask.flash("Invalid PR status provided", "error")
+        pr_status = "open"
+
+    page = flask.request.args.get("page", 1)
+    try:
+        page = int(page)
+        if page < 1:
+            page = 1
+    except ValueError:
+        page = 1
+
+    limit = pagure_config["ITEM_PER_PAGE"]
+    start = limit * (page - 1)
+
+    filed = actionable = None
+    if pr_type == "filed":
+        filed = user.user
+    else:
+        actionable = user.user
+
+    status = None
+    if pr_status == "open":
+        status = "Open"
+    elif pr_status == "merged":
+        status = "Merged"
+    elif pr_status == "cancelled":
+        status = "Closed"
+
     requests = pagure.lib.query.get_pull_request_of_user(
-        flask.g.session, username=username
+        flask.g.session,
+        username=username,
+        filed=filed,
+        actionable=actionable,
+        status=status,
+        offset=start,
+        limit=limit,
     )
+    requests_length = pagure.lib.query.get_pull_request_of_user(
+        flask.g.session,
+        username=username,
+        filed=filed,
+        actionable=actionable,
+        status=status,
+        count=True,
+    )
+    total_pages = int(ceil(requests_length / float(limit)))
 
     userprofile_common = get_userprofile_common(user)
 
@@ -910,6 +960,9 @@ def view_user_requests(username):
         user=user,
         requests=requests,
         select="requests",
+        pr_type=pr_type,
+        pr_status=pr_status,
+        total_pages=total_pages,
         repos_length=userprofile_common["repos_length"],
         forks_length=userprofile_common["forks_length"],
     )

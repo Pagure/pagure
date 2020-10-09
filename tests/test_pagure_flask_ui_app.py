@@ -1544,12 +1544,19 @@ class PagureFlaskApptests(tests.Modeltests):
         self.assertEqual(req.title, "test pull-request #2")
 
         # Check pingou's PR list
-        output = self.app.get("/user/pingou/requests")
+        output = self.app.get("/user/pingou/requests?type=filed")
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
         self.assertIn("test pull-request #1", output_text)
+        self.assertNotIn("test pull-request #2", output_text)
+        self.assertEqual(output_text.count('pr-status pr-status-open"'), 1)
+
+        output = self.app.get("/user/pingou/requests?type=actionable")
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        self.assertNotIn("test pull-request #1", output_text)
         self.assertIn("test pull-request #2", output_text)
-        self.assertEqual(output_text.count('pr-status pr-status-open"'), 2)
+        self.assertEqual(output_text.count('pr-status pr-status-open"'), 1)
 
         # Check foo's PR list
         output = self.app.get("/user/foo/requests")
