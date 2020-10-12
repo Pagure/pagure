@@ -308,8 +308,8 @@ git push -u origin {{ g.repo_obj | get_default_branch or "<your main branch>"}}<
 
               <p>If you have not created your git repo yet:</p>
               <pre>git clone {{ config.get('GIT_URL_SSH') }}{{ repo.path }}
-git checkout -b {{ g.repo_obj | get_default_branch or "<your main branch>"}}
 cd {{ repo.name }}
+git checkout -b {{ g.repo_obj | get_default_branch or "<your main branch>"}}
 touch README.rst
 git add README.rst
 git commit -m "Add README file"
