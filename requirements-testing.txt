@@ -7,6 +7,7 @@ fedmsg
 flake8
 flask-oidc
 mock
+pagure-messages >= 0.0.1
 pytest
 pytest-cov
 pytest-xdist

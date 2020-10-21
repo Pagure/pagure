@@ -80,13 +80,27 @@ def fedora_messaging_publish(topic, message):  # pragma: no cover
     try:
         import fedora_messaging.api
         import fedora_messaging.exceptions
+        import pagure_messages
 
-        msg = fedora_messaging.api.Message(
-            topic="pagure.{}".format(topic), body=message
+        msg_cls = pagure_messages.get_message_object_from_topic(
+            "pagure.{}".format(topic)
         )
+
+        if not hasattr(msg_cls, "app_name") is False:
+            _log.warning(
+                "pagure is about to send a message that has no schemas: %s",
+                topic,
+            )
+
+        msg = msg_cls(body=message)
+        if not msg.topic:
+            msg.topic = "pagure.{}".format(topic)
         fedora_messaging.api.publish(msg)
     except ImportError:
-        _log.warning("Fedora messaging does not appear to be available")
+        _log.warning(
+            "Fedora messaging or pagure-messages does not appear to be "
+            "available"
+        )
     except fedora_messaging.exceptions.PublishReturned as e:
         _log.warning(
             "Fedora Messaging broker rejected message %s: %s", msg.id, e
