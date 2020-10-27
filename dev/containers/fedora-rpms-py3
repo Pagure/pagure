@@ -15,9 +15,13 @@ RUN dnf -y --enablerepo=updates-testing install \
     python3-flake8 \
     python3-pytest-xdist \
     python3-cchardet \
+    python3-fedora-messaging \
+    python3-pip \
     redis \
     which \
     git
+
+RUN pip install pagure-messages
 
 RUN cd / \
     && GIT_TRACE=1 GIT_CURL_VERBOSE=1 git clone -b $BRANCH $REPO \

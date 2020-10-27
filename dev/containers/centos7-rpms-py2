@@ -23,12 +23,18 @@ RUN yum -y install \
     python-flask \
     python-flake8 \
     python2-pytest-xdist \
+    python2-fedora-messaging \
+    python2-pip \
     redis \
     which \
     git
 #    git \
 #    repoSpanner \
 #    repoSpanner-bridge
+
+RUN pip install pip --upgrade
+RUN pip install setuptools --upgrade
+RUN pip install pagure-messages
 
 RUN cd / \
     && GIT_TRACE=1 GIT_CURL_VERBOSE=1 git clone -b $BRANCH $REPO \
