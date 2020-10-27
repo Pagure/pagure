@@ -537,6 +537,7 @@ def add_tag_obj(session, obj, tags, user):
                 topic="pull-request.tag.added",
                 msg=dict(
                     pull_request=obj.to_json(public=True),
+                    pullrequest=obj.to_json(public=True),
                     project=obj.project.to_json(public=True),
                     tags=sorted(added_tags),
                     agent=user_obj.username,
@@ -655,11 +656,23 @@ def add_pull_request_assignee(session, request, assignee, user):
 
         pagure.lib.notify.notify_assigned_request(request, None, user_obj)
 
+        # Deprecated -- this is not consistent in both the topic and the body:
+        # request vs pull-request (topic) and request vs pullrequest (body)
         pagure.lib.notify.log(
             request.project,
             topic="request.assigned.reset",
             msg=dict(
                 request=request.to_json(public=True),
+                pullrequest=request.to_json(public=True),
+                project=request.project.to_json(public=True),
+                agent=user_obj.username,
+            ),
+        )
+        pagure.lib.notify.log(
+            request.project,
+            topic="pull-request.assigned.reset",
+            msg=dict(
+                pullrequest=request.to_json(public=True),
                 project=request.project.to_json(public=True),
                 agent=user_obj.username,
             ),
@@ -683,11 +696,23 @@ def add_pull_request_assignee(session, request, assignee, user):
             request, assignee_obj, user_obj
         )
 
+        # Deprecated -- this is not consistent in both the topic and the body:
+        # request vs pull-request (topic) and request vs pullrequest (body)
         pagure.lib.notify.log(
             request.project,
             topic="request.assigned.added",
             msg=dict(
                 request=request.to_json(public=True),
+                pullrequest=request.to_json(public=True),
+                project=request.project.to_json(public=True),
+                agent=user_obj.username,
+            ),
+        )
+        pagure.lib.notify.log(
+            request.project,
+            topic="pull-request.assigned.added",
+            msg=dict(
+                pullrequest=request.to_json(public=True),
                 project=request.project.to_json(public=True),
                 agent=user_obj.username,
             ),
@@ -920,6 +945,7 @@ def remove_tags_obj(session, obj, tags, user):
             topic="pull-request.tag.removed",
             msg=dict(
                 pull_request=obj.to_json(public=True),
+                pullrequest=obj.to_json(public=True),
                 project=obj.project.to_json(public=True),
                 tags=sorted(removed_tags),
                 agent=user_obj.username,
