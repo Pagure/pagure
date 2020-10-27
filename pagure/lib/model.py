@@ -1505,7 +1505,7 @@ class Issue(BASE):
     @property
     def tags_text(self):
         """ Return the list of tags in a simple text form. """
-        return [tag.tag for tag in self.tags]
+        return sorted([tag.tag for tag in self.tags])
 
     @property
     def depending_text(self):
@@ -2180,7 +2180,7 @@ class PullRequest(BASE):
     @property
     def tags_text(self):
         """ Return the list of tags in a simple text form. """
-        return [tag.tag for tag in self.tags]
+        return sorted([tag.tag for tag in self.tags])
 
     @property
     def discussion(self):

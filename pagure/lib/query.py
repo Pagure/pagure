@@ -511,7 +511,7 @@ def add_tag_obj(session, obj, tags, user):
                 msg=dict(
                     issue=obj.to_json(public=True),
                     project=obj.project.to_json(public=True),
-                    tags=added_tags,
+                    tags=sorted(added_tags),
                     agent=user_obj.username,
                 ),
             )
@@ -537,7 +537,7 @@ def add_tag_obj(session, obj, tags, user):
                 msg=dict(
                     pull_request=obj.to_json(public=True),
                     project=obj.project.to_json(public=True),
-                    tags=added_tags,
+                    tags=sorted(added_tags),
                     agent=user_obj.username,
                 ),
             )
@@ -851,7 +851,7 @@ def remove_tags(session, project, tags, user):
         topic="project.tag.removed",
         msg=dict(
             project=project.to_json(public=True),
-            tags=removed_tags,
+            tags=sorted(removed_tags),
             agent=user_obj.username,
         ),
     )
@@ -895,7 +895,7 @@ def remove_tags_obj(session, obj, tags, user):
             msg=dict(
                 issue=obj.to_json(public=True),
                 project=obj.project.to_json(public=True),
-                tags=removed_tags,
+                tags=sorted(removed_tags),
                 agent=user_obj.username,
             ),
         )
@@ -915,7 +915,7 @@ def remove_tags_obj(session, obj, tags, user):
             msg=dict(
                 pull_request=obj.to_json(public=True),
                 project=obj.project.to_json(public=True),
-                tags=removed_tags,
+                tags=sorted(removed_tags),
                 agent=user_obj.username,
             ),
         )
@@ -2169,7 +2169,7 @@ def edit_issue(
             msg=dict(
                 issue=issue.to_json(public=True),
                 project=issue.project.to_json(public=True),
-                fields=list(set(edit)),
+                fields=sorted(set(edit)),
                 agent=user_obj.username,
             ),
         )
@@ -2260,7 +2260,7 @@ def update_project_settings(session, repo, settings, user, from_api=False):
             topic="project.edit",
             msg=dict(
                 project=repo.to_json(public=True),
-                fields=update,
+                fields=sorted(update),
                 agent=user_obj.username,
             ),
         )
