@@ -2163,11 +2163,24 @@ def remove_group_project(repo, groupid, username=None, namespace=None):
                 + "#usersgroups-tab"
             )
 
+        removed_groups = []
         for grp in repo.groups:
             if grp.id == groupid:
+                removed_groups.append(grp.group_name)
                 repo.groups.remove(grp)
                 break
         try:
+            # Commit so the JSON sent on the notification is up to date
+            flask.g.session.commit()
+            pagure.lib.notify.log(
+                repo,
+                topic="project.group.removed",
+                msg=dict(
+                    project=repo.to_json(public=True),
+                    removed_groups=removed_groups,
+                    agent=flask.g.fas_user.username,
+                ),
+            )
             # Mark the project as read_only, celery will unmark it
             pagure.lib.query.update_read_only_mode(
                 flask.g.session, repo, read_only=True
