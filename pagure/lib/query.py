@@ -498,7 +498,8 @@ def add_tag_obj(session, obj, tags, user):
 
         session.add(dbobjtag)
         # Make sure we won't have SQLAlchemy error before we continue
-        session.flush()
+        # Commit so the tags show up in the notification sent
+        session.commit()
         added_tags.append(tagobj.tag)
 
     if isinstance(obj, model.Issue):
@@ -710,7 +711,8 @@ def add_issue_dependency(session, issue, issue_blocked, user):
         )
         session.add(i2i)
         # Make sure we won't have SQLAlchemy error before we continue
-        session.flush()
+        # and commit so the blocking issue appears in the JSON representation
+        session.commit()
         pagure.lib.git.update_git(issue, repo=issue.project)
         pagure.lib.git.update_git(issue_blocked, repo=issue_blocked.project)
 
@@ -769,7 +771,8 @@ def remove_issue_dependency(session, issue, issue_blocked, user):
                 issue.parents.remove(parent)
 
         # Make sure we won't have SQLAlchemy error before we continue
-        session.flush()
+        # and commit so the blocking issue appears in the JSON representation
+        session.commit()
         pagure.lib.git.update_git(issue, repo=issue.project)
         pagure.lib.git.update_git(issue_blocked, repo=issue_blocked.project)
 
@@ -885,6 +888,9 @@ def remove_tags_obj(session, obj, tags, user):
                 tag = objtag.tag.tag
                 removed_tags.append(tag)
                 session.delete(objtag)
+
+    # Commit so the tags are updated in the notification sent
+    session.commit()
 
     if isinstance(obj, model.Issue):
         pagure.lib.git.update_git(obj, repo=obj.project)
@@ -1151,7 +1157,7 @@ def add_user_to_project(
         update_read_only_mode(session, project, read_only=True)
         session.add(access_obj)
         session.add(project)
-        session.flush()
+        session.commit()
 
         pagure.lib.notify.log(
             project,
@@ -1178,8 +1184,8 @@ def add_user_to_project(
     # Mark the project as read only, celery will then unmark it
     update_read_only_mode(session, project, read_only=True)
     session.add(project)
-    # Make sure we won't have SQLAlchemy error before we continue
-    session.flush()
+    # Commit so the JSON sent in the notification is up to date
+    session.commit()
 
     pagure.lib.notify.log(
         project,
@@ -1263,7 +1269,8 @@ def add_group_to_project(
         project.date_modified = datetime.datetime.utcnow()
         update_read_only_mode(session, project, read_only=True)
         session.add(project)
-        session.flush()
+        # Commit so the JSON sent in the notification is up to date
+        session.commit()
 
         pagure.lib.notify.log(
             project,
@@ -1291,7 +1298,8 @@ def add_group_to_project(
     # Mark the project read_only, celery will then unmark it
     update_read_only_mode(session, project, read_only=True)
     session.add(project)
-    session.flush()
+    # Commit so the JSON sent in the notification is up to date
+    session.commit()
 
     pagure.lib.notify.log(
         project,
