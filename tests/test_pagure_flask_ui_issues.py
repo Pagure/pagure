@@ -21,15 +21,17 @@ try:
     import pyclamd
 except ImportError:
     pyclamd = None
+import pagure_messages
 import six
 import tempfile
 import re
 from datetime import datetime, timedelta
+from fedora_messaging import testing
 from six.moves.urllib.parse import urlparse, parse_qs
 
 import pygit2
 from bs4 import BeautifulSoup
-from mock import patch, MagicMock
+from mock import ANY, patch, MagicMock
 
 sys.path.insert(
     0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
@@ -1934,6 +1936,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 " <p>No issue tracker found for this project</p>", output_text
             )
 
+    @patch.dict(
+        "pagure.config.config", {"FEDORA_MESSAGING_NOTIFICATIONS": True}
+    )
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_update_issue_add_tags(self, p_send_email, p_ugt):
@@ -1991,9 +1996,83 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
             # Add two tags to the issue
             data = {"csrf_token": csrf_token, "tag": "red,green"}
-            output = self.app.post(
-                "/test/issue/1/update", data=data, follow_redirects=True
-            )
+            with testing.mock_sends(
+                pagure_messages.IssueTagAddedV1(
+                    topic="pagure.issue.tag.added",
+                    body={
+                        "issue": {
+                            "id": 1,
+                            "title": "Test issue",
+                            "content": "We should work on this",
+                            "status": "Open",
+                            "close_status": None,
+                            "date_created": ANY,
+                            "last_updated": ANY,
+                            "closed_at": None,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "private": False,
+                            "tags": ["green", "red"],
+                            "depends": [],
+                            "blocks": [],
+                            "assignee": None,
+                            "priority": None,
+                            "milestone": None,
+                            "custom_fields": [],
+                            "closed_by": None,
+                            "related_prs": [],
+                            "comments": [],
+                        },
+                        "project": {
+                            "id": 1,
+                            "name": "test",
+                            "fullname": "test",
+                            "url_path": "test",
+                            "description": "test project #1",
+                            "namespace": None,
+                            "parent": None,
+                            "date_created": ANY,
+                            "date_modified": ANY,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "access_users": {
+                                "owner": ["pingou"],
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "access_groups": {
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "tags": [],
+                            "priorities": {},
+                            "custom_keys": [],
+                            "close_status": [
+                                "Invalid",
+                                "Insufficient data",
+                                "Fixed",
+                                "Duplicate",
+                            ],
+                            "milestones": {},
+                        },
+                        "tags": ["green", "red"],
+                        "agent": "pingou",
+                    },
+                )
+            ):
+                output = self.app.post(
+                    "/test/issue/1/update", data=data, follow_redirects=True
+                )
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
@@ -2007,6 +2086,132 @@ class PagureFlaskIssuestests(tests.Modeltests):
             )
             self.assertIn(
                 "</i> Issue tagged with: green, red</div>", output_text
+            )
+
+        # After update, list tags
+        tags = pagure.lib.query.get_tags_of_project(self.session, repo)
+        self.assertEqual([tag.tag for tag in tags], ["green", "red"])
+        self.assertEqual(repo.issues[0].tags_text, [])
+
+        # Drop one of the two tags
+        user = tests.FakeUser()
+        user.username = "pingou"
+        with tests.user_set(self.app.application, user):
+
+            # Add two tags to the issue
+            data = {"csrf_token": csrf_token, "tag": "green"}
+            with testing.mock_sends(
+                pagure_messages.IssueTagRemovedV1(
+                    topic="pagure.issue.tag.removed",
+                    body={
+                        "issue": {
+                            "id": 1,
+                            "title": "Test issue",
+                            "content": "We should work on this",
+                            "status": "Open",
+                            "close_status": None,
+                            "date_created": ANY,
+                            "last_updated": ANY,
+                            "closed_at": None,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "private": False,
+                            "tags": ["green"],
+                            "depends": [],
+                            "blocks": [],
+                            "assignee": None,
+                            "priority": None,
+                            "milestone": None,
+                            "custom_fields": [],
+                            "closed_by": None,
+                            "related_prs": [],
+                            "comments": [
+                                {
+                                    "id": 1,
+                                    "comment": "**Metadata Update from "
+                                    "@pingou**:\n- Issue tagged with: green, "
+                                    "red",
+                                    "parent": None,
+                                    "date_created": ANY,
+                                    "user": {
+                                        "name": "pingou",
+                                        "fullname": "PY C",
+                                        "url_path": "user/pingou",
+                                    },
+                                    "edited_on": None,
+                                    "editor": None,
+                                    "notification": True,
+                                    "reactions": {},
+                                }
+                            ],
+                        },
+                        "project": {
+                            "id": 1,
+                            "name": "test",
+                            "fullname": "test",
+                            "url_path": "test",
+                            "description": "test project #1",
+                            "namespace": None,
+                            "parent": None,
+                            "date_created": ANY,
+                            "date_modified": ANY,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "access_users": {
+                                "owner": ["pingou"],
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "access_groups": {
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "tags": [],
+                            "priorities": {},
+                            "custom_keys": [],
+                            "close_status": [
+                                "Invalid",
+                                "Insufficient data",
+                                "Fixed",
+                                "Duplicate",
+                            ],
+                            "milestones": {},
+                        },
+                        "tags": ["red"],
+                        "agent": "pingou",
+                    },
+                )
+            ):
+                output = self.app.post(
+                    "/test/issue/1/update", data=data, follow_redirects=True
+                )
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                "<title>Issue #1: Test issue - test - Pagure</title>",
+                output_text,
+            )
+            self.assertIn(
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                ' href="/test/issue/1/edit" title="Edit this issue">',
+                output_text,
+            )
+            self.assertIn(
+                "<br>\n- Issue tagged with: green, red</p>", output_text
+            )
+            self.assertIn(
+                "<br>\n- Issue <strong>un</strong>tagged with: red</p>",
+                output_text,
             )
 
         # After update, list tags
@@ -2347,6 +2552,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post("/test/issue/1/update", data=data)
             self.assertEqual(output.status_code, 404)
 
+    @patch.dict(
+        "pagure.config.config", {"FEDORA_MESSAGING_NOTIFICATIONS": True}
+    )
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_update_issue_drop_comment(self, p_send_email, p_ugt):
@@ -2392,9 +2600,98 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 "csrf_token": csrf_token,
                 "comment": "Woohoo a second comment!",
             }
-            output = self.app.post(
-                "/test/issue/1/update", data=data, follow_redirects=True
-            )
+            with testing.mock_sends(
+                pagure_messages.IssueCommentAddedV1(
+                    topic="pagure.issue.comment.added",
+                    body={
+                        "issue": {
+                            "id": 1,
+                            "title": "Test issue",
+                            "content": "We should work on this",
+                            "status": "Open",
+                            "close_status": None,
+                            "date_created": ANY,
+                            "last_updated": ANY,
+                            "closed_at": None,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "private": False,
+                            "tags": [],
+                            "depends": [],
+                            "blocks": [],
+                            "assignee": None,
+                            "priority": None,
+                            "milestone": None,
+                            "custom_fields": [],
+                            "closed_by": None,
+                            "related_prs": [],
+                            "comments": [
+                                {
+                                    "id": 1,
+                                    "comment": "Woohoo a second comment!",
+                                    "parent": None,
+                                    "date_created": ANY,
+                                    "user": {
+                                        "name": "pingou",
+                                        "fullname": "PY C",
+                                        "url_path": "user/pingou",
+                                    },
+                                    "edited_on": None,
+                                    "editor": None,
+                                    "notification": False,
+                                    "reactions": {},
+                                }
+                            ],
+                        },
+                        "project": {
+                            "id": 1,
+                            "name": "test",
+                            "fullname": "test",
+                            "url_path": "test",
+                            "description": "test project #1",
+                            "namespace": None,
+                            "parent": None,
+                            "date_created": ANY,
+                            "date_modified": ANY,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "access_users": {
+                                "owner": ["pingou"],
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "access_groups": {
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "tags": [],
+                            "priorities": {},
+                            "custom_keys": [],
+                            "close_status": [
+                                "Invalid",
+                                "Insufficient data",
+                                "Fixed",
+                                "Duplicate",
+                            ],
+                            "milestones": {},
+                        },
+                        "agent": "pingou",
+                    },
+                )
+            ):
+                output = self.app.post(
+                    "/test/issue/1/update", data=data, follow_redirects=True
+                )
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
@@ -2461,6 +2758,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
         issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.comments), 0)
 
+    @patch.dict(
+        "pagure.config.config", {"FEDORA_MESSAGING_NOTIFICATIONS": True}
+    )
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_update_issue_depend(self, p_send_email, p_ugt):
@@ -2514,9 +2814,83 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
             # Add a dependent ticket
             data = {"csrf_token": csrf_token, "depending": "2"}
-            output = self.app.post(
-                "/test/issue/1/update", data=data, follow_redirects=True
-            )
+            with testing.mock_sends(
+                pagure_messages.IssueDependencyAddedV1(
+                    topic="pagure.issue.dependency.added",
+                    body={
+                        "issue": {
+                            "id": 2,
+                            "title": "Test issue #2",
+                            "content": "We should work on this again",
+                            "status": "Open",
+                            "close_status": None,
+                            "date_created": ANY,
+                            "last_updated": ANY,
+                            "closed_at": None,
+                            "user": {
+                                "name": "foo",
+                                "fullname": "foo bar",
+                                "url_path": "user/foo",
+                            },
+                            "private": False,
+                            "tags": [],
+                            "depends": [],
+                            "blocks": ["1"],
+                            "assignee": None,
+                            "priority": None,
+                            "milestone": None,
+                            "custom_fields": [],
+                            "closed_by": None,
+                            "related_prs": [],
+                            "comments": [],
+                        },
+                        "project": {
+                            "id": 1,
+                            "name": "test",
+                            "fullname": "test",
+                            "url_path": "test",
+                            "description": "test project #1",
+                            "namespace": None,
+                            "parent": None,
+                            "date_created": ANY,
+                            "date_modified": ANY,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "access_users": {
+                                "owner": ["pingou"],
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "access_groups": {
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "tags": [],
+                            "priorities": {},
+                            "custom_keys": [],
+                            "close_status": [
+                                "Invalid",
+                                "Insufficient data",
+                                "Fixed",
+                                "Duplicate",
+                            ],
+                            "milestones": {},
+                        },
+                        "added_dependency": 1,
+                        "agent": "pingou",
+                    },
+                )
+            ):
+                output = self.app.post(
+                    "/test/issue/1/update", data=data, follow_redirects=True
+                )
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
@@ -2670,6 +3044,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(issue.depending_text, [])
         self.assertEqual(issue.blocking_text, [2])
 
+    @patch.dict(
+        "pagure.config.config", {"FEDORA_MESSAGING_NOTIFICATIONS": True}
+    )
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_update_issue_block(self, p_send_email, p_ugt):
@@ -2682,15 +3059,88 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         # Create issues to play with
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
-        msg = pagure.lib.query.new_issue(
-            session=self.session,
-            repo=repo,
-            title="Test issue",
-            content="We should work on this",
-            user="pingou",
-        )
-        self.session.commit()
-        self.assertEqual(msg.title, "Test issue")
+        with testing.mock_sends(
+            pagure_messages.IssueNewV1(
+                topic="pagure.issue.new",
+                body={
+                    "issue": {
+                        "id": 1,
+                        "title": "Test issue",
+                        "content": "We should work on this",
+                        "status": "Open",
+                        "close_status": None,
+                        "date_created": ANY,
+                        "last_updated": ANY,
+                        "closed_at": None,
+                        "user": {
+                            "name": "pingou",
+                            "fullname": "PY C",
+                            "url_path": "user/pingou",
+                        },
+                        "private": False,
+                        "tags": [],
+                        "depends": [],
+                        "blocks": [],
+                        "assignee": None,
+                        "priority": None,
+                        "milestone": None,
+                        "custom_fields": [],
+                        "closed_by": None,
+                        "related_prs": [],
+                        "comments": [],
+                    },
+                    "project": {
+                        "id": 1,
+                        "name": "test",
+                        "fullname": "test",
+                        "url_path": "test",
+                        "description": "test project #1",
+                        "namespace": None,
+                        "parent": None,
+                        "date_created": ANY,
+                        "date_modified": ANY,
+                        "user": {
+                            "name": "pingou",
+                            "fullname": "PY C",
+                            "url_path": "user/pingou",
+                        },
+                        "access_users": {
+                            "owner": ["pingou"],
+                            "admin": [],
+                            "commit": [],
+                            "collaborator": [],
+                            "ticket": [],
+                        },
+                        "access_groups": {
+                            "admin": [],
+                            "commit": [],
+                            "collaborator": [],
+                            "ticket": [],
+                        },
+                        "tags": [],
+                        "priorities": {},
+                        "custom_keys": [],
+                        "close_status": [
+                            "Invalid",
+                            "Insufficient data",
+                            "Fixed",
+                            "Duplicate",
+                        ],
+                        "milestones": {},
+                    },
+                    "agent": "pingou",
+                },
+            )
+        ):
+            msg = pagure.lib.query.new_issue(
+                session=self.session,
+                repo=repo,
+                title="Test issue",
+                content="We should work on this",
+                user="pingou",
+            )
+            self.session.commit()
+            self.assertEqual(msg.title, "Test issue")
 
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
         msg = pagure.lib.query.new_issue(
@@ -2755,9 +3205,83 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
             # Add a dependent ticket
             data = {"csrf_token": csrf_token, "blocking": "2"}
-            output = self.app.post(
-                "/test/issue/1/update", data=data, follow_redirects=True
-            )
+            with testing.mock_sends(
+                pagure_messages.IssueDependencyAddedV1(
+                    topic="pagure.issue.dependency.added",
+                    body={
+                        "issue": {
+                            "id": 1,
+                            "title": "Test issue",
+                            "content": "We should work on this",
+                            "status": "Open",
+                            "close_status": None,
+                            "date_created": ANY,
+                            "last_updated": ANY,
+                            "closed_at": None,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "private": False,
+                            "tags": [],
+                            "depends": [],
+                            "blocks": ["2"],
+                            "assignee": None,
+                            "priority": None,
+                            "milestone": None,
+                            "custom_fields": [],
+                            "closed_by": None,
+                            "related_prs": [],
+                            "comments": [],
+                        },
+                        "project": {
+                            "id": 1,
+                            "name": "test",
+                            "fullname": "test",
+                            "url_path": "test",
+                            "description": "test project #1",
+                            "namespace": None,
+                            "parent": None,
+                            "date_created": ANY,
+                            "date_modified": ANY,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "access_users": {
+                                "owner": ["pingou"],
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "access_groups": {
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "tags": [],
+                            "priorities": {},
+                            "custom_keys": [],
+                            "close_status": [
+                                "Invalid",
+                                "Insufficient data",
+                                "Fixed",
+                                "Duplicate",
+                            ],
+                            "milestones": {},
+                        },
+                        "added_dependency": 2,
+                        "agent": "pingou",
+                    },
+                )
+            ):
+                output = self.app.post(
+                    "/test/issue/1/update", data=data, follow_redirects=True
+                )
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
@@ -2793,6 +3317,123 @@ class PagureFlaskIssuestests(tests.Modeltests):
         issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.depending_text, [])
         self.assertEqual(issue.blocking_text, [2])
+
+        # Now remove the dependency and check everything is recorded
+
+        user = tests.FakeUser()
+        user.username = "pingou"
+        with tests.user_set(self.app.application, user):
+            output = self.app.get("/test/issue/1")
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                "<title>Issue #1: Test issue - test - Pagure</title>",
+                output_text,
+            )
+            self.assertIn(
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                ' href="/test/issue/1/edit" title="Edit this issue">',
+                output_text,
+            )
+
+            csrf_token = self.get_csrf(output=output)
+
+            # Add a dependent ticket
+            data = {"csrf_token": csrf_token}
+            with testing.mock_sends(
+                pagure_messages.IssueDependencyRemovedV1(
+                    topic="pagure.issue.dependency.removed",
+                    body={
+                        "issue": {
+                            "id": 2,
+                            "title": "Test issue #2",
+                            "content": "We should work on this again",
+                            "status": "Open",
+                            "close_status": None,
+                            "date_created": ANY,
+                            "last_updated": ANY,
+                            "closed_at": None,
+                            "user": {
+                                "name": "foo",
+                                "fullname": "foo bar",
+                                "url_path": "user/foo",
+                            },
+                            "private": False,
+                            "tags": [],
+                            "depends": [],
+                            "blocks": [],
+                            "assignee": None,
+                            "priority": None,
+                            "milestone": None,
+                            "custom_fields": [],
+                            "closed_by": None,
+                            "related_prs": [],
+                            "comments": [],
+                        },
+                        "project": {
+                            "id": 1,
+                            "name": "test",
+                            "fullname": "test",
+                            "url_path": "test",
+                            "description": "test project #1",
+                            "namespace": None,
+                            "parent": None,
+                            "date_created": ANY,
+                            "date_modified": ANY,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "access_users": {
+                                "owner": ["pingou"],
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "access_groups": {
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "tags": [],
+                            "priorities": {},
+                            "custom_keys": [],
+                            "close_status": [
+                                "Invalid",
+                                "Insufficient data",
+                                "Fixed",
+                                "Duplicate",
+                            ],
+                            "milestones": {},
+                        },
+                        "removed_dependency": [1],
+                        "agent": "pingou",
+                    },
+                )
+            ):
+                output = self.app.post(
+                    "/test/issue/1/update", data=data, follow_redirects=True
+                )
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                "<title>Issue #1: Test issue - test - Pagure</title>",
+                output_text,
+            )
+            self.assertIn(
+                '<a class="btn btn-outline-secondary btn-sm border-0"'
+                ' href="/test/issue/1/edit" title="Edit this issue">',
+                output_text,
+            )
+
+        self.session.commit()
+        repo = pagure.lib.query.get_authorized_project(self.session, "test")
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
+        self.assertEqual(issue.depending_text, [])
+        self.assertEqual(issue.blocking_text, [])
 
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
@@ -3092,6 +3733,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
         output = self.app.get("/test" + url)
         self.assertEqual(output.status_code, 404)
 
+    @patch.dict(
+        "pagure.config.config", {"FEDORA_MESSAGING_NOTIFICATIONS": True}
+    )
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_edit_issue(self, p_send_email, p_ugt):
@@ -3168,9 +3812,83 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output_text.count("Not a valid choice"), 0)
 
             data["csrf_token"] = csrf_token
-            output = self.app.post(
-                "/test/issue/1/edit", data=data, follow_redirects=True
-            )
+            with testing.mock_sends(
+                pagure_messages.IssueEditV1(
+                    topic="pagure.issue.edit",
+                    body={
+                        "issue": {
+                            "id": 1,
+                            "title": "Test issue #1",
+                            "content": "We should work on this!",
+                            "status": "Open",
+                            "close_status": None,
+                            "date_created": ANY,
+                            "last_updated": ANY,
+                            "closed_at": None,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "private": False,
+                            "tags": [],
+                            "depends": [],
+                            "blocks": [],
+                            "assignee": None,
+                            "priority": None,
+                            "milestone": None,
+                            "custom_fields": [],
+                            "closed_by": None,
+                            "related_prs": [],
+                            "comments": [],
+                        },
+                        "project": {
+                            "id": 1,
+                            "name": "test",
+                            "fullname": "test",
+                            "url_path": "test",
+                            "description": "test project #1",
+                            "namespace": None,
+                            "parent": None,
+                            "date_created": ANY,
+                            "date_modified": ANY,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "access_users": {
+                                "owner": ["pingou"],
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "access_groups": {
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "tags": [],
+                            "priorities": {},
+                            "custom_keys": [],
+                            "close_status": [
+                                "Invalid",
+                                "Insufficient data",
+                                "Fixed",
+                                "Duplicate",
+                            ],
+                            "milestones": {},
+                        },
+                        "fields": ["content", "title"],
+                        "agent": "pingou",
+                    },
+                )
+            ):
+                output = self.app.post(
+                    "/test/issue/1/edit", data=data, follow_redirects=True
+                )
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
@@ -3266,7 +3984,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         # disable issue tracker
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
-        repo.settings = {"issue_tracker": False}
+        repo.settings = {"issue_tracker": False, "fedmsg_notifications": True}
         self.session.add(repo)
         self.session.commit()
 
@@ -3325,6 +4043,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
         tags = pagure.lib.query.get_tags_of_project(self.session, repo)
         self.assertEqual([tag.tag for tag in tags], ["tag1"])
 
+    @patch.dict(
+        "pagure.config.config", {"FEDORA_MESSAGING_NOTIFICATIONS": True}
+    )
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_edit_tag(self, p_send_email, p_ugt):
@@ -3405,17 +4126,70 @@ class PagureFlaskIssuestests(tests.Modeltests):
             )
 
             data["csrf_token"] = csrf_token
-            output = self.app.post(
-                "/test/tag/tag1/edit", data=data, follow_redirects=True
-            )
-            self.assertEqual(output.status_code, 200)
-            output_text = output.get_data(as_text=True)
-            self.assertIn("Settings - test - Pagure", output_text)
-            self.assertIn(
-                ""
-                "Edited tag: tag1()[DeepSkyBlue] to tag2(lorem ipsum)[DeepSkyBlue]",
-                output_text,
-            )
+            with testing.mock_sends(
+                pagure_messages.ProjectTagEditedV1(
+                    topic="pagure.project.tag.edited",
+                    body={
+                        "project": {
+                            "id": 1,
+                            "name": "test",
+                            "fullname": "test",
+                            "url_path": "test",
+                            "description": "test project #1",
+                            "namespace": None,
+                            "parent": None,
+                            "date_created": ANY,
+                            "date_modified": ANY,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "access_users": {
+                                "owner": ["pingou"],
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "access_groups": {
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "tags": [],
+                            "priorities": {},
+                            "custom_keys": [],
+                            "close_status": [
+                                "Invalid",
+                                "Insufficient data",
+                                "Fixed",
+                                "Duplicate",
+                            ],
+                            "milestones": {},
+                        },
+                        "old_tag": "tag2",
+                        "old_tag_description": "",
+                        "old_tag_color": "DeepSkyBlue",
+                        "new_tag": "tag2",
+                        "new_tag_description": "lorem ipsum",
+                        "new_tag_color": "DeepSkyBlue",
+                        "agent": "pingou",
+                    },
+                )
+            ):
+                output = self.app.post(
+                    "/test/tag/tag1/edit", data=data, follow_redirects=True
+                )
+                self.assertEqual(output.status_code, 200)
+                output_text = output.get_data(as_text=True)
+                self.assertIn("Settings - test - Pagure", output_text)
+                self.assertIn(
+                    ""
+                    "Edited tag: tag1()[DeepSkyBlue] to tag2(lorem ipsum)[DeepSkyBlue]",
+                    output_text,
+                )
 
             # update tag with empty description
             data["tag_description"] = ""
@@ -3436,6 +4210,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
         tags = pagure.lib.query.get_tags_of_project(self.session, repo)
         self.assertEqual([tag.tag for tag in tags], ["tag2"])
 
+    @patch.dict(
+        "pagure.config.config", {"FEDORA_MESSAGING_NOTIFICATIONS": True}
+    )
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_remove_tag_issue_disabled(self):
@@ -3477,9 +4254,57 @@ class PagureFlaskIssuestests(tests.Modeltests):
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
             data = {"tag": "tag1", "csrf_token": self.get_csrf()}
-            output = self.app.post(
-                "/test/droptag/", data=data, follow_redirects=True
-            )
+            with testing.mock_sends(
+                pagure_messages.ProjectTagRemovedV1(
+                    topic="pagure.project.tag.removed",
+                    body={
+                        "project": {
+                            "id": 1,
+                            "name": "test",
+                            "fullname": "test",
+                            "url_path": "test",
+                            "description": "test project #1",
+                            "namespace": None,
+                            "parent": None,
+                            "date_created": ANY,
+                            "date_modified": ANY,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "access_users": {
+                                "owner": ["pingou"],
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "access_groups": {
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "tags": [],
+                            "priorities": {},
+                            "custom_keys": [],
+                            "close_status": [
+                                "Invalid",
+                                "Insufficient data",
+                                "Fixed",
+                                "Duplicate",
+                            ],
+                            "milestones": {},
+                        },
+                        "tags": ["tag1"],
+                        "agent": "pingou",
+                    },
+                )
+            ):
+                output = self.app.post(
+                    "/test/droptag/", data=data, follow_redirects=True
+                )
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
@@ -3584,6 +4409,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
             )
             self.assertIn("" "Tag: tag1 has been deleted", output_text)
 
+    @patch.dict(
+        "pagure.config.config", {"FEDORA_MESSAGING_NOTIFICATIONS": True}
+    )
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_delete_issue(self, p_send_email, p_ugt):
@@ -3644,9 +4472,82 @@ class PagureFlaskIssuestests(tests.Modeltests):
             )
 
             data["csrf_token"] = csrf_token
-            output = self.app.post(
-                "/test/issue/1/drop", data=data, follow_redirects=True
-            )
+            with testing.mock_sends(
+                pagure_messages.IssueDropV1(
+                    topic="pagure.issue.drop",
+                    body={
+                        "issue": {
+                            "id": 1,
+                            "title": "Test issue",
+                            "content": "We should work on this",
+                            "status": "Open",
+                            "close_status": None,
+                            "date_created": ANY,
+                            "last_updated": ANY,
+                            "closed_at": None,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "private": False,
+                            "tags": [],
+                            "depends": [],
+                            "blocks": [],
+                            "assignee": None,
+                            "priority": None,
+                            "milestone": None,
+                            "custom_fields": [],
+                            "closed_by": None,
+                            "related_prs": [],
+                            "comments": [],
+                        },
+                        "project": {
+                            "id": 1,
+                            "name": "test",
+                            "fullname": "test",
+                            "url_path": "test",
+                            "description": "test project #1",
+                            "namespace": None,
+                            "parent": None,
+                            "date_created": ANY,
+                            "date_modified": ANY,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "access_users": {
+                                "owner": ["pingou"],
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "access_groups": {
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "tags": [],
+                            "priorities": {},
+                            "custom_keys": [],
+                            "close_status": [
+                                "Invalid",
+                                "Insufficient data",
+                                "Fixed",
+                                "Duplicate",
+                            ],
+                            "milestones": {},
+                        },
+                        "agent": "pingou",
+                    },
+                )
+            ):
+                output = self.app.post(
+                    "/test/issue/1/drop", data=data, follow_redirects=True
+                )
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn("<title>Issues - test - Pagure</title>", output_text)

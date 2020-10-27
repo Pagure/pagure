@@ -16,7 +16,9 @@ import sys
 import os
 
 import json
-from mock import patch
+import pagure_messages
+from fedora_messaging import api, testing
+from mock import ANY, patch
 
 sys.path.insert(
     0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
@@ -161,6 +163,9 @@ class PagureFlaskGroupstests(tests.Modeltests):
                 output.get_data(as_text=True),
             )
 
+    @patch.dict(
+        "pagure.config.config", {"FEDORA_MESSAGING_NOTIFICATIONS": True}
+    )
     def test_edit_group(self):
         """ Test the edit_group endpoint. """
 
@@ -244,7 +249,7 @@ class PagureFlaskGroupstests(tests.Modeltests):
                 output.get_data(as_text=True),
             )
             self.assertIn(
-                "You are not " "allowed to edit this group",
+                "You are not allowed to edit this group",
                 output.get_data(as_text=True),
             )
             self.assertIn(
@@ -263,10 +268,33 @@ class PagureFlaskGroupstests(tests.Modeltests):
                 "<p>Group not found</p>", output.get_data(as_text=True)
             )
 
-            output = self.app.post(
-                "/group/test_group/edit", data=data, follow_redirects=True
-            )
-            self.assertEqual(output.status_code, 200)
+            # All good
+            with testing.mock_sends(
+                pagure_messages.GroupEditV1(
+                    topic="pagure.group.edit",
+                    body={
+                        "group": {
+                            "name": "test_group",
+                            "display_name": "Test Group edited",
+                            "description": "This is a group for the tests edited",
+                            "group_type": "user",
+                            "creator": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "date_created": ANY,
+                            "members": ["pingou"],
+                        },
+                        "fields": ["display_name", "description"],
+                        "agent": "pingou",
+                    },
+                )
+            ):
+                output = self.app.post(
+                    "/group/test_group/edit", data=data, follow_redirects=True
+                )
+                self.assertEqual(output.status_code, 200)
             self.assertIn(
                 "<title>Group test_group - Pagure</title>",
                 output.get_data(as_text=True),

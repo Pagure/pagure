@@ -19,11 +19,13 @@ import time
 import os
 import re
 
+import pagure_messages
 import pygit2
 import six
-from mock import patch, MagicMock
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
+from fedora_messaging import api, testing
+from mock import ANY, patch, MagicMock
 
 sys.path.insert(
     0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
@@ -2335,6 +2337,9 @@ index 0000000..2a552bb
             )
             self.assertIn("Pull request closed!", output_text)
 
+    @patch.dict(
+        "pagure.config.config", {"FEDORA_MESSAGING_NOTIFICATIONS": True}
+    )
     @patch("pagure.lib.notify.send_email")
     def test_reopen_request_pull(self, send_email):
         """ Test the reopen_request_pull endpoint. """
@@ -2422,16 +2427,606 @@ index 0000000..2a552bb
             )
             settings = repo.settings
             settings["pull_requests"] = True
+            settings["fedmsg_notifications"] = True
             repo.settings = settings
             self.session.add(repo)
             self.session.commit()
 
-            output = self.app.post(
-                "/test/pull-request/cancel/1", data=data, follow_redirects=True
-            )
-            output = self.app.post(
-                "/test/pull-request/1/reopen", data=data, follow_redirects=True
-            )
+            with testing.mock_sends(
+                pagure_messages.PullRequestCommentAddedV1(
+                    topic="pagure.pull-request.comment.added",
+                    body={
+                        "pullrequest": {
+                            "id": 1,
+                            "uid": ANY,
+                            "title": "PR from the feature branch",
+                            "branch": "master",
+                            "project": {
+                                "id": 1,
+                                "name": "test",
+                                "fullname": "test",
+                                "url_path": "test",
+                                "description": "test project #1",
+                                "namespace": None,
+                                "parent": None,
+                                "date_created": ANY,
+                                "date_modified": ANY,
+                                "user": {
+                                    "name": "pingou",
+                                    "fullname": "PY C",
+                                    "url_path": "user/pingou",
+                                },
+                                "access_users": {
+                                    "owner": ["pingou"],
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "access_groups": {
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "tags": [],
+                                "priorities": {},
+                                "custom_keys": [],
+                                "close_status": [
+                                    "Invalid",
+                                    "Insufficient data",
+                                    "Fixed",
+                                    "Duplicate",
+                                ],
+                                "milestones": {},
+                            },
+                            "branch_from": "feature",
+                            "repo_from": {
+                                "id": 1,
+                                "name": "test",
+                                "fullname": "test",
+                                "url_path": "test",
+                                "description": "test project #1",
+                                "namespace": None,
+                                "parent": None,
+                                "date_created": ANY,
+                                "date_modified": ANY,
+                                "user": {
+                                    "name": "pingou",
+                                    "fullname": "PY C",
+                                    "url_path": "user/pingou",
+                                },
+                                "access_users": {
+                                    "owner": ["pingou"],
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "access_groups": {
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "tags": [],
+                                "priorities": {},
+                                "custom_keys": [],
+                                "close_status": [
+                                    "Invalid",
+                                    "Insufficient data",
+                                    "Fixed",
+                                    "Duplicate",
+                                ],
+                                "milestones": {},
+                            },
+                            "remote_git": None,
+                            "date_created": ANY,
+                            "updated_on": ANY,
+                            "last_updated": ANY,
+                            "closed_at": ANY,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "assignee": None,
+                            "status": "Closed",
+                            "commit_start": ANY,
+                            "commit_stop": ANY,
+                            "closed_by": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "initial_comment": None,
+                            "cached_merge_status": "unknown",
+                            "threshold_reached": None,
+                            "tags": [],
+                            "comments": [
+                                {
+                                    "id": 1,
+                                    "commit": None,
+                                    "tree": None,
+                                    "filename": None,
+                                    "line": None,
+                                    "comment": "Pull-Request has been closed by pingou",
+                                    "parent": None,
+                                    "date_created": ANY,
+                                    "user": {
+                                        "name": "pingou",
+                                        "fullname": "PY C",
+                                        "url_path": "user/pingou",
+                                    },
+                                    "edited_on": None,
+                                    "editor": None,
+                                    "notification": True,
+                                    "reactions": {},
+                                }
+                            ],
+                        },
+                        "agent": "pingou",
+                    },
+                ),
+                pagure_messages.PullRequestClosedV1(
+                    topic="pagure.pull-request.closed",
+                    body={
+                        "pullrequest": {
+                            "id": 1,
+                            "uid": ANY,
+                            "title": "PR from the feature branch",
+                            "branch": "master",
+                            "project": {
+                                "id": 1,
+                                "name": "test",
+                                "fullname": "test",
+                                "url_path": "test",
+                                "description": "test project #1",
+                                "namespace": None,
+                                "parent": None,
+                                "date_created": ANY,
+                                "date_modified": ANY,
+                                "user": {
+                                    "name": "pingou",
+                                    "fullname": "PY C",
+                                    "url_path": "user/pingou",
+                                },
+                                "access_users": {
+                                    "owner": ["pingou"],
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "access_groups": {
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "tags": [],
+                                "priorities": {},
+                                "custom_keys": [],
+                                "close_status": [
+                                    "Invalid",
+                                    "Insufficient data",
+                                    "Fixed",
+                                    "Duplicate",
+                                ],
+                                "milestones": {},
+                            },
+                            "branch_from": "feature",
+                            "repo_from": {
+                                "id": 1,
+                                "name": "test",
+                                "fullname": "test",
+                                "url_path": "test",
+                                "description": "test project #1",
+                                "namespace": None,
+                                "parent": None,
+                                "date_created": ANY,
+                                "date_modified": ANY,
+                                "user": {
+                                    "name": "pingou",
+                                    "fullname": "PY C",
+                                    "url_path": "user/pingou",
+                                },
+                                "access_users": {
+                                    "owner": ["pingou"],
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "access_groups": {
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "tags": [],
+                                "priorities": {},
+                                "custom_keys": [],
+                                "close_status": [
+                                    "Invalid",
+                                    "Insufficient data",
+                                    "Fixed",
+                                    "Duplicate",
+                                ],
+                                "milestones": {},
+                            },
+                            "remote_git": None,
+                            "date_created": ANY,
+                            "updated_on": ANY,
+                            "last_updated": ANY,
+                            "closed_at": ANY,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "assignee": None,
+                            "status": "Closed",
+                            "commit_start": ANY,
+                            "commit_stop": ANY,
+                            "closed_by": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "initial_comment": None,
+                            "cached_merge_status": "unknown",
+                            "threshold_reached": None,
+                            "tags": [],
+                            "comments": [
+                                {
+                                    "id": 1,
+                                    "commit": None,
+                                    "tree": None,
+                                    "filename": None,
+                                    "line": None,
+                                    "comment": "Pull-Request has been closed by pingou",
+                                    "parent": None,
+                                    "date_created": ANY,
+                                    "user": {
+                                        "name": "pingou",
+                                        "fullname": "PY C",
+                                        "url_path": "user/pingou",
+                                    },
+                                    "edited_on": None,
+                                    "editor": None,
+                                    "notification": True,
+                                    "reactions": {},
+                                }
+                            ],
+                        },
+                        "merged": False,
+                        "agent": "pingou",
+                    },
+                ),
+            ):
+                output = self.app.post(
+                    "/test/pull-request/close/1",
+                    data=data,
+                    follow_redirects=True,
+                )
+                self.assertEqual(output.status_code, 200)
+
+            with testing.mock_sends(
+                pagure_messages.PullRequestCommentAddedV1(
+                    topic="pagure.pull-request.comment.added",
+                    body={
+                        "pullrequest": {
+                            "id": 1,
+                            "uid": ANY,
+                            "title": "PR from the feature branch",
+                            "branch": "master",
+                            "project": {
+                                "id": 1,
+                                "name": "test",
+                                "fullname": "test",
+                                "url_path": "test",
+                                "description": "test project #1",
+                                "namespace": None,
+                                "parent": None,
+                                "date_created": ANY,
+                                "date_modified": ANY,
+                                "user": {
+                                    "name": "pingou",
+                                    "fullname": "PY C",
+                                    "url_path": "user/pingou",
+                                },
+                                "access_users": {
+                                    "owner": ["pingou"],
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "access_groups": {
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "tags": [],
+                                "priorities": {},
+                                "custom_keys": [],
+                                "close_status": [
+                                    "Invalid",
+                                    "Insufficient data",
+                                    "Fixed",
+                                    "Duplicate",
+                                ],
+                                "milestones": {},
+                            },
+                            "branch_from": "feature",
+                            "repo_from": {
+                                "id": 1,
+                                "name": "test",
+                                "fullname": "test",
+                                "url_path": "test",
+                                "description": "test project #1",
+                                "namespace": None,
+                                "parent": None,
+                                "date_created": ANY,
+                                "date_modified": ANY,
+                                "user": {
+                                    "name": "pingou",
+                                    "fullname": "PY C",
+                                    "url_path": "user/pingou",
+                                },
+                                "access_users": {
+                                    "owner": ["pingou"],
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "access_groups": {
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "tags": [],
+                                "priorities": {},
+                                "custom_keys": [],
+                                "close_status": [
+                                    "Invalid",
+                                    "Insufficient data",
+                                    "Fixed",
+                                    "Duplicate",
+                                ],
+                                "milestones": {},
+                            },
+                            "remote_git": None,
+                            "date_created": ANY,
+                            "updated_on": ANY,
+                            "last_updated": ANY,
+                            "closed_at": ANY,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "assignee": None,
+                            "status": "Open",
+                            "commit_start": ANY,
+                            "commit_stop": ANY,
+                            "closed_by": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "initial_comment": None,
+                            "cached_merge_status": "unknown",
+                            "threshold_reached": None,
+                            "tags": [],
+                            "comments": [
+                                {
+                                    "id": 1,
+                                    "commit": None,
+                                    "tree": None,
+                                    "filename": None,
+                                    "line": None,
+                                    "comment": "Pull-Request has been closed by pingou",
+                                    "parent": None,
+                                    "date_created": ANY,
+                                    "user": {
+                                        "name": "pingou",
+                                        "fullname": "PY C",
+                                        "url_path": "user/pingou",
+                                    },
+                                    "edited_on": None,
+                                    "editor": None,
+                                    "notification": True,
+                                    "reactions": {},
+                                },
+                                {
+                                    "id": 2,
+                                    "commit": None,
+                                    "tree": None,
+                                    "filename": None,
+                                    "line": None,
+                                    "comment": "Pull-Request has been reopened by pingou",
+                                    "parent": None,
+                                    "date_created": ANY,
+                                    "user": {
+                                        "name": "pingou",
+                                        "fullname": "PY C",
+                                        "url_path": "user/pingou",
+                                    },
+                                    "edited_on": None,
+                                    "editor": None,
+                                    "notification": True,
+                                    "reactions": {},
+                                },
+                            ],
+                        },
+                        "agent": "pingou",
+                    },
+                ),
+                pagure_messages.PullRequestReopenedV1(
+                    topic="pagure.pull-request.reopened",
+                    body={
+                        "pullrequest": {
+                            "id": 1,
+                            "uid": ANY,
+                            "title": "PR from the feature branch",
+                            "branch": "master",
+                            "project": {
+                                "id": 1,
+                                "name": "test",
+                                "fullname": "test",
+                                "url_path": "test",
+                                "description": "test project #1",
+                                "namespace": None,
+                                "parent": None,
+                                "date_created": ANY,
+                                "date_modified": ANY,
+                                "user": {
+                                    "name": "pingou",
+                                    "fullname": "PY C",
+                                    "url_path": "user/pingou",
+                                },
+                                "access_users": {
+                                    "owner": ["pingou"],
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "access_groups": {
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "tags": [],
+                                "priorities": {},
+                                "custom_keys": [],
+                                "close_status": [
+                                    "Invalid",
+                                    "Insufficient data",
+                                    "Fixed",
+                                    "Duplicate",
+                                ],
+                                "milestones": {},
+                            },
+                            "branch_from": "feature",
+                            "repo_from": {
+                                "id": 1,
+                                "name": "test",
+                                "fullname": "test",
+                                "url_path": "test",
+                                "description": "test project #1",
+                                "namespace": None,
+                                "parent": None,
+                                "date_created": ANY,
+                                "date_modified": ANY,
+                                "user": {
+                                    "name": "pingou",
+                                    "fullname": "PY C",
+                                    "url_path": "user/pingou",
+                                },
+                                "access_users": {
+                                    "owner": ["pingou"],
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "access_groups": {
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "tags": [],
+                                "priorities": {},
+                                "custom_keys": [],
+                                "close_status": [
+                                    "Invalid",
+                                    "Insufficient data",
+                                    "Fixed",
+                                    "Duplicate",
+                                ],
+                                "milestones": {},
+                            },
+                            "remote_git": None,
+                            "date_created": ANY,
+                            "updated_on": ANY,
+                            "last_updated": ANY,
+                            "closed_at": ANY,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "assignee": None,
+                            "status": "Open",
+                            "commit_start": ANY,
+                            "commit_stop": ANY,
+                            "closed_by": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "initial_comment": None,
+                            "cached_merge_status": "unknown",
+                            "threshold_reached": None,
+                            "tags": [],
+                            "comments": [
+                                {
+                                    "id": 1,
+                                    "commit": None,
+                                    "tree": None,
+                                    "filename": None,
+                                    "line": None,
+                                    "comment": "Pull-Request has been closed by pingou",
+                                    "parent": None,
+                                    "date_created": ANY,
+                                    "user": {
+                                        "name": "pingou",
+                                        "fullname": "PY C",
+                                        "url_path": "user/pingou",
+                                    },
+                                    "edited_on": None,
+                                    "editor": None,
+                                    "notification": True,
+                                    "reactions": {},
+                                },
+                                {
+                                    "id": 2,
+                                    "commit": None,
+                                    "tree": None,
+                                    "filename": None,
+                                    "line": None,
+                                    "comment": "Pull-Request has been reopened by pingou",
+                                    "parent": None,
+                                    "date_created": ANY,
+                                    "user": {
+                                        "name": "pingou",
+                                        "fullname": "PY C",
+                                        "url_path": "user/pingou",
+                                    },
+                                    "edited_on": None,
+                                    "editor": None,
+                                    "notification": True,
+                                    "reactions": {},
+                                },
+                            ],
+                        },
+                        "agent": "pingou",
+                    },
+                ),
+            ):
+                output = self.app.post(
+                    "/test/pull-request/1/reopen",
+                    data=data,
+                    follow_redirects=True,
+                )
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
@@ -2444,6 +3039,9 @@ index 0000000..2a552bb
                 output_text,
             )
 
+    @patch.dict(
+        "pagure.config.config", {"FEDORA_MESSAGING_NOTIFICATIONS": True}
+    )
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_update_pull_requests_assign(self):
         """ Test the update_pull_requests endpoint when assigning a PR.
@@ -2554,9 +3152,430 @@ index 0000000..2a552bb
 
         user.username = "pingou"
         with tests.user_set(self.app.application, user):
-            output = self.app.post(
-                "/test/pull-request/1/update", data=data, follow_redirects=True
-            )
+            with testing.mock_sends(
+                api.Message(
+                    topic="pagure.request.assigned.added",
+                    body={
+                        "request": {
+                            "id": 1,
+                            "uid": ANY,
+                            "title": "PR from the feature branch",
+                            "branch": "master",
+                            "project": {
+                                "id": 1,
+                                "name": "test",
+                                "fullname": "test",
+                                "url_path": "test",
+                                "description": "test project #1",
+                                "namespace": None,
+                                "parent": None,
+                                "date_created": ANY,
+                                "date_modified": ANY,
+                                "user": {
+                                    "name": "pingou",
+                                    "fullname": "PY C",
+                                    "url_path": "user/pingou",
+                                },
+                                "access_users": {
+                                    "owner": ["pingou"],
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "access_groups": {
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "tags": [],
+                                "priorities": {},
+                                "custom_keys": [],
+                                "close_status": [
+                                    "Invalid",
+                                    "Insufficient data",
+                                    "Fixed",
+                                    "Duplicate",
+                                ],
+                                "milestones": {},
+                            },
+                            "branch_from": "feature",
+                            "repo_from": {
+                                "id": 1,
+                                "name": "test",
+                                "fullname": "test",
+                                "url_path": "test",
+                                "description": "test project #1",
+                                "namespace": None,
+                                "parent": None,
+                                "date_created": ANY,
+                                "date_modified": ANY,
+                                "user": {
+                                    "name": "pingou",
+                                    "fullname": "PY C",
+                                    "url_path": "user/pingou",
+                                },
+                                "access_users": {
+                                    "owner": ["pingou"],
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "access_groups": {
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "tags": [],
+                                "priorities": {},
+                                "custom_keys": [],
+                                "close_status": [
+                                    "Invalid",
+                                    "Insufficient data",
+                                    "Fixed",
+                                    "Duplicate",
+                                ],
+                                "milestones": {},
+                            },
+                            "remote_git": None,
+                            "date_created": ANY,
+                            "updated_on": ANY,
+                            "last_updated": ANY,
+                            "closed_at": None,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "assignee": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "status": "Open",
+                            "commit_start": ANY,
+                            "commit_stop": ANY,
+                            "closed_by": None,
+                            "initial_comment": None,
+                            "cached_merge_status": "unknown",
+                            "threshold_reached": None,
+                            "tags": [],
+                            "comments": [],
+                        },
+                        "pullrequest": {
+                            "id": 1,
+                            "uid": ANY,
+                            "title": "PR from the feature branch",
+                            "branch": "master",
+                            "project": {
+                                "id": 1,
+                                "name": "test",
+                                "fullname": "test",
+                                "url_path": "test",
+                                "description": "test project #1",
+                                "namespace": None,
+                                "parent": None,
+                                "date_created": ANY,
+                                "date_modified": ANY,
+                                "user": {
+                                    "name": "pingou",
+                                    "fullname": "PY C",
+                                    "url_path": "user/pingou",
+                                },
+                                "access_users": {
+                                    "owner": ["pingou"],
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "access_groups": {
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "tags": [],
+                                "priorities": {},
+                                "custom_keys": [],
+                                "close_status": [
+                                    "Invalid",
+                                    "Insufficient data",
+                                    "Fixed",
+                                    "Duplicate",
+                                ],
+                                "milestones": {},
+                            },
+                            "branch_from": "feature",
+                            "repo_from": {
+                                "id": 1,
+                                "name": "test",
+                                "fullname": "test",
+                                "url_path": "test",
+                                "description": "test project #1",
+                                "namespace": None,
+                                "parent": None,
+                                "date_created": ANY,
+                                "date_modified": ANY,
+                                "user": {
+                                    "name": "pingou",
+                                    "fullname": "PY C",
+                                    "url_path": "user/pingou",
+                                },
+                                "access_users": {
+                                    "owner": ["pingou"],
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "access_groups": {
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "tags": [],
+                                "priorities": {},
+                                "custom_keys": [],
+                                "close_status": [
+                                    "Invalid",
+                                    "Insufficient data",
+                                    "Fixed",
+                                    "Duplicate",
+                                ],
+                                "milestones": {},
+                            },
+                            "remote_git": None,
+                            "date_created": ANY,
+                            "updated_on": ANY,
+                            "last_updated": ANY,
+                            "closed_at": None,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "assignee": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "status": "Open",
+                            "commit_start": ANY,
+                            "commit_stop": ANY,
+                            "closed_by": None,
+                            "initial_comment": None,
+                            "cached_merge_status": "unknown",
+                            "threshold_reached": None,
+                            "tags": [],
+                            "comments": [],
+                        },
+                        "project": {
+                            "id": 1,
+                            "name": "test",
+                            "fullname": "test",
+                            "url_path": "test",
+                            "description": "test project #1",
+                            "namespace": None,
+                            "parent": None,
+                            "date_created": ANY,
+                            "date_modified": ANY,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "access_users": {
+                                "owner": ["pingou"],
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "access_groups": {
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "tags": [],
+                            "priorities": {},
+                            "custom_keys": [],
+                            "close_status": [
+                                "Invalid",
+                                "Insufficient data",
+                                "Fixed",
+                                "Duplicate",
+                            ],
+                            "milestones": {},
+                        },
+                        "agent": "pingou",
+                    },
+                ),
+                pagure_messages.PullRequestAssignedAddedV1(
+                    topic="pagure.pull-request.assigned.added",
+                    body={
+                        "pullrequest": {
+                            "id": 1,
+                            "uid": ANY,
+                            "title": "PR from the feature branch",
+                            "branch": "master",
+                            "project": {
+                                "id": 1,
+                                "name": "test",
+                                "fullname": "test",
+                                "url_path": "test",
+                                "description": "test project #1",
+                                "namespace": None,
+                                "parent": None,
+                                "date_created": ANY,
+                                "date_modified": ANY,
+                                "user": {
+                                    "name": "pingou",
+                                    "fullname": "PY C",
+                                    "url_path": "user/pingou",
+                                },
+                                "access_users": {
+                                    "owner": ["pingou"],
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "access_groups": {
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "tags": [],
+                                "priorities": {},
+                                "custom_keys": [],
+                                "close_status": [
+                                    "Invalid",
+                                    "Insufficient data",
+                                    "Fixed",
+                                    "Duplicate",
+                                ],
+                                "milestones": {},
+                            },
+                            "branch_from": "feature",
+                            "repo_from": {
+                                "id": 1,
+                                "name": "test",
+                                "fullname": "test",
+                                "url_path": "test",
+                                "description": "test project #1",
+                                "namespace": None,
+                                "parent": None,
+                                "date_created": ANY,
+                                "date_modified": ANY,
+                                "user": {
+                                    "name": "pingou",
+                                    "fullname": "PY C",
+                                    "url_path": "user/pingou",
+                                },
+                                "access_users": {
+                                    "owner": ["pingou"],
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "access_groups": {
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "tags": [],
+                                "priorities": {},
+                                "custom_keys": [],
+                                "close_status": [
+                                    "Invalid",
+                                    "Insufficient data",
+                                    "Fixed",
+                                    "Duplicate",
+                                ],
+                                "milestones": {},
+                            },
+                            "remote_git": None,
+                            "date_created": ANY,
+                            "updated_on": ANY,
+                            "last_updated": ANY,
+                            "closed_at": None,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "assignee": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "status": "Open",
+                            "commit_start": ANY,
+                            "commit_stop": ANY,
+                            "closed_by": None,
+                            "initial_comment": None,
+                            "cached_merge_status": "unknown",
+                            "threshold_reached": None,
+                            "tags": [],
+                            "comments": [],
+                        },
+                        "project": {
+                            "id": 1,
+                            "name": "test",
+                            "fullname": "test",
+                            "url_path": "test",
+                            "description": "test project #1",
+                            "namespace": None,
+                            "parent": None,
+                            "date_created": ANY,
+                            "date_modified": ANY,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "access_users": {
+                                "owner": ["pingou"],
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "access_groups": {
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "tags": [],
+                            "priorities": {},
+                            "custom_keys": [],
+                            "close_status": [
+                                "Invalid",
+                                "Insufficient data",
+                                "Fixed",
+                                "Duplicate",
+                            ],
+                            "milestones": {},
+                        },
+                        "agent": "pingou",
+                    },
+                ),
+            ):
+                output = self.app.post(
+                    "/test/pull-request/1/update",
+                    data=data,
+                    follow_redirects=True,
+                )
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
@@ -2575,7 +3594,7 @@ index 0000000..2a552bb
             )
             self.assertIn("Request assigned", output_text)
 
-            # Pull-Request closed
+            # Pull-Request closed - reset assignee
             repo = pagure.lib.query.get_authorized_project(
                 self.session, "test"
             )
@@ -2585,9 +3604,480 @@ index 0000000..2a552bb
             self.session.add(req)
             self.session.commit()
 
-            output = self.app.post(
-                "/test/pull-request/1/update", data=data, follow_redirects=True
-            )
+            data = {"csrf_token": csrf_token, "user": None}
+
+            with testing.mock_sends(
+                api.Message(
+                    topic="pagure.request.assigned.reset",
+                    body={
+                        "request": {
+                            "id": 1,
+                            "uid": ANY,
+                            "title": "PR from the feature branch",
+                            "branch": "master",
+                            "project": {
+                                "id": 1,
+                                "name": "test",
+                                "fullname": "test",
+                                "url_path": "test",
+                                "description": "test project #1",
+                                "namespace": None,
+                                "parent": None,
+                                "date_created": ANY,
+                                "date_modified": ANY,
+                                "user": {
+                                    "name": "pingou",
+                                    "fullname": "PY C",
+                                    "url_path": "user/pingou",
+                                },
+                                "access_users": {
+                                    "owner": ["pingou"],
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "access_groups": {
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "tags": [],
+                                "priorities": {},
+                                "custom_keys": [],
+                                "close_status": [
+                                    "Invalid",
+                                    "Insufficient data",
+                                    "Fixed",
+                                    "Duplicate",
+                                ],
+                                "milestones": {},
+                            },
+                            "branch_from": "feature",
+                            "repo_from": {
+                                "id": 1,
+                                "name": "test",
+                                "fullname": "test",
+                                "url_path": "test",
+                                "description": "test project #1",
+                                "namespace": None,
+                                "parent": None,
+                                "date_created": ANY,
+                                "date_modified": ANY,
+                                "user": {
+                                    "name": "pingou",
+                                    "fullname": "PY C",
+                                    "url_path": "user/pingou",
+                                },
+                                "access_users": {
+                                    "owner": ["pingou"],
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "access_groups": {
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "tags": [],
+                                "priorities": {},
+                                "custom_keys": [],
+                                "close_status": [
+                                    "Invalid",
+                                    "Insufficient data",
+                                    "Fixed",
+                                    "Duplicate",
+                                ],
+                                "milestones": {},
+                            },
+                            "remote_git": None,
+                            "date_created": ANY,
+                            "updated_on": ANY,
+                            "last_updated": ANY,
+                            "closed_at": None,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "assignee": None,
+                            "status": "Closed",
+                            "commit_start": ANY,
+                            "commit_stop": ANY,
+                            "closed_by": None,
+                            "initial_comment": None,
+                            "cached_merge_status": "unknown",
+                            "threshold_reached": None,
+                            "tags": [],
+                            "comments": [
+                                {
+                                    "id": 1,
+                                    "commit": None,
+                                    "tree": None,
+                                    "filename": None,
+                                    "line": None,
+                                    "comment": "**Metadata Update from @pingou**:\n- Request assigned",
+                                    "parent": None,
+                                    "date_created": ANY,
+                                    "user": {
+                                        "name": "pingou",
+                                        "fullname": "PY C",
+                                        "url_path": "user/pingou",
+                                    },
+                                    "edited_on": None,
+                                    "editor": None,
+                                    "notification": True,
+                                    "reactions": {},
+                                }
+                            ],
+                        },
+                        "pullrequest": {
+                            "id": 1,
+                            "uid": ANY,
+                            "title": "PR from the feature branch",
+                            "branch": "master",
+                            "project": {
+                                "id": 1,
+                                "name": "test",
+                                "fullname": "test",
+                                "url_path": "test",
+                                "description": "test project #1",
+                                "namespace": None,
+                                "parent": None,
+                                "date_created": ANY,
+                                "date_modified": ANY,
+                                "user": {
+                                    "name": "pingou",
+                                    "fullname": "PY C",
+                                    "url_path": "user/pingou",
+                                },
+                                "access_users": {
+                                    "owner": ["pingou"],
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "access_groups": {
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "tags": [],
+                                "priorities": {},
+                                "custom_keys": [],
+                                "close_status": [
+                                    "Invalid",
+                                    "Insufficient data",
+                                    "Fixed",
+                                    "Duplicate",
+                                ],
+                                "milestones": {},
+                            },
+                            "branch_from": "feature",
+                            "repo_from": {
+                                "id": 1,
+                                "name": "test",
+                                "fullname": "test",
+                                "url_path": "test",
+                                "description": "test project #1",
+                                "namespace": None,
+                                "parent": None,
+                                "date_created": ANY,
+                                "date_modified": ANY,
+                                "user": {
+                                    "name": "pingou",
+                                    "fullname": "PY C",
+                                    "url_path": "user/pingou",
+                                },
+                                "access_users": {
+                                    "owner": ["pingou"],
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "access_groups": {
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "tags": [],
+                                "priorities": {},
+                                "custom_keys": [],
+                                "close_status": [
+                                    "Invalid",
+                                    "Insufficient data",
+                                    "Fixed",
+                                    "Duplicate",
+                                ],
+                                "milestones": {},
+                            },
+                            "remote_git": None,
+                            "date_created": ANY,
+                            "updated_on": ANY,
+                            "last_updated": ANY,
+                            "closed_at": None,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "assignee": None,
+                            "status": "Closed",
+                            "commit_start": ANY,
+                            "commit_stop": ANY,
+                            "closed_by": None,
+                            "initial_comment": None,
+                            "cached_merge_status": "unknown",
+                            "threshold_reached": None,
+                            "tags": [],
+                            "comments": [
+                                {
+                                    "id": 1,
+                                    "commit": None,
+                                    "tree": None,
+                                    "filename": None,
+                                    "line": None,
+                                    "comment": "**Metadata Update from @pingou**:\n- Request assigned",
+                                    "parent": None,
+                                    "date_created": ANY,
+                                    "user": {
+                                        "name": "pingou",
+                                        "fullname": "PY C",
+                                        "url_path": "user/pingou",
+                                    },
+                                    "edited_on": None,
+                                    "editor": None,
+                                    "notification": True,
+                                    "reactions": {},
+                                }
+                            ],
+                        },
+                        "project": {
+                            "id": 1,
+                            "name": "test",
+                            "fullname": "test",
+                            "url_path": "test",
+                            "description": "test project #1",
+                            "namespace": None,
+                            "parent": None,
+                            "date_created": ANY,
+                            "date_modified": ANY,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "access_users": {
+                                "owner": ["pingou"],
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "access_groups": {
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "tags": [],
+                            "priorities": {},
+                            "custom_keys": [],
+                            "close_status": [
+                                "Invalid",
+                                "Insufficient data",
+                                "Fixed",
+                                "Duplicate",
+                            ],
+                            "milestones": {},
+                        },
+                        "agent": "pingou",
+                    },
+                ),
+                pagure_messages.PullRequestAssignedResetV1(
+                    topic="pagure.pull-request.assigned.reset",
+                    body={
+                        "pullrequest": {
+                            "id": 1,
+                            "uid": ANY,
+                            "title": "PR from the feature branch",
+                            "branch": "master",
+                            "project": {
+                                "id": 1,
+                                "name": "test",
+                                "fullname": "test",
+                                "url_path": "test",
+                                "description": "test project #1",
+                                "namespace": None,
+                                "parent": None,
+                                "date_created": ANY,
+                                "date_modified": ANY,
+                                "user": {
+                                    "name": "pingou",
+                                    "fullname": "PY C",
+                                    "url_path": "user/pingou",
+                                },
+                                "access_users": {
+                                    "owner": ["pingou"],
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "access_groups": {
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "tags": [],
+                                "priorities": {},
+                                "custom_keys": [],
+                                "close_status": [
+                                    "Invalid",
+                                    "Insufficient data",
+                                    "Fixed",
+                                    "Duplicate",
+                                ],
+                                "milestones": {},
+                            },
+                            "branch_from": "feature",
+                            "repo_from": {
+                                "id": 1,
+                                "name": "test",
+                                "fullname": "test",
+                                "url_path": "test",
+                                "description": "test project #1",
+                                "namespace": None,
+                                "parent": None,
+                                "date_created": ANY,
+                                "date_modified": ANY,
+                                "user": {
+                                    "name": "pingou",
+                                    "fullname": "PY C",
+                                    "url_path": "user/pingou",
+                                },
+                                "access_users": {
+                                    "owner": ["pingou"],
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "access_groups": {
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "tags": [],
+                                "priorities": {},
+                                "custom_keys": [],
+                                "close_status": [
+                                    "Invalid",
+                                    "Insufficient data",
+                                    "Fixed",
+                                    "Duplicate",
+                                ],
+                                "milestones": {},
+                            },
+                            "remote_git": None,
+                            "date_created": ANY,
+                            "updated_on": ANY,
+                            "last_updated": ANY,
+                            "closed_at": None,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "assignee": None,
+                            "status": "Closed",
+                            "commit_start": ANY,
+                            "commit_stop": ANY,
+                            "closed_by": None,
+                            "initial_comment": None,
+                            "cached_merge_status": "unknown",
+                            "threshold_reached": None,
+                            "tags": [],
+                            "comments": [
+                                {
+                                    "id": 1,
+                                    "commit": None,
+                                    "tree": None,
+                                    "filename": None,
+                                    "line": None,
+                                    "comment": "**Metadata Update from @pingou**:\n- Request assigned",
+                                    "parent": None,
+                                    "date_created": ANY,
+                                    "user": {
+                                        "name": "pingou",
+                                        "fullname": "PY C",
+                                        "url_path": "user/pingou",
+                                    },
+                                    "edited_on": None,
+                                    "editor": None,
+                                    "notification": True,
+                                    "reactions": {},
+                                }
+                            ],
+                        },
+                        "project": {
+                            "id": 1,
+                            "name": "test",
+                            "fullname": "test",
+                            "url_path": "test",
+                            "description": "test project #1",
+                            "namespace": None,
+                            "parent": None,
+                            "date_created": ANY,
+                            "date_modified": ANY,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "access_users": {
+                                "owner": ["pingou"],
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "access_groups": {
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "tags": [],
+                            "priorities": {},
+                            "custom_keys": [],
+                            "close_status": [
+                                "Invalid",
+                                "Insufficient data",
+                                "Fixed",
+                                "Duplicate",
+                            ],
+                            "milestones": {},
+                        },
+                        "agent": "pingou",
+                    },
+                ),
+            ):
+                output = self.app.post(
+                    "/test/pull-request/1/update",
+                    data=data,
+                    follow_redirects=True,
+                )
             self.assertEqual(output.status_code, 200)
 
             # Project w/o pull-request
@@ -2605,6 +4095,9 @@ index 0000000..2a552bb
             )
             self.assertEqual(output.status_code, 404)
 
+    @patch.dict(
+        "pagure.config.config", {"FEDORA_MESSAGING_NOTIFICATIONS": True}
+    )
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_update_pull_requests_tag(self):
         """ Test the update_pull_requests endpoint when tagging a PR.
@@ -2653,10 +4146,168 @@ index 0000000..2a552bb
             # Tag the PR
             data = {"csrf_token": csrf_token, "tag": "black"}
 
-            output = self.app.post(
-                "/test/pull-request/1/update", data=data, follow_redirects=True
-            )
-            self.assertEqual(output.status_code, 200)
+            with testing.mock_sends(
+                pagure_messages.PullRequestTagAddedV1(
+                    topic="pagure.pull-request.tag.added",
+                    body={
+                        # This is field is for backward compatibility but we
+                        # don't want to check it
+                        "pull_request": ANY,
+                        "pullrequest": {
+                            "id": 1,
+                            "uid": ANY,
+                            "title": "PR from the feature branch",
+                            "branch": "master",
+                            "project": {
+                                "id": 1,
+                                "name": "test",
+                                "fullname": "test",
+                                "url_path": "test",
+                                "description": "test project #1",
+                                "namespace": None,
+                                "parent": None,
+                                "date_created": ANY,
+                                "date_modified": ANY,
+                                "user": {
+                                    "name": "pingou",
+                                    "fullname": "PY C",
+                                    "url_path": "user/pingou",
+                                },
+                                "access_users": {
+                                    "owner": ["pingou"],
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "access_groups": {
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "tags": [],
+                                "priorities": {},
+                                "custom_keys": [],
+                                "close_status": [
+                                    "Invalid",
+                                    "Insufficient data",
+                                    "Fixed",
+                                    "Duplicate",
+                                ],
+                                "milestones": {},
+                            },
+                            "branch_from": "feature",
+                            "repo_from": {
+                                "id": 1,
+                                "name": "test",
+                                "fullname": "test",
+                                "url_path": "test",
+                                "description": "test project #1",
+                                "namespace": None,
+                                "parent": None,
+                                "date_created": ANY,
+                                "date_modified": ANY,
+                                "user": {
+                                    "name": "pingou",
+                                    "fullname": "PY C",
+                                    "url_path": "user/pingou",
+                                },
+                                "access_users": {
+                                    "owner": ["pingou"],
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "access_groups": {
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "tags": [],
+                                "priorities": {},
+                                "custom_keys": [],
+                                "close_status": [
+                                    "Invalid",
+                                    "Insufficient data",
+                                    "Fixed",
+                                    "Duplicate",
+                                ],
+                                "milestones": {},
+                            },
+                            "remote_git": None,
+                            "date_created": ANY,
+                            "updated_on": ANY,
+                            "last_updated": ANY,
+                            "closed_at": None,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "assignee": None,
+                            "status": "Open",
+                            "commit_start": ANY,
+                            "commit_stop": ANY,
+                            "closed_by": None,
+                            "initial_comment": None,
+                            "cached_merge_status": "unknown",
+                            "threshold_reached": None,
+                            "tags": ["black"],
+                            "comments": [],
+                        },
+                        "project": {
+                            "id": 1,
+                            "name": "test",
+                            "fullname": "test",
+                            "url_path": "test",
+                            "description": "test project #1",
+                            "namespace": None,
+                            "parent": None,
+                            "date_created": ANY,
+                            "date_modified": ANY,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "access_users": {
+                                "owner": ["pingou"],
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "access_groups": {
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "tags": [],
+                            "priorities": {},
+                            "custom_keys": [],
+                            "close_status": [
+                                "Invalid",
+                                "Insufficient data",
+                                "Fixed",
+                                "Duplicate",
+                            ],
+                            "milestones": {},
+                        },
+                        "tags": ["black"],
+                        "agent": "pingou",
+                    },
+                )
+            ):
+                output = self.app.post(
+                    "/test/pull-request/1/update",
+                    data=data,
+                    follow_redirects=True,
+                )
+                self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
                 "<title>PR#1: PR from the feature branch - test\n - "
@@ -2702,9 +4353,363 @@ index 0000000..2a552bb
             # Re-try to tag the PR
             data = {"csrf_token": csrf_token, "tag": "blue, yellow"}
 
-            output = self.app.post(
-                "/test/pull-request/1/update", data=data, follow_redirects=True
-            )
+            with testing.mock_sends(
+                pagure_messages.PullRequestTagAddedV1(
+                    topic="pagure.pull-request.tag.added",
+                    body={
+                        "pull_request": ANY,
+                        "pullrequest": {
+                            "id": 1,
+                            "uid": ANY,
+                            "title": "PR from the feature branch",
+                            "branch": "master",
+                            "project": {
+                                "id": 1,
+                                "name": "test",
+                                "fullname": "test",
+                                "url_path": "test",
+                                "description": "test project #1",
+                                "namespace": None,
+                                "parent": None,
+                                "date_created": ANY,
+                                "date_modified": ANY,
+                                "user": {
+                                    "name": "pingou",
+                                    "fullname": "PY C",
+                                    "url_path": "user/pingou",
+                                },
+                                "access_users": {
+                                    "owner": ["pingou"],
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "access_groups": {
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "tags": [],
+                                "priorities": {},
+                                "custom_keys": [],
+                                "close_status": [
+                                    "Invalid",
+                                    "Insufficient data",
+                                    "Fixed",
+                                    "Duplicate",
+                                ],
+                                "milestones": {},
+                            },
+                            "branch_from": "feature",
+                            "repo_from": {
+                                "id": 1,
+                                "name": "test",
+                                "fullname": "test",
+                                "url_path": "test",
+                                "description": "test project #1",
+                                "namespace": None,
+                                "parent": None,
+                                "date_created": ANY,
+                                "date_modified": ANY,
+                                "user": {
+                                    "name": "pingou",
+                                    "fullname": "PY C",
+                                    "url_path": "user/pingou",
+                                },
+                                "access_users": {
+                                    "owner": ["pingou"],
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "access_groups": {
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "tags": [],
+                                "priorities": {},
+                                "custom_keys": [],
+                                "close_status": [
+                                    "Invalid",
+                                    "Insufficient data",
+                                    "Fixed",
+                                    "Duplicate",
+                                ],
+                                "milestones": {},
+                            },
+                            "remote_git": None,
+                            "date_created": ANY,
+                            "updated_on": ANY,
+                            "last_updated": ANY,
+                            "closed_at": None,
+                            "user": {
+                                "name": "foo",
+                                "fullname": "foo bar",
+                                "url_path": "user/foo",
+                            },
+                            "assignee": None,
+                            "status": "Open",
+                            "commit_start": ANY,
+                            "commit_stop": ANY,
+                            "closed_by": None,
+                            "initial_comment": None,
+                            "cached_merge_status": "unknown",
+                            "threshold_reached": None,
+                            "tags": ["black", "blue", "yellow"],
+                            "comments": [
+                                {
+                                    "id": 1,
+                                    "commit": None,
+                                    "tree": None,
+                                    "filename": None,
+                                    "line": None,
+                                    "comment": "**Metadata Update from "
+                                    "@pingou**:\n- Pull-request tagged "
+                                    "with: black",
+                                    "parent": None,
+                                    "date_created": ANY,
+                                    "user": {
+                                        "name": "pingou",
+                                        "fullname": "PY C",
+                                        "url_path": "user/pingou",
+                                    },
+                                    "edited_on": None,
+                                    "editor": None,
+                                    "notification": True,
+                                    "reactions": {},
+                                }
+                            ],
+                        },
+                        "project": {
+                            "id": 1,
+                            "name": "test",
+                            "fullname": "test",
+                            "url_path": "test",
+                            "description": "test project #1",
+                            "namespace": None,
+                            "parent": None,
+                            "date_created": ANY,
+                            "date_modified": ANY,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "access_users": {
+                                "owner": ["pingou"],
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "access_groups": {
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "tags": [],
+                            "priorities": {},
+                            "custom_keys": [],
+                            "close_status": [
+                                "Invalid",
+                                "Insufficient data",
+                                "Fixed",
+                                "Duplicate",
+                            ],
+                            "milestones": {},
+                        },
+                        "tags": ["blue", "yellow"],
+                        "agent": "foo",
+                    },
+                ),
+                pagure_messages.PullRequestTagRemovedV1(
+                    topic="pagure.pull-request.tag.removed",
+                    body={
+                        # This is field is for backward compatibility but we
+                        # don't want to check it
+                        "pull_request": ANY,
+                        "pullrequest": {
+                            "id": 1,
+                            "uid": ANY,
+                            "title": "PR from the feature branch",
+                            "branch": "master",
+                            "project": {
+                                "id": 1,
+                                "name": "test",
+                                "fullname": "test",
+                                "url_path": "test",
+                                "description": "test project #1",
+                                "namespace": None,
+                                "parent": None,
+                                "date_created": ANY,
+                                "date_modified": ANY,
+                                "user": {
+                                    "name": "pingou",
+                                    "fullname": "PY C",
+                                    "url_path": "user/pingou",
+                                },
+                                "access_users": {
+                                    "owner": ["pingou"],
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "access_groups": {
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "tags": [],
+                                "priorities": {},
+                                "custom_keys": [],
+                                "close_status": [
+                                    "Invalid",
+                                    "Insufficient data",
+                                    "Fixed",
+                                    "Duplicate",
+                                ],
+                                "milestones": {},
+                            },
+                            "branch_from": "feature",
+                            "repo_from": {
+                                "id": 1,
+                                "name": "test",
+                                "fullname": "test",
+                                "url_path": "test",
+                                "description": "test project #1",
+                                "namespace": None,
+                                "parent": None,
+                                "date_created": ANY,
+                                "date_modified": ANY,
+                                "user": {
+                                    "name": "pingou",
+                                    "fullname": "PY C",
+                                    "url_path": "user/pingou",
+                                },
+                                "access_users": {
+                                    "owner": ["pingou"],
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "access_groups": {
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "tags": [],
+                                "priorities": {},
+                                "custom_keys": [],
+                                "close_status": [
+                                    "Invalid",
+                                    "Insufficient data",
+                                    "Fixed",
+                                    "Duplicate",
+                                ],
+                                "milestones": {},
+                            },
+                            "remote_git": None,
+                            "date_created": ANY,
+                            "updated_on": ANY,
+                            "last_updated": ANY,
+                            "closed_at": None,
+                            "user": {
+                                "name": "foo",
+                                "fullname": "foo bar",
+                                "url_path": "user/foo",
+                            },
+                            "assignee": None,
+                            "status": "Open",
+                            "commit_start": ANY,
+                            "commit_stop": ANY,
+                            "closed_by": None,
+                            "initial_comment": None,
+                            "cached_merge_status": "unknown",
+                            "threshold_reached": None,
+                            "tags": ["blue", "yellow"],
+                            "comments": [
+                                {
+                                    "id": 1,
+                                    "commit": None,
+                                    "tree": None,
+                                    "filename": None,
+                                    "line": None,
+                                    "comment": "**Metadata Update from "
+                                    "@pingou**:\n- Pull-request tagged "
+                                    "with: black",
+                                    "parent": None,
+                                    "date_created": ANY,
+                                    "user": {
+                                        "name": "pingou",
+                                        "fullname": "PY C",
+                                        "url_path": "user/pingou",
+                                    },
+                                    "edited_on": None,
+                                    "editor": None,
+                                    "notification": True,
+                                    "reactions": {},
+                                }
+                            ],
+                        },
+                        "project": {
+                            "id": 1,
+                            "name": "test",
+                            "fullname": "test",
+                            "url_path": "test",
+                            "description": "test project #1",
+                            "namespace": None,
+                            "parent": None,
+                            "date_created": ANY,
+                            "date_modified": ANY,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "access_users": {
+                                "owner": ["pingou"],
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "access_groups": {
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "tags": [],
+                            "priorities": {},
+                            "custom_keys": [],
+                            "close_status": [
+                                "Invalid",
+                                "Insufficient data",
+                                "Fixed",
+                                "Duplicate",
+                            ],
+                            "milestones": {},
+                        },
+                        "tags": ["black"],
+                        "agent": "foo",
+                    },
+                ),
+            ):
+                output = self.app.post(
+                    "/test/pull-request/1/update",
+                    data=data,
+                    follow_redirects=True,
+                )
             self.assertEqual(output.status_code, 200)
             soup = BeautifulSoup(output.get_data(as_text=True), "html.parser")
             self.assertEqual(
@@ -2753,6 +4758,9 @@ index 0000000..2a552bb
             )
             self.assertEqual(output.status_code, 404)
 
+    @patch.dict(
+        "pagure.config.config", {"FEDORA_MESSAGING_NOTIFICATIONS": True}
+    )
     @patch("pagure.lib.notify.send_email")
     def test_fork_project(self, send_email):
         """ Test the fork_project endpoint. """
@@ -2793,10 +4801,90 @@ index 0000000..2a552bb
 
             data = {"csrf_token": csrf_token}
 
-            output = self.app.post(
-                "/do_fork/test", data=data, follow_redirects=True
-            )
-            self.assertEqual(output.status_code, 200)
+            with testing.mock_sends(
+                pagure_messages.ProjectForkedV1(
+                    topic="pagure.project.forked",
+                    body={
+                        "project": {
+                            "id": 4,
+                            "name": "test",
+                            "fullname": "forks/foo/test",
+                            "url_path": "fork/foo/test",
+                            "description": "test project #1",
+                            "namespace": None,
+                            "parent": {
+                                "id": 1,
+                                "name": "test",
+                                "fullname": "test",
+                                "url_path": "test",
+                                "description": "test project #1",
+                                "namespace": None,
+                                "parent": None,
+                                "date_created": ANY,
+                                "date_modified": ANY,
+                                "user": {
+                                    "name": "pingou",
+                                    "fullname": "PY C",
+                                    "url_path": "user/pingou",
+                                },
+                                "access_users": {
+                                    "owner": ["pingou"],
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "access_groups": {
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "tags": [],
+                                "priorities": {},
+                                "custom_keys": [],
+                                "close_status": [
+                                    "Invalid",
+                                    "Insufficient data",
+                                    "Fixed",
+                                    "Duplicate",
+                                ],
+                                "milestones": {},
+                            },
+                            "date_created": ANY,
+                            "date_modified": ANY,
+                            "user": {
+                                "name": "foo",
+                                "fullname": "foo bar",
+                                "url_path": "user/foo",
+                            },
+                            "access_users": {
+                                "owner": ["foo"],
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "access_groups": {
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "tags": [],
+                            "priorities": {},
+                            "custom_keys": [],
+                            "close_status": [],
+                            "milestones": {},
+                        },
+                        "agent": "foo",
+                    },
+                )
+            ):
+                output = self.app.post(
+                    "/do_fork/test", data=data, follow_redirects=True
+                )
+                self.assertEqual(output.status_code, 200)
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_fork_project_non_master_default(self):
@@ -2881,6 +4969,9 @@ index 0000000..2a552bb
             output_text = output.get_data(as_text=True)
             self.assertIn("<p>Branch foo bar does not exist</p>", output_text)
 
+    @patch.dict(
+        "pagure.config.config", {"FEDORA_MESSAGING_NOTIFICATIONS": True}
+    )
     @patch("pagure.lib.notify.send_email")
     def test_new_request_pull(self, send_email):
         """ Test the new_request_pull endpoint. """
@@ -2987,9 +5078,124 @@ More information</textarea>
                 "initial_comment": "Test Initial Comment",
             }
 
-            output = self.app.post(
-                "/test/diff/master..feature", data=data, follow_redirects=True
-            )
+            with testing.mock_sends(
+                pagure_messages.PullRequestNewV1(
+                    topic="pagure.pull-request.new",
+                    body={
+                        "pullrequest": {
+                            "id": 2,
+                            "uid": ANY,
+                            "title": "foo bar PR",
+                            "branch": "master",
+                            "project": {
+                                "id": 1,
+                                "name": "test",
+                                "fullname": "test",
+                                "url_path": "test",
+                                "description": "test project #1",
+                                "namespace": None,
+                                "parent": None,
+                                "date_created": ANY,
+                                "date_modified": ANY,
+                                "user": {
+                                    "name": "pingou",
+                                    "fullname": "PY C",
+                                    "url_path": "user/pingou",
+                                },
+                                "access_users": {
+                                    "owner": ["pingou"],
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "access_groups": {
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "tags": [],
+                                "priorities": {},
+                                "custom_keys": [],
+                                "close_status": [
+                                    "Invalid",
+                                    "Insufficient data",
+                                    "Fixed",
+                                    "Duplicate",
+                                ],
+                                "milestones": {},
+                            },
+                            "branch_from": "feature",
+                            "repo_from": {
+                                "id": 1,
+                                "name": "test",
+                                "fullname": "test",
+                                "url_path": "test",
+                                "description": "test project #1",
+                                "namespace": None,
+                                "parent": None,
+                                "date_created": ANY,
+                                "date_modified": ANY,
+                                "user": {
+                                    "name": "pingou",
+                                    "fullname": "PY C",
+                                    "url_path": "user/pingou",
+                                },
+                                "access_users": {
+                                    "owner": ["pingou"],
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "access_groups": {
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "tags": [],
+                                "priorities": {},
+                                "custom_keys": [],
+                                "close_status": [
+                                    "Invalid",
+                                    "Insufficient data",
+                                    "Fixed",
+                                    "Duplicate",
+                                ],
+                                "milestones": {},
+                            },
+                            "remote_git": None,
+                            "date_created": ANY,
+                            "updated_on": ANY,
+                            "last_updated": ANY,
+                            "closed_at": None,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "assignee": None,
+                            "status": "Open",
+                            "commit_start": ANY,
+                            "commit_stop": ANY,
+                            "closed_by": None,
+                            "initial_comment": "Test Initial Comment",
+                            "cached_merge_status": "unknown",
+                            "threshold_reached": None,
+                            "tags": [],
+                            "comments": [],
+                        },
+                        "agent": "pingou",
+                    },
+                )
+            ):
+                output = self.app.post(
+                    "/test/diff/master..feature",
+                    data=data,
+                    follow_redirects=True,
+                )
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
@@ -4156,6 +6362,9 @@ More information</textarea>
 
         shutil.rmtree(newpath)
 
+    @patch.dict(
+        "pagure.config.config", {"FEDORA_MESSAGING_NOTIFICATIONS": True}
+    )
     @patch("pagure.lib.notify.send_email")
     def test_pull_request_add_comment(self, send_email):
         """ Test the pull_request_add_comment endpoint. """
@@ -4186,11 +6395,144 @@ More information</textarea>
                 "csrf_token": csrf_token,
                 "comment": "This look alright but we can do better",
             }
-            output = self.app.post(
-                "/test/pull-request/1/comment",
-                data=data,
-                follow_redirects=True,
-            )
+            with testing.mock_sends(
+                pagure_messages.PullRequestCommentAddedV1(
+                    topic="pagure.pull-request.comment.added",
+                    body={
+                        "pullrequest": {
+                            "id": 1,
+                            "uid": ANY,
+                            "title": "PR from the feature branch",
+                            "branch": "master",
+                            "project": {
+                                "id": 1,
+                                "name": "test",
+                                "fullname": "test",
+                                "url_path": "test",
+                                "description": "test project #1",
+                                "namespace": None,
+                                "parent": None,
+                                "date_created": ANY,
+                                "date_modified": ANY,
+                                "user": {
+                                    "name": "pingou",
+                                    "fullname": "PY C",
+                                    "url_path": "user/pingou",
+                                },
+                                "access_users": {
+                                    "owner": ["pingou"],
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "access_groups": {
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "tags": [],
+                                "priorities": {},
+                                "custom_keys": [],
+                                "close_status": [
+                                    "Invalid",
+                                    "Insufficient data",
+                                    "Fixed",
+                                    "Duplicate",
+                                ],
+                                "milestones": {},
+                            },
+                            "branch_from": "feature",
+                            "repo_from": {
+                                "id": 1,
+                                "name": "test",
+                                "fullname": "test",
+                                "url_path": "test",
+                                "description": "test project #1",
+                                "namespace": None,
+                                "parent": None,
+                                "date_created": ANY,
+                                "date_modified": ANY,
+                                "user": {
+                                    "name": "pingou",
+                                    "fullname": "PY C",
+                                    "url_path": "user/pingou",
+                                },
+                                "access_users": {
+                                    "owner": ["pingou"],
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "access_groups": {
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "tags": [],
+                                "priorities": {},
+                                "custom_keys": [],
+                                "close_status": [
+                                    "Invalid",
+                                    "Insufficient data",
+                                    "Fixed",
+                                    "Duplicate",
+                                ],
+                                "milestones": {},
+                            },
+                            "remote_git": None,
+                            "date_created": ANY,
+                            "updated_on": ANY,
+                            "last_updated": ANY,
+                            "closed_at": None,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "assignee": None,
+                            "status": "Open",
+                            "commit_start": ANY,
+                            "commit_stop": ANY,
+                            "closed_by": None,
+                            "initial_comment": None,
+                            "cached_merge_status": "unknown",
+                            "threshold_reached": None,
+                            "tags": [],
+                            "comments": [
+                                {
+                                    "id": 1,
+                                    "commit": None,
+                                    "tree": None,
+                                    "filename": None,
+                                    "line": None,
+                                    "comment": "This look alright but we can do better",
+                                    "parent": None,
+                                    "date_created": ANY,
+                                    "user": {
+                                        "name": "pingou",
+                                        "fullname": "PY C",
+                                        "url_path": "user/pingou",
+                                    },
+                                    "edited_on": None,
+                                    "editor": None,
+                                    "notification": False,
+                                    "reactions": {},
+                                }
+                            ],
+                        },
+                        "agent": "pingou",
+                    },
+                )
+            ):
+                output = self.app.post(
+                    "/test/pull-request/1/comment",
+                    data=data,
+                    follow_redirects=True,
+                )
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
@@ -4317,6 +6659,9 @@ More information</textarea>
             )
             self.assertEqual(output.status_code, 404)
 
+    @patch.dict(
+        "pagure.config.config", {"FEDORA_MESSAGING_NOTIFICATIONS": True}
+    )
     @patch("pagure.lib.notify.send_email")
     def test_pull_request_edit_comment(self, send_email):
         """ Test the pull request edit comment endpoint """
@@ -4350,6 +6695,7 @@ More information</textarea>
                 "csrf_token": csrf_token,
                 "comment": "This look alright but we can do better",
             }
+
             output = self.app.post(
                 "/test/pull-request/1/comment",
                 data=data,
@@ -4389,11 +6735,186 @@ More information</textarea>
                 "csrf_token": csrf_token,
                 "update_comment": "This look alright but we can do better than this.",
             }
-            output = self.app.post(
-                "/test/pull-request/1/comment/1/edit",
-                data=data,
-                follow_redirects=True,
-            )
+            with testing.mock_sends(
+                pagure_messages.PullRequestCommentEditedV1(
+                    topic="pagure.pull-request.comment.edited",
+                    body={
+                        "pullrequest": {
+                            "id": 1,
+                            "uid": ANY,
+                            "title": "PR from the feature branch",
+                            "branch": "master",
+                            "project": {
+                                "id": 1,
+                                "name": "test",
+                                "fullname": "test",
+                                "url_path": "test",
+                                "description": "test project #1",
+                                "namespace": None,
+                                "parent": None,
+                                "date_created": ANY,
+                                "date_modified": ANY,
+                                "user": {
+                                    "name": "pingou",
+                                    "fullname": "PY C",
+                                    "url_path": "user/pingou",
+                                },
+                                "access_users": {
+                                    "owner": ["pingou"],
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "access_groups": {
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "tags": [],
+                                "priorities": {},
+                                "custom_keys": [],
+                                "close_status": [
+                                    "Invalid",
+                                    "Insufficient data",
+                                    "Fixed",
+                                    "Duplicate",
+                                ],
+                                "milestones": {},
+                            },
+                            "branch_from": "feature",
+                            "repo_from": {
+                                "id": 1,
+                                "name": "test",
+                                "fullname": "test",
+                                "url_path": "test",
+                                "description": "test project #1",
+                                "namespace": None,
+                                "parent": None,
+                                "date_created": ANY,
+                                "date_modified": ANY,
+                                "user": {
+                                    "name": "pingou",
+                                    "fullname": "PY C",
+                                    "url_path": "user/pingou",
+                                },
+                                "access_users": {
+                                    "owner": ["pingou"],
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "access_groups": {
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "tags": [],
+                                "priorities": {},
+                                "custom_keys": [],
+                                "close_status": [
+                                    "Invalid",
+                                    "Insufficient data",
+                                    "Fixed",
+                                    "Duplicate",
+                                ],
+                                "milestones": {},
+                            },
+                            "remote_git": None,
+                            "date_created": ANY,
+                            "updated_on": ANY,
+                            "last_updated": ANY,
+                            "closed_at": None,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "assignee": None,
+                            "status": "Open",
+                            "commit_start": ANY,
+                            "commit_stop": ANY,
+                            "closed_by": None,
+                            "initial_comment": None,
+                            "cached_merge_status": "unknown",
+                            "threshold_reached": None,
+                            "tags": [],
+                            "comments": [],
+                        },
+                        "project": {
+                            "id": 1,
+                            "name": "test",
+                            "fullname": "test",
+                            "url_path": "test",
+                            "description": "test project #1",
+                            "namespace": None,
+                            "parent": None,
+                            "date_created": ANY,
+                            "date_modified": ANY,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "access_users": {
+                                "owner": ["pingou"],
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "access_groups": {
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "tags": [],
+                            "priorities": {},
+                            "custom_keys": [],
+                            "close_status": [
+                                "Invalid",
+                                "Insufficient data",
+                                "Fixed",
+                                "Duplicate",
+                            ],
+                            "milestones": {},
+                        },
+                        "comment": {
+                            "id": 1,
+                            "commit": None,
+                            "tree": None,
+                            "filename": None,
+                            "line": None,
+                            "comment": "This look alright but we can do better than this.",
+                            "parent": None,
+                            "date_created": ANY,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "edited_on": ANY,
+                            "editor": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "notification": False,
+                            "reactions": {},
+                        },
+                        "agent": "pingou",
+                    },
+                )
+            ):
+                output = self.app.post(
+                    "/test/pull-request/1/comment/1/edit",
+                    data=data,
+                    follow_redirects=True,
+                )
             output_text = output.get_data(as_text=True)
             # Checking if the comment is updated in the main page
             self.assertIn(

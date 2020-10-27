@@ -14,6 +14,7 @@ from __future__ import unicode_literals, absolute_import
 import datetime
 import json
 import unittest
+import pagure_messages
 import shutil
 import sys
 import tempfile
@@ -21,7 +22,8 @@ import os
 
 import pygit2
 from celery.result import EagerResult
-from mock import patch, Mock
+from fedora_messaging import api, testing
+from mock import ANY, patch, Mock
 
 sys.path.insert(
     0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
@@ -2927,6 +2929,221 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
 
         self.assertEqual(data, expected_output)
 
+    @patch.dict(
+        "pagure.config.config", {"FEDORA_MESSAGING_NOTIFICATIONS": True}
+    )
+    def test_update_flag_commit_with_uid(self):
+        """ Test flagging a commit with provided uid. """
+        repo_obj = pygit2.Repository(self.git_path)
+        commit = repo_obj.revparse_single("HEAD")
+
+        headers = {"Authorization": "token aaabbbcccddd"}
+        data = {
+            "username": "Jenkins",
+            "percent": 0,
+            "comment": "Tests running",
+            "url": "http://jenkins.cloud.fedoraproject.org/",
+            "uid": "jenkins_build_pagure_100+seed",
+            "status": "pending",
+        }
+        with testing.mock_sends(
+            pagure_messages.CommitFlagAddedV1(
+                topic="pagure.commit.flag.added",
+                body={
+                    "repo": {
+                        "id": 1,
+                        "name": "test",
+                        "fullname": "test",
+                        "url_path": "test",
+                        "description": "test project #1",
+                        "namespace": None,
+                        "parent": None,
+                        "date_created": ANY,
+                        "date_modified": ANY,
+                        "user": {
+                            "name": "pingou",
+                            "fullname": "PY C",
+                            "url_path": "user/pingou",
+                        },
+                        "access_users": {
+                            "owner": ["pingou"],
+                            "admin": [],
+                            "commit": [],
+                            "collaborator": [],
+                            "ticket": [],
+                        },
+                        "access_groups": {
+                            "admin": [],
+                            "commit": [],
+                            "collaborator": [],
+                            "ticket": [],
+                        },
+                        "tags": [],
+                        "priorities": {},
+                        "custom_keys": [],
+                        "close_status": [
+                            "Invalid",
+                            "Insufficient data",
+                            "Fixed",
+                            "Duplicate",
+                        ],
+                        "milestones": {},
+                    },
+                    "flag": {
+                        "commit_hash": commit.oid.hex,
+                        "username": "Jenkins",
+                        "percent": "0",
+                        "comment": "Tests running",
+                        "status": "pending",
+                        "url": "http://jenkins.cloud.fedoraproject.org/",
+                        "date_created": ANY,
+                        "date_updated": ANY,
+                        "user": {
+                            "name": "pingou",
+                            "fullname": "PY C",
+                            "url_path": "user/pingou",
+                        },
+                    },
+                    "agent": "pingou",
+                },
+            )
+        ):
+            output = self.app.post(
+                "/api/0/test/c/%s/flag" % commit.oid.hex,
+                headers=headers,
+                data=data,
+            )
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        data["flag"]["date_created"] = "1510742565"
+        data["flag"]["date_updated"] = "1510742565"
+        expected_output = {
+            "flag": {
+                "comment": "Tests running",
+                "commit_hash": commit.oid.hex,
+                "date_created": "1510742565",
+                "date_updated": "1510742565",
+                "percent": 0,
+                "status": "pending",
+                "url": "http://jenkins.cloud.fedoraproject.org/",
+                "user": {
+                    "default_email": "bar@pingou.com",
+                    "emails": ["bar@pingou.com", "foo@pingou.com"],
+                    "fullname": "PY C",
+                    "name": "pingou",
+                    "url_path": "user/pingou",
+                },
+                "username": "Jenkins",
+            },
+            "message": "Flag added",
+            "uid": "jenkins_build_pagure_100+seed",
+        }
+
+        self.assertEqual(data, expected_output)
+
+        data = {
+            "username": "Jenkins",
+            "percent": 100,
+            "comment": "Tests passed",
+            "url": "http://jenkins.cloud.fedoraproject.org/",
+            "uid": "jenkins_build_pagure_100+seed",
+            "status": "success",
+        }
+        with testing.mock_sends(
+            pagure_messages.CommitFlagUpdatedV1(
+                topic="pagure.commit.flag.updated",
+                body={
+                    "repo": {
+                        "id": 1,
+                        "name": "test",
+                        "fullname": "test",
+                        "url_path": "test",
+                        "description": "test project #1",
+                        "namespace": None,
+                        "parent": None,
+                        "date_created": ANY,
+                        "date_modified": ANY,
+                        "user": {
+                            "name": "pingou",
+                            "fullname": "PY C",
+                            "url_path": "user/pingou",
+                        },
+                        "access_users": {
+                            "owner": ["pingou"],
+                            "admin": [],
+                            "commit": [],
+                            "collaborator": [],
+                            "ticket": [],
+                        },
+                        "access_groups": {
+                            "admin": [],
+                            "commit": [],
+                            "collaborator": [],
+                            "ticket": [],
+                        },
+                        "tags": [],
+                        "priorities": {},
+                        "custom_keys": [],
+                        "close_status": [
+                            "Invalid",
+                            "Insufficient data",
+                            "Fixed",
+                            "Duplicate",
+                        ],
+                        "milestones": {},
+                    },
+                    "flag": {
+                        "commit_hash": commit.oid.hex,
+                        "username": "Jenkins",
+                        "percent": "100",
+                        "comment": "Tests passed",
+                        "status": "success",
+                        "url": "http://jenkins.cloud.fedoraproject.org/",
+                        "date_created": ANY,
+                        "date_updated": ANY,
+                        "user": {
+                            "name": "pingou",
+                            "fullname": "PY C",
+                            "url_path": "user/pingou",
+                        },
+                    },
+                    "agent": "pingou",
+                },
+            )
+        ):
+            output = self.app.post(
+                "/api/0/test/c/%s/flag" % commit.oid.hex,
+                headers=headers,
+                data=data,
+            )
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        data["flag"]["date_created"] = "1510742565"
+        data["flag"]["date_updated"] = "1510742565"
+        expected_output = {
+            "flag": {
+                "comment": "Tests passed",
+                "commit_hash": commit.oid.hex,
+                "date_created": "1510742565",
+                "date_updated": "1510742565",
+                "percent": 100,
+                "status": "success",
+                "url": "http://jenkins.cloud.fedoraproject.org/",
+                "user": {
+                    "default_email": "bar@pingou.com",
+                    "emails": ["bar@pingou.com", "foo@pingou.com"],
+                    "fullname": "PY C",
+                    "name": "pingou",
+                    "url_path": "user/pingou",
+                },
+                "username": "Jenkins",
+            },
+            "message": "Flag updated",
+            "uid": "jenkins_build_pagure_100+seed",
+        }
+
+        self.assertEqual(data, expected_output)
+
     @patch("pagure.lib.notify.send_email")
     def test_flag_commit_without_uid(self, mock_email):
         """ Test flagging a commit with missing info.
@@ -3003,6 +3220,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
             "url": "http://jenkins.cloud.fedoraproject.org/",
             "status": "success",
         }
+
         output = self.app.post(
             "/api/0/test/c/%s/flag" % commit.oid.hex,
             headers=headers,
@@ -5081,6 +5299,9 @@ class PagureFlaskApiProjectCreateProjectTests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(data, {"message": 'Project "api1" created'})
 
+    @patch.dict(
+        "pagure.config.config", {"FEDORA_MESSAGING_NOTIFICATIONS": True}
+    )
     def test_api_new_project(self):
 
         headers = {"Authorization": "token aaabbbcccddd"}
@@ -5090,7 +5311,49 @@ class PagureFlaskApiProjectCreateProjectTests(tests.Modeltests):
         }
 
         # Valid request
-        output = self.app.post("/api/0/new/", data=data, headers=headers)
+        with testing.mock_sends(
+            pagure_messages.ProjectNewV1(
+                topic="pagure.project.new",
+                body={
+                    "project": {
+                        "id": 4,
+                        "name": "test_42",
+                        "fullname": "test_42",
+                        "url_path": "test_42",
+                        "description": "Just another small test project",
+                        "namespace": None,
+                        "parent": None,
+                        "date_created": ANY,
+                        "date_modified": ANY,
+                        "user": {
+                            "name": "pingou",
+                            "fullname": "PY C",
+                            "url_path": "user/pingou",
+                        },
+                        "access_users": {
+                            "owner": ["pingou"],
+                            "admin": [],
+                            "commit": [],
+                            "collaborator": [],
+                            "ticket": [],
+                        },
+                        "access_groups": {
+                            "admin": [],
+                            "commit": [],
+                            "collaborator": [],
+                            "ticket": [],
+                        },
+                        "tags": [],
+                        "priorities": {},
+                        "custom_keys": [],
+                        "close_status": [],
+                        "milestones": {},
+                    },
+                    "agent": "pingou",
+                },
+            )
+        ):
+            output = self.app.post("/api/0/new/", data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(data, {"message": 'Project "test_42" created'})

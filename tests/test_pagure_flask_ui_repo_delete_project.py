@@ -13,7 +13,9 @@ from __future__ import unicode_literals, absolute_import
 import sys
 import os
 
-from mock import patch, MagicMock
+import pagure_messages
+from mock import ANY, patch, MagicMock
+from fedora_messaging import testing
 
 sys.path.insert(
     0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
@@ -169,6 +171,9 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
         projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 4)
 
+    @patch.dict(
+        "pagure.config.config", {"FEDORA_MESSAGING_NOTIFICATIONS": True}
+    )
     @patch.dict("pagure.config.config", {"ENABLE_DEL_PROJECTS": False})
     @patch.dict("pagure.config.config", {"ENABLE_DEL_FORKS": True})
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
@@ -191,10 +196,90 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
 
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
-            output = self.app.post(
-                "/fork/pingou/test/delete", follow_redirects=True
-            )
-            self.assertEqual(output.status_code, 200)
+            with testing.mock_sends(
+                pagure_messages.ProjectDeletedV1(
+                    topic="pagure.project.deleted",
+                    body={
+                        "project": {
+                            "id": 4,
+                            "name": "test",
+                            "fullname": "forks/pingou/test",
+                            "url_path": "fork/pingou/test",
+                            "description": "test project #1",
+                            "namespace": None,
+                            "parent": {
+                                "id": 1,
+                                "name": "test",
+                                "fullname": "test",
+                                "url_path": "test",
+                                "description": "test project #1",
+                                "namespace": None,
+                                "parent": None,
+                                "date_created": ANY,
+                                "date_modified": ANY,
+                                "user": {
+                                    "name": "pingou",
+                                    "fullname": "PY C",
+                                    "url_path": "user/pingou",
+                                },
+                                "access_users": {
+                                    "owner": ["pingou"],
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "access_groups": {
+                                    "admin": [],
+                                    "commit": [],
+                                    "collaborator": [],
+                                    "ticket": [],
+                                },
+                                "tags": [],
+                                "priorities": {},
+                                "custom_keys": [],
+                                "close_status": [
+                                    "Invalid",
+                                    "Insufficient data",
+                                    "Fixed",
+                                    "Duplicate",
+                                ],
+                                "milestones": {},
+                            },
+                            "date_created": ANY,
+                            "date_modified": ANY,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "access_users": {
+                                "owner": ["pingou"],
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "access_groups": {
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "tags": [],
+                            "priorities": {},
+                            "custom_keys": [],
+                            "close_status": [],
+                            "milestones": {},
+                        },
+                        "agent": "pingou",
+                    },
+                )
+            ):
+                output = self.app.post(
+                    "/fork/pingou/test/delete", follow_redirects=True
+                )
+                self.assertEqual(output.status_code, 200)
 
         projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 3)

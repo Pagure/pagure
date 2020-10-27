@@ -142,7 +142,7 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
                 )
             ]
         )
-        self.assertIn(cnt, (9, 10))
+        self.assertIn(cnt, (9, 10, 11))
 
         last_commit = repo.revparse_single("HEAD")
         patch = pagure.lib.git.commit_to_patch(repo, last_commit)

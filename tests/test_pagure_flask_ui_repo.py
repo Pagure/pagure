@@ -26,8 +26,10 @@ try:
 except ImportError:
     pass
 
+import pagure_messages
 import pygit2
 import six
+from fedora_messaging import testing
 from mock import ANY, patch, MagicMock
 
 sys.path.insert(
@@ -246,9 +248,11 @@ class PagureFlaskRepotests(tests.Modeltests):
             output = self.app.post("/test/adddeploykey")
             self.assertEqual(output.status_code, 404)
 
+    @patch.dict(
+        "pagure.config.config", {"FEDORA_MESSAGING_NOTIFICATIONS": True}
+    )
     @patch("pagure.decorators.admin_session_timedout")
-    @patch("pagure.lib.notify.log")
-    def test_add_user(self, mock_log, ast):
+    def test_add_user(self, ast):
         """ Test the add_user endpoint. """
         ast.return_value = False
 
@@ -338,9 +342,59 @@ class PagureFlaskRepotests(tests.Modeltests):
 
             # All correct
             data["user"] = "foo"
-            output = self.app.post(
-                "/test/adduser", data=data, follow_redirects=True
-            )
+            with testing.mock_sends(
+                pagure_messages.ProjectUserAddedV1(
+                    topic="pagure.project.user.added",
+                    body={
+                        "project": {
+                            "id": 1,
+                            "name": "test",
+                            "fullname": "test",
+                            "url_path": "test",
+                            "description": "test project #1",
+                            "namespace": None,
+                            "parent": None,
+                            "date_created": ANY,
+                            "date_modified": ANY,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "access_users": {
+                                "owner": ["pingou"],
+                                "admin": [],
+                                "commit": ["foo"],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "access_groups": {
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "tags": [],
+                            "priorities": {},
+                            "custom_keys": [],
+                            "close_status": [
+                                "Invalid",
+                                "Insufficient data",
+                                "Fixed",
+                                "Duplicate",
+                            ],
+                            "milestones": {},
+                        },
+                        "new_user": "foo",
+                        "access": "commit",
+                        "branches": None,
+                        "agent": "pingou",
+                    },
+                )
+            ):
+                output = self.app.post(
+                    "/test/adduser", data=data, follow_redirects=True
+                )
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
@@ -349,7 +403,69 @@ class PagureFlaskRepotests(tests.Modeltests):
             )
             self.assertIn("User added", output_text)
 
-        mock_log.assert_called_with(ANY, topic="project.user.added", msg=ANY)
+            # Update access
+            data["access"] = "ticket"
+            data["user"] = "foo"
+            with testing.mock_sends(
+                pagure_messages.ProjectUserAccessUpdatedV1(
+                    topic="pagure.project.user.access.updated",
+                    body={
+                        "project": {
+                            "id": 1,
+                            "name": "test",
+                            "fullname": "test",
+                            "url_path": "test",
+                            "description": "test project #1",
+                            "namespace": None,
+                            "parent": None,
+                            "date_created": ANY,
+                            "date_modified": ANY,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "access_users": {
+                                "owner": ["pingou"],
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": ["foo"],
+                            },
+                            "access_groups": {
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "tags": [],
+                            "priorities": {},
+                            "custom_keys": [],
+                            "close_status": [
+                                "Invalid",
+                                "Insufficient data",
+                                "Fixed",
+                                "Duplicate",
+                            ],
+                            "milestones": {},
+                        },
+                        "new_user": "foo",
+                        "new_access": "ticket",
+                        "new_branches": None,
+                        "agent": "pingou",
+                    },
+                )
+            ):
+                output = self.app.post(
+                    "/test/adduser", data=data, follow_redirects=True
+                )
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>',
+                output_text,
+            )
+            self.assertIn("User access updated", output_text)
 
     @patch("pagure.decorators.admin_session_timedout")
     def test_add_group_project_when_user_mngt_off(self, ast):
@@ -439,6 +555,9 @@ class PagureFlaskRepotests(tests.Modeltests):
             )
             self.assertIn("No group ralph found.", output_text)
 
+    @patch.dict(
+        "pagure.config.config", {"FEDORA_MESSAGING_NOTIFICATIONS": True}
+    )
     @patch("pagure.decorators.admin_session_timedout")
     def test_add_group_project(self, ast):
         """ Test the add_group_project endpoint. """
@@ -524,9 +643,59 @@ class PagureFlaskRepotests(tests.Modeltests):
 
             # All good
             data["access"] = "ticket"
-            output = self.app.post(
-                "/test/addgroup", data=data, follow_redirects=True
-            )
+            with testing.mock_sends(
+                pagure_messages.ProjectGroupAddedV1(
+                    topic="pagure.project.group.added",
+                    body={
+                        "project": {
+                            "id": 1,
+                            "name": "test",
+                            "fullname": "test",
+                            "url_path": "test",
+                            "description": "test project #1",
+                            "namespace": None,
+                            "parent": None,
+                            "date_created": ANY,
+                            "date_modified": ANY,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "access_users": {
+                                "owner": ["pingou"],
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "access_groups": {
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": ["ralph"],
+                            },
+                            "tags": [],
+                            "priorities": {},
+                            "custom_keys": [],
+                            "close_status": [
+                                "Invalid",
+                                "Insufficient data",
+                                "Fixed",
+                                "Duplicate",
+                            ],
+                            "milestones": {},
+                        },
+                        "new_group": "ralph",
+                        "access": "ticket",
+                        "branches": None,
+                        "agent": "pingou",
+                    },
+                )
+            ):
+                output = self.app.post(
+                    "/test/addgroup", data=data, follow_redirects=True
+                )
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
@@ -537,6 +706,72 @@ class PagureFlaskRepotests(tests.Modeltests):
                 output_text,
             )
             self.assertIn("Group added", output_text)
+
+            # All good -- Update existing group/access
+            data["access"] = "commit"
+            with testing.mock_sends(
+                pagure_messages.ProjectGroupAccessUpdatedV1(
+                    topic="pagure.project.group.access.updated",
+                    body={
+                        "project": {
+                            "id": 1,
+                            "name": "test",
+                            "fullname": "test",
+                            "url_path": "test",
+                            "description": "test project #1",
+                            "namespace": None,
+                            "parent": None,
+                            "date_created": ANY,
+                            "date_modified": ANY,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "access_users": {
+                                "owner": ["pingou"],
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "access_groups": {
+                                "admin": [],
+                                "commit": ["ralph"],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "tags": [],
+                            "priorities": {},
+                            "custom_keys": [],
+                            "close_status": [
+                                "Invalid",
+                                "Insufficient data",
+                                "Fixed",
+                                "Duplicate",
+                            ],
+                            "milestones": {},
+                        },
+                        "new_group": "ralph",
+                        "new_access": "commit",
+                        "new_branches": None,
+                        "agent": "pingou",
+                    },
+                )
+            ):
+                output = self.app.post(
+                    "/test/addgroup", data=data, follow_redirects=True
+                )
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                "<title>Settings - test - Pagure</title>", output_text
+            )
+            self.assertIn(
+                '<h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>',
+                output_text,
+            )
+            self.assertIn("Group access updated", output_text)
 
     @patch("pagure.decorators.admin_session_timedout")
     def test_remove_user_when_user_mngt_off(self, ast):
@@ -585,6 +820,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
             data = {"csrf_token": csrf_token}
+
             output = self.app.post(
                 "/test/dropuser/2", data=data, follow_redirects=True
             )
@@ -704,9 +940,11 @@ class PagureFlaskRepotests(tests.Modeltests):
             output = self.app.post("/test/dropdeploykey/1")
             self.assertEqual(output.status_code, 404)
 
+    @patch.dict(
+        "pagure.config.config", {"FEDORA_MESSAGING_NOTIFICATIONS": True}
+    )
     @patch("pagure.decorators.admin_session_timedout")
-    @patch("pagure.lib.notify.log")
-    def test_remove_user(self, mock_log, ast):
+    def test_remove_user(self, ast):
         """ Test the remove_user endpoint. """
         ast.return_value = False
 
@@ -790,9 +1028,58 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertEqual(len(repo.users), 1)
 
             data = {"csrf_token": csrf_token}
-            output = self.app.post(
-                "/test/dropuser/2", data=data, follow_redirects=True
-            )
+
+            with testing.mock_sends(
+                pagure_messages.ProjectUserRemovedV1(
+                    topic="pagure.project.user.removed",
+                    body={
+                        "project": {
+                            "id": 1,
+                            "name": "test",
+                            "fullname": "test",
+                            "url_path": "test",
+                            "description": "test project #1",
+                            "namespace": None,
+                            "parent": None,
+                            "date_created": ANY,
+                            "date_modified": ANY,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "access_users": {
+                                "owner": ["pingou"],
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "access_groups": {
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "tags": [],
+                            "priorities": {},
+                            "custom_keys": [],
+                            "close_status": [
+                                "Invalid",
+                                "Insufficient data",
+                                "Fixed",
+                                "Duplicate",
+                            ],
+                            "milestones": {},
+                        },
+                        "removed_user": "foo",
+                        "agent": "pingou",
+                    },
+                )
+            ):
+                output = self.app.post(
+                    "/test/dropuser/2", data=data, follow_redirects=True
+                )
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
@@ -810,8 +1097,6 @@ class PagureFlaskRepotests(tests.Modeltests):
                 self.session, "test"
             )
             self.assertEqual(len(repo.users), 0)
-
-        mock_log.assert_called_with(ANY, topic="project.user.removed", msg=ANY)
 
     @patch("pagure.decorators.admin_session_timedout")
     @patch("pagure.lib.notify.log")
@@ -931,6 +1216,9 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         pagure.config.config["ENABLE_USER_MNGT"] = True
 
+    @patch.dict(
+        "pagure.config.config", {"FEDORA_MESSAGING_NOTIFICATIONS": True}
+    )
     @patch("pagure.decorators.admin_session_timedout")
     def test_remove_group_project(self, ast):
         """ Test the remove_group_project endpoint. """
@@ -1035,9 +1323,57 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertEqual(len(repo.groups), 1)
 
             data = {"csrf_token": csrf_token}
-            output = self.app.post(
-                "/test/dropgroup/1", data=data, follow_redirects=True
-            )
+            with testing.mock_sends(
+                pagure_messages.ProjectGroupRemovedV1(
+                    topic="pagure.project.group.removed",
+                    body={
+                        "project": {
+                            "id": 1,
+                            "name": "test",
+                            "fullname": "test",
+                            "url_path": "test",
+                            "description": "test project #1",
+                            "namespace": None,
+                            "parent": None,
+                            "date_created": ANY,
+                            "date_modified": ANY,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "access_users": {
+                                "owner": ["pingou"],
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "access_groups": {
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "tags": [],
+                            "priorities": {},
+                            "custom_keys": [],
+                            "close_status": [
+                                "Invalid",
+                                "Insufficient data",
+                                "Fixed",
+                                "Duplicate",
+                            ],
+                            "milestones": {},
+                        },
+                        "removed_groups": ["testgrp"],
+                        "agent": "pingou",
+                    },
+                )
+            ):
+                output = self.app.post(
+                    "/test/dropgroup/1", data=data, follow_redirects=True
+                )
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
@@ -1270,6 +1606,9 @@ class PagureFlaskRepotests(tests.Modeltests):
             )
             self.assertIn("Project updated", output_text)
 
+    @patch.dict(
+        "pagure.config.config", {"FEDORA_MESSAGING_NOTIFICATIONS": True}
+    )
     @patch("pagure.decorators.admin_session_timedout")
     def test_view_settings(self, ast):
         """ Test the view_settings endpoint. """
@@ -1329,6 +1668,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             )[1].split('">')[0]
 
             data = {}
+
             output = self.app.post(
                 "/test/settings", data=data, follow_redirects=True
             )
@@ -1365,6 +1705,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             )
 
             data = {"csrf_token": csrf_token}
+
             output = self.app.post(
                 "/test/settings", data=data, follow_redirects=True
             )
@@ -1403,10 +1744,63 @@ class PagureFlaskRepotests(tests.Modeltests):
                 "csrf_token": csrf_token,
                 "pull_requests": "y",
                 "issue_tracker": "y",
+                "fedmsg_notifications": "y",
             }
-            output = self.app.post(
-                "/test/settings", data=data, follow_redirects=True
-            )
+            with testing.mock_sends(
+                pagure_messages.ProjectEditV1(
+                    topic="pagure.project.edit",
+                    body={
+                        "project": {
+                            "id": 1,
+                            "name": "test",
+                            "fullname": "test",
+                            "url_path": "test",
+                            "description": "test project #1",
+                            "namespace": None,
+                            "parent": None,
+                            "date_created": ANY,
+                            "date_modified": ANY,
+                            "user": {
+                                "name": "pingou",
+                                "fullname": "PY C",
+                                "url_path": "user/pingou",
+                            },
+                            "access_users": {
+                                "owner": ["pingou"],
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "access_groups": {
+                                "admin": [],
+                                "commit": [],
+                                "collaborator": [],
+                                "ticket": [],
+                            },
+                            "tags": [],
+                            "priorities": {},
+                            "custom_keys": [],
+                            "close_status": [
+                                "Invalid",
+                                "Insufficient data",
+                                "Fixed",
+                                "Duplicate",
+                            ],
+                            "milestones": {},
+                        },
+                        "fields": [
+                            "fedmsg_notifications",
+                            "issue_tracker",
+                            "pull_requests",
+                        ],
+                        "agent": "pingou",
+                    },
+                )
+            ):
+                output = self.app.post(
+                    "/test/settings", data=data, follow_redirects=True
+                )
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(

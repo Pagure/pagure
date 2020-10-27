@@ -20,9 +20,12 @@ import time
 import os
 
 import flask
+import pagure_messages
 import json
 import munch
-from mock import patch, MagicMock
+
+from fedora_messaging import api, testing
+from mock import ANY, patch, MagicMock
 from sqlalchemy.exc import SQLAlchemyError
 
 sys.path.insert(
@@ -469,6 +472,9 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             },
         )
 
+    @patch.dict(
+        "pagure.config.config", {"FEDORA_MESSAGING_NOTIFICATIONS": True}
+    )
     def test_api_new_issue(self):
         """ Test the api_new_issue method of the flask api. """
         tests.create_projects(self.session)
@@ -486,9 +492,82 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         }
 
         # Valid request
-        output = self.app.post(
-            "/api/0/test/new_issue", data=data, headers=headers
-        )
+        with testing.mock_sends(
+            pagure_messages.IssueNewV1(
+                topic="pagure.issue.new",
+                body={
+                    "issue": {
+                        "id": 1,
+                        "title": "test issue",
+                        "content": "This issue needs attention",
+                        "status": "Open",
+                        "close_status": None,
+                        "date_created": ANY,
+                        "last_updated": ANY,
+                        "closed_at": None,
+                        "user": {
+                            "name": "pingou",
+                            "fullname": "PY C",
+                            "url_path": "user/pingou",
+                        },
+                        "private": False,
+                        "tags": [],
+                        "depends": [],
+                        "blocks": [],
+                        "assignee": None,
+                        "priority": None,
+                        "milestone": None,
+                        "custom_fields": [],
+                        "closed_by": None,
+                        "related_prs": [],
+                        "comments": [],
+                    },
+                    "project": {
+                        "id": 1,
+                        "name": "test",
+                        "fullname": "test",
+                        "url_path": "test",
+                        "description": "test project #1",
+                        "namespace": None,
+                        "parent": None,
+                        "date_created": ANY,
+                        "date_modified": ANY,
+                        "user": {
+                            "name": "pingou",
+                            "fullname": "PY C",
+                            "url_path": "user/pingou",
+                        },
+                        "access_users": {
+                            "owner": ["pingou"],
+                            "admin": [],
+                            "commit": [],
+                            "collaborator": [],
+                            "ticket": [],
+                        },
+                        "access_groups": {
+                            "admin": [],
+                            "commit": [],
+                            "collaborator": [],
+                            "ticket": [],
+                        },
+                        "tags": [],
+                        "priorities": {},
+                        "custom_keys": [],
+                        "close_status": [
+                            "Invalid",
+                            "Insufficient data",
+                            "Fixed",
+                            "Duplicate",
+                        ],
+                        "milestones": {},
+                    },
+                    "agent": "pingou",
+                },
+            )
+        ):
+            output = self.app.post(
+                "/api/0/test/new_issue", data=data, headers=headers
+            )
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
         data["issue"]["date_created"] = "1431414800"
@@ -757,6 +836,58 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         exp["id"] = 2
 
         self.assertDictEqual(data, {"issue": exp, "message": "Issue created"})
+
+    @patch.dict(
+        "pagure.config.config", {"FEDORA_MESSAGING_NOTIFICATIONS": True}
+    )
+    def test_api_new_issue_private_no_fedora_messaging_notifs(self):
+        """ Test the api_new_issue method of the flask api. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, "tickets"), bare=True
+        )
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        headers = {"Authorization": "token aaabbbcccddd"}
+
+        # Private issue: True
+        data = {
+            "title": "test issue",
+            "issue_content": "This issue needs attention",
+            "private": True,
+        }
+        output = self.app.post(
+            "/api/0/test/new_issue", data=data, headers=headers
+        )
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        data["issue"]["date_created"] = "1431414800"
+        data["issue"]["last_updated"] = "1431414800"
+
+        issue = copy.deepcopy(FULL_ISSUE_LIST[2])
+        issue["id"] = 1
+
+        self.assertDictEqual(
+            data, {"issue": issue, "message": "Issue created"}
+        )
+
+        # Private issue: 1
+        data = {
+            "title": "test issue1",
+            "issue_content": "This issue needs attention",
+            "private": 1,
+            "assignee": "foo",
+        }
+        with self.assertRaises(AssertionError) as cm:
+            with testing.mock_sends(api.Message()):
+                output = self.app.post(
+                    "/api/0/test/new_issue", data=data, headers=headers
+                )
+        self.assertEqual(
+            cm.exception.args[0],
+            "Expected 1 messages to be sent, but 0 were sent",
+        )
 
     @patch("pagure.utils.check_api_acls", MagicMock(return_value=None))
     def test_api_new_issue_raise_db_error(self):
@@ -2982,6 +3113,9 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             },
         )
 
+    @patch.dict(
+        "pagure.config.config", {"FEDORA_MESSAGING_NOTIFICATIONS": True}
+    )
     def test_api_change_milestone_issue(self):
         """ Test the api_change_milestone_issue method of the flask api. """
         tests.create_projects(self.session)
@@ -3017,9 +3151,86 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         data = {"milestone": "v1.0"}
 
         # Valid requests
-        output = self.app.post(
-            "/api/0/test/issue/1/milestone", data=data, headers=headers
-        )
+        with testing.mock_sends(
+            pagure_messages.IssueEditV1(
+                topic="pagure.issue.edit",
+                body={
+                    "issue": {
+                        "id": 1,
+                        "title": "Test issue #1",
+                        "content": "We should work on this",
+                        "status": "Open",
+                        "close_status": None,
+                        "date_created": ANY,
+                        "last_updated": ANY,
+                        "closed_at": None,
+                        "user": {
+                            "name": "pingou",
+                            "fullname": "PY C",
+                            "url_path": "user/pingou",
+                        },
+                        "private": False,
+                        "tags": [],
+                        "depends": [],
+                        "blocks": [],
+                        "assignee": None,
+                        "priority": None,
+                        "milestone": "v1.0",
+                        "custom_fields": [],
+                        "closed_by": None,
+                        "related_prs": [],
+                        "comments": [],
+                    },
+                    "project": {
+                        "id": 1,
+                        "name": "test",
+                        "fullname": "test",
+                        "url_path": "test",
+                        "description": "test project #1",
+                        "namespace": None,
+                        "parent": None,
+                        "date_created": ANY,
+                        "date_modified": ANY,
+                        "user": {
+                            "name": "pingou",
+                            "fullname": "PY C",
+                            "url_path": "user/pingou",
+                        },
+                        "access_users": {
+                            "owner": ["pingou"],
+                            "admin": [],
+                            "commit": [],
+                            "collaborator": [],
+                            "ticket": [],
+                        },
+                        "access_groups": {
+                            "admin": [],
+                            "commit": [],
+                            "collaborator": [],
+                            "ticket": [],
+                        },
+                        "tags": [],
+                        "priorities": {},
+                        "custom_keys": [],
+                        "close_status": [
+                            "Invalid",
+                            "Insufficient data",
+                            "Fixed",
+                            "Duplicate",
+                        ],
+                        "milestones": {
+                            "v1.0": {"date": None, "active": True},
+                            "v2.0": {"date": "Soon", "active": True},
+                        },
+                    },
+                    "fields": ["milestone"],
+                    "agent": "pingou",
+                },
+            )
+        ):
+            output = self.app.post(
+                "/api/0/test/issue/1/milestone", data=data, headers=headers
+            )
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
@@ -3554,6 +3765,9 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             pagure.api.APIERROR.ETRACKERDISABLED.name, data["error_code"]
         )
 
+    @patch.dict(
+        "pagure.config.config", {"FEDORA_MESSAGING_NOTIFICATIONS": True}
+    )
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_api_assign_issue(self, p_send_email, p_ugt):
@@ -3620,17 +3834,184 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         data = {"assignee": "pingou"}
 
         # Valid request
-        output = self.app.post(
-            "/api/0/test/issue/1/assign", data=data, headers=headers
-        )
+        with testing.mock_sends(
+            pagure_messages.IssueAssignedAddedV1(
+                topic="pagure.issue.assigned.added",
+                body={
+                    "issue": {
+                        "id": 1,
+                        "title": "Test issue #1",
+                        "content": "We should work on this",
+                        "status": "Open",
+                        "close_status": None,
+                        "date_created": ANY,
+                        "last_updated": ANY,
+                        "closed_at": None,
+                        "user": {
+                            "name": "pingou",
+                            "fullname": "PY C",
+                            "url_path": "user/pingou",
+                        },
+                        "private": False,
+                        "tags": [],
+                        "depends": [],
+                        "blocks": [],
+                        "assignee": {
+                            "name": "pingou",
+                            "fullname": "PY C",
+                            "url_path": "user/pingou",
+                        },
+                        "priority": None,
+                        "milestone": None,
+                        "custom_fields": [],
+                        "closed_by": None,
+                        "related_prs": [],
+                        "comments": [],
+                    },
+                    "project": {
+                        "id": 1,
+                        "name": "test",
+                        "fullname": "test",
+                        "url_path": "test",
+                        "description": "test project #1",
+                        "namespace": None,
+                        "parent": None,
+                        "date_created": ANY,
+                        "date_modified": ANY,
+                        "user": {
+                            "name": "pingou",
+                            "fullname": "PY C",
+                            "url_path": "user/pingou",
+                        },
+                        "access_users": {
+                            "owner": ["pingou"],
+                            "admin": [],
+                            "commit": [],
+                            "collaborator": [],
+                            "ticket": [],
+                        },
+                        "access_groups": {
+                            "admin": [],
+                            "commit": [],
+                            "collaborator": [],
+                            "ticket": [],
+                        },
+                        "tags": [],
+                        "priorities": {},
+                        "custom_keys": [],
+                        "close_status": [
+                            "Invalid",
+                            "Insufficient data",
+                            "Fixed",
+                            "Duplicate",
+                        ],
+                        "milestones": {},
+                    },
+                    "agent": "pingou",
+                },
+            )
+        ):
+            output = self.app.post(
+                "/api/0/test/issue/1/assign", data=data, headers=headers
+            )
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(data, {"message": "Issue assigned to pingou"})
 
         # Un-assign
-        output = self.app.post(
-            "/api/0/test/issue/1/assign", data=data, headers=headers
-        )
+        with testing.mock_sends(
+            pagure_messages.IssueAssignedResetV1(
+                topic="pagure.issue.assigned.reset",
+                body={
+                    "issue": {
+                        "id": 1,
+                        "title": "Test issue #1",
+                        "content": "We should work on this",
+                        "status": "Open",
+                        "close_status": None,
+                        "date_created": ANY,
+                        "last_updated": ANY,
+                        "closed_at": None,
+                        "user": {
+                            "name": "pingou",
+                            "fullname": "PY C",
+                            "url_path": "user/pingou",
+                        },
+                        "private": False,
+                        "tags": [],
+                        "depends": [],
+                        "blocks": [],
+                        "assignee": None,
+                        "priority": None,
+                        "milestone": None,
+                        "custom_fields": [],
+                        "closed_by": None,
+                        "related_prs": [],
+                        "comments": [
+                            {
+                                "id": 1,
+                                "comment": "**Metadata Update from @pingou**:"
+                                "\n- Issue assigned to pingou",
+                                "parent": None,
+                                "date_created": ANY,
+                                "user": {
+                                    "name": "pingou",
+                                    "fullname": "PY C",
+                                    "url_path": "user/pingou",
+                                },
+                                "edited_on": None,
+                                "editor": None,
+                                "notification": True,
+                                "reactions": {},
+                            }
+                        ],
+                    },
+                    "project": {
+                        "id": 1,
+                        "name": "test",
+                        "fullname": "test",
+                        "url_path": "test",
+                        "description": "test project #1",
+                        "namespace": None,
+                        "parent": None,
+                        "date_created": ANY,
+                        "date_modified": ANY,
+                        "user": {
+                            "name": "pingou",
+                            "fullname": "PY C",
+                            "url_path": "user/pingou",
+                        },
+                        "access_users": {
+                            "owner": ["pingou"],
+                            "admin": [],
+                            "commit": [],
+                            "collaborator": [],
+                            "ticket": [],
+                        },
+                        "access_groups": {
+                            "admin": [],
+                            "commit": [],
+                            "collaborator": [],
+                            "ticket": [],
+                        },
+                        "tags": [],
+                        "priorities": {},
+                        "custom_keys": [],
+                        "close_status": [
+                            "Invalid",
+                            "Insufficient data",
+                            "Fixed",
+                            "Duplicate",
+                        ],
+                        "milestones": {},
+                    },
+                    "agent": "pingou",
+                },
+            )
+        ):
+            output = self.app.post(
+                "/api/0/test/issue/1/assign", data=data, headers=headers
+            )
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(data, {"message": "Assignee reset"})
