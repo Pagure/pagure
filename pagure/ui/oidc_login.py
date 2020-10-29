@@ -11,6 +11,7 @@
 from __future__ import unicode_literals, absolute_import
 
 import logging
+from base64 import b64decode
 
 import flask
 from flask import Markup
@@ -51,11 +52,19 @@ def fas_user_from_oidc():
                 username = info[email_key].split("@")[0]
             elif fb == "sub":
                 username = flask.g.oidc_id_token["sub"]
+        # The SSH key may be returned base64-encoded
+        ssh_key = info.get(ssh_key)
+        if ssh_key is not None:
+            try:
+                ssh_key = b64decode(ssh_key).decode("ascii")
+            except (TypeError, ValueError):
+                pass
+        # Create the user object
         flask.g.fas_user = munch.Munch(
             username=username,
             fullname=info.get(fulln_key, ""),
             email=info[email_key],
-            ssh_key=info.get(ssh_key),
+            ssh_key=ssh_key,
             groups=info.get(groups_key, []),
             login_time=flask.session["oidc_logintime"],
         )
