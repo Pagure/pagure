@@ -261,6 +261,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
                             "fullname": "test",
                             "url_path": "test",
                             "description": "test project #1",
+                            "full_url": "http://localhost.localdomain/test",
                             "namespace": None,
                             "parent": None,
                             "date_created": ANY,
@@ -268,6 +269,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
                             "user": {
                                 "name": "pingou",
                                 "fullname": "PY C",
+                                "full_url": "http://localhost.localdomain/user/pingou",
                                 "url_path": "user/pingou",
                             },
                             "access_users": {
@@ -301,6 +303,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
                             "fullname": "test",
                             "url_path": "test",
                             "description": "test project #1",
+                            "full_url": "http://localhost.localdomain/test",
                             "namespace": None,
                             "parent": None,
                             "date_created": ANY,
@@ -308,6 +311,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
                             "user": {
                                 "name": "pingou",
                                 "fullname": "PY C",
+                                "full_url": "http://localhost.localdomain/user/pingou",
                                 "url_path": "user/pingou",
                             },
                             "access_users": {
@@ -336,12 +340,14 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
                         },
                         "remote_git": None,
                         "date_created": ANY,
+                        "full_url": "http://localhost.localdomain/test/pull-request/1",
                         "updated_on": ANY,
                         "last_updated": ANY,
                         "closed_at": None,
                         "user": {
                             "name": "pingou",
                             "fullname": "PY C",
+                            "full_url": "http://localhost.localdomain/user/pingou",
                             "url_path": "user/pingou",
                         },
                         "assignee": None,
@@ -367,6 +373,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
                         "user": {
                             "name": "pingou",
                             "fullname": "PY C",
+                            "full_url": "http://localhost.localdomain/user/pingou",
                             "url_path": "user/pingou",
                         },
                     },
@@ -398,6 +405,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
                     "user": {
                         "default_email": "bar@pingou.com",
                         "emails": ["bar@pingou.com", "foo@pingou.com"],
+                        "full_url": "http://localhost.localdomain/user/pingou",
                         "fullname": "PY C",
                         "name": "pingou",
                         "url_path": "user/pingou",
@@ -476,6 +484,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
                     "user": {
                         "default_email": "bar@pingou.com",
                         "emails": ["bar@pingou.com", "foo@pingou.com"],
+                        "full_url": "http://localhost.localdomain/user/pingou",
                         "fullname": "PY C",
                         "name": "pingou",
                         "url_path": "user/pingou",
@@ -520,6 +529,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
                         "id": 1,
                         "uid": ANY,
                         "title": "test pull-request",
+                        "full_url": "http://localhost.localdomain/test/pull-request/1",
                         "branch": "master",
                         "project": {
                             "id": 1,
@@ -527,6 +537,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
                             "fullname": "test",
                             "url_path": "test",
                             "description": "test project #1",
+                            "full_url": "http://localhost.localdomain/test",
                             "namespace": None,
                             "parent": None,
                             "date_created": ANY,
@@ -534,6 +545,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
                             "user": {
                                 "name": "pingou",
                                 "fullname": "PY C",
+                                "full_url": "http://localhost.localdomain/user/pingou",
                                 "url_path": "user/pingou",
                             },
                             "access_users": {
@@ -567,6 +579,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
                             "fullname": "test",
                             "url_path": "test",
                             "description": "test project #1",
+                            "full_url": "http://localhost.localdomain/test",
                             "namespace": None,
                             "parent": None,
                             "date_created": ANY,
@@ -574,6 +587,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
                             "user": {
                                 "name": "pingou",
                                 "fullname": "PY C",
+                                "full_url": "http://localhost.localdomain/user/pingou",
                                 "url_path": "user/pingou",
                             },
                             "access_users": {
@@ -608,6 +622,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
                         "user": {
                             "name": "pingou",
                             "fullname": "PY C",
+                            "full_url": "http://localhost.localdomain/user/pingou",
                             "url_path": "user/pingou",
                         },
                         "assignee": None,
@@ -633,6 +648,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
                         "user": {
                             "name": "pingou",
                             "fullname": "PY C",
+                            "full_url": "http://localhost.localdomain/user/pingou",
                             "url_path": "user/pingou",
                         },
                     },
@@ -662,6 +678,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
                     "user": {
                         "default_email": "bar@pingou.com",
                         "emails": ["bar@pingou.com", "foo@pingou.com"],
+                        "full_url": "http://localhost.localdomain/user/pingou",
                         "fullname": "PY C",
                         "name": "pingou",
                         "url_path": "user/pingou",
@@ -724,6 +741,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
                     "user": {
                         "default_email": "bar@pingou.com",
                         "emails": ["bar@pingou.com", "foo@pingou.com"],
+                        "full_url": "http://localhost.localdomain/user/pingou",
                         "fullname": "PY C",
                         "name": "pingou",
                         "url_path": "user/pingou",
@@ -782,6 +800,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
                     "user": {
                         "default_email": "bar@pingou.com",
                         "emails": ["bar@pingou.com", "foo@pingou.com"],
+                        "full_url": "http://localhost.localdomain/user/pingou",
                         "fullname": "PY C",
                         "name": "pingou",
                         "url_path": "user/pingou",
@@ -1092,6 +1111,7 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
                     "user": {
                         "default_email": "bar@pingou.com",
                         "emails": ["bar@pingou.com", "foo@pingou.com"],
+                        "full_url": "http://localhost.localdomain/user/pingou",
                         "fullname": "PY C",
                         "name": "pingou",
                         "url_path": "user/pingou",
@@ -1158,6 +1178,7 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
                     "user": {
                         "default_email": "bar@pingou.com",
                         "emails": ["bar@pingou.com", "foo@pingou.com"],
+                        "full_url": "http://localhost.localdomain/user/pingou",
                         "fullname": "PY C",
                         "name": "pingou",
                         "url_path": "user/pingou",
@@ -1217,6 +1238,7 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
                     "user": {
                         "default_email": "bar@pingou.com",
                         "emails": ["bar@pingou.com", "foo@pingou.com"],
+                        "full_url": "http://localhost.localdomain/user/pingou",
                         "fullname": "PY C",
                         "name": "pingou",
                         "url_path": "user/pingou",
@@ -1393,6 +1415,7 @@ class PagureFlaskApiGetPRFlagtests(tests.Modeltests):
                         "url": "http://jenkins.cloud.fedoraproject.org",
                         "user": {
                             "fullname": "foo bar",
+                            "full_url": "http://localhost.localdomain/user/foo",
                             "name": "foo",
                             "url_path": "user/foo",
                         },
@@ -1471,6 +1494,7 @@ class PagureFlaskApiGetPRFlagtests(tests.Modeltests):
                         "user": {
                             "fullname": "foo bar",
                             "name": "foo",
+                            "full_url": "http://localhost.localdomain/user/foo",
                             "url_path": "user/foo",
                         },
                         "username": "jenkins",
@@ -1486,6 +1510,7 @@ class PagureFlaskApiGetPRFlagtests(tests.Modeltests):
                         "user": {
                             "fullname": "foo bar",
                             "name": "foo",
+                            "full_url": "http://localhost.localdomain/user/foo",
                             "url_path": "user/foo",
                         },
                         "username": "travis",

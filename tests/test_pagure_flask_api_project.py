@@ -254,6 +254,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "description": "test project #1",
                     "fullname": "test",
                     "url_path": "test",
+                    "full_url": "http://localhost.localdomain/test",
                     "id": 1,
                     "milestones": {},
                     "name": "test",
@@ -264,6 +265,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "user": {
                         "fullname": "PY C",
                         "name": "pingou",
+                        "full_url": "http://localhost.localdomain/user/pingou",
                         "url_path": "user/pingou",
                     },
                 }
@@ -474,6 +476,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "date_created": "1436527638",
                     "date_modified": "1436527638",
                     "description": "test project #1",
+                    "full_url": "http://localhost.localdomain/test",
                     "fullname": "test",
                     "url_path": "test",
                     "id": 1,
@@ -484,8 +487,9 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "priorities": {},
                     "tags": ["infra"],
                     "user": {
-                        "fullname": "PY C",
                         "name": "pingou",
+                        "fullname": "PY C",
+                        "full_url": "http://localhost.localdomain/user/pingou",
                         "url_path": "user/pingou",
                     },
                 }
@@ -541,6 +545,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "date_created": "1436527638",
                     "date_modified": "1436527638",
                     "description": "test project #1",
+                    "full_url": "http://localhost.localdomain/test",
                     "fullname": "test",
                     "url_path": "test",
                     "id": 1,
@@ -554,6 +559,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                         "fullname": "PY C",
                         "name": "pingou",
                         "url_path": "user/pingou",
+                        "full_url": "http://localhost.localdomain/user/pingou",
                     },
                 },
                 {
@@ -581,6 +587,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "date_modified": "1436527638",
                     "description": "test project #2",
                     "fullname": "test2",
+                    "full_url": "http://localhost.localdomain/test2",
                     "url_path": "test2",
                     "id": 2,
                     "milestones": {},
@@ -591,6 +598,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "tags": [],
                     "user": {
                         "fullname": "PY C",
+                        "full_url": "http://localhost.localdomain/user/pingou",
                         "name": "pingou",
                         "url_path": "user/pingou",
                     },
@@ -621,6 +629,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "description": "namespaced test project",
                     "fullname": "somenamespace/test3",
                     "url_path": "somenamespace/test3",
+                    "full_url": "http://localhost.localdomain/somenamespace/test3",
                     "id": 3,
                     "milestones": {},
                     "name": "test3",
@@ -630,6 +639,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "tags": [],
                     "user": {
                         "fullname": "PY C",
+                        "full_url": "http://localhost.localdomain/user/pingou",
                         "name": "pingou",
                         "url_path": "user/pingou",
                     },
@@ -688,6 +698,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "description": "test project #1",
                     "fullname": "test",
                     "url_path": "test",
+                    "full_url": "http://localhost.localdomain/test",
                     "id": 1,
                     "milestones": {},
                     "name": "test",
@@ -697,6 +708,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "tags": ["infra"],
                     "user": {
                         "fullname": "PY C",
+                        "full_url": "http://localhost.localdomain/user/pingou",
                         "name": "pingou",
                         "url_path": "user/pingou",
                     },
@@ -727,6 +739,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "description": "test project #2",
                     "fullname": "test2",
                     "url_path": "test2",
+                    "full_url": "http://localhost.localdomain/test2",
                     "id": 2,
                     "milestones": {},
                     "name": "test2",
@@ -737,6 +750,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "user": {
                         "fullname": "PY C",
                         "name": "pingou",
+                        "full_url": "http://localhost.localdomain/user/pingou",
                         "url_path": "user/pingou",
                     },
                 },
@@ -766,6 +780,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "description": "namespaced test project",
                     "fullname": "somenamespace/test3",
                     "url_path": "somenamespace/test3",
+                    "full_url": "http://localhost.localdomain/somenamespace/test3",
                     "id": 3,
                     "milestones": {},
                     "name": "test3",
@@ -776,6 +791,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "user": {
                         "fullname": "PY C",
                         "name": "pingou",
+                        "full_url": "http://localhost.localdomain/user/pingou",
                         "url_path": "user/pingou",
                     },
                 },
@@ -829,6 +845,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "description": "test project #1",
                     "fullname": "test",
                     "url_path": "test",
+                    "full_url": "http://localhost.localdomain/test",
                     "id": 1,
                     "milestones": {},
                     "name": "test",
@@ -839,6 +856,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "user": {
                         "fullname": "PY C",
                         "name": "pingou",
+                        "full_url": "http://localhost.localdomain/user/pingou",
                         "url_path": "user/pingou",
                     },
                 }
@@ -892,6 +910,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "description": "namespaced test project",
                     "fullname": "somenamespace/test3",
                     "url_path": "somenamespace/test3",
+                    "full_url": "http://localhost.localdomain/somenamespace/test3",
                     "id": 3,
                     "milestones": {},
                     "name": "test3",
@@ -902,6 +921,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "user": {
                         "fullname": "PY C",
                         "name": "pingou",
+                        "full_url": "http://localhost.localdomain/user/pingou",
                         "url_path": "user/pingou",
                     },
                 }
@@ -971,6 +991,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             "description": "test project #1",
             "fullname": "test",
             "url_path": "test",
+            "full_url": "http://localhost.localdomain/test",
             "id": 1,
             "milestones": {},
             "name": "test",
@@ -981,6 +1002,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             "user": {
                 "fullname": "PY C",
                 "name": "pingou",
+                "full_url": "http://localhost.localdomain/user/pingou",
                 "url_path": "user/pingou",
             },
         }
@@ -1063,6 +1085,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             "date_created": "1436527638",
             "date_modified": "1436527638",
             "description": "test project #1",
+            "full_url": "http://localhost.localdomain/test",
             "fullname": "test",
             "url_path": "test",
             "id": 1,
@@ -1076,6 +1099,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 "fullname": "PY C",
                 "name": "pingou",
                 "url_path": "user/pingou",
+                "full_url": "http://localhost.localdomain/user/pingou",
             },
         }
         self.assertDictEqual(data, expected_data)
@@ -1157,6 +1181,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             "date_created": "1436527638",
             "date_modified": "1436527638",
             "description": "test project #1",
+            "full_url": "http://localhost.localdomain/test",
             "fullname": "test",
             "url_path": "test",
             "group_details": {"some_group": ["foo"]},
@@ -1171,6 +1196,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 "fullname": "PY C",
                 "name": "pingou",
                 "url_path": "user/pingou",
+                "full_url": "http://localhost.localdomain/user/pingou",
             },
         }
         self.assertDictEqual(data, expected_data)
@@ -1225,6 +1251,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             "date_created": "1436527638",
             "date_modified": "1436527638",
             "description": "test project #1",
+            "full_url": "http://localhost.localdomain/test",
             "fullname": "test",
             "url_path": "test",
             "id": 1,
@@ -1238,6 +1265,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 "fullname": "PY C",
                 "name": "pingou",
                 "url_path": "user/pingou",
+                "full_url": "http://localhost.localdomain/user/pingou",
             },
         }
         self.assertDictEqual(data, expected_data)
@@ -1298,6 +1326,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "description": "test project #1",
                     "fullname": "test",
                     "url_path": "test",
+                    "full_url": "http://localhost.localdomain/test",
                     "id": 1,
                     "milestones": {},
                     "name": "test",
@@ -1309,6 +1338,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                         "fullname": "PY C",
                         "name": "pingou",
                         "url_path": "user/pingou",
+                        "full_url": "http://localhost.localdomain/user/pingou",
                     },
                 },
                 {
@@ -1337,6 +1367,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "description": "test project #2",
                     "fullname": "test2",
                     "url_path": "test2",
+                    "full_url": "http://localhost.localdomain/test2",
                     "id": 2,
                     "milestones": {},
                     "name": "test2",
@@ -1348,6 +1379,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                         "fullname": "PY C",
                         "name": "pingou",
                         "url_path": "user/pingou",
+                        "full_url": "http://localhost.localdomain/user/pingou",
                     },
                 },
                 {
@@ -1376,6 +1408,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "description": "namespaced test project",
                     "fullname": "somenamespace/test3",
                     "url_path": "somenamespace/test3",
+                    "full_url": "http://localhost.localdomain/somenamespace/test3",
                     "id": 3,
                     "milestones": {},
                     "name": "test3",
@@ -1387,6 +1420,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                         "fullname": "PY C",
                         "name": "pingou",
                         "url_path": "user/pingou",
+                        "full_url": "http://localhost.localdomain/user/pingou",
                     },
                 },
             ],
@@ -1453,6 +1487,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                     "description": "namespaced test project",
                     "fullname": "somenamespace/test3",
                     "url_path": "somenamespace/test3",
+                    "full_url": "http://localhost.localdomain/somenamespace/test3",
                     "id": 3,
                     "milestones": {},
                     "name": "test3",
@@ -1464,6 +1499,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                         "fullname": "PY C",
                         "name": "pingou",
                         "url_path": "user/pingou",
+                        "full_url": "http://localhost.localdomain/user/pingou",
                     },
                 }
             ],
@@ -1617,6 +1653,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             "description": "test project #1",
             "fullname": "test",
             "url_path": "test",
+            "full_url": "http://localhost.localdomain/test",
             "id": 1,
             "milestones": {},
             "name": "test",
@@ -1630,6 +1667,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 "fullname": "foo bar",
                 "name": "foo",
                 "url_path": "user/foo",
+                "full_url": "http://localhost.localdomain/user/foo",
             },
         }
         self.assertEqual(data, expected_output)
@@ -1676,6 +1714,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             "date_created": "1496338274",
             "date_modified": "1496338274",
             "description": "test project #1",
+            "full_url": "http://localhost.localdomain/test",
             "fullname": "test",
             "url_path": "test",
             "id": 1,
@@ -1691,6 +1730,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 "fullname": "foo bar",
                 "name": "foo",
                 "url_path": "user/foo",
+                "full_url": "http://localhost.localdomain/user/foo",
             },
         }
         self.assertEqual(data, expected_output)
@@ -1747,6 +1787,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             "date_created": "1496338274",
             "date_modified": "1496338274",
             "description": "test project #1",
+            "full_url": "http://localhost.localdomain/test",
             "fullname": "test",
             "url_path": "test",
             "id": 1,
@@ -1762,6 +1803,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 "fullname": "foo bar",
                 "name": "foo",
                 "url_path": "user/foo",
+                "full_url": "http://localhost.localdomain/user/foo",
             },
         }
         self.assertEqual(data, expected_output)
@@ -1812,6 +1854,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             "description": "test project #1",
             "fullname": "test",
             "url_path": "test",
+            "full_url": "http://localhost.localdomain/test",
             "id": 1,
             "milestones": {},
             "name": "test",
@@ -1825,6 +1868,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 "fullname": "foo bar",
                 "name": "foo",
                 "url_path": "user/foo",
+                "full_url": "http://localhost.localdomain/user/foo",
             },
         }
         self.assertEqual(data, expected_output)
@@ -1875,6 +1919,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             "date_created": "1496338274",
             "date_modified": "1496338274",
             "description": "test project #1",
+            "full_url": "http://localhost.localdomain/test",
             "fullname": "test",
             "url_path": "test",
             "id": 1,
@@ -1890,6 +1935,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 "fullname": "foo bar",
                 "name": "foo",
                 "url_path": "user/foo",
+                "full_url": "http://localhost.localdomain/user/foo",
             },
         }
         self.assertEqual(data, expected_output)
@@ -2917,6 +2963,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
                 "user": {
                     "default_email": "bar@pingou.com",
                     "emails": ["bar@pingou.com", "foo@pingou.com"],
+                    "full_url": "http://localhost.localdomain/user/pingou",
                     "fullname": "PY C",
                     "name": "pingou",
                     "url_path": "user/pingou",
@@ -2956,12 +3003,14 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
                         "fullname": "test",
                         "url_path": "test",
                         "description": "test project #1",
+                        "full_url": "http://localhost.localdomain/test",
                         "namespace": None,
                         "parent": None,
                         "date_created": ANY,
                         "date_modified": ANY,
                         "user": {
                             "name": "pingou",
+                            "full_url": "http://localhost.localdomain/user/pingou",
                             "fullname": "PY C",
                             "url_path": "user/pingou",
                         },
@@ -3000,6 +3049,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
                         "date_updated": ANY,
                         "user": {
                             "name": "pingou",
+                            "full_url": "http://localhost.localdomain/user/pingou",
                             "fullname": "PY C",
                             "url_path": "user/pingou",
                         },
@@ -3029,6 +3079,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
                 "user": {
                     "default_email": "bar@pingou.com",
                     "emails": ["bar@pingou.com", "foo@pingou.com"],
+                    "full_url": "http://localhost.localdomain/user/pingou",
                     "fullname": "PY C",
                     "name": "pingou",
                     "url_path": "user/pingou",
@@ -3059,12 +3110,14 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
                         "fullname": "test",
                         "url_path": "test",
                         "description": "test project #1",
+                        "full_url": "http://localhost.localdomain/test",
                         "namespace": None,
                         "parent": None,
                         "date_created": ANY,
                         "date_modified": ANY,
                         "user": {
                             "name": "pingou",
+                            "full_url": "http://localhost.localdomain/user/pingou",
                             "fullname": "PY C",
                             "url_path": "user/pingou",
                         },
@@ -3103,6 +3156,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
                         "date_updated": ANY,
                         "user": {
                             "name": "pingou",
+                            "full_url": "http://localhost.localdomain/user/pingou",
                             "fullname": "PY C",
                             "url_path": "user/pingou",
                         },
@@ -3132,6 +3186,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
                 "user": {
                     "default_email": "bar@pingou.com",
                     "emails": ["bar@pingou.com", "foo@pingou.com"],
+                    "full_url": "http://localhost.localdomain/user/pingou",
                     "fullname": "PY C",
                     "name": "pingou",
                     "url_path": "user/pingou",
@@ -3184,6 +3239,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
                 "user": {
                     "default_email": "bar@pingou.com",
                     "emails": ["bar@pingou.com", "foo@pingou.com"],
+                    "full_url": "http://localhost.localdomain/user/pingou",
                     "fullname": "PY C",
                     "name": "pingou",
                     "url_path": "user/pingou",
@@ -3244,6 +3300,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
                 "user": {
                     "default_email": "bar@pingou.com",
                     "emails": ["bar@pingou.com", "foo@pingou.com"],
+                    "full_url": "http://localhost.localdomain/user/pingou",
                     "fullname": "PY C",
                     "name": "pingou",
                     "url_path": "user/pingou",
@@ -3386,6 +3443,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
                     "url": "https://koji.fp.o/koji...",
                     "user": {
                         "fullname": "foo bar",
+                        "full_url": "http://localhost.localdomain/user/foo",
                         "name": "foo",
                         "url_path": "user/foo",
                     },
@@ -3401,6 +3459,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
                     "url": "https://koji.fp.o/koji...",
                     "user": {
                         "fullname": "foo bar",
+                        "full_url": "http://localhost.localdomain/user/foo",
                         "name": "foo",
                         "url_path": "user/foo",
                     },
@@ -3592,6 +3651,7 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
             "date_created": "1510742565",
             "date_modified": "1510742566",
             "description": "test project #1",
+            "full_url": "http://localhost.localdomain/test",
             "fullname": "test",
             "id": 1,
             "milestones": {},
@@ -3603,6 +3663,7 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
             "url_path": "test",
             "user": {
                 "fullname": "PY C",
+                "full_url": "http://localhost.localdomain/user/pingou",
                 "name": "pingou",
                 "url_path": "user/pingou",
             },
@@ -3662,6 +3723,7 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
             "date_created": "1510742565",
             "date_modified": "1510742566",
             "description": "test project #1",
+            "full_url": "http://localhost.localdomain/test",
             "fullname": "test",
             "id": 1,
             "milestones": {},
@@ -3674,6 +3736,7 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
             "user": {
                 "fullname": "PY C",
                 "name": "pingou",
+                "full_url": "http://localhost.localdomain/user/pingou",
                 "url_path": "user/pingou",
             },
         }
@@ -3793,6 +3856,7 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
             "date_created": "1510742565",
             "date_modified": "1510742566",
             "description": "test project #1",
+            "full_url": "http://localhost.localdomain/test",
             "fullname": "test",
             "id": 1,
             "milestones": {},
@@ -3805,6 +3869,7 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
             "user": {
                 "fullname": "PY C",
                 "name": "pingou",
+                "full_url": "http://localhost.localdomain/user/pingou",
                 "url_path": "user/pingou",
             },
         }
@@ -3872,6 +3937,7 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
             "date_created": "1510742565",
             "date_modified": "1510742566",
             "description": "test project #1",
+            "full_url": "http://localhost.localdomain/test",
             "fullname": "test",
             "id": 1,
             "milestones": {},
@@ -3884,6 +3950,7 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
             "user": {
                 "fullname": "PY C",
                 "name": "pingou",
+                "full_url": "http://localhost.localdomain/user/pingou",
                 "url_path": "user/pingou",
             },
         }
@@ -3953,6 +4020,7 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
             "date_modified": "1510742566",
             "description": "test project #1",
             "fullname": "test",
+            "full_url": "http://localhost.localdomain/test",
             "id": 1,
             "milestones": {},
             "name": "test",
@@ -3963,6 +4031,7 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
             "url_path": "test",
             "user": {
                 "fullname": "PY C",
+                "full_url": "http://localhost.localdomain/user/pingou",
                 "name": "pingou",
                 "url_path": "user/pingou",
             },
@@ -4017,6 +4086,7 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
             "date_created": "1510742565",
             "date_modified": "1510742566",
             "description": "test project #1",
+            "full_url": "http://localhost.localdomain/test",
             "fullname": "test",
             "id": 1,
             "milestones": {},
@@ -4029,6 +4099,7 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
             "user": {
                 "fullname": "PY C",
                 "name": "pingou",
+                "full_url": "http://localhost.localdomain/user/pingou",
                 "url_path": "user/pingou",
             },
         }
@@ -4100,6 +4171,7 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
             "date_created": "1510742565",
             "date_modified": "1510742566",
             "description": "test project #1",
+            "full_url": "http://localhost.localdomain/test",
             "fullname": "test",
             "id": 1,
             "milestones": {},
@@ -4113,6 +4185,7 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
                 "fullname": "PY C",
                 "name": "pingou",
                 "url_path": "user/pingou",
+                "full_url": "http://localhost.localdomain/user/pingou",
             },
         }
         self.assertEqual(data, expected_output)
@@ -5382,6 +5455,7 @@ class PagureFlaskApiProjectCreateProjectTests(tests.Modeltests):
                         "fullname": "test_42",
                         "url_path": "test_42",
                         "description": "Just another small test project",
+                        "full_url": "http://localhost.localdomain/test_42",
                         "namespace": None,
                         "parent": None,
                         "date_created": ANY,
@@ -5389,6 +5463,7 @@ class PagureFlaskApiProjectCreateProjectTests(tests.Modeltests):
                         "user": {
                             "name": "pingou",
                             "fullname": "PY C",
+                            "full_url": "http://localhost.localdomain/user/pingou",
                             "url_path": "user/pingou",
                         },
                         "access_users": {

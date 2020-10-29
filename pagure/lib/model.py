@@ -276,6 +276,12 @@ class User(BASE):
         """ Ensures the settings are properly saved. """
         self._settings = json.dumps(settings)
 
+    @property
+    def full_url(self):
+        """ Returns the default status of the board. """
+        base_url = pagure_config["APP_URL"].rstrip("/")
+        return "/".join([base_url, "user", self.user])
+
     def __repr__(self):
         """ Return a string representation of this object. """
 
@@ -287,6 +293,7 @@ class User(BASE):
             "name": self.user,
             "fullname": self.fullname,
             "url_path": self.url_path,
+            "full_url": self.full_url,
         }
 
         if not public:
@@ -651,6 +658,12 @@ class Project(BASE):
         if self.is_fork:
             path = "fork/%s/%s" % (self.user.user, path)
         return path
+
+    @property
+    def full_url(self):
+        """ Returns the default status of the board. """
+        base_url = pagure_config["APP_URL"].rstrip("/")
+        return "/".join([base_url, self.url_path])
 
     @property
     def tags_text(self):
@@ -1105,6 +1118,7 @@ class Project(BASE):
             "name": self.name,
             "fullname": self.fullname,
             "url_path": self.url_path,
+            "full_url": self.full_url,
             "description": self.description,
             "namespace": self.namespace,
             "parent": self.parent.to_json(public=public, api=api)
@@ -1540,6 +1554,14 @@ class Issue(BASE):
             out.append(status_board.board.name)
         return out
 
+    @property
+    def full_url(self):
+        """ Returns the default status of the board. """
+        base_url = pagure_config["APP_URL"].rstrip("/")
+        return "/".join(
+            [base_url, self.project.url_path, "issue", str(self.id)]
+        )
+
     def to_json(self, public=False, with_comments=True, with_project=False):
         """ Returns a dictionary representation of the issue.
 
@@ -1582,6 +1604,7 @@ class Issue(BASE):
             ]
             if self.related_prs
             else [],
+            "full_url": self.full_url,
         }
 
         comments = []
@@ -2259,6 +2282,14 @@ class PullRequest(BASE):
             comment for comment in self.comments if not comment.notification
         ]
 
+    @property
+    def full_url(self):
+        """ Returns the default status of the board. """
+        base_url = pagure_config["APP_URL"].rstrip("/")
+        return "/".join(
+            [base_url, self.project.url_path, "pull-request", str(self.id)]
+        )
+
     def to_json(self, public=False, api=False, with_comments=True):
         """ Returns a dictionary representation of the pull-request.
 
@@ -2292,6 +2323,7 @@ class PullRequest(BASE):
             "cached_merge_status": self.merge_status or "unknown",
             "threshold_reached": self.threshold_reached,
             "tags": self.tags_text,
+            "full_url": self.full_url,
         }
 
         comments = []
@@ -2719,6 +2751,12 @@ class PagureGroup(BASE):
 
         return "Group: %s - name %s" % (self.id, self.group_name)
 
+    @property
+    def full_url(self):
+        """ Returns the default status of the board. """
+        base_url = pagure_config["APP_URL"].rstrip("/")
+        return "/".join([base_url, "group", self.group_name])
+
     def to_json(self, public=False):
         """ Returns a dictionary representation of the pull-request.
 
@@ -2730,6 +2768,7 @@ class PagureGroup(BASE):
             "group_type": self.group_type,
             "creator": self.creator.to_json(public=public),
             "date_created": arrow_ts(self.created),
+            "full_url": self.full_url,
             "members": [user.username for user in self.users],
         }
 
@@ -3274,6 +3313,12 @@ class Board(BASE):
                 break
         return out
 
+    @property
+    def full_url(self):
+        """ Returns the default status of the board. """
+        base_url = pagure_config["APP_URL"].rstrip("/")
+        return "/".join([base_url, self.project.url_path, "boards", self.name])
+
     def __repr__(self):
         """ Return a string representation of this object. """
 
@@ -3286,6 +3331,7 @@ class Board(BASE):
             "active": self.active,
             "status": [status.to_json() for status in self.statuses],
             "tag": self.tag.to_json(),
+            "full_url": self.full_url,
         }
 
 

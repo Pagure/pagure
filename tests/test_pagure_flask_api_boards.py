@@ -63,6 +63,7 @@ def set_up_board(self):
             "boards": [
                 {
                     "active": True,
+                    "full_url": "http://localhost.localdomain/test/boards/dev",
                     "name": "dev",
                     "status": [],
                     "tag": {
@@ -263,6 +264,7 @@ class PagureFlaskApiBoardstests(tests.SimplePagureTest):
                 "boards": [
                     {
                         "active": True,
+                        "full_url": "http://localhost.localdomain/test/boards/dev",
                         "name": "dev",
                         "status": [],
                         "tag": {
@@ -299,6 +301,7 @@ class PagureFlaskApiBoardstests(tests.SimplePagureTest):
                 "boards": [
                     {
                         "active": True,
+                        "full_url": "http://localhost.localdomain/test/boards/dev",
                         "name": "dev",
                         "status": [],
                         "tag": {
@@ -309,6 +312,7 @@ class PagureFlaskApiBoardstests(tests.SimplePagureTest):
                     },
                     {
                         "active": True,
+                        "full_url": "http://localhost.localdomain/test/boards/infra",
                         "name": "infra",
                         "status": [],
                         "tag": {
@@ -334,6 +338,7 @@ class PagureFlaskApiBoardstests(tests.SimplePagureTest):
                 "boards": [
                     {
                         "active": True,
+                        "full_url": "http://localhost.localdomain/test/boards/dev",
                         "name": "dev",
                         "status": [],
                         "tag": {
@@ -422,6 +427,7 @@ class PagureFlaskApiBoardsWithBoardtests(tests.SimplePagureTest):
                 "boards": [
                     {
                         "active": False,
+                        "full_url": "http://localhost.localdomain/test/boards/dev",
                         "name": "dev",
                         "status": [],
                         "tag": {
@@ -768,6 +774,7 @@ class PagureFlaskApiBoardsWithBoardtests(tests.SimplePagureTest):
             {
                 "board": {
                     "active": True,
+                    "full_url": "http://localhost.localdomain/test/boards/dev",
                     "name": "dev",
                     "status": [
                         {
@@ -849,6 +856,7 @@ class PagureFlaskApiBoardsWithBoardtests(tests.SimplePagureTest):
             {
                 "board": {
                     "active": True,
+                    "full_url": "http://localhost.localdomain/test/boards/dev",
                     "name": "dev",
                     "status": [
                         {
@@ -930,6 +938,7 @@ class PagureFlaskApiBoardsWithBoardtests(tests.SimplePagureTest):
             {
                 "board": {
                     "active": True,
+                    "full_url": "http://localhost.localdomain/test/boards/dev",
                     "name": "dev",
                     "status": [
                         {
@@ -998,6 +1007,7 @@ class PagureFlaskApiBoardsWithBoardtests(tests.SimplePagureTest):
             {
                 "board": {
                     "active": True,
+                    "full_url": "http://localhost.localdomain/test/boards/dev",
                     "name": "dev",
                     "status": [
                         {
@@ -1240,6 +1250,7 @@ class PagureFlaskApiBoardsWithBoardAndIssuetests(tests.SimplePagureTest):
             {
                 "board": {
                     "active": True,
+                    "full_url": "http://localhost.localdomain/test/boards/dev",
                     "name": "dev",
                     "status": [
                         {
@@ -1401,6 +1412,7 @@ class PagureFlaskApiBoardsWithBoardAndIssuetests(tests.SimplePagureTest):
             {
                 "board": {
                     "active": True,
+                    "full_url": "http://localhost.localdomain/test/boards/dev",
                     "name": "dev",
                     "status": [
                         {
@@ -1500,6 +1512,7 @@ class PagureFlaskApiBoardsWithBoardAndIssuetests(tests.SimplePagureTest):
                 {
                     "board": {
                         "active": True,
+                        "full_url": "http://localhost.localdomain/test/boards/dev",
                         "name": "dev",
                         "status": [
                             {
@@ -1556,6 +1569,7 @@ class PagureFlaskApiBoardsWithBoardAndIssuetests(tests.SimplePagureTest):
                     "user": {
                         "default_email": "bar@pingou.com",
                         "emails": ["bar@pingou.com", "foo@pingou.com"],
+                        "full_url": "http://localhost.localdomain/user/pingou",
                         "fullname": "PY C",
                         "name": "pingou",
                         "url_path": "user/pingou",
@@ -1566,6 +1580,7 @@ class PagureFlaskApiBoardsWithBoardAndIssuetests(tests.SimplePagureTest):
             "custom_fields": [],
             "date_created": "1594654596",
             "depends": [],
+            "full_url": "http://localhost.localdomain/test/issue/2",
             "id": 2,
             "last_updated": "1594654596",
             "milestone": None,
@@ -1578,6 +1593,7 @@ class PagureFlaskApiBoardsWithBoardAndIssuetests(tests.SimplePagureTest):
             "user": {
                 "default_email": "foo@bar.com",
                 "emails": ["foo@bar.com"],
+                "full_url": "http://localhost.localdomain/user/foo",
                 "fullname": "foo bar",
                 "name": "foo",
                 "url_path": "user/foo",

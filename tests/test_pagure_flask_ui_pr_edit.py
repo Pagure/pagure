@@ -233,12 +233,14 @@ class PagureFlaskPrEdittests(tests.Modeltests):
                             "id": 1,
                             "uid": ANY,
                             "title": "New title",
+                            "full_url": "http://localhost.localdomain/test/pull-request/1",
                             "branch": "master",
                             "project": {
                                 "id": 1,
                                 "name": "test",
                                 "fullname": "test",
                                 "url_path": "test",
+                                "full_url": "http://localhost.localdomain/test",
                                 "description": "test project #1",
                                 "namespace": None,
                                 "parent": None,
@@ -248,6 +250,7 @@ class PagureFlaskPrEdittests(tests.Modeltests):
                                     "name": "pingou",
                                     "fullname": "PY C",
                                     "url_path": "user/pingou",
+                                    "full_url": "http://localhost.localdomain/user/pingou",
                                 },
                                 "access_users": {
                                     "owner": ["pingou"],
@@ -279,6 +282,7 @@ class PagureFlaskPrEdittests(tests.Modeltests):
                                 "name": "test",
                                 "fullname": "forks/foo/test",
                                 "url_path": "fork/foo/test",
+                                "full_url": "http://localhost.localdomain/fork/foo/test",
                                 "description": "test project #1",
                                 "namespace": None,
                                 "parent": {
@@ -287,6 +291,7 @@ class PagureFlaskPrEdittests(tests.Modeltests):
                                     "fullname": "test",
                                     "url_path": "test",
                                     "description": "test project #1",
+                                    "full_url": "http://localhost.localdomain/test",
                                     "namespace": None,
                                     "parent": None,
                                     "date_created": ANY,
@@ -295,6 +300,7 @@ class PagureFlaskPrEdittests(tests.Modeltests):
                                         "name": "pingou",
                                         "fullname": "PY C",
                                         "url_path": "user/pingou",
+                                        "full_url": "http://localhost.localdomain/user/pingou",
                                     },
                                     "access_users": {
                                         "owner": ["pingou"],
@@ -325,6 +331,7 @@ class PagureFlaskPrEdittests(tests.Modeltests):
                                 "user": {
                                     "name": "foo",
                                     "fullname": "foo bar",
+                                    "full_url": "http://localhost.localdomain/user/foo",
                                     "url_path": "user/foo",
                                 },
                                 "access_users": {
@@ -355,6 +362,7 @@ class PagureFlaskPrEdittests(tests.Modeltests):
                                 "name": "foo",
                                 "fullname": "foo bar",
                                 "url_path": "user/foo",
+                                "full_url": "http://localhost.localdomain/user/foo",
                             },
                             "assignee": None,
                             "status": "Open",
@@ -371,6 +379,7 @@ class PagureFlaskPrEdittests(tests.Modeltests):
                             "id": 1,
                             "name": "test",
                             "fullname": "test",
+                            "full_url": "http://localhost.localdomain/test",
                             "url_path": "test",
                             "description": "test project #1",
                             "namespace": None,
@@ -381,6 +390,7 @@ class PagureFlaskPrEdittests(tests.Modeltests):
                                 "name": "pingou",
                                 "fullname": "PY C",
                                 "url_path": "user/pingou",
+                                "full_url": "http://localhost.localdomain/user/pingou",
                             },
                             "access_users": {
                                 "owner": ["pingou"],

@@ -149,6 +149,7 @@ class PagureFlaskApiIssueCreatetests(tests.Modeltests):
                     "comments": [],
                     "content": "This issue needs attention",
                     "custom_fields": [],
+                    "full_url": "http://localhost.localdomain/test/issue/1",
                     "date_created": "1431414800",
                     "depends": [],
                     "id": 1,
@@ -162,6 +163,7 @@ class PagureFlaskApiIssueCreatetests(tests.Modeltests):
                     "title": "test issue",
                     "user": {
                         "fullname": "PY C",
+                        "full_url": "http://localhost.localdomain/user/pingou",
                         "name": "pingou",
                         "url_path": "user/pingou",
                     },
@@ -205,6 +207,7 @@ class PagureFlaskApiIssueCreatetests(tests.Modeltests):
                     "comments": [],
                     "content": "This issue needs attention",
                     "custom_fields": [],
+                    "full_url": "http://localhost.localdomain/test/issue/1",
                     "date_created": "1431414800",
                     "depends": [],
                     "id": 1,
@@ -218,6 +221,7 @@ class PagureFlaskApiIssueCreatetests(tests.Modeltests):
                     "title": "test issue",
                     "user": {
                         "fullname": "foo bar",
+                        "full_url": "http://localhost.localdomain/user/foo",
                         "name": "foo",
                         "url_path": "user/foo",
                     },
@@ -261,6 +265,7 @@ class PagureFlaskApiIssueCreatetests(tests.Modeltests):
                     "comments": [],
                     "content": "This issue needs attention",
                     "custom_fields": [],
+                    "full_url": "http://localhost.localdomain/test/issue/1",
                     "date_created": "1431414800",
                     "depends": [],
                     "id": 1,
@@ -274,6 +279,7 @@ class PagureFlaskApiIssueCreatetests(tests.Modeltests):
                     "title": "test issue",
                     "user": {
                         "fullname": "foo bar",
+                        "full_url": "http://localhost.localdomain/user/foo",
                         "name": "foo",
                         "url_path": "user/foo",
                     },

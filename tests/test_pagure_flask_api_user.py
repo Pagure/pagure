@@ -95,6 +95,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
                 "fullname": "PY C",
                 "name": "pingou",
                 "url_path": "user/pingou",
+                "full_url": "http://localhost.localdomain/user/pingou",
                 "avatar_url": "https://seccdn.libravatar.org/avatar/...",
             },
         }
@@ -164,6 +165,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
                     "description": "test project #1",
                     "fullname": "test",
                     "url_path": "test",
+                    "full_url": "http://localhost.localdomain/test",
                     "id": 1,
                     "milestones": {},
                     "name": "test",
@@ -175,6 +177,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
                         "fullname": "PY C",
                         "name": "pingou",
                         "url_path": "user/pingou",
+                        "full_url": "http://localhost.localdomain/user/pingou",
                     },
                 },
                 {
@@ -201,6 +204,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
                     "date_created": "1490272832",
                     "date_modified": "1490272832",
                     "description": "test project #2",
+                    "full_url": "http://localhost.localdomain/test2",
                     "fullname": "test2",
                     "url_path": "test2",
                     "id": 2,
@@ -214,6 +218,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
                         "fullname": "PY C",
                         "name": "pingou",
                         "url_path": "user/pingou",
+                        "full_url": "http://localhost.localdomain/user/pingou",
                     },
                 },
                 {
@@ -242,6 +247,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
                     "description": "namespaced test project",
                     "fullname": "somenamespace/test3",
                     "url_path": "somenamespace/test3",
+                    "full_url": "http://localhost.localdomain/somenamespace/test3",
                     "id": 3,
                     "milestones": {},
                     "name": "test3",
@@ -251,6 +257,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
                     "tags": [],
                     "user": {
                         "fullname": "PY C",
+                        "full_url": "http://localhost.localdomain/user/pingou",
                         "name": "pingou",
                         "url_path": "user/pingou",
                     },
@@ -269,6 +276,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
                 "fullname": "PY C",
                 "name": "pingou",
                 "url_path": "user/pingou",
+                "full_url": "http://localhost.localdomain/user/pingou",
                 "avatar_url": "https://seccdn.libravatar.org/avatar/...",
             },
         }
@@ -421,6 +429,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
                     "type": "created",
                     "user": {
                         "fullname": "PY C",
+                        "full_url": "http://localhost.localdomain/user/pingou",
                         "name": "pingou",
                         "url_path": "user/pingou",
                     },
@@ -435,6 +444,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
                     "type": "commented",
                     "user": {
                         "fullname": "PY C",
+                        "full_url": "http://localhost.localdomain/user/pingou",
                         "name": "pingou",
                         "url_path": "user/pingou",
                     },
@@ -449,6 +459,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
                     "type": "closed",
                     "user": {
                         "fullname": "PY C",
+                        "full_url": "http://localhost.localdomain/user/pingou",
                         "name": "pingou",
                         "url_path": "user/pingou",
                     },
@@ -463,6 +474,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
                     "type": "commented",
                     "user": {
                         "fullname": "PY C",
+                        "full_url": "http://localhost.localdomain/user/pingou",
                         "name": "pingou",
                         "url_path": "user/pingou",
                     },
@@ -1768,6 +1780,7 @@ class PagureFlaskApiUsertestissues(tests.Modeltests):
                         "content": "We should work on this",
                         "custom_fields": [],
                         "date_created": "1513111778",
+                        "full_url": "http://localhost.localdomain/test/issue/1",
                         "depends": [],
                         "id": 1,
                         "last_updated": "1513111778",
@@ -1798,6 +1811,7 @@ class PagureFlaskApiUsertestissues(tests.Modeltests):
                             "date_created": "1513111778",
                             "date_modified": "1513111778",
                             "description": "test project #1",
+                            "full_url": "http://localhost.localdomain/test",
                             "fullname": "test",
                             "id": 1,
                             "milestones": {},
@@ -1809,6 +1823,7 @@ class PagureFlaskApiUsertestissues(tests.Modeltests):
                             "url_path": "test",
                             "user": {
                                 "fullname": "PY C",
+                                "full_url": "http://localhost.localdomain/user/pingou",
                                 "name": "pingou",
                                 "url_path": "user/pingou",
                             },
@@ -1819,6 +1834,7 @@ class PagureFlaskApiUsertestissues(tests.Modeltests):
                         "title": "Test issue",
                         "user": {
                             "fullname": "PY C",
+                            "full_url": "http://localhost.localdomain/user/pingou",
                             "name": "pingou",
                             "url_path": "user/pingou",
                         },

@@ -46,6 +46,7 @@ FULL_ISSUE_LIST = [
         "comments": [],
         "content": "We should work on this",
         "custom_fields": [],
+        "full_url": "http://localhost.localdomain/test/issue/2",
         "date_created": "1431414800",
         "depends": [],
         "id": 2,
@@ -59,6 +60,7 @@ FULL_ISSUE_LIST = [
         "title": "Test issue",
         "user": {
             "fullname": "PY C",
+            "full_url": "http://localhost.localdomain/user/pingou",
             "name": "pingou",
             "url_path": "user/pingou",
         },
@@ -66,6 +68,7 @@ FULL_ISSUE_LIST = [
     {
         "assignee": {
             "fullname": "foo bar",
+            "full_url": "http://localhost.localdomain/user/foo",
             "name": "foo",
             "url_path": "user/foo",
         },
@@ -76,6 +79,7 @@ FULL_ISSUE_LIST = [
         "comments": [],
         "content": "This issue needs attention",
         "custom_fields": [],
+        "full_url": "http://localhost.localdomain/test/issue/8",
         "date_created": "1431414800",
         "depends": [],
         "id": 8,
@@ -89,6 +93,7 @@ FULL_ISSUE_LIST = [
         "title": "test issue1",
         "user": {
             "fullname": "PY C",
+            "full_url": "http://localhost.localdomain/user/pingou",
             "name": "pingou",
             "url_path": "user/pingou",
         },
@@ -102,6 +107,7 @@ FULL_ISSUE_LIST = [
         "comments": [],
         "content": "This issue needs attention",
         "custom_fields": [],
+        "full_url": "http://localhost.localdomain/test/issue/7",
         "date_created": "1431414800",
         "depends": [],
         "id": 7,
@@ -115,6 +121,7 @@ FULL_ISSUE_LIST = [
         "title": "test issue",
         "user": {
             "fullname": "PY C",
+            "full_url": "http://localhost.localdomain/user/pingou",
             "name": "pingou",
             "url_path": "user/pingou",
         },
@@ -128,6 +135,7 @@ FULL_ISSUE_LIST = [
         "comments": [],
         "content": "This issue needs attention",
         "custom_fields": [],
+        "full_url": "http://localhost.localdomain/test/issue/6",
         "date_created": "1431414800",
         "depends": [],
         "id": 6,
@@ -141,6 +149,7 @@ FULL_ISSUE_LIST = [
         "title": "test issue",
         "user": {
             "fullname": "PY C",
+            "full_url": "http://localhost.localdomain/user/pingou",
             "name": "pingou",
             "url_path": "user/pingou",
         },
@@ -154,6 +163,7 @@ FULL_ISSUE_LIST = [
         "comments": [],
         "content": "This issue needs attention",
         "custom_fields": [],
+        "full_url": "http://localhost.localdomain/test/issue/5",
         "date_created": "1431414800",
         "depends": [],
         "id": 5,
@@ -167,6 +177,7 @@ FULL_ISSUE_LIST = [
         "title": "test issue",
         "user": {
             "fullname": "PY C",
+            "full_url": "http://localhost.localdomain/user/pingou",
             "name": "pingou",
             "url_path": "user/pingou",
         },
@@ -180,6 +191,7 @@ FULL_ISSUE_LIST = [
         "comments": [],
         "content": "This issue needs attention",
         "custom_fields": [],
+        "full_url": "http://localhost.localdomain/test/issue/4",
         "date_created": "1431414800",
         "depends": [],
         "id": 4,
@@ -193,6 +205,7 @@ FULL_ISSUE_LIST = [
         "title": "test issue",
         "user": {
             "fullname": "PY C",
+            "full_url": "http://localhost.localdomain/user/pingou",
             "name": "pingou",
             "url_path": "user/pingou",
         },
@@ -206,6 +219,7 @@ FULL_ISSUE_LIST = [
         "comments": [],
         "content": "This issue needs attention",
         "custom_fields": [],
+        "full_url": "http://localhost.localdomain/test/issue/3",
         "date_created": "1431414800",
         "depends": [],
         "id": 3,
@@ -219,6 +233,7 @@ FULL_ISSUE_LIST = [
         "title": "test issue",
         "user": {
             "fullname": "PY C",
+            "full_url": "http://localhost.localdomain/user/pingou",
             "name": "pingou",
             "url_path": "user/pingou",
         },
@@ -232,6 +247,7 @@ FULL_ISSUE_LIST = [
         "comments": [],
         "content": "This issue needs attention",
         "custom_fields": [],
+        "full_url": "http://localhost.localdomain/test/issue/2",
         "date_created": "1431414800",
         "depends": [],
         "id": 2,
@@ -245,6 +261,7 @@ FULL_ISSUE_LIST = [
         "title": "test issue",
         "user": {
             "fullname": "PY C",
+            "full_url": "http://localhost.localdomain/user/pingou",
             "name": "pingou",
             "url_path": "user/pingou",
         },
@@ -258,6 +275,7 @@ FULL_ISSUE_LIST = [
         "comments": [],
         "content": "This issue needs attention",
         "custom_fields": [],
+        "full_url": "http://localhost.localdomain/test/issue/1",
         "date_created": "1431414800",
         "depends": [],
         "id": 1,
@@ -271,6 +289,7 @@ FULL_ISSUE_LIST = [
         "title": "test issue",
         "user": {
             "fullname": "PY C",
+            "full_url": "http://localhost.localdomain/user/pingou",
             "name": "pingou",
             "url_path": "user/pingou",
         },
@@ -288,6 +307,7 @@ LCL_ISSUES = [
         "comments": [],
         "content": "Description",
         "custom_fields": [],
+        "full_url": "http://localhost.localdomain/test/issue/2",
         "date_created": "1431414800",
         "depends": [],
         "id": 2,
@@ -301,6 +321,7 @@ LCL_ISSUES = [
         "title": "Issue #2",
         "user": {
             "fullname": "PY C",
+            "full_url": "http://localhost.localdomain/user/pingou",
             "name": "pingou",
             "url_path": "user/pingou",
         },
@@ -314,6 +335,7 @@ LCL_ISSUES = [
         "comments": [],
         "content": "Description",
         "custom_fields": [],
+        "full_url": "http://localhost.localdomain/test/issue/1",
         "date_created": "1431414800",
         "depends": [],
         "id": 1,
@@ -327,6 +349,7 @@ LCL_ISSUES = [
         "title": "Issue #1",
         "user": {
             "fullname": "PY C",
+            "full_url": "http://localhost.localdomain/user/pingou",
             "name": "pingou",
             "url_path": "user/pingou",
         },
@@ -507,6 +530,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                         "closed_at": None,
                         "user": {
                             "name": "pingou",
+                            "full_url": "http://localhost.localdomain/user/pingou",
                             "fullname": "PY C",
                             "url_path": "user/pingou",
                         },
@@ -518,6 +542,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                         "priority": None,
                         "milestone": None,
                         "custom_fields": [],
+                        "full_url": "http://localhost.localdomain/test/issue/1",
                         "closed_by": None,
                         "related_prs": [],
                         "comments": [],
@@ -528,12 +553,14 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                         "fullname": "test",
                         "url_path": "test",
                         "description": "test project #1",
+                        "full_url": "http://localhost.localdomain/test",
                         "namespace": None,
                         "parent": None,
                         "date_created": ANY,
                         "date_modified": ANY,
                         "user": {
                             "name": "pingou",
+                            "full_url": "http://localhost.localdomain/user/pingou",
                             "fullname": "PY C",
                             "url_path": "user/pingou",
                         },
@@ -681,6 +708,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
 
         issue = copy.deepcopy(FULL_ISSUE_LIST[7])
         issue["id"] = 1
+        issue["full_url"] = "http://localhost.localdomain/test/issue/1"
 
         self.assertDictEqual(
             data, {"issue": issue, "message": "Issue created"}
@@ -714,6 +742,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
 
         issue = copy.deepcopy(FULL_ISSUE_LIST[6])
         issue["id"] = 1
+        issue["full_url"] = "http://localhost.localdomain/test/issue/1"
 
         self.assertDictEqual(
             data, {"issue": issue, "message": "Issue created"}
@@ -736,6 +765,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
 
         issue = copy.deepcopy(FULL_ISSUE_LIST[5])
         issue["id"] = 2
+        issue["full_url"] = "http://localhost.localdomain/test/issue/2"
 
         self.assertDictEqual(
             data, {"issue": issue, "message": "Issue created"}
@@ -758,6 +788,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
 
         issue = copy.deepcopy(FULL_ISSUE_LIST[4])
         issue["id"] = 3
+        issue["full_url"] = "http://localhost.localdomain/test/issue/3"
 
         self.assertDictEqual(
             data, {"issue": issue, "message": "Issue created"}
@@ -780,6 +811,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
 
         issue = copy.deepcopy(FULL_ISSUE_LIST[3])
         issue["id"] = 4
+        issue["full_url"] = "http://localhost.localdomain/test/issue/4"
 
         self.assertDictEqual(
             data, {"issue": issue, "message": "Issue created"}
@@ -812,6 +844,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
 
         issue = copy.deepcopy(FULL_ISSUE_LIST[2])
         issue["id"] = 1
+        issue["full_url"] = "http://localhost.localdomain/test/issue/1"
 
         self.assertDictEqual(
             data, {"issue": issue, "message": "Issue created"}
@@ -834,6 +867,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
 
         exp = copy.deepcopy(FULL_ISSUE_LIST[1])
         exp["id"] = 2
+        exp["full_url"] = "http://localhost.localdomain/test/issue/2"
 
         self.assertDictEqual(data, {"issue": exp, "message": "Issue created"})
 
@@ -867,6 +901,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
 
         issue = copy.deepcopy(FULL_ISSUE_LIST[2])
         issue["id"] = 1
+        issue["full_url"] = "http://localhost.localdomain/test/issue/1"
 
         self.assertDictEqual(
             data, {"issue": issue, "message": "Issue created"}
@@ -1094,6 +1129,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
 
         issue = copy.deepcopy(FULL_ISSUE_LIST[7])
         issue["id"] = 1
+        issue["full_url"] = "http://localhost.localdomain/test/issue/1"
 
         self.assertDictEqual(
             data, {"issue": issue, "message": "Issue created"}
@@ -1127,6 +1163,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
 
         issue = copy.deepcopy(FULL_ISSUE_LIST[6])
         issue["id"] = 1
+        issue["full_url"] = "http://localhost.localdomain/test/issue/1"
 
         self.assertDictEqual(
             data, {"issue": issue, "message": "Issue created"}
@@ -1149,6 +1186,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
 
         issue = copy.deepcopy(FULL_ISSUE_LIST[5])
         issue["id"] = 2
+        issue["full_url"] = "http://localhost.localdomain/test/issue/2"
 
         self.assertDictEqual(
             data, {"issue": issue, "message": "Issue created"}
@@ -1171,6 +1209,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
 
         issue = copy.deepcopy(FULL_ISSUE_LIST[4])
         issue["id"] = 3
+        issue["full_url"] = "http://localhost.localdomain/test/issue/3"
 
         self.assertDictEqual(
             data, {"issue": issue, "message": "Issue created"}
@@ -1193,6 +1232,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
 
         issue = copy.deepcopy(FULL_ISSUE_LIST[4])
         issue["id"] = 4
+        issue["full_url"] = "http://localhost.localdomain/test/issue/4"
 
         self.assertDictEqual(
             data, {"issue": issue, "message": "Issue created"}
@@ -1225,6 +1265,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
 
         issue = copy.deepcopy(FULL_ISSUE_LIST[2])
         issue["id"] = 1
+        issue["full_url"] = "http://localhost.localdomain/test/issue/1"
 
         self.assertDictEqual(
             data, {"issue": issue, "message": "Issue created"}
@@ -1247,6 +1288,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
 
         issue = copy.deepcopy(FULL_ISSUE_LIST[1])
         issue["id"] = 2
+        issue["full_url"] = "http://localhost.localdomain/test/issue/2"
 
         self.assertDictEqual(
             data, {"issue": issue, "message": "Issue created"}
@@ -1268,6 +1310,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
 
         exp = copy.deepcopy(FULL_ISSUE_LIST[1])
         exp["id"] = 3
+        exp["full_url"] = "http://localhost.localdomain/test/issue/3"
         exp["assignee"] = None
 
         self.assertDictEqual(data, {"issue": exp, "message": "Issue created"})
@@ -2670,6 +2713,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                         "custom_fields": [],
                         "date_created": "1431414800",
                         "depends": [],
+                        "full_url": "http://localhost.localdomain/test/issue/3",
                         "id": 3,
                         "last_updated": "1431414800",
                         "milestone": None,
@@ -2681,6 +2725,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                         "title": "Issue #3",
                         "user": {
                             "fullname": "PY C",
+                            "full_url": "http://localhost.localdomain/user/pingou",
                             "name": "pingou",
                             "url_path": "user/pingou",
                         },
@@ -2733,6 +2778,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                 "comments": [],
                 "content": "This issue needs attention",
                 "custom_fields": [],
+                "full_url": "http://localhost.localdomain/test/issue/1",
                 "date_created": "1431414800",
                 "close_status": None,
                 "closed_at": None,
@@ -2749,6 +2795,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                 "title": "test issue",
                 "user": {
                     "fullname": "PY C",
+                    "full_url": "http://localhost.localdomain/user/pingou",
                     "name": "pingou",
                     "url_path": "user/pingou",
                 },
@@ -2837,6 +2884,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                 "comments": [],
                 "content": "We should work on this",
                 "custom_fields": [],
+                "full_url": "http://localhost.localdomain/test/issue/2",
                 "date_created": "1431414800",
                 "close_status": None,
                 "closed_at": None,
@@ -2853,6 +2901,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                 "title": "Test issue",
                 "user": {
                     "fullname": "PY C",
+                    "full_url": "http://localhost.localdomain/user/pingou",
                     "name": "pingou",
                     "url_path": "user/pingou",
                 },
@@ -2873,6 +2922,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                 "comments": [],
                 "content": "We should work on this",
                 "custom_fields": [],
+                "full_url": "http://localhost.localdomain/test/issue/2",
                 "date_created": "1431414800",
                 "close_status": None,
                 "closed_at": None,
@@ -2889,6 +2939,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                 "title": "Test issue",
                 "user": {
                     "fullname": "PY C",
+                    "full_url": "http://localhost.localdomain/user/pingou",
                     "name": "pingou",
                     "url_path": "user/pingou",
                 },
@@ -3166,6 +3217,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                         "closed_at": None,
                         "user": {
                             "name": "pingou",
+                            "full_url": "http://localhost.localdomain/user/pingou",
                             "fullname": "PY C",
                             "url_path": "user/pingou",
                         },
@@ -3177,6 +3229,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                         "priority": None,
                         "milestone": "v1.0",
                         "custom_fields": [],
+                        "full_url": "http://localhost.localdomain/test/issue/1",
                         "closed_by": None,
                         "related_prs": [],
                         "comments": [],
@@ -3187,12 +3240,14 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                         "fullname": "test",
                         "url_path": "test",
                         "description": "test project #1",
+                        "full_url": "http://localhost.localdomain/test",
                         "namespace": None,
                         "parent": None,
                         "date_created": ANY,
                         "date_modified": ANY,
                         "user": {
                             "name": "pingou",
+                            "full_url": "http://localhost.localdomain/user/pingou",
                             "fullname": "PY C",
                             "url_path": "user/pingou",
                         },
@@ -3583,6 +3638,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                 "reactions": {},
                 "user": {
                     "fullname": "PY C",
+                    "full_url": "http://localhost.localdomain/user/pingou",
                     "name": "pingou",
                     "url_path": "user/pingou",
                 },
@@ -3611,6 +3667,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                 "reactions": {},
                 "user": {
                     "fullname": "PY C",
+                    "full_url": "http://localhost.localdomain/user/pingou",
                     "name": "pingou",
                     "url_path": "user/pingou",
                 },
@@ -3710,6 +3767,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                 "reactions": {},
                 "user": {
                     "fullname": "foo bar",
+                    "full_url": "http://localhost.localdomain/user/foo",
                     "name": "foo",
                     "url_path": "user/foo",
                 },
@@ -3849,6 +3907,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                         "closed_at": None,
                         "user": {
                             "name": "pingou",
+                            "full_url": "http://localhost.localdomain/user/pingou",
                             "fullname": "PY C",
                             "url_path": "user/pingou",
                         },
@@ -3858,12 +3917,14 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                         "blocks": [],
                         "assignee": {
                             "name": "pingou",
+                            "full_url": "http://localhost.localdomain/user/pingou",
                             "fullname": "PY C",
                             "url_path": "user/pingou",
                         },
                         "priority": None,
                         "milestone": None,
                         "custom_fields": [],
+                        "full_url": "http://localhost.localdomain/test/issue/1",
                         "closed_by": None,
                         "related_prs": [],
                         "comments": [],
@@ -3874,12 +3935,14 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                         "fullname": "test",
                         "url_path": "test",
                         "description": "test project #1",
+                        "full_url": "http://localhost.localdomain/test",
                         "namespace": None,
                         "parent": None,
                         "date_created": ANY,
                         "date_modified": ANY,
                         "user": {
                             "name": "pingou",
+                            "full_url": "http://localhost.localdomain/user/pingou",
                             "fullname": "PY C",
                             "url_path": "user/pingou",
                         },
@@ -3934,6 +3997,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                         "closed_at": None,
                         "user": {
                             "name": "pingou",
+                            "full_url": "http://localhost.localdomain/user/pingou",
                             "fullname": "PY C",
                             "url_path": "user/pingou",
                         },
@@ -3945,6 +4009,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                         "priority": None,
                         "milestone": None,
                         "custom_fields": [],
+                        "full_url": "http://localhost.localdomain/test/issue/1",
                         "closed_by": None,
                         "related_prs": [],
                         "comments": [
@@ -3956,6 +4021,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                                 "date_created": ANY,
                                 "user": {
                                     "name": "pingou",
+                                    "full_url": "http://localhost.localdomain/user/pingou",
                                     "fullname": "PY C",
                                     "url_path": "user/pingou",
                                 },
@@ -3972,12 +4038,14 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                         "fullname": "test",
                         "url_path": "test",
                         "description": "test project #1",
+                        "full_url": "http://localhost.localdomain/test",
                         "namespace": None,
                         "parent": None,
                         "date_created": ANY,
                         "date_modified": ANY,
                         "user": {
                             "name": "pingou",
+                            "full_url": "http://localhost.localdomain/user/pingou",
                             "fullname": "PY C",
                             "url_path": "user/pingou",
                         },

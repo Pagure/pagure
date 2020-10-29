@@ -35,6 +35,8 @@ from pagure.lib.repo import PagureRepo
 class PagureLibGittests(tests.Modeltests):
     """ Tests for pagure.lib.git """
 
+    maxDiff = None
+
     def test_write_gitolite_acls(self):
         """ Test the write_gitolite_acls function of pagure.lib.git.
         when the new uesr is an made an admin """
@@ -1411,7 +1413,7 @@ new file mode 100644
 index 0000000..60f7480
 --- /dev/null
 +++ b/456
-@@ -0,0 +1,31 @@
+@@ -0,0 +1,33 @@
 +{
 +    "assignee": null,
 +    "blocks": [],
@@ -1422,6 +1424,7 @@ index 0000000..60f7480
 +    "custom_fields": [],
 +    "date_created": null,
 +    "depends": [],
++    "full_url": "http://localhost.localdomain/test_ticket_repo/issue/1",
 +    "id": 1,
 +    "last_updated": null,
 +    "milestone": null,
@@ -1437,6 +1440,7 @@ index 0000000..60f7480
 +            "bar@pingou.com",
 +            "foo@pingou.com"
 +        ],
++        "full_url": "http://localhost.localdomain/user/pingou",
 +        "fullname": "PY C",
 +        "name": "pingou",
 +        "url_path": "user/pingou"
@@ -1513,7 +1517,7 @@ diff --git a/123 b/456
 index 458821a..77674a8
 --- a/123
 +++ b/456
-@@ -4,13 +4,33 @@
+@@ -4,14 +4,35 @@
      "close_status": null,
      "closed_at": null,
 -    "comments": [],
@@ -1532,6 +1536,7 @@ index 458821a..77674a8
 +                "emails": [
 +                    "foo@bar.com"
 +                ],
++                "full_url": "http://localhost.localdomain/user/foo",
 +                "fullname": "foo bar",
 +                "name": "foo",
 +                "url_path": "user/foo"
@@ -1542,6 +1547,7 @@ index 458821a..77674a8
      "custom_fields": [],
      "date_created": null,
      "depends": [],
+     "full_url": "http://localhost.localdomain/test_ticket_repo/issue/1",
      "id": 1,
 -    "last_updated": "<date>",
 +    "last_updated": "<date>",
@@ -1683,7 +1689,7 @@ new file mode 100644
 index 0000000..60f7480
 --- /dev/null
 +++ b/456
-@@ -0,0 +1,156 @@
+@@ -0,0 +1,162 @@
 +{
 +    "assignee": null,
 +    "branch": "master",
@@ -1695,6 +1701,7 @@ index 0000000..60f7480
 +    "commit_start": null,
 +    "commit_stop": null,
 +    "date_created": null,
++    "full_url": "http://localhost.localdomain/test_ticket_repo/pull-request/1",
 +    "id": 1,
 +    "initial_comment": null,
 +    "last_updated": null,
@@ -1720,6 +1727,7 @@ index 0000000..60f7480
 +        "date_created": null,
 +        "date_modified": null,
 +        "description": "test project for ticket",
++        "full_url": "http://localhost.localdomain/test_ticket_repo",
 +        "fullname": "test_ticket_repo",
 +        "id": 1,
 +        "milestones": {},
@@ -1755,6 +1763,7 @@ index 0000000..60f7480
 +                "bar@pingou.com",
 +                "foo@pingou.com"
 +            ],
++            "full_url": "http://localhost.localdomain/user/pingou",
 +            "fullname": "PY C",
 +            "name": "pingou",
 +            "url_path": "user/pingou"
@@ -1783,6 +1792,7 @@ index 0000000..60f7480
 +        "date_created": null,
 +        "date_modified": null,
 +        "description": "test project for ticket",
++        "full_url": "http://localhost.localdomain/test_ticket_repo",
 +        "fullname": "test_ticket_repo",
 +        "id": 1,
 +        "milestones": {},
@@ -1818,6 +1828,7 @@ index 0000000..60f7480
 +                "bar@pingou.com",
 +                "foo@pingou.com"
 +            ],
++            "full_url": "http://localhost.localdomain/user/pingou",
 +            "fullname": "PY C",
 +            "name": "pingou",
 +            "url_path": "user/pingou"
@@ -1835,6 +1846,7 @@ index 0000000..60f7480
 +            "bar@pingou.com",
 +            "foo@pingou.com"
 +        ],
++        "full_url": "http://localhost.localdomain/user/pingou",
 +        "fullname": "PY C",
 +        "name": "pingou",
 +        "url_path": "user/pingou"
@@ -1895,7 +1907,11 @@ index 0000000..60f7480
             "comments": [],
             "content": "bar",
             "date_created": "1426500263",
-            "user": {"name": "pingou", "emails": ["pingou@fedoraproject.org"]},
+            "user": {
+                "name": "pingou",
+                "emails": ["pingou@fedoraproject.org"],
+                "full_url": "http://localhost.localdomain/user/pingou",
+            },
             "milestone": "Next Release",
             "priority": 1,
         }
@@ -1920,7 +1936,11 @@ index 0000000..60f7480
             "comments": [],
             "content": "bar",
             "date_created": "1426500263",
-            "user": {"name": "pingou", "emails": ["pingou@fedoraproject.org"]},
+            "user": {
+                "name": "pingou",
+                "emails": ["pingou@fedoraproject.org"],
+                "full_url": "http://localhost.localdomain/user/pingou",
+            },
             "milestone": "Next Release",
         }
 
@@ -1942,7 +1962,11 @@ index 0000000..60f7480
             "comments": [],
             "content": "bar",
             "date_created": "1426500263",
-            "user": {"name": "pingou", "emails": ["pingou@fedoraproject.org"]},
+            "user": {
+                "name": "pingou",
+                "emails": ["pingou@fedoraproject.org"],
+                "full_url": "http://localhost.localdomain/user/pingou",
+            },
             "milestone": "Next Release",
             "priority": 1,
         }
@@ -1989,7 +2013,11 @@ index 0000000..60f7480
             "comments": [],
             "content": "bar",
             "date_created": "1426500263",
-            "user": {"name": "foo", "emails": ["foo@fedoraproject.org"]},
+            "user": {
+                "name": "foo",
+                "emails": ["foo@fedoraproject.org"],
+                "full_url": "http://localhost.localdomain/user/pingou",
+            },
             "milestone": "Next Release",
         }
 
@@ -2012,7 +2040,11 @@ index 0000000..60f7480
             "comments": [],
             "content": "bar",
             "date_created": "1426500263",
-            "user": {"name": "foo", "emails": ["foo@fedoraproject.org"]},
+            "user": {
+                "name": "foo",
+                "emails": ["foo@fedoraproject.org"],
+                "full_url": "http://localhost.localdomain/user/pingou",
+            },
             "milestone": "Next Release",
         }
 
@@ -2068,7 +2100,11 @@ index 0000000..60f7480
             "comments": [],
             "content": "bar",
             "date_created": "1426500263",
-            "user": {"name": "pingou", "emails": ["pingou@fedoraproject.org"]},
+            "user": {
+                "name": "pingou",
+                "emails": ["pingou@fedoraproject.org"],
+                "full_url": "http://localhost.localdomain/user/pingou",
+            },
             "milestone": "Next Release",
             "priority": 1,
         }
@@ -2137,6 +2173,7 @@ index 0000000..60f7480
             "close_status": "Fixed",
             "closed_at": "1426595225",
             "title": "Rename pagure",
+            "full_url": "http://localhost.localdomain/test/issue/20",
             "private": False,
             "content": "This is too much of a conflict with the book",
             "user": {
@@ -2144,6 +2181,7 @@ index 0000000..60f7480
                 "name": "pingou",
                 "default_email": "pingou@fedoraproject.org",
                 "emails": ["pingou@fedoraproject.org"],
+                "full_url": "http://localhost.localdomain/user/pingou",
             },
             "id": 20,
             "blocks": [1],
@@ -2168,6 +2206,7 @@ index 0000000..60f7480
                         "name": "pingou",
                         "default_email": "pingou@fedoraproject.org",
                         "emails": ["pingou@fedoraproject.org"],
+                        "full_url": "http://localhost.localdomain/user/pingou",
                     },
                 },
                 {
@@ -2186,6 +2225,7 @@ index 0000000..60f7480
                         "name": "ralph",
                         "default_email": "ralph@fedoraproject.org",
                         "emails": ["ralph@fedoraproject.org"],
+                        "full_url": "http://localhost.localdomain/user/pingou",
                     },
                 },
             ],
@@ -2262,9 +2302,11 @@ index 0000000..60f7480
                     "name": "pingou",
                     "default_email": "pingou@fedoraproject.org",
                     "emails": ["pingou@fedoraproject.org"],
+                    "full_url": "http://localhost.localdomain/user/pingou",
                 },
                 "id": 1,
                 "description": "test project",
+                "full_url": "http://localhost.localdomain/test",
             },
             "commit_stop": "eface8e13bc2a08a3fb22af9a72a8c90e36b8b89",
             "user": {
@@ -2272,6 +2314,7 @@ index 0000000..60f7480
                 "name": "pingou",
                 "default_email": "pingou@fedoraproject.org",
                 "emails": ["pingou@fedoraproject.org"],
+                "full_url": "http://localhost.localdomain/user/pingou",
             },
             "id": 7,
             "comments": [
@@ -2282,6 +2325,7 @@ index 0000000..60f7480
                         "name": "pingou",
                         "default_email": "pingou@fedoraproject.org",
                         "emails": ["pingou@fedoraproject.org"],
+                        "full_url": "http://localhost.localdomain/user/pingou",
                     },
                     "parent": None,
                     "date_created": "1426843778",
@@ -2297,6 +2341,7 @@ index 0000000..60f7480
                         "name": "pingou",
                         "default_email": "pingou@fedoraproject.org",
                         "emails": ["pingou@fedoraproject.org"],
+                        "full_url": "http://localhost.localdomain/user/pingou",
                     },
                     "parent": None,
                     "date_created": "1426866781",
@@ -2312,6 +2357,7 @@ index 0000000..60f7480
                         "name": "pingou",
                         "default_email": "pingou@fedoraproject.org",
                         "emails": ["pingou@fedoraproject.org"],
+                        "full_url": "http://localhost.localdomain/user/pingou",
                     },
                     "parent": None,
                     "date_created": "1426866950",
@@ -2336,6 +2382,7 @@ index 0000000..60f7480
                         "name": "pingou",
                         "default_email": "pingou@fedoraproject.org",
                         "emails": ["pingou@fedoraproject.org"],
+                        "full_url": "http://localhost.localdomain/user/pingou",
                     },
                     "settings": {
                         "issue_tracker": True,
@@ -2344,6 +2391,7 @@ index 0000000..60f7480
                     },
                     "id": 1,
                     "description": "test project",
+                    "full_url": "http://localhost.localdomain/test",
                 },
                 "settings": {
                     "issue_tracker": True,
@@ -2359,7 +2407,9 @@ index 0000000..60f7480
                     "name": "fake",
                     "default_email": "fake@fedoraproject.org",
                     "emails": ["fake@fedoraproject.org"],
+                    "full_url": "http://localhost.localdomain/user/fake",
                 },
+                "full_url": "http://localhost.localdomain/fork/fake/test",
                 "id": 6,
                 "description": "test project",
             },
@@ -2405,12 +2455,14 @@ index 0000000..60f7480
                 "name": "test",
                 "custom_keys": [],
                 "date_created": "1426500194",
+                "full_url": "http://localhost.localdomain/test",
                 "tags": [],
                 "user": {
                     "fullname": "Pierre-YvesChibon",
                     "name": "pingou",
                     "default_email": "pingou@fedoraproject.org",
                     "emails": ["pingou@fedoraproject.org"],
+                    "full_url": "http://localhost.localdomain/user/pingou",
                 },
                 "settings": {
                     "issue_tracker": True,
@@ -2426,6 +2478,7 @@ index 0000000..60f7480
                 "name": "pingou",
                 "default_email": "pingou@fedoraproject.org",
                 "emails": ["pingou@fedoraproject.org"],
+                "full_url": "http://localhost.localdomain/user/pingou",
             },
             "id": 4,
             "comments": [],
@@ -2436,6 +2489,7 @@ index 0000000..60f7480
                 "parent": {
                     "parent": None,
                     "name": "test",
+                    "full_url": "http://localhost.localdomain/test",
                     "custom_keys": [],
                     "date_created": "1426500194",
                     "tags": [],
@@ -2444,6 +2498,7 @@ index 0000000..60f7480
                         "name": "pingou",
                         "default_email": "pingou@fedoraproject.org",
                         "emails": ["pingou@fedoraproject.org"],
+                        "full_url": "http://localhost.localdomain/user/pingou",
                     },
                     "settings": {
                         "issue_tracker": True,
@@ -2467,10 +2522,12 @@ index 0000000..60f7480
                     "name": "fake",
                     "default_email": "fake@fedoraproject.org",
                     "emails": ["fake@fedoraproject.org"],
+                    "full_url": "http://localhost.localdomain/user/fake",
                 },
                 "project_docs": True,
                 "id": 6,
                 "description": "test project",
+                "full_url": "http://localhost.localdomain/fork/fake/test",
             },
             "branch": "master",
             "date_created": "1426843745",
@@ -2505,9 +2562,11 @@ index 0000000..60f7480
         data = {
             "status": True,
             "uid": "d4182a2ac2d541d884742d3037c26e58",
+            "full_url": "http://localhost.localdomain/test/pull-request/5",
             "project": {
                 "parent": None,
                 "name": "test3",
+                "full_url": "http://localhost.localdomain/somenamespace/test3",
                 "custom_keys": [],
                 "namespace": "somenamespace",
                 "date_created": "1426500194",
@@ -2517,6 +2576,7 @@ index 0000000..60f7480
                     "name": "pingou",
                     "default_email": "pingou@fedoraproject.org",
                     "emails": ["pingou@fedoraproject.org"],
+                    "full_url": "http://localhost.localdomain/user/pingou",
                 },
                 "settings": {
                     "issue_tracker": True,
@@ -2532,6 +2592,7 @@ index 0000000..60f7480
                 "name": "pingou",
                 "default_email": "pingou@fedoraproject.org",
                 "emails": ["pingou@fedoraproject.org"],
+                "full_url": "http://localhost.localdomain/user/pingou",
             },
             "id": 5,
             "comments": [],
@@ -2542,6 +2603,7 @@ index 0000000..60f7480
                 "parent": {
                     "parent": None,
                     "name": "test",
+                    "full_url": "http://localhost.localdomain/test",
                     "custom_keys": [],
                     "date_created": "1426500194",
                     "tags": [],
@@ -2550,6 +2612,7 @@ index 0000000..60f7480
                         "name": "pingou",
                         "default_email": "pingou@fedoraproject.org",
                         "emails": ["pingou@fedoraproject.org"],
+                        "full_url": "http://localhost.localdomain/user/pingou",
                     },
                     "settings": {
                         "issue_tracker": True,
@@ -2565,6 +2628,7 @@ index 0000000..60f7480
                     "pull_requests": True,
                 },
                 "name": "test",
+                "full_url": "http://localhost.localdomain/test",
                 "date_created": "1426843440",
                 "custom_keys": [],
                 "tags": [],
@@ -2573,6 +2637,7 @@ index 0000000..60f7480
                     "name": "fake",
                     "default_email": "fake@fedoraproject.org",
                     "emails": ["fake@fedoraproject.org"],
+                    "full_url": "http://localhost.localdomain/user/pingou",
                 },
                 "project_docs": True,
                 "id": 6,
@@ -2654,6 +2719,7 @@ index 0000000..60f7480
                             "tag_color": "DeepBlueSky",
                             "tag_description": "",
                         },
+                        "full_url": "http://localhost.localdomain/somenamespace/test3/boards/dev",
                     },
                     "rank": 2,
                     "status": {
@@ -2683,6 +2749,7 @@ index 0000000..60f7480
                         "fullname": "PY C",
                         "name": "pingou",
                         "url_path": "user/pingou",
+                        "full_url": "http://localhost.localdomain/user/pingou",
                     },
                 }
             ],
@@ -2691,6 +2758,7 @@ index 0000000..60f7480
             "date_created": "1594654596",
             "depends": [],
             "id": 2,
+            "full_url": "http://localhost.localdomain/somenamespace/test3/issue/2",
             "last_updated": "1594654596",
             "milestone": None,
             "priority": None,
@@ -2705,6 +2773,7 @@ index 0000000..60f7480
                 "fullname": "foo bar",
                 "name": "foo",
                 "url_path": "user/foo",
+                "full_url": "http://localhost.localdomain/user/pingou",
             },
         }
 
@@ -2792,6 +2861,7 @@ index 0000000..60f7480
                         "close_status": None,
                         "name": "In Progress",
                     },
+                    "full_url": "http://localhost.localdomain/somenamespace/test3/boards/dev",
                 }
             ],
             "close_status": None,
@@ -2813,6 +2883,7 @@ index 0000000..60f7480
                         "fullname": "PY C",
                         "name": "pingou",
                         "url_path": "user/pingou",
+                        "full_url": "http://localhost.localdomain/user/pingou",
                     },
                 }
             ],
@@ -2821,6 +2892,7 @@ index 0000000..60f7480
             "date_created": "1594654596",
             "depends": [],
             "id": 2,
+            "full_url": "http://localhost.localdomain/somenamespace/test3/issue/2",
             "last_updated": "1594654596",
             "milestone": None,
             "priority": None,
@@ -2835,6 +2907,7 @@ index 0000000..60f7480
                 "fullname": "foo bar",
                 "name": "foo",
                 "url_path": "user/foo",
+                "full_url": "http://localhost.localdomain/user/foo",
             },
         }
 
@@ -2908,9 +2981,11 @@ index 0000000..60f7480
         data = {
             "status": True,
             "uid": "d4182a2ac2d541d884742d3037c26e57",
+            "full_url": "http://localhost.localdomain/test/pull-request/4",
             "project": {
                 "parent": None,
                 "name": "test",
+                "full_url": "http://localhost.localdomain/test",
                 "custom_keys": [],
                 "date_created": "1426500194",
                 "tags": [],
@@ -2919,6 +2994,7 @@ index 0000000..60f7480
                     "name": "pingou",
                     "default_email": "pingou@fedoraproject.org",
                     "emails": ["pingou@fedoraproject.org"],
+                    "full_url": "http://localhost.localdomain/user/pingou",
                 },
                 "settings": {
                     "issue_tracker": True,
@@ -2934,6 +3010,7 @@ index 0000000..60f7480
                 "name": "pingou",
                 "default_email": "pingou@fedoraproject.org",
                 "emails": ["pingou@fedoraproject.org"],
+                "full_url": "http://localhost.localdomain/user/pingou",
             },
             "id": 4,
             "comments": [],
@@ -2944,6 +3021,7 @@ index 0000000..60f7480
                 "parent": {
                     "parent": None,
                     "name": "test",
+                    "full_url": "http://localhost.localdomain/test",
                     "custom_keys": [],
                     "date_created": "1426500194",
                     "tags": [],
@@ -2952,6 +3030,7 @@ index 0000000..60f7480
                         "name": "pingou",
                         "default_email": "pingou@fedoraproject.org",
                         "emails": ["pingou@fedoraproject.org"],
+                        "full_url": "http://localhost.localdomain/user/pingou",
                     },
                     "settings": {
                         "issue_tracker": True,
@@ -2966,6 +3045,7 @@ index 0000000..60f7480
                     "project_documentation": True,
                     "pull_requests": True,
                 },
+                "full_url": "http://localhost.localdomain/fork/fake/test",
                 "name": "test",
                 "date_created": "1426843440",
                 "custom_keys": [],
@@ -2975,6 +3055,7 @@ index 0000000..60f7480
                     "name": "fake",
                     "default_email": "fake@fedoraproject.org",
                     "emails": ["fake@fedoraproject.org"],
+                    "full_url": "http://localhost.localdomain/user/fake",
                 },
                 "project_docs": True,
                 "id": 6,
@@ -3946,7 +4027,6 @@ index 9f44358..2a552bb 100644
 
             patch = "\n".join(npatch)
             output.append(patch)
-
         self.assertEqual(output, exp)
 
     def test_commit_to_patch_empty_commit(self):

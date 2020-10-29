@@ -71,6 +71,7 @@ def set_up_board(self):
                         "tag_color": "DeepBlueSky",
                         "tag_description": "",
                     },
+                    "full_url": "http://localhost.localdomain/test/boards/dev",
                 }
             ]
         },
@@ -602,6 +603,7 @@ class PagureFlaskUiBoardstests(tests.SimplePagureTest):
                             "tag_color": "DeepBlueSky",
                             "tag_description": "",
                         },
+                        "full_url": "http://localhost.localdomain/test/boards/dev",
                     },
                     "rank": 1,
                     "status": {
@@ -633,6 +635,7 @@ class PagureFlaskUiBoardstests(tests.SimplePagureTest):
                         "fullname": "PY C",
                         "name": "pingou",
                         "url_path": "user/pingou",
+                        "full_url": "http://localhost.localdomain/user/pingou",
                     },
                 }
             ],
@@ -640,6 +643,7 @@ class PagureFlaskUiBoardstests(tests.SimplePagureTest):
             "custom_fields": [],
             "date_created": "1594654596",
             "depends": [],
+            "full_url": "http://localhost.localdomain/test/issue/1",
             "id": 1,
             "last_updated": "1594654596",
             "milestone": None,
@@ -655,6 +659,7 @@ class PagureFlaskUiBoardstests(tests.SimplePagureTest):
                 "fullname": "PY C",
                 "name": "pingou",
                 "url_path": "user/pingou",
+                "full_url": "http://localhost.localdomain/user/pingou",
             },
         }
 

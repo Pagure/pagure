@@ -205,6 +205,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
                             "name": "test",
                             "fullname": "forks/pingou/test",
                             "url_path": "fork/pingou/test",
+                            "full_url": "http://localhost.localdomain/fork/pingou/test",
                             "description": "test project #1",
                             "namespace": None,
                             "parent": {
@@ -212,6 +213,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
                                 "name": "test",
                                 "fullname": "test",
                                 "url_path": "test",
+                                "full_url": "http://localhost.localdomain/test",
                                 "description": "test project #1",
                                 "namespace": None,
                                 "parent": None,
@@ -221,6 +223,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
                                     "name": "pingou",
                                     "fullname": "PY C",
                                     "url_path": "user/pingou",
+                                    "full_url": "http://localhost.localdomain/user/pingou",
                                 },
                                 "access_users": {
                                     "owner": ["pingou"],
@@ -252,6 +255,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
                                 "name": "pingou",
                                 "fullname": "PY C",
                                 "url_path": "user/pingou",
+                                "full_url": "http://localhost.localdomain/user/pingou",
                             },
                             "access_users": {
                                 "owner": ["pingou"],

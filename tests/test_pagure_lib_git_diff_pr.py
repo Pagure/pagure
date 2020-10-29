@@ -403,11 +403,13 @@ class PagureFlaskForkPrtests(tests.Modeltests):
                     "pullrequest": {
                         "id": 1,
                         "uid": ANY,
+                        "full_url": "http://localhost.localdomain/test/pull-request/1",
                         "title": "test pull-request",
                         "branch": "master",
                         "project": {
                             "id": 1,
                             "name": "test",
+                            "full_url": "http://localhost.localdomain/test",
                             "fullname": "test",
                             "url_path": "test",
                             "description": "test project #1",
@@ -419,6 +421,7 @@ class PagureFlaskForkPrtests(tests.Modeltests):
                                 "name": "pingou",
                                 "fullname": "PY C",
                                 "url_path": "user/pingou",
+                                "full_url": "http://localhost.localdomain/user/pingou",
                             },
                             "access_users": {
                                 "owner": ["pingou"],
@@ -450,12 +453,14 @@ class PagureFlaskForkPrtests(tests.Modeltests):
                             "name": "test",
                             "fullname": "forks/pingou/test",
                             "url_path": "fork/pingou/test",
+                            "full_url": "http://localhost.localdomain/fork/pingou/test",
                             "description": "test project #1",
                             "namespace": None,
                             "parent": {
                                 "id": 1,
                                 "name": "test",
                                 "fullname": "test",
+                                "full_url": "http://localhost.localdomain/test",
                                 "url_path": "test",
                                 "description": "test project #1",
                                 "namespace": None,
@@ -466,6 +471,7 @@ class PagureFlaskForkPrtests(tests.Modeltests):
                                     "name": "pingou",
                                     "fullname": "PY C",
                                     "url_path": "user/pingou",
+                                    "full_url": "http://localhost.localdomain/user/pingou",
                                 },
                                 "access_users": {
                                     "owner": ["pingou"],
@@ -497,6 +503,7 @@ class PagureFlaskForkPrtests(tests.Modeltests):
                                 "name": "pingou",
                                 "fullname": "PY C",
                                 "url_path": "user/pingou",
+                                "full_url": "http://localhost.localdomain/user/pingou",
                             },
                             "access_users": {
                                 "owner": ["pingou"],
@@ -531,6 +538,7 @@ class PagureFlaskForkPrtests(tests.Modeltests):
                             "name": "pingou",
                             "fullname": "PY C",
                             "url_path": "user/pingou",
+                            "full_url": "http://localhost.localdomain/user/pingou",
                         },
                         "assignee": None,
                         "status": "Open",
@@ -551,6 +559,7 @@ class PagureFlaskForkPrtests(tests.Modeltests):
                 body={
                     "pullrequest": {
                         "id": 1,
+                        "full_url": "http://localhost.localdomain/test/pull-request/1",
                         "uid": ANY,
                         "title": "test pull-request",
                         "branch": "master",
@@ -558,6 +567,7 @@ class PagureFlaskForkPrtests(tests.Modeltests):
                             "id": 1,
                             "name": "test",
                             "fullname": "test",
+                            "full_url": "http://localhost.localdomain/test",
                             "url_path": "test",
                             "description": "test project #1",
                             "namespace": None,
@@ -568,6 +578,7 @@ class PagureFlaskForkPrtests(tests.Modeltests):
                                 "name": "pingou",
                                 "fullname": "PY C",
                                 "url_path": "user/pingou",
+                                "full_url": "http://localhost.localdomain/user/pingou",
                             },
                             "access_users": {
                                 "owner": ["pingou"],
@@ -597,6 +608,7 @@ class PagureFlaskForkPrtests(tests.Modeltests):
                         "repo_from": {
                             "id": 2,
                             "name": "test",
+                            "full_url": "http://localhost.localdomain/fork/pingou/test",
                             "fullname": "forks/pingou/test",
                             "url_path": "fork/pingou/test",
                             "description": "test project #1",
@@ -604,6 +616,7 @@ class PagureFlaskForkPrtests(tests.Modeltests):
                             "parent": {
                                 "id": 1,
                                 "name": "test",
+                                "full_url": "http://localhost.localdomain/test",
                                 "fullname": "test",
                                 "url_path": "test",
                                 "description": "test project #1",
@@ -615,6 +628,7 @@ class PagureFlaskForkPrtests(tests.Modeltests):
                                     "name": "pingou",
                                     "fullname": "PY C",
                                     "url_path": "user/pingou",
+                                    "full_url": "http://localhost.localdomain/user/pingou",
                                 },
                                 "access_users": {
                                     "owner": ["pingou"],
@@ -646,6 +660,7 @@ class PagureFlaskForkPrtests(tests.Modeltests):
                                 "name": "pingou",
                                 "fullname": "PY C",
                                 "url_path": "user/pingou",
+                                "full_url": "http://localhost.localdomain/user/pingou",
                             },
                             "access_users": {
                                 "owner": ["pingou"],
@@ -680,6 +695,7 @@ class PagureFlaskForkPrtests(tests.Modeltests):
                             "name": "pingou",
                             "fullname": "PY C",
                             "url_path": "user/pingou",
+                            "full_url": "http://localhost.localdomain/user/pingou",
                         },
                         "assignee": None,
                         "status": "Open",
@@ -706,6 +722,7 @@ class PagureFlaskForkPrtests(tests.Modeltests):
                                     "name": "pingou",
                                     "fullname": "PY C",
                                     "url_path": "user/pingou",
+                                    "full_url": "http://localhost.localdomain/user/pingou",
                                 },
                                 "edited_on": None,
                                 "editor": None,

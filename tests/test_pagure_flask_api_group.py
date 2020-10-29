@@ -159,9 +159,11 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 200)
         exp = {
             "display_name": "Some Group",
+            "full_url": "http://localhost.localdomain/group/some_group",
             "description": None,
             "creator": {
                 "fullname": "PY C",
+                "full_url": "http://localhost.localdomain/user/pingou",
                 "url_path": "user/pingou",
                 "default_email": "bar@pingou.com",
                 "emails": ["bar@pingou.com", "foo@pingou.com"],
@@ -185,9 +187,11 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 200)
         exp = {
             "display_name": "Some Group",
+            "full_url": "http://localhost.localdomain/group/some_group",
             "description": None,
             "creator": {
                 "fullname": "PY C",
+                "full_url": "http://localhost.localdomain/user/pingou",
                 "name": "pingou",
                 "url_path": "user/pingou",
             },
@@ -231,9 +235,11 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 200)
         exp = {
             "display_name": "Some Group",
+            "full_url": "http://localhost.localdomain/group/some_group",
             "description": None,
             "creator": {
                 "fullname": "PY C",
+                "full_url": "http://localhost.localdomain/user/pingou",
                 "default_email": "bar@pingou.com",
                 "emails": ["bar@pingou.com", "foo@pingou.com"],
                 "name": "pingou",
@@ -274,9 +280,11 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 200)
         exp = {
             "display_name": "Some Group",
+            "full_url": "http://localhost.localdomain/group/some_group",
             "description": None,
             "creator": {
                 "fullname": "PY C",
+                "full_url": "http://localhost.localdomain/user/pingou",
                 "default_email": "bar@pingou.com",
                 "emails": ["bar@pingou.com", "foo@pingou.com"],
                 "name": "pingou",
@@ -320,6 +328,7 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
                     "date_created": "1492020239",
                     "date_modified": "1492020239",
                     "description": "test project #2",
+                    "full_url": "http://localhost.localdomain/test2",
                     "fullname": "test2",
                     "id": 2,
                     "milestones": {},
@@ -331,6 +340,7 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
                     "url_path": "test2",
                     "user": {
                         "fullname": "PY C",
+                        "full_url": "http://localhost.localdomain/user/pingou",
                         "name": "pingou",
                         "url_path": "user/pingou",
                     },
@@ -379,9 +389,11 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 200)
         exp = {
             "display_name": "Some Group",
+            "full_url": "http://localhost.localdomain/group/some_group",
             "description": None,
             "creator": {
                 "fullname": "PY C",
+                "full_url": "http://localhost.localdomain/user/pingou",
                 "name": "pingou",
                 "url_path": "user/pingou",
             },
@@ -423,6 +435,7 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
                     "date_created": "1492020239",
                     "date_modified": "1492020239",
                     "description": "test project #2",
+                    "full_url": "http://localhost.localdomain/test2",
                     "fullname": "test2",
                     "id": 2,
                     "milestones": {},
@@ -434,6 +447,7 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
                     "url_path": "test2",
                     "user": {
                         "fullname": "PY C",
+                        "full_url": "http://localhost.localdomain/user/pingou",
                         "name": "pingou",
                         "url_path": "user/pingou",
                     },
@@ -465,9 +479,11 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 200)
         exp = {
             "display_name": "Some Group",
+            "full_url": "http://localhost.localdomain/group/some_group",
             "description": None,
             "creator": {
                 "fullname": "PY C",
+                "full_url": "http://localhost.localdomain/user/pingou",
                 "name": "pingou",
                 "url_path": "user/pingou",
             },
@@ -509,6 +525,7 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
                     "date_created": "1492020239",
                     "date_modified": "1492020239",
                     "description": "test project #2",
+                    "full_url": "http://localhost.localdomain/test2",
                     "fullname": "test2",
                     "id": 2,
                     "milestones": {},
@@ -520,6 +537,7 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
                     "url_path": "test2",
                     "user": {
                         "fullname": "PY C",
+                        "full_url": "http://localhost.localdomain/user/pingou",
                         "name": "pingou",
                         "url_path": "user/pingou",
                     },
@@ -563,9 +581,11 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 200)
         exp = {
             "display_name": "Some Group",
+            "full_url": "http://localhost.localdomain/group/some_group",
             "description": None,
             "creator": {
                 "fullname": "PY C",
+                "full_url": "http://localhost.localdomain/user/pingou",
                 "name": "pingou",
                 "url_path": "user/pingou",
             },
@@ -615,9 +635,11 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 200)
         exp = {
             "display_name": "Some Group",
+            "full_url": "http://localhost.localdomain/group/some_group",
             "description": None,
             "creator": {
                 "fullname": "PY C",
+                "full_url": "http://localhost.localdomain/user/pingou",
                 "name": "pingou",
                 "url_path": "user/pingou",
             },
@@ -665,9 +687,11 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 200)
         exp = {
             "display_name": "Release engineering group",
+            "full_url": "http://localhost.localdomain/group/rel-eng",
             "description": None,
             "creator": {
                 "fullname": "PY C",
+                "full_url": "http://localhost.localdomain/user/pingou",
                 "name": "pingou",
                 "url_path": "user/pingou",
             },
