@@ -227,9 +227,9 @@ class PagureRebasetests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn("rebased onto", output_text)
             repo = pagure.lib.query._get_project(self.session, "test")
-            # This should be pingou, but we have some bug that adds the
-            # rebase message as PR author instead of rebaser
-            self.assertEqual(repo.requests[0].comments[0].user.username, "foo")
+            self.assertEqual(
+                repo.requests[0].comments[0].user.username, "pingou"
+            )
 
     def test_rebase_api_ui_logged_in_different_user(self):
         """ Test the rebase PR API endpoint when logged in from the UI and
@@ -295,9 +295,7 @@ class PagureRebasetests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn("rebased onto", output_text)
             repo = pagure.lib.query._get_project(self.session, "test")
-            # This should be bar, but we have some bug that adds the
-            # rebase message as PR author instead of rebaser
-            self.assertEqual(repo.requests[0].comments[0].user.username, "foo")
+            self.assertEqual(repo.requests[0].comments[0].user.username, "bar")
 
     def test_rebase_api_ui_logged_in_pull_request_author(self):
         """ Test the rebase PR API endpoint when logged in from the UI and
@@ -623,9 +621,9 @@ class PagureRebaseNotAllowedtests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn("rebased onto", output_text)
             repo = pagure.lib.query._get_project(self.session, "test")
-            # This should be pingou, but we have some bug that adds the
-            # rebase message as PR author instead of rebaser
-            self.assertEqual(repo.requests[0].comments[0].user.username, "foo")
+            self.assertEqual(
+                repo.requests[0].comments[0].user.username, "pingou"
+            )
 
     def test_rebase_api_ui_logged_in_different_user(self):
         """ Test the rebase PR API endpoint when logged in from the UI and
@@ -713,9 +711,7 @@ class PagureRebaseNotAllowedtests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn("rebased onto", output_text)
             repo = pagure.lib.query._get_project(self.session, "test")
-            # This should be bar, but we have some bug that adds the
-            # rebase message as PR author instead of rebaser
-            self.assertEqual(repo.requests[0].comments[0].user.username, "foo")
+            self.assertEqual(repo.requests[0].comments[0].user.username, "bar")
 
     def test_rebase_api_api_logged_in(self):
         """ Test the rebase PR API endpoint when using an API token and

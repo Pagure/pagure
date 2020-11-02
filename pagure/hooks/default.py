@@ -224,7 +224,7 @@ def send_notifications(
 
 
 def inform_pull_request_urls(
-    session, project, commits, refname, default_branch
+    session, project, commits, refname, default_branch, username
 ):
     """ Inform the user about the URLs to open a new pull-request or visit
     the existing one.
@@ -260,7 +260,9 @@ def inform_pull_request_urls(
         seen = len(prs) != 0
         for pr in prs:
             # Refresh the PR in the db and everywhere else where needed
-            pagure.lib.tasks.update_pull_request.delay(pr.uid)
+            pagure.lib.tasks.update_pull_request.delay(
+                pr.uid, username=username
+            )
 
             # Link tickets with pull-requests if the commit mentions it
             pagure.lib.tasks.link_pr_to_ticket.delay(pr.uid)
@@ -429,7 +431,12 @@ class DefaultRunner(BaseRunner):
             # open a new pr or review the existing one
             pr_uids.extend(
                 inform_pull_request_urls(
-                    session, project, commits, refname, default_branch
+                    session,
+                    project,
+                    commits,
+                    refname,
+                    default_branch,
+                    username,
                 )
             )
 
