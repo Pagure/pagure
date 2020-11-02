@@ -134,6 +134,8 @@ LOGGING = {
     # that applies to all log messages not handled by a different logger
     "root": {"level": "WARN", "handlers": ["console"]},
 }
+
+NOGITHOOKS = %(nogithooks)s
 """
 # The Celery docs warn against using task_always_eager:
 # http://docs.celeryproject.org/en/latest/userguide/testing.html
@@ -396,6 +398,7 @@ class SimplePagureTest(unittest.TestCase):
             "repospanner_admin_override": "False",
             "repospanner_new_fork": "True",
             "repospanner_admin_migration": "False",
+            "nogithooks": False,
         }
         config_values.update(self.config_values)
         self.config_values = config_values

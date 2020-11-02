@@ -497,6 +497,9 @@ def run_hook_file(hooktype):
         hooktype (string): The name of the hook to run: pre-receive, update
             or post-receive
     """
+    if pagure_config.get("NOGITHOOKS") or False:
+        return
+
     if hooktype not in ("pre-receive", "update", "post-receive"):
         raise ValueError("Hook type %s not valid" % hooktype)
     changes = extract_changes(from_stdin=hooktype != "update")
