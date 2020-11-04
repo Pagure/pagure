@@ -140,25 +140,36 @@ def api_view_group(group):
 
         GET /api/0/group/some_group_name?projects=1&acl=commit
 
+    ::
+
+        GET /api/0/group/some_group_name?page=1&per_page=50
+
     Input
     ^^^^^
 
-    +------------------+---------+--------------+-----------------------------+
-    | Key              | Type    | Optionality  | Description                 |
-    +==================+=========+==============+=============================+
-    | ``group name``   | str     | Mandatory    | The name of the group to    |
-    |                  |         |              | retrieve information about. |
-    +------------------+---------+--------------+-----------------------------+
-    | ``projects``     | bool    | Optional     | Specifies whether to include|
-    |                  |         |              | projects in the data        |
-    |                  |         |              | returned.                   |
-    +------------------+---------+--------------+-----------------------------+
-    | ``acl``          | str     | Optional     | Filter the project returned |
-    |                  |         |              | (if any) to those where the |
-    |                  |         |              | has the specified ACL level.|
-    |                  |         |              | Can be any of: ``admin``,   |
-    |                  |         |              | ``commit`` or ``ticket``.   |
-    +------------------+---------+--------------+-----------------------------+
+    +-----------------------+---------+--------------+-----------------------------+
+    | Key                   | Type    | Optionality  | Description                 |
+    +=======================+=========+==============+=============================+
+    | ``group name``        | str     | Mandatory    | The name of the group to    |
+    |                       |         |              | retrieve information about. |
+    +-----------------------+---------+--------------+-----------------------------+
+    | ``projects``          | bool    | Optional     | Specifies whether to include|
+    |                       |         |              | projects in the data        |
+    |                       |         |              | returned.                   |
+    +-----------------------+---------+--------------+-----------------------------+
+    | ``acl``               | str     | Optional     | Filter the project returned |
+    |                       |         |              | (if any) to those where the |
+    |                       |         |              | has the specified ACL level.|
+    |                       |         |              | Can be any of: ``admin``,   |
+    |                       |         |              | ``commit`` or ``ticket``.   |
+    +-----------------------+---------+--------------+-----------------------------+
+    | ``page``              | int     | Optional     | Specifies which page to     |
+    |                       |         |              | return (defaults to: 1)     |
+    +-----------------------+---------+--------------+-----------------------------+
+    | ``per_page``          | int     | Optional     | The number of projects      |
+    |                       |         |              | to return per page.         |
+    |                       |         |              | The maximum is 100.         |
+    +-----------------------+---------+--------------+-----------------------------+
 
 
     Sample response
@@ -179,6 +190,15 @@ def api_view_group(group):
           "description": "Some Group",
           "display_name": "Some Group",
           "group_type": "user",
+          "pagination": {
+            "first": "http://127.0.0.1:5000/api/0/group/some_group_name?per_page=2&page=1",
+            "last": "http://127.0.0.1:5000/api/0/group/some_group_name?per_page=2&page=2",
+            "next": "http://127.0.0.1:5000/api/0/group/some_group_name?per_page=2&page=2",
+            "page": 1,
+            "pages": 2,
+            "per_page": 2,
+            "prev": null
+          },
           "members": [
             "user1",
             "user2"
@@ -206,6 +226,19 @@ def api_view_group(group):
             "user2"
           ],
           "name": "some_group_name",
+          "total_projects": 1000,
+          "pagination": {
+            "first":
+                "http://127.0.0.1:5000/api/0/group/some_group_name?per_page=2&projects=1&page=1",
+            "last":
+                "http://127.0.0.1:5000/api/0/group/some_group_name?per_page=2&projects=1&page=500",
+            "next":
+                "http://127.0.0.1:5000/api/0/group/some_group_name?per_page=2&projects=1&page=2",
+            "page": 1,
+            "pages": 500,
+            "per_page": 2,
+            "prev": null
+          },
           "projects": [],
         }
 
@@ -228,15 +261,30 @@ def api_view_group(group):
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOGROUP)
 
     output = group.to_json(public=(not pagure.utils.api_authenticated()))
-    if projects and not acl:
+
+    if projects:
+        # Prepare pagination data for projects
+        if not acl:
+            group_projects = group.projects
+        elif acl:
+            group_projects = [
+                pg.project for pg in group.projects_groups if pg.access in acl
+            ]
+        page = get_page()
+        per_page = get_per_page()
+        projects_cnt = len(group_projects)
+        pagination_metadata = pagure.lib.query.get_pagination_metadata(
+            flask.request, page, per_page, projects_cnt
+        )
+        query_start = (page - 1) * per_page
+        query_limit = per_page
+        page_projects = group_projects[query_start:query_limit]
+
+        output["total_projects"] = projects_cnt
+        output["pagination"] = pagination_metadata
+
         output["projects"] = [
-            project.to_json(public=True) for project in group.projects
-        ]
-    elif projects and acl:
-        output["projects"] = [
-            pg.project.to_json(public=True)
-            for pg in group.projects_groups
-            if pg.access in acl
+            project.to_json(public=True) for project in page_projects
         ]
     jsonout = flask.jsonify(output)
     jsonout.status_code = 200

@@ -286,6 +286,15 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
             "date_created": "1492020239",
             "group_type": "user",
             "name": "some_group",
+            "pagination": {
+                "first": "http://localhost...",
+                "last": "http://localhost...",
+                "next": None,
+                "page": 1,
+                "pages": 1,
+                "per_page": 20,
+                "prev": None,
+            },
             "projects": [
                 {
                     "access_groups": {
@@ -327,9 +336,14 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
                     },
                 }
             ],
+            "total_projects": 1,
         }
         data = json.loads(output.get_data(as_text=True))
         data["date_created"] = "1492020239"
+        self.assertIsNotNone(data["pagination"]["first"])
+        data["pagination"]["first"] = "http://localhost..."
+        self.assertIsNotNone(data["pagination"]["last"])
+        data["pagination"]["last"] = "http://localhost..."
         projects = []
         for p in data["projects"]:
             p["date_created"] = "1492020239"
@@ -338,13 +352,22 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
         data["projects"] = projects
         self.assertDictEqual(data, exp)
 
-        output2 = self.app.get(
+        output = self.app.get(
             "/api/0/group/some_group?projects=1&acl=admin", headers=headers
         )
-        self.assertListEqual(
-            output.get_data(as_text=True).split("\n"),
-            output2.get_data(as_text=True).split("\n"),
-        )
+        data = json.loads(output.get_data(as_text=True))
+        data["date_created"] = "1492020239"
+        self.assertIsNotNone(data["pagination"]["first"])
+        data["pagination"]["first"] = "http://localhost..."
+        self.assertIsNotNone(data["pagination"]["last"])
+        data["pagination"]["last"] = "http://localhost..."
+        projects = []
+        for p in data["projects"]:
+            p["date_created"] = "1492020239"
+            p["date_modified"] = "1492020239"
+            projects.append(p)
+        data["projects"] = projects
+        self.assertDictEqual(data, exp)
 
     def test_api_view_group_w_projects_and_acl_commit(self):
         """
@@ -366,6 +389,15 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
             "date_created": "1492020239",
             "group_type": "user",
             "name": "some_group",
+            "pagination": {
+                "first": "http://localhost...",
+                "last": "http://localhost...",
+                "next": None,
+                "page": 1,
+                "pages": 1,
+                "per_page": 20,
+                "prev": None,
+            },
             "projects": [
                 {
                     "access_groups": {
@@ -407,9 +439,14 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
                     },
                 }
             ],
+            "total_projects": 1,
         }
         data = json.loads(output.get_data(as_text=True))
         data["date_created"] = "1492020239"
+        self.assertIsNotNone(data["pagination"]["first"])
+        data["pagination"]["first"] = "http://localhost..."
+        self.assertIsNotNone(data["pagination"]["last"])
+        data["pagination"]["last"] = "http://localhost..."
         projects = []
         for p in data["projects"]:
             p["date_created"] = "1492020239"
@@ -438,6 +475,15 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
             "date_created": "1492020239",
             "group_type": "user",
             "name": "some_group",
+            "pagination": {
+                "first": "http://localhost...",
+                "last": "http://localhost...",
+                "next": None,
+                "page": 1,
+                "pages": 1,
+                "per_page": 20,
+                "prev": None,
+            },
             "projects": [
                 {
                     "access_groups": {
@@ -479,9 +525,14 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
                     },
                 }
             ],
+            "total_projects": 1,
         }
         data = json.loads(output.get_data(as_text=True))
         data["date_created"] = "1492020239"
+        self.assertIsNotNone(data["pagination"]["first"])
+        data["pagination"]["first"] = "http://localhost..."
+        self.assertIsNotNone(data["pagination"]["last"])
+        data["pagination"]["last"] = "http://localhost..."
         projects = []
         for p in data["projects"]:
             p["date_created"] = "1492020239"
@@ -522,10 +573,24 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
             "date_created": "1492020239",
             "group_type": "user",
             "name": "some_group",
+            "pagination": {
+                "first": "http://localhost...",
+                "last": "http://localhost...",
+                "next": None,
+                "page": 1,
+                "pages": 0,
+                "per_page": 20,
+                "prev": None,
+            },
             "projects": [],
+            "total_projects": 0,
         }
         data = json.loads(output.get_data(as_text=True))
         data["date_created"] = "1492020239"
+        self.assertIsNotNone(data["pagination"]["first"])
+        data["pagination"]["first"] = "http://localhost..."
+        self.assertIsNotNone(data["pagination"]["last"])
+        data["pagination"]["last"] = "http://localhost..."
         self.assertDictEqual(data, exp)
 
     def test_api_view_group_w_projects_and_acl_commit_no_project(self):
@@ -560,10 +625,24 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
             "date_created": "1492020239",
             "group_type": "user",
             "name": "some_group",
+            "pagination": {
+                "first": "http://localhost...",
+                "last": "http://localhost...",
+                "next": None,
+                "page": 1,
+                "pages": 0,
+                "per_page": 20,
+                "prev": None,
+            },
             "projects": [],
+            "total_projects": 0,
         }
         data = json.loads(output.get_data(as_text=True))
         data["date_created"] = "1492020239"
+        self.assertIsNotNone(data["pagination"]["first"])
+        data["pagination"]["first"] = "http://localhost..."
+        self.assertIsNotNone(data["pagination"]["last"])
+        data["pagination"]["last"] = "http://localhost..."
         self.assertDictEqual(data, exp)
 
     def test_api_view_group_w_projects_and_acl_ticket_no_project(self):
@@ -596,10 +675,24 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
             "date_created": "1492020239",
             "group_type": "user",
             "name": "rel-eng",
+            "pagination": {
+                "first": "http://localhost...",
+                "last": "http://localhost...",
+                "next": None,
+                "page": 1,
+                "pages": 0,
+                "per_page": 20,
+                "prev": None,
+            },
             "projects": [],
+            "total_projects": 0,
         }
         data = json.loads(output.get_data(as_text=True))
         data["date_created"] = "1492020239"
+        self.assertIsNotNone(data["pagination"]["first"])
+        data["pagination"]["first"] = "http://localhost..."
+        self.assertIsNotNone(data["pagination"]["last"])
+        data["pagination"]["last"] = "http://localhost..."
         self.assertDictEqual(data, exp)
 
 
