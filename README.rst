@@ -239,7 +239,6 @@ Manually
 
 This will launch the application at http://127.0.0.1:5000
 
-
 * To run unit-tests on pagure
 
   * Install the dependencies::
@@ -248,16 +247,12 @@ This will launch the application at http://127.0.0.1:5000
 
   * Run it::
 
-      python runtests.py run
-
-   You may use::
-
-      python runtests.py --help
-
-   to check other options supported or read the source code ;-)
+      pytest tests/
 
     .. note:: While testing for worker tasks, pagure uses celery in /usr/bin/
             Celery then looks for eventlet (which we use for testing only) at
             system level and not in virtual environment. You will need to
             install eventlet outside of your virtual environment if you are
             using one.
+
+    .. note:: This will also work in vagrant.
