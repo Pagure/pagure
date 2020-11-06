@@ -1619,7 +1619,7 @@ def get_commit_flag(session, project, commit_hash):
         session.query(model.CommitFlag)
         .filter(model.CommitFlag.project_id == project.id)
         .filter(model.CommitFlag.commit_hash == commit_hash)
-    )
+    ).order_by(model.CommitFlag.date_updated)
 
     return query.all()
 
