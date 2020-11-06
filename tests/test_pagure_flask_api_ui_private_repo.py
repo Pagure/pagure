@@ -1985,6 +1985,8 @@ class PagurePrivateRepotest(tests.Modeltests):
             title="test pull-request",
             user="pingou",
         )
+        req.commit_stop = "hash_commit_stop"
+        self.session.add(req)
         self.session.commit()
         self.assertEqual(req.id, 1)
         self.assertEqual(req.title, "test pull-request")
@@ -2041,17 +2043,16 @@ class PagurePrivateRepotest(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
         data["flag"]["date_created"] = "1510742565"
         data["flag"]["date_updated"] = "1510742565"
-        data["flag"]["pull_request_uid"] = "62b49f00d489452994de5010565fab81"
         data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
             data,
             {
                 "flag": {
                     "comment": "Tests failed",
+                    "commit_hash": "hash_commit_stop",
                     "date_created": "1510742565",
                     "date_updated": "1510742565",
                     "percent": 0,
-                    "pull_request_uid": "62b49f00d489452994de5010565fab81",
                     "status": "failure",
                     "url": "http://jenkins.cloud.fedoraproject.org/",
                     "user": {
@@ -2075,9 +2076,14 @@ class PagurePrivateRepotest(tests.Modeltests):
         request = pagure.lib.query.search_pull_requests(
             self.session, project_id=1, requestid=1
         )
-        self.assertEqual(len(request.flags), 1)
-        self.assertEqual(request.flags[0].comment, "Tests failed")
-        self.assertEqual(request.flags[0].percent, 0)
+        self.assertEqual(len(request.flags), 0)
+
+        flags = pagure.lib.query.get_commit_flag(
+            self.session, request.project, "hash_commit_stop"
+        )
+        self.assertEqual(len(flags), 1)
+        self.assertEqual(flags[0].comment, "Tests failed")
+        self.assertEqual(flags[0].percent, 0)
 
         # Update flag
         data = {
@@ -2095,17 +2101,16 @@ class PagurePrivateRepotest(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
         data["flag"]["date_created"] = "1510742565"
         data["flag"]["date_updated"] = "1510742565"
-        data["flag"]["pull_request_uid"] = "62b49f00d489452994de5010565fab81"
         data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
             data,
             {
                 "flag": {
                     "comment": "Tests passed",
+                    "commit_hash": "hash_commit_stop",
                     "date_created": "1510742565",
                     "date_updated": "1510742565",
                     "percent": 100,
-                    "pull_request_uid": "62b49f00d489452994de5010565fab81",
                     "status": "success",
                     "url": "http://jenkins.cloud.fedoraproject.org/",
                     "user": {
@@ -2129,9 +2134,14 @@ class PagurePrivateRepotest(tests.Modeltests):
         request = pagure.lib.query.search_pull_requests(
             self.session, project_id=1, requestid=1
         )
-        self.assertEqual(len(request.flags), 1)
-        self.assertEqual(request.flags[0].comment, "Tests passed")
-        self.assertEqual(request.flags[0].percent, 100)
+        self.assertEqual(len(request.flags), 0)
+
+        flags = pagure.lib.query.get_commit_flag(
+            self.session, request.project, "hash_commit_stop"
+        )
+        self.assertEqual(len(flags), 1)
+        self.assertEqual(flags[0].comment, "Tests passed")
+        self.assertEqual(flags[0].percent, 100)
 
     @patch("pagure.lib.notify.send_email")
     def test_api_private_repo_pr_close(self, send_email):

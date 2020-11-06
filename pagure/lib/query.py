@@ -1502,35 +1502,26 @@ def add_pull_request_flag(
     """ Add a flag to a pull-request. """
     user_obj = get_user(session, user)
 
-    action = "added"
-    pr_flag = None
-    if uid:
-        pr_flag = get_pull_request_flag_by_uid(session, request, uid)
-    if pr_flag:
-        action = "updated"
-        pr_flag.comment = comment
-        pr_flag.status = status
-        pr_flag.percent = percent
-        pr_flag.url = url
-    else:
-        pr_flag = model.PullRequestFlag(
-            pull_request_uid=request.uid,
-            uid=uid or uuid.uuid4().hex,
-            username=username,
-            percent=percent,
-            comment=comment,
-            status=status,
-            url=url,
-            user_id=user_obj.id,
-            token_id=token,
-        )
-    request.updated_on = datetime.datetime.utcnow()
-    session.add(pr_flag)
-    # Make sure we won't have SQLAlchemy error before we continue
-    session.flush()
+    action, flag_uid = add_commit_flag(
+        session=session,
+        repo=request.project,
+        commit_hash=request.commit_stop,
+        username=username,
+        status=status,
+        percent=percent,
+        comment=comment,
+        url=url,
+        uid=uid,
+        user=user,
+        token=token,
+    )
+
+    pr_flag = pagure.lib.query.get_commit_flag_by_uid(
+        session, request.commit_stop, flag_uid
+    )
 
     if request.project.settings.get("notify_on_pull-request_flag"):
-        pagure.lib.notify.notify_pull_request_flag(pr_flag, username)
+        pagure.lib.notify.notify_pull_request_flag(pr_flag, request, username)
 
     pagure.lib.git.update_git(request, repo=request.project)
 
@@ -1543,6 +1534,8 @@ def add_pull_request_flag(
             agent=user_obj.username,
         ),
     )
+
+    action = action.replace("Flag ", "")
 
     return ("Flag %s" % action, pr_flag.uid)
 

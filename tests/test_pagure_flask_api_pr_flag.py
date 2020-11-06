@@ -65,6 +65,9 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         request = pagure.lib.query.search_pull_requests(
             self.session, project_id=1, requestid=1
         )
+        request.commit_stop = "hash_commit_stop"
+        self.session.add(request)
+        self.session.commit()
         self.assertEqual(len(request.flags), 0)
 
     def test_invalid_project(self):
@@ -244,8 +247,8 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
         data["flag"]["date_created"] = "1510742565"
         data["flag"]["date_updated"] = "1510742565"
-        pr_uid = data["flag"]["pull_request_uid"]
-        data["flag"]["pull_request_uid"] = "62b49f00d489452994de5010565fab81"
+        commit_hash = data["flag"]["commit_hash"]
+        data["flag"]["commit_hash"] = "62b49f00d489452994de5010565fab81"
         data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
             data,
@@ -255,7 +258,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
                     "date_created": "1510742565",
                     "date_updated": "1510742565",
                     "percent": None,
-                    "pull_request_uid": "62b49f00d489452994de5010565fab81",
+                    "commit_hash": "62b49f00d489452994de5010565fab81",
                     "status": "pending",
                     "url": "http://jenkins.cloud.fedoraproject.org/",
                     "user": {
@@ -279,9 +282,13 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         request = pagure.lib.query.search_pull_requests(
             self.session, project_id=1, requestid=1
         )
-        self.assertEqual(len(request.flags), 1)
-        self.assertEqual(request.flags[0].comment, "Tests running")
-        self.assertEqual(request.flags[0].percent, None)
+        self.assertEqual(len(request.flags), 0)
+
+        flags = pagure.lib.query.get_commit_flag(
+            self.session, request.project, commit_hash
+        )
+        self.assertEqual(flags[0].comment, "Tests running")
+        self.assertEqual(flags[0].percent, None)
 
         # Check the notification sent
         mock_email.assert_called_once_with(
@@ -291,8 +298,8 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
             "PR #1 - Jenkins: pending",
             "bar@pingou.com",
             assignee=None,
-            in_reply_to="test-pull-request-" + pr_uid,
-            mail_id="test-pull-request-" + pr_uid + "-1",
+            in_reply_to="test-pull-request-%s" % request.uid,
+            mail_id="test-commit-1-1",
             project_name="test",
             reporter="pingou",
             user_from="Jenkins",
@@ -317,17 +324,16 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
         data["flag"]["date_created"] = "1510742565"
         data["flag"]["date_updated"] = "1510742565"
-        data["flag"]["pull_request_uid"] = "62b49f00d489452994de5010565fab81"
         data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
             data,
             {
                 "flag": {
                     "comment": "Tests running",
+                    "commit_hash": "hash_commit_stop",
                     "date_created": "1510742565",
                     "date_updated": "1510742565",
                     "percent": None,
-                    "pull_request_uid": "62b49f00d489452994de5010565fab81",
                     "status": "pending",
                     "url": "http://jenkins.cloud.fedoraproject.org/",
                     "user": {
@@ -351,9 +357,13 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         request = pagure.lib.query.search_pull_requests(
             self.session, project_id=1, requestid=1
         )
-        self.assertEqual(len(request.flags), 1)
-        self.assertEqual(request.flags[0].comment, "Tests running")
-        self.assertEqual(request.flags[0].percent, None)
+        self.assertEqual(len(request.flags), 0)
+
+        flags = pagure.lib.query.get_commit_flag(
+            self.session, request.project, "hash_commit_stop"
+        )
+        self.assertEqual(flags[0].comment, "Tests running")
+        self.assertEqual(flags[0].percent, None)
 
         # Update flag  -  w/o providing the status
         data = {
@@ -371,17 +381,16 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
         data["flag"]["date_created"] = "1510742565"
         data["flag"]["date_updated"] = "1510742565"
-        data["flag"]["pull_request_uid"] = "62b49f00d489452994de5010565fab81"
         data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
             data,
             {
                 "flag": {
                     "comment": "Tests passed",
+                    "commit_hash": "hash_commit_stop",
                     "date_created": "1510742565",
                     "date_updated": "1510742565",
                     "percent": 100,
-                    "pull_request_uid": "62b49f00d489452994de5010565fab81",
                     "status": "success",
                     "url": "http://jenkins.cloud.fedoraproject.org/",
                     "user": {
@@ -405,9 +414,13 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         request = pagure.lib.query.search_pull_requests(
             self.session, project_id=1, requestid=1
         )
-        self.assertEqual(len(request.flags), 1)
-        self.assertEqual(request.flags[0].comment, "Tests passed")
-        self.assertEqual(request.flags[0].percent, 100)
+        self.assertEqual(len(request.flags), 0)
+
+        flags = pagure.lib.query.get_commit_flag(
+            self.session, request.project, "hash_commit_stop"
+        )
+        self.assertEqual(flags[0].comment, "Tests passed")
+        self.assertEqual(flags[0].percent, 100)
 
     def test_adding_two_flags(self):
         """ Test the adding two flags to a PR. """
@@ -430,17 +443,16 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
         data["flag"]["date_created"] = "1510742565"
         data["flag"]["date_updated"] = "1510742565"
-        data["flag"]["pull_request_uid"] = "62b49f00d489452994de5010565fab81"
         data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
             data,
             {
                 "flag": {
                     "comment": "Tests passed",
+                    "commit_hash": "hash_commit_stop",
                     "date_created": "1510742565",
                     "date_updated": "1510742565",
                     "percent": 100,
-                    "pull_request_uid": "62b49f00d489452994de5010565fab81",
                     "status": "success",
                     "url": "http://jenkins.cloud.fedoraproject.org/",
                     "user": {
@@ -459,14 +471,19 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
             },
         )
 
-        # One flag added
+        # One flag added - but no longer on the request object
         self.session.commit()
         request = pagure.lib.query.search_pull_requests(
             self.session, project_id=1, requestid=1
         )
-        self.assertEqual(len(request.flags), 1)
-        self.assertEqual(request.flags[0].comment, "Tests passed")
-        self.assertEqual(request.flags[0].percent, 100)
+        self.assertEqual(len(request.flags), 0)
+
+        flags = pagure.lib.query.get_commit_flag(
+            self.session, request.project, "hash_commit_stop"
+        )
+        self.assertEqual(len(flags), 1)
+        self.assertEqual(flags[0].comment, "Tests passed")
+        self.assertEqual(flags[0].percent, 100)
 
         data = {
             "username": "Jenkins",
@@ -482,7 +499,6 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
         data["flag"]["date_created"] = "1510742565"
         data["flag"]["date_updated"] = "1510742565"
-        data["flag"]["pull_request_uid"] = "62b49f00d489452994de5010565fab81"
         self.assertNotEqual(data["uid"], "jenkins_build_pagure_100+seed")
         data["uid"] = "jenkins_build_pagure_100+seed"
         data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
@@ -491,10 +507,10 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
             {
                 "flag": {
                     "comment": "Tests running again",
+                    "commit_hash": "hash_commit_stop",
                     "date_created": "1510742565",
                     "date_updated": "1510742565",
                     "percent": None,
-                    "pull_request_uid": "62b49f00d489452994de5010565fab81",
                     "status": "pending",
                     "url": "http://jenkins.cloud.fedoraproject.org/",
                     "user": {
@@ -513,16 +529,21 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
             },
         )
 
-        # Two flag added
+        # Two flags added - but no longer on the request object
         self.session.commit()
         request = pagure.lib.query.search_pull_requests(
             self.session, project_id=1, requestid=1
         )
-        self.assertEqual(len(request.flags), 2)
-        self.assertEqual(request.flags[0].comment, "Tests running again")
-        self.assertEqual(request.flags[0].percent, None)
-        self.assertEqual(request.flags[1].comment, "Tests passed")
-        self.assertEqual(request.flags[1].percent, 100)
+        self.assertEqual(len(request.flags), 0)
+
+        flags = pagure.lib.query.get_commit_flag(
+            self.session, request.project, "hash_commit_stop"
+        )
+        self.assertEqual(len(flags), 2)
+        self.assertEqual(flags[1].comment, "Tests running again")
+        self.assertEqual(flags[1].percent, None)
+        self.assertEqual(flags[0].comment, "Tests passed")
+        self.assertEqual(flags[0].percent, 100)
 
     @patch.dict(
         "pagure.config.config",
@@ -642,6 +663,9 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
         request = pagure.lib.query.search_pull_requests(
             self.session, project_id=1, requestid=1
         )
+        request.commit_stop = "hash_commit_stop"
+        self.session.add(request)
+        self.session.commit()
         self.assertEqual(len(request.flags), 0)
 
     def test_no_pr(self):
@@ -787,17 +811,16 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
         data["flag"]["date_created"] = "1510742565"
         data["flag"]["date_updated"] = "1510742565"
-        data["flag"]["pull_request_uid"] = "62b49f00d489452994de5010565fab81"
         data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
             data,
             {
                 "flag": {
                     "comment": "Tests failed",
+                    "commit_hash": "hash_commit_stop",
                     "date_created": "1510742565",
                     "date_updated": "1510742565",
                     "percent": 0,
-                    "pull_request_uid": "62b49f00d489452994de5010565fab81",
                     "status": "failure",
                     "url": "http://jenkins.cloud.fedoraproject.org/",
                     "user": {
@@ -821,9 +844,14 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
         request = pagure.lib.query.search_pull_requests(
             self.session, project_id=1, requestid=1
         )
-        self.assertEqual(len(request.flags), 1)
-        self.assertEqual(request.flags[0].comment, "Tests failed")
-        self.assertEqual(request.flags[0].percent, 0)
+        self.assertEqual(len(request.flags), 0)
+
+        flags = pagure.lib.query.get_commit_flag(
+            self.session, request.project, "hash_commit_stop"
+        )
+        self.assertEqual(len(flags), 1)
+        self.assertEqual(flags[0].comment, "Tests failed")
+        self.assertEqual(flags[0].percent, 0)
 
         # no notifications sent
         mock_email.assert_not_called()
@@ -849,17 +877,16 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
         data["flag"]["date_created"] = "1510742565"
         data["flag"]["date_updated"] = "1510742565"
-        data["flag"]["pull_request_uid"] = "62b49f00d489452994de5010565fab81"
         data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
             data,
             {
                 "flag": {
                     "comment": "Tests failed",
+                    "commit_hash": "hash_commit_stop",
                     "date_created": "1510742565",
                     "date_updated": "1510742565",
                     "percent": None,
-                    "pull_request_uid": "62b49f00d489452994de5010565fab81",
                     "status": "failure",
                     "url": "http://jenkins.cloud.fedoraproject.org/",
                     "user": {
@@ -883,9 +910,14 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
         request = pagure.lib.query.search_pull_requests(
             self.session, project_id=1, requestid=1
         )
-        self.assertEqual(len(request.flags), 1)
-        self.assertEqual(request.flags[0].comment, "Tests failed")
-        self.assertEqual(request.flags[0].percent, None)
+        self.assertEqual(len(request.flags), 0)
+
+        flags = pagure.lib.query.get_commit_flag(
+            self.session, request.project, "hash_commit_stop"
+        )
+        self.assertEqual(len(flags), 1)
+        self.assertEqual(flags[0].comment, "Tests failed")
+        self.assertEqual(flags[0].percent, None)
 
         # Update flag
         data = {
@@ -904,17 +936,16 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
         data["flag"]["date_created"] = "1510742565"
         data["flag"]["date_updated"] = "1510742565"
-        data["flag"]["pull_request_uid"] = "62b49f00d489452994de5010565fab81"
         data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
         self.assertDictEqual(
             data,
             {
                 "flag": {
                     "comment": "Tests passed",
+                    "commit_hash": "hash_commit_stop",
                     "date_created": "1510742565",
                     "date_updated": "1510742565",
                     "percent": 100,
-                    "pull_request_uid": "62b49f00d489452994de5010565fab81",
                     "status": "success",
                     "url": "http://jenkins.cloud.fedoraproject.org/",
                     "user": {
@@ -938,9 +969,14 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
         request = pagure.lib.query.search_pull_requests(
             self.session, project_id=1, requestid=1
         )
-        self.assertEqual(len(request.flags), 1)
-        self.assertEqual(request.flags[0].comment, "Tests passed")
-        self.assertEqual(request.flags[0].percent, 100)
+        self.assertEqual(len(request.flags), 0)
+
+        flags = pagure.lib.query.get_commit_flag(
+            self.session, request.project, "hash_commit_stop"
+        )
+        self.assertEqual(len(flags), 1)
+        self.assertEqual(flags[0].comment, "Tests passed")
+        self.assertEqual(flags[0].percent, 100)
 
 
 class PagureFlaskApiGetPRFlagtests(tests.Modeltests):
@@ -983,6 +1019,9 @@ class PagureFlaskApiGetPRFlagtests(tests.Modeltests):
         request = pagure.lib.query.search_pull_requests(
             self.session, project_id=1, requestid=1
         )
+        request.commit_stop = "hash_commit_stop"
+        self.session.add(request)
+        self.session.commit()
         self.assertEqual(len(request.flags), 0)
 
     def test_invalid_project(self):
@@ -1060,8 +1099,13 @@ class PagureFlaskApiGetPRFlagtests(tests.Modeltests):
         self.assertEqual(msg, ("Flag added", "jenkins_build_pagure_34"))
         self.session.commit()
 
-        self.assertEqual(len(request.flags), 1)
-        self.assertEqual(request.flags[0].token_id, "aaabbbcccddd")
+        self.assertEqual(len(request.flags), 0)
+
+        flags = pagure.lib.query.get_commit_flag(
+            self.session, request.project, "hash_commit_stop"
+        )
+        self.assertEqual(len(flags), 1)
+        self.assertEqual(flags[0].token_id, "aaabbbcccddd")
 
         # 1 flag
         output = self.app.get("/api/0/test/pull-request/1/flag")
@@ -1069,19 +1113,16 @@ class PagureFlaskApiGetPRFlagtests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
         data["flags"][0]["date_created"] = "1541413645"
         data["flags"][0]["date_updated"] = "1541413645"
-        data["flags"][0][
-            "pull_request_uid"
-        ] = "72a61033c2fc464aa9ef514c057aa62c"
         self.assertDictEqual(
             data,
             {
                 "flags": [
                     {
                         "comment": "Build passes",
+                        "commit_hash": "hash_commit_stop",
                         "date_created": "1541413645",
                         "date_updated": "1541413645",
                         "percent": None,
-                        "pull_request_uid": "72a61033c2fc464aa9ef514c057aa62c",
                         "status": "success",
                         "url": "http://jenkins.cloud.fedoraproject.org",
                         "user": {
@@ -1132,9 +1173,14 @@ class PagureFlaskApiGetPRFlagtests(tests.Modeltests):
         self.assertEqual(msg, ("Flag added", "travis_build_pagure_34"))
         self.session.commit()
 
-        self.assertEqual(len(request.flags), 2)
-        self.assertEqual(request.flags[1].token_id, "aaabbbcccddd")
-        self.assertEqual(request.flags[0].token_id, "aaabbbcccddd")
+        self.assertEqual(len(request.flags), 0)
+
+        flags = pagure.lib.query.get_commit_flag(
+            self.session, request.project, "hash_commit_stop"
+        )
+        self.assertEqual(len(flags), 2)
+        self.assertEqual(flags[1].token_id, "aaabbbcccddd")
+        self.assertEqual(flags[0].token_id, "aaabbbcccddd")
 
         # 1 flag
         output = self.app.get("/api/0/test/pull-request/1/flag")
@@ -1142,39 +1188,18 @@ class PagureFlaskApiGetPRFlagtests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
         data["flags"][0]["date_created"] = "1541413645"
         data["flags"][0]["date_updated"] = "1541413645"
-        data["flags"][0][
-            "pull_request_uid"
-        ] = "72a61033c2fc464aa9ef514c057aa62c"
         data["flags"][1]["date_created"] = "1541413645"
         data["flags"][1]["date_updated"] = "1541413645"
-        data["flags"][1][
-            "pull_request_uid"
-        ] = "72a61033c2fc464aa9ef514c057aa62c"
         self.assertDictEqual(
             data,
             {
                 "flags": [
                     {
-                        "comment": "Build pending",
-                        "date_created": "1541413645",
-                        "date_updated": "1541413645",
-                        "percent": None,
-                        "pull_request_uid": "72a61033c2fc464aa9ef514c057aa62c",
-                        "status": "pending",
-                        "url": "http://travis.io",
-                        "user": {
-                            "fullname": "foo bar",
-                            "name": "foo",
-                            "url_path": "user/foo",
-                        },
-                        "username": "travis",
-                    },
-                    {
                         "comment": "Build passes",
+                        "commit_hash": "hash_commit_stop",
                         "date_created": "1541413645",
                         "date_updated": "1541413645",
                         "percent": None,
-                        "pull_request_uid": "72a61033c2fc464aa9ef514c057aa62c",
                         "status": "success",
                         "url": "http://jenkins.cloud.fedoraproject.org",
                         "user": {
@@ -1183,6 +1208,21 @@ class PagureFlaskApiGetPRFlagtests(tests.Modeltests):
                             "url_path": "user/foo",
                         },
                         "username": "jenkins",
+                    },
+                    {
+                        "comment": "Build pending",
+                        "commit_hash": "hash_commit_stop",
+                        "date_created": "1541413645",
+                        "date_updated": "1541413645",
+                        "percent": None,
+                        "status": "pending",
+                        "url": "http://travis.io",
+                        "user": {
+                            "fullname": "foo bar",
+                            "name": "foo",
+                            "url_path": "user/foo",
+                        },
+                        "username": "travis",
                     },
                 ]
             },

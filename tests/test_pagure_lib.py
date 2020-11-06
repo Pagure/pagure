@@ -2655,6 +2655,12 @@ class PagureLibtests(tests.Modeltests):
         request = pagure.lib.query.search_pull_requests(
             self.session, requestid=1
         )
+        request.commit_stop = "hash_commit_stop"
+        self.session.add(request)
+        self.session.commit()
+        request = pagure.lib.query.search_pull_requests(
+            self.session, requestid=1
+        )
         self.assertEqual(len(request.flags), 0)
 
         msg = pagure.lib.query.add_pull_request_flag(
@@ -2672,8 +2678,14 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(msg, ("Flag added", "jenkins_build_pagure_34"))
         self.session.commit()
 
-        self.assertEqual(len(request.flags), 1)
-        self.assertEqual(request.flags[0].token_id, "aaabbbcccddd")
+        # We're no longer adding a PR flag but instead a commit flag to the
+        # latest commit of the PR
+        self.assertEqual(len(request.flags), 0)
+        flags = pagure.lib.query.get_commit_flag(
+            self.session, request.project, "hash_commit_stop"
+        )
+        self.assertEqual(flags[0].comment, "Build passes")
+        self.assertEqual(flags[0].token_id, "aaabbbcccddd")
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_search_pull_requests(self):

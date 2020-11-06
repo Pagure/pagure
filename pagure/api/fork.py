@@ -1064,9 +1064,27 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
                     else pagure_config["FLAG_FAILURE"]
                 )
         try:
+            if not request.commit_stop:
+                repopath = None
+                parentpath = pagure.utils.get_repo_path(request.project)
+                if request.remote:
+                    repopath = pagure.utils.get_remote_repo_path(
+                        request.remote_git, request.branch_from
+                    )
+                elif request.project_from:
+                    repopath = pagure.utils.get_repo_path(request.project_from)
+
+                repo_obj = None
+                if repopath:
+                    repo_obj = pygit2.Repository(repopath)
+                orig_repo = pygit2.Repository(parentpath)
+                pagure.lib.git.diff_pull_request(
+                    flask.g.session, request, repo_obj, orig_repo
+                )
+
             # New Flag
             message, uid = pagure.lib.query.add_pull_request_flag(
-                flask.g.session,
+                session=flask.g.session,
                 request=request,
                 username=username,
                 status=status,
@@ -1078,8 +1096,8 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
                 token=flask.g.token.id,
             )
             flask.g.session.commit()
-            pr_flag = pagure.lib.query.get_pull_request_flag_by_uid(
-                flask.g.session, request, uid
+            pr_flag = pagure.lib.query.get_commit_flag_by_uid(
+                flask.g.session, request.commit_stop, uid
             )
             output["message"] = message
             output["uid"] = uid
@@ -1182,9 +1200,31 @@ def api_pull_request_get_flag(repo, requestid, username=None, namespace=None):
     _check_pull_request(repo)
     request = _get_request(repo, requestid)
 
+    if not request.commit_stop:
+        repopath = None
+        parentpath = pagure.utils.get_repo_path(request.project)
+        if request.remote:
+            repopath = pagure.utils.get_remote_repo_path(
+                request.remote_git, request.branch_from
+            )
+        elif request.project_from:
+            repopath = pagure.utils.get_repo_path(request.project_from)
+
+        repo_obj = None
+        if repopath:
+            repo_obj = pygit2.Repository(repopath)
+        orig_repo = pygit2.Repository(parentpath)
+        pagure.lib.git.diff_pull_request(
+            flask.g.session, request, repo_obj, orig_repo
+        )
+
     output = {"flags": []}
 
-    for flag in request.flags:
+    flags = pagure.lib.query.get_commit_flag(
+        flask.g.session, request.project, request.commit_stop
+    )
+
+    for flag in flags:
         output["flags"].append(flag.to_json(public=True))
 
     jsonout = flask.jsonify(output)

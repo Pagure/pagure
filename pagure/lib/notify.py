@@ -1016,7 +1016,7 @@ def notify_pull_request_comment(comment, user):
     )
 
 
-def notify_pull_request_flag(flag, user):
+def notify_pull_request_flag(flag, request, user):
     """ Notify the people following a pull-request that a new flag was
     added to it.
     """
@@ -1026,31 +1026,29 @@ def notify_pull_request_flag(flag, user):
 %s
 """ % (
         flag.username,
-        flag.pull_request.title,
+        request.title,
         flag.status,
         flag.comment,
         _build_url(
             pagure_config["APP_URL"],
-            _fullname_to_url(flag.pull_request.project.fullname),
+            _fullname_to_url(request.project.fullname),
             "pull-request",
-            flag.pull_request.id,
+            request.id,
         ),
     )
-    mail_to = _get_emails_for_obj(flag.pull_request)
+    mail_to = _get_emails_for_obj(request)
 
-    assignee = (
-        flag.pull_request.assignee.user if flag.pull_request.assignee else None
-    )
+    assignee = request.assignee.user if request.assignee else None
 
     send_email(
         text,
-        "PR #%s - %s: %s" % (flag.pull_request.id, flag.username, flag.status),
+        "PR #%s - %s: %s" % (request.id, flag.username, flag.status),
         ",".join(mail_to),
         mail_id=flag.mail_id,
-        in_reply_to=flag.pull_request.mail_id,
-        project_name=flag.pull_request.project.fullname,
+        in_reply_to=request.mail_id,
+        project_name=request.project.fullname,
         user_from=flag.username,
-        reporter=flag.pull_request.user.user,
+        reporter=request.user.user,
         assignee=assignee,
     )
 
