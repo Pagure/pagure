@@ -97,7 +97,7 @@
               {% if pull_request.project_from.is_fork -%}
                 {{ pull_request.project_from.user.user }}/
               {%- endif -%}
-              {{ pull_request.project_from.name }}  
+              {{ pull_request.project_from.name }}
             </span>
             {% elif pull_request.project_from is none and pull_request.remote_git is none %}
             <span class="badge badge-light badge-pill border border-seconday font-1em">
@@ -336,7 +336,8 @@
               <div class="col-xs-auto pr-3 text-right">
                   <div class="btn-group">
                     <a href="{{ commit_link }}"
-                      class="btn btn-outline-primary font-weight-bold {{'disabled' if not commit_link}}">
+                      data-commithash="{{ commit.hex }}"
+                      class="btn btn-outline-primary font-weight-bold {{'disabled' if not commit_link}} commithash">
                       <code>{{ commit.hex|short }}</code>
                     </a>
                     <a class="btn btn-outline-primary font-weight-bold {{'disabled' if not commit_link}}" href="{{tree_link}}"><span class="fa fa-file-code-o fa-fw"></span></a>
@@ -409,6 +410,12 @@
       </form>
     </section>
 
+    <div class="mb-4">
+        <div class="list-group list-group-flush" id="flags">
+        </div>
+    </div>
+
+
     {% if g.authenticated and mergeform %}
     <div class="card mt-5">
     {% if g.authenticated %}
@@ -458,7 +465,7 @@
         </form>
 
           {% endif %}
-  </div>
+    </div>
       <div class="small">
         <p>
           Pull this pull-request locally
@@ -470,9 +477,8 @@
         <pre id="local_pull_info" class="hidden">git fetch {{ config.get('GIT_URL_GIT') }}{{ repo.fullname }}.git refs/pull/{{ pull_request.id }}/head:pr{{ pull_request.id }}</pre>
       </div>
     {% endif %}
-
-
   </div>
+
   <div class="col-md-4">
     <div>
     <div class="mb-4">
@@ -579,7 +585,6 @@
             </form>
         {% endif %}
     </div>
-
 
     {% if pull_request.flags %}
     <div class="mb-4">
@@ -882,7 +887,101 @@ function show_merge_status(){
 }
 {% endif %}
 
+var statusesLabels = {{ flag_statuses_labels|safe }}
+
 $(document).ready(function() {
+
+  {# Show latest tag #}
+  {% if pull_request.commit_stop %};
+    var url = '{{ url_for("api_ns.api_commit_flags",
+                  repo=repo.name,
+                  username=repo.user.user if repo.is_fork else none,
+                  namespace=repo.namespace,
+                  commit_hash=pull_request.commit_stop) }}'
+    var commitUrl = '{{ url_for("ui_ns.view_commit",
+                        repo=repo.name,
+                        username=username,
+                        namespace=repo.namespace,
+                        commitid=pull_request.commit_stop) }}';
+    $.ajax({
+      url: url,
+      type: 'GET',
+      dataType: 'json',
+      success: function(res) {
+        var statusesLabels = {{ flag_statuses_labels|safe }};
+        var flags_html = '';
+
+        for (var i in res['flags']) {
+          var f = res['flags'][i];
+          var t = f.date_created == f.date_updated ? "Created at": "Updated at";
+          var d = new Date(f.date_updated * 1000);
+          var html = '<a href="' + f.url + '" class="list-group-item list-group-item-action border-0 pl-2 pr-2">'
+            + ' <div>'
+            + '    <span class="font-weight-bold">' + f.username
+            + '    </span>'
+            + '    <div class="float-right">'
+            + '      <span class="badge ' + statusesLabels[f.status] + ' font-size-09">' + f.status
+            + '      </span>'
+            + '    </div>'
+            + '  </div>'
+            + '  <small><div class="clearfix">'
+            + '      <span>' + f.comment + '</span>'
+            + '      <div title="' + t + ' ' + d.toUTCString() + '" class="float-right">'
+            + '      ' + d.toUTCString() + '</div>'
+            + '  </div>'
+            + '  </small>'
+            + '</a>';
+            flags_html += html;
+        }
+        $("#flags").html(flags_html);
+      }
+    });
+  {% endif %}
+
+  {# Show flags in commit list #}
+  $(".commithash").each(function(idx, item) {
+    var url = '{{ url_for("api_ns.api_commit_flags",
+                  repo=repo.name,
+                  username=repo.user.user if repo.is_fork else none,
+                  namespace=repo.namespace,
+                  commit_hash='COMMIT_HASH') }}'
+    var commitUrl = '{{ url_for("ui_ns.view_commit",
+                        repo=repo.name,
+                        username=username,
+                        namespace=repo.namespace,
+                        commitid="COMMIT_HASH") }}';
+    var commithash= $(item).attr('data-commithash');
+    url = url.replace("COMMIT_HASH", commithash);
+    commitUrl = commitUrl.replace("COMMIT_HASH", commithash);
+    $.ajax({
+      url: url,
+      type: 'GET',
+      dataType: 'json',
+      success: function(res) {
+        var statuses = {}
+        for (var i in res['flags']) {
+          var f = res['flags'][i]
+          if (!(f['status'] in statuses)) {
+            statuses[f['status']] = []
+          }
+          statuses[f['status']].push(f)
+        }
+        var html = ''
+        var sortedStatuses = Object.keys(statuses).sort()
+        for (var i in sortedStatuses) {
+          s = sortedStatuses[i]
+          numStatuses = statuses[s].length
+          html += '<a href="' + commitUrl + '" title="' + numStatuses
+          html += ' ' + s + ' flag' + (numStatuses > 1 ? 's' : '')
+          html += '" class="btn ' + statusesLabels[s].replace('badge', 'btn-outline') + '">'
+          html += statuses[s].length + '</a>\n'
+        }
+        $(html).insertBefore(item);
+      }
+    });
+  });
+
+
   $('#merge_btn').click(function() {
       return confirm('Confirm merging this pull-request');
   });

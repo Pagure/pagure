@@ -19,6 +19,7 @@
 from __future__ import unicode_literals, absolute_import
 
 import logging
+import json
 import os
 from math import ceil
 
@@ -369,6 +370,7 @@ def request_pull(repo, requestid, username=None, namespace=None):
         can_delete_branch=can_delete_branch,
         trigger_ci=trigger_ci,
         trigger_ci_pr_form=trigger_ci_pr_form,
+        flag_statuses_labels=json.dumps(pagure_config["FLAG_STATUSES_LABELS"]),
     )
 
 
