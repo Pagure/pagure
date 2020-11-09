@@ -8,6 +8,7 @@ python3-cryptography
 python3-docutils
 python3-fedora-flask
 python3-flask
+python3-flask-oidc
 python3-flask-wtf
 python3-bcrypt
 python3-jinja2

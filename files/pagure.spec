@@ -62,6 +62,7 @@ Requires:           python%{python_pkgversion}-email-validator
 Requires:           python%{python_pkgversion}-enum34
 Requires:           python%{python_pkgversion}-flask
 Requires:           python%{python_pkgversion}-flask-wtf
+Requires:           python%{python_pkgversion}-flask-oidc
 Requires:           python%{python_pkgversion}-markdown
 Requires:           python%{python_pkgversion}-munch
 Requires:           python%{python_pkgversion}-pillow

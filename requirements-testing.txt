@@ -5,6 +5,7 @@ cryptography
 eventlet
 fedmsg
 flake8
+flask-oidc
 mock
 pytest
 pytest-cov
