@@ -11,6 +11,7 @@
 from __future__ import unicode_literals, absolute_import
 
 import base64
+import datetime
 import logging
 import os
 import stat
@@ -242,7 +243,8 @@ def mirror_project(self, session, username, namespace, name):
             error=True,
             env={"SSHKEY": private_key_file, "GIT_SSH": script_file},
         )
-        log = "Output from the push:\n  stdout: %s\n  stderr: %s" % (
+        log = "Output from the push (%s):\n  stdout: %s\n  stderr: %s" % (
+            datetime.datetime.utcnow().isoformat(),
             stdout,
             stderr,
         )
