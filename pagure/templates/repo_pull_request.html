@@ -626,6 +626,9 @@
               <div class="py-2 text-uppercase font-size-09">
                 Subscribers
                 <span class="badge badge-secondary badge-pill font-size-09 ml-1" id="subscribers-count">{{subscribers|count}}</span>
+                <span title="Show/Hide subscribers" id="subscribers-toggle">
+                  <span class="fa fa-arrow-circle-down fa-fw fa-1x"</span>
+                </span>
               </div>
               <div class="ml-auto">
                   <a href="#" class="btn btn-sm btn-link" id="subcribe-btn"
@@ -637,13 +640,13 @@
                 </a>
                 </div>
             </h5>
-              {% if subscribers %}
 
-            <div id="subscribers_list" class="p-2">
+            {% if subscribers %}
+            <div id="subscribers_list" class="p-2 hidden">
             {% for subscriber in subscribers %}
                 <a href="{{ url_for('ui_ns.view_user', username=subscriber)
                 }}" title="{{ subscriber }}" id="sub-avatar-{{subscriber}}">{{
-                  subscriber |avatar(size=30, css_class="pb-1") | safe
+                  subscriber |avatar(size=30, css_class="pb-1", src_tag="data-src") | safe
                 }}</a>
             {% endfor %}
 
@@ -891,6 +894,16 @@ var statusesLabels = {{ flag_statuses_labels|safe }}
 
 $(document).ready(function() {
 
+  $('#subscribers-toggle').click(function(event){
+    var _el = $('#subscribers_list');
+    if (! _el.is(':visible')){
+      $('#subscribers-toggle').html('<span class="fa fa-arrow-circle-up fa-fw fa-1x">');
+    } else {
+      $('#subscribers-toggle').html('<span class="fa fa-arrow-circle-down fa-fw fa-1x">');
+    }
+    _el.toggle();
+  });
+
   {# Show latest tag #}
   {% if pull_request.commit_stop %};
     var url = '{{ url_for("api_ns.api_commit_flags",
@@ -980,7 +993,6 @@ $(document).ready(function() {
       }
     });
   });
-
 
   $('#merge_btn').click(function() {
       return confirm('Confirm merging this pull-request');
@@ -1485,7 +1497,7 @@ $(document).ready(function () {
             _countlabel.text(_count+1)
             var _html = '<a href="/user/' + data.user + '"'
                       + 'title="'+data.user+'" id="sub-avatar-'+data.user+'">'
-                      + '<img src="'+data.avatar_url+'" class="pb-1"></a>';
+                      + '<img src="'+data.avatar_url+'" class="pb-1 lazyload"></a>';
             $('#subscribers_list').prepend(_html);
           } else {
             _btn.text('Subscribe');

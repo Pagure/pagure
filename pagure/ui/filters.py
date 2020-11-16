@@ -500,7 +500,7 @@ def text_wraps(text, size=10):
 
 
 @UI_NS.app_template_filter("avatar")
-def avatar(packager, size=64, css_class=None):
+def avatar(packager, size=64, css_class=None, src_tag="src"):
     """ Template filter that returns html for avatar of any given Username.
     """
     if not isinstance(packager, six.text_type):
@@ -515,8 +515,9 @@ def avatar(packager, size=64, css_class=None):
     if css_class:
         class_string = class_string + " " + css_class
 
-    output = '<img class="%s" src="%s"/>' % (
+    output = '<img class="%s lazyload" %s="%s"/>' % (
         class_string,
+        src_tag,
         avatar_url(packager, size),
     )
 

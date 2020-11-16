@@ -590,6 +590,9 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
           <div class="py-2 text-uppercase font-size-09">
             Subscribers
             <span class="badge badge-secondary badge-pill font-size-09 ml-1" id="subscribers-count">{{subscribers|count}}</span>
+            <span id="subscribers-toggle" title="Show/Hide subscribers">
+              <span class="fa fa-arrow-circle-down fa-fw fa-1x"></span>
+            </span>
           </div>
           <div class="ml-auto">
               <a href="#" class="btn btn-sm btn-link" id="subcribe-btn"
@@ -603,11 +606,11 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
         </h5>
 
         {% if subscribers %}
-        <div id="subscribers_list" class="p-2">
+        <div id="subscribers_list" class="p-2 hidden">
         {% for subscriber in subscribers %}
             <a href="{{ url_for('ui_ns.view_user', username=subscriber)
             }}" title="{{ subscriber }}" id="sub-avatar-{{subscriber}}">{{
-              subscriber |avatar(size=30, css_class="pb-1") | safe
+              subscriber |avatar(size=30, css_class="pb-1", src_tag="data-src") | safe
             }}</a>
         {% endfor %}
         </div>
@@ -815,6 +818,16 @@ $(document).ready(function() {
     };
     return false;
   };
+
+  $('#subscribers-toggle').click(function(event){
+    var _el = $('#subscribers_list');
+    if (! _el.is(':visible')){
+      $('#subscribers-toggle').html('<span class="fa fa-arrow-circle-up fa-fw fa-1x">');
+    } else {
+      $('#subscribers-toggle').html('<span class="fa fa-arrow-circle-down fa-fw fa-1x">');
+    }
+    _el.toggle();
+  });
 
   {% if g.repo_user %}
   $('#closeticket').click(function(event){
