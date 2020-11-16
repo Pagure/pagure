@@ -928,6 +928,13 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
     -------------------
     Add or edit flags on a pull-request.
 
+    This is an utility method which add a flag to the latest commit of the
+    specified pull-request.
+
+    Note that using it has a risk of race-condition if the pull-request changes
+    at the time the flag is being added. Using the commit flag endpoint prevents
+    this risk of race-condition.
+
     ::
 
         POST /api/0/<repo>/pull-request/<request id>/flag
