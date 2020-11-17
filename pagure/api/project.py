@@ -3085,6 +3085,115 @@ def api_project_block_user(repo, namespace=None, username=None):
     return jsonout
 
 
+@API.route("/<repo>/contributors")
+@API.route("/<namespace>/<repo>/contributors")
+@API.route("/fork/<username>/<repo>/contributors")
+@API.route("/fork/<username>/<namespace>/<repo>/contributors")
+@api_method
+def api_project_contributors(repo, namespace=None, username=None):
+    """
+    Contributors of a project
+    -------------------------
+    List all the contributors of a project, by their access level.
+
+    ::
+
+        GET /api/0/<repo>/contributors
+        GET /api/0/<namespace>/<repo>/contributors
+
+    ::
+
+        GET /api/0/fork/<username>/<repo>/contributors
+        GET /api/0/fork/<username>/<namespace>/<repo>/contributors
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "groups": {
+            "admin": [],
+            "collaborators": [
+              {
+                "branches": "f*",
+                "user": "packager"
+              }
+            ],
+            "commit": [
+              "infra"
+            ],
+            "ticket": []
+          },
+          "users": {
+            "admin": [
+              "pingou"
+            ],
+            "collaborators": [
+              {
+                "branches": "epel*",
+                "user": "ngompa"
+              }
+            ],
+            "commit": [
+              "kevin"
+            ],
+            "ticket": [
+              "ralph"
+            ]
+          }
+        }
+
+    """
+
+    project = _get_repo(repo, username, namespace)
+
+    # USERS
+    admins = set([u.user for u in project.admins + [project.user]])
+    committers = set(u.user for u in project.committers)
+    collaborators = set([u.user.user for u in project.collaborators])
+    users = set([u.user for u in project.users])
+
+    output_users = {
+        "admin": sorted(admins),
+        "commit": sorted(committers - admins),
+        "ticket": sorted(users - collaborators - committers - admins),
+        "collaborators": sorted(
+            [
+                {"user": u.user.user, "branches": u.branches}
+                for u in project.collaborators
+                if u not in admins and u not in committers
+            ],
+            key=lambda x: x["user"],
+        ),
+    }
+
+    # GROUPS
+    admins = set([g.group_name for g in project.admin_groups])
+    committers = set([g.group_name for g in project.committer_groups])
+    collaborators = set(
+        [g.group.group_name for g in project.collaborator_project_groups]
+    )
+    groups = set([g.group_name for g in project.groups])
+
+    output_groups = {
+        "admin": sorted(admins),
+        "commit": sorted(committers - admins),
+        "ticket": sorted(groups - collaborators - committers - admins),
+        "collaborators": sorted(
+            [
+                {"user": g.group.group_name, "branches": g.branches}
+                for g in project.collaborator_project_groups
+                if g not in admins and g not in committers
+            ],
+            key=lambda x: x["user"],
+        ),
+    }
+
+    jsonout = flask.jsonify({"users": output_users, "groups": output_groups})
+    return jsonout
+
+
 @API.route("/<repo>/delete", methods=["POST"])
 @API.route("/<namespace>/<repo>/delete", methods=["POST"])
 @API.route("/fork/<username>/<repo>/delete", methods=["POST"])

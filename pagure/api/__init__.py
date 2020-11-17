@@ -530,6 +530,7 @@ def api():
         project.api_new_git_tags,
         project.api_project_git_urls,
         project.api_project_watchers,
+        project.api_project_contributors,
         project.api_git_branches,
         project.api_new_branch,
         project.api_fork_project,
