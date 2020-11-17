@@ -3056,7 +3056,7 @@ def mirror_pull_project(session, project, debug=False):
 
     try:
         # Pull
-        logs = []
+        logs = ["Run from: %s" % datetime.datetime.utcnow().isoformat()]
         logs = _run_command(["clone", "--mirror", remote, "."], logs)
         logs = _run_command(["remote", "add", "local", lclrepopath], logs)
 
