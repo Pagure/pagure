@@ -21,19 +21,19 @@ echo "Last commits:"
 git --no-pager log -2
 fi
 
-podman build --rm -t pagure-f31-rpms-py3 \
-    -f dev/containers/f31-rpms-py3 \
+podman build --rm -t pagure-fedora-rpms-py3 \
+    -f dev/containers/fedora-rpms-py3 \
     dev/containers
 
-if [ ! -d `pwd`/results_f31-rpms-py3 ]; then
-  mkdir `pwd`/results_f31-rpms-py3;
+if [ ! -d `pwd`/results_fedora-rpms-py3 ]; then
+  mkdir `pwd`/results_fedora-rpms-py3;
 fi
 
-podman run --rm -it --name pagure-f31-rpms-py3 \
-    -v `pwd`/results_f31-rpms-py3:/pagure/results:z \
+podman run --rm -it --name pagure-fedora-rpms-py3 \
+    -v `pwd`/results_fedora-rpms-py3:/pagure/results:z \
     -e BRANCH=$BRANCH \
     -e REPO=$REPO \
-    pagure-f31-rpms-py3
+    pagure-fedora-rpms-py3
 
 
 podman build --rm -t pagure-c7-rpms-py2 \

@@ -71,7 +71,7 @@ node('pagure') {
         throw e
     } finally {
         stage('Sync Artifacts'){
-            syncfromduffynode('pagure/results_f31-rpms-py3/')
+            syncfromduffynode('pagure/results_fedora-rpms-py3/')
             syncfromduffynode('pagure/results_centos7-rpms-py2/')
             syncfromduffynode('pagure/results_fedora-pip-py3/')
         }
@@ -86,7 +86,7 @@ node('pagure') {
         }
 
         stage('Archive Artifacts'){
-            archiveArtifacts artifacts: 'pagure/results_f31-rpms-py3/'
+            archiveArtifacts artifacts: 'pagure/results_fedora-rpms-py3/'
             archiveArtifacts artifacts: 'pagure/results_centos7-rpms-py2/'
             archiveArtifacts artifacts: 'pagure/results_fedora-pip-py3/'
         }
