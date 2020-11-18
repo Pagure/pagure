@@ -70,11 +70,6 @@ node('pagure') {
         currentBuild.result = "FAILURE"
         throw e
     } finally {
-        stage('Sync Artifacts'){
-            syncfromduffynode('pagure/results_fedora-rpms-py3/')
-            syncfromduffynode('pagure/results_centos7-rpms-py2/')
-            syncfromduffynode('pagure/results_fedora-pip-py3/')
-        }
 
         stage('Deallocate Node'){
             sh 'cico node done ${SSID}'
@@ -85,10 +80,5 @@ node('pagure') {
             notifyPagurePR("pagure", "Build " + res + "! ", res, "FINALIZED")
         }
 
-        stage('Archive Artifacts'){
-            archiveArtifacts artifacts: 'pagure/results_fedora-rpms-py3/'
-            archiveArtifacts artifacts: 'pagure/results_centos7-rpms-py2/'
-            archiveArtifacts artifacts: 'pagure/results_fedora-pip-py3/'
-        }
     }
 }
