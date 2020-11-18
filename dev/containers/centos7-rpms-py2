@@ -1,4 +1,4 @@
-FROM centos:7
+FROM registry.centos.org/centos/centos:7
 
 ARG repo=https://pagure.io/pagure.git
 ARG branch=master
