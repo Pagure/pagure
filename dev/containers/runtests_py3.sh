@@ -22,4 +22,6 @@ echo "Last commits:"
 git --no-pager log -2
 fi
 
+sed -i -e "s|#!/usr/bin/env python|#!/usr/bin/env python3|" pagure/hooks/files/hookrunner
+
 pytest-3 -n auto ${TESTCASE:-tests/}
