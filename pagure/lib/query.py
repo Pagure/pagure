@@ -2190,6 +2190,7 @@ def edit_issue(
                             public=True, with_comments=False
                         ),
                         "priorities": issue.project.priorities,
+                        "content_updated": text2markdown(issue.content),
                     }
                 ),
             )

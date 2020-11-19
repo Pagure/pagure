@@ -264,7 +264,7 @@ update_issue = function(data, _roadmap_url) {
       }
     } else if (_f == 'content'){
       var field = $('#comment-0').parent().find('.comment_body');
-      field.html('<p>' + data.issue.content + '</p>');
+      field.html('<p>' + data.content_updated + '</p>');
     } else if (_f == 'milestone'){
       var field = $('#milestone_plain');
       var _url = _roadmap_url.replace('-123456789', data.issue.milestone);
