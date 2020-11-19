@@ -1550,6 +1550,8 @@ def add_pull_request_flag(
         token=token,
     )
 
+    action = action.replace("Flag ", "")
+
     pr_flag = pagure.lib.query.get_commit_flag_by_uid(
         session, request.commit_stop, flag_uid
     )
@@ -1568,8 +1570,6 @@ def add_pull_request_flag(
             agent=user_obj.username,
         ),
     )
-
-    action = action.replace("Flag ", "")
 
     return ("Flag %s" % action, pr_flag.uid)
 
