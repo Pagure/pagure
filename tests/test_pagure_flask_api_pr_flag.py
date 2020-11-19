@@ -246,6 +246,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
 
         # Valid request
         with testing.mock_sends(
+            pagure_messages.CommitFlagAddedV1,
             pagure_messages.PullRequestFlagAddedV1(
                 topic="pagure.pull-request.flag.added",
                 body={
@@ -346,7 +347,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
                         "assignee": None,
                         "status": "Open",
                         "commit_start": None,
-                        "commit_stop": None,
+                        "commit_stop": "hash_commit_stop",
                         "closed_by": None,
                         "initial_comment": None,
                         "cached_merge_status": "unknown",
@@ -355,7 +356,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
                         "comments": [],
                     },
                     "flag": {
-                        "pull_request_uid": ANY,
+                        "commit_hash": "hash_commit_stop",
                         "username": "Jenkins",
                         "percent": None,
                         "comment": "Tests running",
@@ -371,7 +372,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
                     },
                     "agent": "pingou",
                 },
-            )
+            ),
         ):
             output = self.app.post(
                 "/api/0/test/pull-request/1/flag", data=data, headers=headers
@@ -511,6 +512,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         }
 
         with testing.mock_sends(
+            pagure_messages.CommitFlagUpdatedV1,
             pagure_messages.PullRequestFlagUpdatedV1(
                 topic="pagure.pull-request.flag.updated",
                 body={
@@ -611,7 +613,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
                         "assignee": None,
                         "status": "Open",
                         "commit_start": None,
-                        "commit_stop": None,
+                        "commit_stop": "hash_commit_stop",
                         "closed_by": None,
                         "initial_comment": None,
                         "cached_merge_status": "unknown",
@@ -620,9 +622,9 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
                         "comments": [],
                     },
                     "flag": {
-                        "pull_request_uid": ANY,
+                        "commit_hash": "hash_commit_stop",
                         "username": "Jenkins",
-                        "percent": "100",
+                        "percent": 100,
                         "comment": "Tests passed",
                         "status": "success",
                         "url": "http://jenkins.cloud.fedoraproject.org/",
@@ -636,7 +638,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
                     },
                     "agent": "pingou",
                 },
-            )
+            ),
         ):
             output = self.app.post(
                 "/api/0/test/pull-request/1/flag", data=data, headers=headers
