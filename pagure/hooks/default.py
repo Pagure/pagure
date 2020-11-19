@@ -178,6 +178,13 @@ def send_notifications(
     for author in auths:
         if not isinstance(author, six.string_types):
             author = author.to_json(public=True)
+        else:
+            author = {
+                "fullname": author,
+                "email": None,
+                "name": None,
+                "url_path": None,
+            }
         authors.append(author)
 
     if revs:
