@@ -19,7 +19,7 @@ RUN dnf -y update && \
                    python3-pillow python3-psutil python3-psycopg2 \
                    python3-pygit2 python3-redis python3-requests \
                    python3-setuptools python3-six python3-sqlalchemy \
-                   python3-straight-plugin python3-trololio \
+                   python3-straight-plugin \
                    python-unversioned-command python3-wtforms which \
                    python3-email-validator \
                    python3-whitenoise \

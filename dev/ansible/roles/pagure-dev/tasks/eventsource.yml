@@ -4,7 +4,6 @@
   dnf:
     name:
       - python3-redis
-      - python3-trololio
       - redis
     state: present
 

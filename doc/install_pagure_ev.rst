@@ -16,7 +16,6 @@ The eventsource server is easy to set-up.
 ::
 
     python-redis
-    python-trololio
 
 .. note:: We ship a systemd unit file for pagure_milter but we welcome patches
         for scripts for other init systems.

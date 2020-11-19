@@ -12,7 +12,6 @@ pytest
 pytest-cov
 pytest-xdist
 python-fedora
-trololio
 
 # Seems that mock doesn't list this one
 funcsigs
