@@ -1,4 +1,4 @@
-FROM quay.io/fedora/fedora:33
+FROM quay.io/fedora/fedora:33-x86_64
 
 ARG repo=https://pagure.io/pagure.git
 ARG branch=master
