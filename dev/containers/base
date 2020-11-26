@@ -14,7 +14,7 @@ RUN dnf -y update && \
                    python3-flake8 python3-flask python3-flask-oidc \
                    python3-flask-wtf python3-funcsigs python3-jinja2 \
                    python3-kitchen python3-markdown python3-mock \
-                   python3-munch python3-nose python3-nose-xcover \
+                   python3-munch \
                    python3-openid python3-openid-cla python3-openid-teams \
                    python3-pillow python3-psutil python3-psycopg2 \
                    python3-pygit2 python3-redis python3-requests \

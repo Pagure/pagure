@@ -17,7 +17,6 @@ RUN yum -y install \
     rpm-build \
     python-setuptools \
     python-coverage \
-    python-nose \
     python-mock \
     python-docutils \
     python-enum \

@@ -9,7 +9,6 @@ ENV BRANCH=$branch
 RUN dnf -y --enablerepo=updates-testing install \
     python3-setuptools \
     python3-coverage \
-    python3-nose \
     python3-mock \
     python3-docutils \
     python3-black \
