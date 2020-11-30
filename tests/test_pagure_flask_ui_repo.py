@@ -5770,7 +5770,7 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 403)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                "<p>You are not allowed to delete the master branch</p>",
+                "<p>You are not allowed to delete the default branch: master</p>",
                 output_text,
             )
 
@@ -5863,6 +5863,49 @@ index 0000000..fb7093d
             output = self.app.get("/test/branches")
             output_text = output.get_data(as_text=True)
             self.assertNotIn('<form id="delete_branch_form-☃️"', output_text)
+
+    def test_delete_branch_master(self):
+        """ Test the delete_branch endpoint with the master branch. """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
+        project = pagure.lib.query._get_project(self.session, "test")
+
+        user = tests.FakeUser(username="pingou")
+        with tests.user_set(self.app.application, user):
+
+            # Add a branch that we can delete
+            path = os.path.join(self.path, "repos", "test.git")
+            tests.add_content_git_repo(path)
+            repo = pygit2.Repository(path)
+            branchname = "main"
+            repo.create_branch(branchname, repo.head.peel())
+
+            # Make that branch be the default one:
+            pagure.lib.git.git_set_ref_head(project=project, branch=branchname)
+
+            # Check before deletion
+            output = self.app.get("/test")
+            self.assertEqual(output.status_code, 200)
+
+            output = self.app.get("/test/branches")
+            output_text = output.get_data(as_text=True)
+            self.assertIn('<form id="delete_branch_form-master"', output_text)
+            self.assertNotIn('<form id="delete_branch_form-main"', output_text)
+
+            # Delete the branch
+            output = self.app.post(
+                "/test/b/master/delete", follow_redirects=True
+            )
+            self.assertEqual(output.status_code, 200)
+
+            # Check after deletion
+            output = self.app.get("/test/branches")
+            output_text = output.get_data(as_text=True)
+            self.assertNotIn(
+                '<form id="delete_branch_form-master"', output_text
+            )
+            self.assertNotIn('<form id="delete_branch_form-main"', output_text)
 
     @patch.dict("pagure.config.config", {"ALLOW_DELETE_BRANCH": False})
     def test_delete_branch_disabled_in_ui(self):

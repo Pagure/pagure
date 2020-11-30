@@ -2694,9 +2694,15 @@ def delete_branch(repo, branchname, username=None, namespace=None):
     if six.PY2:
         branchname = branchname.encode("utf-8")
 
-    if branchname == "master":
+    default_branchname = "master"
+    if not repo_obj.is_empty and not repo_obj.head_is_unborn:
+        default_branchname = repo_obj.head.shorthand
+
+    if branchname == default_branchname:
         flask.abort(
-            403, description="You are not allowed to delete the master branch"
+            403,
+            description="You are not allowed to delete the default "
+            "branch: %s" % default_branchname,
         )
 
     if branchname not in repo_obj.listall_branches():
