@@ -321,7 +321,7 @@ $(".select-on-focus").on("focus", function() {
 
 {% if g.authenticated and not g.repo_obj.is_empty %}
 
-{% if g.repo_committer %}
+{% if g.repo_committer or g.repo_forked %}
 var _cnt = 0;
 
 function process_task_results(_data, callback) {
