@@ -2828,7 +2828,7 @@ def _check_value(value):
     if str(value).lower() in ["true"]:
         value = True
     elif str(value).lower() in ["false"]:
-        value = True
+        value = False
     elif str(value).isdigit():
         value = int(value)
     return value
