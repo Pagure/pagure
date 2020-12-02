@@ -417,6 +417,8 @@ $("#pr-button").one("click",
       _b.show();
       $("#pr-dropdown-mainlist .pr-dropdown-spinner").hide();
   })
+  {% else %}
+  $("#pr-dropdown-mainlist .pr-dropdown-spinner").hide();
   {% endif %}
 
   var data = {
