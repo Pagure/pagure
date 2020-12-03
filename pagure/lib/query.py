@@ -1738,7 +1738,7 @@ def new_project(
         name,
         add_readme,
         ignore_existing_repo,
-        default_branch,
+        default_branch or pagure_config.get("GIT_DEFAULT_BRANCH"),
     )
 
 

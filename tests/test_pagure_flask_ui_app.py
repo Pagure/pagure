@@ -2517,6 +2517,89 @@ class PagureFlaskAppNewProjecttests(tests.Modeltests):
         repo = pygit2.Repository(projects[0].repopath("main"))
         self.assertEqual(repo.listall_branches(), ["main"])
 
+    @patch.dict("pagure.config.config", {"GIT_DEFAULT_BRANCH": "main"})
+    def test_new_project_with_default_branch_instance_wide(self):
+        """ Test the new_project endpoint when new project contains a plus sign.
+        """
+        # Before
+        projects = pagure.lib.query.search_projects(self.session)
+        self.assertEqual(len(projects), 0)
+
+        user = tests.FakeUser(username="foo")
+        with tests.user_set(self.app.application, user):
+            csrf_token = self.get_csrf()
+
+            data = {
+                "description": "Project #1.",
+                "name": "project_main",
+                "csrf_token": csrf_token,
+                "create_readme": True,
+            }
+            output = self.app.post("/new/", data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                "<title>Overview - project_main - Pagure</title>", output_text
+            )
+            self.assertIn(
+                '<a href="/project_main"><strong>project_main</strong></a>',
+                output_text,
+            )
+            self.assertIn(
+                '<code class="py-1 px-2 font-weight-bold '
+                'commit_branch">main</code>',
+                output_text,
+            )
+
+        # After
+        projects = pagure.lib.query.search_projects(self.session)
+        self.assertEqual(len(projects), 1)
+
+        repo = pygit2.Repository(projects[0].repopath("main"))
+        self.assertEqual(repo.listall_branches(), ["main"])
+
+    @patch.dict("pagure.config.config", {"GIT_DEFAULT_BRANCH": "main"})
+    def test_new_project_with_default_branch_instance_wide_overriden(self):
+        """ Test the new_project endpoint when new project contains a plus sign.
+        """
+        # Before
+        projects = pagure.lib.query.search_projects(self.session)
+        self.assertEqual(len(projects), 0)
+
+        user = tests.FakeUser(username="foo")
+        with tests.user_set(self.app.application, user):
+            csrf_token = self.get_csrf()
+
+            data = {
+                "description": "Project #1.",
+                "name": "project_main",
+                "csrf_token": csrf_token,
+                "default_branch": "rawhide",
+                "create_readme": True,
+            }
+            output = self.app.post("/new/", data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                "<title>Overview - project_main - Pagure</title>", output_text
+            )
+            self.assertIn(
+                '<a href="/project_main"><strong>project_main</strong></a>',
+                output_text,
+            )
+            self.assertIn(
+                '<code class="py-1 px-2 font-weight-bold '
+                'commit_branch">rawhide</code>',
+                output_text,
+            )
+
+        # After
+        projects = pagure.lib.query.search_projects(self.session)
+        self.assertEqual(len(projects), 1)
+
+        repo = pygit2.Repository(projects[0].repopath("main"))
+        self.assertEqual(repo.listall_branches(), ["rawhide"])
+
     def test_new_project_when_turned_off(self):
         """ Test the new_project endpoint when new project creation is
         not allowed in the pagure instance. """

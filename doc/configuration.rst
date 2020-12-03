@@ -1912,6 +1912,17 @@ When set to ``False``, this essentially makes the API ignore whether the
 
 Default to: ``True``
 
+GIT_DEFAULT_BRANCH
+~~~~~~~~~~~~~~~~~~
+
+This configuration key allows to specify the default branch configured upon
+project creation. The default branch can be specified by the user upon project
+creation but if the user does not specify any branch, this branch name will be
+used.
+
+Defaults to: ``None`` (which results in the default branch being ``master``).
+
+
 
 RepoSpanner Options
 -------------------
