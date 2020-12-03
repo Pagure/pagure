@@ -514,6 +514,11 @@ def fork(
                 with open(http_clone_file, "w"):
                     pass
 
+        # Finally set the default branch to be the same as the parent
+        repo_from_obj = pygit2.Repository(repo_from.repopath("main"))
+        repo_to_obj = pygit2.Repository(repo_to.repopath("main"))
+        repo_to_obj.set_head(repo_from_obj.lookup_reference("HEAD").target)
+
         pagure.lib.notify.log(
             repo_to,
             topic="project.forked",

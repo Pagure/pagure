@@ -2798,6 +2798,58 @@ index 0000000..2a552bb
             )
             self.assertEqual(output.status_code, 200)
 
+    @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
+    def test_fork_project_non_master_default(self):
+        """ Test the fork_project endpoint with a project whose default branch
+        is not master. """
+
+        tests.create_projects(self.session)
+        for folder in ["docs", "tickets", "requests", "repos"]:
+            tests.create_projects_git(
+                os.path.join(self.path, folder), bare=True
+            )
+        path = os.path.join(self.path, "repos", "test.git")
+        tests.add_content_git_repo(path)
+        project = pagure.lib.query.get_authorized_project(self.session, "test")
+
+        # Check before that the master branch is the default one - shown in the
+        # default page
+        output = self.app.get("/test")
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        self.assertIn(
+            '<code class="py-1 px-2 font-weight-bold commit_branch">master</code><code',
+            output_text,
+        )
+
+        # Create the main branch with some content and make it the default branch
+        repo = pygit2.Repository(path)
+        branchname = "main"
+        repo.create_branch(branchname, repo.head.peel())
+        pagure.lib.git.git_set_ref_head(project=project, branch=branchname)
+
+        user = tests.FakeUser(username="foo")
+        with tests.user_set(self.app.application, user):
+            data = {"csrf_token": self.get_csrf()}
+
+            output = self.app.post(
+                "/do_fork/test", data=data, follow_redirects=True
+            )
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            self.assertIn(
+                '<code class="py-1 px-2 font-weight-bold commit_branch">main</code><code',
+                output_text,
+            )
+
+        output = self.app.get("/fork/foo/test")
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        self.assertIn(
+            '<code class="py-1 px-2 font-weight-bold commit_branch">main</code><code',
+            output_text,
+        )
+
     @patch("pagure.lib.notify.send_email")
     def test_new_request_pull_branch_space(self, send_email):
         """ Test the new_request_pull endpoint. """
