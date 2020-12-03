@@ -2865,6 +2865,19 @@ def api_modify_project_options(repo, username=None, namespace=None):
     do not specify in the request values that have been changed before they
     will go back to their default value.
 
+    The fields and values can be specified either as a regular HTTP form or as
+    a JSON blob.
+
+    Sample request body
+    ^^^^^^^^^^^^^^^^^^^
+
+    ::
+
+       {
+           'issue_tracker': false,
+           'disable_non_fast-forward_merges': true
+       }
+
     Sample response
     ^^^^^^^^^^^^^^^
 
@@ -2880,9 +2893,10 @@ def api_modify_project_options(repo, username=None, namespace=None):
     _check_token(project, project_token=False)
 
     settings = {}
-    for key in flask.request.form:
+    request_data = get_request_data()
+    for key in request_data:
 
-        settings[key] = _check_value(flask.request.form[key])
+        settings[key] = _check_value(request_data[key])
 
     try:
         message = pagure.lib.query.update_project_settings(

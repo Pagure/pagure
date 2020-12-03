@@ -4413,6 +4413,67 @@ class PagureFlaskApiProjectOptionsTests(tests.Modeltests):
         before["settings"]["issue_tracker"] = False
         self.assertEqual(after, before)
 
+    def test_api_modify_project_options_json(self):
+        """ Test accessing api_modify_project_options w/ auth header and
+        input submitted as JSON instead of HTML arguments. """
+
+        # check before
+        headers = {"Authorization": "token aaabbbcccddd"}
+        output = self.app.get("/api/0/test/options", headers=headers)
+        self.assertEqual(output.status_code, 200)
+        before = json.loads(output.get_data(as_text=True))
+        self.assertEqual(
+            before,
+            {
+                "settings": {
+                    "Enforce_signed-off_commits_in_pull-request": False,
+                    "Minimum_score_to_merge_pull-request": -1,
+                    "Only_assignee_can_merge_pull-request": False,
+                    "Web-hooks": None,
+                    "always_merge": False,
+                    "disable_non_fast-forward_merges": False,
+                    "fedmsg_notifications": True,
+                    "issue_tracker": True,
+                    "issue_tracker_read_only": False,
+                    "issues_default_to_private": False,
+                    "mqtt_notifications": True,
+                    "notify_on_commit_flag": False,
+                    "notify_on_pull-request_flag": False,
+                    "open_metadata_access_to_all": False,
+                    "project_documentation": False,
+                    "pull_request_access_only": False,
+                    "pull_requests": True,
+                    "stomp_notifications": True,
+                },
+                "status": "ok",
+            },
+        )
+
+        # Update: `issue_tracker`.
+        data = json.dumps({"issue_tracker": False})
+        headers["Content-Type"] = "application/json"
+        output = self.app.post(
+            "/api/0/test/options/update", headers=headers, data=data
+        )
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertEqual(
+            data,
+            {
+                "message": "Edited successfully settings of repo: test",
+                "status": "ok",
+            },
+        )
+
+        # check after
+        headers = {"Authorization": "token aaabbbcccddd"}
+        output = self.app.get("/api/0/test/options", headers=headers)
+        self.assertEqual(output.status_code, 200)
+        after = json.loads(output.get_data(as_text=True))
+        self.assertNotEqual(before, after)
+        before["settings"]["issue_tracker"] = False
+        self.assertEqual(after, before)
+
 
 class PagureFlaskApiProjectCreateAPITokenTests(tests.Modeltests):
     """ Tests for the flask API of pagure for creating user project API token
