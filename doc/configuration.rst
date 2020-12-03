@@ -1909,8 +1909,16 @@ existing git tags via the API.
 When set to ``False``, this essentially makes the API ignore whether the
 ``force`` argument is set or not.
 
+Defaults to: ``True``
 
-Default to: ``True``
+
+PAGURE_PLUGINS_CONFIG
+~~~~~~~~~~~~~~~~~~~~~~
+
+This option can be used to specify the configuration file used for loading
+plugins. It is not set by default, instead if must be declared explicitly.
+Also see the documentation on plugins at :ref:`plugins`.
+
 
 GIT_DEFAULT_BRANCH
 ~~~~~~~~~~~~~~~~~~
@@ -2069,6 +2077,7 @@ SSH_COMMAND_NON_REPOSPANNER
 The command to run if a repository is not on repospanner when aclchecker is in use.
 
 
+
 MQTT Options
 ------------
 
@@ -2188,13 +2197,6 @@ notifications on commits made on all projects in a pagure instance.
 
 Defaults to: ``False``.
 
-
-PAGURE_PLUGINS_CONFIG
-~~~~~~~~~~~~~~~~~~~~~~
-
-This option can be used to specify the configuration file used for loading
-plugins. It is not set by default, instead if must be declared explicitly.
-Also see the documentation on plugins at :ref:`plugins`.
 
 
 Deprecated configuration keys
