@@ -358,6 +358,9 @@ ACLS = {
     "pull_request_rebase": "Rebase a pull-request",
     "tag_project": "Allows adding git tags to a project",
     "commit": "Commit to a git repository via http(s)",
+    "modify_git_alias": "Modify git aliases (create or delete)",
+    "create_git_alias": "Create git aliases",
+    "delete_git_alias": "Delete git aliases",
 }
 
 # List of ACLs which a regular user is allowed to associate to an API token

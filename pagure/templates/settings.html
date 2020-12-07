@@ -19,8 +19,8 @@
           <h5 class="pl-2 font-weight-bold text-muted">Project Settings</h5>
           <a class="nav-item nav-link active" id="projectdetails" data-toggle="tab"
                 href="#projectdetails-tab" role="tab" aria-controls="projectdetails" aria-selected="true">Project Details</a>
-          <a class="nav-item nav-link" id="defaultbranch" data-toggle="tab"
-                href="#defaultbranch-tab" role="tab" aria-controls="defaultbranch">Default Branch</a>
+          <a class="nav-item nav-link" id="gitbranch" data-toggle="tab"
+                href="#gitbranch-tab" role="tab" aria-controls="gitbranch">Git Branches</a>
 
           {% if config.get('WEBHOOK', False) %}
           <a class="nav-item nav-link" id="privatewebhookkey" data-toggle="tab"
@@ -179,22 +179,9 @@
               </div>
             </div>
           </div>
-          <div class="tab-pane fade" id="defaultbranch-tab" role="tabpanel" aria-labelledby="defaultbranch-tab">
-            <h3 class="font-weight-bold mb-3">
-              Default Branch
-            </h3>
-            <div class="row">
-              <div class="col">
-                <form action="{{ url_for('ui_ns.change_ref_head',
-                    repo=repo.name,
-                    username=username,
-                    namespace=repo.namespace) }}" method="post">
-                  {{ branches_form.csrf_token }}
-                  {{ branches_form.branches(class_="c-select") }}
-                  <input class="btn btn-primary" type="submit" value="Make Default"/>
-                </form>
-              </div>
-            </div>
+
+          <div class="tab-pane fade" id="gitbranch-tab" role="tabpanel" aria-labelledby="gitbranch-tab">
+              {% include 'settings_git_branches.html' %}
           </div>
 
           {% if config.get('WEBHOOK', False) %}

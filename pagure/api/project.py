@@ -1949,6 +1949,229 @@ def api_new_branch(repo, username=None, namespace=None):
     return jsonout
 
 
+@API.route("/<repo>/git/alias/drop", methods=["POST"])
+@API.route("/<namespace>/<repo>/git/alias/drop", methods=["POST"])
+@API.route("/fork/<username>/<repo>/git/alias/drop", methods=["POST"])
+@API.route(
+    "/fork/<username>/<namespace>/<repo>/git/alias/drop", methods=["POST"]
+)
+@api_login_required(
+    acls=["delete_git_alias", "modify_git_alias", "modify_project"]
+)
+@api_method
+def api_drop_git_alias(repo, username=None, namespace=None):
+    """
+    Delete a git branch alias
+    -------------------------
+    Delete an existing git branch alias from a project.
+
+    ::
+
+        POST /api/0/rpms/python-requests/alias/drop
+
+
+    Input
+    ^^^^^
+
+    +------------------+---------+--------------+----------------------------+
+    | Key              | Type    | Optionality  | Description                |
+    +==================+=========+==============+============================+
+    | ``alias_from``   | string  | Mandatory    | | The origin reference the |
+    |                  |         |              |   alias is for.            |
+    +------------------+---------+--------------+----------------------------+
+    | ``alias_to``     | string  | Mandatory    | | The destination reference|
+    |                  |         |              |   of the alias (must be an |
+    |                  |         |              |   existing branch in the   |
+    |                  |         |              |   git repository).         |
+    +------------------+---------+--------------+----------------------------+
+
+    Note: while the references are listed as ``refs/heads/...`` the alias_from
+        and alias_to need to be specified as the basic branch name that they
+        are (ie: ``refs/heads/main`` needs to be specified as ``main``).
+
+
+    Sample input
+    ^^^^^^^^^^^^
+
+    ::
+
+        {
+          'alias_from': 'master',
+          'alias_to': 'main'
+        }
+
+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+            "refs/heads/rawhide": "refs/heads/main"
+        }
+
+    """
+    project = _get_repo(repo, username, namespace)
+    _check_token(project, project_token=False)
+
+    args = get_request_data()
+
+    alias_from = args.get("alias_from")
+    alias_to = args.get("alias_to")
+
+    if (
+        not alias_from
+        or (alias_from and not isinstance(alias_from, string_types))
+    ) or (
+        not alias_to or (alias_to and not isinstance(alias_to, string_types))
+    ):
+        raise pagure.exceptions.APIError(400, error_code=APIERROR.EINVALIDREQ)
+
+    try:
+        pagure.lib.git.drop_branch_aliases(project, alias_from, alias_to)
+    except KeyError:
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.EBRANCHNOTFOUND
+        )
+
+    return api_list_git_alias(repo, username, namespace)
+
+
+@API.route("/<repo>/git/alias/new", methods=["POST"])
+@API.route("/<namespace>/<repo>/git/alias/new", methods=["POST"])
+@API.route("/fork/<username>/<repo>/git/alias/new", methods=["POST"])
+@API.route(
+    "/fork/<username>/<namespace>/<repo>/git/alias/new", methods=["POST"]
+)
+@api_login_required(
+    acls=["create_git_alias", "modify_git_alias", "modify_project"]
+)
+@api_method
+def api_new_git_alias(repo, username=None, namespace=None):
+    """
+    Create a git branch alias
+    -------------------------
+    Create a new git branch alias in a project.
+
+    ::
+
+        POST /api/0/rpms/python-requests/alias/new
+
+
+    Input
+    ^^^^^
+
+    +------------------+---------+--------------+----------------------------+
+    | Key              | Type    | Optionality  | Description                |
+    +==================+=========+==============+============================+
+    | ``alias_from``   | string  | Mandatory    | | The origin reference the |
+    |                  |         |              |   alias is for.            |
+    +------------------+---------+--------------+----------------------------+
+    | ``alias_to``     | string  | Mandatory    | | The destination reference|
+    |                  |         |              |   of the alias (must be an |
+    |                  |         |              |   existing branch in the   |
+    |                  |         |              |   git repository).         |
+    +------------------+---------+--------------+----------------------------+
+
+    Note: while the references are listed as ``refs/heads/...`` the alias_from
+        and alias_to need to be specified as the basic branch name that they
+        are (ie: ``refs/heads/main`` needs to be specified as ``main``).
+
+
+    Sample input
+    ^^^^^^^^^^^^
+
+    ::
+
+        {
+          'alias_from': 'main',
+          'alias_to': 'rawhide'
+        }
+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+            "refs/heads/main": "refs/heads/master"
+        }
+
+    """
+    project = _get_repo(repo, username, namespace)
+    _check_token(project, project_token=False)
+
+    args = get_request_data()
+
+    alias_from = args.get("alias_from")
+    alias_to = args.get("alias_to")
+
+    if (
+        not alias_from
+        or (alias_from and not isinstance(alias_from, string_types))
+    ) or (
+        not alias_to or (alias_to and not isinstance(alias_to, string_types))
+    ):
+        raise pagure.exceptions.APIError(
+            400,
+            error_code=APIERROR.EINVALIDREQ,
+            error="Invalid input for alias_from or alias_to",
+        )
+
+    try:
+        pagure.lib.git.set_branch_alias(project, alias_from, alias_to)
+    except KeyError:
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.EBRANCHNOTFOUND
+        )
+    except pagure.exceptions.PagureException as error:
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.ENOCODE, error=str(error)
+        )
+
+    return api_list_git_alias(repo, username, namespace)
+
+
+@API.route("/<repo>/git/alias")
+@API.route("/<namespace>/<repo>/git/alias")
+@API.route("/fork/<username>/<repo>/git/alias")
+@API.route("/fork/<username>/<namespace>/<repo>/git/alias")
+@api_method
+def api_list_git_alias(repo, username=None, namespace=None):
+    """
+    List git branch alias
+    ---------------------
+    List the existing git branch alias in a project.
+
+    ::
+
+        GET /api/0/rpms/python-requests/alias
+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+            "refs/heads/main": "refs/heads/master"
+        }
+
+    """
+    project = _get_repo(repo, username, namespace)
+    _check_token(project, project_token=False)
+
+    try:
+        output = pagure.lib.git.get_branch_aliases(project)
+    except pygit2.GitError:  # pragma: no cover
+        raise pagure.exceptions.APIError(400, error_code=APIERROR.EGITERROR)
+
+    jsonout = flask.jsonify(output)
+    return jsonout
+
+
 @API.route("/<repo>/c/<commit_hash>/flag")
 @API.route("/<namespace>/<repo>/c/<commit_hash>/flag")
 @API.route("/fork/<username>/<repo>/c/<commit_hash>/flag")

@@ -1,0 +1,195 @@
+
+<h3 class="font-weight-bold mb-3">
+  Default Branch
+</h3>
+<div class="row">
+  <div class="col">
+    <form action="{{ url_for('ui_ns.change_ref_head',
+        repo=repo.name,
+        username=username,
+        namespace=repo.namespace) }}" method="post">
+      {{ branches_form.csrf_token }}
+      {{ branches_form.branches(class_="c-select") }}
+      <input class="btn btn-primary" type="submit" value="Make Default"/>
+    </form>
+  </div>
+</div>
+
+<div class="row p-t-1">
+  <div class="col-sm-12"></div>
+</div>
+
+<h3 class="font-weight-bold mb-3">
+  Git Branch Alias
+</h3>
+<div class="row">
+  <div class="col">
+    <div class="form-group">
+      <div class="row">
+        <div class="col-sm-5" >
+          Alias name
+        </div>
+
+        <div class="col-sm-5" >
+          Alias To (existing reference/branch)
+        </div>
+
+      </div>
+    </div>
+    <div class="form-group settings-field-rows" id="git-alias-list">
+      <form action="{{ url_for('api_ns.api_drop_git_alias',
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace) }}" class="add-alias-form hidden blank-field" method="post">
+        <div class="row">
+          <div class="col-sm-5" >
+            <input type="text" name="alias_from" value="" class="form-control"/>
+          </div>
+          <div class="col-sm-5" >
+            <input type="text" name="alias_to" value="" class="form-control"/>
+          </div>
+
+          <div class="col-sm-1">
+            <a class="btn btn-outline-info create-field-row pointer create-alias"
+                title="Create this alias"><i class="fa fa-check"></i></a>
+          </div>
+          <div class="col-sm-1">
+            <a class="btn btn-outline-danger remove-settings-field-row pointer drop-alias"
+                title="Delete this alias"><i class="fa fa-trash"></i></a>
+          </div>
+        </div>
+      </form>
+      {% for alias in branch_aliases %}
+        <form action="{{ url_for('api_ns.api_drop_git_alias',
+              repo=repo.name,
+              username=username,
+              namespace=repo.namespace) }}" class="add-alias-form" method="post">
+          <div class="row">
+            <div class="col-sm-5" >
+              <input type="text" name="alias_from" value="{{ alias | replace('refs/heads/', '') }}"
+                class="form-control" readonly />
+            </div>
+            <div class="col-sm-5" >
+              <input type="text" name="alias_to" value="{{ branch_aliases[alias] | replace('refs/heads/', '') }}"
+                class="form-control" readonly />
+            </div>
+
+            <div class="col-sm-1">
+            </div>
+            <div class="col-sm-1">
+              <a class="btn btn-outline-danger remove-settings-field-row pointer drop-alias"
+                title="Delete this alias"><i class="fa fa-trash"></i></a>
+            </div>
+          </div>
+        </form>
+      {% endfor %}
+    </div>
+    <a class="btn btn-secondary pt-2 btn-sm btn-block add-alias" data-target="#git-alias-list">
+      <i class="fa fa-plus"></i> Add new alias
+    </a>
+  </div>
+</div>
+
+<script type="text/javascript" nonce="{{ g.nonce }}" src="{{
+      url_for('static', filename='vendor/jquery/jquery.min.js') }}?version={{ g.version}}"></script>
+
+<script type="text/javascript" nonce="{{ g.nonce }}">
+
+function set_up_drop_btn() {
+  $('.drop-alias').click(function(e) {
+    _form = $(this).closest('.add-alias-form');
+    data = $(_form).serializeArray();
+    output = {}
+    for (d = 0; d < data.length; d++ ) {
+      output[data[d]["name"]] = data[d]["value"];
+    }
+
+    $.ajax({
+        url: _form.prop('action') ,
+        type: 'POST',
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(output),
+        dataType: 'json',
+        success: function(res) {
+          _form.hide()
+
+          var _html = '<div class="container pt-2">'
+            + '  <div class="alert alert-info border border-secondary bg-white alert-dismissible" role="alert">'
+            + '      <button type="button" class="close" data-dismiss="alert" aria-label="Close">'
+            + '      <span aria-hidden="true">×</span>'
+            + '      <span class="sr-only">Close</span>'
+            + '    </button>'
+            + '    <div class="text-info font-weight-bold">'
+            + '      <i class="fa fa-fw fa-info-circle"></i>Alias deleted'
+            + '    </div>'
+            + '  </div>'
+            + '</div>';
+          $('.bodycontent').prepend(_html)
+        },
+        error: function(res) {
+          console.log(res);
+          alert('Request failed: ' + res.responseJSON["error"]);
+        }
+    });
+    return false;
+  });
+};
+set_up_drop_btn();
+
+
+function set_up_create_btn() {
+  $('.create-alias').click(function(e) {
+    _form = $(this).closest('.add-alias-form');
+    data = $(_form).serializeArray();
+    output = {}
+    for (d = 0; d < data.length; d++ ) {
+      output[data[d]["name"]] = data[d]["value"];
+    }
+
+    $.ajax({
+        url: "{{ url_for('api_ns.api_new_git_alias',
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace) }}",
+        type: 'POST',
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(output),
+        dataType: 'json',
+        success: function(res) {
+          _form.find(".create-alias").hide()
+          _form.find("input").prop("readonly", true);
+
+          var _html = '<div class="container pt-2">'
+            + '  <div class="alert alert-info border border-secondary bg-white alert-dismissible" role="alert">'
+            + '      <button type="button" class="close" data-dismiss="alert" aria-label="Close">'
+            + '      <span aria-hidden="true">×</span>'
+            + '      <span class="sr-only">Close</span>'
+            + '    </button>'
+            + '    <div class="text-info font-weight-bold">'
+            + '      <i class="fa fa-fw fa-info-circle"></i>Alias created'
+            + '    </div>'
+            + '  </div>'
+            + '</div>';
+          $('.bodycontent').prepend(_html)
+
+        },
+        error: function(res) {
+          console.log(res);
+          alert('Request failed: ' + res.responseJSON["error"]);
+        }
+    });
+    return false;
+  });
+};
+
+$('.add-alias').click(function(e) {
+  let target = $(this).attr("data-target");
+  let row = $(target + ".settings-field-rows .blank-field").clone();
+  row.removeClass("hidden");
+  row.removeClass("blank-field");
+  $(target + ".settings-field-rows").append(row);
+  set_up_drop_btn();
+  set_up_create_btn();
+});
+
+</script>

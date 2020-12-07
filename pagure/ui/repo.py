@@ -1292,6 +1292,8 @@ def view_settings(repo, username=None, namespace=None):
     )
     tags = pagure.lib.query.get_tags_of_project(flask.g.session, repo)
 
+    branch_aliases = pagure.lib.git.get_branch_aliases(repo)
+
     form = pagure.forms.ConfirmationForm()
     tag_form = pagure.forms.AddIssueTagForm()
 
@@ -1357,6 +1359,7 @@ def view_settings(repo, username=None, namespace=None):
         plugins=plugins,
         branchname=branchname,
         pagure_admin=pagure.utils.is_admin(),
+        branch_aliases=branch_aliases,
     )
 
 

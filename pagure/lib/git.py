@@ -2670,6 +2670,61 @@ def git_set_ref_head(project, branch):
     repo_obj.set_head(reference.name)
 
 
+def get_branch_aliases(project):
+    """ Iterates through the references of the provided git repo to extract all
+    of its aliases.
+    """
+    repo_path = pagure.utils.get_repo_path(project)
+    repo_obj = PagureRepo(repo_path)
+
+    output = {}
+    for ref in repo_obj.listall_reference_objects():
+        if "refs/heads/" in str(ref.target):
+            output[ref.name] = ref.target
+    return output
+
+
+def set_branch_alias(project, source, dest):
+    """ Create a reference in the provided git repo from the source reference
+    to the dest one.
+    """
+    repo_path = pagure.utils.get_repo_path(project)
+    repo_obj = PagureRepo(repo_path)
+
+    # Check that the source reference exists
+    repo_obj.lookup_reference("refs/heads/{}".format(dest))
+
+    try:
+        repo_obj.create_reference(
+            "refs/heads/{}".format(source), "refs/heads/{}".format(dest),
+        )
+    except ValueError as err:
+        _log.debug(
+            "Failed to create alias from %s to %s -- %s", source, dest, err
+        )
+        raise pagure.exceptions.PagureException(
+            "Could not create alias from {0} to {1}. "
+            "Reference already existing?".format(source, dest)
+        )
+
+
+def drop_branch_aliases(project, source, dest):
+    """ Delete a reference in the provided git repo from the source reference
+    to the dest one.
+    """
+    repo_path = pagure.utils.get_repo_path(project)
+    repo_obj = PagureRepo(repo_path)
+
+    ref = repo_obj.lookup_reference("refs/heads/{}".format(dest))
+    output = False
+    if ref.target == "refs/heads/{}".format(source):
+        ref_file = os.path.join(repo_obj.path, ref.name)
+        if os.path.exists(ref_file):
+            os.unlink(ref_file)
+            output = True
+    return output
+
+
 def delete_project_repos(project):
     """ Deletes the actual git repositories on disk or repoSpanner
 
