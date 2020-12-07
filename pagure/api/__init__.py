@@ -161,7 +161,13 @@ def get_authorized_api_project(session, repo, user=None, namespace=None):
 
 
 def get_request_data():
-    return flask.request.form or flask.request.get_json() or {}
+    # Check if it's JSON or form data
+    if flask.request.headers.get("Content-Type") == "application/json":
+        # Set force to True to ignore the mimetype. Set silent so that None is
+        # returned if it's invalid JSON.
+        return flask.request.get_json(force=True, silent=True) or {}
+    else:
+        return flask.request.form or flask.request.get_json() or {}
 
 
 def api_login_required(acls=None, optional=False):

@@ -1627,15 +1627,8 @@ def api_modify_project(repo, namespace=None):
         )
 
     valid_keys = ["main_admin", "retain_access"]
-    # Check if it's JSON or form data
-    if flask.request.headers.get("Content-Type") == "application/json":
-        # Set force to True to ignore the mimetype. Set silent so that None is
-        # returned if it's invalid JSON.
-        args = flask.request.get_json(force=True, silent=True) or {}
-        retain_access = args.get("retain_access", False)
-    else:
-        args = get_request_data()
-        retain_access = args.get("retain_access", "").lower() in ["true", "1"]
+    args = get_request_data()
+    retain_access = args.get("retain_access", "").lower() in ["true", "1"]
 
     if not args:
         raise pagure.exceptions.APIError(400, error_code=APIERROR.EINVALIDREQ)
@@ -1847,14 +1840,7 @@ def api_generate_acls(repo, username=None, namespace=None):
     project = _get_repo(repo, username, namespace)
     _check_token(project, project_token=False)
 
-    # Check if it's JSON or form data
-    if flask.request.headers.get("Content-Type") == "application/json":
-        # Set force to True to ignore the mimetype. Set silent so that None is
-        # returned if it's invalid JSON.
-        json = flask.request.get_json(force=True, silent=True) or {}
-        wait = json.get("wait", False)
-    else:
-        wait = pagure.utils.is_true(get_request_data().get("wait"))
+    wait = pagure.utils.is_true(get_request_data().get("wait"))
 
     try:
         task = pagure.lib.git.generate_gitolite_acls(project=project)
@@ -1926,13 +1912,7 @@ def api_new_branch(repo, username=None, namespace=None):
     project = _get_repo(repo, username, namespace)
     _check_token(project, project_token=False)
 
-    # Check if it's JSON or form data
-    if flask.request.headers.get("Content-Type") == "application/json":
-        # Set force to True to ignore the mimetype. Set silent so that None is
-        # returned if it's invalid JSON.
-        args = flask.request.get_json(force=True, silent=True) or {}
-    else:
-        args = get_request_data()
+    args = get_request_data()
 
     branch = args.get("branch")
     from_branch = args.get("from_branch")
