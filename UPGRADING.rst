@@ -1,6 +1,17 @@
 Upgrading Pagure
 ================
 
+From 5.11 to 5.12
+-----------------
+
+The 5.12 release does not contain any database schema changes.
+
+New configuration key added (in 5.12):
+
+* NOGITHOOKS (must not be touched)
+* ALLOW_USER_REGISTRATION
+* GIT_DEFAULT_BRANCH
+
 
 From 5.10 to 5.11
 -----------------
