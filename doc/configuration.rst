@@ -2198,22 +2198,6 @@ notifications on commits made on all projects in a pagure instance.
 Defaults to: ``False``.
 
 
-
-NOGITHOOKS
-~~~~~~~~~~
-
-This configuration key should not be touched. It is used in the test suite as a
-way to prevent all the git hooks from running (which includes checking if the
-user is allowed to push). Using this mechanism we are able to check some
-behavior in the test suite that in a deployed pagure instance are happening in
-a different process.
-
-**Do not change this option in production**
-
-Defaults to: ``None``.
-
-
-
 NOGITHOOKS
 ~~~~~~~~~~
 
