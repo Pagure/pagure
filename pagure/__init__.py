@@ -12,4 +12,4 @@ from __future__ import unicode_literals, absolute_import
 
 
 __api_version__ = "0.30"
-__version__ = "5.11.3"
+__version__ = "5.12"

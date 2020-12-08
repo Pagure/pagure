@@ -3,6 +3,64 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
+5.12.0 (2021-01-06)
+-------------------
+
+/!\ the PR flag API is now creating Commit flag on the commit at the top of the
+pull-request.
+
+
+- Display real line numbers on pull request's diff view (Julen Landa Alustiza)
+- Show the assignee's avatar on the board
+- Allow setting a status as closing even if the project has no close_status
+- Include the assignee in the list of people notified on a ticket/PR
+- Add orphaning reason on the dist-git theme (Michal Konečný)
+- Adjust the way we generate humanized dates so we provide the humanized date
+  as well as the actual date when hovering over (Julen Landa Alustiza)
+- When a file a detected as a binary file, return the raw file
+- Allow using the modifyacl API endpoint to remove groups from a project
+- Add a note that repo_from* argument are mandatory in some situations when
+  opening a Pull-Request from the API
+- Increase the list of running pagure instances in the documentation (Neal Gompa)
+- Remove fenced code block when checking mention (Michael Scherer)
+- Add support for using cchardet to detect files' encoding
+- Show the default branch in the project overview page
+- Send appropriate SMTP status codes and error messages in the milter. (Björn
+  Persson)
+- Report an error if a message ID isn't recognized by the milter. (Björn Persson)
+- Add support for disabling user registration (Neal Gompa)
+- Add a way to make the stats view on more than one year (if you know how to)
+- Encode the data passed onto the mail hook so it is of bytes type
+- Reverse out of order instructions for new repos (Jerry James)
+- Split the list of branches into two lists active/inactive in dist-git
+- Rework the "My PR" page so it does not pull so many info at once
+- Include the date of the last mirroring process in the logs
+- Forward the username when updating the pull-request
+- Add pagination to group API (Michal Konečný)
+- When returning the commits flags in the API, returned them by update date
+- Change the PR flag API endpoints to use commit flags
+- Only show the subscribers list on demand
+- Improve the message showns when a new mirrored project is created
+- When editing the issue's description sent the html of it to the SSE server
+- Add an update-acls action to pagure-admin
+- Add support for AAA system sending SSH keys encoded in base64
+- Allow deleting the master branch when it is not the default branch
+- Allow people with a fork to have a working drop-down for opening new PRs
+- Fix handling "false" when editing project's options via the API (Bernhard M.
+  Wiedemann)
+- Ensure a fork project has the same default branch as its parent
+- Allow to specify a default branch for all projects hosted on an instance
+- Add support for pagure-messages
+- Add a notification for when a group is removed from a project
+- When checking if messages were sent via a rebase, do not run the git hooks
+- Make the API endpoint to update project's options accept JSON
+- Add a full_url to the JSON representation of our main objects
+- Ensure the author in git commit notifications follow the expected format
+- Add support for git branch aliases
+- Update the vagrant development environment
+- Allow updating the target branch when editing a PR
+
+
 5.11.3 (2020-08-11)
 -------------------
 
