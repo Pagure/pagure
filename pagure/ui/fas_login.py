@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014-2017 - Copyright Red Hat Inc
+ (c) 2014-2020 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -11,6 +11,7 @@
 from __future__ import unicode_literals, absolute_import
 
 import logging
+from base64 import b64decode
 
 import flask
 from flask import Markup
@@ -62,12 +63,20 @@ def set_user(return_url):
 
     try:
         try:
+
+            ssh_key = flask.g.fas_user.get("ssh_key")
+            if ssh_key is not None:
+                try:
+                    ssh_key = b64decode(ssh_key).decode("ascii")
+                except (TypeError, ValueError):
+                    pass
+
             pagure.lib.query.set_up_user(
                 session=flask.g.session,
                 username=flask.g.fas_user.username,
                 fullname=flask.g.fas_user.fullname,
                 default_email=flask.g.fas_user.email,
-                ssh_key=flask.g.fas_user.get("ssh_key"),
+                ssh_key=ssh_key,
                 keydir=pagure_config.get("GITOLITE_KEYDIR", None),
             )
         except pagure.exceptions.PagureException as err:
