@@ -42,7 +42,7 @@
         <h5 class="font-weight-bold mb-0">Pull Requests {{username}} can act on</h5>
         {% endif %}
         <span class="ml-auto btn btn-outline-secondary border-0 o-100 disabled font-weight-bold">
-          <span id="opened_pr_count"></span> PRs
+          {{ requests_length }} PRs
         </span>
     </div>
 
@@ -64,7 +64,4 @@
 {{ super() }}
 <script type="text/javascript" nonce="{{ g.nonce }}" src="{{
   url_for('static', filename='tags.js') }}?version={{ g.version}}"></script>
-<script type="text/javascript" nonce="{{ g.nonce }}">
-  $('#opened_pr_count').text($('.request-row').length);
-</script>
 {% endblock %}

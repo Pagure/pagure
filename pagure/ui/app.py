@@ -959,6 +959,7 @@ def view_user_requests(username):
         username=username,
         user=user,
         requests=requests,
+        requests_length=requests_length,
         select="requests",
         pr_type=pr_type,
         pr_status=pr_status,
