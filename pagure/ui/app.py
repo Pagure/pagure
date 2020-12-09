@@ -962,6 +962,7 @@ def view_user_requests(username):
         select="requests",
         pr_type=pr_type,
         pr_status=pr_status,
+        page=page,
         total_pages=total_pages,
         repos_length=userprofile_common["repos_length"],
         forks_length=userprofile_common["forks_length"],

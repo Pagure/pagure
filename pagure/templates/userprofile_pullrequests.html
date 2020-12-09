@@ -2,6 +2,7 @@
 
 {% block title %}Pull Requests for {{ username }}{% endblock %}
 
+{% from "_render_repo.html" import pagination_link %}
 {% from "_render_pullrequests.html" import render_pullrequest_row %}
 
 {% block userprofile_content %}
