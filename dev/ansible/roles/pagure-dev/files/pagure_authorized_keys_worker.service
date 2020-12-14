@@ -4,7 +4,7 @@ After=redis.target
 Documentation=https://pagure.io/pagure
 
 [Service]
-ExecStart=celery worker -A pagure.lib.tasks --loglevel=info -c 1 -Q authorized_keys_queue
+ExecStart=celery -A pagure.lib.tasks worker --loglevel=info -c 1 -Q authorized_keys_queue
 Environment="PAGURE_CONFIG=/etc/pagure/pagure.cfg"
 Type=simple
 Restart=on-failure

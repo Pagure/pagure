@@ -5,7 +5,7 @@ Documentation=https://pagure.io/pagure
 
 [Service]
 Environment="PAGURE_CONFIG=/etc/pagure/pagure.cfg"
-ExecStart=celery worker -A pagure.lib.tasks --loglevel=info
+ExecStart=celery -A pagure.lib.tasks worker --loglevel=info
 Type=simple
 User=git
 Group=git
