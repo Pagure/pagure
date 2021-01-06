@@ -42,6 +42,7 @@ class TestStyle(unittest.TestCase):
             "-m",
             "flake8",
             "--ignore=E712,W503,E203,E902",
+            "--max-line-length=80",
             REPO_PATH,
         ]
 
