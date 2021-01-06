@@ -550,10 +550,11 @@ def request_pull_edit(repo, requestid, username=None, namespace=None):
             403, description="You are not allowed to edit this pull-request"
         )
 
-    form = pagure.forms.RequestPullForm()
+    form = pagure.forms.RequestPullEditForm(branches=flask.g.branches)
     if form.validate_on_submit():
         request.title = form.title.data.strip()
         request.initial_comment = form.initial_comment.data.strip()
+        request.branch = form.branch_to.data.strip()
         if flask.g.fas_user.username == request.user.username:
             request.allow_rebase = form.allow_rebase.data
         flask.g.session.add(request)
@@ -594,6 +595,7 @@ def request_pull_edit(repo, requestid, username=None, namespace=None):
     elif flask.request.method == "GET":
         form.title.data = request.title
         form.initial_comment.data = request.initial_comment
+        form.branch_to.data = request.branch
 
     return flask.render_template(
         "pull_request_title.html",

@@ -330,6 +330,28 @@ class RequestPullForm(PagureForm):
     )
 
 
+class RequestPullEditForm(RequestPullForm):
+    """ Form to edit a pull request. """
+
+    branch_to = wtforms.SelectField(
+        "Target branch",
+        [wtforms.validators.Required()],
+        choices=[],
+        coerce=convert_value,
+    )
+
+    def __init__(self, *args, **kwargs):
+        """Calls the default constructor with the normal argument but
+        uses the list of collection provided to fill the choices of the
+        drop-down list.
+        """
+        super(RequestPullEditForm, self).__init__(*args, **kwargs)
+        if "branches" in kwargs:
+            self.branch_to.choices = [
+                (branch, branch) for branch in kwargs["branches"]
+            ]
+
+
 class RemoteRequestPullForm(RequestPullForm):
     """ Form to create a remote pull request. """
 

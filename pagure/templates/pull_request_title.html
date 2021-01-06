@@ -51,6 +51,9 @@
               <div id="preview" class="p-1">
               </div>
             </fieldset>
+            {{ render_bootstrap_field(
+              form.branch_to,
+              field_description="branch in which the pull-request should be merged") }}
             <div class="form-control">
               <label for="allow_rebase">Allow rebasing</label>
               <label class="c-input c-checkbox">

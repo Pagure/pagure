@@ -72,6 +72,7 @@ class PagureFlaskPrEdittests(tests.Modeltests):
         super(PagureFlaskPrEdittests, self).setUp()
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
+
         # Create foo's fork of pingou's test project
         item = pagure.lib.model.Project(
             user_id=2,  # foo
@@ -99,6 +100,12 @@ class PagureFlaskPrEdittests(tests.Modeltests):
             user="foo",
             allow_rebase=True,
         )
+
+        # Create a "main" branch in addition to the default "master" one
+        repo_obj = pygit2.Repository(
+            os.path.join(self.path, "repos", "test.git")
+        )
+        repo_obj.branches.local.create("main", repo_obj.head.peel())
 
     def tearDown(self):
         try:
@@ -168,6 +175,7 @@ class PagureFlaskPrEdittests(tests.Modeltests):
             data = {
                 "title": "New title",
                 "initial_comment": "New initial comment",
+                "branch_to": "master",
                 "allow_rebase": False,
             }
             output = self.app.post(
@@ -223,6 +231,7 @@ class PagureFlaskPrEdittests(tests.Modeltests):
                 "title": "New title",
                 "initial_comment": "New initial comment",
                 "allow_rebase": False,
+                "branch_to": "master",
                 "csrf_token": self.get_csrf(),
             }
             with testing.mock_sends(
@@ -492,6 +501,7 @@ class PagureFlaskPrEdittests(tests.Modeltests):
                 "title": "New title",
                 "initial_comment": "New initial comment",
                 "allow_rebase": False,
+                "branch_to": "master",
                 "csrf_token": self.get_csrf(),
             }
             output = self.app.post(
@@ -516,5 +526,73 @@ class PagureFlaskPrEdittests(tests.Modeltests):
             # DB model has been changed
             self.assertEqual("New title", request.title)
             self.assertEqual("New initial comment", request.initial_comment)
+            # But allow_rebase remains unchanged
+            self.assertEqual(True, request.allow_rebase)
+
+    def test_pr_edit_pull_request_invalid_branch_to(self):
+        user = tests.FakeUser(username="pingou")
+        with tests.user_set(self.app.application, user):
+            data = {
+                "title": "New title",
+                "initial_comment": "New initial comment",
+                "allow_rebase": False,
+                "branch_to": "invalid",
+                "csrf_token": self.get_csrf(),
+            }
+            output = self.app.post(
+                "/test/pull-request/1/edit", data=data, follow_redirects=True
+            )
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            # Edit failed - we're back on the same page
+            self.assertIn(
+                "<title>Edit PR#1: PR from the feature branch - test - Pagure"
+                "</title>",
+                output_text,
+            )
+            self.assertIn("Not a valid choice", output_text)
+            request = pagure.lib.query.search_pull_requests(
+                self.session, project_id=1, requestid=1
+            )
+            # DB model has not been changed
+            self.assertEqual("PR from the feature branch", request.title)
+            self.assertEqual(None, request.initial_comment)
+            self.assertEqual("master", request.branch)
+            # But allow_rebase remains unchanged
+            self.assertEqual(True, request.allow_rebase)
+
+    def test_pr_edit_pull_request_valid_branch_to(self):
+        user = tests.FakeUser(username="pingou")
+        with tests.user_set(self.app.application, user):
+            data = {
+                "title": "New title",
+                "initial_comment": "New initial comment",
+                "allow_rebase": False,
+                "branch_to": "main",
+                "csrf_token": self.get_csrf(),
+            }
+            output = self.app.post(
+                "/test/pull-request/1/edit", data=data, follow_redirects=True
+            )
+            self.assertEqual(output.status_code, 200)
+            output_text = output.get_data(as_text=True)
+            # After successful edit, we end on pull_request view with new data
+            self.assertIn(
+                "<title>PR#1: New title - test\n - Pagure</title>", output_text
+            )
+            self.assertIn(
+                '<span class="font-weight-bold">\n'
+                "                  New title\n"
+                "            </span>",
+                output_text,
+            )
+            self.assertIn("<p>New initial comment</p>", output_text)
+            request = pagure.lib.query.search_pull_requests(
+                self.session, project_id=1, requestid=1
+            )
+            # DB model has been changed
+            self.assertEqual("New title", request.title)
+            self.assertEqual("New initial comment", request.initial_comment)
+            self.assertEqual("main", request.branch)
             # But allow_rebase remains unchanged
             self.assertEqual(True, request.allow_rebase)
