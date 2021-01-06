@@ -266,7 +266,7 @@ class PagurePrivateRepotest(tests.Modeltests):
     def set_up_git_repo(
         self, new_project=None, branch_from="feature", mtype="FF"
     ):
-        """ Set up the git repo and create the corresponding PullRequest
+        """Set up the git repo and create the corresponding PullRequest
         object.
         """
 

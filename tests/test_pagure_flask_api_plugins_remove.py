@@ -28,8 +28,7 @@ import tests  # noqa: E402
 
 
 class PagureFlaskApiPluginRemovetests(tests.Modeltests):
-    """ Tests for the flask API of pagure for removing a plugin
-    """
+    """Tests for the flask API of pagure for removing a plugin"""
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def setUp(self):
@@ -77,7 +76,7 @@ class PagureFlaskApiPluginRemovetests(tests.Modeltests):
         tests.create_tokens_acl(self.session, token_id="project-specific-foo")
 
     def test_remove_plugin_own_project_plugin_not_installed(self):
-        """ Test removing a plugin from a project for which you're the
+        """Test removing a plugin from a project for which you're the
         main maintainer and the plugin is not installed.
         """
 
@@ -98,7 +97,7 @@ class PagureFlaskApiPluginRemovetests(tests.Modeltests):
         )
 
     def test_remove_plugin_own_project(self):
-        """ Test removing a plugin from a project for which you're the
+        """Test removing a plugin from a project for which you're the
         main maintainer.
         """
 
@@ -121,7 +120,7 @@ class PagureFlaskApiPluginRemovetests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_remove_plugin_someone_else_project_project_less_token(self):
-        """ Test removing a plugin from a project with which you have
+        """Test removing a plugin from a project with which you have
         nothing to do.
         """
 
@@ -144,7 +143,7 @@ class PagureFlaskApiPluginRemovetests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_remove_plugin_project_specific_token(self):
-        """ Test removing a plugin from a project with a regular
+        """Test removing a plugin from a project with a regular
         project-specific token.
         """
 
@@ -167,7 +166,7 @@ class PagureFlaskApiPluginRemovetests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_remove_plugin_invalid_project_specific_token(self):
-        """ Test removing a plugin from a project with a regular
+        """Test removing a plugin from a project with a regular
         project-specific token but for another project.
         """
 

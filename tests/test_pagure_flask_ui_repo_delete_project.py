@@ -73,7 +73,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
         MagicMock(return_value=False),
     )
     def test_delete_repo_when_turned_off(self):
-        """ Test the delete_repo endpoint for a fork when only deleting main
+        """Test the delete_repo endpoint for a fork when only deleting main
         project is forbidden.
         """
 
@@ -91,7 +91,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
         MagicMock(return_value=False),
     )
     def test_delete_button_present(self):
-        """ Test that the delete button is present when deletions are
+        """Test that the delete button is present when deletions are
         allowed.
         """
 
@@ -116,7 +116,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
         MagicMock(return_value=False),
     )
     def test_delete_button_absent(self):
-        """ Test that the delete button is absent when deletions are not
+        """Test that the delete button is absent when deletions are not
         allowed.
         """
 
@@ -142,7 +142,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
         MagicMock(return_value=False),
     )
     def test_delete_fork_when_project_off_refreshing(self):
-        """ Test the delete_repo endpoint for a fork when only deleting main
+        """Test the delete_repo endpoint for a fork when only deleting main
         project is forbidden but the fork is being refreshed in the backend
         """
         project = pagure.lib.query.get_authorized_project(
@@ -182,7 +182,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
         MagicMock(return_value=False),
     )
     def test_delete_fork_when_project_off(self):
-        """ Test the delete_repo endpoint for a fork when only deleting main
+        """Test the delete_repo endpoint for a fork when only deleting main
         project is forbidden.
         """
         project = pagure.lib.query.get_authorized_project(
@@ -296,7 +296,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
         MagicMock(return_value=False),
     )
     def test_delete_fork_when_fork_and_project_off(self):
-        """ Test the delete_repo endpoint for a fork when deleting fork and
+        """Test the delete_repo endpoint for a fork when deleting fork and
         project is forbidden.
         """
 
@@ -318,7 +318,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
         MagicMock(return_value=False),
     )
     def test_delete_fork_button_absent(self):
-        """ Test that the delete button is absent when deletions are not
+        """Test that the delete button is absent when deletions are not
         allowed.
         """
 
@@ -346,7 +346,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
         MagicMock(return_value=False),
     )
     def test_delete_fork_button_fork_del_allowed(self):
-        """ Test that the delete button is present when deletions of projects
+        """Test that the delete button is present when deletions of projects
         is not allowed but deletions of forks is.
         """
 
@@ -383,7 +383,7 @@ class PagureFlaskDeleteRepotests(tests.Modeltests):
         MagicMock(return_value=False),
     )
     def test_delete_fork_button_fork_del_allowed_read_only(self):
-        """ Test that the delete button is absent when deletions of projects
+        """Test that the delete button is absent when deletions of projects
         is not allowed but deletions of forks is but fork is still being
         processed.
         """

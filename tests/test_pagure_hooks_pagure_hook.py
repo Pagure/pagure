@@ -95,7 +95,7 @@ class PagureHooksPagureHooktests(tests.SimplePagureTest):
 
     @mock.patch("pagure.hooks.pagure_hook.fixes_relation")
     def test_generate_revision_change_log_short_url(self, fixes_relation):
-        """ Test generate_revision_change_log when the comment contains
+        """Test generate_revision_change_log when the comment contains
         a short link to the same project.
         """
 
@@ -127,7 +127,7 @@ class PagureHooksPagureHooktests(tests.SimplePagureTest):
 
     @mock.patch("pagure.hooks.pagure_hook.fixes_relation")
     def test_generate_revision_change_log_full_url(self, fixes_relation):
-        """ Test generate_revision_change_log when the comment contains
+        """Test generate_revision_change_log when the comment contains
         a full link to another project.
         """
 
@@ -163,7 +163,7 @@ class PagureHooksPagureHooktests(tests.SimplePagureTest):
 
     @mock.patch("pagure.hooks.pagure_hook.fixes_relation")
     def test_generate_revision_change_log_full_url_fork(self, fixes_relation):
-        """ Test generate_revision_change_log when the comment contains
+        """Test generate_revision_change_log when the comment contains
         a full link to a fork.
         """
 

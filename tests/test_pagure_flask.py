@@ -57,16 +57,15 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
         self.assertTrue(output.endswith("repos_test2.git_master"))
 
     def test_is_repo_committer_logged_out(self):
-        """ Test is_repo_committer in pagure when there is no logged in user.
-        """
+        """Test is_repo_committer in pagure when there is no logged in user."""
         repo = pagure.lib.query._get_project(self.session, "test")
         with self.app.application.app_context():
             output = pagure.utils.is_repo_committer(repo)
         self.assertFalse(output)
 
     def test_is_repo_committer_logged_in(self):
-        """ Test is_repo_committer in pagure with the appropriate user logged
-        in. """
+        """Test is_repo_committer in pagure with the appropriate user logged
+        in."""
         repo = pagure.lib.query._get_project(self.session, "test")
 
         g = munch.Munch()
@@ -78,8 +77,8 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
             self.assertTrue(output)
 
     def test_is_repo_committer_logged_in_in_group(self):
-        """ Test is_repo_committer in pagure with the appropriate user logged
-        in. """
+        """Test is_repo_committer in pagure with the appropriate user logged
+        in."""
         # Create group
         msg = pagure.lib.query.add_group(
             self.session,
@@ -127,8 +126,8 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
             self.assertTrue(output)
 
     def test_is_repo_committer_logged_in_in_ticket_group(self):
-        """ Test is_repo_committer in pagure with the appropriate user logged
-        in. """
+        """Test is_repo_committer in pagure with the appropriate user logged
+        in."""
         # Create group
         msg = pagure.lib.query.add_group(
             self.session,
@@ -180,8 +179,7 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
             self.assertFalse(output)
 
     def test_is_repo_committer_logged_in_wrong_user(self):
-        """ Test is_repo_committer in pagure with the wrong user logged in.
-        """
+        """Test is_repo_committer in pagure with the wrong user logged in."""
         repo = pagure.lib.query._get_project(self.session, "test")
 
         g = munch.Munch()
@@ -197,7 +195,7 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
 
     @mock.patch.dict("pagure.config.config", {"EXTERNAL_COMMITTER": config})
     def test_is_repo_committer_external_committer_generic_no_member(self):
-        """ Test is_repo_committer in pagure with EXTERNAL_COMMITTER
+        """Test is_repo_committer in pagure with EXTERNAL_COMMITTER
         configured to give access to all the provenpackager, but the user
         is not one.
         """
@@ -214,7 +212,7 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
 
     @mock.patch.dict("pagure.config.config", {"EXTERNAL_COMMITTER": config})
     def test_is_repo_committer_external_committer_generic_member(self):
-        """ Test is_repo_committer in pagure with EXTERNAL_COMMITTER
+        """Test is_repo_committer in pagure with EXTERNAL_COMMITTER
         configured to give access to all the provenpackager, and the user
         is one
         """
@@ -233,7 +231,7 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
 
     @mock.patch.dict("pagure.config.config", {"EXTERNAL_COMMITTER": config})
     def test_is_repo_committer_external_committer_excluding_one(self):
-        """ Test is_repo_committer in pagure with EXTERNAL_COMMITTER
+        """Test is_repo_committer in pagure with EXTERNAL_COMMITTER
         configured to give access to all the provenpackager but for this
         one repo
         """
@@ -250,7 +248,7 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
 
     @mock.patch.dict("pagure.config.config", {"EXTERNAL_COMMITTER": config})
     def test_is_repo_committer_owner_external_committer_excluding_one(self):
-        """ Test is_repo_committer in pagure with EXTERNAL_COMMITTER
+        """Test is_repo_committer in pagure with EXTERNAL_COMMITTER
         configured to give access to all the provenpackager but for this
         one repo, but the user is still a direct committer
         """
@@ -269,7 +267,7 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
 
     @mock.patch.dict("pagure.config.config", {"EXTERNAL_COMMITTER": config})
     def test_is_repo_committer_external_committer_restricted_not_member(self):
-        """ Test is_repo_committer in pagure with EXTERNAL_COMMITTER
+        """Test is_repo_committer in pagure with EXTERNAL_COMMITTER
         configured to give access the provenpackager just for one repo
         """
         repo = pagure.lib.query._get_project(self.session, "test")
@@ -284,7 +282,7 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
 
     @mock.patch.dict("pagure.config.config", {"EXTERNAL_COMMITTER": config})
     def test_is_repo_committer_external_committer_restricting_to_one(self):
-        """ Test is_repo_committer in pagure with EXTERNAL_COMMITTER
+        """Test is_repo_committer in pagure with EXTERNAL_COMMITTER
         configured to give access the provenpackager just for one repo
         """
         repo = pagure.lib.query._get_project(self.session, "test")
@@ -302,7 +300,7 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
     def test_is_repo_committer_external_committer_restricting_another_one(
         self,
     ):
-        """ Test is_repo_committer in pagure with EXTERNAL_COMMITTER
+        """Test is_repo_committer in pagure with EXTERNAL_COMMITTER
         configured to give access the provenpackager just for one repo not
         this one
         """
@@ -318,16 +316,15 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
             self.assertFalse(output)
 
     def test_is_repo_collaborator_logged_out(self):
-        """ Test is_repo_committer in pagure when there is no logged in user.
-        """
+        """Test is_repo_committer in pagure when there is no logged in user."""
         repo = pagure.lib.query._get_project(self.session, "test")
         with self.app.application.app_context():
             output = pagure.utils.is_repo_collaborator(repo, "master")
         self.assertFalse(output)
 
     def test_is_repo_collaborator_logged_in(self):
-        """ Test is_repo_collaborator in pagure with the appropriate user logged
-        in. """
+        """Test is_repo_collaborator in pagure with the appropriate user logged
+        in."""
         repo = pagure.lib.query._get_project(self.session, "test")
 
         g = munch.Munch()
@@ -341,8 +338,8 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
             self.assertTrue(output)
 
     def test_is_repo_collaborator_invalid_username(self):
-        """ Test is_repo_collaborator in pagure with the appropriate user logged
-        in. """
+        """Test is_repo_collaborator in pagure with the appropriate user logged
+        in."""
         repo = pagure.lib.query._get_project(self.session, "test")
 
         g = munch.Munch()
@@ -357,8 +354,8 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
 
     @mock.patch.dict("pagure.config.config", {"PAGURE_ADMIN_USERS": ["foo"]})
     def test_is_repo_collaborator_admin_user(self):
-        """ Test is_repo_collaborator in pagure with the appropriate user logged
-        in. """
+        """Test is_repo_collaborator in pagure with the appropriate user logged
+        in."""
         repo = pagure.lib.query._get_project(self.session, "test")
 
         g = munch.Munch()
@@ -372,8 +369,8 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
             self.assertTrue(output)
 
     def test_is_repo_collaborator_not_in_project(self):
-        """ Test is_repo_collaborator in pagure with the appropriate user logged
-        in. """
+        """Test is_repo_collaborator in pagure with the appropriate user logged
+        in."""
         repo = pagure.lib.query._get_project(self.session, "test")
 
         g = munch.Munch()
@@ -387,8 +384,8 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
             self.assertFalse(output)
 
     def test_is_repo_collaborator_in_project(self):
-        """ Test is_repo_collaborator in pagure with the appropriate user logged
-        in. """
+        """Test is_repo_collaborator in pagure with the appropriate user logged
+        in."""
         repo = pagure.lib.query._get_project(self.session, "test")
 
         # Add user foo to project test
@@ -431,8 +428,8 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
             self.assertTrue(output)
 
     def test_is_repo_collaborator_logged_in_in_group(self):
-        """ Test is_repo_committer in pagure with the appropriate user logged
-        in. """
+        """Test is_repo_committer in pagure with the appropriate user logged
+        in."""
         # Create group
         msg = pagure.lib.query.add_group(
             self.session,

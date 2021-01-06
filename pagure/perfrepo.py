@@ -145,7 +145,7 @@ class FakeDiffer(six.Iterator):  # pragma: no cover
 class PerfRepo(
     six.with_metaclass(PerfRepoMeta, six.Iterator)
 ):  # pragma: no cover
-    """ An utility class allowing to go around pygit2's inability to be
+    """An utility class allowing to go around pygit2's inability to be
     stable.
 
     """

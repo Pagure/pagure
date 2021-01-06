@@ -29,7 +29,7 @@ import tests  # pylint: disable=wrong-import-position
 
 
 class PagureLibNotifyEmailtests(tests.Modeltests):
-    """ Some tests for the various email construction functions. In
+    """Some tests for the various email construction functions. In
     their own class so they can have some shared fixtures.
     """
 

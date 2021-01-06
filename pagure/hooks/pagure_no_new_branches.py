@@ -25,7 +25,7 @@ from pagure.lib.model import BASE, Project
 
 
 class PagureNoNewBranchesTable(BASE):
-    """ Stores information about the pagure hook deployed on a project.
+    """Stores information about the pagure hook deployed on a project.
 
     Table -- hook_pagure_no_new_branches
     """
@@ -60,7 +60,7 @@ class PagureNoNewBranchRunner(BaseRunner):
 
     @staticmethod
     def pre_receive(session, username, project, repotype, repodir, changes):
-        """ Run the pre-receive tasks of a hook.
+        """Run the pre-receive tasks of a hook.
 
         For args, see BaseRunner.runhook.
         """

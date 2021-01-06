@@ -53,8 +53,8 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         )
 
     def test_get_watch_list_simple(self):
-        """ Test get_watch_list when the creator of the ticket is the
-        creator of the project """
+        """Test get_watch_list when the creator of the ticket is the
+        creator of the project"""
         # Create a project ns/test
         item = pagure.lib.model.Project(
             user_id=1,  # pingou
@@ -85,8 +85,8 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         )
 
     def test_get_watch_list_different_creator(self):
-        """ Test get_watch_list when the creator of the ticket is not the
-        creator of the project """
+        """Test get_watch_list when the creator of the ticket is not the
+        creator of the project"""
         # Create a project ns/test
         item = pagure.lib.model.Project(
             user_id=1,  # pingou
@@ -118,8 +118,8 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         )
 
     def test_get_watch_list_project_w_contributor(self):
-        """ Test get_watch_list when the project has more than one
-        contributor """
+        """Test get_watch_list when the project has more than one
+        contributor"""
         # Create a project ns/test3
         item = pagure.lib.model.Project(
             user_id=1,  # pingou
@@ -174,8 +174,7 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         )
 
     def test_get_watch_list_user_in_group(self):
-        """ Test get_watch_list when the project has groups of contributors
-        """
+        """Test get_watch_list when the project has groups of contributors"""
         # Create a project ns/test3
         item = pagure.lib.model.Project(
             user_id=1,  # pingou
@@ -258,8 +257,8 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         )
 
     def test_get_watch_list_project_w_contributor_out(self):
-        """ Test get_watch_list when the project has one contributor not
-        watching the project """
+        """Test get_watch_list when the project has one contributor not
+        watching the project"""
         # Create a project ns/test3
         item = pagure.lib.model.Project(
             user_id=1,  # pingou
@@ -321,8 +320,8 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         )
 
     def test_get_watch_list_project_w_contributor_out_pr(self):
-        """ Test get_watch_list when the project has one contributor not
-        watching the pull-request """
+        """Test get_watch_list when the project has one contributor not
+        watching the pull-request"""
         # Create a project ns/test3
         item = pagure.lib.model.Project(
             user_id=1,  # pingou
@@ -384,8 +383,8 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         )
 
     def test_get_watch_list_project_w_contributor_watching_project(self):
-        """ Test get_watch_list when the project has one contributor watching
-        the project """
+        """Test get_watch_list when the project has one contributor watching
+        the project"""
         # Create a project ns/test3
         item = pagure.lib.model.Project(
             user_id=1,  # pingou
@@ -442,8 +441,8 @@ class PagureLibGetWatchListtests(tests.Modeltests):
 
     @mock.patch.dict("pagure.config.config", {"PAGURE_ADMIN_USERS": "foo"})
     def test_get_watch_list_project_w_private_issue(self):
-        """ Test get_watch_list when the project has one contributor watching
-        the project and the issue is private """
+        """Test get_watch_list when the project has one contributor watching
+        the project and the issue is private"""
         # Create a project ns/test3
         item = pagure.lib.model.Project(
             user_id=1,  # pingou

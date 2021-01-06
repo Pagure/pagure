@@ -129,8 +129,7 @@ class PagureFlaskRepoMilestonestests(tests.Modeltests):
         MagicMock(return_value=False),
     )
     def test_issue_page_milestone_actives(self):
-        """ Test viewing tickets on a project having milestones, all active.
-        """
+        """Test viewing tickets on a project having milestones, all active."""
 
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
 
@@ -160,7 +159,7 @@ class PagureFlaskRepoMilestonestests(tests.Modeltests):
         MagicMock(return_value=False),
     )
     def test_issue_page_milestone_not_allactives(self):
-        """ Test viewing tickets on a project having milestones, not all
+        """Test viewing tickets on a project having milestones, not all
         being active.
         """
 

@@ -18,7 +18,7 @@ from pagure.config import config as pagure_config
 
 
 def pagure_task(function):
-    """ Simple decorator that is responsible for:
+    """Simple decorator that is responsible for:
     * Adjusting the status of the task when it starts
     * Creating and cleaning up a SQLAlchemy session
     """

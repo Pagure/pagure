@@ -32,7 +32,7 @@ class PagureLibDropIssuetests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def setUp(self, p_send_email, p_ugt):
-        """ Create a couple of tickets and add tag to the project so we can
+        """Create a couple of tickets and add tag to the project so we can
         play with them later.
         """
         super(PagureLibDropIssuetests, self).setUp()
@@ -95,7 +95,7 @@ class PagureLibDropIssuetests(tests.Modeltests):
     @patch("pagure.lib.notify.send_email")
     @patch("pagure.lib.git._maybe_wait", tests.definitely_wait)
     def test_drop_issue(self, p_send_email, p_ugt):
-        """ Test the drop_issue of pagure.lib.query.
+        """Test the drop_issue of pagure.lib.query.
 
         We had an issue where we could not delete issue that had been tagged
         with this test, we create two issues, tag one of them and delete
@@ -135,7 +135,7 @@ class PagureLibDropIssuetests(tests.Modeltests):
     @patch("pagure.lib.notify.send_email")
     @patch("pagure.lib.git._maybe_wait", tests.definitely_wait)
     def test_drop_issue_two_issues_one_tag(self, p_send_email, p_ugt):
-        """ Test the drop_issue of pagure.lib.query.
+        """Test the drop_issue of pagure.lib.query.
 
         We had an issue where we could not delete issue that had been tagged
         with this test, we create two issues, tag them both and delete one

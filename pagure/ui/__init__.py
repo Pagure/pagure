@@ -49,7 +49,5 @@ def unauthorized(error):  # pragma: no cover
 @UI_NS.route("/api/")
 @UI_NS.route("/api")
 def api_redirect():
-    """ Redirects the user to the API documentation page.
-
-    """
+    """Redirects the user to the API documentation page."""
     return flask.redirect(flask.url_for("api_ns.api"))

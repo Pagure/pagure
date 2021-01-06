@@ -124,8 +124,8 @@ class PagureFlaskUiArchivesTest(tests.Modeltests):
         self.assertEqual(os.listdir(self.archive_path), [])
 
     def test_project_no_tag(self):
-        """ Test getting the archive of a non-empty project but without
-        tags. """
+        """Test getting the archive of a non-empty project but without
+        tags."""
         with mock.patch.dict(
             "pagure.config.config",
             {"ARCHIVE_FOLDER": os.path.join(self.path, "archives")},
@@ -310,8 +310,8 @@ class PagureFlaskUiArchivesTest(tests.Modeltests):
         )
 
     def test_project_w_commit_tar_gz_twice(self):
-        """ Test getting the archive from a commit twice, so we hit the
-        disk cache. """
+        """Test getting the archive from a commit twice, so we hit the
+        disk cache."""
         repopath = os.path.join(self.path, "repos", "test.git")
         repo = pygit2.Repository(repopath)
         commit = repo.head.target.hex

@@ -117,7 +117,7 @@ def call_web_hooks(project, topic, msg, urls):
 def webhook_notification(
     self, session, topic, msg, namespace=None, name=None, user=None
 ):
-    """ Send webhook notifications about an event on that project.
+    """Send webhook notifications about an event on that project.
 
     :arg session: SQLAlchemy session object
     :type session: sqlalchemy.orm.session.Session
@@ -167,7 +167,7 @@ def log_commit_send_notifications(
     namespace=None,
     username=None,
 ):
-    """ Send webhook notifications about an event on that project.
+    """Send webhook notifications about an event on that project.
 
     :arg session: SQLAlchemy session object
     :type session: sqlalchemy.orm.session.Session
@@ -272,7 +272,7 @@ def load_json_commits_to_db(
     namespace=None,
     username=None,
 ):
-    """ Loads into the database the specified commits that have been pushed
+    """Loads into the database the specified commits that have been pushed
     to either the tickets or the pull-request repository.
 
     """
@@ -409,9 +409,7 @@ def trigger_ci_build(
     pr_uid=None,
 ):
 
-    """ Triggers a new run of the CI system on the specified pull-request.
-
-    """
+    """Triggers a new run of the CI system on the specified pull-request."""
     pagure.lib.plugins.get_plugin("Pagure CI")
 
     if not pr_uid and not project_name:

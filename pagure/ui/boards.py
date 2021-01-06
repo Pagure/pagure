@@ -45,8 +45,7 @@ _log = logging.getLogger(__name__)
 @UI_NS.route("/fork/<username>/<namespace>/<repo>/boards/<board_name>")
 @has_issue_tracker
 def view_board(repo, board_name, username=None, namespace=None):
-    """ View a board
-    """
+    """View a board"""
 
     project = flask.g.repo
 
@@ -113,8 +112,7 @@ def view_board(repo, board_name, username=None, namespace=None):
 @is_admin_sess_timedout
 @is_repo_admin
 def view_board_settings(repo, board_name, username=None, namespace=None):
-    """ Presents and update the settings of the board
-    """
+    """Presents and update the settings of the board"""
     project = flask.g.repo
 
     if not project.boards:

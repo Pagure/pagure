@@ -129,8 +129,8 @@ class PagureRebasetests(PagureRebaseBasetests):
             )
 
     def test_merge_status_needsrebase(self):
-        """ Test that the PR is marked as needing a rebase if the project
-        disables non-fast-forward merges. """
+        """Test that the PR is marked as needing a rebase if the project
+        disables non-fast-forward merges."""
         self.project = pagure.lib.query.get_authorized_project(
             self.session, "test"
         )
@@ -189,8 +189,8 @@ class PagureRebasetests(PagureRebaseBasetests):
             )
 
     def test_rebase_api_ui_logged_in_different_user(self):
-        """ Test the rebase PR API endpoint when logged in from the UI and
-        its outcome. """
+        """Test the rebase PR API endpoint when logged in from the UI and
+        its outcome."""
         # Add 'bar' to the project 'test' so 'bar' can rebase the PR
         item = pagure.lib.model.User(
             user="bar",
@@ -254,8 +254,8 @@ class PagureRebasetests(PagureRebaseBasetests):
             self.assertEqual(repo.requests[0].comments[0].user.username, "bar")
 
     def test_rebase_api_ui_logged_in_pull_request_author(self):
-        """ Test the rebase PR API endpoint when logged in from the UI and
-        its outcome. """
+        """Test the rebase PR API endpoint when logged in from the UI and
+        its outcome."""
 
         user = tests.FakeUser(username="foo")
         with tests.user_set(self.app.application, user):
@@ -302,8 +302,8 @@ class PagureRebasetests(PagureRebaseBasetests):
             self.assertEqual(repo.requests[0].comments[0].user.username, "foo")
 
     def test_rebase_api_api_logged_in(self):
-        """ Test the rebase PR API endpoint when using an API token and
-        its outcome. """
+        """Test the rebase PR API endpoint when using an API token and
+        its outcome."""
 
         tests.create_tokens(self.session)
         tests.create_tokens_acl(self.session)
@@ -338,8 +338,8 @@ class PagureRebasetests(PagureRebaseBasetests):
             )
 
     def test_rebase_api_conflicts(self):
-        """ Test the rebase PR API endpoint when logged in from the UI and
-        its outcome. """
+        """Test the rebase PR API endpoint when logged in from the UI and
+        its outcome."""
         tests.add_content_to_git(
             os.path.join(self.path, "repos", "test.git"),
             branch="master",
@@ -441,11 +441,14 @@ class PagureRebaseNoHooktests(PagureRebaseBasetests):
     config_values = {"authbackend": "pagure", "nogithooks": True}
 
     @patch.dict(
-        "pagure.config.config", {"FEDORA_MESSAGING_NOTIFICATIONS": True,}
+        "pagure.config.config",
+        {
+            "FEDORA_MESSAGING_NOTIFICATIONS": True,
+        },
     )
     def test_rebase_api_ui_logged_in(self):
-        """ Test the rebase PR API endpoint when logged in from the UI and
-        its outcome. """
+        """Test the rebase PR API endpoint when logged in from the UI and
+        its outcome."""
 
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
@@ -894,8 +897,8 @@ class PagureRebaseNotAllowedtests(tests.Modeltests):
         self.request = self.project.requests[0]
 
     def test_rebase_api_ui_logged_in(self):
-        """ Test the rebase PR API endpoint when logged in from the UI and
-        its outcome. """
+        """Test the rebase PR API endpoint when logged in from the UI and
+        its outcome."""
 
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
@@ -969,8 +972,8 @@ class PagureRebaseNotAllowedtests(tests.Modeltests):
             )
 
     def test_rebase_api_ui_logged_in_different_user(self):
-        """ Test the rebase PR API endpoint when logged in from the UI and
-        its outcome. """
+        """Test the rebase PR API endpoint when logged in from the UI and
+        its outcome."""
         # Add 'bar' to the project 'test' so 'bar' can rebase the PR
         item = pagure.lib.model.User(
             user="bar",
@@ -1057,8 +1060,8 @@ class PagureRebaseNotAllowedtests(tests.Modeltests):
             self.assertEqual(repo.requests[0].comments[0].user.username, "bar")
 
     def test_rebase_api_api_logged_in(self):
-        """ Test the rebase PR API endpoint when using an API token and
-        its outcome. """
+        """Test the rebase PR API endpoint when using an API token and
+        its outcome."""
 
         tests.create_tokens(self.session)
         tests.create_tokens_acl(self.session)
@@ -1117,8 +1120,8 @@ class PagureRebaseNotAllowedtests(tests.Modeltests):
             )
 
     def test_rebase_api_ui_logged_in_pull_request_author(self):
-        """ Test the rebase PR API endpoint when logged in from the UI and
-        its outcome. """
+        """Test the rebase PR API endpoint when logged in from the UI and
+        its outcome."""
 
         user = tests.FakeUser(username="foo")
         with tests.user_set(self.app.application, user):

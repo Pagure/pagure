@@ -36,8 +36,7 @@ _log = logging.getLogger(__name__)
 @UI_NS.route("/user/new/", methods=["GET", "POST"])
 @UI_NS.route("/user/new", methods=["GET", "POST"])
 def new_user():
-    """ Create a new user.
-    """
+    """Create a new user."""
     if not pagure.config.config.get("ALLOW_USER_REGISTRATION", True):
         flask.flash("User registration is disabled.", "error")
         return flask.redirect(flask.url_for("auth_login"))
@@ -90,8 +89,7 @@ def new_user():
 
 @UI_NS.route("/dologin", methods=["POST"])
 def do_login():
-    """ Log in the user.
-    """
+    """Log in the user."""
     logout()
 
     form = forms.LoginForm()
@@ -146,8 +144,7 @@ def do_login():
 @UI_NS.route("/confirm/<token>/")
 @UI_NS.route("/confirm/<token>")
 def confirm_user(token):
-    """ Confirm a user account.
-    """
+    """Confirm a user account."""
     user_obj = pagure.lib.query.search_user(flask.g.session, token=token)
     if not user_obj:
         flask.flash("No user associated with this token.", "error")
@@ -173,7 +170,7 @@ def confirm_user(token):
 @UI_NS.route("/password/lost/", methods=["GET", "POST"])
 @UI_NS.route("/password/lost", methods=["GET", "POST"])
 def lost_password():
-    """ Method to allow a user to change his/her password assuming the email
+    """Method to allow a user to change his/her password assuming the email
     is not compromised.
     """
     form = forms.LostPasswordForm()
@@ -224,8 +221,7 @@ def lost_password():
 @UI_NS.route("/password/reset/<token>/", methods=["GET", "POST"])
 @UI_NS.route("/password/reset/<token>", methods=["GET", "POST"])
 def reset_password(token):
-    """ Method to allow a user to reset his/her password.
-    """
+    """Method to allow a user to reset his/her password."""
     form = forms.ResetPasswordForm()
 
     user_obj = pagure.lib.query.search_user(flask.g.session, token=token)
@@ -270,8 +266,7 @@ def reset_password(token):
 @UI_NS.route("/password/change", methods=["GET", "POST"])
 @login_required
 def change_password():
-    """ Method to change the password for local auth users.
-    """
+    """Method to change the password for local auth users."""
 
     form = forms.ChangePasswordForm()
     user_obj = pagure.lib.query.search_user(
@@ -324,7 +319,7 @@ def change_password():
 
 
 def send_confirmation_email(user):
-    """ Sends the confirmation email asking the user to confirm its email
+    """Sends the confirmation email asking the user to confirm its email
     address.
     """
     if not user.emails:
@@ -335,7 +330,8 @@ def send_confirmation_email(user):
 
     # A link with a secret token to confirm the registration
     confirmation_url = urljoin(
-        instance_url, flask.url_for("ui_ns.confirm_user", token=user.token),
+        instance_url,
+        flask.url_for("ui_ns.confirm_user", token=user.token),
     )
 
     message = """Dear %(username)s,
@@ -367,7 +363,7 @@ Your pagure admin.
 
 
 def send_lostpassword_email(user):
-    """ Sends the email with the information on how to reset his/her password
+    """Sends the email with the information on how to reset his/her password
     to the user.
     """
     if not user.emails:
@@ -408,15 +404,13 @@ Your pagure admin.
 
 
 def logout():
-    """ Log the user out by expiring the user's session.
-    """
+    """Log the user out by expiring the user's session."""
     flask.g.fas_session_id = None
     flask.g.fas_user = None
 
 
 def _check_session_cookie():
-    """ Set the user into flask.g if the user is logged in.
-    """
+    """Set the user into flask.g if the user is logged in."""
     if not hasattr(flask.g, "session") or not flask.g.session:
         flask.g.session = pagure.lib.model_base.create_session(
             flask.current_app.config["DB_URL"]

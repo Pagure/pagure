@@ -35,8 +35,7 @@ import tests  # noqa
 
 
 class PagureAdminAdminTokenEmptytests(tests.Modeltests):
-    """ Tests for pagure-admin admin-token when there is nothing in the DB
-    """
+    """Tests for pagure-admin admin-token when there is nothing in the DB"""
 
     populate_db = False
 
@@ -46,7 +45,7 @@ class PagureAdminAdminTokenEmptytests(tests.Modeltests):
         pagure.cli.admin.session = self.session
 
     def test_do_create_admin_token_no_user(self):
-        """ Test the do_create_admin_token function of pagure-admin without
+        """Test the do_create_admin_token function of pagure-admin without
         user.
         """
         exp_date = datetime.date.today() + datetime.timedelta(days=300)
@@ -61,7 +60,7 @@ class PagureAdminAdminTokenEmptytests(tests.Modeltests):
         self.assertEqual(cm.exception.args[0], 'No user "pingou" found')
 
     def test_do_list_admin_token_empty(self):
-        """ Test the do_list_admin_token function of pagure-admin when there
+        """Test the do_list_admin_token function of pagure-admin when there
         are not tokens in the db.
         """
         list_args = munch.Munch(
@@ -178,8 +177,7 @@ class PagureAdminAdminRefreshGitolitetests(tests.Modeltests):
     @patch("pagure.cli.admin._ask_confirmation")
     @patch("pagure.lib.git_auth.get_git_auth_helper")
     def test_do_refresh_gitolite_one_project_and_all(self, get_helper, conf):
-        """ Test the do_generate_acl function for a certain project and all.
-        """
+        """Test the do_generate_acl function for a certain project and all."""
         conf.return_value = True
         helper = MagicMock()
         get_helper.return_value = helper
@@ -321,8 +319,8 @@ class PagureAdminAdminTokentests(tests.Modeltests):
         self.assertEqual(output, "No admin tokens found\n")
 
     def test_do_list_admin_token_non_admin_acls(self):
-        """ Test the do_list_admin_token function of pagure-admin for a token
-        without any admin ACL. """
+        """Test the do_list_admin_token function of pagure-admin for a token
+        without any admin ACL."""
         exp_date = datetime.date.today() + datetime.timedelta(days=300)
         pagure.lib.query.add_token_to_user(
             self.session,
@@ -415,8 +413,8 @@ class PagureAdminAdminTokentests(tests.Modeltests):
         )
 
     def test_do_info_admin_token_non_admin_acl(self):
-        """ Test the do_info_admin_token function of pagure-admin for a
-        token not having any admin ACL. """
+        """Test the do_info_admin_token function of pagure-admin for a
+        token not having any admin ACL."""
         exp_date = datetime.date.today() + datetime.timedelta(days=300)
         pagure.lib.query.add_token_to_user(
             self.session,
@@ -533,8 +531,8 @@ class PagureAdminAdminTokentests(tests.Modeltests):
     @patch("pagure.cli.admin._get_input")
     @patch("pagure.cli.admin._ask_confirmation")
     def test_do_expire_admin_token_non_admin_acls(self, conf, rinp):
-        """ Test the do_expire_admin_token function of pagure-admin for a token
-        without any admin ACL. """
+        """Test the do_expire_admin_token function of pagure-admin for a token
+        without any admin ACL."""
 
         # Create an admin token to use
         conf.return_value = True
@@ -590,8 +588,8 @@ class PagureAdminAdminTokentests(tests.Modeltests):
     @patch("pagure.cli.admin._get_input")
     @patch("pagure.cli.admin._ask_confirmation")
     def test_do_update_admin_token_invalid_date(self, conf, rinp):
-        """ Test the do_update_admin_token function of pagure-admin with
-        an invalid date. """
+        """Test the do_update_admin_token function of pagure-admin with
+        an invalid date."""
 
         # Create an admin token to use
         conf.return_value = True
@@ -637,8 +635,8 @@ class PagureAdminAdminTokentests(tests.Modeltests):
     @patch("pagure.cli.admin._get_input")
     @patch("pagure.cli.admin._ask_confirmation")
     def test_do_update_admin_token_invalid_date2(self, conf, rinp):
-        """ Test the do_update_admin_token function of pagure-admin with
-        an invalid date. """
+        """Test the do_update_admin_token function of pagure-admin with
+        an invalid date."""
 
         # Create an admin token to use
         conf.return_value = True
@@ -686,8 +684,8 @@ class PagureAdminAdminTokentests(tests.Modeltests):
     @patch("pagure.cli.admin._get_input")
     @patch("pagure.cli.admin._ask_confirmation")
     def test_do_update_admin_token_invalid_date3(self, conf, rinp):
-        """ Test the do_update_admin_token function of pagure-admin with
-        an invalid date (is today). """
+        """Test the do_update_admin_token function of pagure-admin with
+        an invalid date (is today)."""
 
         # Create an admin token to use
         conf.return_value = True
@@ -826,8 +824,8 @@ class PagureAdminAdminTokentests(tests.Modeltests):
     @patch("pagure.cli.admin._get_input")
     @patch("pagure.cli.admin._ask_confirmation")
     def test_do_update_admin_token_non_admin_acls(self, conf, rinp):
-        """ Test the do_update_admin_token function of pagure-admin for a token
-        without any admin ACL. """
+        """Test the do_update_admin_token function of pagure-admin for a token
+        without any admin ACL."""
 
         # Create an admin token to use
         conf.return_value = True
@@ -949,7 +947,7 @@ class PagureAdminGetWatchTests(tests.Modeltests):
         pagure.cli.admin.session = self.session
 
     def test_get_watch_get_project_unknown_project(self):
-        """ Test the get-watch function of pagure-admin with an unknown
+        """Test the get-watch function of pagure-admin with an unknown
         project.
         """
         args = munch.Munch({"project": "foobar", "user": "pingou"})
@@ -960,7 +958,7 @@ class PagureAdminGetWatchTests(tests.Modeltests):
         )
 
     def test_get_watch_get_project_invalid_project(self):
-        """ Test the get-watch function of pagure-admin with an invalid
+        """Test the get-watch function of pagure-admin with an invalid
         project.
         """
         args = munch.Munch({"project": "fo/o/bar", "user": "pingou"})
@@ -972,16 +970,14 @@ class PagureAdminGetWatchTests(tests.Modeltests):
         )
 
     def test_get_watch_get_project_invalid_user(self):
-        """ Test the get-watch function of pagure-admin on a invalid user.
-        """
+        """Test the get-watch function of pagure-admin on a invalid user."""
         args = munch.Munch({"project": "test", "user": "beebop"})
         with self.assertRaises(pagure.exceptions.PagureException) as cm:
             pagure.cli.admin.do_get_watch_status(args)
         self.assertEqual(cm.exception.args[0], 'No user "beebop" found')
 
     def test_get_watch_get_project(self):
-        """ Test the get-watch function of pagure-admin on a regular project.
-        """
+        """Test the get-watch function of pagure-admin on a regular project."""
         args = munch.Munch({"project": "test", "user": "pingou"})
         with tests.capture_output() as output:
             pagure.cli.admin.do_get_watch_status(args)
@@ -993,8 +989,7 @@ class PagureAdminGetWatchTests(tests.Modeltests):
         )
 
     def test_get_watch_get_project_not_watching(self):
-        """ Test the get-watch function of pagure-admin on a regular project.
-        """
+        """Test the get-watch function of pagure-admin on a regular project."""
 
         args = munch.Munch({"project": "test", "user": "foo"})
         with tests.capture_output() as output:
@@ -1005,8 +1000,7 @@ class PagureAdminGetWatchTests(tests.Modeltests):
         )
 
     def test_get_watch_get_project_namespaced(self):
-        """ Test the get-watch function of pagure-admin on a namespaced project.
-        """
+        """Test the get-watch function of pagure-admin on a namespaced project."""
 
         args = munch.Munch({"project": "somenamespace/test", "user": "pingou"})
         with tests.capture_output() as output:
@@ -1019,8 +1013,7 @@ class PagureAdminGetWatchTests(tests.Modeltests):
         )
 
     def test_get_watch_get_project_namespaced_not_watching(self):
-        """ Test the get-watch function of pagure-admin on a namespaced project.
-        """
+        """Test the get-watch function of pagure-admin on a namespaced project."""
 
         args = munch.Munch({"project": "somenamespace/test", "user": "foo"})
         with tests.capture_output() as output:
@@ -1090,7 +1083,7 @@ class PagureAdminUpdateWatchTests(tests.Modeltests):
         pagure.cli.admin.session = self.session
 
     def test_get_watch_update_project_unknown_project(self):
-        """ Test the update-watch function of pagure-admin on an unknown
+        """Test the update-watch function of pagure-admin on an unknown
         project.
         """
         args = munch.Munch(
@@ -1103,7 +1096,7 @@ class PagureAdminUpdateWatchTests(tests.Modeltests):
         )
 
     def test_get_watch_update_project_invalid_project(self):
-        """ Test the update-watch function of pagure-admin on an invalid
+        """Test the update-watch function of pagure-admin on an invalid
         project.
         """
         args = munch.Munch(
@@ -1117,15 +1110,14 @@ class PagureAdminUpdateWatchTests(tests.Modeltests):
         )
 
     def test_get_watch_update_project_invalid_user(self):
-        """ Test the update-watch function of pagure-admin on an invalid user.
-        """
+        """Test the update-watch function of pagure-admin on an invalid user."""
         args = munch.Munch({"project": "test", "user": "foob", "status": "1"})
         with self.assertRaises(pagure.exceptions.PagureException) as cm:
             pagure.cli.admin.do_update_watch_status(args)
         self.assertEqual(cm.exception.args[0], 'No user "foob" found')
 
     def test_get_watch_update_project_invalid_status(self):
-        """ Test the update-watch function of pagure-admin with an invalid
+        """Test the update-watch function of pagure-admin with an invalid
         status.
         """
         args = munch.Munch(
@@ -1139,7 +1131,7 @@ class PagureAdminUpdateWatchTests(tests.Modeltests):
         )
 
     def test_get_watch_update_project_no_effect(self):
-        """ Test the update-watch function of pagure-admin with a regular
+        """Test the update-watch function of pagure-admin with a regular
         project - nothing changed.
         """
 
@@ -1222,7 +1214,7 @@ class PagureAdminReadOnlyTests(tests.Modeltests):
         pagure.cli.admin.session = self.session
 
     def test_read_only_unknown_project(self):
-        """ Test the read-only function of pagure-admin on an unknown
+        """Test the read-only function of pagure-admin on an unknown
         project.
         """
 
@@ -1234,7 +1226,7 @@ class PagureAdminReadOnlyTests(tests.Modeltests):
         )
 
     def test_read_only_invalid_project(self):
-        """ Test the read-only function of pagure-admin on an invalid
+        """Test the read-only function of pagure-admin on an invalid
         project.
         """
 
@@ -1247,7 +1239,7 @@ class PagureAdminReadOnlyTests(tests.Modeltests):
         )
 
     def test_read_only(self):
-        """ Test the read-only function of pagure-admin to get status of
+        """Test the read-only function of pagure-admin to get status of
         a non-namespaced project.
         """
 
@@ -1261,7 +1253,7 @@ class PagureAdminReadOnlyTests(tests.Modeltests):
         )
 
     def test_read_only_namespace(self):
-        """ Test the read-only function of pagure-admin to get status of
+        """Test the read-only function of pagure-admin to get status of
         a namespaced project.
         """
 
@@ -1278,7 +1270,7 @@ class PagureAdminReadOnlyTests(tests.Modeltests):
         )
 
     def test_read_only_namespace_changed(self):
-        """ Test the read-only function of pagure-admin to set the status of
+        """Test the read-only function of pagure-admin to set the status of
         a namespaced project.
         """
 
@@ -1321,7 +1313,7 @@ class PagureAdminReadOnlyTests(tests.Modeltests):
         )
 
     def test_read_only_no_change(self):
-        """ Test the read-only function of pagure-admin to set the status of
+        """Test the read-only function of pagure-admin to set the status of
         a namespaced project.
         """
 
@@ -1387,7 +1379,7 @@ class PagureNewGroupTests(tests.Modeltests):
         self.assertEqual(len(groups), 0)
 
     def test_missing_display_name(self):
-        """ Test the new-group function of pagure-admin when the display name
+        """Test the new-group function of pagure-admin when the display name
         is missing from the args.
         """
 
@@ -1410,7 +1402,7 @@ class PagureNewGroupTests(tests.Modeltests):
         self.assertEqual(len(groups), 0)
 
     def test_missing_username(self):
-        """ Test the new-group function of pagure-admin when the username
+        """Test the new-group function of pagure-admin when the username
         is missing from the args.
         """
 
@@ -1435,7 +1427,7 @@ class PagureNewGroupTests(tests.Modeltests):
         self.assertEqual(len(groups), 0)
 
     def test_new_group(self):
-        """ Test the new-group function of pagure-admin when all arguments
+        """Test the new-group function of pagure-admin when all arguments
         are provided.
         """
 
@@ -1456,7 +1448,7 @@ class PagureNewGroupTests(tests.Modeltests):
     @patch.dict("pagure.config.config", {"ENABLE_GROUP_MNGT": False})
     @patch("pagure.cli.admin._ask_confirmation")
     def test_new_group_grp_mngt_off_no(self, conf):
-        """ Test the new-group function of pagure-admin when all arguments
+        """Test the new-group function of pagure-admin when all arguments
         are provided and ENABLE_GROUP_MNGT if off in the config and the user
         replies no to the question.
         """
@@ -1479,7 +1471,7 @@ class PagureNewGroupTests(tests.Modeltests):
     @patch.dict("pagure.config.config", {"ENABLE_GROUP_MNGT": False})
     @patch("pagure.cli.admin._ask_confirmation")
     def test_new_group_grp_mngt_off_yes(self, conf):
-        """ Test the new-group function of pagure-admin when all arguments
+        """Test the new-group function of pagure-admin when all arguments
         are provided and ENABLE_GROUP_MNGT if off in the config and the user
         replies yes to the question.
         """
@@ -1501,7 +1493,7 @@ class PagureNewGroupTests(tests.Modeltests):
 
     @patch.dict("pagure.config.config", {"BLACKLISTED_GROUPS": ["foob"]})
     def test_new_group_grp_mngt_off_yes(self):
-        """ Test the new-group function of pagure-admin when all arguments
+        """Test the new-group function of pagure-admin when all arguments
         are provided but the group is black listed.
         """
 
@@ -1557,7 +1549,7 @@ class PagureListGroupEmptyTests(tests.Modeltests):
 
     @patch("sys.stdout", new_callable=StringIO)
     def test_no_groups(self, mock_stdout):
-        """ Test the list-groups function of pagure-admin when there are no
+        """Test the list-groups function of pagure-admin when there are no
         groups in the database
         """
 
@@ -1616,7 +1608,7 @@ class PagureListGroupTests(tests.Modeltests):
 
     @patch("sys.stdout", new_callable=StringIO)
     def test_list_groups(self, mock_stdout):
-        """ Test the list-groups function of pagure-admin when there is one
+        """Test the list-groups function of pagure-admin when there is one
         group in the database
         """
 
@@ -1662,7 +1654,7 @@ class PagureBlockUserTests(tests.Modeltests):
         self.assertIsNone(user.refuse_sessions_before)
 
     def test_missing_date(self):
-        """ Test the block-user function of pagure-admin when the no date is
+        """Test the block-user function of pagure-admin when the no date is
         provided.
         """
 
@@ -1678,7 +1670,7 @@ class PagureBlockUserTests(tests.Modeltests):
         self.assertIsNone(user.refuse_sessions_before)
 
     def test_missing_username(self):
-        """ Test the block-user function of pagure-admin when the username
+        """Test the block-user function of pagure-admin when the username
         is missing from the args.
         """
 
@@ -1695,7 +1687,7 @@ class PagureBlockUserTests(tests.Modeltests):
         self.assertIsNone(user.refuse_sessions_before)
 
     def test_invalid_username(self):
-        """ Test the block-user function of pagure-admin when the username
+        """Test the block-user function of pagure-admin when the username
         provided does correspond to any user in the DB.
         """
 
@@ -1712,7 +1704,7 @@ class PagureBlockUserTests(tests.Modeltests):
         self.assertIsNone(user.refuse_sessions_before)
 
     def test_invalide_date(self):
-        """ Test the block-user function of pagure-admin when the provided
+        """Test the block-user function of pagure-admin when the provided
         date is incorrect.
         """
 
@@ -1733,7 +1725,7 @@ class PagureBlockUserTests(tests.Modeltests):
 
     @patch("pagure.cli.admin._ask_confirmation", MagicMock(return_value=True))
     def test_block_user(self):
-        """ Test the block-user function of pagure-admin when all arguments
+        """Test the block-user function of pagure-admin when all arguments
         are provided correctly.
         """
 
@@ -1747,7 +1739,7 @@ class PagureBlockUserTests(tests.Modeltests):
         self.assertIsNotNone(user.refuse_sessions_before)
 
     def test_list_blocked_user(self):
-        """ Test the block-user function of pagure-admin when all arguments
+        """Test the block-user function of pagure-admin when all arguments
         are provided correctly.
         """
 
@@ -1761,7 +1753,7 @@ class PagureBlockUserTests(tests.Modeltests):
 
     @patch("pagure.cli.admin._ask_confirmation", MagicMock(return_value=True))
     def test_list_blocked_user_with_data(self):
-        """ Test the block-user function of pagure-admin when all arguments
+        """Test the block-user function of pagure-admin when all arguments
         are provided correctly.
         """
         args = munch.Munch(
@@ -1783,7 +1775,7 @@ class PagureBlockUserTests(tests.Modeltests):
 
     @patch("pagure.cli.admin._ask_confirmation", MagicMock(return_value=True))
     def test_list_blocked_user_with_username_data(self):
-        """ Test the block-user function of pagure-admin when all arguments
+        """Test the block-user function of pagure-admin when all arguments
         are provided correctly.
         """
         args = munch.Munch(
@@ -1812,7 +1804,7 @@ class PagureBlockUserTests(tests.Modeltests):
 
     @patch("pagure.cli.admin._ask_confirmation", MagicMock(return_value=True))
     def test_list_blocked_user_with_date(self):
-        """ Test the block-user function of pagure-admin when all arguments
+        """Test the block-user function of pagure-admin when all arguments
         are provided correctly.
         """
         args = munch.Munch(
@@ -1827,7 +1819,7 @@ class PagureBlockUserTests(tests.Modeltests):
 
     @patch("pagure.cli.admin._ask_confirmation", MagicMock(return_value=True))
     def test_list_blocked_user_with_date_and_data(self):
-        """ Test the block-user function of pagure-admin when all arguments
+        """Test the block-user function of pagure-admin when all arguments
         are provided correctly.
         """
         args = munch.Munch(
@@ -1906,7 +1898,7 @@ class PagureAdminDeleteProjectTests(tests.Modeltests):
         pagure.cli.admin.session = self.session
 
     def test_delete_project_unknown_project(self):
-        """ Test the read-only function of pagure-admin on an unknown
+        """Test the read-only function of pagure-admin on an unknown
         project.
         """
 
@@ -1921,7 +1913,7 @@ class PagureAdminDeleteProjectTests(tests.Modeltests):
         )
 
     def test_delete_project_invalid_project(self):
-        """ Test the read-only function of pagure-admin on an invalid
+        """Test the read-only function of pagure-admin on an invalid
         project.
         """
 
@@ -1937,7 +1929,7 @@ class PagureAdminDeleteProjectTests(tests.Modeltests):
 
     @patch("pagure.cli.admin._ask_confirmation", MagicMock(return_value=True))
     def test_delete_project(self):
-        """ Test the read-only function of pagure-admin to get status of
+        """Test the read-only function of pagure-admin to get status of
         a non-namespaced project.
         """
 
@@ -1956,7 +1948,7 @@ class PagureAdminDeleteProjectTests(tests.Modeltests):
 
     @patch("pagure.cli.admin._ask_confirmation", MagicMock(return_value=True))
     def test_delete_project_namespace(self):
-        """ Test the read-only function of pagure-admin to get status of
+        """Test the read-only function of pagure-admin to get status of
         a namespaced project.
         """
 
@@ -1979,7 +1971,7 @@ class PagureAdminDeleteProjectTests(tests.Modeltests):
 
     @patch("pagure.cli.admin._ask_confirmation", MagicMock(return_value=True))
     def test_delete_project_namespace_changed(self):
-        """ Test the read-only function of pagure-admin to set the status of
+        """Test the read-only function of pagure-admin to set the status of
         a namespaced project.
         """
 
@@ -2027,7 +2019,7 @@ class PagureCreateBranchTests(tests.Modeltests):
         pagure.cli.admin.session = self.session
 
     def test_create_branch_unknown_project(self):
-        """ Test the read-only function of pagure-admin on an unknown
+        """Test the read-only function of pagure-admin on an unknown
         project.
         """
 
@@ -2049,7 +2041,7 @@ class PagureCreateBranchTests(tests.Modeltests):
         )
 
     def test_create_branch_invalid_project(self):
-        """ Test the read-only function of pagure-admin on an invalid
+        """Test the read-only function of pagure-admin on an invalid
         project.
         """
 
@@ -2071,7 +2063,7 @@ class PagureCreateBranchTests(tests.Modeltests):
         )
 
     def test_create_branch_commit_and_branch_from(self):
-        """ Test the read-only function of pagure-admin to get status of
+        """Test the read-only function of pagure-admin to get status of
         a non-namespaced project.
         """
 
@@ -2094,7 +2086,7 @@ class PagureCreateBranchTests(tests.Modeltests):
         )
 
     def test_create_branch_no_branch_from(self):
-        """ Test the read-only function of pagure-admin to get status of
+        """Test the read-only function of pagure-admin to get status of
         a non-namespaced project.
         """
 
@@ -2115,7 +2107,7 @@ class PagureCreateBranchTests(tests.Modeltests):
         )
 
     def test_create_branch_no_commit_from(self):
-        """ Test the read-only function of pagure-admin to get status of
+        """Test the read-only function of pagure-admin to get status of
         a non-namespaced project.
         """
 
@@ -2186,7 +2178,7 @@ class PagureSetDefaultBranchTests(tests.Modeltests):
         pagure.cli.admin.session = self.session
 
     def test_set_default_branch_unknown_project(self):
-        """ Test the set-default-branch function of pagure-admin on an unknown
+        """Test the set-default-branch function of pagure-admin on an unknown
         project.
         """
 
@@ -2201,7 +2193,7 @@ class PagureSetDefaultBranchTests(tests.Modeltests):
         )
 
     def test_set_default_branch_invalid_project(self):
-        """ Test the set-default-branch function of pagure-admin on an invalid
+        """Test the set-default-branch function of pagure-admin on an invalid
         project.
         """
 
@@ -2216,7 +2208,7 @@ class PagureSetDefaultBranchTests(tests.Modeltests):
         )
 
     def test_set_default_branch_unknown_branch(self):
-        """ Test the set-default-branch function of pagure-admin on an unknown
+        """Test the set-default-branch function of pagure-admin on an unknown
         branch.
         """
 
@@ -2228,8 +2220,7 @@ class PagureSetDefaultBranchTests(tests.Modeltests):
         )
 
     def test_set_default_branch_invalid_branch(self):
-        """ Test the set-default-branch function of pagure-admin on an invalid branch.
-        """
+        """Test the set-default-branch function of pagure-admin on an invalid branch."""
 
         args = munch.Munch(
             {"project": "test", "user": None, "branch": "~invalid~"}
@@ -2277,8 +2268,7 @@ class PagureAdminUpdateAclsTests(tests.Modeltests):
         pagure.cli.admin.session = self.session
 
     def test_update_acls(self):
-        """ Test the update-acls function of pagure-admin.
-        """
+        """Test the update-acls function of pagure-admin."""
         args = munch.Munch()
         with tests.capture_output() as output:
             pagure.cli.admin.do_update_acls(args)

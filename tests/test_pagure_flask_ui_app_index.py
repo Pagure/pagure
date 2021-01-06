@@ -57,8 +57,8 @@ class PagureFlaskAppIndextests(tests.Modeltests):
 
     def test_index_logged_in(self):
         """
-            Test the index endpoint when logged in.
-            It should redirect to the userdash.
+        Test the index endpoint when logged in.
+        It should redirect to the userdash.
         """
         tests.create_projects(self.session)
 

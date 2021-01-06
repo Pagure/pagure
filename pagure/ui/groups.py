@@ -259,8 +259,7 @@ def give_group(group):
 @UI_NS.route("/group/<group>/<user>/delete", methods=["POST"])
 @login_required
 def group_user_delete(user, group):
-    """ Delete an user from a certain group
-    """
+    """Delete an user from a certain group"""
     if not pagure_config.get("ENABLE_USER_MNGT", True):
         flask.abort(404)
 
@@ -307,8 +306,7 @@ def group_user_delete(user, group):
 @UI_NS.route("/group/<group>/delete", methods=["POST"])
 @login_required
 def group_delete(group):
-    """ Delete a certain group
-    """
+    """Delete a certain group"""
     if not pagure_config.get("ENABLE_USER_MNGT", True):
         flask.abort(404)
 
@@ -350,8 +348,7 @@ def group_delete(group):
 @UI_NS.route("/group/add", methods=["GET", "POST"])
 @login_required
 def add_group():
-    """ Endpoint to create groups
-    """
+    """Endpoint to create groups"""
     if not pagure_config.get("ENABLE_USER_MNGT", True):
         flask.abort(404)
 

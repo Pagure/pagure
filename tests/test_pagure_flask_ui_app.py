@@ -545,8 +545,7 @@ class PagureFlaskApptests(tests.Modeltests):
 
     @patch("pygit2.init_repository", wraps=pygit2.init_repository)
     def test_new_project_with_template(self, pygit2init):
-        """ Test the new_project endpoint for a new project with a template set.
-        """
+        """Test the new_project endpoint for a new project with a template set."""
         # Before
         projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 0)
@@ -848,7 +847,7 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertIn("SSH key removed", output_text)
 
     def patched_commit_exists(user, namespace, repo, githash):
-        """ Patched version of pagure.pfmarkdown._commit_exists to enforce
+        """Patched version of pagure.pfmarkdown._commit_exists to enforce
         returning true on some given hash without having us actually check
         the git repos.
         """
@@ -933,8 +932,7 @@ class PagureFlaskApptests(tests.Modeltests):
                 self.assertEqual(expected[idx], output.get_data(as_text=True))
 
     def test_markdown_preview(self):
-        """ Test the markdown_preview endpoint with a non-existing commit.
-        """
+        """Test the markdown_preview endpoint with a non-existing commit."""
 
         user = tests.FakeUser()
         user.username = "foo"
@@ -1511,7 +1509,7 @@ class PagureFlaskApptests(tests.Modeltests):
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_view_my_requests_pr_in_another_project(self):
         """Test the view_user_requests endpoint when the user opened a PR
-        in another project. """
+        in another project."""
         # Pingou creates the PR on test
         tests.create_projects(self.session)
         repo = pagure.lib.query._get_project(self.session, "test")
@@ -1570,7 +1568,7 @@ class PagureFlaskApptests(tests.Modeltests):
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_view_my_requests_against_another_project(self):
         """Test the view_user_requests endpoint when there is a PR opened
-        by me against a project I do not have rights on. """
+        by me against a project I do not have rights on."""
         # Create the PR
         tests.create_projects(self.session)
         repo = pagure.lib.query._get_project(self.session, "test")
@@ -1724,7 +1722,7 @@ class PagureFlaskApptests(tests.Modeltests):
 
     def test_view_my_issues_tickets_turned_off(self):
         """Test the view_user_issues endpoint when the user exists and
-        and ENABLE_TICKETS is False """
+        and ENABLE_TICKETS is False"""
 
         # Turn off the tickets instance wide
         pagure.config.config["ENABLE_TICKETS"] = False
@@ -1934,8 +1932,8 @@ class PagureFlaskApptests(tests.Modeltests):
     @patch.dict("pagure.config.config", {"PAGURE_AUTH": "fas"})
     @patch.dict("pagure.utils.pagure_config", {"PAGURE_AUTH": "fas"})
     def test_create_project_auth_FAS_no_FPCA(self):
-        """ Test creating a project when auth is FAS and the user did not
-        sign the FPCA. """
+        """Test creating a project when auth is FAS and the user did not
+        sign the FPCA."""
 
         user = tests.FakeUser(username="foo", cla_done=False)
         with tests.user_set(self.app.application, user):
@@ -2347,8 +2345,8 @@ class PagureFlaskAppNewProjecttests(tests.Modeltests):
 
     @patch.dict("pagure.config.config", {"ENABLE_UI_NEW_PROJECTS": False})
     def test_new_project_when_turned_off_in_the_ui(self):
-        """ Test the new_project endpoint when new project creation is
-        not allowed in the UI of this pagure instance. """
+        """Test the new_project endpoint when new project creation is
+        not allowed in the UI of this pagure instance."""
 
         user = tests.FakeUser(username="foo")
         with tests.user_set(self.app.application, user):
@@ -2362,8 +2360,8 @@ class PagureFlaskAppNewProjecttests(tests.Modeltests):
 
     @patch.dict("pagure.config.config", {"ENABLE_UI_NEW_PROJECTS": False})
     def test_new_project_button_when_turned_off_in_the_ui_no_project(self):
-        """ Test the index endpoint when new project creation is
-        not allowed in the UI of this pagure instance. """
+        """Test the index endpoint when new project creation is
+        not allowed in the UI of this pagure instance."""
 
         user = tests.FakeUser(username="foo")
         with tests.user_set(self.app.application, user):
@@ -2386,8 +2384,8 @@ class PagureFlaskAppNewProjecttests(tests.Modeltests):
 
     @patch.dict("pagure.config.config", {"ENABLE_UI_NEW_PROJECTS": False})
     def test_new_project_button_when_turned_off_in_the_ui_w_project(self):
-        """ Test the index endpoint when new project creation is
-        not allowed in the UI of this pagure instance. """
+        """Test the index endpoint when new project creation is
+        not allowed in the UI of this pagure instance."""
         tests.create_projects(self.session)
 
         user = tests.FakeUser(username="pingou")
@@ -2410,8 +2408,7 @@ class PagureFlaskAppNewProjecttests(tests.Modeltests):
             )
 
     def test_new_project_with_dot(self):
-        """ Test the new_project endpoint when new project contains a dot.
-        """
+        """Test the new_project endpoint when new project contains a dot."""
         # Before
         projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 0)
@@ -2441,8 +2438,7 @@ class PagureFlaskAppNewProjecttests(tests.Modeltests):
         self.assertEqual(len(projects), 1)
 
     def test_new_project_with_plus(self):
-        """ Test the new_project endpoint when new project contains a plus sign.
-        """
+        """Test the new_project endpoint when new project contains a plus sign."""
         # Before
         projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 0)
@@ -2477,8 +2473,7 @@ class PagureFlaskAppNewProjecttests(tests.Modeltests):
         self.assertEqual(repo.listall_branches(), [])
 
     def test_new_project_with_default_branch(self):
-        """ Test the new_project endpoint when new project contains a plus sign.
-        """
+        """Test the new_project endpoint when new project contains a plus sign."""
         # Before
         projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 0)
@@ -2519,8 +2514,7 @@ class PagureFlaskAppNewProjecttests(tests.Modeltests):
 
     @patch.dict("pagure.config.config", {"GIT_DEFAULT_BRANCH": "main"})
     def test_new_project_with_default_branch_instance_wide(self):
-        """ Test the new_project endpoint when new project contains a plus sign.
-        """
+        """Test the new_project endpoint when new project contains a plus sign."""
         # Before
         projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 0)
@@ -2560,8 +2554,7 @@ class PagureFlaskAppNewProjecttests(tests.Modeltests):
 
     @patch.dict("pagure.config.config", {"GIT_DEFAULT_BRANCH": "main"})
     def test_new_project_with_default_branch_instance_wide_overriden(self):
-        """ Test the new_project endpoint when new project contains a plus sign.
-        """
+        """Test the new_project endpoint when new project contains a plus sign."""
         # Before
         projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 0)
@@ -2601,8 +2594,8 @@ class PagureFlaskAppNewProjecttests(tests.Modeltests):
         self.assertEqual(repo.listall_branches(), ["rawhide"])
 
     def test_new_project_when_turned_off(self):
-        """ Test the new_project endpoint when new project creation is
-        not allowed in the pagure instance. """
+        """Test the new_project endpoint when new project creation is
+        not allowed in the pagure instance."""
 
         # turn the project creation off
         pagure.config.config["ENABLE_NEW_PROJECTS"] = False
@@ -2701,7 +2694,7 @@ class PagureFlaskAppNewProjecttests(tests.Modeltests):
             self.assertIn("Invalid input.&nbsp;", output_text)
 
     def test_new_project_mirrored_invalid_sshurl(self):
-        """ Test the new_project with a mirrored repo but an invalid
+        """Test the new_project with a mirrored repo but an invalid
         SSH-like url.
         """
 
@@ -2762,7 +2755,7 @@ class PagureFlaskAppNewProjecttests(tests.Modeltests):
 
     @patch.dict("pagure.config.config", {"DISABLE_MIRROR_IN": True})
     def test_new_project_mirrored_mirror_disabled(self):
-        """ Test the new_project with a mirrored repo when that feature is
+        """Test the new_project with a mirrored repo when that feature is
         disabled.
         """
 
@@ -2878,8 +2871,7 @@ class PagureFlaskAppNewProjecttests(tests.Modeltests):
 
     @patch.dict("pagure.config.config", {"USER_NAMESPACE": True})
     def test_new_project_user_namespaced(self):
-        """ Test the new_project with a user namespaced enabled.
-        """
+        """Test the new_project with a user namespaced enabled."""
 
         user = tests.FakeUser(username="foo")
         with tests.user_set(self.app.application, user):
@@ -2938,8 +2930,7 @@ class PagureFlaskAppNewProjecttests(tests.Modeltests):
 
     @patch.dict("pagure.config.config", {"USER_NAMESPACE": True})
     def test_new_project_user_namespaced_invalid_user(self):
-        """ Test the new_project with a user namespaced enabled.
-        """
+        """Test the new_project with a user namespaced enabled."""
         tests.create_user(self.session, "docs", "evil docs", ["docs@bar.com"])
 
         user = tests.FakeUser(username="docs")

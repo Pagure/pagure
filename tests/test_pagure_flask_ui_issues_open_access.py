@@ -64,8 +64,8 @@ class PagureFlaskIssuesOpenAccesstests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_new_issue_with_metadata(self):
-        """ Test the new_issue endpoint when the user has access to the
-        project. """
+        """Test the new_issue endpoint when the user has access to the
+        project."""
 
         user = tests.FakeUser()
         user.username = "foo"
@@ -122,7 +122,7 @@ class PagureFlaskIssuesOpenAccesstests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_new_issue_with_metadata_not_user(self):
-        """ Test the new_issue endpoint when the user does not have access
+        """Test the new_issue endpoint when the user does not have access
         to the project but still tries to.
         """
 
@@ -516,8 +516,8 @@ class PagureFlaskIssuesOpenAccesstests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_view_issue_list_no_data(self):
-        """ Test the view_issue endpoint when the issue has a custom field
-        of type list with no data attached. """
+        """Test the view_issue endpoint when the issue has a custom field
+        of type list with no data attached."""
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
 
         # Add custom fields to the project

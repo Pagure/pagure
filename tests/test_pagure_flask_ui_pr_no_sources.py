@@ -77,7 +77,7 @@ class PagureFlaskPrNoSourcestests(tests.Modeltests):
         self.assertTrue(os.path.exists(path))
 
     def set_up_git_repo(self, repo, fork, branch_from="feature"):
-        """ Set up the git repo and create the corresponding PullRequest
+        """Set up the git repo and create the corresponding PullRequest
         object.
         """
 
@@ -162,8 +162,8 @@ class PagureFlaskPrNoSourcestests(tests.Modeltests):
         )
 
     def test_accessing_pr_branch_deleted(self):
-        """ Test accessing the PR if branch it originates from has been
-        deleted. """
+        """Test accessing the PR if branch it originates from has been
+        deleted."""
         project = pagure.lib.query.get_authorized_project(
             self.session, "test", user="foo"
         )
@@ -193,8 +193,8 @@ class PagureFlaskPrNoSourcestests(tests.Modeltests):
         self.assertEqual(output2.status_code, 200)
 
     def test_accessing_pr_patch_branch_deleted(self):
-        """ Test accessing the PR's patch if branch it originates from has
-        been deleted. """
+        """Test accessing the PR's patch if branch it originates from has
+        been deleted."""
         project = pagure.lib.query.get_authorized_project(
             self.session, "test", user="foo"
         )

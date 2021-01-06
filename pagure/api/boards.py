@@ -91,7 +91,8 @@ def api_boards_view(repo, username=None, namespace=None):
 @API.route("/<namespace>/<repo>/boards", methods=["POST"])
 @API.route("/fork/<username>/<repo>/boards", methods=["POST"])
 @API.route(
-    "/fork/<username>/<namespace>/<repo>/boards", methods=["POST"],
+    "/fork/<username>/<namespace>/<repo>/boards",
+    methods=["POST"],
 )
 @api_login_required(acls=["modify_project"])
 @api_method
@@ -228,7 +229,9 @@ def api_board_create(repo, username=None, namespace=None):
     if removing_names:
         try:
             pagure.lib.query.delete_board(
-                flask.g.session, project=repo, names=removing_names,
+                flask.g.session,
+                project=repo,
+                names=removing_names,
             )
             flask.g.session.commit()
         except SQLAlchemyError as err:  # pragma: no cover
@@ -245,7 +248,8 @@ def api_board_create(repo, username=None, namespace=None):
 @API.route("/<namespace>/<repo>/boards/delete", methods=["POST"])
 @API.route("/fork/<username>/<repo>/boards/delete", methods=["POST"])
 @API.route(
-    "/fork/<username>/<namespace>/<repo>/boards/delete", methods=["POST"],
+    "/fork/<username>/<namespace>/<repo>/boards/delete",
+    methods=["POST"],
 )
 @api_login_required(acls=["modify_project"])
 @api_method
@@ -311,7 +315,9 @@ def api_board_delete(repo, username=None, namespace=None):
 
     try:
         pagure.lib.query.delete_board(
-            flask.g.session, project=repo, names=names,
+            flask.g.session,
+            project=repo,
+            names=names,
         )
         flask.g.session.commit()
     except SQLAlchemyError as err:  # pragma: no cover
@@ -451,7 +457,9 @@ def api_board_status(repo, board_name, username=None, namespace=None):
 
     if board is None:
         raise pagure.exceptions.APIError(
-            404, error_code=APIERROR.EINVALIDREQ, errors="Board not found",
+            404,
+            error_code=APIERROR.EINVALIDREQ,
+            errors="Board not found",
         )
 
     data = flask.request.get_json() or {}
@@ -611,7 +619,9 @@ def api_board_ticket_update_status(
 
     if board is None:
         raise pagure.exceptions.APIError(
-            404, error_code=APIERROR.EINVALIDREQ, errors="Board not found",
+            404,
+            error_code=APIERROR.EINVALIDREQ,
+            errors="Board not found",
         )
 
     data = flask.request.get_json() or {}
@@ -667,7 +677,8 @@ def api_board_ticket_update_status(
     "/<namespace>/<repo>/boards/<board_name>/add_issue", methods=["POST"]
 )
 @API.route(
-    "/fork/<username>/<repo>/boards/<board_name>/add_issue", methods=["POST"],
+    "/fork/<username>/<repo>/boards/<board_name>/add_issue",
+    methods=["POST"],
 )
 @API.route(
     "/fork/<username>/<namespace>/<repo>/boards/<board_name>/add_issue",
@@ -737,7 +748,9 @@ def api_board_ticket_add_status(
 
     if board is None:
         raise pagure.exceptions.APIError(
-            404, error_code=APIERROR.EINVALIDREQ, errors="Board not found",
+            404,
+            error_code=APIERROR.EINVALIDREQ,
+            errors="Board not found",
         )
 
     data = flask.request.get_json() or {}

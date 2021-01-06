@@ -65,8 +65,8 @@ class PagureFlaskApiUSertests(tests.Modeltests):
 
     def test_api_view_user(self):
         """
-            Test the api_view_user method of the flask api
-            The tested user has no project or forks.
+        Test the api_view_user method of the flask api
+        The tested user has no project or forks.
         """
         output = self.app.get("/api/0/user/pingou")
         self.assertEqual(output.status_code, 200)
@@ -109,8 +109,8 @@ class PagureFlaskApiUSertests(tests.Modeltests):
 
     def test_api_view_user_with_project(self):
         """
-            Test the api_view_user method of the flask api,
-            this time the user has some project defined.
+        Test the api_view_user method of the flask api,
+        this time the user has some project defined.
         """
         tests.create_projects(self.session)
 
@@ -285,8 +285,8 @@ class PagureFlaskApiUSertests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_api_view_user_activity_stats(self, mockemail):
-        """ Test the api_view_user_activity_stats method of the flask user
-        api. """
+        """Test the api_view_user_activity_stats method of the flask user
+        api."""
         mockemail.return_value = True
 
         tests.create_projects(self.session)
@@ -359,8 +359,8 @@ class PagureFlaskApiUSertests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_api_view_user_activity_date(self, mockemail):
-        """ Test the api_view_user_activity_date method of the flask user
-        api. """
+        """Test the api_view_user_activity_date method of the flask user
+        api."""
 
         self.test_api_view_user_activity_stats()
 
@@ -490,8 +490,8 @@ class PagureFlaskApiUSertests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_api_view_user_activity_date_1_activity(self, mockemail):
-        """ Test the api_view_user_activity_date method of the flask user
-        api when the user only did one action. """
+        """Test the api_view_user_activity_date method of the flask user
+        api when the user only did one action."""
 
         tests.create_projects(self.session)
         repo = pagure.lib.query._get_project(self.session, "test")
@@ -959,8 +959,8 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_api_view_user_requests_filed(self, mockemail):
-        """ Test the api_view_user_requests_filed method of the flask user
-        api """
+        """Test the api_view_user_requests_filed method of the flask user
+        api"""
 
         # First we test without the status parameter. It should default to `open`
         output = self.app.get("/api/0/user/pingou/requests/filed")
@@ -1131,8 +1131,8 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_api_view_user_requests_filed_created(self, mockemail):
-        """ Test the api_view_user_requests_filed method of the flask user
-        api with the created parameter """
+        """Test the api_view_user_requests_filed method of the flask user
+        api with the created parameter"""
 
         today = datetime.datetime.utcnow().date()
         output = self.app.get(
@@ -1204,8 +1204,8 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_api_view_user_requests_filed_updated(self, mockemail):
-        """ Test the api_view_user_requests_filed method of the flask user
-        api with the created parameter """
+        """Test the api_view_user_requests_filed method of the flask user
+        api with the created parameter"""
 
         today = datetime.datetime.utcnow().date()
         output = self.app.get(
@@ -1236,8 +1236,8 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_api_view_user_requests_filed_closed(self, mockemail):
-        """ Test the api_view_user_requests_filed method of the flask user
-        api with the created parameter """
+        """Test the api_view_user_requests_filed method of the flask user
+        api with the created parameter"""
 
         today = datetime.datetime.utcnow().date()
         output = self.app.get(
@@ -1268,8 +1268,8 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_api_view_user_requests_filed_foo(self, mockemail):
-        """ Test the api_view_user_requests_filed method of the flask user
-        api """
+        """Test the api_view_user_requests_filed method of the flask user
+        api"""
 
         # Default data returned
         output = self.app.get(
@@ -1339,8 +1339,8 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_api_view_user_requests_actionable(self, mockemail):
-        """ Test the api_view_user_requests_actionable method of the flask user
-        api """
+        """Test the api_view_user_requests_actionable method of the flask user
+        api"""
 
         # First we test without the status parameter. It should default to `open`
         output = self.app.get("/api/0/user/pingou/requests/actionable")
@@ -1515,8 +1515,8 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_api_view_user_requests_actionable_created(self, mockemail):
-        """ Test the api_view_user_requests_filed method of the flask user
-        api with the created parameter """
+        """Test the api_view_user_requests_filed method of the flask user
+        api with the created parameter"""
 
         today = datetime.datetime.utcnow().date()
         output = self.app.get(
@@ -1588,8 +1588,8 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_api_view_user_requests_actionable_updated(self, mockemail):
-        """ Test the api_view_user_requests_filed method of the flask user
-        api with the created parameter """
+        """Test the api_view_user_requests_filed method of the flask user
+        api with the created parameter"""
 
         today = datetime.datetime.utcnow().date()
         output = self.app.get(
@@ -1620,8 +1620,8 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_api_view_user_requests_actionable_closed(self, mockemail):
-        """ Test the api_view_user_requests_filed method of the flask user
-        api with the created parameter """
+        """Test the api_view_user_requests_filed method of the flask user
+        api with the created parameter"""
 
         today = datetime.datetime.utcnow().date()
         output = self.app.get(
@@ -1866,8 +1866,8 @@ class PagureFlaskApiUsertestissues(tests.Modeltests):
         )
 
     def test_user_issues_created(self):
-        """ Return the list of issues associated with the specified user
-        and play with the created filter. """
+        """Return the list of issues associated with the specified user
+        and play with the created filter."""
 
         today = datetime.datetime.utcnow().date()
         output = self.app.get(

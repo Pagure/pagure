@@ -223,7 +223,8 @@ class PagureFlaskAppClonetests(tests.Modeltests):
             % base64.b64encode(b"pingou:aaabbbcccddd")
         }
         output = self.app.get(
-            "/test.git/info/refs?service=git-receive-pack", headers=headers,
+            "/test.git/info/refs?service=git-receive-pack",
+            headers=headers,
         )
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
@@ -344,7 +345,8 @@ class PagureFlaskAppClonetests(tests.Modeltests):
             % base64.b64encode(b"pingou:aaabbbcccddd2")
         }
         output = self.app.get(
-            "/test.git/info/refs?service=git-receive-pack", headers=headers,
+            "/test.git/info/refs?service=git-receive-pack",
+            headers=headers,
         )
         self.assertEqual(output.status_code, 401)
         self.assertIn("Authorization Required", output.get_data(as_text=True))

@@ -79,7 +79,7 @@ def _serialize_public_ssh_key(key):
 
 
 def _create_ssh_key(keyfile):
-    """ Create the public and private ssh keys.
+    """Create the public and private ssh keys.
 
     The specified file name will be the private key and the public one will
     be in a similar file name ending with a '.pub'.
@@ -109,8 +109,7 @@ def _create_ssh_key(keyfile):
 @conn.task(queue=pagure_config["MIRRORING_QUEUE"], bind=True)
 @pagure_task
 def setup_mirroring(self, session, username, namespace, name):
-    """ Setup the specified project for mirroring.
-    """
+    """Setup the specified project for mirroring."""
     plugin = pagure.lib.plugins.get_plugin("Mirroring")
     plugin.db_object()
 
@@ -163,8 +162,7 @@ def setup_mirroring(self, session, username, namespace, name):
 @conn.task(queue=pagure_config["MIRRORING_QUEUE"], bind=True)
 @pagure_task
 def teardown_mirroring(self, session, username, namespace, name):
-    """ Stop the mirroring of the specified project.
-    """
+    """Stop the mirroring of the specified project."""
     plugin = pagure.lib.plugins.get_plugin("Mirroring")
     plugin.db_object()
 
@@ -192,8 +190,7 @@ def teardown_mirroring(self, session, username, namespace, name):
 @conn.task(queue=pagure_config["MIRRORING_QUEUE"], bind=True)
 @pagure_task
 def mirror_project(self, session, username, namespace, name):
-    """ Does the actual mirroring of the specified project.
-    """
+    """Does the actual mirroring of the specified project."""
     plugin = pagure.lib.plugins.get_plugin("Mirroring")
     plugin.db_object()
 

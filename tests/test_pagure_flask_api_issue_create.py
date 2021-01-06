@@ -27,8 +27,7 @@ import tests  # noqa: E402
 
 
 class PagureFlaskApiIssueCreatetests(tests.Modeltests):
-    """ Tests for the flask API of pagure for creating an issue
-    """
+    """Tests for the flask API of pagure for creating an issue"""
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def setUp(self):
@@ -67,7 +66,7 @@ class PagureFlaskApiIssueCreatetests(tests.Modeltests):
         tests.create_tokens_acl(self.session, token_id="project-specific-foo")
 
     def test_create_issue_own_project_no_data(self):
-        """ Test creating a new ticket on a project for which you're the
+        """Test creating a new ticket on a project for which you're the
         main maintainer.
         """
 
@@ -91,7 +90,7 @@ class PagureFlaskApiIssueCreatetests(tests.Modeltests):
         )
 
     def test_create_issue_own_project_incomplete_data(self):
-        """ Test creating a new ticket on a project for which you're the
+        """Test creating a new ticket on a project for which you're the
         main maintainer.
         """
 
@@ -116,7 +115,7 @@ class PagureFlaskApiIssueCreatetests(tests.Modeltests):
         )
 
     def test_create_issue_own_project(self):
-        """ Test creating a new ticket on a project for which you're the
+        """Test creating a new ticket on a project for which you're the
         main maintainer.
         """
 
@@ -174,7 +173,7 @@ class PagureFlaskApiIssueCreatetests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_create_issue_someone_else_project_project_less_token(self):
-        """ Test creating a new ticket on a project with which you have
+        """Test creating a new ticket on a project with which you have
         nothing to do.
         """
 
@@ -232,7 +231,7 @@ class PagureFlaskApiIssueCreatetests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_create_issue_project_specific_token(self):
-        """ Test creating a new ticket on a project with a regular
+        """Test creating a new ticket on a project with a regular
         project-specific token.
         """
 
@@ -290,7 +289,7 @@ class PagureFlaskApiIssueCreatetests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_create_issue_invalid_project_specific_token(self):
-        """ Test creating a new ticket on a project with a regular
+        """Test creating a new ticket on a project with a regular
         project-specific token but for another project.
         """
 

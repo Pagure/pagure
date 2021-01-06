@@ -25,8 +25,7 @@ from pagure.utils import is_true, validate_date, validate_date_range
 
 
 def _get_user(username):
-    """ Check user is valid or not
-    """
+    """Check user is valid or not"""
     try:
         return pagure.lib.query.get_user(flask.g.session, username)
     except pagure.exceptions.PagureException:

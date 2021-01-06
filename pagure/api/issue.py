@@ -1600,7 +1600,10 @@ def api_view_issues_history_detailed_stats(
     _check_issue_tracker(repo)
 
     stats = pagure.lib.query.issues_history_stats(
-        flask.g.session, repo, detailed=True, weeks_range=weeks_range,
+        flask.g.session,
+        repo,
+        detailed=True,
+        weeks_range=weeks_range,
     )
     jsonout = flask.jsonify({"stats": stats})
     return jsonout

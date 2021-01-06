@@ -51,7 +51,7 @@ class PagureFlaskApiCustomFieldIssuetests(tests.Modeltests):
         self.session.commit()
 
     def test_api_update_custom_field_bad_request(self):
-        """ Test the api_update_custom_field method of the flask api.
+        """Test the api_update_custom_field method of the flask api.
         This test that a badly form request returns the correct error.
         """
 
@@ -73,7 +73,7 @@ class PagureFlaskApiCustomFieldIssuetests(tests.Modeltests):
         )
 
     def test_api_update_custom_field_wrong_field(self):
-        """ Test the api_update_custom_field method of the flask api.
+        """Test the api_update_custom_field method of the flask api.
         This test that an invalid field retruns the correct error.
         """
 
@@ -98,7 +98,7 @@ class PagureFlaskApiCustomFieldIssuetests(tests.Modeltests):
         MagicMock(side_effect=pagure.exceptions.PagureException("error")),
     )
     def test_api_update_custom_field_raise_error(self):
-        """ Test the api_update_custom_field method of the flask api.
+        """Test the api_update_custom_field method of the flask api.
         This test the successful requests scenarii.
         """
 
@@ -132,7 +132,7 @@ class PagureFlaskApiCustomFieldIssuetests(tests.Modeltests):
         self.assertDictEqual(data, {"error": "error", "error_code": "ENOCODE"})
 
     def test_api_update_custom_field(self):
-        """ Test the api_update_custom_field method of the flask api.
+        """Test the api_update_custom_field method of the flask api.
         This test the successful requests scenarii.
         """
 

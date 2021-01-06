@@ -218,7 +218,7 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
     @patch.dict("pagure.config.config", {"PAGURE_ADMIN_USERS": "foo"})
     @patch("pagure.lib.git.generate_gitolite_acls", MagicMock())
     def test_give_project_not_owner_but_admin(self):
-        """ Test the give_project endpoint.
+        """Test the give_project endpoint.
 
         Test giving a project when the person giving the project is a pagure
         admin (instance wide admin) but not a project admin.
@@ -282,8 +282,8 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
     @patch.dict("pagure.config.config", {"PAGURE_ADMIN_USERS": "foo"})
     @patch("pagure.lib.git.generate_gitolite_acls", MagicMock())
     def test_give_project_already_user(self):
-        """ Test the give_project endpoint when the new main_admin is already
-        a committer on the project. """
+        """Test the give_project endpoint when the new main_admin is already
+        a committer on the project."""
 
         project = pagure.lib.query._get_project(self.session, "test")
         pagure.lib.query.add_user_to_project(

@@ -32,7 +32,7 @@ FEDMSG_INIT = False
 
 
 def send_fedmsg_notifications(project, topic, msg):
-    """ If the user or admin asked for fedmsg notifications on commit, this will
+    """If the user or admin asked for fedmsg notifications on commit, this will
     do it.
     """
 
@@ -75,7 +75,7 @@ def send_fedmsg_notifications(project, topic, msg):
 
 
 def send_stomp_notifications(project, topic, msg):
-    """ If the user or admin asked for stomp notifications on commit, this will
+    """If the user or admin asked for stomp notifications on commit, this will
     do it.
     """
     always_stomp = _config.get("ALWAYS_STOMP_ON_COMMITS") or None
@@ -89,7 +89,7 @@ def send_stomp_notifications(project, topic, msg):
 
 
 def send_mqtt_notifications(project, topic, msg):
-    """ If the user or admin asked for mqtt notifications on commit, this will
+    """If the user or admin asked for mqtt notifications on commit, this will
     do it.
     """
     always_mqtt = _config.get("ALWAYS_MQTT_ON_COMMITS") or None
@@ -103,7 +103,7 @@ def send_mqtt_notifications(project, topic, msg):
 
 
 def send_webhook_notifications(project, topic, msg):
-    """ If the user asked for webhook notifications on commit, this will
+    """If the user asked for webhook notifications on commit, this will
     do it.
     """
     if project.settings.get("Web-hooks"):
@@ -125,8 +125,7 @@ def send_webhook_notifications(project, topic, msg):
 def send_action_notification(
     session, subject, action, project, repodir, user, refname, rev
 ):
-    """ Send out-going notifications about the branch/tag.
-    """
+    """Send out-going notifications about the branch/tag."""
     email = pagure.lib.git.get_author_email(rev, repodir)
     name = pagure.lib.git.get_author(rev, repodir)
     author = pagure.lib.query.search_user(session, email=email)
@@ -163,7 +162,7 @@ def send_action_notification(
 def send_notifications(
     session, project, repodir, user, refname, revs, forced, oldrev
 ):
-    """ Send out-going notifications about the commits that have just been
+    """Send out-going notifications about the commits that have just been
     pushed.
     """
 
@@ -233,7 +232,7 @@ def send_notifications(
 def inform_pull_request_urls(
     session, project, commits, refname, default_branch, username
 ):
-    """ Inform the user about the URLs to open a new pull-request or visit
+    """Inform the user about the URLs to open a new pull-request or visit
     the existing one.
     """
     target_repo = project
@@ -304,7 +303,7 @@ class DefaultRunner(BaseRunner):
 
     @staticmethod
     def post_receive(session, username, project, repotype, repodir, changes):
-        """ Run the default post-receive hook.
+        """Run the default post-receive hook.
 
         For args, see BaseRunner.runhook.
         """

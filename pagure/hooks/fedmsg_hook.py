@@ -25,7 +25,7 @@ from pagure.lib.model import BASE, Project
 
 
 class FedmsgTable(BASE):
-    """ Stores information about the fedmsg hook deployed on a project.
+    """Stores information about the fedmsg hook deployed on a project.
 
     Table -- hook_fedmsg
     """
@@ -56,7 +56,7 @@ class FedmsgTable(BASE):
 
 
 class FedmsgRunner(BaseRunner):
-    """ Runner for the fedmsg hook, it does nothing as all the magic is
+    """Runner for the fedmsg hook, it does nothing as all the magic is
     part of the default hook/runner.
     """
 
@@ -94,7 +94,7 @@ class Fedmsg(BaseHook):
 
     @classmethod
     def install(cls, project, dbobj):
-        """ Method called to install the hook for a project.
+        """Method called to install the hook for a project.
 
         :arg project: a ``pagure.model.Project`` object to which the hook
             should be installed
@@ -109,7 +109,7 @@ class Fedmsg(BaseHook):
 
     @classmethod
     def remove(cls, project):
-        """ Method called to remove the hook of a project.
+        """Method called to remove the hook of a project.
 
         :arg project: a ``pagure.model.Project`` object to which the hook
             should be installed

@@ -210,8 +210,7 @@ def create_app(config=None):
 
 
 def generate_user_key_files():
-    """ Regenerate the key files used by gitolite.
-    """
+    """Regenerate the key files used by gitolite."""
     gitolite_home = pagure_config.get("GITOLITE_HOME", None)
     if gitolite_home:
         users = pagure.lib.query.search_user(flask.g.session)
@@ -227,7 +226,7 @@ def generate_user_key_files():
 
 
 def admin_session_timedout():
-    """ Check if the current user has been authenticated for more than what
+    """Check if the current user has been authenticated for more than what
     is allowed (defaults to 15 minutes).
     If it is the case, the user is logged out and the method returns True,
     otherwise it returns False.
@@ -248,8 +247,7 @@ def admin_session_timedout():
 
 
 def logout():
-    """ Log out the user currently logged in in the application
-    """
+    """Log out the user currently logged in in the application"""
     auth = pagure_config.get("PAGURE_AUTH", None)
     if auth in ["fas", "openid"]:
         if hasattr(flask.g, "fas_user") and flask.g.fas_user is not None:
@@ -521,7 +519,7 @@ def auth_logout():  # pragma: no cover
 
 # pylint: disable=unused-argument
 def end_request(exception=None):
-    """ This method is called at the end of each request.
+    """This method is called at the end of each request.
 
     Remove the DB session at the end of each request.
     Runs a garbage collection to get rid of any open pygit2 handles.
@@ -555,8 +553,7 @@ def after_request(response):
 
 
 def _get_user(username):
-    """ Check if user exists or not
-    """
+    """Check if user exists or not"""
     try:
         return pagure.lib.query.get_user(flask.g.session, username)
     except pagure.exceptions.PagureException as e:

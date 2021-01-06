@@ -36,7 +36,7 @@ _auth_log = logging.getLogger("pagure_auth")
 
 
 def _get_remote_user(project):
-    """ Returns the remote user using either the content of
+    """Returns the remote user using either the content of
     ``flask.g.remote_user`` or checking the headers for ``Authorization``
     and check if the provided API token is valid.
     """
@@ -94,7 +94,7 @@ def _get_remote_user(project):
 
 
 def proxy_raw_git(project):
-    """ Proxy a request to Git or gitolite3 via a subprocess.
+    """Proxy a request to Git or gitolite3 via a subprocess.
 
     This should get called after it is determined the requested project
     is not on repoSpanner.
@@ -227,7 +227,7 @@ def proxy_raw_git(project):
 
 
 def proxy_repospanner(project, service):
-    """ Proxy a request to repoSpanner.
+    """Proxy a request to repoSpanner.
 
     Args:
         project (model.Project): The project being accessed
@@ -284,7 +284,7 @@ def proxy_repospanner(project, service):
 
 
 def clone_proxy(project, username=None, namespace=None):
-    """ Proxy the /info/refs endpoint for HTTP pull/push.
+    """Proxy the /info/refs endpoint for HTTP pull/push.
 
     Note that for the clone endpoints, it's very explicit that <repo> has been
     renamed to <project>, to avoid the automatic repo searching from flask_app.
@@ -426,7 +426,7 @@ def clone_proxy(project, username=None, namespace=None):
 
 
 def add_clone_proxy_cmds():
-    """ This function adds flask routes for all possible clone paths.
+    """This function adds flask routes for all possible clone paths.
 
     This comes down to:
     /(fork/<username>/)(<namespace>/)<project>(.git)

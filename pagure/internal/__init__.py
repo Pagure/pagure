@@ -61,7 +61,7 @@ MERGE_OPTIONS = {
 
 
 def internal_access_only(function):
-    """ Decorator used to check if the request is iternal or not.
+    """Decorator used to check if the request is iternal or not.
 
     The request must either come from one of the addresses listed
     in IP_ALLOWED_INTERNAL or it must have the "Authentication"
@@ -71,8 +71,7 @@ def internal_access_only(function):
 
     @wraps(function)
     def decorated_function(*args, **kwargs):
-        """ Wrapped function actually checking if the request is local.
-        """
+        """Wrapped function actually checking if the request is local."""
         ip_allowed = pagure_config.get(
             "IP_ALLOWED_INTERNAL", ["127.0.0.1", "localhost", "::1"]
         )
@@ -228,8 +227,7 @@ def check_ssh_access():
 @PV.route("/pull-request/comment/", methods=["PUT"])
 @internal_access_only
 def pull_request_add_comment():
-    """ Add a comment to a pull-request.
-    """
+    """Add a comment to a pull-request."""
     pform = pagure.forms.ProjectCommentForm(csrf_enabled=False)
     if not pform.validate_on_submit():
         flask.abort(400, description="Invalid request")
@@ -280,8 +278,7 @@ def pull_request_add_comment():
 @PV.route("/ticket/comment/", methods=["PUT"])
 @internal_access_only
 def ticket_add_comment():
-    """ Add a comment to an issue.
-    """
+    """Add a comment to an issue."""
     pform = pagure.forms.ProjectCommentForm(csrf_enabled=False)
     if not pform.validate_on_submit():
         flask.abort(400, description="Invalid request")
@@ -341,8 +338,7 @@ def ticket_add_comment():
 
 @PV.route("/pull-request/merge", methods=["POST"])
 def mergeable_request_pull():
-    """ Returns if the specified pull-request can be merged or not.
-    """
+    """Returns if the specified pull-request can be merged or not."""
     force = flask.request.form.get("force", False)
     if force is not False:
         force = True
@@ -413,7 +409,7 @@ def mergeable_request_pull():
 
 @PV.route("/pull-request/ready", methods=["POST"])
 def get_pull_request_ready_branch():
-    """ Return the list of branches that have commits not in the main
+    """Return the list of branches that have commits not in the main
     branch/repo (thus for which one could open a PR) and the number of
     commits that differ.
     """
@@ -480,8 +476,7 @@ def get_pull_request_ready_branch():
     "/fork/<username>/<namespace>/<repo>/issue/template", methods=["POST"]
 )
 def get_ticket_template(repo, namespace=None, username=None):
-    """ Return the template asked for the specified project
-    """
+    """Return the template asked for the specified project"""
 
     form = pagure.forms.ConfirmationForm()
     if not form.validate_on_submit():
@@ -542,8 +537,7 @@ def get_ticket_template(repo, namespace=None, username=None):
 
 @PV.route("/branches/commit/", methods=["POST"])
 def get_branches_of_commit():
-    """ Return the list of branches that have the specified commit in
-    """
+    """Return the list of branches that have the specified commit in"""
     form = pagure.forms.ConfirmationForm()
     if not form.validate_on_submit():
         response = flask.jsonify(
@@ -645,7 +639,7 @@ def get_branches_of_commit():
 
 @PV.route("/branches/heads/", methods=["POST"])
 def get_branches_head():
-    """ Return the heads of each branch in the repo, using the following
+    """Return the heads of each branch in the repo, using the following
     structure:
     {
         code: 'OK',
@@ -714,7 +708,7 @@ def get_branches_head():
 
 @PV.route("/task/<taskid>", methods=["GET"])
 def task_info(taskid):
-    """ Return the results of the specified task or a 418 if the task is
+    """Return the results of the specified task or a 418 if the task is
     still being processed.
     """
     task = pagure.lib.tasks.get_result(taskid)
@@ -730,9 +724,7 @@ def task_info(taskid):
 
 @PV.route("/stats/commits/authors", methods=["POST"])
 def get_stats_commits():
-    """ Return statistics about the commits made on the specified repo.
-
-    """
+    """Return statistics about the commits made on the specified repo."""
     form = pagure.forms.ConfirmationForm()
     if not form.validate_on_submit():
         response = flask.jsonify(
@@ -774,9 +766,7 @@ def get_stats_commits():
 
 @PV.route("/stats/commits/trend", methods=["POST"])
 def get_stats_commits_trend():
-    """ Return evolution of the commits made on the specified repo.
-
-    """
+    """Return evolution of the commits made on the specified repo."""
     form = pagure.forms.ConfirmationForm()
     if not form.validate_on_submit():
         response = flask.jsonify(
@@ -821,7 +811,7 @@ def get_stats_commits_trend():
 @PV.route("/fork/<username>/<repo>/family", methods=["POST"])
 @PV.route("/fork/<username>/<namespace>/<repo>/family", methods=["POST"])
 def get_project_family(repo, namespace=None, username=None):
-    """ Return the family of projects for the specified project
+    """Return the family of projects for the specified project
 
     {
         code: 'OK',

@@ -46,8 +46,8 @@ class PagureFlaskAppBrowsetests(tests.Modeltests):
 
     @patch.dict("pagure.config.config", {"PRIVATE_PROJECTS": True})
     def test_browse_project_logged_in_private_project(self):
-        """ Test the browse project endpoint when logged in with a private
-        project. """
+        """Test the browse project endpoint when logged in with a private
+        project."""
 
         user = tests.FakeUser(username="foo")
         with tests.user_set(self.app.application, user):
@@ -69,8 +69,8 @@ class PagureFlaskAppBrowsetests(tests.Modeltests):
 
     @patch.dict("pagure.config.config", {"PRIVATE_PROJECTS": True})
     def test_browse_project_unauth_private_project(self):
-        """ Test the browse project endpoint when logged out with a private
-        project. """
+        """Test the browse project endpoint when logged out with a private
+        project."""
 
         output = self.app.get("/browse/projects/")
         self.assertEqual(output.status_code, 200)
@@ -90,8 +90,8 @@ class PagureFlaskAppBrowsetests(tests.Modeltests):
 
     @patch.dict("pagure.config.config", {"PRIVATE_PROJECTS": True})
     def test_browse_project_logged_in_no_access_private_project(self):
-        """ Test the browse project endpoint when logged in as an user that
-        has no access to the private project. """
+        """Test the browse project endpoint when logged in as an user that
+        has no access to the private project."""
 
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
@@ -113,8 +113,8 @@ class PagureFlaskAppBrowsetests(tests.Modeltests):
 
     @patch.dict("pagure.config.config", {"PRIVATE_PROJECTS": True})
     def test_browse_project_logged_in_ticket_private_project(self):
-        """ Test the browse project endpoint when logged in as an user that
-        has no access to the private project. """
+        """Test the browse project endpoint when logged in as an user that
+        has no access to the private project."""
 
         # Add user 'pingou' with ticket access on repo
         repo = pagure.lib.query._get_project(self.session, "test3")
@@ -145,8 +145,8 @@ class PagureFlaskAppBrowsetests(tests.Modeltests):
 
     @patch.dict("pagure.config.config", {"PRIVATE_PROJECTS": True})
     def test_browse_project_logged_in_commit_private_project(self):
-        """ Test the browse project endpoint when logged in as an user that
-        has no access to the private project. """
+        """Test the browse project endpoint when logged in as an user that
+        has no access to the private project."""
 
         # Add user 'pingou' with commit access on repo
         repo = pagure.lib.query._get_project(self.session, "test3")
@@ -176,8 +176,8 @@ class PagureFlaskAppBrowsetests(tests.Modeltests):
 
     @patch.dict("pagure.config.config", {"PRIVATE_PROJECTS": True})
     def test_browse_project_logged_in_admin_private_project(self):
-        """ Test the browse project endpoint when logged in as an user that
-        has no access to the private project. """
+        """Test the browse project endpoint when logged in as an user that
+        has no access to the private project."""
 
         # Add user 'pingou' with admin access on repo
         repo = pagure.lib.query._get_project(self.session, "test3")
@@ -255,8 +255,8 @@ class PagureFlaskAppBrowseGroupAdmintests(tests.Modeltests):
 
     @patch.dict("pagure.config.config", {"PRIVATE_PROJECTS": True})
     def test_browse_project_user_not_in_group(self):
-        """ Test the browse project endpoint when logged in as an user that
-        has no access to the private project via a group as admin. """
+        """Test the browse project endpoint when logged in as an user that
+        has no access to the private project via a group as admin."""
 
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
@@ -278,8 +278,8 @@ class PagureFlaskAppBrowseGroupAdmintests(tests.Modeltests):
 
     @patch.dict("pagure.config.config", {"PRIVATE_PROJECTS": True})
     def test_browse_project_user_in_group(self):
-        """ Test the browse project endpoint when logged in as an user that
-        has no access to the private project via a group as admin. """
+        """Test the browse project endpoint when logged in as an user that
+        has no access to the private project via a group as admin."""
         group = pagure.lib.query.search_groups(self.session, group_name="JL")
 
         pagure.lib.query.add_user_to_group(
@@ -359,8 +359,8 @@ class PagureFlaskAppBrowseGroupCommittests(tests.Modeltests):
 
     @patch.dict("pagure.config.config", {"PRIVATE_PROJECTS": True})
     def test_browse_project_user_not_in_group(self):
-        """ Test the browse project endpoint when logged in as an user that
-        has no access to the private project via a group as admin. """
+        """Test the browse project endpoint when logged in as an user that
+        has no access to the private project via a group as admin."""
 
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
@@ -382,8 +382,8 @@ class PagureFlaskAppBrowseGroupCommittests(tests.Modeltests):
 
     @patch.dict("pagure.config.config", {"PRIVATE_PROJECTS": True})
     def test_browse_project_user_in_group(self):
-        """ Test the browse project endpoint when logged in as an user that
-        has no access to the private project via a group as admin. """
+        """Test the browse project endpoint when logged in as an user that
+        has no access to the private project via a group as admin."""
         group = pagure.lib.query.search_groups(self.session, group_name="JL")
 
         pagure.lib.query.add_user_to_group(
@@ -463,8 +463,8 @@ class PagureFlaskAppBrowseGroupTickettests(tests.Modeltests):
 
     @patch.dict("pagure.config.config", {"PRIVATE_PROJECTS": True})
     def test_browse_project_user_not_in_group(self):
-        """ Test the browse project endpoint when logged in as an user that
-        has no access to the private project via a group as admin. """
+        """Test the browse project endpoint when logged in as an user that
+        has no access to the private project via a group as admin."""
 
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
@@ -486,8 +486,8 @@ class PagureFlaskAppBrowseGroupTickettests(tests.Modeltests):
 
     @patch.dict("pagure.config.config", {"PRIVATE_PROJECTS": True})
     def test_browse_project_user_in_group(self):
-        """ Test the browse project endpoint when logged in as an user that
-        has no access to the private project via a group as admin. """
+        """Test the browse project endpoint when logged in as an user that
+        has no access to the private project via a group as admin."""
         group = pagure.lib.query.search_groups(self.session, group_name="JL")
 
         pagure.lib.query.add_user_to_group(

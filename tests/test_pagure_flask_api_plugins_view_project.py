@@ -27,8 +27,7 @@ import tests  # noqa: E402
 
 
 class PagureFlaskApiPluginViewProjecttests(tests.Modeltests):
-    """ Tests for the flask API of pagure for viewing enabled plugins on project
-    """
+    """Tests for the flask API of pagure for viewing enabled plugins on project"""
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def setUp(self):
@@ -38,8 +37,7 @@ class PagureFlaskApiPluginViewProjecttests(tests.Modeltests):
         tests.create_projects(self.session)
 
     def test_view_plugin_on_project(self):
-        """ Test viewing plugins on a project.
-        """
+        """Test viewing plugins on a project."""
 
         # Install plugin
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
@@ -66,7 +64,7 @@ class PagureFlaskApiPluginViewProjecttests(tests.Modeltests):
         )
 
     def test_viewing_plugin_on_project_no_plugin(self):
-        """ Test viewing plugins on a project, which doesn't
+        """Test viewing plugins on a project, which doesn't
         have any installed.
         """
 

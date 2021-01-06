@@ -36,7 +36,7 @@ pagure_config = pagure.config.reload_config()
 
 
 class PagureTable(BASE):
-    """ Stores information about the pagure hook deployed on a project.
+    """Stores information about the pagure hook deployed on a project.
 
     Table -- hook_pagure
     """
@@ -148,8 +148,8 @@ def relates_commit(session, username, commitid, issue, app_url=None):
 
 
 def fixes_relation(session, username, commitid, relation, app_url=None):
-    """ Add a comment to an issue or PR that this commit fixes it and update
-    the status if the commit is in the master branch. """
+    """Add a comment to an issue or PR that this commit fixes it and update
+    the status if the commit is in the master branch."""
 
     url = "../c/%s" % commitid[:8]
     if app_url:
@@ -216,7 +216,7 @@ class PagureRunner(BaseRunner):
 
     @staticmethod
     def post_receive(session, username, project, repotype, repodir, changes):
-        """ Run the default post-receive hook.
+        """Run the default post-receive hook.
 
         For args, see BaseRunner.runhook.
         """

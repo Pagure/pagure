@@ -30,9 +30,7 @@ class TestDevData(tests.Modeltests):
     maxDiff = None
 
     def test_dev_data_all(self):
-        """Check how dev-data --all performs
-
-        """
+        """Check how dev-data --all performs"""
 
         config_path = os.path.join(self.path, "config")
         with open(config_path, "w") as f:
@@ -81,9 +79,7 @@ WARNING: Deleting all data from sqlite:///%s/db_dev_data.sqlite
         self.assertEqual(stdout, output)
 
     def test_dev_data_delete(self):
-        """Check how dev-data --init --delete performs
-
-        """
+        """Check how dev-data --init --delete performs"""
 
         config_path = os.path.join(self.path, "config")
 
@@ -114,9 +110,7 @@ WARNING: Deleting all data from %s
         self.assertEqual(stdout.split("\n"), output.split("\n"))
 
     def test_dev_data_init(self):
-        """Check how dev-data --init performs
-
-        """
+        """Check how dev-data --init performs"""
 
         config_path = os.path.join(self.path, "config")
 

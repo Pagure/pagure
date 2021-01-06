@@ -30,8 +30,7 @@ from pagure.lib.repo import PagureRepo
 
 
 class PagureFlaskNoMasterBranchtests(tests.SimplePagureTest):
-    """ Tests for flask application when the git repo has no master branch.
-    """
+    """Tests for flask application when the git repo has no master branch."""
 
     def set_up_git_repo(self):
         """ Set up the git repo to play with. """
@@ -96,7 +95,7 @@ class PagureFlaskNoMasterBranchtests(tests.SimplePagureTest):
 
     @patch("pagure.lib.notify.send_email")
     def test_view_repo(self, send_email):
-        """ Test the view_repo endpoint when the git repo has no master
+        """Test the view_repo endpoint when the git repo has no master
         branch.
         """
         send_email.return_value = True
@@ -147,7 +146,7 @@ class PagureFlaskNoMasterBranchtests(tests.SimplePagureTest):
 
     @patch("pagure.lib.notify.send_email")
     def test_view_commits(self, send_email):
-        """ Test the view_commits endpoint when the git repo has no
+        """Test the view_commits endpoint when the git repo has no
         master branch.
         """
         send_email.return_value = True
@@ -184,7 +183,7 @@ class PagureFlaskNoMasterBranchtests(tests.SimplePagureTest):
 
     @patch("pagure.lib.notify.send_email")
     def test_view_file(self, send_email):
-        """ Test the view_file endpoint when the git repo has no
+        """Test the view_file endpoint when the git repo has no
         master branch.
         """
         send_email.return_value = True
@@ -227,7 +226,7 @@ class PagureFlaskNoMasterBranchtests(tests.SimplePagureTest):
 
     @patch("pagure.lib.notify.send_email")
     def test_view_raw_file(self, send_email):
-        """ Test the view_raw_file endpoint when the git repo has no
+        """Test the view_raw_file endpoint when the git repo has no
         master branch.
         """
         send_email.return_value = True
@@ -259,7 +258,7 @@ class PagureFlaskNoMasterBranchtests(tests.SimplePagureTest):
 
     @patch("pagure.lib.notify.send_email")
     def test_view_tree(self, send_email):
-        """ Test the view_tree endpoint when the git repo has no
+        """Test the view_tree endpoint when the git repo has no
         master branch.
         """
         send_email.return_value = True
@@ -303,7 +302,7 @@ class PagureFlaskNoMasterBranchtests(tests.SimplePagureTest):
 
     @patch("pagure.lib.notify.send_email")
     def test_new_request_pull(self, send_email):
-        """ Test the new_request_pull endpoint when the git repo has no
+        """Test the new_request_pull endpoint when the git repo has no
         master branch.
         """
         send_email.return_value = True

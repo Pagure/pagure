@@ -81,7 +81,7 @@ TMPL_HTML = """
 
 
 def __get_tree(repo_obj, tree, filepath, index=0, extended=False):
-    """ Retrieve the entry corresponding to the provided filename in a
+    """Retrieve the entry corresponding to the provided filename in a
     given tree.
     """
     filename = filepath[index]
@@ -164,8 +164,7 @@ def __get_tree_and_content(repo_obj, commit, path):
 @APP.route("/fork/<username>/<repo>/<path:filename>")
 @APP.route("/fork/<namespace>.<username>/<repo>/<path:filename>")
 def view_docs(repo, username=None, namespace=None, filename=None):
-    """ Display the documentation
-    """
+    """Display the documentation"""
     if "." in repo:
         namespace, repo = repo.split(".", 1)
 

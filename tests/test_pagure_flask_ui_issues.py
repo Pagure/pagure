@@ -540,8 +540,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             )
 
     def test_new_issue_metadata_user(self):
-        """ Test the new_issue endpoint when the user has access to the
-        project. """
+        """Test the new_issue endpoint when the user has access to the
+        project."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
@@ -563,8 +563,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertIn("<strong>Assignee</strong>", output_text)
 
     def test_new_issue_metadata_not_user(self):
-        """ Test the new_issue endpoint when the user does not have access
-        to the project. """
+        """Test the new_issue endpoint when the user does not have access
+        to the project."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
@@ -588,8 +588,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_new_issue_with_metadata(self):
-        """ Test the new_issue endpoint when the user has access to the
-        project. """
+        """Test the new_issue endpoint when the user has access to the
+        project."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
@@ -658,7 +658,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_new_issue_with_metadata_not_user(self):
-        """ Test the new_issue endpoint when the user does not have access
+        """Test the new_issue endpoint when the user does not have access
         to the project but still tries to.
         """
 
@@ -1276,8 +1276,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_view_issue_inconsistent_milestone(self, p_send_email, p_ugt):
-        """ Test the view_issue endpoint when the milestone keys are
-        inconsistent with the milestones of the project. """
+        """Test the view_issue endpoint when the milestone keys are
+        inconsistent with the milestones of the project."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -1811,8 +1811,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_view_issue_list_no_data(self, p_send_email, p_ugt):
-        """ Test the view_issue endpoint when the issue has a custom field
-        of type list with no data attached. """
+        """Test the view_issue endpoint when the issue has a custom field
+        of type list with no data attached."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -2947,8 +2947,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_update_issue_block_closed(self):
-        """ Test how blocked issue shows in the UI when the blocking ticket
-        is open and closed. """
+        """Test how blocked issue shows in the UI when the blocking ticket
+        is open and closed."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
@@ -4853,7 +4853,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_git_urls(self, p_send_email, p_ugt):
-        """ Check that the url to the git repo for issues is present/absent when
+        """Check that the url to the git repo for issues is present/absent when
         it should.
         """
         p_send_email.return_value = True
@@ -5454,8 +5454,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_view_issue_namespace_comment(self, p_send_email, p_ugt):
-        """ Test comment on the view_issue endpoint on namespaced project.
-        """
+        """Test comment on the view_issue endpoint on namespaced project."""
         # Create the project ns/test
         item = pagure.lib.model.Project(
             user_id=1,  # pingou
@@ -5520,7 +5519,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_view_issue_comment_and_close(self, p_send_email, p_ugt):
-        """ Test if the comment and close button shows up on a ticket opened
+        """Test if the comment and close button shows up on a ticket opened
         by the user
         """
         # Create the project ns/test
@@ -5566,8 +5565,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_view_issue_forked_namespace_comment(self, p_send_email, p_ugt):
-        """ Test comment on the view_issue endpoint on namespaced project.
-        """
+        """Test comment on the view_issue endpoint on namespaced project."""
         # Create the project ns/test
         item = pagure.lib.model.Project(
             user_id=1,  # pingou

@@ -31,7 +31,7 @@ import tests
 
 
 class PagureFlaskApiIssueChangeStatustests(tests.Modeltests):
-    """ Tests for the flask API of pagure for changing the status of an
+    """Tests for the flask API of pagure for changing the status of an
     issue
     """
 

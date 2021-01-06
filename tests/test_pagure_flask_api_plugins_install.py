@@ -27,8 +27,7 @@ import tests  # noqa: E402
 
 
 class PagureFlaskApiPluginInstalltests(tests.Modeltests):
-    """ Tests for the flask API of pagure for installing a plugin
-    """
+    """Tests for the flask API of pagure for installing a plugin"""
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def setUp(self):
@@ -64,7 +63,7 @@ class PagureFlaskApiPluginInstalltests(tests.Modeltests):
         tests.create_tokens_acl(self.session, token_id="project-specific-foo")
 
     def test_install_plugin_own_project_no_data(self):
-        """ Test installing a new plugin on a project for which you're the
+        """Test installing a new plugin on a project for which you're the
         main maintainer.
         """
 
@@ -86,7 +85,7 @@ class PagureFlaskApiPluginInstalltests(tests.Modeltests):
         )
 
     def test_install_plugin_own_project(self):
-        """ Test installing a new plugin on a project for which you're the
+        """Test installing a new plugin on a project for which you're the
         main maintainer.
         """
 
@@ -112,7 +111,7 @@ class PagureFlaskApiPluginInstalltests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_install_plugin_someone_else_project_project_less_token(self):
-        """ Test installing a new plugin on a project with which you have
+        """Test installing a new plugin on a project with which you have
         nothing to do.
         """
 
@@ -138,7 +137,7 @@ class PagureFlaskApiPluginInstalltests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_install_plugin_project_specific_token(self):
-        """ Test installing a new plugin on a project with a regular
+        """Test installing a new plugin on a project with a regular
         project-specific token.
         """
 
@@ -164,7 +163,7 @@ class PagureFlaskApiPluginInstalltests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_install_plugin_invalid_project_specific_token(self):
-        """ Test installing a new plugin on a project with a regular
+        """Test installing a new plugin on a project with a regular
         project-specific token but for another project.
         """
 

@@ -16,7 +16,7 @@ from pagure.lib.model_base import BASE
 
 
 def get_plugin_names(blacklist=None, without_backref=False):
-    """ Return the list of plugins names.
+    """Return the list of plugins names.
 
     :arg blacklist: name or list of names to not return
     :type blacklist: string or list of strings
@@ -61,7 +61,7 @@ def get_plugin(plugin_name):
 
 
 def get_enabled_plugins(project):
-    """ Returns a list of plugins enabled for a specific project.
+    """Returns a list of plugins enabled for a specific project.
 
     Args:
         project (model.Project): The project to look for.

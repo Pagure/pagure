@@ -55,7 +55,7 @@ class PagureRemotePRtests(tests.Modeltests):
         shutil.rmtree(self.newpath)
 
     def set_up_git_repo(self, new_project=None, branch_from="feature"):
-        """ Set up the git repo and create the corresponding PullRequest
+        """Set up the git repo and create the corresponding PullRequest
         object.
         """
 
@@ -293,8 +293,8 @@ class PagureRemotePRtests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_new_remote_no_title(self):
-        """ Test creating a new remote PR authenticated when no title is
-        specified. """
+        """Test creating a new remote PR authenticated when no title is
+        specified."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(
@@ -341,8 +341,8 @@ class PagureRemotePRtests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_new_remote_pr_empty_target(self):
-        """ Test creating a new remote PR authenticated against an empty
-        git repo. """
+        """Test creating a new remote PR authenticated against an empty
+        git repo."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(

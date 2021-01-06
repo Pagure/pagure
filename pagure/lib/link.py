@@ -59,7 +59,7 @@ def get_relation(
     reftype="relates",
     include_prs=False,
 ):
-    """ For a given text, searches using regex if the text contains
+    """For a given text, searches using regex if the text contains
     reference to another issue in this project or another one.
 
     Returns the list of issues referenced (possibly empty).

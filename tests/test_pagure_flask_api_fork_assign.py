@@ -101,8 +101,7 @@ class PagureFlaskApiForkAssigntests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 200)
 
     def test_api_assign_pr_invalid_project_namespace(self):
-        """ Test api_pull_request_assign method when the project doesn't exist.
-        """
+        """Test api_pull_request_assign method when the project doesn't exist."""
 
         headers = {"Authorization": "token aaabbbcccddd"}
 
@@ -123,8 +122,7 @@ class PagureFlaskApiForkAssigntests(tests.SimplePagureTest):
         )
 
     def test_api_assign_pr_invalid_project(self):
-        """ Test api_pull_request_assign method when the project doesn't exist.
-        """
+        """Test api_pull_request_assign method when the project doesn't exist."""
 
         headers = {"Authorization": "token aaabbbcccddd"}
 
@@ -139,7 +137,7 @@ class PagureFlaskApiForkAssigntests(tests.SimplePagureTest):
         )
 
     def test_api_assign_pr_invalid_project_token(self):
-        """ Test api_pull_request_assign method when the token doesn't correspond
+        """Test api_pull_request_assign method when the token doesn't correspond
         to the project.
         """
 
@@ -158,8 +156,7 @@ class PagureFlaskApiForkAssigntests(tests.SimplePagureTest):
         )
 
     def test_api_assign_pr_invalid_pr(self):
-        """ Test api_pull_request_assign method when asking for an invalid PR
-        """
+        """Test api_pull_request_assign method when asking for an invalid PR"""
 
         headers = {"Authorization": "token aaabbbcccddd"}
 
@@ -174,8 +171,7 @@ class PagureFlaskApiForkAssigntests(tests.SimplePagureTest):
         )
 
     def test_api_assign_pr_no_input(self):
-        """ Test api_pull_request_assign method when no input is specified
-        """
+        """Test api_pull_request_assign method when no input is specified"""
 
         headers = {"Authorization": "token aaabbbcccddd"}
 
@@ -188,8 +184,7 @@ class PagureFlaskApiForkAssigntests(tests.SimplePagureTest):
         self.assertDictEqual(data, {"message": "Nothing to change"})
 
     def test_api_assign_pr_assigned(self):
-        """ Test api_pull_request_assign method when with valid input
-        """
+        """Test api_pull_request_assign method when with valid input"""
 
         headers = {"Authorization": "token aaabbbcccddd"}
 
@@ -204,8 +199,7 @@ class PagureFlaskApiForkAssigntests(tests.SimplePagureTest):
         self.assertDictEqual(data, {"message": "Request assigned"})
 
     def test_api_assign_pr_unassigned(self):
-        """ Test api_pull_request_assign method when unassigning
-        """
+        """Test api_pull_request_assign method when unassigning"""
         self.test_api_assign_pr_assigned()
 
         headers = {"Authorization": "token aaabbbcccddd"}
@@ -220,8 +214,7 @@ class PagureFlaskApiForkAssigntests(tests.SimplePagureTest):
         self.assertDictEqual(data, {"message": "Request assignee reset"})
 
     def test_api_assign_pr_unassigned_twice(self):
-        """ Test api_pull_request_assign method when unassigning
-        """
+        """Test api_pull_request_assign method when unassigning"""
         self.test_api_assign_pr_unassigned()
         headers = {"Authorization": "token aaabbbcccddd"}
         data = {"assignee": None}
@@ -235,7 +228,7 @@ class PagureFlaskApiForkAssigntests(tests.SimplePagureTest):
         self.assertDictEqual(data, {"message": "Nothing to change"})
 
     def test_api_assign_pr_unassigned_empty_string(self):
-        """ Test api_pull_request_assign method when unassigning with an
+        """Test api_pull_request_assign method when unassigning with an
         empty string
         """
         self.test_api_assign_pr_assigned()

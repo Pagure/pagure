@@ -30,7 +30,7 @@ _config = pagure.config.config
 
 
 class RtdTable(BASE):
-    """ Stores information about the pagure hook deployed on a project.
+    """Stores information about the pagure hook deployed on a project.
 
     Table -- hook_rtd
     """
@@ -102,7 +102,7 @@ will have to provide below.
 class RtdRunner(BaseRunner):
     @staticmethod
     def post_receive(session, username, project, repotype, repodir, changes):
-        """ Perform the RTD Post Receive hook.
+        """Perform the RTD Post Receive hook.
 
         For arguments, see BaseRunner.runhook.
         """

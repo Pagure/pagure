@@ -101,7 +101,7 @@ def get_repotypes():
 
 
 class Unspecified(object):
-    """ Custom None object used to indicate that the caller has not made
+    """Custom None object used to indicate that the caller has not made
     a choice for a particular argument.
     """
 
@@ -122,8 +122,7 @@ def set_pagure_ci(services):
 
 
 def get_user(session, key):
-    """ Searches for a user in the database for a given username or email.
-    """
+    """Searches for a user in the database for a given username or email."""
     user_obj = search_user(session, username=key)
     if not user_obj:
         user_obj = search_user(session, email=key)
@@ -135,16 +134,14 @@ def get_user(session, key):
 
 
 def get_user_by_id(session, userid):
-    """ Searches for a user in the database for a given username or email.
-    """
+    """Searches for a user in the database for a given username or email."""
     query = session.query(model.User).filter(model.User.id == userid)
 
     return query.first()
 
 
 def get_blocked_users(session, username=None, date=None):
-    """ Returns all the users that are blocked in this pagure instance.
-    """
+    """Returns all the users that are blocked in this pagure instance."""
     now = datetime.datetime.utcnow()
     query = session.query(model.User).filter(
         model.User.refuse_sessions_before >= (date or now)
@@ -160,7 +157,7 @@ def get_blocked_users(session, username=None, date=None):
 
 
 def get_next_id(session, projectid):
-    """ Returns the next identifier of a project ticket or pull-request
+    """Returns the next identifier of a project ticket or pull-request
     based on the identifier already in the database.
     """
     query1 = session.query(func.max(model.Issue.id)).filter(
@@ -180,7 +177,7 @@ def get_next_id(session, projectid):
 
 
 def search_user(session, username=None, email=None, token=None, pattern=None):
-    """ Searches the database for the user or users matching the given
+    """Searches the database for the user or users matching the given
     criterias.
 
     :arg session: the session to use to connect to the database.
@@ -254,7 +251,7 @@ def are_valid_ssh_keys(keys):
 
 
 def find_ssh_key(session, search_key, username):
-    """ Finds and returns SSHKey matching the requested search_key.
+    """Finds and returns SSHKey matching the requested search_key.
 
     Args:
         session: database session
@@ -281,7 +278,7 @@ def find_ssh_key(session, search_key, username):
 
 
 def create_deploykeys_ssh_keys_on_disk(project, gitolite_keydir):
-    """ Create the ssh keys for the projects' deploy keys on the key dir.
+    """Create the ssh keys for the projects' deploy keys on the key dir.
 
     This method does NOT support multiple ssh keys per deploy key.
     """
@@ -326,7 +323,7 @@ def create_deploykeys_ssh_keys_on_disk(project, gitolite_keydir):
 
 
 def create_user_ssh_keys_on_disk(user, gitolite_keydir):
-    """ Create the ssh keys for the user on the specific folder.
+    """Create the ssh keys for the user on the specific folder.
 
     This is the method allowing to have multiple ssh keys per user.
     """
@@ -1138,8 +1135,7 @@ def add_user_to_project(
     branches=None,
     required_groups=None,
 ):
-    """ Add a specified user to a specified project with a specified access
-    """
+    """Add a specified user to a specified project with a specified access"""
 
     new_user_obj = get_user(session, new_user)
 
@@ -1632,7 +1628,7 @@ def add_commit_flag(
 
 
 def get_commit_flag(session, project, commit_hash):
-    """ Return the commit flags corresponding to the specified git hash
+    """Return the commit flags corresponding to the specified git hash
     (commitid) in the specified repository.
 
     :arg session: the session with which to connect to the database
@@ -1672,7 +1668,7 @@ def new_project(
     private=False,
     default_branch=None,
 ):
-    """ Create a new project based on the information provided.
+    """Create a new project based on the information provided.
 
     Is an async operation, and returns task ID.
     """
@@ -2009,7 +2005,7 @@ def new_pull_request(
 
 
 def link_pr_to_issue_on_description(session, request):
-    """ Link the given request to issues it may be referring to in its
+    """Link the given request to issues it may be referring to in its
     description if there is a description and such link in it.
     """
     _log.debug("Drop the existing relations")
@@ -2088,7 +2084,7 @@ def edit_issue(
     milestone=Unspecified,
     private=None,
 ):
-    """ Edit the specified issue.
+    """Edit the specified issue.
 
     :arg session: the session to use to connect to the database.
     :arg issue: the pagure.lib.model.Issue object to edit.
@@ -2236,7 +2232,7 @@ def edit_issue(
 
 
 def update_project_settings(session, repo, settings, user, from_api=False):
-    """ Update the settings of a project.
+    """Update the settings of a project.
 
     If from_api is true, all values that are not specified will be changed
     back to their default value.
@@ -2400,8 +2396,7 @@ def search_projects(
     private=None,
     owner=None,
 ):
-    """List existing projects
-    """
+    """List existing projects"""
     projects = session.query(sqlalchemy.distinct(model.Project.id))
 
     if owner is not None and username is not None:
@@ -2647,8 +2642,7 @@ def list_users_projects(
     private=None,
     acls=None,
 ):
-    """List a users projects
-    """
+    """List a users projects"""
     projects = session.query(sqlalchemy.distinct(model.Project.id))
 
     if acls is None:
@@ -2838,8 +2832,7 @@ def list_users_projects(
 
 
 def _get_project(session, name, user=None, namespace=None):
-    """Get a project from the database
-    """
+    """Get a project from the database"""
     case = pagure_config.get("CASE_SENSITIVE", False)
 
     query = session.query(model.Project)
@@ -2905,7 +2898,7 @@ def search_issues(
     order="desc",
     order_key=None,
 ):
-    """ Retrieve one or more issues associated to a project with the given
+    """Retrieve one or more issues associated to a project with the given
     criterias.
 
     Watch out that the closed argument is incompatible with the status
@@ -3242,8 +3235,7 @@ def search_issues(
 
 
 def get_tags_of_project(session, project, pattern=None):
-    """ Returns the list of tags associated with the issues of a project.
-    """
+    """Returns the list of tags associated with the issues of a project."""
     query = (
         session.query(model.TagColored)
         .filter(model.TagColored.tag != "")
@@ -3260,16 +3252,14 @@ def get_tags_of_project(session, project, pattern=None):
 
 
 def get_tag(session, tag):
-    """ Returns a Tag object for the given tag text.
-    """
+    """Returns a Tag object for the given tag text."""
     query = session.query(model.Tag).filter(model.Tag.tag == tag)
 
     return query.first()
 
 
 def get_colored_tag(session, tag, project_id):
-    """ Returns a TagColored object for the given tag text.
-    """
+    """Returns a TagColored object for the given tag text."""
     query = (
         session.query(model.TagColored)
         .filter(model.TagColored.tag == tag)
@@ -3297,8 +3287,7 @@ def search_pull_requests(
     order_key=None,
     search_pattern=None,
 ):
-    """ Retrieve the specified pull-requests.
-    """
+    """Retrieve the specified pull-requests."""
 
     query = session.query(model.PullRequest)
 
@@ -3444,8 +3433,7 @@ def search_pull_requests(
 
 
 def reopen_pull_request(session, request, user):
-    """ Re-Open the provided pull request
-    """
+    """Re-Open the provided pull request"""
     if request.status != "Closed":
         raise pagure.exceptions.PagureException(
             "Trying to reopen a pull request that is not closed"
@@ -3479,8 +3467,7 @@ def reopen_pull_request(session, request, user):
 
 
 def close_pull_request(session, request, user, merged=True):
-    """ Close the provided pull-request.
-    """
+    """Close the provided pull-request."""
     user_obj = get_user(session, user)
 
     if merged is True:
@@ -3527,8 +3514,7 @@ def close_pull_request(session, request, user, merged=True):
 
 
 def reset_status_pull_request(session, project, but_uids=None):
-    """ Reset the status of all opened Pull-Requests of a project.
-    """
+    """Reset the status of all opened Pull-Requests of a project."""
     query = (
         session.query(model.PullRequest)
         .filter(model.PullRequest.project_id == project.id)
@@ -3585,8 +3571,7 @@ def add_attachment(repo, issue, attachmentfolder, user, filename, filestream):
 
 
 def get_issue_statuses(session):
-    """ Return the complete list of status an issue can have.
-    """
+    """Return the complete list of status an issue can have."""
     output = []
     statuses = session.query(model.StatusIssue).all()
     for status in statuses:
@@ -3595,8 +3580,7 @@ def get_issue_statuses(session):
 
 
 def get_issue_comment(session, issue_uid, comment_id):
-    """ Return a specific comment of a specified issue.
-    """
+    """Return a specific comment of a specified issue."""
     query = (
         session.query(model.IssueComment)
         .filter(model.IssueComment.issue_uid == issue_uid)
@@ -3609,8 +3593,7 @@ def get_issue_comment(session, issue_uid, comment_id):
 def get_issue_comment_by_user_and_comment(
     session, issue_uid, user_id, content
 ):
-    """ Return a specific comment of a specified issue.
-    """
+    """Return a specific comment of a specified issue."""
     query = (
         session.query(model.IssueComment)
         .filter(model.IssueComment.issue_uid == issue_uid)
@@ -3622,8 +3605,7 @@ def get_issue_comment_by_user_and_comment(
 
 
 def get_request_comment(session, request_uid, comment_id):
-    """ Return a specific comment of a specified request.
-    """
+    """Return a specific comment of a specified request."""
     query = (
         session.query(model.PullRequestComment)
         .filter(model.PullRequestComment.pull_request_uid == request_uid)
@@ -3634,7 +3616,7 @@ def get_request_comment(session, request_uid, comment_id):
 
 
 def get_issue_by_uid(session, issue_uid):
-    """ Return the issue corresponding to the specified unique identifier.
+    """Return the issue corresponding to the specified unique identifier.
 
     :arg session: the session to use to connect to the database.
     :arg issue_uid: the unique identifier of an issue. This identifier is
@@ -3651,7 +3633,7 @@ def get_issue_by_uid(session, issue_uid):
 
 
 def get_request_by_uid(session, request_uid):
-    """ Return the request corresponding to the specified unique identifier.
+    """Return the request corresponding to the specified unique identifier.
 
     :arg session: the session to use to connect to the database.
     :arg request_uid: the unique identifier of a request. This identifier is
@@ -3670,7 +3652,7 @@ def get_request_by_uid(session, request_uid):
 
 
 def get_pull_request_flag_by_uid(session, request, flag_uid):
-    """ Return the flag corresponding to the specified unique identifier.
+    """Return the flag corresponding to the specified unique identifier.
 
     :arg session: the session to use to connect to the database.
     :arg request: the pull-request that was flagged
@@ -3692,7 +3674,7 @@ def get_pull_request_flag_by_uid(session, request, flag_uid):
 
 
 def get_commit_flag_by_uid(session, commit_hash, flag_uid):
-    """ Return the flag corresponding to the specified unique identifier.
+    """Return the flag corresponding to the specified unique identifier.
 
     :arg session: the session to use to connect to the database.
     :arg commit_hash: the hash of the commit that got flagged
@@ -3754,8 +3736,8 @@ def set_up_user(
 
 
 def allowed_emailaddress(email):
-    """ check if email domains are restricted and if a given email address
-    is allowed. """
+    """check if email domains are restricted and if a given email address
+    is allowed."""
     allowed_email_domains = pagure_config.get("ALLOWED_EMAIL_DOMAINS", None)
     if allowed_email_domains:
         for domain in allowed_email_domains:
@@ -3836,7 +3818,7 @@ def avatar_url_from_email(email, size=64, default="retro", dns=False):
 
 
 def update_tags(session, obj, tags, username):
-    """ Update the tags of a specified object (adding or removing them).
+    """Update the tags of a specified object (adding or removing them).
     This object can be either an issue or a project.
 
     """
@@ -3866,9 +3848,7 @@ def update_tags(session, obj, tags, username):
 
 
 def update_dependency_issue(session, repo, issue, depends, username):
-    """ Update the dependency of a specified issue (adding or removing them)
-
-    """
+    """Update the dependency of a specified issue (adding or removing them)"""
     if isinstance(depends, six.string_types):
         depends = [depends]
 
@@ -3911,7 +3891,7 @@ def update_dependency_issue(session, repo, issue, depends, username):
 
 
 def update_blocked_issue(session, repo, issue, blocks, username):
-    """ Update the upstream dependency of a specified issue (adding or
+    """Update the upstream dependency of a specified issue (adding or
     removing them)
 
     """
@@ -3959,8 +3939,7 @@ def update_blocked_issue(session, repo, issue, blocks, username):
 
 
 def add_user_pending_email(session, userobj, email):
-    """ Add the provided email to the specified user.
-    """
+    """Add the provided email to the specified user."""
     try:
         allowed_emailaddress(email)
     except pagure.exceptions.PagureException:
@@ -3989,7 +3968,7 @@ def add_user_pending_email(session, userobj, email):
 
 
 def resend_pending_email(session, userobj, email):
-    """ Resend to the user the confirmation email for the provided email
+    """Resend to the user the confirmation email for the provided email
     address.
     """
     other_user = search_user(session, email=email)
@@ -4012,7 +3991,7 @@ def resend_pending_email(session, userobj, email):
 
 
 def search_pending_email(session, email=None, token=None):
-    """ Searches the database for the pending email matching the given
+    """Searches the database for the pending email matching the given
     criterias.
 
     :arg session: the session to use to connect to the database.
@@ -4038,9 +4017,7 @@ def search_pending_email(session, email=None, token=None):
 
 
 def generate_hook_token(session):
-    """ For each project in the database, re-generate a unique hook_token.
-
-    """
+    """For each project in the database, re-generate a unique hook_token."""
 
     for project in search_projects(session):
         project.hook_token = pagure.lib.login.id_generator(40)
@@ -4049,9 +4026,7 @@ def generate_hook_token(session):
 
 
 def get_group_types(session, group_type=None):
-    """ Return the list of type a group can have.
-
-    """
+    """Return the list of type a group can have."""
     query = session.query(model.PagureGroupType).order_by(
         model.PagureGroupType.group_type
     )
@@ -4072,9 +4047,7 @@ def search_groups(
     limit=None,
     count=False,
 ):
-    """ Return the groups based on the criteria specified.
-
-    """
+    """Return the groups based on the criteria specified."""
     query = session.query(model.PagureGroup).order_by(
         model.PagureGroup.group_type, model.PagureGroup.group_name
     )
@@ -4113,7 +4086,7 @@ def search_groups(
 def add_user_to_group(
     session, username, group, user, is_admin, from_external=False
 ):
-    """ Add the specified user to the given group.
+    """Add the specified user to the given group.
 
     from_external indicates whether this is a remotely synced group.
     """
@@ -4156,8 +4129,7 @@ def add_user_to_group(
 
 
 def edit_group_info(session, group, display_name, description, user, is_admin):
-    """ Edit the information regarding a given group.
-    """
+    """Edit the information regarding a given group."""
     action_user = user
     user = search_user(session, username=user)
     if not user:
@@ -4210,8 +4182,7 @@ def delete_user_of_group(
     force=False,
     from_external=False,
 ):
-    """ Removes the specified user from the given group.
-    """
+    """Removes the specified user from the given group."""
     group_obj = search_groups(session, group_name=groupname)
 
     if not group_obj:
@@ -4267,8 +4238,7 @@ def add_group(
     is_admin,
     blacklist,
 ):
-    """ Creates a new group with the given information.
-    """
+    """Creates a new group with the given information."""
     if " " in group_name:
         raise pagure.exceptions.PagureException(
             "Spaces are not allowed in group names: %s" % group_name
@@ -4326,7 +4296,7 @@ def add_group(
 
 
 def get_user_group(session, userid, groupid):
-    """ Return a specific user_group for the specified group and user
+    """Return a specific user_group for the specified group and user
     identifiers.
 
     :arg session: the session with which to connect to the database.
@@ -4354,7 +4324,7 @@ def is_group_member(session, user, groupname):
 
 
 def get_api_token(session, token_str):
-    """ Return the Token object corresponding to the provided token string
+    """Return the Token object corresponding to the provided token string
     if there is any, returns None otherwise.
     """
     query = session.query(model.Token).filter(model.Token.id == token_str)
@@ -4363,7 +4333,7 @@ def get_api_token(session, token_str):
 
 
 def get_acls(session, restrict=None):
-    """ Returns all the possible ACLs a token can have according to the
+    """Returns all the possible ACLs a token can have according to the
     database.
     """
     query = session.query(model.ACL).order_by(model.ACL.name)
@@ -4379,7 +4349,7 @@ def get_acls(session, restrict=None):
 def add_token_to_user(
     session, project, acls, username, expiration_date, description=None
 ):
-    """ Create a new token for the specified user on the specified project
+    """Create a new token for the specified user on the specified project
     with the given ACLs.
     """
     acls_obj = session.query(model.ACL).filter(model.ACL.name.in_(acls)).all()
@@ -4413,7 +4383,7 @@ def add_token_to_user(
 
 
 def _convert_markdown(md_processor, text):
-    """ Small function converting the text to html using the given markdown
+    """Small function converting the text to html using the given markdown
     processor.
 
     This was done in order to make testing it easier.
@@ -4422,8 +4392,7 @@ def _convert_markdown(md_processor, text):
 
 
 def text2markdown(text, extended=True, readme=False):
-    """ Simple text to html converter using the markdown library.
-    """
+    """Simple text to html converter using the markdown library."""
     extensions = [
         "markdown.extensions.def_list",
         "markdown.extensions.fenced_code",
@@ -4490,7 +4459,7 @@ def filter_img_src(name, value):
 
 
 def clean_input(text, ignore=None):
-    """ For a given html text, escape everything we do not want to support
+    """For a given html text, escape everything we do not want to support
     to avoid potential security breach.
     """
     if ignore and not isinstance(ignore, (tuple, set, list)):
@@ -4564,8 +4533,7 @@ def clean_input(text, ignore=None):
 
 
 def could_be_text(text):
-    """ Returns whether we think this chain of character could be text or not
-    """
+    """Returns whether we think this chain of character could be text or not"""
     try:
         text.decode("utf-8")
         return True
@@ -4711,7 +4679,7 @@ def get_pull_request_of_user(
 
 
 def update_watch_status(session, project, user, watch):
-    """ Update the user status for watching a project.
+    """Update the user status for watching a project.
 
     The watch status can be:
         -1: reset the watch status to default
@@ -4784,8 +4752,7 @@ def update_watch_status(session, project, user, watch):
 def get_watch_level_on_repo(
     session, user, repo, repouser=None, namespace=None
 ):
-    """ Get a list representing the watch level of the user on the project.
-    """
+    """Get a list representing the watch level of the user on the project."""
     # If a user wasn't passed in, we can't determine their watch level
     if user is None:
         return []
@@ -4903,7 +4870,7 @@ def user_watch_list(session, user, exclude_groups=None):
 
 
 def set_watch_obj(session, user, obj, watch_status):
-    """ Set the watch status of the user on the specified object.
+    """Set the watch status of the user on the specified object.
 
     Objects can be either an issue or a pull-request
     """
@@ -4952,8 +4919,7 @@ def set_watch_obj(session, user, obj, watch_status):
 
 
 def get_watch_list(session, obj):
-    """ Return a list of all the users that are watching the "object"
-    """
+    """Return a list of all the users that are watching the "object" """
     private = False
     if obj.isa == "issue":
         private = obj.private
@@ -5020,8 +4986,7 @@ def get_watch_list(session, obj):
 
 
 def save_report(session, repo, name, url, username):
-    """ Save the report of issues based on the given URL of the project.
-    """
+    """Save the report of issues based on the given URL of the project."""
     url_obj = urlparse(url)
     url = url_obj.geturl().replace(url_obj.query, "")
     query = {}
@@ -5040,7 +5005,7 @@ def save_report(session, repo, name, url, username):
 
 
 def set_custom_key_fields(session, project, fields, types, data, notify=None):
-    """ Set or update the custom key fields of a project with the values
+    """Set or update the custom key fields of a project with the values
     provided.  "data" is currently only used for lists and dates
     """
 
@@ -5087,8 +5052,7 @@ def set_custom_key_fields(session, project, fields, types, data, notify=None):
 
 
 def set_custom_key_value(session, issue, key, value):
-    """ Set or update the value of the specified custom key.
-    """
+    """Set or update the value of the specified custom key."""
 
     query = (
         session.query(model.IssueValues)
@@ -5152,7 +5116,7 @@ def set_custom_key_value(session, issue, key, value):
 
 
 def get_yearly_stats_user(session, user, date, tz="UTC"):
-    """ Return the activity of the specified user in the year preceding the
+    """Return the activity of the specified user in the year preceding the
     specified date. 'offset' is intended to be a timezone offset from UTC,
     in minutes: you can discover the offset for a timezone and pass that
     in order for the results to be relative to that timezone. Note, offset
@@ -5178,7 +5142,7 @@ def get_yearly_stats_user(session, user, date, tz="UTC"):
 
 
 def get_user_activity_day(session, user, date, tz="UTC"):
-    """ Return the activity of the specified user on the specified date.
+    """Return the activity of the specified user on the specified date.
     'offset' is intended to be a timezone offset from UTC, in minutes:
     you can discover the offset for a timezone and pass that, so this
     will return activity that occurred on the specified date in the
@@ -5276,7 +5240,7 @@ def email_logs_count(session, email):
 
 
 def update_log_email_user(session, email, user):
-    """ Update the logs with the provided email to point to the specified
+    """Update the logs with the provided email to point to the specified
     user.
     """
     session.query(model.PagureLog).filter(
@@ -5297,8 +5261,7 @@ def get_custom_key(session, project, keyname):
 
 
 def get_active_milestones(session, project):
-    """ Returns the list of all the active milestones for a given project.
-    """
+    """Returns the list of all the active milestones for a given project."""
 
     query = (
         session.query(model.Issue.milestone)
@@ -5311,7 +5274,7 @@ def get_active_milestones(session, project):
 
 
 def add_metadata_update_notif(session, obj, messages, user):
-    """ Add a notification to the specified issue with the given messages
+    """Add a notification to the specified issue with the given messages
     which should reflect changes made to the meta-data of the issue.
     """
     if not messages:
@@ -5419,7 +5382,7 @@ def get_access_levels(session):
 
 
 def get_obj_access(session, project_obj, obj):
-    """ Returns the level of access the user/group has on the project.
+    """Returns the level of access the user/group has on the project.
 
     :arg session: the session to use to connect to the database.
     :arg project_obj: SQLAlchemy object of Project class
@@ -5451,7 +5414,7 @@ def search_token(
     expired=False,
     description=None,
 ):
-    """ Searches the API tokens corresponding to the criterias specified.
+    """Searches the API tokens corresponding to the criterias specified.
 
     :arg session: the session to use to connect to the database.
     :arg acls: List of the ACL associated with these API tokens
@@ -5497,7 +5460,7 @@ def search_token(
 
 
 def set_project_owner(session, project, user, required_groups=None):
-    """ Set the ownership of a project
+    """Set the ownership of a project
     :arg session: the session to use to connect to the database.
     :arg project: a Project object representing the project's ownership to
     change.
@@ -5604,7 +5567,7 @@ def get_pagination_metadata(
 
 
 def update_star_project(session, repo, star, user):
-    """ Unset or set the star status depending on the star value.
+    """Unset or set the star status depending on the star value.
 
     :arg session: the session to use to connect to the database.
     :arg repo: a model.Project object representing the project to star/unstar
@@ -5626,7 +5589,7 @@ def update_star_project(session, repo, star, user):
 
 
 def _star_project(session, repo, user):
-    """ Star a project
+    """Star a project
 
     :arg session: Session object to connect to db with
     :arg repo: model.Project object representing the repo to star
@@ -5642,7 +5605,7 @@ def _star_project(session, repo, user):
 
 
 def _unstar_project(session, repo, user):
-    """ Unstar a project
+    """Unstar a project
     :arg session: Session object to connect to db with
     :arg repo: model.Project object representing the repo to unstar
     :arg user: model.User object who is unstarring this repo
@@ -5663,7 +5626,7 @@ def _unstar_project(session, repo, user):
 
 
 def _get_stargazer_obj(session, repo, user):
-    """ Query the db to find stargazer object with given repo and user
+    """Query the db to find stargazer object with given repo and user
     :arg session: Session object to connect to db with
     :arg repo: model.Project object
     :arg user: model.User object
@@ -5682,7 +5645,7 @@ def _get_stargazer_obj(session, repo, user):
 
 
 def has_starred(session, repo, user):
-    """ Check if a given user has starred a particular project
+    """Check if a given user has starred a particular project
 
     :arg session: The session object to query the db with
     :arg repo: model.Project object for which the star is checked
@@ -5700,7 +5663,7 @@ def has_starred(session, repo, user):
 
 
 def update_read_only_mode(session, repo, read_only=True):
-    """ Remove the read only mode from the project
+    """Remove the read only mode from the project
 
     :arg session: The session object to query the db with
     :arg repo: model.Project object to mark/unmark read only
@@ -5724,7 +5687,7 @@ def update_read_only_mode(session, repo, read_only=True):
 
 
 def issues_history_stats(session, project, detailed=False, weeks_range=53):
-    """ Returns the number of opened issues on the specified project over
+    """Returns the number of opened issues on the specified project over
     the last 365 days
 
     :arg session: The session object to query the db with
@@ -5807,7 +5770,7 @@ def issues_history_stats(session, project, detailed=False, weeks_range=53):
 def get_authorized_project(
     session, project_name, user=None, namespace=None, asuser=None
 ):
-    """ Retrieving the project with user permission constraint
+    """Retrieving the project with user permission constraint
 
     :arg session: The SQLAlchemy session to use
     :type session: sqlalchemy.orm.session.Session
@@ -5833,7 +5796,7 @@ def get_authorized_project(
 
 
 def get_project_family(session, project):
-    """ Retrieve the family of the specified project, ie: all the forks
+    """Retrieve the family of the specified project, ie: all the forks
     of the main project.
     If the specified project is a fork, let's work our way up the chain
     until we find the main project so we can go down and get all the forks
@@ -5868,7 +5831,7 @@ def get_project_family(session, project):
 
 
 def link_pr_issue(session, issue, request, origin="commit"):
-    """ Associate the specified issue with the specified pull-requets.
+    """Associate the specified issue with the specified pull-requets.
 
     :arg session: The SQLAlchemy session to use
     :type session: sqlalchemy.orm.session.Session
@@ -5890,7 +5853,7 @@ def link_pr_issue(session, issue, request, origin="commit"):
 
 
 def remove_user_of_project(session, user, project, agent):
-    """ Remove the specified user from the given project.
+    """Remove the specified user from the given project.
 
     :arg session: the session with which to connect to the database.
     :arg user: an pagure.lib.model.User object to remove from the project.
@@ -5932,7 +5895,7 @@ def remove_user_of_project(session, user, project, agent):
 
 
 def create_board(session, project, name, active, tag):
-    """ Create a board on a given project.
+    """Create a board on a given project.
 
     :arg session: the session with which to connect to the database.
     :arg project: the model.Project of the project that is creating the
@@ -5957,7 +5920,7 @@ def create_board(session, project, name, active, tag):
 
 
 def edit_board(session, project, name, active, tag, bg_color=None):
-    """ Edit an existing board on a given project.
+    """Edit an existing board on a given project.
 
     :arg session: the session with which to connect to the database.
     :arg project: the model.Project of the project that is creating the
@@ -5995,7 +5958,7 @@ def edit_board(session, project, name, active, tag, bg_color=None):
 
 
 def delete_board(session, project, names):
-    """ Delete boards of a given project.
+    """Delete boards of a given project.
 
     :arg session: the session with which to connect to the database.
     :arg project: the model.Project of the project that is creating the
@@ -6017,7 +5980,7 @@ def delete_board(session, project, names):
 def update_board_status(
     session, board, name, rank, default, close, close_status, bg_color
 ):
-    """ Create or update the board statuses of a project.
+    """Create or update the board statuses of a project.
 
     :arg session: the session with which to connect to the database.
     :arg board: the model.Board of the board being updated.
@@ -6063,7 +6026,7 @@ def update_board_status(
 def add_issue_to_boards(
     session, issue, board_name, user, status_id=None, rank=None
 ):
-    """ Add the given issue to the boards specified.
+    """Add the given issue to the boards specified.
 
     :arg session: the session with which to connect to the database.
     :arg issue: the model.Issue of the issue to add to the boards.
@@ -6104,13 +6067,15 @@ def add_issue_to_boards(
         rank = len(status.boards_issues) + 1
 
     board_issue = model.BoardIssues(
-        issue_uid=issue.uid, status_id=status.id, rank=rank,
+        issue_uid=issue.uid,
+        status_id=status.id,
+        rank=rank,
     )
     session.add(board_issue)
 
 
 def remove_issue_from_boards(session, issue, board_names, user):
-    """ Remove the given issue from the specified boards.
+    """Remove the given issue from the specified boards.
 
     :arg session: the session with which to connect to the database.
     :arg issue: the model.Issue of the issue to add to the boards.
@@ -6135,8 +6100,7 @@ def update_ticket_board_status(
     ticket_uid=None,
     ticket_id=None,
 ):
-    """ Set the status of a ticket on a given board.
-    """
+    """Set the status of a ticket on a given board."""
     if not ticket_uid and not ticket_id:
         raise pagure.exceptions.PagureException(
             "One of ticket_id/ticket_uid must be provided"
@@ -6203,7 +6167,9 @@ def update_ticket_board_status(
     if board.name not in seen:
         _log.debug("Adding to a new board")
         board_issue = model.BoardIssues(
-            issue_uid=ticket.uid, status_id=status.id, rank=rank,
+            issue_uid=ticket.uid,
+            status_id=status.id,
+            rank=rank,
         )
         session.add(board_issue)
 
@@ -6233,7 +6199,10 @@ def update_ticket_board_status(
     elif not status.close and ticket.status != "Open":
         comments.extend(
             edit_issue(
-                session=session, issue=ticket, user=user, status="Open",
+                session=session,
+                issue=ticket,
+                user=user,
+                status="Open",
             )
         )
         session.add(ticket)

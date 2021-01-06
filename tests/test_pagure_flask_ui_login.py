@@ -362,7 +362,8 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
             output.get_data(as_text=True),
         )
         self.assertIn(
-            "Username or password invalid.", output.get_data(as_text=True),
+            "Username or password invalid.",
+            output.get_data(as_text=True),
         )
 
         # Check the password is still not of a known version
@@ -476,8 +477,8 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
     @patch.dict("pagure.config.config", {"PAGURE_AUTH": "local"})
     @patch.dict("pagure.config.config", {"CHECK_SESSION_IP": False})
     def test_has_settings(self):
-        """ Test that user can see the Settings button when they are logged
-        in. """
+        """Test that user can see the Settings button when they are logged
+        in."""
         # Create a local user
         self.test_new_user()
         self.session.commit()
@@ -517,8 +518,8 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
     @patch.dict("pagure.config.config", {"PAGURE_AUTH": "local"})
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_non_ascii_password(self):
-        """ Test login and create user functionality when the password is
-            non-ascii.
+        """Test login and create user functionality when the password is
+        non-ascii.
         """
 
         # Check before:

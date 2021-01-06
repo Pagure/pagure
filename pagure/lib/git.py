@@ -54,7 +54,7 @@ _log = logging.getLogger(__name__)
 def commit_to_patch(
     repo_obj, commits, diff_view=False, find_similar=False, separated=False
 ):
-    """ For a given commit (PyGit2 commit object) of a specified git repo,
+    """For a given commit (PyGit2 commit object) of a specified git repo,
     returns a string representation of the changes the commit did in a
     format that allows it to be used as patch.
 
@@ -145,7 +145,7 @@ Subject: {subject}
 
 
 def generate_gitolite_acls(project=None, group=None):
-    """ Generate the gitolite configuration file.
+    """Generate the gitolite configuration file.
 
     :arg project: the project of which to update the ACLs. This argument
             can take three values: ``-1``, ``None`` and a project.
@@ -197,10 +197,10 @@ def update_git(obj, repo):
 
 
 def _maybe_wait(result):
-    """ Function to patch if one wants to wait for finish.
+    """Function to patch if one wants to wait for finish.
 
     This function should only ever be overridden by a few tests that depend
-    on counting and very precise timing. """
+    on counting and very precise timing."""
     pass
 
 
@@ -214,7 +214,7 @@ def _make_signature(name, email):
 
 
 def _update_git(obj, repo):
-    """ Update the given issue in its git.
+    """Update the given issue in its git.
 
     This method forks the provided repo, add/edit the issue whose file name
     is defined by the uid field of the issue and if there are additions/
@@ -313,9 +313,7 @@ def clean_git(repo, obj_repotype, obj_uid):
 
 
 def _clean_git(repo, obj_repotype, obj_uid):
-    """ Update the given issue remove it from its git.
-
-    """
+    """Update the given issue remove it from its git."""
     _log.info("Update the git repo: %s to remove: %s", repo.path, obj_uid)
 
     with TemporaryClone(repo, obj_repotype, "clean_git") as tempclone:
@@ -369,7 +367,7 @@ def _clean_git(repo, obj_repotype, obj_uid):
 
 
 def get_user_from_json(session, jsondata, key="user"):
-    """ From the given json blob, retrieve the user info and search for it
+    """From the given json blob, retrieve the user info and search for it
     in the db and create the user if it does not already exist.
     """
     user = None
@@ -412,7 +410,7 @@ def get_user_from_json(session, jsondata, key="user"):
 
 
 def get_project_from_json(session, jsondata):
-    """ From the given json blob, retrieve the project info and search for
+    """From the given json blob, retrieve the project info and search for
     it in the db and create the projec if it does not already exist.
     """
     project = None
@@ -468,7 +466,7 @@ def get_project_from_json(session, jsondata):
 
 
 def update_custom_field_from_json(session, repo, issue, json_data):
-    """ Update the custom fields according to the custom fields of
+    """Update the custom fields according to the custom fields of
     the issue. If the custom field is not present for the repo in
     it's settings, this will create them.
 
@@ -522,7 +520,7 @@ def update_custom_field_from_json(session, repo, issue, json_data):
 def update_ticket_from_git(
     session, reponame, namespace, username, issue_uid, json_data, agent
 ):
-    """ Update the specified issue (identified by its unique identifier)
+    """Update the specified issue (identified by its unique identifier)
     with the data present in the json blob provided.
 
     :arg session: the session to connect to the database with.
@@ -797,7 +795,7 @@ def update_ticket_from_git(
 def update_request_from_git(
     session, reponame, namespace, username, request_uid, json_data
 ):
-    """ Update the specified request (identified by its unique identifier)
+    """Update the specified request (identified by its unique identifier)
     with the data present in the json blob provided.
 
     :arg session: the session to connect to the database with.
@@ -897,7 +895,7 @@ def update_request_from_git(
 
 
 def _add_file_to_git(repo, issue, attachmentfolder, user, filename):
-    """ Add a given file to the specified ticket git repository.
+    """Add a given file to the specified ticket git repository.
 
     :arg repo: the Project object from the database
     :arg attachmentfolder: the folder on the filesystem where the attachments
@@ -982,7 +980,7 @@ class TemporaryClone(object):
     repo = None
 
     def __init__(self, project, repotype, action, path=None, parent=None):
-        """ Initializes a TempoaryClone instance.
+        """Initializes a TempoaryClone instance.
 
         Args:
             project (model.Project): A project instance
@@ -1095,7 +1093,7 @@ class TemporaryClone(object):
         shutil.rmtree(self.repopath)
 
     def change_project_association(self, new_project):
-        """ Make this instance "belong" to another project.
+        """Make this instance "belong" to another project.
 
         This is useful when you want to create TemporaryClone of one project
         and then push some of its content into a different project just
@@ -1112,7 +1110,7 @@ class TemporaryClone(object):
             )
 
     def mirror(self, username, force=False, **extra):
-        """ Run ``git push --mirror`` of the repo to its origin.
+        """Run ``git push --mirror`` of the repo to its origin.
 
         Args:
             username (string): The user on who's account this push is
@@ -1125,7 +1123,7 @@ class TemporaryClone(object):
             self._push(username, "--mirror", force, **extra)
 
     def push(self, username, sbranch, tbranch=None, force=False, **extra):
-        """ Push the repo back to its origin.
+        """Push the repo back to its origin.
 
         Args:
             username (string): The user on who's account this push is
@@ -1139,7 +1137,7 @@ class TemporaryClone(object):
         self._push(username, pushref, force, **extra)
 
     def _push(self, username, pushref, force, **extra):
-        """ Push the repo back to its origin.
+        """Push the repo back to its origin.
 
         Args:
             username (string): The user on who's account this push is
@@ -1243,7 +1241,7 @@ class TemporaryClone(object):
 def _update_file_in_git(
     repo, branch, branchto, filename, content, message, user, email
 ):
-    """ Update a specific file in the specified repository with the content
+    """Update a specific file in the specified repository with the content
     given and commit the change under the user's name.
 
     :arg repo: the Project object from the database
@@ -1327,7 +1325,7 @@ def _update_file_in_git(
 
 
 def read_output(cmd, abspath, input=None, keepends=False, error=False, **kw):
-    """ Read the output from the given command to run.
+    """Read the output from the given command to run.
 
     cmd:
         The command to run, this is a list with each space separated into an
@@ -1428,7 +1426,7 @@ def get_revs_between(oldrev, newrev, abspath, refname, forced=False):
 
 
 def is_forced_push(oldrev, newrev, abspath):
-    """ Returns whether there was a force push between HEAD and BASE.
+    """Returns whether there was a force push between HEAD and BASE.
     Doc: http://stackoverflow.com/a/12258773
     """
 
@@ -1442,7 +1440,7 @@ def is_forced_push(oldrev, newrev, abspath):
 
 
 def get_base_revision(torev, fromrev, abspath):
-    """ Return the base revision between HEAD and BASE.
+    """Return the base revision between HEAD and BASE.
     This is useful in case of force-push.
     """
     cmd = ["merge-base", fromrev, torev]
@@ -1484,7 +1482,7 @@ def get_commit_subject(commit, abspath):
 
 
 def get_repo_info_from_path(gitdir, hide_notfound=False):
-    """ Returns the name, username, namespace and type of a git directory
+    """Returns the name, username, namespace and type of a git directory
 
     This gets computed based on the *_FOLDER's in the config file,
     and as such only works for the central file-based repositories.
@@ -1591,29 +1589,25 @@ def get_repo_info_from_path(gitdir, hide_notfound=False):
 
 
 def get_repo_name(abspath):
-    """ Return the name of the git repo based on its path.
-    """
+    """Return the name of the git repo based on its path."""
     _, _, _, name = get_repo_info_from_path(abspath)
     return name
 
 
 def get_repo_namespace(abspath, gitfolder=None):
-    """ Return the name of the git repo based on its path.
-    """
+    """Return the name of the git repo based on its path."""
     _, _, namespace, _ = get_repo_info_from_path(abspath)
     return namespace
 
 
 def get_username(abspath):
-    """ Return the username of the git repo based on its path.
-    """
+    """Return the username of the git repo based on its path."""
     _, username, _, _ = get_repo_info_from_path(abspath)
     return username
 
 
 def get_branch_ref(repo, branchname):
-    """ Return the reference to the specified branch or raises an exception.
-    """
+    """Return the reference to the specified branch or raises an exception."""
     location = pygit2.GIT_BRANCH_LOCAL
     if branchname not in repo.listall_branches():
         branchname = "origin/%s" % branchname
@@ -1628,8 +1622,7 @@ def get_branch_ref(repo, branchname):
 
 
 def merge_pull_request(session, request, username, domerge=True):
-    """ Merge the specified pull-request.
-    """
+    """Merge the specified pull-request."""
     if domerge:
         _log.info("%s asked to merge the pull-request: %s", username, request)
     else:
@@ -1955,7 +1948,7 @@ def merge_pull_request(session, request, username, domerge=True):
 
 
 def rebase_pull_request(session, request, username):
-    """ Rebase the specified pull-request.
+    """Rebase the specified pull-request.
 
     Args:
         session (sqlalchemy): the session to connect to the database with
@@ -2094,7 +2087,7 @@ def rebase_pull_request(session, request, username):
 
 
 def get_diff_info(repo_obj, orig_repo, branch_from, branch_to, prid=None):
-    """ Return the info needed to see a diff or make a Pull-Request between
+    """Return the info needed to see a diff or make a Pull-Request between
     the two specified repo.
 
     :arg repo_obj: The pygit2.Repository object of the first git repo
@@ -2261,7 +2254,7 @@ def diff_pull_request(
     notify=True,
     username=None,
 ):
-    """ Returns the diff and the list of commits between the two git repos
+    """Returns the diff and the list of commits between the two git repos
     mentionned in the given pull-request.
 
     :arg session: The sqlalchemy session to connect to the database
@@ -2383,8 +2376,7 @@ def diff_pull_request(
 
 
 def update_pull_ref(request, repo):
-    """ Create or update the refs/pull/ reference in the git repo.
-    """
+    """Create or update the refs/pull/ reference in the git repo."""
 
     repopath = pagure.utils.get_repo_path(request.project)
     reponame = "%s_%s" % (request.user.user, request.uid)
@@ -2422,7 +2414,7 @@ def update_pull_ref(request, repo):
 
 
 def get_git_tags(project, with_commits=False):
-    """ Returns the list of tags created in the git repositorie of the
+    """Returns the list of tags created in the git repositorie of the
     specified project.
     """
     repopath = pagure.utils.get_repo_path(project)
@@ -2448,7 +2440,7 @@ def get_git_tags(project, with_commits=False):
 
 
 def new_git_tag(project, tagname, target, user, message=None, force=False):
-    """ Create a new git tag in the git repositorie of the specified project.
+    """Create a new git tag in the git repositorie of the specified project.
 
     :arg project: the project in which we want to create a git tag
     :type project: pagure.lib.model.Project
@@ -2486,9 +2478,9 @@ def new_git_tag(project, tagname, target, user, message=None, force=False):
 
 
 def get_git_tags_objects(project):
-    """ Returns the list of references of the tags created in the git
+    """Returns the list of references of the tags created in the git
     repositorie the specified project.
-    The list is sorted using the time of the commit associated to the tag """
+    The list is sorted using the time of the commit associated to the tag"""
     repopath = pagure.utils.get_repo_path(project)
     repo_obj = PagureRepo(repopath)
     tags = {}
@@ -2566,7 +2558,7 @@ def log_commits_to_db(session, project, commits, gitdir):
 
 
 def reinit_git(project, repofolder):
-    """ Delete and recreate a git folder
+    """Delete and recreate a git folder
     :args project: SQLAlchemy object of the project
     :args folder: The folder which contains the git repos
     like TICKETS_FOLDER for tickets and REQUESTS_FOLDER for
@@ -2587,7 +2579,7 @@ def reinit_git(project, repofolder):
 
 
 def get_git_branches(project, with_commits=False):
-    """ Return a list of branches for the project
+    """Return a list of branches for the project
     :arg project: The Project instance to get the branches for
     :arg with_commits: Whether we should return branch head commits or not
     """
@@ -2609,7 +2601,7 @@ def get_git_branches(project, with_commits=False):
 
 
 def get_default_git_branches(project):
-    """ Return a tuple of the default branchname and its head commit hash
+    """Return a tuple of the default branchname and its head commit hash
     :arg project: The Project instance to get the branches for
     """
     repo_path = pagure.utils.get_repo_path(project)
@@ -2624,7 +2616,7 @@ def get_default_git_branches(project):
 def new_git_branch(
     username, project, branch, from_branch=None, from_commit=None
 ):
-    """ Create a new git branch on the project
+    """Create a new git branch on the project
     :arg project: The Project instance to get the branches for
     :arg from_branch: The branch to branch off of
     """
@@ -2659,7 +2651,7 @@ def new_git_branch(
 
 
 def git_set_ref_head(project, branch):
-    """ Set the HEAD reference of the project
+    """Set the HEAD reference of the project
     :arg project: The project instance to set the HEAD reference
     :arg branch: The branch to be set as HEAD reference
     """
@@ -2671,7 +2663,7 @@ def git_set_ref_head(project, branch):
 
 
 def get_branch_aliases(project):
-    """ Iterates through the references of the provided git repo to extract all
+    """Iterates through the references of the provided git repo to extract all
     of its aliases.
     """
     repo_path = pagure.utils.get_repo_path(project)
@@ -2685,7 +2677,7 @@ def get_branch_aliases(project):
 
 
 def set_branch_alias(project, source, dest):
-    """ Create a reference in the provided git repo from the source reference
+    """Create a reference in the provided git repo from the source reference
     to the dest one.
     """
     repo_path = pagure.utils.get_repo_path(project)
@@ -2696,7 +2688,8 @@ def set_branch_alias(project, source, dest):
 
     try:
         repo_obj.create_reference(
-            "refs/heads/{}".format(source), "refs/heads/{}".format(dest),
+            "refs/heads/{}".format(source),
+            "refs/heads/{}".format(dest),
         )
     except ValueError as err:
         _log.debug(
@@ -2709,7 +2702,7 @@ def set_branch_alias(project, source, dest):
 
 
 def drop_branch_aliases(project, source, dest):
-    """ Delete a reference in the provided git repo from the source reference
+    """Delete a reference in the provided git repo from the source reference
     to the dest one.
     """
     repo_path = pagure.utils.get_repo_path(project)
@@ -2726,7 +2719,7 @@ def drop_branch_aliases(project, source, dest):
 
 
 def delete_project_repos(project):
-    """ Deletes the actual git repositories on disk or repoSpanner
+    """Deletes the actual git repositories on disk or repoSpanner
 
     Args:
         project (Project): Project to delete repos for
@@ -2774,7 +2767,7 @@ def delete_project_repos(project):
 
 
 def set_up_project_hooks(project, region, hook=None):
-    """ Makes sure the git repositories for a project have their hooks setup.
+    """Makes sure the git repositories for a project have their hooks setup.
 
     Args:
         project (model.Project): Project to set up hooks for
@@ -2824,7 +2817,7 @@ def set_up_project_hooks(project, region, hook=None):
 
 
 def _create_project_repo(project, region, templ, ignore_existing, repotype):
-    """ Creates a single specific git repository on disk or repoSpanner
+    """Creates a single specific git repository on disk or repoSpanner
 
     Args:
         project (Project): Project to create repos for
@@ -2901,7 +2894,7 @@ def _create_project_repo(project, region, templ, ignore_existing, repotype):
 
 
 def create_project_repos(project, region, templ, ignore_existing):
-    """ Creates the actual git repositories on disk or repoSpanner
+    """Creates the actual git repositories on disk or repoSpanner
 
     Args:
         project (Project): Project to create repos for
@@ -2930,7 +2923,7 @@ def create_project_repos(project, region, templ, ignore_existing):
 
 
 def get_stats_patch(patch):
-    """ Returns some statistics about a given patch.
+    """Returns some statistics about a given patch.
 
     These stats include:
         status: if the file was added (A), deleted (D), modified (M) or
@@ -3008,7 +3001,7 @@ def get_stats_patch(patch):
 
 
 def generate_archive(project, commit, tag, name, archive_fmt):
-    """ Generate the desired archive of the specified project for the
+    """Generate the desired archive of the specified project for the
     specified commit with the given name and archive format.
 
     Args:

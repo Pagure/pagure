@@ -38,8 +38,8 @@ class PagureLibGittests(tests.Modeltests):
     maxDiff = None
 
     def test_write_gitolite_acls(self):
-        """ Test the write_gitolite_acls function of pagure.lib.git.
-        when the new uesr is an made an admin """
+        """Test the write_gitolite_acls function of pagure.lib.git.
+        when the new uesr is an made an admin"""
         tests.create_projects(self.session)
 
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
@@ -143,8 +143,8 @@ repo requests/forks/pingou/test3
         self.assertFalse(os.path.exists(outputconf))
 
     def test_write_gitolite_acls_preconf(self):
-        """ Test the write_gitolite_acls function of pagure.lib.git with
-        a preconf set """
+        """Test the write_gitolite_acls function of pagure.lib.git with
+        a preconf set"""
         tests.create_projects(self.session)
 
         outputconf = os.path.join(self.path, "test_gitolite.conf")
@@ -214,8 +214,8 @@ repo requests/somenamespace/test3
         self.assertFalse(os.path.exists(outputconf))
 
     def test_write_gitolite_acls_preconf_postconf(self):
-        """ Test the write_gitolite_acls function of pagure.lib.git with
-        a postconf set """
+        """Test the write_gitolite_acls function of pagure.lib.git with
+        a postconf set"""
         tests.create_projects(self.session)
 
         outputconf = os.path.join(self.path, "test_gitolite.conf")
@@ -295,8 +295,8 @@ repo requests/somenamespace/test3
         self.assertFalse(os.path.exists(outputconf))
 
     def test_write_gitolite_acls_postconf(self):
-        """ Test the write_gitolite_acls function of pagure.lib.git with
-        a preconf and a postconf set """
+        """Test the write_gitolite_acls function of pagure.lib.git with
+        a preconf and a postconf set"""
         tests.create_projects(self.session)
 
         outputconf = os.path.join(self.path, "test_gitolite.conf")
@@ -483,8 +483,8 @@ repo requests/forks/pingou/test3
         self.assertFalse(os.path.exists(outputconf))
 
     def test_write_gitolite_acls_ticket(self):
-        """ Test the write_gitolite_acls function of pagure.lib.git.
-        when the new uesr is just a ticketer """
+        """Test the write_gitolite_acls function of pagure.lib.git.
+        when the new uesr is just a ticketer"""
         tests.create_projects(self.session)
 
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
@@ -586,8 +586,8 @@ repo requests/forks/pingou/test3
         self.assertFalse(os.path.exists(outputconf))
 
     def test_write_gitolite_acls_commit(self):
-        """ Test the write_gitolite_acls function of pagure.lib.git.
-        when the new uesr is just a committer """
+        """Test the write_gitolite_acls function of pagure.lib.git.
+        when the new uesr is just a committer"""
         tests.create_projects(self.session)
 
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
@@ -693,7 +693,7 @@ repo requests/forks/pingou/test3
         self.assertFalse(os.path.exists(outputconf))
 
     def test_write_gitolite_acls_groups(self):
-        """ Test the write_gitolite_acls function of pagure.lib.git with
+        """Test the write_gitolite_acls function of pagure.lib.git with
         groups as admin
         """
         tests.create_projects(self.session)
@@ -847,7 +847,7 @@ repo requests/forks/pingou/test2
         self.assertFalse(os.path.exists(outputconf))
 
     def test_write_gitolite_acls_groups_ticket(self):
-        """ Test the write_gitolite_acls function of pagure.lib.git with
+        """Test the write_gitolite_acls function of pagure.lib.git with
         groups as ticketers
         """
         tests.create_projects(self.session)
@@ -1002,7 +1002,7 @@ repo requests/forks/pingou/test2
         self.assertFalse(os.path.exists(outputconf))
 
     def test_write_gitolite_acls_groups_commit(self):
-        """ Test the write_gitolite_acls function of pagure.lib.git with
+        """Test the write_gitolite_acls function of pagure.lib.git with
         groups as committers
         """
         tests.create_projects(self.session)
@@ -1161,7 +1161,7 @@ repo requests/forks/pingou/test2
         self.assertFalse(os.path.exists(outputconf))
 
     def test_write_gitolite_project_pr_only(self):
-        """ Test the write_gitolite_acls function of pagure.lib.git.
+        """Test the write_gitolite_acls function of pagure.lib.git.
         when the project enforces the PR approach.
         """
         tests.create_projects(self.session)
@@ -1268,7 +1268,7 @@ repo requests/forks/pingou/test3
 
     @patch.dict("pagure.config.config", {"PR_ONLY": True})
     def test_write_gitolite_global_pr_only(self):
-        """ Test the write_gitolite_acls function of pagure.lib.git.
+        """Test the write_gitolite_acls function of pagure.lib.git.
         when the pagure instance enforces the PR approach.
         """
         tests.create_projects(self.session)
@@ -3355,8 +3355,8 @@ index 0000000..60f7480
     @patch("pagure.lib.notify.send_email")
     @patch("pagure.lib.git.update_git")
     def test_merge_pull_request_no_master(self, email_f, up_git):
-        """ Test the merge_pull_request function when there are no master
-        branch in the repo. """
+        """Test the merge_pull_request function when there are no master
+        branch in the repo."""
         email_f.return_value = True
         up_git.return_value = True
 
@@ -3436,8 +3436,8 @@ index 0000000..60f7480
     @patch("pagure.lib.notify.send_email")
     @patch("pagure.lib.git.update_git")
     def test_merge_pull_request_closed(self, email_f, up_git):
-        """ Test the merge_pull_request function when the PR was already
-        closed/merged. """
+        """Test the merge_pull_request function when the PR was already
+        closed/merged."""
         email_f.return_value = True
         up_git.return_value = True
 

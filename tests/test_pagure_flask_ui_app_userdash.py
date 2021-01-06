@@ -33,8 +33,8 @@ class PagureFlaskAppUserdashTests(tests.Modeltests):
     """ Tests for the index page of flask app controller of pagure """
 
     def test_index_commit_access_while_admin(self):
-        """ Test the index endpoint filter for commit access only when user
-        is an admin. """
+        """Test the index endpoint filter for commit access only when user
+        is an admin."""
         tests.create_projects(self.session)
 
         # Add a 3rd project just for foo
@@ -87,8 +87,8 @@ class PagureFlaskAppUserdashTests(tests.Modeltests):
             )
 
     def test_index_commit_access_while_commit(self):
-        """ Test the index endpoint filter for commit access only when user
-        is an committer. """
+        """Test the index endpoint filter for commit access only when user
+        is an committer."""
         tests.create_projects(self.session)
 
         # Add a 3rd project just for foo
@@ -138,8 +138,8 @@ class PagureFlaskAppUserdashTests(tests.Modeltests):
             )
 
     def test_index_commit_access_while_ticket(self):
-        """ Test the index endpoint filter for commit access only when user
-        is has ticket access. """
+        """Test the index endpoint filter for commit access only when user
+        is has ticket access."""
         tests.create_projects(self.session)
 
         # Add a 3rd project just for foo
@@ -189,8 +189,8 @@ class PagureFlaskAppUserdashTests(tests.Modeltests):
             )
 
     def test_index_admin_access_while_admin(self):
-        """ Test the index endpoint filter for admin access only when user
-        is an admin. """
+        """Test the index endpoint filter for admin access only when user
+        is an admin."""
         tests.create_projects(self.session)
 
         # Add a 3rd project just for foo
@@ -240,8 +240,8 @@ class PagureFlaskAppUserdashTests(tests.Modeltests):
             )
 
     def test_index_admin_access_while_commit(self):
-        """ Test the index endpoint filter for admin access only when user
-        is an committer. """
+        """Test the index endpoint filter for admin access only when user
+        is an committer."""
         tests.create_projects(self.session)
 
         # Add a 3rd project just for foo
@@ -292,8 +292,8 @@ class PagureFlaskAppUserdashTests(tests.Modeltests):
             )
 
     def test_index_main_admin_access_while_commit(self):
-        """ Test the index endpoint filter for main admin access only when
-        user is an committer. """
+        """Test the index endpoint filter for main admin access only when
+        user is an committer."""
         tests.create_projects(self.session)
 
         # Add a 3rd project just for foo

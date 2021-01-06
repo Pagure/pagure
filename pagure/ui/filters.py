@@ -43,7 +43,7 @@ _log = logging.getLogger(__name__)
 
 @UI_NS.app_template_filter("hasattr")
 def jinja_hasattr(obj, string):
-    """ Template filter checking if the provided object at the provided
+    """Template filter checking if the provided object at the provided
     string as attribute
     """
     return hasattr(obj, string)
@@ -51,15 +51,13 @@ def jinja_hasattr(obj, string):
 
 @UI_NS.app_template_filter("render")
 def jinja_render(tmpl, **kwargs):
-    """ Render the given template with the provided arguments
-    """
+    """Render the given template with the provided arguments"""
     return flask.render_template_string(tmpl, **kwargs)
 
 
 @UI_NS.app_template_filter("humanize")
 def humanize_date(date):
-    """ Template filter returning the last commit date of the provided repo.
-    """
+    """Template filter returning the last commit date of the provided repo."""
     if date:
         return arrow.get(date).humanize()
 
@@ -67,7 +65,7 @@ def humanize_date(date):
 @UI_NS.app_template_filter("format_ts")
 @UI_NS.app_template_filter("format_datetime")
 def format_ts(string):
-    """ Template filter transforming a timestamp, datetime or anything
+    """Template filter transforming a timestamp, datetime or anything
     else arrow.get() can handle to a human-readable date
     """
     # We *could* enhance this by allowing users to specify preferred
@@ -82,7 +80,7 @@ def format_ts(string):
 
 @UI_NS.app_template_filter("humanize_tooltip")
 def humanize_with_tooltip(date):
-    """ Template filter returning a human readable time string with an
+    """Template filter returning a human readable time string with an
     UTC timestamp tooltip
     """
     if date:
@@ -96,8 +94,7 @@ def humanize_with_tooltip(date):
 
 @UI_NS.app_template_filter("linkify")
 def linkify_text(text):
-    """ escape all html tags with bleach, then use bleach to linkify
-    """
+    """escape all html tags with bleach, then use bleach to linkify"""
     if text:
         cleaned = bleach.clean(text, tags=[], attributes=[])
         return bleach.linkify(cleaned)
@@ -107,9 +104,9 @@ def linkify_text(text):
 
 @UI_NS.app_template_filter("syntax_alias")
 def get_syntax_alias(filename):
-    """ return an alias based on the filename that is used to
-        override the automatic syntax highlighting dectection
-        by highlight.js
+    """return an alias based on the filename that is used to
+    override the automatic syntax highlighting dectection
+    by highlight.js
     """
 
     override_rules = pagure_config.get(
@@ -137,8 +134,7 @@ def format_loc(
     index=None,
     isprdiff=False,
 ):
-    """ Template filter putting the provided lines of code into a table
-    """
+    """Template filter putting the provided lines of code into a table"""
     if loc is None:
         return
 
@@ -408,7 +404,7 @@ def format_loc(
 
 @UI_NS.app_template_filter("blame_loc")
 def blame_loc(loc, repo, username, blame):
-    """ Template filter putting the provided lines of code into a table
+    """Template filter putting the provided lines of code into a table
 
 
     This method blame lines of code (loc) takes as input a text (lines of
@@ -488,8 +484,7 @@ def blame_loc(loc, repo, username, blame):
 
 @UI_NS.app_template_filter("wraps")
 def text_wraps(text, size=10):
-    """ Template filter to wrap text at a specified size
-    """
+    """Template filter to wrap text at a specified size"""
     if text:
         parts = textwrap.wrap(text, size)
         if len(parts) > 1:
@@ -501,8 +496,7 @@ def text_wraps(text, size=10):
 
 @UI_NS.app_template_filter("avatar")
 def avatar(packager, size=64, css_class=None, src_tag="src"):
-    """ Template filter that returns html for avatar of any given Username.
-    """
+    """Template filter that returns html for avatar of any given Username."""
     if not isinstance(packager, six.text_type):
         packager = packager.decode("utf-8")
 
@@ -526,8 +520,7 @@ def avatar(packager, size=64, css_class=None, src_tag="src"):
 
 @UI_NS.app_template_filter("avatar_url")
 def avatar_url(email, size=64):
-    """ Template filter that returns html for avatar of any given Email.
-    """
+    """Template filter that returns html for avatar of any given Email."""
     return pagure.lib.query.avatar_url_from_email(email, size)
 
 
@@ -539,7 +532,7 @@ def shorted_commit(cid):
 
 @UI_NS.app_template_filter("markdown")
 def markdown_filter(text):
-    """ Template filter converting a string into html content using the
+    """Template filter converting a string into html content using the
     markdown library.
     """
     return pagure.lib.query.text2markdown(text)
@@ -574,7 +567,7 @@ def patch_to_diff(patch):
 
 @UI_NS.app_template_filter("author2user")
 def author_to_user(author, size=16, cssclass=None, with_name=True):
-    """ Template filter transforming a pygit2 Author object into a text
+    """Template filter transforming a pygit2 Author object into a text
     either with just the username or linking to the user in pagure.
     """
     output = escape(author.name)
@@ -609,8 +602,7 @@ def author_to_user(author, size=16, cssclass=None, with_name=True):
 
 @UI_NS.app_template_filter("author2avatar")
 def author_to_avatar(author, size=32):
-    """ Template filter transforming a pygit2 Author object into an avatar.
-    """
+    """Template filter transforming a pygit2 Author object into an avatar."""
     if not author.email:
         return ""
     user = pagure.lib.query.search_user(flask.g.session, email=author.email)
@@ -620,7 +612,7 @@ def author_to_avatar(author, size=32):
 
 @UI_NS.app_template_filter("author2user_commits")
 def author_to_user_commits(author, link, size=16, cssclass=None):
-    """ Template filter transforming a pygit2 Author object into a text
+    """Template filter transforming a pygit2 Author object into a text
     either with just the username or linking to the user in pagure.
     """
     output = author.name
@@ -641,7 +633,7 @@ def author_to_user_commits(author, link, size=16, cssclass=None):
 
 @UI_NS.app_template_filter("InsertDiv")
 def insert_div(content):
-    """ Template filter inserting an opening <div> and closing </div>
+    """Template filter inserting an opening <div> and closing </div>
     after the first title and then at the end of the content.
     """
     # This is quite a hack but simpler solution using .replace() didn't work
@@ -667,7 +659,7 @@ def insert_div(content):
 
 @UI_NS.app_template_filter("noJS")
 def no_js(content, ignore=None):
-    """ Template filter replacing <script by &lt;script and </script> by
+    """Template filter replacing <script by &lt;script and </script> by
     &lt;/script&gt;
     """
     return pagure.lib.query.clean_input(content, ignore=ignore)
@@ -675,8 +667,7 @@ def no_js(content, ignore=None):
 
 @UI_NS.app_template_filter("toRGB")
 def int_to_rgb(percent):
-    """ Template filter converting a given percentage to a css RGB value.
-    """
+    """Template filter converting a given percentage to a css RGB value."""
     output = "rgb(255, 0, 0);"
     try:
         percent = int(percent)
@@ -694,8 +685,7 @@ def int_to_rgb(percent):
 
 @UI_NS.app_template_filter("increment_largest_priority")
 def largest_priority(dictionary):
-    """ Template filter to return the largest priority +1
-    """
+    """Template filter to return the largest priority +1"""
     if dictionary:
         keys = [int(k) for k in dictionary if k]
         if keys:
@@ -705,7 +695,7 @@ def largest_priority(dictionary):
 
 @UI_NS.app_template_filter("unicode")
 def convert_unicode(text):
-    """ If the provided string is a binary string, this filter converts it
+    """If the provided string is a binary string, this filter converts it
     to UTF-8 (unicode).
     """
     if isinstance(text, str) and six.PY2:
@@ -716,7 +706,7 @@ def convert_unicode(text):
 
 @UI_NS.app_template_filter("combine_url")
 def combine_url(url, page, pagetitle, **kwargs):
-    """ Add the specified arguments in the provided kwargs dictionary to
+    """Add the specified arguments in the provided kwargs dictionary to
     the given URL.
     """
     url_obj = urlparse(url)
@@ -744,7 +734,7 @@ def combine_url(url, page, pagetitle, **kwargs):
 
 @UI_NS.app_template_filter("add_or_remove")
 def add_or_remove(item, items):
-    """ Adds the item to the list if it is not in there and remove it
+    """Adds the item to the list if it is not in there and remove it
     otherwise.
     """
     if item in items:
@@ -756,8 +746,7 @@ def add_or_remove(item, items):
 
 @UI_NS.app_template_filter("table_sort_arrow")
 def table_sort_arrow(column, order_key, order):
-    """ Outputs an arrow icon if the column is currently being sorted on
-    """
+    """Outputs an arrow icon if the column is currently being sorted on"""
     arrow_html = '<span class="oi" data-glyph="arrow-thick-{0}"></span>'
     if column == order_key:
         if order == "desc":
@@ -769,8 +758,7 @@ def table_sort_arrow(column, order_key, order):
 
 @UI_NS.app_template_filter("table_get_link_order")
 def table_get_link_order(column, order_key, order):
-    """ Get the correct order parameter value for the table heading link
-    """
+    """Get the correct order parameter value for the table heading link"""
     if column == order_key:
         # If the user is clicking on the column again, they want the
         # oposite order
@@ -785,8 +773,7 @@ def table_get_link_order(column, order_key, order):
 
 @UI_NS.app_template_filter("flag2label")
 def flag_to_label(flag):
-    """ For a given flag return the bootstrap label to use
-    """
+    """For a given flag return the bootstrap label to use"""
     return pagure_config["FLAG_STATUSES_LABELS"][flag.status.lower()]
 
 
@@ -838,7 +825,7 @@ def user_group_can_ssh_commit(username):
 
 @UI_NS.app_template_filter("git_url_ssh")
 def get_git_url_ssh(complement=""):
-    """ Return the GIT SSH URL to be displayed in the UI based on the
+    """Return the GIT SSH URL to be displayed in the UI based on the
     content of the configuration file.
     """
     git_url_ssh = pagure_config.get("GIT_URL_SSH")

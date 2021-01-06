@@ -61,7 +61,7 @@ def augment_celery_log(**kwargs):
 
 
 def get_result(uuid):
-    """ Returns the AsyncResult object for a given task.
+    """Returns the AsyncResult object for a given task.
 
     :arg uuid: the unique identifier of the task to retrieve.
     :type uuid: str
@@ -82,7 +82,7 @@ def ret(endpoint, **kwargs):
 def generate_gitolite_acls(
     self, session, namespace=None, name=None, user=None, group=None
 ):
-    """ Generate the gitolite configuration file either entirely or for a
+    """Generate the gitolite configuration file either entirely or for a
     specific project.
 
     :arg session: SQLAlchemy session object
@@ -131,7 +131,7 @@ def generate_gitolite_acls(
 @conn.task(queue=pagure_config.get("GITOLITE_CELERY_QUEUE", None), bind=True)
 @pagure_task
 def gitolite_post_compile_only(self, session):
-    """ Do gitolite post-processing only. Most importantly, this processes SSH
+    """Do gitolite post-processing only. Most importantly, this processes SSH
     keys used by gitolite. This is an optimization task that's supposed to be
     used if you only need to run `gitolite trigger POST_COMPILE` without
     touching any other gitolite configuration
@@ -149,7 +149,7 @@ def gitolite_post_compile_only(self, session):
 def delete_project(
     self, session, namespace=None, name=None, user=None, action_user=None
 ):
-    """ Delete a project in pagure.
+    """Delete a project in pagure.
 
     This is achieved in three steps:
     - Remove the project from gitolite.conf
@@ -222,7 +222,7 @@ def create_project(
     ignore_existing_repo,
     default_branch=None,
 ):
-    """ Create a project.
+    """Create a project.
 
     :arg session: SQLAlchemy session object
     :type session: sqlalchemy.orm.session.Session
@@ -332,7 +332,7 @@ def create_project(
 def update_git(
     self, session, name, namespace, user, ticketuid=None, requestuid=None
 ):
-    """ Update the JSON representation of either a ticket or a pull-request
+    """Update the JSON representation of either a ticket or a pull-request
     depending on the argument specified.
     """
     project = pagure.lib.query._get_project(
@@ -364,7 +364,7 @@ def update_git(
 @conn.task(queue=pagure_config.get("SLOW_CELERY_QUEUE", None), bind=True)
 @pagure_task
 def clean_git(self, session, name, namespace, user, obj_repotype, obj_uid):
-    """ Remove the JSON representation of a ticket on the git repository
+    """Remove the JSON representation of a ticket on the git repository
     for tickets.
     """
     project = pagure.lib.query._get_project(
@@ -393,8 +393,7 @@ def update_file_in_git(
     username,
     email,
 ):
-    """ Update a file in the specified git repo.
-    """
+    """Update a file in the specified git repo."""
     userobj = pagure.lib.query.search_user(session, username=username)
     project = pagure.lib.query._get_project(
         session, namespace=namespace, name=name, user=user
@@ -424,8 +423,7 @@ def update_file_in_git(
 @conn.task(queue=pagure_config.get("MEDIUM_CELERY_QUEUE", None), bind=True)
 @pagure_task
 def delete_branch(self, session, name, namespace, user, branchname):
-    """ Delete a branch from a git repo.
-    """
+    """Delete a branch from a git repo."""
     project = pagure.lib.query._get_project(
         session, namespace=namespace, name=name, user=user
     )
@@ -456,7 +454,7 @@ def fork(
     editbranch,
     editfile,
 ):
-    """ Forks the specified project for the specified user.
+    """Forks the specified project for the specified user.
 
     :arg namespace: the namespace of the project
     :type namespace: str
@@ -554,8 +552,7 @@ def fork(
 @conn.task(queue=pagure_config.get("FAST_CELERY_QUEUE", None), bind=True)
 @pagure_task
 def pull_remote_repo(self, session, remote_git, branch_from):
-    """ Clone a remote git repository locally for remote PRs.
-    """
+    """Clone a remote git repository locally for remote PRs."""
 
     clonepath = pagure.utils.get_remote_repo_path(
         remote_git, branch_from, ignore_non_exist=True
@@ -571,7 +568,7 @@ def pull_remote_repo(self, session, remote_git, branch_from):
 @conn.task(queue=pagure_config.get("MEDIUM_CELERY_QUEUE", None), bind=True)
 @pagure_task
 def refresh_remote_pr(self, session, name, namespace, user, requestid):
-    """ Refresh the local clone of a git repository used in a remote
+    """Refresh the local clone of a git repository used in a remote
     pull-request.
     """
     project = pagure.lib.query._get_project(
@@ -608,8 +605,7 @@ def refresh_remote_pr(self, session, name, namespace, user, requestid):
 @conn.task(queue=pagure_config.get("FAST_CELERY_QUEUE", None), bind=True)
 @pagure_task
 def move_to_repospanner(self, session, name, namespace, user, region):
-    """ Move a repository to a repoSpanner region.
-    """
+    """Move a repository to a repoSpanner region."""
     project = pagure.lib.query._get_project(
         session, namespace=namespace, name=name, user=user
     )
@@ -708,8 +704,7 @@ def move_to_repospanner(self, session, name, namespace, user, region):
 @conn.task(queue=pagure_config.get("FAST_CELERY_QUEUE", None), bind=True)
 @pagure_task
 def refresh_pr_cache(self, session, name, namespace, user, but_uids=None):
-    """ Refresh the merge status cached of pull-requests.
-    """
+    """Refresh the merge status cached of pull-requests."""
     project = pagure.lib.query._get_project(
         session, namespace=namespace, name=name, user=user
     )
@@ -724,8 +719,7 @@ def refresh_pr_cache(self, session, name, namespace, user, but_uids=None):
 def rebase_pull_request(
     self, session, name, namespace, user, requestid, user_rebaser
 ):
-    """ Rebase a pull-request.
-    """
+    """Rebase a pull-request."""
     project = pagure.lib.query._get_project(
         session, namespace=namespace, name=name, user=user
     )
@@ -760,8 +754,7 @@ def merge_pull_request(
     user_merger,
     delete_branch_after=False,
 ):
-    """ Merge pull-request.
-    """
+    """Merge pull-request."""
     project = pagure.lib.query._get_project(
         session, namespace=namespace, name=name, user=user
     )
@@ -810,8 +803,7 @@ def merge_pull_request(
 def add_file_to_git(
     self, session, name, namespace, user, user_attacher, issueuid, filename
 ):
-    """ Add a file to the specified git repo.
-    """
+    """Add a file to the specified git repo."""
     project = pagure.lib.query._get_project(
         session, namespace=namespace, name=name, user=user
     )
@@ -837,11 +829,11 @@ def add_file_to_git(
 @conn.task(queue=pagure_config.get("MEDIUM_CELERY_QUEUE", None), bind=True)
 @pagure_task
 def project_dowait(self, session, name, namespace, user):
-    """ This is a task used to test the locking systems.
+    """This is a task used to test the locking systems.
 
     It should never be allowed to be called in production instances, since that
     would allow an attacker to basically DOS a project by calling this
-    repeatedly. """
+    repeatedly."""
     assert pagure_config.get("ALLOW_PROJECT_DOWAIT", False)
 
     project = pagure.lib.query._get_project(
@@ -859,7 +851,7 @@ def project_dowait(self, session, name, namespace, user):
 @conn.task(queue=pagure_config.get("MEDIUM_CELERY_QUEUE", None), bind=True)
 @pagure_task
 def sync_pull_ref(self, session, name, namespace, user, requestid):
-    """ Synchronize a pull/ reference from the content in the forked repo,
+    """Synchronize a pull/ reference from the content in the forked repo,
     allowing local checkout of the pull-request.
     """
     project = pagure.lib.query._get_project(
@@ -893,7 +885,7 @@ def sync_pull_ref(self, session, name, namespace, user, requestid):
 @conn.task(queue=pagure_config.get("FAST_CELERY_QUEUE", None), bind=True)
 @pagure_task
 def update_pull_request(self, session, pr_uid, username=None):
-    """ Updates a pull-request in the DB once a commit was pushed to it in
+    """Updates a pull-request in the DB once a commit was pushed to it in
     git.
     """
     request = pagure.lib.query.get_request_by_uid(session, pr_uid)
@@ -920,8 +912,7 @@ def update_pull_request(self, session, pr_uid, username=None):
 @conn.task(queue=pagure_config.get("MEDIUM_CELERY_QUEUE", None), bind=True)
 @pagure_task
 def update_checksums_file(self, session, folder, filenames):
-    """ Update the checksums file in the release folder of the project.
-    """
+    """Update the checksums file in the release folder of the project."""
 
     sha_file = os.path.join(folder, "CHECKSUMS")
     new_file = not os.path.exists(sha_file)
@@ -960,7 +951,7 @@ def update_checksums_file(self, session, folder, filenames):
 @conn.task(queue=pagure_config.get("FAST_CELERY_QUEUE", None), bind=True)
 @pagure_task
 def commits_author_stats(self, session, repopath):
-    """ Returns some statistics about commits made against the specified
+    """Returns some statistics about commits made against the specified
     git repository.
     """
 
@@ -1023,7 +1014,7 @@ def commits_author_stats(self, session, repopath):
 @conn.task(queue=pagure_config.get("FAST_CELERY_QUEUE", None), bind=True)
 @pagure_task
 def commits_history_stats(self, session, repopath):
-    """ Returns the evolution of the commits made against the specified
+    """Returns the evolution of the commits made against the specified
     git repository.
     """
 
@@ -1049,7 +1040,7 @@ def commits_history_stats(self, session, repopath):
 @conn.task(queue=pagure_config.get("MEDIUM_CELERY_QUEUE", None), bind=True)
 @pagure_task
 def link_pr_to_ticket(self, session, pr_uid):
-    """ Link the specified pull-request against the ticket(s) mentioned in
+    """Link the specified pull-request against the ticket(s) mentioned in
     the commits of the pull-request
 
     """
@@ -1237,7 +1228,7 @@ def git_garbage_collect(self, session, repopath):
 def generate_archive(
     self, session, project, namespace, username, commit, tag, name, archive_fmt
 ):
-    """ Generate the archive of the specified project on the specified
+    """Generate the archive of the specified project on the specified
     commit with the given name and archive format.
     Currently only support the following format: gzip and tar.gz
 
@@ -1275,7 +1266,7 @@ def generate_archive(
 @conn.task(queue=pagure_config.get("AUTHORIZED_KEYS_QUEUE", None), bind=True)
 @pagure_task
 def add_key_to_authorized_keys(self, session, ssh_folder, username, sshkey):
-    """ Add the specified key to the the `authorized_keys` file of the
+    """Add the specified key to the the `authorized_keys` file of the
     specified ssh folder.
     """
     if not os.path.exists(ssh_folder):
@@ -1298,7 +1289,7 @@ def add_key_to_authorized_keys(self, session, ssh_folder, username, sshkey):
 @conn.task(queue=pagure_config.get("AUTHORIZED_KEYS_QUEUE", None), bind=True)
 @pagure_task
 def remove_key_from_authorized_keys(self, session, ssh_folder, sshkey):
-    """ Remove the specified key from the the `authorized_keys` file of the
+    """Remove the specified key from the the `authorized_keys` file of the
     specified ssh folder.
     """
     if not os.path.exists(ssh_folder):

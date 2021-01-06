@@ -93,7 +93,7 @@ class PagureFlaskPluginPagureHooktests(tests.SimplePagureTest):
             )
 
     def test_plugin_mail_no_data_csrf(self):
-        """ Test the pagure hook plugin endpoint when no data is sent but
+        """Test the pagure hook plugin endpoint when no data is sent but
         the csrf token.
         """
 
@@ -160,8 +160,7 @@ class PagureFlaskPluginPagureHooktests(tests.SimplePagureTest):
             )
 
     def test_plugin_mail_activate_hook(self):
-        """ Test the pagure hook plugin endpoint when activating the hook.
-        """
+        """Test the pagure hook plugin endpoint when activating the hook."""
         pagure.config.config["DOCS_FOLDER"] = os.path.join(
             self.path, "repos", "docs"
         )
@@ -218,8 +217,7 @@ class PagureFlaskPluginPagureHooktests(tests.SimplePagureTest):
             )
 
     def test_plugin_mail_deactivate_hook(self):
-        """ Test the pagure hook plugin endpoint when activating the hook.
-        """
+        """Test the pagure hook plugin endpoint when activating the hook."""
         self.test_plugin_mail_activate_hook()
 
         user = tests.FakeUser(username="pingou")
@@ -285,7 +283,7 @@ class PagureFlaskPluginPagureHooktests(tests.SimplePagureTest):
 
     @patch.dict("pagure.config.config", {"DOCS_FOLDER": None})
     def test_plugin_mail_activate_hook_no_doc(self):
-        """ Test the pagure hook plugin endpoint when activating the hook
+        """Test the pagure hook plugin endpoint when activating the hook
         on a pagure instance that de-activated the doc repos.
         """
 
@@ -319,7 +317,7 @@ class PagureFlaskPluginPagureHooktests(tests.SimplePagureTest):
 
     @patch.dict("pagure.config.config", {"DOCS_FOLDER": None})
     def test_plugin_mail_deactivate_hook_no_doc(self):
-        """ Test the pagure hook plugin endpoint when activating then
+        """Test the pagure hook plugin endpoint when activating then
         deactivating the hook on a pagure instance that de-activated the
         doc repos.
         """

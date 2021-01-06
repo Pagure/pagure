@@ -515,8 +515,7 @@ def issue_comment_add_reaction(
 @UI_NS.route("/fork/<username>/<namespace>/<repo>/issues")
 @has_issue_tracker
 def view_issues(repo, username=None, namespace=None):
-    """ List all issues associated to a repo
-    """
+    """List all issues associated to a repo"""
 
     status = flask.request.args.get("status", "Open")
     status = flask.request.args.get("close_status") or status
@@ -747,8 +746,7 @@ def view_issues(repo, username=None, namespace=None):
 @UI_NS.route("/fork/<username>/<namespace>/<repo>/roadmap")
 @has_issue_tracker
 def view_roadmap(repo, username=None, namespace=None):
-    """ List all issues associated to a repo as roadmap
-    """
+    """List all issues associated to a repo as roadmap"""
     milestones_status_arg = flask.request.args.get("status", "active")
     milestones_keyword_arg = flask.request.args.get("keyword", None)
     milestones_onlyincomplete_arg = flask.request.args.get(
@@ -849,8 +847,7 @@ def view_roadmap(repo, username=None, namespace=None):
 @UI_NS.route("/fork/<username>/<namespace>/<repo>/roadmap/<path:milestone>")
 @has_issue_tracker
 def view_milestone(repo, username=None, namespace=None, milestone=None):
-    """ List all issues associated to a repo as roadmap
-    """
+    """List all issues associated to a repo as roadmap"""
 
     repo = flask.g.repo
 
@@ -908,8 +905,7 @@ def view_milestone(repo, username=None, namespace=None, milestone=None):
 @login_required
 @has_issue_tracker
 def new_issue(repo, username=None, namespace=None):
-    """ Create a new issue
-    """
+    """Create a new issue"""
     template = flask.request.args.get("template") or "default"
     repo = flask.g.repo
     open_access = repo.settings.get("open_metadata_access_to_all", False)
@@ -1112,8 +1108,7 @@ def new_issue(repo, username=None, namespace=None):
 @UI_NS.route("/fork/<username>/<namespace>/<repo>/issue/<int:issueid>")
 @has_issue_tracker
 def view_issue(repo, issueid, username=None, namespace=None):
-    """ List all issues associated to a repo
-    """
+    """List all issues associated to a repo"""
 
     repo = flask.g.repo
 
@@ -1189,8 +1184,7 @@ def view_issue(repo, issueid, username=None, namespace=None):
 )
 @has_issue_tracker
 def delete_issue(repo, issueid, username=None, namespace=None):
-    """ Delete the specified issue
-    """
+    """Delete the specified issue"""
 
     repo = flask.g.repo
 
@@ -1266,8 +1260,7 @@ def delete_issue(repo, issueid, username=None, namespace=None):
 @login_required
 @has_issue_tracker
 def edit_issue(repo, issueid, username=None, namespace=None):
-    """ Edit the specified issue
-    """
+    """Edit the specified issue"""
     repo = flask.g.repo
 
     issue = pagure.lib.query.search_issues(
@@ -1403,8 +1396,7 @@ def edit_issue(repo, issueid, username=None, namespace=None):
 @login_required
 @has_issue_tracker
 def upload_issue(repo, issueid, username=None, namespace=None):
-    """ Upload a file to a ticket.
-    """
+    """Upload a file to a ticket."""
     repo = flask.g.repo
 
     issue = pagure.lib.query.search_issues(
@@ -1468,7 +1460,7 @@ def upload_issue(repo, issueid, username=None, namespace=None):
 @UI_NS.route("/fork/<username>/<namespace>/<repo>/issue/raw/<path:filename>")
 @has_issue_tracker
 def view_issue_raw_file(repo, filename=None, username=None, namespace=None):
-    """ Displays the raw content of a file of a commit for the specified
+    """Displays the raw content of a file of a commit for the specified
     ticket repo.
     """
     raw = is_true(flask.request.args.get("raw"))
@@ -1560,8 +1552,7 @@ def view_issue_raw_file(repo, filename=None, username=None, namespace=None):
 def edit_comment_issue(
     repo, issueid, commentid, username=None, namespace=None
 ):
-    """Edit comment of an issue
-    """
+    """Edit comment of an issue"""
     is_js = flask.request.args.get("js", False)
 
     project = flask.g.repo
@@ -1648,8 +1639,7 @@ def edit_comment_issue(
 @login_required
 @is_repo_admin
 def save_reports(repo, username=None, namespace=None):
-    """ Marked for watching or Unwatching
-    """
+    """Marked for watching or Unwatching"""
 
     return_point = flask.url_for(
         "ui_ns.view_issues", repo=repo, username=username, namespace=namespace
@@ -1684,8 +1674,7 @@ def save_reports(repo, username=None, namespace=None):
 @UI_NS.route("/fork/<username>/<repo>/report/<report>")
 @UI_NS.route("/fork/<username>/<namespace>/<repo>/report/<report>")
 def view_report(repo, report, username=None, namespace=None):
-    """ Show the specified report.
-    """
+    """Show the specified report."""
     reports = flask.g.repo.reports
     if report not in reports:
         flask.abort(404, description="No such report found")

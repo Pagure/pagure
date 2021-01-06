@@ -49,7 +49,7 @@ _log = logging.getLogger(__name__)
 
 
 def create_tables(db_url, alembic_ini=None, acls=None, debug=False):
-    """ Create the tables in the database using the information from the
+    """Create the tables in the database using the information from the
     url obtained.
 
     :arg db_url, URL used to connect to the database. The URL contains
@@ -100,8 +100,7 @@ def create_tables(db_url, alembic_ini=None, acls=None, debug=False):
 
 
 def create_default_status(session, acls=None):
-    """ Insert the defaults status in the status tables.
-    """
+    """Insert the defaults status in the status tables."""
 
     statuses = ["Open", "Closed"]
     for status in statuses:
@@ -165,7 +164,7 @@ class AccessLevels(BASE):
 
 
 class StatusIssue(BASE):
-    """ Stores the status a ticket can have.
+    """Stores the status a ticket can have.
 
     Table -- status_issue
     """
@@ -177,7 +176,7 @@ class StatusIssue(BASE):
 
 
 class StatusPullRequest(BASE):
-    """ Stores the status a pull-request can have.
+    """Stores the status a pull-request can have.
 
     Table -- status_issue
     """
@@ -189,7 +188,7 @@ class StatusPullRequest(BASE):
 
 
 class User(BASE):
-    """ Stores information about users.
+    """Stores information about users.
 
     Table -- users
     """
@@ -232,14 +231,13 @@ class User(BASE):
 
     @property
     def url_path(self):
-        """ Return the path at which this user can be accessed in the web UI.
-        """
+        """Return the path at which this user can be accessed in the web UI."""
 
         return "user/%s" % (self.user)
 
     @property
     def html_title(self):
-        """ Return the ``fullname (username)`` or simply ``username`` to be
+        """Return the ``fullname (username)`` or simply ``username`` to be
         used in the html templates.
         """
         if self.fullname:
@@ -254,7 +252,7 @@ class User(BASE):
 
     @property
     def settings(self):
-        """ Return the dict stored as string in the database as an actual
+        """Return the dict stored as string in the database as an actual
         dict object.
         """
         default = {"cc_me_to_my_actions": False}
@@ -304,7 +302,7 @@ class User(BASE):
 
 
 class UserEmail(BASE):
-    """ Stores email information about the users.
+    """Stores email information about the users.
 
     Table -- user_emails
     """
@@ -330,7 +328,7 @@ class UserEmail(BASE):
 
 
 class UserEmailPending(BASE):
-    """ Stores email information about the users.
+    """Stores email information about the users.
 
     Table -- user_emails_pending
     """
@@ -360,7 +358,7 @@ class UserEmailPending(BASE):
 
 
 class Project(BASE):
-    """ Stores the projects.
+    """Stores the projects.
 
     Table -- projects
     """
@@ -531,7 +529,7 @@ class Project(BASE):
 
     @property
     def mail_id(self):
-        """ Return a unique representation of the project as string that
+        """Return a unique representation of the project as string that
         can be used when sending emails.
         """
         return "%s-project-%s" % (self.fullname, self.id)
@@ -547,7 +545,7 @@ class Project(BASE):
         return "%s.git" % self.fullname
 
     def repospanner_repo_info(self, repotype, region=None):
-        """ Returns info for getting a repoSpanner repo for a project.
+        """Returns info for getting a repoSpanner repo for a project.
 
         Args:
             repotype (string): Type of repository
@@ -577,7 +575,7 @@ class Project(BASE):
         return url, regioninfo
 
     def _repospanner_repo_name(self, repotype, region=None):
-        """ Returns the name of a repo as named in repoSpanner.
+        """Returns the name of a repo as named in repoSpanner.
 
         Args:
             repotype (string): Type of repository
@@ -595,7 +593,7 @@ class Project(BASE):
         )
 
     def repopath(self, repotype):
-        """ Return the full repository path of the git repo on the filesystem.
+        """Return the full repository path of the git repo on the filesystem.
 
         If the repository is on repoSpanner, this will be a pseudo repository,
         which is "git repo enough" to be considered a valid repo, but any
@@ -637,7 +635,7 @@ class Project(BASE):
 
     @property
     def fullname(self):
-        """ Return the name of the git repo as user/project if it is a
+        """Return the name of the git repo as user/project if it is a
         project forked, otherwise it returns the project name.
         """
         str_name = self.name
@@ -649,7 +647,7 @@ class Project(BASE):
 
     @property
     def url_path(self):
-        """ Return the path at which this project can be accessed in the
+        """Return the path at which this project can be accessed in the
         web UI.
         """
         path = self.name
@@ -672,7 +670,7 @@ class Project(BASE):
 
     @property
     def settings(self):
-        """ Return the dict stored as string in the database as an actual
+        """Return the dict stored as string in the database as an actual
         dict object.
         """
         default = {
@@ -721,7 +719,7 @@ class Project(BASE):
 
     @property
     def milestones(self):
-        """ Return the dict stored as string in the database as an actual
+        """Return the dict stored as string in the database as an actual
         dict object.
         """
         milestones = {}
@@ -750,8 +748,7 @@ class Project(BASE):
 
     @property
     def milestones_keys(self):
-        """ Return the list of milestones so we can keep the order consistent.
-        """
+        """Return the list of milestones so we can keep the order consistent."""
         milestones_keys = {}
 
         if self._milestones_keys:
@@ -766,7 +763,7 @@ class Project(BASE):
 
     @property
     def priorities(self):
-        """ Return the dict stored as string in the database as an actual
+        """Return the dict stored as string in the database as an actual
         dict object.
         """
         priorities = {}
@@ -783,7 +780,7 @@ class Project(BASE):
 
     @property
     def block_users(self):
-        """ Return the dict stored as string in the database as an actual
+        """Return the dict stored as string in the database as an actual
         dict object.
         """
         block_users = []
@@ -800,7 +797,7 @@ class Project(BASE):
 
     @property
     def quick_replies(self):
-        """ Return a list of quick replies available for pull requests and
+        """Return a list of quick replies available for pull requests and
         issues.
         """
         quick_replies = []
@@ -817,7 +814,7 @@ class Project(BASE):
 
     @property
     def notifications(self):
-        """ Return the dict stored as string in the database as an actual
+        """Return the dict stored as string in the database as an actual
         dict object.
         """
         notifications = {}
@@ -834,7 +831,7 @@ class Project(BASE):
 
     @property
     def reports(self):
-        """ Return the dict stored as string in the database as an actual
+        """Return the dict stored as string in the database as an actual
         dict object.
         """
         reports = {}
@@ -851,7 +848,7 @@ class Project(BASE):
 
     @property
     def close_status(self):
-        """ Return the dict stored as string in the database as an actual
+        """Return the dict stored as string in the database as an actual
         dict object.
         """
         close_status = []
@@ -899,7 +896,7 @@ class Project(BASE):
 
     @property
     def contributors(self):
-        """ Return the dict presenting the different contributors of the
+        """Return the dict presenting the different contributors of the
         project based on their access level.
         """
         contributors = collections.defaultdict(list)
@@ -911,7 +908,7 @@ class Project(BASE):
 
     @property
     def contributor_groups(self):
-        """ Return the dict presenting the different contributors of the
+        """Return the dict presenting the different contributors of the
         project based on their access level.
         """
         contributors = collections.defaultdict(list)
@@ -922,7 +919,7 @@ class Project(BASE):
         return contributors
 
     def get_project_users(self, access, combine=True):
-        """ Returns the list of users/groups of the project according
+        """Returns the list of users/groups of the project according
         to the given access.
 
         :arg access: the access level to query for, can be: 'admin',
@@ -979,7 +976,7 @@ class Project(BASE):
                 return list(users - collaborators - committers - admins)
 
     def get_project_groups(self, access, combine=True):
-        """ Returns the list of groups of the project according
+        """Returns the list of groups of the project according
         to the given access.
 
         :arg access: the access level to query for, can be: 'admin',
@@ -1034,8 +1031,7 @@ class Project(BASE):
 
     @property
     def access_users(self):
-        """ Return a dictionary with all user access
-        """
+        """Return a dictionary with all user access"""
         return {
             "admin": sorted(
                 self.get_project_users(access="admin", combine=False),
@@ -1077,8 +1073,7 @@ class Project(BASE):
 
     @property
     def access_groups(self):
-        """ Return a dictionary with all group access
-        """
+        """Return a dictionary with all group access"""
         return {
             "admin": sorted(
                 self.get_project_groups(access="admin", combine=False),
@@ -1104,13 +1099,11 @@ class Project(BASE):
         return [board for board in self.boards if board.active]
 
     def lock(self, ltype):
-        """ Get a SQL lock of type ltype for the current project.
-        """
+        """Get a SQL lock of type ltype for the current project."""
         return ProjectLocker(self, ltype)
 
     def to_json(self, public=False, api=False):
-        """ Return a representation of the project as JSON.
-        """
+        """Return a representation of the project as JSON."""
         custom_keys = [[key.name, key.key_type] for key in self.issue_keys]
 
         output = {
@@ -1143,7 +1136,7 @@ class Project(BASE):
 
 
 class ProjectLock(BASE):
-    """ Table used to define project-specific locks.
+    """Table used to define project-specific locks.
 
     Table -- project_locks
     """
@@ -1166,7 +1159,7 @@ class ProjectLock(BASE):
 
 
 class ProjectLocker(object):
-    """ This is used as a context manager to lock a project.
+    """This is used as a context manager to lock a project.
 
     This is used as a context manager to make it very explicit when we unlock
     the project, and so that we unlock even if an exception occurs.
@@ -1209,7 +1202,7 @@ class ProjectLocker(object):
 
 
 class ProjectUser(BASE):
-    """ Stores the user of a projects.
+    """Stores the user of a projects.
 
     Table -- user_projects
     """
@@ -1236,7 +1229,10 @@ class ProjectUser(BASE):
         ),
         nullable=False,
     )
-    branches = sa.Column(sa.Text, nullable=True,)
+    branches = sa.Column(
+        sa.Text,
+        nullable=True,
+    )
 
     project = relation(
         "Project",
@@ -1250,7 +1246,7 @@ class ProjectUser(BASE):
 
 
 class SSHKey(BASE):
-    """ Stores information about SSH keys.
+    """Stores information about SSH keys.
 
     Every instance needs to either have user_id set (SSH key for a specific
     user) or project_id ("deploy key" for a specific project).
@@ -1330,7 +1326,7 @@ class SSHKey(BASE):
 
 
 class Issue(BASE):
-    """ Stores the issues reported on a project.
+    """Stores the issues reported on a project.
 
     Table -- issues
     """
@@ -1432,12 +1428,12 @@ class Issue(BASE):
 
     @property
     def attachments(self):
-        """ Return a list of attachment tuples: (LINK, FILENAME, DISPLAY_NAME,
-        DATE) """
+        """Return a list of attachment tuples: (LINK, FILENAME, DISPLAY_NAME,
+        DATE)"""
 
         def extract_info(text):
-            """ Return a tuple containing the link, file name, and the
-            "display" file name from the markdown attachment link """
+            """Return a tuple containing the link, file name, and the
+            "display" file name from the markdown attachment link"""
             pattern_md = re.compile(r"^\[\!(.*)\]")
             pattern_link = re.compile(r"\(([^)]+)\)")
             pattern_file = re.compile(r"\[([^]]+)\]")
@@ -1511,7 +1507,7 @@ class Issue(BASE):
 
     @property
     def mail_id(self):
-        """ Return a unique reprensetation of the issue as string that
+        """Return a unique reprensetation of the issue as string that
         can be used when sending emails.
         """
         return "%s-ticket-%s" % (self.project.name, self.uid)
@@ -1533,22 +1529,20 @@ class Issue(BASE):
 
     @property
     def user_comments(self):
-        """ Return user comments only, filter it from notifications
-        """
+        """Return user comments only, filter it from notifications"""
         return [
             comment for comment in self.comments if not comment.notification
         ]
 
     @property
     def sortable_priority(self):
-        """ Return an empty string if no priority is set allowing issues to
-        be sorted using this attribute. """
+        """Return an empty string if no priority is set allowing issues to
+        be sorted using this attribute."""
         return self.priority if self.priority else ""
 
     @property
     def boards_name(self):
-        """ Return the list of boards the issue is part of
-        """
+        """Return the list of boards the issue is part of"""
         out = []
         for status_board in self.boards_issues:
             out.append(status_board.board.name)
@@ -1563,9 +1557,7 @@ class Issue(BASE):
         )
 
     def to_json(self, public=False, with_comments=True, with_project=False):
-        """ Returns a dictionary representation of the issue.
-
-        """
+        """Returns a dictionary representation of the issue."""
         custom_fields = [
             dict(
                 name=field.key.name,
@@ -1626,7 +1618,7 @@ class Issue(BASE):
 
 
 class IssueToIssue(BASE):
-    """ Stores the parent/child relationship between two issues.
+    """Stores the parent/child relationship between two issues.
 
     Table -- issue_to_issue
     """
@@ -1646,7 +1638,7 @@ class IssueToIssue(BASE):
 
 
 class PrToIssue(BASE):
-    """ Stores the associations between issues and pull-requests.
+    """Stores the associations between issues and pull-requests.
 
     Table -- pr_to_issue
     """
@@ -1669,7 +1661,7 @@ class PrToIssue(BASE):
 
 
 class IssueComment(BASE):
-    """ Stores the comments made on a commit/file.
+    """Stores the comments made on a commit/file.
 
     Table -- issue_comments
     """
@@ -1729,7 +1721,7 @@ class IssueComment(BASE):
 
     @property
     def mail_id(self):
-        """ Return a unique reprensetation of the issue as string that
+        """Return a unique reprensetation of the issue as string that
         can be used when sending emails.
         """
         return "%s-ticket-%s-%s" % (
@@ -1745,7 +1737,7 @@ class IssueComment(BASE):
 
     @property
     def reactions(self):
-        """ Return the reactions stored as a string in the database parsed as
+        """Return the reactions stored as a string in the database parsed as
         an actual dict object.
         """
         if self._reactions:
@@ -1758,9 +1750,7 @@ class IssueComment(BASE):
         self._reactions = json.dumps(reactions)
 
     def to_json(self, public=False):
-        """ Returns a dictionary representation of the issue.
-
-        """
+        """Returns a dictionary representation of the issue."""
         output = {
             "id": self.id,
             "comment": self.comment,
@@ -1778,7 +1768,7 @@ class IssueComment(BASE):
 
 
 class IssueKeys(BASE):
-    """ Stores the custom keys a project can use on issues.
+    """Stores the custom keys a project can use on issues.
 
     Table -- issue_keys
     """
@@ -1829,7 +1819,7 @@ class IssueKeys(BASE):
 
 
 class IssueValues(BASE):
-    """ Stores the values of the custom keys set by project on issues.
+    """Stores the values of the custom keys set by project on issues.
 
     Table -- issue_values
     """
@@ -1866,7 +1856,7 @@ class IssueValues(BASE):
 
 
 class Tag(BASE):
-    """ Stores the tags.
+    """Stores the tags.
 
     Table -- tags
     """
@@ -1880,7 +1870,7 @@ class Tag(BASE):
 
 
 class TagIssue(BASE):
-    """ Stores the tag associated with an issue.
+    """Stores the tag associated with an issue.
 
     Table -- tags_issues
     """
@@ -1915,7 +1905,7 @@ class TagIssue(BASE):
 
 
 class TagColored(BASE):
-    """ Stores the colored tags.
+    """Stores the colored tags.
 
     Table -- tags_colored
     """
@@ -1964,7 +1954,7 @@ class TagColored(BASE):
 
 
 class TagIssueColored(BASE):
-    """ Stores the colored tag associated with an issue.
+    """Stores the colored tag associated with an issue.
 
     Table -- tags_issues_colored
     """
@@ -2008,7 +1998,7 @@ class TagIssueColored(BASE):
 
 
 class TagProject(BASE):
-    """ Stores the tag associated with a project.
+    """Stores the tag associated with a project.
 
     Table -- tags_projects
     """
@@ -2046,7 +2036,7 @@ class TagProject(BASE):
 
 
 class PullRequest(BASE):
-    """ Stores the pull requests created on a project.
+    """Stores the pull requests created on a project.
 
     Table -- pull_requests
     """
@@ -2195,7 +2185,7 @@ class PullRequest(BASE):
 
     @property
     def mail_id(self):
-        """ Return a unique reprensetation of the issue as string that
+        """Return a unique reprensetation of the issue as string that
         can be used when sending emails.
         """
         return "%s-pull-request-%s" % (self.project.name, self.uid)
@@ -2207,15 +2197,14 @@ class PullRequest(BASE):
 
     @property
     def discussion(self):
-        """ Return the list of comments related to the pull-request itself,
+        """Return the list of comments related to the pull-request itself,
         ie: not related to a specific commit.
         """
         return [comment for comment in self.comments if not comment.commit_id]
 
     @property
     def flags_stats(self):
-        """ Return some stats about the flags associated with this PR.
-        """
+        """Return some stats about the flags associated with this PR."""
         flags = self.flags
         flags.reverse()
 
@@ -2232,7 +2221,7 @@ class PullRequest(BASE):
 
     @property
     def score(self):
-        """ Return the review score of the pull-request by checking the
+        """Return the review score of the pull-request by checking the
         number of +1, -1, :thumbup: and :thumbdown: in the comment of the
         pull-request.
         This includes only the main comments not the inline ones.
@@ -2254,7 +2243,7 @@ class PullRequest(BASE):
 
     @property
     def threshold_reached(self):
-        """ Return whether the pull-request has reached the threshold above
+        """Return whether the pull-request has reached the threshold above
         which it is allowed to be merged, if the project requests a minimal
         score on pull-request, otherwise returns None.
 
@@ -2269,15 +2258,14 @@ class PullRequest(BASE):
 
     @property
     def remote(self):
-        """ Return whether the current PullRequest is a remote pull-request
+        """Return whether the current PullRequest is a remote pull-request
         or not.
         """
         return self.remote_git is not None
 
     @property
     def user_comments(self):
-        """ Return user comments only, filter it from notifications
-        """
+        """Return user comments only, filter it from notifications"""
         return [
             comment for comment in self.comments if not comment.notification
         ]
@@ -2291,9 +2279,7 @@ class PullRequest(BASE):
         )
 
     def to_json(self, public=False, api=False, with_comments=True):
-        """ Returns a dictionary representation of the pull-request.
-
-        """
+        """Returns a dictionary representation of the pull-request."""
         output = {
             "id": self.id,
             "uid": self.uid,
@@ -2337,7 +2323,7 @@ class PullRequest(BASE):
 
 
 class PullRequestComment(BASE):
-    """ Stores the comments made on a pull-request.
+    """Stores the comments made on a pull-request.
 
     Table -- pull_request_comments
     """
@@ -2405,7 +2391,7 @@ class PullRequestComment(BASE):
 
     @property
     def mail_id(self):
-        """ Return a unique representation of the issue as string that
+        """Return a unique representation of the issue as string that
         can be used when sending emails.
         """
         return "%s-pull-request-%s-%s" % (
@@ -2421,7 +2407,7 @@ class PullRequestComment(BASE):
 
     @property
     def reactions(self):
-        """ Return the reactions stored as a string in the database parsed as
+        """Return the reactions stored as a string in the database parsed as
         an actual dict object.
         """
         if self._reactions:
@@ -2456,7 +2442,7 @@ class PullRequestComment(BASE):
 
 
 class PullRequestFlag(BASE):
-    """ Stores the flags attached to a pull-request.
+    """Stores the flags attached to a pull-request.
 
     Table -- pull_request_flags
     """
@@ -2523,7 +2509,7 @@ class PullRequestFlag(BASE):
 
     @property
     def mail_id(self):
-        """ Return a unique representation of the flag as string that
+        """Return a unique representation of the flag as string that
         can be used when sending emails.
         """
         return "%s-pull-request-%s-%s" % (
@@ -2533,9 +2519,7 @@ class PullRequestFlag(BASE):
         )
 
     def to_json(self, public=False):
-        """ Returns a dictionary representation of the pull-request.
-
-        """
+        """Returns a dictionary representation of the pull-request."""
         output = {
             "pull_request_uid": self.pull_request_uid,
             "username": self.username,
@@ -2552,7 +2536,7 @@ class PullRequestFlag(BASE):
 
 
 class CommitFlag(BASE):
-    """ Stores the flags attached to a commit.
+    """Stores the flags attached to a commit.
 
     Table -- commit_flags
     """
@@ -2619,7 +2603,7 @@ class CommitFlag(BASE):
 
     @property
     def mail_id(self):
-        """ Return a unique representation of the flag as string that
+        """Return a unique representation of the flag as string that
         can be used when sending emails.
         """
         return "%s-commit-%s-%s" % (
@@ -2629,9 +2613,7 @@ class CommitFlag(BASE):
         )
 
     def to_json(self, public=False):
-        """ Returns a dictionary representation of the commit flag.
-
-        """
+        """Returns a dictionary representation of the commit flag."""
         output = {
             "commit_hash": self.commit_hash,
             "username": self.username,
@@ -2648,7 +2630,7 @@ class CommitFlag(BASE):
 
 
 class TagPullRequest(BASE):
-    """ Stores the tag associated with an pull-request.
+    """Stores the tag associated with an pull-request.
 
     Table -- tags_pull_requests
     """
@@ -2758,9 +2740,7 @@ class PagureGroup(BASE):
         return "/".join([base_url, "group", self.group_name])
 
     def to_json(self, public=False):
-        """ Returns a dictionary representation of the pull-request.
-
-        """
+        """Returns a dictionary representation of the pull-request."""
         output = {
             "name": self.group_name,
             "display_name": self.display_name,
@@ -2798,7 +2778,10 @@ class ProjectGroup(BASE):
         ),
         nullable=False,
     )
-    branches = sa.Column(sa.Text, nullable=True,)
+    branches = sa.Column(
+        sa.Text,
+        nullable=True,
+    )
 
     project = relation(
         "Project",
@@ -2818,7 +2801,7 @@ class ProjectGroup(BASE):
 
 
 class Star(BASE):
-    """ Stores users association with the all the projects which
+    """Stores users association with the all the projects which
     they have starred
 
     Table -- star
@@ -2860,7 +2843,7 @@ class Star(BASE):
 
 
 class Watcher(BASE):
-    """ Stores the user of a projects.
+    """Stores the user of a projects.
 
     Table -- watchers
     """
@@ -2968,9 +2951,7 @@ class PagureLog(BASE):
     )
 
     def to_json(self, public=False):
-        """ Returns a dictionary representation of the issue.
-
-        """
+        """Returns a dictionary representation of the issue."""
         output = {
             "id": self.id,
             "type": self.log_type,
@@ -3037,7 +3018,7 @@ class PagureLog(BASE):
 
 
 class IssueWatcher(BASE):
-    """ Stores the users watching issues.
+    """Stores the users watching issues.
 
     Table -- issue_watchers
     """
@@ -3075,7 +3056,7 @@ class IssueWatcher(BASE):
 
 
 class PullRequestWatcher(BASE):
-    """ Stores the users watching issues.
+    """Stores the users watching issues.
 
     Table -- pull_request_watchers
     """
@@ -3211,8 +3192,7 @@ class Token(BASE):
 
     @property
     def acls_list(self):
-        """ Return a list containing the name of each ACLs this token has.
-        """
+        """Return a list containing the name of each ACLs this token has."""
         return sorted(["%s" % acl.name for acl in self.acls])
 
     @property
@@ -3322,7 +3302,10 @@ class Board(BASE):
     def __repr__(self):
         """ Return a string representation of this object. """
 
-        return "Board: %s - name %s" % (self.id, self.name,)
+        return "Board: %s - name %s" % (
+            self.id,
+            self.name,
+        )
 
     def to_json(self):
         """ The JSON representation of a board. """
@@ -3386,7 +3369,7 @@ class BoardStatus(BASE):
         )
 
     def visible_tickets(self, watching_user):
-        """ Returns the sorted list of tickets visible to the user currently
+        """Returns the sorted list of tickets visible to the user currently
         watching.
 
         If the user currently watching (ie: ``watching_user``) is False, do not

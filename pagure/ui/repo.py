@@ -68,7 +68,7 @@ _log = logging.getLogger(__name__)
 
 
 def get_preferred_readme(tree):
-    """ Establish some order about which README gets displayed
+    """Establish some order about which README gets displayed
     if there are several in the repository. If none of the listed
     README files is availabe, display either the next file that
     starts with 'README' or nothing at all.
@@ -90,7 +90,7 @@ def get_preferred_readme(tree):
 @UI_NS.route("/fork/<username>/<repo>.git")
 @UI_NS.route("/fork/<username>/<namespace>/<repo>.git")
 def view_repo_git(repo, username=None, namespace=None):
-    """ Redirect to the project index page when user wants to view
+    """Redirect to the project index page when user wants to view
     the git repo of the project
     """
     return flask.redirect(
@@ -112,8 +112,7 @@ def view_repo_git(repo, username=None, namespace=None):
 @UI_NS.route("/fork/<username>/<namespace>/<repo>/")
 @UI_NS.route("/fork/<username>/<namespace>/<repo>")
 def view_repo(repo, username=None, namespace=None):
-    """ Front page of a specific repo.
-    """
+    """Front page of a specific repo."""
     repo_db = flask.g.repo
     repo_obj = flask.g.repo_obj
 
@@ -297,8 +296,7 @@ def view_repo_branch(repo, branchname, username=None, namespace=None):
 @UI_NS.route("/fork/<username>/<namespace>/<repo>/commits")
 @UI_NS.route("/fork/<username>/<namespace>/<repo>/commits/<path:branchname>")
 def view_commits(repo, branchname=None, username=None, namespace=None):
-    """ Displays the commits of the specified repo.
-    """
+    """Displays the commits of the specified repo."""
     repo = flask.g.repo
     repo_obj = flask.g.repo_obj
 
@@ -442,8 +440,7 @@ def view_commits(repo, branchname=None, username=None, namespace=None):
 @UI_NS.route("/fork/<username>/<namespace>/<repo>/c/<commit1>..<commit2>/")
 @UI_NS.route("/fork/<username>/<namespace>/<repo>/c/<commit1>..<commit2>")
 def compare_commits(repo, commit1, commit2, username=None, namespace=None):
-    """ Compares two commits for specified repo
-    """
+    """Compares two commits for specified repo"""
     repo = flask.g.repo
     repo_obj = flask.g.repo_obj
 
@@ -513,8 +510,7 @@ def compare_commits(repo, commit1, commit2, username=None, namespace=None):
     "<path:filename>"
 )
 def view_file(repo, identifier, filename, username=None, namespace=None):
-    """ Displays the content of a file or a tree for the specified repo.
-    """
+    """Displays the content of a file or a tree for the specified repo."""
     repo = flask.g.repo
     repo_obj = flask.g.repo_obj
 
@@ -685,8 +681,7 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
 def view_raw_file(
     repo, identifier, filename=None, username=None, namespace=None
 ):
-    """ Displays the raw content of a file of a commit for the specified repo.
-    """
+    """Displays the raw content of a file of a commit for the specified repo."""
     repo_obj = flask.g.repo_obj
 
     if repo_obj.is_empty:
@@ -743,8 +738,7 @@ def view_raw_file(
 @UI_NS.route("/fork/<username>/<repo>/blame/<path:filename>")
 @UI_NS.route("/fork/<username>/<namespace>/<repo>/blame/<path:filename>")
 def view_blame_file(repo, filename, username=None, namespace=None):
-    """ Displays the blame of a file or a tree for the specified repo.
-    """
+    """Displays the blame of a file or a tree for the specified repo."""
     repo = flask.g.repo
     repo_obj = flask.g.repo_obj
 
@@ -826,8 +820,7 @@ def view_blame_file(repo, filename, username=None, namespace=None):
 @UI_NS.route("/fork/<username>/<repo>/history/<path:filename>")
 @UI_NS.route("/fork/<username>/<namespace>/<repo>/history/<path:filename>")
 def view_history_file(repo, filename, username=None, namespace=None):
-    """ Displays the history of a file or a tree for the specified repo.
-    """
+    """Displays the history of a file or a tree for the specified repo."""
     repo = flask.g.repo
     repo_obj = flask.g.repo_obj
 
@@ -880,8 +873,7 @@ def view_history_file(repo, filename, username=None, namespace=None):
 @UI_NS.route("/fork/<username>/<namespace>/<repo>/c/<commitid>/")
 @UI_NS.route("/fork/<username>/<namespace>/<repo>/c/<commitid>")
 def view_commit(repo, commitid, username=None, namespace=None):
-    """ Render a commit in a repo
-    """
+    """Render a commit in a repo"""
     repo = flask.g.repo
     if not repo:
         flask.abort(404, description="Project not found")
@@ -953,8 +945,7 @@ def view_commit(repo, commitid, username=None, namespace=None):
 @UI_NS.route("/fork/<username>/<repo>/c/<commitid>.patch")
 @UI_NS.route("/fork/<username>/<namespace>/<repo>/c/<commitid>.patch")
 def view_commit_patch(repo, commitid, username=None, namespace=None):
-    """ Render a commit in a repo as patch
-    """
+    """Render a commit in a repo as patch"""
     return view_commit_patch_or_diff(
         repo, commitid, username, namespace, diff=False
     )
@@ -965,8 +956,7 @@ def view_commit_patch(repo, commitid, username=None, namespace=None):
 @UI_NS.route("/fork/<username>/<repo>/c/<commitid>.diff")
 @UI_NS.route("/fork/<username>/<namespace>/<repo>/c/<commitid>.diff")
 def view_commit_diff(repo, commitid, username=None, namespace=None):
-    """ Render a commit in a repo as diff
-    """
+    """Render a commit in a repo as diff"""
 
     is_js = is_true(flask.request.args.get("js"))
 
@@ -1032,8 +1022,7 @@ def view_commit_patch_or_diff(
 @UI_NS.route("/fork/<username>/<repo>/tree/<path:identifier>")
 @UI_NS.route("/fork/<username>/<namespace>/<repo>/tree/<path:identifier>")
 def view_tree(repo, identifier=None, username=None, namespace=None):
-    """ Render the tree of the repo
-    """
+    """Render the tree of the repo"""
     repo = flask.g.repo
     repo_obj = flask.g.repo_obj
 
@@ -1111,8 +1100,7 @@ def view_tree(repo, identifier=None, username=None, namespace=None):
 @UI_NS.route("/fork/<username>/<namespace>/<repo>/releases/")
 @UI_NS.route("/fork/<username>/<namespace>/<repo>/releases")
 def view_tags(repo, username=None, namespace=None):
-    """ Presents all the tags of the project.
-    """
+    """Presents all the tags of the project."""
     repo = flask.g.repo
     tags = pagure.lib.git.get_git_tags_objects(repo)
 
@@ -1140,8 +1128,7 @@ def view_tags(repo, username=None, namespace=None):
 @UI_NS.route("/fork/<username>/<namespace>/<repo>/branches/")
 @UI_NS.route("/fork/<username>/<namespace>/<repo>/branches")
 def view_branches(repo, username=None, namespace=None):
-    """ Branches
-    """
+    """Branches"""
     repo_db = flask.g.repo
     repo_obj = flask.g.repo_obj
 
@@ -1175,8 +1162,7 @@ def view_branches(repo, username=None, namespace=None):
 @UI_NS.route("/fork/<username>/<namespace>/<repo>/forks/")
 @UI_NS.route("/fork/<username>/<namespace>/<repo>/forks")
 def view_forks(repo, username=None, namespace=None):
-    """ Forks
-    """
+    """Forks"""
 
     return flask.render_template(
         "repo_forks.html", select="forks", username=username, repo=flask.g.repo
@@ -1198,8 +1184,7 @@ def view_forks(repo, username=None, namespace=None):
 @login_required
 @is_repo_admin
 def new_release(repo, username=None, namespace=None):
-    """ Upload a new release.
-    """
+    """Upload a new release."""
     if not pagure_config.get("UPLOAD_FOLDER_PATH") or not pagure_config.get(
         "UPLOAD_FOLDER_URL"
     ):
@@ -1281,8 +1266,7 @@ def new_release(repo, username=None, namespace=None):
 @is_admin_sess_timedout
 @is_repo_admin
 def view_settings(repo, username=None, namespace=None):
-    """ Presents the settings of the project.
-    """
+    """Presents the settings of the project."""
 
     repo = flask.g.repo
     repo_obj = flask.g.repo_obj
@@ -1376,7 +1360,7 @@ def view_settings(repo, username=None, namespace=None):
 @is_admin_sess_timedout
 @is_repo_admin
 def test_web_hook(repo, username=None, namespace=None):
-    """ Endpoint that can be called to send a test message to the web-hook
+    """Endpoint that can be called to send a test message to the web-hook
     service allowing to test the web-hooks set.
     """
 
@@ -1412,8 +1396,7 @@ def test_web_hook(repo, username=None, namespace=None):
 @is_admin_sess_timedout
 @is_repo_admin
 def update_project(repo, username=None, namespace=None):
-    """ Update the description of a project.
-    """
+    """Update the description of a project."""
 
     repo = flask.g.repo
 
@@ -1471,8 +1454,7 @@ def update_project(repo, username=None, namespace=None):
 @is_admin_sess_timedout
 @is_repo_admin
 def update_priorities(repo, username=None, namespace=None):
-    """ Update the priorities of a project.
-    """
+    """Update the priorities of a project."""
 
     repo = flask.g.repo
 
@@ -1570,8 +1552,7 @@ def update_priorities(repo, username=None, namespace=None):
 @is_admin_sess_timedout
 @is_repo_admin
 def default_priority(repo, username=None, namespace=None):
-    """ Update the default priority of a project.
-    """
+    """Update the default priority of a project."""
 
     repo = flask.g.repo
 
@@ -1616,8 +1597,7 @@ def default_priority(repo, username=None, namespace=None):
 @is_admin_sess_timedout
 @is_repo_admin
 def update_milestones(repo, username=None, namespace=None):
-    """ Update the milestones of a project.
-    """
+    """Update the milestones of a project."""
 
     repo = flask.g.repo
 
@@ -1702,8 +1682,7 @@ def update_milestones(repo, username=None, namespace=None):
 @is_admin_sess_timedout
 @is_repo_admin
 def change_ref_head(repo, username=None, namespace=None):
-    """ Change HEAD reference
-    """
+    """Change HEAD reference"""
 
     repo = flask.g.repo
     repo_obj = flask.g.repo_obj
@@ -1738,8 +1717,7 @@ def change_ref_head(repo, username=None, namespace=None):
 @is_admin_sess_timedout
 @is_repo_admin
 def delete_repo(repo, username=None, namespace=None):
-    """ Delete the present project.
-    """
+    """Delete the present project."""
     repo = flask.g.repo
 
     del_project = pagure_config.get("ENABLE_DEL_PROJECTS", True)
@@ -1784,8 +1762,7 @@ def delete_repo(repo, username=None, namespace=None):
 @is_admin_sess_timedout
 @is_repo_admin
 def new_repo_hook_token(repo, username=None, namespace=None):
-    """ Re-generate a hook token for the present project.
-    """
+    """Re-generate a hook token for the present project."""
     if not pagure_config.get("WEBHOOK", False):
         flask.abort(404)
 
@@ -1828,8 +1805,7 @@ def new_repo_hook_token(repo, username=None, namespace=None):
 @is_admin_sess_timedout
 @is_repo_admin
 def remove_deploykey(repo, keyid, username=None, namespace=None):
-    """ Remove the specified deploy key from the project.
-    """
+    """Remove the specified deploy key from the project."""
 
     if not pagure_config.get("DEPLOY_KEY", True):
         flask.abort(
@@ -1903,8 +1879,7 @@ def remove_deploykey(repo, keyid, username=None, namespace=None):
 @is_admin_sess_timedout
 @is_repo_admin
 def remove_user(repo, userid, username=None, namespace=None):
-    """ Remove the specified user from the project.
-    """
+    """Remove the specified user from the project."""
 
     if not pagure_config.get("ENABLE_USER_MNGT", True):
         flask.abort(
@@ -1972,8 +1947,7 @@ def remove_user(repo, userid, username=None, namespace=None):
 @is_admin_sess_timedout
 @is_repo_admin
 def add_deploykey(repo, username=None, namespace=None):
-    """ Add the specified deploy key to the project.
-    """
+    """Add the specified deploy key to the project."""
 
     if not pagure_config.get("DEPLOY_KEY", True):
         flask.abort(
@@ -2049,8 +2023,7 @@ def add_deploykey(repo, username=None, namespace=None):
 @is_admin_sess_timedout
 @is_repo_admin
 def add_user(repo, username=None, namespace=None):
-    """ Add the specified user to the project.
-    """
+    """Add the specified user to the project."""
 
     if not pagure_config.get("ENABLE_USER_MNGT", True):
         flask.abort(
@@ -2136,8 +2109,7 @@ def add_user(repo, username=None, namespace=None):
 @is_admin_sess_timedout
 @is_repo_admin
 def remove_group_project(repo, groupid, username=None, namespace=None):
-    """ Remove the specified group from the project.
-    """
+    """Remove the specified group from the project."""
 
     if not pagure_config.get("ENABLE_USER_MNGT", True):
         flask.abort(
@@ -2223,8 +2195,7 @@ def remove_group_project(repo, groupid, username=None, namespace=None):
 @is_admin_sess_timedout
 @is_repo_admin
 def add_group_project(repo, username=None, namespace=None):
-    """ Add the specified group to the project.
-    """
+    """Add the specified group to the project."""
 
     if not pagure_config.get("ENABLE_USER_MNGT", True):
         flask.abort(
@@ -2308,8 +2279,7 @@ def add_group_project(repo, username=None, namespace=None):
 @is_admin_sess_timedout
 @is_repo_admin
 def regenerate_git(repo, username=None, namespace=None):
-    """ Regenerate the specified git repo with the content in the project.
-    """
+    """Regenerate the specified git repo with the content in the project."""
 
     repo = flask.g.repo
 
@@ -2378,8 +2348,7 @@ def regenerate_git(repo, username=None, namespace=None):
 @login_required
 @is_admin_sess_timedout
 def add_token(repo, username=None, namespace=None):
-    """ Add a token to a specified project.
-    """
+    """Add a token to a specified project."""
 
     repo = flask.g.repo
 
@@ -2448,8 +2417,7 @@ def add_token(repo, username=None, namespace=None):
 @is_admin_sess_timedout
 @is_repo_admin
 def renew_api_token(repo, token_id, username=None, namespace=None):
-    """ Renew a token to a specified project.
-    """
+    """Renew a token to a specified project."""
 
     repo = flask.g.repo
 
@@ -2518,8 +2486,7 @@ def renew_api_token(repo, token_id, username=None, namespace=None):
 @is_admin_sess_timedout
 @is_repo_admin
 def revoke_api_token(repo, token_id, username=None, namespace=None):
-    """ Revokie a token to a specified project.
-    """
+    """Revokie a token to a specified project."""
 
     repo = flask.g.repo
 
@@ -2579,8 +2546,7 @@ def revoke_api_token(repo, token_id, username=None, namespace=None):
 )
 @login_required
 def edit_file(repo, branchname, filename, username=None, namespace=None):
-    """ Edit a file online.
-    """
+    """Edit a file online."""
     repo = flask.g.repo
     repo_obj = flask.g.repo_obj
 
@@ -2688,8 +2654,7 @@ def edit_file(repo, branchname, filename, username=None, namespace=None):
 )
 @login_required
 def delete_branch(repo, branchname, username=None, namespace=None):
-    """ Delete the branch of a project.
-    """
+    """Delete the branch of a project."""
     if not flask.g.repo.is_fork and not pagure_config.get(
         "ALLOW_DELETE_BRANCH", True
     ):
@@ -2739,8 +2704,7 @@ def delete_branch(repo, branchname, username=None, namespace=None):
 @UI_NS.route("/docs/fork/<username>/<repo>/")
 @UI_NS.route("/docs/fork/<username>/<namespace>/<repo>/<path:filename>")
 def view_docs(repo, username=None, filename=None, namespace=None):
-    """ Display the documentation
-    """
+    """Display the documentation"""
     repo = flask.g.repo
 
     if not pagure_config.get("DOC_APP_URL"):
@@ -2761,8 +2725,7 @@ def view_docs(repo, username=None, filename=None, namespace=None):
 @UI_NS.route("/<namespace>/<repo>/activity/")
 @UI_NS.route("/<namespace>/<repo>/activity")
 def view_project_activity(repo, namespace=None):
-    """ Display the activity feed
-    """
+    """Display the activity feed"""
 
     if not pagure_config.get("DATAGREPPER_URL"):
         flask.abort(404)
@@ -2798,7 +2761,7 @@ def view_stargazers(repo, username=None, namespace=None):
 )
 @login_required
 def star_project(repo, star, username=None, namespace=None):
-    """ Star or Unstar a project
+    """Star or Unstar a project
 
     :arg repo: string representing the project which has to be starred or
     unstarred.
@@ -2847,8 +2810,7 @@ def star_project(repo, star, username=None, namespace=None):
 )
 @login_required
 def watch_repo(repo, watch, username=None, namespace=None):
-    """ Marked for watching or unwatching
-    """
+    """Marked for watching or unwatching"""
 
     return_point = flask.url_for("ui_ns.index")
     if pagure.utils.is_safe_url(flask.request.referrer):
@@ -2884,8 +2846,7 @@ def watch_repo(repo, watch, username=None, namespace=None):
 @is_admin_sess_timedout
 @is_repo_admin
 def update_public_notifications(repo, username=None, namespace=None):
-    """ Update the public notification settings of a project.
-    """
+    """Update the public notification settings of a project."""
 
     repo = flask.g.repo
 
@@ -2938,8 +2899,7 @@ def update_public_notifications(repo, username=None, namespace=None):
 @is_admin_sess_timedout
 @is_repo_admin
 def update_close_status(repo, username=None, namespace=None):
-    """ Update the close_status of a project.
-    """
+    """Update the close_status of a project."""
 
     repo = flask.g.repo
 
@@ -2984,8 +2944,7 @@ def update_close_status(repo, username=None, namespace=None):
 @is_admin_sess_timedout
 @is_repo_admin
 def update_quick_replies(repo, username=None, namespace=None):
-    """ Update the quick_replies of a project.
-    """
+    """Update the quick_replies of a project."""
 
     repo = flask.g.repo
 
@@ -3033,8 +2992,7 @@ def update_quick_replies(repo, username=None, namespace=None):
 @is_admin_sess_timedout
 @is_repo_admin
 def update_custom_keys(repo, username=None, namespace=None):
-    """ Update the custom_keys of a project.
-    """
+    """Update the custom_keys of a project."""
 
     repo = flask.g.repo
 
@@ -3098,8 +3056,7 @@ def update_custom_keys(repo, username=None, namespace=None):
 @is_admin_sess_timedout
 @is_repo_admin
 def delete_report(repo, username=None, namespace=None):
-    """ Delete a report from a project.
-    """
+    """Delete a report from a project."""
 
     repo = flask.g.repo
 
@@ -3142,8 +3099,7 @@ def delete_report(repo, username=None, namespace=None):
 @is_admin_sess_timedout
 @is_repo_admin
 def move_to_repospanner(repo, username=None, namespace=None):
-    """ Give a project to someone else.
-    """
+    """Give a project to someone else."""
     repo = flask.g.repo
 
     if not pagure.utils.is_admin():
@@ -3206,8 +3162,7 @@ def move_to_repospanner(repo, username=None, namespace=None):
 @is_admin_sess_timedout
 @is_repo_admin
 def give_project(repo, username=None, namespace=None):
-    """ Give a project to someone else.
-    """
+    """Give a project to someone else."""
     if not pagure_config.get("ENABLE_GIVE_PROJECTS", True):
         flask.abort(404)
 
@@ -3306,7 +3261,7 @@ def give_project(repo, username=None, namespace=None):
 @UI_NS.route("/fork/<username>/<namespace>/<repo>/dowait/")
 @UI_NS.route("/fork/<username>/<namespace>/<repo>/dowait")
 def project_dowait(repo, username=None, namespace=None):
-    """ Schedules a task that just waits 10 seconds for testing locking.
+    """Schedules a task that just waits 10 seconds for testing locking.
 
     This is not available unless ALLOW_PROJECT_DOWAIT is set to True, which
     should only ever be done in test instances.
@@ -3330,8 +3285,7 @@ def project_dowait(repo, username=None, namespace=None):
 @UI_NS.route("/fork/<username>/<namespace>/<repo>/stats/")
 @UI_NS.route("/fork/<username>/<namespace>/<repo>/stats")
 def view_stats(repo, username=None, namespace=None):
-    """ Displays some statistics about the specified repo.
-    """
+    """Displays some statistics about the specified repo."""
     return flask.render_template(
         "repo_stats.html", select="stats", username=username, repo=flask.g.repo
     )
@@ -3343,8 +3297,7 @@ def view_stats(repo, username=None, namespace=None):
 @is_repo_admin
 @has_issue_or_pr_enabled
 def update_tags(repo, username=None, namespace=None):
-    """ Update the tags of a project.
-    """
+    """Update the tags of a project."""
 
     repo = flask.g.repo
 
@@ -3448,8 +3401,7 @@ def update_tags(repo, username=None, namespace=None):
 @is_repo_admin
 @has_issue_or_pr_enabled
 def remove_tag(repo, username=None, namespace=None):
-    """ Remove the specified tag, associated with the issues, from the project.
-    """
+    """Remove the specified tag, associated with the issues, from the project."""
     repo = flask.g.repo
 
     form = pagure.forms.DeleteIssueTagForm()
@@ -3501,8 +3453,7 @@ def remove_tag(repo, username=None, namespace=None):
 @is_repo_admin
 @has_issue_or_pr_enabled
 def edit_tag(repo, tag, username=None, namespace=None):
-    """ Edit the specified tag associated with the issues of a project.
-    """
+    """Edit the specified tag associated with the issues of a project."""
     repo = flask.g.repo
 
     tags = pagure.lib.query.get_tags_of_project(flask.g.session, repo)
@@ -3567,8 +3518,7 @@ def edit_tag(repo, tag, username=None, namespace=None):
 @UI_NS.route("/fork/<username>/<repo>/archive/<ref>/<name>.tar")
 @UI_NS.route("/fork/<username>/<namespace>/<repo>/archive/<ref>/<name>.tar")
 def get_project_archive_tar(repo, ref, name, namespace=None, username=None):
-    """ Generate an archive or redirect the user to where it already exists
-    """
+    """Generate an archive or redirect the user to where it already exists"""
 
     return generate_project_archive(
         repo,
@@ -3585,8 +3535,7 @@ def get_project_archive_tar(repo, ref, name, namespace=None, username=None):
 @UI_NS.route("/fork/<username>/<repo>/archive/<ref>/<name>.tar.gz")
 @UI_NS.route("/fork/<username>/<namespace>/<repo>/archive/<ref>/<name>.tar.gz")
 def get_project_archive_tar_gz(repo, ref, name, namespace=None, username=None):
-    """ Generate an archive or redirect the user to where it already exists
-    """
+    """Generate an archive or redirect the user to where it already exists"""
     return generate_project_archive(
         repo,
         ref,
@@ -3602,8 +3551,7 @@ def get_project_archive_tar_gz(repo, ref, name, namespace=None, username=None):
 @UI_NS.route("/fork/<username>/<repo>/archive/<ref>/<name>.zip")
 @UI_NS.route("/fork/<username>/<namespace>/<repo>/archive/<ref>/<name>.zip")
 def get_project_archive_zip(repo, ref, name, namespace=None, username=None):
-    """ Generate an archive or redirect the user to where it already exists
-    """
+    """Generate an archive or redirect the user to where it already exists"""
     return generate_project_archive(
         repo,
         ref,
@@ -3617,7 +3565,7 @@ def get_project_archive_zip(repo, ref, name, namespace=None, username=None):
 def generate_project_archive(
     repo, ref, name, extension, namespace=None, username=None
 ):
-    """ Generate an archive or redirect the user to where it already
+    """Generate an archive or redirect the user to where it already
     exists.
     """
 

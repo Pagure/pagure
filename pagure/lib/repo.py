@@ -22,7 +22,7 @@ _log = logging.getLogger(__name__)
 
 
 def get_pygit2_version():
-    """ Return pygit2 version as a tuple of integers.
+    """Return pygit2 version as a tuple of integers.
     This is needed for correct version comparison.
     """
     return tuple([int(i) for i in pygit2.__version__.split(".")])
@@ -50,14 +50,14 @@ def run_command(command, cwd=None):
 
 
 class PagureRepo(pygit2.Repository):
-    """ An utility class allowing to go around pygit2's inability to be
+    """An utility class allowing to go around pygit2's inability to be
     stable.
 
     """
 
     @staticmethod
     def clone(path_from, path_to, checkout_branch=None, bare=False):
-        """ Clone the git repo at the specified path to the specified location.
+        """Clone the git repo at the specified path to the specified location.
 
         This method is meant to replace pygit2.clone_repository which for us
         leaks file descriptors on large project leading to "Too many open files
@@ -87,7 +87,7 @@ class PagureRepo(pygit2.Repository):
             remote.push(refname)
 
     def pull(self, remote_name="origin", branch="master", force=False):
-        """ pull changes for the specified remote (defaults to origin).
+        """pull changes for the specified remote (defaults to origin).
 
         Code from MichaelBoselowitz at:
         https://github.com/MichaelBoselowitz/pygit2-examples/blob/
@@ -133,7 +133,7 @@ class PagureRepo(pygit2.Repository):
 
     @staticmethod
     def log(path, log_options=None, target=None, fromref=None):
-        """ Run git log with the specified options at the specified target.
+        """Run git log with the specified options at the specified target.
 
         This method runs the system's `git log` command since pygit2 doesn't
         offer us the possibility to do this via them.
@@ -159,7 +159,7 @@ class PagureRepo(pygit2.Repository):
 
     @staticmethod
     def get_active_branches(path, nbranch=8, catch_exception=False):
-        """ Returns the active branches in the git repo at the specified
+        """Returns the active branches in the git repo at the specified
         location.
 
         :arg path: the location of the git repo

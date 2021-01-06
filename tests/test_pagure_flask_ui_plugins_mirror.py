@@ -35,7 +35,7 @@ class PagureFlaskPluginMirrortests(tests.Modeltests):
         tests.create_projects_git(os.path.join(self.path, "repos"))
 
     def test_valid_ssh_url_pattern(self):
-        """ Check a number of valide ssh target that the pattern should let
+        """Check a number of valide ssh target that the pattern should let
         through.
         """
         entries = [
@@ -95,7 +95,7 @@ class PagureFlaskPluginMirrortests(tests.Modeltests):
             )
 
     def test_plugin_mirror_no_data(self):
-        """ Test the setting up the mirror plugin when there are no data
+        """Test the setting up the mirror plugin when there are no data
         provided in the request.
         """
 
@@ -141,7 +141,7 @@ class PagureFlaskPluginMirrortests(tests.Modeltests):
             )
 
     def test_plugin_mirror_invalid_target(self):
-        """ Test the setting up the mirror plugin when there are the target
+        """Test the setting up the mirror plugin when there are the target
         provided is invalid.
         """
 
@@ -210,8 +210,7 @@ class PagureFlaskPluginMirrortests(tests.Modeltests):
             )
 
     def test_setting_up_mirror(self):
-        """ Test the setting up the mirror plugin.
-        """
+        """Test the setting up the mirror plugin."""
 
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
@@ -255,8 +254,7 @@ class PagureFlaskPluginMirrortests(tests.Modeltests):
             )
 
     def test_plugin_mirror_deactivate(self):
-        """ Test the deactivating the mirror plugin.
-        """
+        """Test the deactivating the mirror plugin."""
         self.test_setting_up_mirror()
 
         user = tests.FakeUser(username="pingou")

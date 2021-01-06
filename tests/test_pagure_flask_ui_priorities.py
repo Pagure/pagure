@@ -1315,7 +1315,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_default_priority_reset_when_updating_priorities(self):
-        """ Test updating the default priority of a repo when updating the
+        """Test updating the default priority of a repo when updating the
         priorities.
         """
         tests.create_projects(self.session)

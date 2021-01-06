@@ -93,7 +93,7 @@ class PagureFlaskPluginFedmsgtests(tests.SimplePagureTest):
             )
 
     def test_plugin_fedmsg_no_data(self):
-        """ Test the setting up the fedmsg plugin when there are no Docs
+        """Test the setting up the fedmsg plugin when there are no Docs
         folder.
         """
 
@@ -147,7 +147,7 @@ class PagureFlaskPluginFedmsgtests(tests.SimplePagureTest):
             )
 
     def test_plugin_fedmsg_activate(self):
-        """ Test the setting up the fedmsg plugin when there are no Docs
+        """Test the setting up the fedmsg plugin when there are no Docs
         folder.
         """
         pagure.config.config["DOCS_FOLDER"] = os.path.join(
@@ -210,7 +210,7 @@ class PagureFlaskPluginFedmsgtests(tests.SimplePagureTest):
             )
 
     def test_plugin_fedmsg_deactivate(self):
-        """ Test the setting up the fedmsg plugin when there are no Docs
+        """Test the setting up the fedmsg plugin when there are no Docs
         folder.
         """
         self.test_plugin_fedmsg_activate()
@@ -271,7 +271,7 @@ class PagureFlaskPluginFedmsgtests(tests.SimplePagureTest):
 
     @patch.dict("pagure.config.config", {"DOCS_FOLDER": None})
     def test_plugin_fedmsg_no_docs(self):
-        """ Test the setting up the fedmsg plugin when there are no Docs
+        """Test the setting up the fedmsg plugin when there are no Docs
         folder.
         """
 

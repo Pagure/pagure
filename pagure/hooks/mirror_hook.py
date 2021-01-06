@@ -30,7 +30,7 @@ _config = pagure.config.reload_config()
 
 
 class MirrorTable(BASE):
-    """ Stores information about the mirroring hook deployed on a project.
+    """Stores information about the mirroring hook deployed on a project.
 
     Table -- mirror_pagure
     """
@@ -69,7 +69,7 @@ class MirrorRunner(BaseRunner):
 
     @staticmethod
     def post_receive(session, username, project, repotype, repodir, changes):
-        """ Run the default post-receive hook.
+        """Run the default post-receive hook.
 
         For args, see BaseRunner.runhook.
         """
@@ -150,7 +150,7 @@ class MirrorHook(BaseHook):
 
     @classmethod
     def install(cls, project, dbobj):
-        """ Method called to install the hook for a project.
+        """Method called to install the hook for a project.
 
         :arg project: a ``pagure.model.Project`` object to which the hook
             should be installed
@@ -167,7 +167,7 @@ class MirrorHook(BaseHook):
 
     @classmethod
     def remove(cls, project):
-        """ Method called to remove the hook of a project.
+        """Method called to remove the hook of a project.
 
         :arg project: a ``pagure.model.Project`` object to which the hook
             should be installed

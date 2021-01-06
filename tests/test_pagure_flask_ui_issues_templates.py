@@ -27,8 +27,7 @@ import tests
 
 
 def create_templates(repopath):
-    """ Create a couple of templates at the specified repo.
-    """
+    """Create a couple of templates at the specified repo."""
     clone_repo = pygit2.Repository(repopath)
 
     # Create the RFE template
@@ -127,8 +126,7 @@ class PagureFlaskIssuesTemplatetests(tests.Modeltests):
         create_templates(repopath)
 
     def test_new_issue_no_template(self):
-        """ Test the new_issue endpoint when the project has no templates.
-        """
+        """Test the new_issue endpoint when the project has no templates."""
 
         user = tests.FakeUser()
         with tests.user_set(self.app.application, user):
@@ -204,7 +202,7 @@ class PagureFlaskIssuesTemplatetests(tests.Modeltests):
             )
 
     def test_get_ticket_template_no_csrf(self):
-        """ Test the get_ticket_template endpoint when the project has no
+        """Test the get_ticket_template endpoint when the project has no
         templates.
         """
 
@@ -218,7 +216,7 @@ class PagureFlaskIssuesTemplatetests(tests.Modeltests):
             )
 
     def test_get_ticket_template_no_template_specified(self):
-        """ Test the get_ticket_template endpoint when not specifying which
+        """Test the get_ticket_template endpoint when not specifying which
         template to get.
         """
 
@@ -234,7 +232,7 @@ class PagureFlaskIssuesTemplatetests(tests.Modeltests):
             )
 
     def test_get_ticket_template_no_project(self):
-        """ Test the get_ticket_template endpoint when the project does not
+        """Test the get_ticket_template endpoint when the project does not
         exist.
         """
 
@@ -246,7 +244,7 @@ class PagureFlaskIssuesTemplatetests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
     def test_get_ticket_template_no_template(self):
-        """ Test the get_ticket_template endpoint when the project has no
+        """Test the get_ticket_template endpoint when the project has no
         templates.
         """
 
@@ -264,7 +262,7 @@ class PagureFlaskIssuesTemplatetests(tests.Modeltests):
             )
 
     def test_get_ticket_template_issue_tracker_disabled(self):
-        """ Test the get_ticket_template endpoint when the project has
+        """Test the get_ticket_template endpoint when the project has
         disabled its issue tracker.
         """
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
@@ -292,7 +290,7 @@ class PagureFlaskIssuesTemplatetests(tests.Modeltests):
             )
 
     def test_get_ticket_template_w_template(self):
-        """ Test the get_ticket_template endpoint when the project has
+        """Test the get_ticket_template endpoint when the project has
         templates.
         """
 
@@ -311,7 +309,7 @@ class PagureFlaskIssuesTemplatetests(tests.Modeltests):
             )
 
     def test_get_ticket_template_w_template_namespace(self):
-        """ Test the get_ticket_template endpoint when the project has
+        """Test the get_ticket_template endpoint when the project has
         templates and a namespace.
         """
 

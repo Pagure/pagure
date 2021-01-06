@@ -1937,7 +1937,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
     def test_api_view_issues_reversed(self):
-        """ Test the api_view_issues method of the flask api. in reversed
+        """Test the api_view_issues method of the flask api. in reversed
         order.
 
         """
@@ -1983,7 +1983,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.assertDictEqual(data, expected)
 
     def test_api_view_issues_milestone(self):
-        """ Test the api_view_issues method of the flask api when filtering
+        """Test the api_view_issues method of the flask api when filtering
         for a milestone.
         """
         tests.create_projects(self.session)
@@ -2103,7 +2103,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
     def test_api_view_issues_priority(self):
-        """ Test the api_view_issues method of the flask api when filtering
+        """Test the api_view_issues method of the flask api when filtering
         for a priority.
         """
         tests.create_projects(self.session)
@@ -2266,7 +2266,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
     def test_api_view_issues_priority_invalid(self):
-        """ Test the api_view_issues method of the flask api when filtering
+        """Test the api_view_issues method of the flask api when filtering
         for an invalid priority.
         """
         tests.create_projects(self.session)
@@ -2289,7 +2289,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
     def test_api_view_issues_no_stones(self):
-        """ Test the api_view_issues method of the flask api when filtering
+        """Test the api_view_issues method of the flask api when filtering
         with no_stones.
         """
         tests.create_projects(self.session)
@@ -4854,8 +4854,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             )
 
     def test_api_view_user_issues_pingou(self):
-        """ Test the api_view_user_issues method of the flask api for pingou.
-        """
+        """Test the api_view_user_issues method of the flask api for pingou."""
         self.test_api_new_issue()
 
         # Create private issue
@@ -4984,8 +4983,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.assertEqual(data["total_issues_created_pages"], 1)
 
     def test_api_view_user_issues_foo(self):
-        """ Test the api_view_user_issues method of the flask api for foo.
-        """
+        """Test the api_view_user_issues method of the flask api for foo."""
         self.test_api_new_issue()
 
         # Create private issue
@@ -5030,8 +5028,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.assertEqual(data["total_issues_created_pages"], 1)
 
     def test_api_view_user_issues_foo_invalid_page(self):
-        """ Test the api_view_user_issues method of the flask api for foo.
-        """
+        """Test the api_view_user_issues method of the flask api for foo."""
         self.test_api_new_issue()
 
         output = self.app.get("/api/0/user/foo/issues?page=0")
@@ -5059,8 +5056,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
     def test_api_view_user_issues_foo_no_assignee(self):
-        """ Test the api_view_user_issues method of the flask api for foo.
-        """
+        """Test the api_view_user_issues method of the flask api for foo."""
         self.test_api_new_issue()
 
         output = self.app.get("/api/0/user/foo/issues?assignee=0")
@@ -5091,8 +5087,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.assertEqual(data["total_issues_created_pages"], 1)
 
     def test_api_view_user_issues_pingou_no_author(self):
-        """ Test the api_view_user_issues method of the flask api for pingou.
-        """
+        """Test the api_view_user_issues method of the flask api for pingou."""
         self.test_api_new_issue()
 
         output = self.app.get("/api/0/user/pingou/issues?author=0")

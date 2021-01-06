@@ -31,7 +31,7 @@ from pagure.lib.model import BASE, Project
 
 
 class PagureTicketsTable(BASE):
-    """ Stores information about the pagure tickets hook deployed on a project.
+    """Stores information about the pagure tickets hook deployed on a project.
 
     Table -- hook_pagure_tickets
     """
@@ -66,7 +66,7 @@ class PagureTicketRunner(BaseRunner):
 
     @staticmethod
     def post_receive(session, username, project, repotype, repodir, changes):
-        """ Run the post-receive tasks of a hook.
+        """Run the post-receive tasks of a hook.
 
         For args, see BaseRunner.runhook.
         """
@@ -128,7 +128,7 @@ class PagureTicketHook(BaseHook):
 
     @classmethod
     def set_up(cls, project):
-        """ Install the generic post-receive hook that allow us to call
+        """Install the generic post-receive hook that allow us to call
         multiple post-receive hooks as set per plugin.
         """
         repopath = os.path.join(pagure_config["TICKETS_FOLDER"], project.path)
@@ -152,7 +152,7 @@ class PagureTicketHook(BaseHook):
 
     @classmethod
     def install(cls, project, dbobj):
-        """ Method called to install the hook for a project.
+        """Method called to install the hook for a project.
 
         :arg project: a ``pagure.model.Project`` object to which the hook
             should be installed
@@ -168,7 +168,7 @@ class PagureTicketHook(BaseHook):
 
     @classmethod
     def remove(cls, project):
-        """ Method called to remove the hook of a project.
+        """Method called to remove the hook of a project.
 
         :arg project: a ``pagure.model.Project`` object to which the hook
             should be installed

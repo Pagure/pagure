@@ -30,7 +30,7 @@ import tests
 
 
 class PagureFlaskApiProjectUpdateWatchTests(tests.Modeltests):
-    """ Tests for the flask API of pagure for changing the watch status on
+    """Tests for the flask API of pagure for changing the watch status on
     a project via the API
     """
 
@@ -268,7 +268,8 @@ class PagureFlaskApiProjectUpdateWatchTests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
-            data, {"message": "Watch status reset", "status": "ok"},
+            data,
+            {"message": "Watch status reset", "status": "ok"},
         )
 
     @patch("pagure.utils.is_admin", MagicMock(return_value=True))

@@ -27,7 +27,7 @@ from pagure.lib.model import BASE, Project
 
 
 class PagureCITable(BASE):
-    """ Stores information about the CI linked to on a project.
+    """Stores information about the CI linked to on a project.
 
     Table -- hook_pagure_ci
     """
@@ -65,7 +65,7 @@ class PagureCITable(BASE):
 
 
 class PagureCIRunner(BaseRunner):
-    """ Runner for the pagure-ci hook, it does nothing as the magic is part
+    """Runner for the pagure-ci hook, it does nothing as the magic is part
     of the CI system itself (to see if there was a commit made and build if
     so).
     """
@@ -151,7 +151,7 @@ class PagureCiForm(FlaskForm):
     )
 
     def __init__(self, *args, **kwargs):
-        """ Calls the default constructor with the normal argument but
+        """Calls the default constructor with the normal argument but
         uses the list of collection provided to fill the choices of the
         drop-down list.
         """
@@ -179,14 +179,14 @@ class PagureCi(BaseHook):
 
     @classmethod
     def set_up(cls, project):
-        """ Install the generic post-receive hook that allow us to call
+        """Install the generic post-receive hook that allow us to call
         multiple post-receive hooks as set per plugin.
         """
         pass
 
     @classmethod
     def install(cls, project, dbobj):
-        """ Method called to install the hook for a project.
+        """Method called to install the hook for a project.
 
         :arg project: a ``pagure.model.Project`` object to which the hook
             should be installed
@@ -198,7 +198,7 @@ class PagureCi(BaseHook):
 
     @classmethod
     def remove(cls, project):
-        """ Method called to remove the hook of a project.
+        """Method called to remove the hook of a project.
 
         :arg project: a ``pagure.model.Project`` object to which the hook
             should be installed

@@ -74,7 +74,7 @@ def convert_value(val):
 
 
 class MultipleEmail(wtforms.validators.Email):
-    """ Split the value by comma and run them through the email validator
+    """Split the value by comma and run them through the email validator
     of wtforms.
     """
 
@@ -87,15 +87,14 @@ class MultipleEmail(wtforms.validators.Email):
 
 
 def user_namespace_if_private(form, field):
-    """ Check if the data in the field is the same as in the password field.
-    """
+    """Check if the data in the field is the same as in the password field."""
     if form.private.data:
         field.data = flask.g.fas_user.username
 
 
 def file_virus_validator(form, field):
-    """ Checks for virus in the file from flask request object,
-    raises wtf.ValidationError if virus is found else None. """
+    """Checks for virus in the file from flask request object,
+    raises wtf.ValidationError if virus is found else None."""
 
     if not pagure_config["VIRUS_SCAN_ATTACHMENTS"]:
         return
@@ -136,7 +135,8 @@ class ProjectFormSimplified(PagureForm):
     """ Form to edit the description of a project. """
 
     description = wtforms.StringField(
-        "Description", [wtforms.validators.DataRequired()],
+        "Description",
+        [wtforms.validators.DataRequired()],
     )
     url = wtforms.StringField(
         "URL",
@@ -206,11 +206,12 @@ class ProjectForm(ProjectFormSimplified):
         default=pagure_config["REPOSPANNER_NEW_REPO"],
     )
     default_branch = wtforms.StringField(
-        "Default branch", [wtforms.validators.optional()],
+        "Default branch",
+        [wtforms.validators.optional()],
     )
 
     def __init__(self, *args, **kwargs):
-        """ Calls the default constructor with the normal argument but
+        """Calls the default constructor with the normal argument but
         uses the list of collection provided to fill the choices of the
         drop-down list.
         """
@@ -250,9 +251,13 @@ class ProjectForm(ProjectFormSimplified):
 class IssueFormSimplied(PagureForm):
     """ Form to create or edit an issue. """
 
-    title = wtforms.StringField("Title", [wtforms.validators.DataRequired()],)
+    title = wtforms.StringField(
+        "Title",
+        [wtforms.validators.DataRequired()],
+    )
     issue_content = wtforms.TextAreaField(
-        "Content", [wtforms.validators.DataRequired()],
+        "Content",
+        [wtforms.validators.DataRequired()],
     )
     private = wtforms.BooleanField(
         "Private", [wtforms.validators.optional()], false_values=FALSE_VALUES
@@ -271,7 +276,7 @@ class IssueFormSimplied(PagureForm):
     )
 
     def __init__(self, *args, **kwargs):
-        """ Calls the default constructor with the normal argument but
+        """Calls the default constructor with the normal argument but
         uses the list of collection provided to fill the choices of the
         drop-down list.
         """
@@ -297,7 +302,7 @@ class IssueForm(IssueFormSimplied):
     )
 
     def __init__(self, *args, **kwargs):
-        """ Calls the default constructor with the normal argument but
+        """Calls the default constructor with the normal argument but
         uses the list of collection provided to fill the choices of the
         drop-down list.
         """
@@ -311,7 +316,10 @@ class IssueForm(IssueFormSimplied):
 class RequestPullForm(PagureForm):
     """ Form to create a pull request. """
 
-    title = wtforms.StringField("Title", [wtforms.validators.DataRequired()],)
+    title = wtforms.StringField(
+        "Title",
+        [wtforms.validators.DataRequired()],
+    )
     initial_comment = wtforms.TextAreaField(
         "Initial Comment", [wtforms.validators.Optional()]
     )
@@ -333,10 +341,12 @@ class RemoteRequestPullForm(RequestPullForm):
         ],
     )
     branch_from = wtforms.StringField(
-        "Git branch", [wtforms.validators.DataRequired()],
+        "Git branch",
+        [wtforms.validators.DataRequired()],
     )
     branch_to = wtforms.StringField(
-        "Git branch to merge in", [wtforms.validators.DataRequired()],
+        "Git branch to merge in",
+        [wtforms.validators.DataRequired()],
     )
 
 
@@ -395,7 +405,7 @@ class StatusForm(PagureForm):
     )
 
     def __init__(self, *args, **kwargs):
-        """ Calls the default constructor with the normal argument but
+        """Calls the default constructor with the normal argument but
         uses the list of collection provided to fill the choices of the
         drop-down list.
         """
@@ -422,7 +432,7 @@ class MilestoneForm(PagureForm):
     )
 
     def __init__(self, *args, **kwargs):
-        """ Calls the default constructor with the normal argument but
+        """Calls the default constructor with the normal argument but
         uses the list of collection provided to fill the choices of the
         drop-down list.
         """
@@ -450,7 +460,7 @@ class NewTokenForm(PagureForm):
     )
 
     def __init__(self, *args, **kwargs):
-        """ Calls the default constructor with the normal argument but
+        """Calls the default constructor with the normal argument but
         uses the list of collection provided to fill the choices of the
         drop-down list.
         """
@@ -507,7 +517,7 @@ class UpdateIssueForm(PagureForm):
     )
 
     def __init__(self, *args, **kwargs):
-        """ Calls the default constructor with the normal argument but
+        """Calls the default constructor with the normal argument but
         uses the list of collection provided to fill the choices of the
         drop-down list.
         """
@@ -544,7 +554,8 @@ class AddPullRequestCommentForm(PagureForm):
     requestid = wtforms.HiddenField("requestid")
     tree_id = wtforms.HiddenField("treeid")
     comment = wtforms.TextAreaField(
-        "Comment", [wtforms.validators.DataRequired()],
+        "Comment",
+        [wtforms.validators.DataRequired()],
     )
 
 
@@ -614,13 +625,16 @@ class AddUserForm(PagureForm):
     """ Form to add a user to a project. """
 
     user = wtforms.StringField(
-        "Username", [wtforms.validators.DataRequired()],
+        "Username",
+        [wtforms.validators.DataRequired()],
     )
     access = wtforms.StringField(
-        "Access Level", [wtforms.validators.DataRequired()],
+        "Access Level",
+        [wtforms.validators.DataRequired()],
     )
     branches = wtforms.StringField(
-        "Git branches", [wtforms.validators.Optional()],
+        "Git branches",
+        [wtforms.validators.Optional()],
     )
 
 
@@ -628,7 +642,8 @@ class AddUserToGroupForm(PagureForm):
     """ Form to add a user to a pagure group. """
 
     user = wtforms.StringField(
-        "Username", [wtforms.validators.DataRequired()],
+        "Username",
+        [wtforms.validators.DataRequired()],
     )
 
 
@@ -636,7 +651,8 @@ class AssignIssueForm(PagureForm):
     """ Form to assign an user to an issue. """
 
     assignee = wtforms.StringField(
-        "Assignee", [wtforms.validators.Optional()],
+        "Assignee",
+        [wtforms.validators.Optional()],
     )
 
 
@@ -651,10 +667,12 @@ class AddGroupForm(PagureForm):
         ],
     )
     access = wtforms.StringField(
-        "Access Level", [wtforms.validators.DataRequired()],
+        "Access Level",
+        [wtforms.validators.DataRequired()],
     )
     branches = wtforms.StringField(
-        "Git branches", [wtforms.validators.Optional()],
+        "Git branches",
+        [wtforms.validators.Optional()],
     )
 
 
@@ -673,7 +691,8 @@ class ModifyACLForm(PagureForm):
         choices=[("user", "User"), ("group", "Group")],
     )
     name = wtforms.StringField(
-        "User- or Groupname", [wtforms.validators.DataRequired()],
+        "User- or Groupname",
+        [wtforms.validators.DataRequired()],
     )
     acl = wtforms.SelectField(
         "ACL type",
@@ -766,7 +785,7 @@ class NewGroupForm(EditGroupForm):
     )
 
     def __init__(self, *args, **kwargs):
-        """ Calls the default constructor with the normal argument but
+        """Calls the default constructor with the normal argument but
         uses the list of collection provided to fill the choices of the
         drop-down list.
         """
@@ -793,7 +812,7 @@ class EditFileForm(PagureForm):
     branch = wtforms.StringField("Branch", [wtforms.validators.DataRequired()])
 
     def __init__(self, *args, **kwargs):
-        """ Calls the default constructor with the normal argument but
+        """Calls the default constructor with the normal argument but
         uses the list of collection provided to fill the choices of the
         drop-down list.
         """
@@ -812,7 +831,7 @@ class DefaultBranchForm(PagureForm):
     )
 
     def __init__(self, *args, **kwargs):
-        """ Calls the default constructor with the normal argument but
+        """Calls the default constructor with the normal argument but
         uses the list of collection provided to fill the choices of the
         drop-down list.
         """
@@ -831,7 +850,7 @@ class DefaultPriorityForm(PagureForm):
     )
 
     def __init__(self, *args, **kwargs):
-        """ Calls the default constructor with the normal argument but
+        """Calls the default constructor with the normal argument but
         uses the list of collection provided to fill the choices of the
         drop-down list.
         """
@@ -843,11 +862,11 @@ class DefaultPriorityForm(PagureForm):
 
 
 class EditCommentForm(PagureForm):
-    """ Form to verify that comment is not empty
-    """
+    """Form to verify that comment is not empty"""
 
     update_comment = wtforms.TextAreaField(
-        "Comment ", [wtforms.validators.DataRequired()],
+        "Comment ",
+        [wtforms.validators.DataRequired()],
     )
 
 
@@ -866,17 +885,16 @@ class ForkRepoForm(PagureForm):
 
 
 class AddReportForm(PagureForm):
-    """ Form to verify that comment is not empty
-    """
+    """Form to verify that comment is not empty"""
 
     report_name = wtforms.TextAreaField(
-        "Report name", [wtforms.validators.DataRequired()],
+        "Report name",
+        [wtforms.validators.DataRequired()],
     )
 
 
 class PublicNotificationForm(PagureForm):
-    """ Form to verify that comment is not empty
-    """
+    """Form to verify that comment is not empty"""
 
     issue_notifs = wtforms.TextAreaField(
         "Public issue notification",
@@ -932,7 +950,8 @@ class AddGitTagForm(PagureForm):
     """ Form to create a new git tag. """
 
     tagname = wtforms.StringField(
-        "Name of the tag", [wtforms.validators.DataRequired()],
+        "Name of the tag",
+        [wtforms.validators.DataRequired()],
     )
     commit_hash = wtforms.StringField(
         "Hash of the commit to tag", [wtforms.validators.DataRequired()]

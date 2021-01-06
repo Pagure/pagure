@@ -29,7 +29,7 @@ from pagure.lib.model import BASE, Project
 
 
 class MailTable(BASE):
-    """ Stores information about the mail hook deployed on a project.
+    """Stores information about the mail hook deployed on a project.
 
     Table -- hook_mail
     """
@@ -70,7 +70,7 @@ class MailForm(FlaskForm):
 class MailRunner(BaseRunner):
     @staticmethod
     def post_receive(session, username, project, repotype, repodir, changes):
-        """ Run the multimail post-receive hook.
+        """Run the multimail post-receive hook.
 
         For args, see BaseRunner.runhook.
         """

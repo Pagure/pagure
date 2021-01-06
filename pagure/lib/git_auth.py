@@ -38,7 +38,7 @@ GIT_AUTH_BACKEND_INSTANCE = None
 
 
 def get_git_auth_helper(backend=None):
-    """ Instantiate and return the appropriate git auth helper backend.
+    """Instantiate and return the appropriate git auth helper backend.
 
     :arg backend: The name of the backend to find on the system (declared via
         the entry_points in setup.py).
@@ -86,7 +86,7 @@ def get_git_auth_helper(backend=None):
 
 
 class GitAuthHelper(with_metaclass(abc.ABCMeta, object)):
-    """ The class to inherit from when creating your own git authentication
+    """The class to inherit from when creating your own git authentication
     helper.
     """
 
@@ -95,7 +95,7 @@ class GitAuthHelper(with_metaclass(abc.ABCMeta, object)):
     @classmethod
     @abc.abstractmethod
     def generate_acls(self, project, group=None):
-        """ This is the method that is called by pagure to generate the
+        """This is the method that is called by pagure to generate the
         configuration file.
 
         :arg project: the project of which to update the ACLs. This argument
@@ -121,7 +121,7 @@ class GitAuthHelper(with_metaclass(abc.ABCMeta, object)):
     @classmethod
     @abc.abstractmethod
     def remove_acls(self, session, project):
-        """ This is the method that is called by pagure to remove a project
+        """This is the method that is called by pagure to remove a project
         from the configuration file.
 
         :arg cls: the current class
@@ -138,7 +138,7 @@ class GitAuthHelper(with_metaclass(abc.ABCMeta, object)):
     # This method can't be marked as abstract, since it's new and that would
     # break backwards compatibility
     def check_acl(cls, session, project, username, refname, **info):
-        """ This method is used in Dynamic Git Auth helpers to check acls.
+        """This method is used in Dynamic Git Auth helpers to check acls.
 
         It is acceptable for implementations to print things, which will be
         returned to the user.
@@ -182,7 +182,7 @@ class GitAuthHelper(with_metaclass(abc.ABCMeta, object)):
 
 
 def _read_file(filename):
-    """ Reads the specified file and return its content.
+    """Reads the specified file and return its content.
     Returns None if it could not read the file for any reason.
     """
     if not os.path.exists(filename):
@@ -197,7 +197,7 @@ class Gitolite2Auth(GitAuthHelper):
 
     @classmethod
     def _process_project(cls, project, config, global_pr_only):
-        """ Generate the gitolite configuration for the specified project.
+        """Generate the gitolite configuration for the specified project.
 
         :arg project: the project to generate the configuration for
         :type project: pagure.lib.model.Project
@@ -281,7 +281,7 @@ class Gitolite2Auth(GitAuthHelper):
 
     @classmethod
     def _clean_current_config(cls, current_config, project):
-        """ Remove the specified project from the current configuration file
+        """Remove the specified project from the current configuration file
 
         :arg current_config: the content of the current/actual gitolite
             configuration file read from the disk
@@ -314,7 +314,7 @@ class Gitolite2Auth(GitAuthHelper):
 
     @classmethod
     def _clean_groups(cls, config, group=None):
-        """ Removes the groups in the given configuration file.
+        """Removes the groups in the given configuration file.
 
         :arg config: the current configuration
         :type config: list
@@ -361,7 +361,7 @@ class Gitolite2Auth(GitAuthHelper):
 
     @classmethod
     def _generate_groups_config(cls, session):
-        """ Generate the gitolite configuration for all of the groups.
+        """Generate the gitolite configuration for all of the groups.
 
         :arg session: the session with which to connect to the database
         :return: the gitolite configuration for the groups
@@ -380,7 +380,7 @@ class Gitolite2Auth(GitAuthHelper):
 
     @classmethod
     def _get_current_config(cls, configfile, preconfig=None, postconfig=None):
-        """ Load the current gitolite configuration file from the disk.
+        """Load the current gitolite configuration file from the disk.
 
         :arg configfile: the name of the configuration file to load
         :type configfile: str
@@ -435,7 +435,7 @@ class Gitolite2Auth(GitAuthHelper):
         postconf=None,
         group=None,
     ):
-        """ Generate the configuration file for gitolite for all projects
+        """Generate the configuration file for gitolite for all projects
         on the forge.
 
         :arg cls: the current class
@@ -585,7 +585,7 @@ class Gitolite2Auth(GitAuthHelper):
 
     @classmethod
     def remove_acls(cls, session, project):
-        """ Remove a project from the configuration file for gitolite.
+        """Remove a project from the configuration file for gitolite.
 
         :arg cls: the current class
         :type: Gitolite2Auth
@@ -685,7 +685,7 @@ class Gitolite2Auth(GitAuthHelper):
 
     @staticmethod
     def _get_gitolite_command():
-        """ Return the gitolite command to run based on the info in the
+        """Return the gitolite command to run based on the info in the
         configuration file.
         """
         _log.info("Compiling the gitolite configuration")
@@ -700,7 +700,7 @@ class Gitolite2Auth(GitAuthHelper):
 
     @classmethod
     def _repos_from_lines(cls, lines):
-        """ Return list of strings representing complete repo entries from list
+        """Return list of strings representing complete repo entries from list
         of lines as returned by _process_project.
         """
         repos = []
@@ -715,7 +715,7 @@ class Gitolite2Auth(GitAuthHelper):
 
     @classmethod
     def _run_gitolite_cmd(cls, cmd):
-        """ Run gitolite command as subprocess, raise PagureException
+        """Run gitolite command as subprocess, raise PagureException
         if it fails.
         """
         if cmd:
@@ -738,7 +738,7 @@ class Gitolite2Auth(GitAuthHelper):
 
     @classmethod
     def generate_acls(cls, project, group=None):
-        """ Generate the gitolite configuration file for all repos
+        """Generate the gitolite configuration file for all repos
 
         :arg project: the project to update in the gitolite configuration
             file. It can be of three types/values.
@@ -824,7 +824,7 @@ class Gitolite3Auth(Gitolite2Auth):
 
     @staticmethod
     def _get_gitolite_command():
-        """ Return the gitolite command to run based on the info in the
+        """Return the gitolite command to run based on the info in the
         configuration file.
         """
         _log.info("Compiling the gitolite configuration")
@@ -839,7 +839,7 @@ class Gitolite3Auth(Gitolite2Auth):
 
     @classmethod
     def post_compile_only(cls):
-        """ This method runs `gitolite trigger POST_COMPILE` without touching
+        """This method runs `gitolite trigger POST_COMPILE` without touching
         any other gitolite configuration. Most importantly, this will process
         SSH keys used by gitolite.
         """
@@ -867,9 +867,9 @@ class PagureGitAuth(GitAuthHelper):
         pass
 
     def info(self, msg):
-        """ Function that prints info about decisions to clients.
+        """Function that prints info about decisions to clients.
 
-        This is a function to make it possible to override for test suite. """
+        This is a function to make it possible to override for test suite."""
         print(msg)
 
     def check_acl(
@@ -920,7 +920,7 @@ class GitAuthTestHelper(GitAuthHelper):
 
     @classmethod
     def generate_acls(cls, project, group=None):
-        """ Print a statement when called, useful for debugging, only.
+        """Print a statement when called, useful for debugging, only.
 
         :arg project: this variable is just printed out but not used
             in any real place.
@@ -938,7 +938,7 @@ class GitAuthTestHelper(GitAuthHelper):
 
     @classmethod
     def remove_acls(cls, session, project):
-        """ Print a statement about which a project would be removed from
+        """Print a statement about which a project would be removed from
         the configuration file for gitolite.
 
         :arg cls: the current class

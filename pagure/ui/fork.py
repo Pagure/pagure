@@ -49,7 +49,7 @@ _log = logging.getLogger(__name__)
 
 
 def _get_parent_request_repo_path(repo):
-    """ Return the path of the parent git repository corresponding to the
+    """Return the path of the parent git repository corresponding to the
     provided Repository object from the DB.
     """
     if repo.parent:
@@ -67,8 +67,7 @@ def _get_parent_request_repo_path(repo):
 @UI_NS.route("/fork/<username>/<namespace>/<repo>/pull-requests/")
 @UI_NS.route("/fork/<username>/<namespace>/<repo>/pull-requests")
 def request_pulls(repo, username=None, namespace=None):
-    """ List all Pull-requests associated to a repo
-    """
+    """List all Pull-requests associated to a repo"""
     status = flask.request.args.get("status", "Open")
     tags = flask.request.args.getlist("tags")
     tags = [tag.strip() for tag in tags if tag.strip()]
@@ -243,8 +242,7 @@ def request_pulls(repo, username=None, namespace=None):
     "/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>"
 )
 def request_pull(repo, requestid, username=None, namespace=None):
-    """ View a pull request with the changes from the fork into the project.
-    """
+    """View a pull request with the changes from the fork into the project."""
     repo = flask.g.repo
 
     _log.info("Viewing pull Request #%s repo: %s", requestid, repo.fullname)
@@ -381,8 +379,7 @@ def request_pull(repo, requestid, username=None, namespace=None):
     "/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>.patch"
 )
 def request_pull_patch(repo, requestid, username=None, namespace=None):
-    """ Returns the commits from the specified pull-request as patches.
-    """
+    """Returns the commits from the specified pull-request as patches."""
     return request_pull_to_diff_or_patch(
         repo, requestid, username, namespace, diff=False
     )
@@ -395,8 +392,7 @@ def request_pull_patch(repo, requestid, username=None, namespace=None):
     "/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>.diff"
 )
 def request_pull_diff(repo, requestid, username=None, namespace=None):
-    """ Returns the commits from the specified pull-request as patches.
-    """
+    """Returns the commits from the specified pull-request as patches."""
     return request_pull_to_diff_or_patch(
         repo, requestid, username, namespace, diff=True
     )
@@ -405,7 +401,7 @@ def request_pull_diff(repo, requestid, username=None, namespace=None):
 def request_pull_to_diff_or_patch(
     repo, requestid, username=None, namespace=None, diff=False
 ):
-    """ Returns the commits from the specified pull-request as patches.
+    """Returns the commits from the specified pull-request as patches.
 
     :arg repo: the `pagure.lib.model.Project` object of the current pagure
         project browsed
@@ -529,8 +525,7 @@ def request_pull_to_diff_or_patch(
 )
 @login_required
 def request_pull_edit(repo, requestid, username=None, namespace=None):
-    """ Edit the title of a pull-request.
-    """
+    """Edit the title of a pull-request."""
 
     repo = flask.g.repo
 
@@ -654,8 +649,7 @@ def pull_request_add_comment(
     username=None,
     namespace=None,
 ):
-    """ Add a comment to a commit in a pull-request.
-    """
+    """Add a comment to a commit in a pull-request."""
     repo = flask.g.repo
 
     if not repo.settings.get("pull_requests", True):
@@ -754,8 +748,7 @@ def pull_request_add_comment(
 )
 @login_required
 def pull_request_drop_comment(repo, requestid, username=None, namespace=None):
-    """ Delete a comment of a pull-request.
-    """
+    """Delete a comment of a pull-request."""
     repo = flask.g.repo
 
     if not repo:
@@ -846,8 +839,7 @@ def pull_request_drop_comment(repo, requestid, username=None, namespace=None):
 def pull_request_edit_comment(
     repo, requestid, commentid, username=None, namespace=None
 ):
-    """Edit comment of a pull request
-    """
+    """Edit comment of a pull request"""
     is_js = flask.request.args.get("js", False)
 
     project = flask.g.repo
@@ -942,8 +934,7 @@ def pull_request_edit_comment(
 )
 @login_required
 def reopen_request_pull(repo, requestid, username=None, namespace=None):
-    """ Re-Open a pull request.
-    """
+    """Re-Open a pull request."""
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
 
@@ -1020,8 +1011,7 @@ def reopen_request_pull(repo, requestid, username=None, namespace=None):
 )
 @login_required
 def ci_trigger_request_pull(repo, requestid, username=None, namespace=None):
-    """ Trigger CI testing for a PR.
-    """
+    """Trigger CI testing for a PR."""
     form = pagure.forms.TriggerCIPRForm()
     if not form.validate_on_submit():
         flask.flash("Invalid input submitted", "error")
@@ -1085,8 +1075,7 @@ def ci_trigger_request_pull(repo, requestid, username=None, namespace=None):
 )
 @login_required
 def merge_request_pull(repo, requestid, username=None, namespace=None):
-    """ Create a pull request with the changes from the fork into the project.
-    """
+    """Create a pull request with the changes from the fork into the project."""
 
     form = pagure.forms.MergePRForm()
     if not form.validate_on_submit():
@@ -1317,8 +1306,7 @@ def merge_request_pull(repo, requestid, username=None, namespace=None):
 )
 @login_required
 def close_request_pull(repo, requestid, username=None, namespace=None):
-    """ Close a pull request without merging it.
-    """
+    """Close a pull request without merging it."""
 
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
@@ -1386,8 +1374,7 @@ def close_request_pull(repo, requestid, username=None, namespace=None):
 )
 @login_required
 def refresh_request_pull(repo, requestid, username=None, namespace=None):
-    """ Refresh a remote pull request.
-    """
+    """Refresh a remote pull request."""
 
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
@@ -1549,8 +1536,7 @@ def update_pull_requests(repo, requestid, username=None, namespace=None):
 @UI_NS.route("/do_fork/fork/<username>/<namespace>/<repo>", methods=["POST"])
 @login_required
 def fork_project(repo, username=None, namespace=None):
-    """ Fork the project specified into the user's namespace
-    """
+    """Fork the project specified into the user's namespace"""
     repo = flask.g.repo
 
     form = pagure.forms.ConfirmationForm()
@@ -1641,8 +1627,7 @@ def fork_project(repo, username=None, namespace=None):
 def new_request_pull(
     repo, branch_to, branch_from, username=None, namespace=None
 ):
-    """ Create a pull request with the changes from the fork into the project.
-    """
+    """Create a pull request with the changes from the fork into the project."""
     branch_to = flask.request.values.get("branch_to", branch_to)
     project_to = flask.request.values.get("project_to")
 
@@ -1853,8 +1838,8 @@ def new_request_pull(
 )
 @login_required
 def new_remote_request_pull(repo, username=None, namespace=None):
-    """ Create a pull request with the changes from a remote fork into the
-        project.
+    """Create a pull request with the changes from a remote fork into the
+    project.
     """
     confirm = flask.request.values.get("confirm", False)
 
@@ -2068,8 +2053,7 @@ def new_remote_request_pull(repo, username=None, namespace=None):
 )
 @login_required
 def fork_edit_file(repo, branchname, filename, username=None, namespace=None):
-    """ Fork the project specified and open the specific file to edit
-    """
+    """Fork the project specified and open the specific file to edit"""
     repo = flask.g.repo
 
     form = pagure.forms.ConfirmationForm()

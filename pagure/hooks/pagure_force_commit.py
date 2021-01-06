@@ -26,7 +26,7 @@ from pagure.lib.model import BASE, Project
 
 
 class PagureForceCommitTable(BASE):
-    """ Stores information about the pagure hook deployed on a project.
+    """Stores information about the pagure hook deployed on a project.
 
     Table -- hook_pagure_force_commit
     """
@@ -64,7 +64,7 @@ class PagureForceCommitRunner(BaseRunner):
 
     @staticmethod
     def pre_receive(session, username, project, repotype, repodir, changes):
-        """ Run the pre-receive tasks of a hook.
+        """Run the pre-receive tasks of a hook.
 
         For args, see BaseRunner.runhook.
         """

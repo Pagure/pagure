@@ -45,7 +45,7 @@ class PagureLibtests_plugins(tests.Modeltests):
 
     @patch("pagure.lib.plugins.load")
     def test_plugin_is_enabled_for(self, load):
-        """ Test the is_enabled_for method of plugins is properly
+        """Test the is_enabled_for method of plugins is properly
         handled by pagure.lib.plugins.get_enabled_plugins.
         """
         tests.create_projects(self.session)
@@ -62,7 +62,7 @@ class PagureLibtests_plugins(tests.Modeltests):
 
     @patch("pagure.lib.plugins.load")
     def test_get_plugin_names(self, load):
-        """ Test the get_plugin_names method with plugins that don't
+        """Test the get_plugin_names method with plugins that don't
         have backref.
         """
         load.return_value = [EnabledForAll]

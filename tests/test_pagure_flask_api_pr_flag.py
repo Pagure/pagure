@@ -908,7 +908,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
 
 
 class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
-    """ Tests for the flask API of pagure for flagging pull-requests using
+    """Tests for the flask API of pagure for flagging pull-requests using
     an user token (ie: not restricted to a specific project).
     """
 
@@ -1004,8 +1004,7 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
         )
 
     def test_no_comment(self):
-        """ Test flagging an existing PR but without all the required info.
-        """
+        """Test flagging an existing PR but without all the required info."""
         headers = {"Authorization": "token aaabbbcccddd"}
 
         data = {
@@ -1038,8 +1037,7 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
         self.assertEqual(len(request.flags), 0)
 
     def test_invalid_status(self):
-        """ Test flagging an existing PR but with an invalid status.
-        """
+        """Test flagging an existing PR but with an invalid status."""
         headers = {"Authorization": "token aaabbbcccddd"}
 
         data = {
@@ -1074,7 +1072,7 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_flag_pr_no_status(self, mock_email):
-        """ Test flagging an existing PR without providing a status.
+        """Test flagging an existing PR without providing a status.
 
         Also check that no notifications have been sent.
         """
@@ -1143,8 +1141,7 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
         mock_email.assert_not_called()
 
     def test_editing_flag(self):
-        """ Test flagging an existing PR without providing a status.
-        """
+        """Test flagging an existing PR without providing a status."""
         headers = {"Authorization": "token aaabbbcccddd"}
 
         data = {
@@ -1268,8 +1265,7 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
 
 
 class PagureFlaskApiGetPRFlagtests(tests.Modeltests):
-    """ Tests for the flask API of pagure for retrieving pull-requests flags
-    """
+    """Tests for the flask API of pagure for retrieving pull-requests flags"""
 
     maxDiff = None
 

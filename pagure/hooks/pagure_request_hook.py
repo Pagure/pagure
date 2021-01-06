@@ -27,7 +27,7 @@ from pagure.lib.model import BASE, Project
 
 
 class PagureRequestsTable(BASE):
-    """ Stores information about the pagure requests hook deployed on a
+    """Stores information about the pagure requests hook deployed on a
     project.
 
     Table -- hook_pagure_requests
@@ -59,13 +59,13 @@ class PagureRequestsTable(BASE):
 
 
 class PagureRequestRunner(BaseRunner):
-    """ Runner for the hook updating the db about requests on push to the
+    """Runner for the hook updating the db about requests on push to the
     git repo containing the meta-data about pull-requests.
     """
 
     @staticmethod
     def post_receive(session, username, project, repotype, repodir, changes):
-        """ Run the default post-receive hook.
+        """Run the default post-receive hook.
 
         For args, see BaseRunner.runhook.
         """

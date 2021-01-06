@@ -57,8 +57,8 @@ class PagureFlaskRepotests(tests.Modeltests):
 
     @patch("pagure.decorators.admin_session_timedout")
     def test_add_user_when_user_mngt_off(self, ast):
-        """ Test the add_user endpoint when user management is turned off
-        in the pagure instance """
+        """Test the add_user endpoint when user management is turned off
+        in the pagure instance"""
         pagure.config.config["ENABLE_USER_MNGT"] = False
         ast.return_value = False
 
@@ -234,8 +234,7 @@ class PagureFlaskRepotests(tests.Modeltests):
     @patch("pagure.decorators.admin_session_timedout")
     @patch.dict("pagure.config.config", {"DEPLOY_KEY": False})
     def test_add_deploykey_disabled(self, ast):
-        """ Test the add_deploykey endpoint when it's disabled in the config.
-        """
+        """Test the add_deploykey endpoint when it's disabled in the config."""
         ast.return_value = False
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"))
@@ -473,7 +472,7 @@ class PagureFlaskRepotests(tests.Modeltests):
 
     @patch("pagure.decorators.admin_session_timedout")
     def test_add_group_project_when_user_mngt_off(self, ast):
-        """ Test the add_group_project endpoint  when user management is
+        """Test the add_group_project endpoint  when user management is
         turned off in the pagure instance"""
         pagure.config.config["ENABLE_USER_MNGT"] = False
         ast.return_value = False
@@ -534,7 +533,7 @@ class PagureFlaskRepotests(tests.Modeltests):
     @patch.dict("pagure.config.config", {"ENABLE_GROUP_MNGT": False})
     @patch("pagure.decorators.admin_session_timedout")
     def test_add_group_project_grp_mngt_off(self, ast):
-        """ Test the add_group_project endpoint  when group management is
+        """Test the add_group_project endpoint  when group management is
         turned off in the pagure instance"""
         ast.return_value = False
 
@@ -783,7 +782,7 @@ class PagureFlaskRepotests(tests.Modeltests):
 
     @patch("pagure.decorators.admin_session_timedout")
     def test_remove_user_when_user_mngt_off(self, ast):
-        """ Test the remove_user endpoint when user management is turned
+        """Test the remove_user endpoint when user management is turned
         off in the pagure instance"""
         pagure.config.config["ENABLE_USER_MNGT"] = False
         ast.return_value = False
@@ -936,7 +935,7 @@ class PagureFlaskRepotests(tests.Modeltests):
     @patch("pagure.decorators.admin_session_timedout")
     @patch.dict("pagure.config.config", {"DEPLOY_KEY": False})
     def test_remove_deploykey_disabled(self, ast):
-        """ Test the remove_deploykey endpoint when it's disabled in the
+        """Test the remove_deploykey endpoint when it's disabled in the
         config.
         """
         ast.return_value = False
@@ -1156,7 +1155,7 @@ class PagureFlaskRepotests(tests.Modeltests):
 
     @patch("pagure.decorators.admin_session_timedout")
     def test_remove_group_project_when_user_mngt_off(self, ast):
-        """ Test the remove_group_project endpoint when user management is
+        """Test the remove_group_project endpoint when user management is
         turned off in the pagure instance"""
         pagure.config.config["ENABLE_USER_MNGT"] = False
         ast.return_value = False
@@ -1525,7 +1524,7 @@ class PagureFlaskRepotests(tests.Modeltests):
 
     @patch("pagure.decorators.admin_session_timedout")
     def test_update_project_update_tag(self, ast):
-        """ Test the view_settings endpoint when updating the project's tags.
+        """Test the view_settings endpoint when updating the project's tags.
 
         We had an issue where when you add an existing tag to a project we
         were querying the wrong table in the database. It would thus not find
@@ -1851,8 +1850,8 @@ class PagureFlaskRepotests(tests.Modeltests):
         MagicMock(return_value=False),
     )
     def test_view_settings_custom_fields(self):
-        """ Test the view_settings endpoint when the project has some custom
-        field for issues. """
+        """Test the view_settings endpoint when the project has some custom
+        field for issues."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"))
@@ -2114,8 +2113,8 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
     def test_view_repo_more_button_absent_no_auth(self):
-        """ Test the view_repo endpoint and check if the "more" button is
-        absent when not logged in. """
+        """Test the view_repo endpoint and check if the "more" button is
+        absent when not logged in."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
@@ -2137,8 +2136,8 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.perfReset()
 
     def test_view_repo_more_button_present(self):
-        """ Test the view_repo endpoint and check if the "more" button is
-        present when it should be. """
+        """Test the view_repo endpoint and check if the "more" button is
+        present when it should be."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
@@ -2178,8 +2177,8 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.perfReset()
 
     def test_view_repo_more_button_absent_no_access(self):
-        """ Test the view_repo endpoint and check if the "more" button is
-        absent if the user doesn't have access to the project. """
+        """Test the view_repo endpoint and check if the "more" button is
+        absent if the user doesn't have access to the project."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
@@ -2205,8 +2204,8 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.perfReset()
 
     def test_view_repo_ssh_key_not_uploaded_no_ssh_url(self):
-        """ Test viewing repo when user hasn't uploaded SSH key yet
-        and thus should see a message instead of url for SSH cloning. """
+        """Test viewing repo when user hasn't uploaded SSH key yet
+        and thus should see a message instead of url for SSH cloning."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
         user = tests.FakeUser(username="pingou")
@@ -2221,8 +2220,8 @@ class PagureFlaskRepotests(tests.Modeltests):
             )
 
     def test_view_repo_read_only_no_ssh_url(self):
-        """ Test viewing repo that is still readonly and thus user
-        should see a message instead of url for SSH cloning. """
+        """Test viewing repo that is still readonly and thus user
+        should see a message instead of url for SSH cloning."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
         repo = pagure.lib.query._get_project(self.session, "test")
@@ -3497,8 +3496,8 @@ class PagureFlaskRepotests(tests.Modeltests):
         )
 
     def test_view_commit_with_full_link(self):
-        """ Test the view_commit endpoint when the commit message includes
-        an url. """
+        """Test the view_commit endpoint when the commit message includes
+        an url."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
@@ -3542,8 +3541,8 @@ class PagureFlaskRepotests(tests.Modeltests):
         )
 
     def test_view_commit_with_short_link(self):
-        """ Test the view_commit endpoint when the commit message includes
-        an url. """
+        """Test the view_commit endpoint when the commit message includes
+        an url."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
@@ -3900,8 +3899,8 @@ index 0000000..fb7093d
     @patch("pagure.lib.notify.send_email")
     @patch("pagure.decorators.admin_session_timedout")
     def test_delete_repo_when_turned_off(self, ast, send_email):
-        """ Test the delete_repo endpoint when deletion of a repo is
-        turned off in the pagure instance """
+        """Test the delete_repo endpoint when deletion of a repo is
+        turned off in the pagure instance"""
         ast.return_value = False
         send_email.return_value = True
 
@@ -4589,8 +4588,8 @@ index 0000000..fb7093d
         MagicMock(return_value=False),
     )
     def test_delete_repo_no_ticket(self):
-        """ Test the delete_repo endpoint when tickets aren't enabled in
-        this pagure instance. """
+        """Test the delete_repo endpoint when tickets aren't enabled in
+        this pagure instance."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"))
@@ -6317,8 +6316,8 @@ index 0000000..fb7093d
 
     @patch.dict("pagure.config.config", {"ALLOW_DELETE_BRANCH": False})
     def test_delete_branch_disabled_in_ui(self):
-        """ Test that the delete branch button doesn't show when the feature
-        is turned off. """
+        """Test that the delete branch button doesn't show when the feature
+        is turned off."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
 
@@ -6341,8 +6340,8 @@ index 0000000..fb7093d
 
     @patch.dict("pagure.config.config", {"ALLOW_DELETE_BRANCH": False})
     def test_delete_branch_disabled(self):
-        """ Test the delete_branch endpoint when it's disabled in the entire
-        instance. """
+        """Test the delete_branch endpoint when it's disabled in the entire
+        instance."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
 
@@ -6371,8 +6370,8 @@ index 0000000..fb7093d
 
     @patch.dict("pagure.config.config", {"ALLOW_DELETE_BRANCH": False})
     def test_delete_branch_disabled_fork(self):
-        """ Test the delete_branch endpoint when it's disabled in the entire
-        instance. """
+        """Test the delete_branch endpoint when it's disabled in the entire
+        instance."""
         item = pagure.lib.model.Project(
             user_id=2,  # foo
             name="test",
@@ -6892,7 +6891,7 @@ index 0000000..fb7093d
         {"UPLOAD_FOLDER_PATH": None, "UPLOAD_FOLDER_URL": None},
     )
     def test_releases_upload_folder_vars_None(self):
-        """ Test that /releases/ page of a repo displays correctly with
+        """Test that /releases/ page of a repo displays correctly with
         UPLOAD_FOLDER_PATH and UPLOAD_FOLDER_URL set to None
         """
         tests.create_projects(self.session)

@@ -326,7 +326,11 @@ class PagureFlaskApiBoardstests(tests.SimplePagureTest):
         )
 
         # Remove one of the 2 boards
-        data = json.dumps({"dev": {"active": True, "tag": "dev"},})
+        data = json.dumps(
+            {
+                "dev": {"active": True, "tag": "dev"},
+            }
+        )
         output = self.app.post(
             "/api/0/test/boards", headers=headers, data=data
         )
@@ -395,7 +399,7 @@ class PagureFlaskApiBoardstests(tests.SimplePagureTest):
 
 
 class PagureFlaskApiBoardsWithBoardtests(tests.SimplePagureTest):
-    """ Tests for flask API Boards controller of pagure for the tests
+    """Tests for flask API Boards controller of pagure for the tests
     requiring a pre-existing board.
     """
 
@@ -447,7 +451,11 @@ class PagureFlaskApiBoardsWithBoardtests(tests.SimplePagureTest):
         }
 
         # Associate the existing board with an invalid tag
-        data = json.dumps({"dev": {"active": True, "tag": "invalid"},})
+        data = json.dumps(
+            {
+                "dev": {"active": True, "tag": "invalid"},
+            }
+        )
         output = self.app.post(
             "/api/0/test/boards", headers=headers, data=data
         )
@@ -521,7 +529,8 @@ class PagureFlaskApiBoardsWithBoardtests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
-            data, {"boards": []},
+            data,
+            {"boards": []},
         )
 
     def test_api_board_delete_html_input(self):
@@ -537,7 +546,8 @@ class PagureFlaskApiBoardsWithBoardtests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
-            data, {"boards": []},
+            data,
+            {"boards": []},
         )
 
     def test_api_board_api_board_status_no_data(self):
@@ -1043,7 +1053,7 @@ class PagureFlaskApiBoardsWithBoardtests(tests.SimplePagureTest):
 
 
 class PagureFlaskApiBoardsWithBoardAndIssuetests(tests.SimplePagureTest):
-    """ Tests for flask API Boards controller of pagure for the tests
+    """Tests for flask API Boards controller of pagure for the tests
     requiring a pre-existing board and issues.
     """
 
@@ -1130,7 +1140,14 @@ class PagureFlaskApiBoardsWithBoardAndIssuetests(tests.SimplePagureTest):
             "Content-Type": "application/json",
         }
 
-        data = json.dumps({"12": {"status": "In Progress", "rank": 2,}})
+        data = json.dumps(
+            {
+                "12": {
+                    "status": "In Progress",
+                    "rank": 2,
+                }
+            }
+        )
         output = self.app.post(
             "/api/0/test/boards/invalid/add_issue", headers=headers, data=data
         )
@@ -1193,7 +1210,13 @@ class PagureFlaskApiBoardsWithBoardAndIssuetests(tests.SimplePagureTest):
             "Content-Type": "application/json",
         }
 
-        data = json.dumps({"12": {"rank": 2,}})
+        data = json.dumps(
+            {
+                "12": {
+                    "rank": 2,
+                }
+            }
+        )
         output = self.app.post(
             "/api/0/test/boards/dev/add_issue", headers=headers, data=data
         )
@@ -1290,7 +1313,14 @@ class PagureFlaskApiBoardsWithBoardAndIssuetests(tests.SimplePagureTest):
             "Content-Type": "application/json",
         }
 
-        data = json.dumps({"12": {"status": "In Progress", "rank": 2,}})
+        data = json.dumps(
+            {
+                "12": {
+                    "status": "In Progress",
+                    "rank": 2,
+                }
+            }
+        )
         output = self.app.post(
             "/api/0/test/boards/invalid/update_issue",
             headers=headers,
@@ -1355,7 +1385,13 @@ class PagureFlaskApiBoardsWithBoardAndIssuetests(tests.SimplePagureTest):
             "Content-Type": "application/json",
         }
 
-        data = json.dumps({"12": {"rank": 2,}})
+        data = json.dumps(
+            {
+                "12": {
+                    "rank": 2,
+                }
+            }
+        )
         output = self.app.post(
             "/api/0/test/boards/dev/add_issue", headers=headers, data=data
         )
@@ -1453,7 +1489,9 @@ class PagureFlaskApiBoardsWithBoardAndIssuetests(tests.SimplePagureTest):
         }
 
         data = json.dumps(
-            {self.tickets_uid[1]: {"status": "Done", "rank": 2},}
+            {
+                self.tickets_uid[1]: {"status": "Done", "rank": 2},
+            }
         )
         output = self.app.post(
             "/api/0/test/boards/dev/update_issue", headers=headers, data=data
@@ -1467,7 +1505,9 @@ class PagureFlaskApiBoardsWithBoardAndIssuetests(tests.SimplePagureTest):
         self.assertEqual(repo.issues[1].close_status, "Fixed")
 
         data = json.dumps(
-            {self.tickets_uid[1]: {"status": "In Progress", "rank": 2},}
+            {
+                self.tickets_uid[1]: {"status": "In Progress", "rank": 2},
+            }
         )
         output = self.app.post(
             "/api/0/test/boards/dev/update_issue", headers=headers, data=data
@@ -1488,7 +1528,11 @@ class PagureFlaskApiBoardsWithBoardAndIssuetests(tests.SimplePagureTest):
             "Content-Type": "application/json",
         }
 
-        data = json.dumps({"2": {"status": "In Progress", "rank": 2},})
+        data = json.dumps(
+            {
+                "2": {"status": "In Progress", "rank": 2},
+            }
+        )
         output = self.app.post(
             "/api/0/test/boards/dev/add_issue", headers=headers, data=data
         )

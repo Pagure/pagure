@@ -41,8 +41,8 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_api_pull_request_views_pr_disabled(self):
-        """ Test the api_pull_request_views method of the flask api when PR
-        are disabled. """
+        """Test the api_pull_request_views method of the flask api when PR
+        are disabled."""
 
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
@@ -86,8 +86,8 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_api_pull_request_views_pr_closed(self):
-        """ Test the api_pull_request_views method of the flask api to list
-        the closed PRs. """
+        """Test the api_pull_request_views method of the flask api to list
+        the closed PRs."""
 
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
@@ -266,8 +266,8 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_api_pull_request_views_all_pr(self):
-        """ Test the api_pull_request_views method of the flask api to list
-        all PRs. """
+        """Test the api_pull_request_views method of the flask api to list
+        all PRs."""
 
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
@@ -542,8 +542,8 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_api_pull_request_view_tag_filtered(self, send_email):
-        """ Test the api_pull_request_view method of the flask api to list
-            tag filtered open PRs. """
+        """Test the api_pull_request_view method of the flask api to list
+        tag filtered open PRs."""
         send_email.return_value = True
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
@@ -1225,8 +1225,8 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_api_pull_request_merge_pr_disabled(self, send_email):
-        """ Test the api_pull_request_merge method of the flask api when PR
-        are disabled. """
+        """Test the api_pull_request_merge method of the flask api when PR
+        are disabled."""
         send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -1283,8 +1283,8 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_api_pull_request_merge_only_assigned(self, send_email):
-        """ Test the api_pull_request_merge method of the flask api when
-        only assignee can merge the PR and the PR isn't assigned. """
+        """Test the api_pull_request_merge method of the flask api when
+        only assignee can merge the PR and the PR isn't assigned."""
         send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -1343,9 +1343,9 @@ class PagureFlaskApiForktests(tests.Modeltests):
     def test_api_pull_request_merge_only_assigned_not_assignee(
         self, send_email
     ):
-        """ Test the api_pull_request_merge method of the flask api when
+        """Test the api_pull_request_merge method of the flask api when
         only assignee can merge the PR and the PR isn't assigned to the
-        user asking to merge. """
+        user asking to merge."""
         send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -1405,8 +1405,8 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_api_pull_request_merge_minimal_score(self, send_email):
-        """ Test the api_pull_request_merge method of the flask api when
-        a PR requires a certain minimal score to be merged. """
+        """Test the api_pull_request_merge method of the flask api when
+        a PR requires a certain minimal score to be merged."""
         send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -1884,8 +1884,8 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_api_pull_request_add_comment_wrong_user(self):
-        """ Test the api_pull_request_add_comment method of the flask api
-        when the user is not found in the DB. """
+        """Test the api_pull_request_add_comment method of the flask api
+        when the user is not found in the DB."""
 
         tests.create_projects(self.session)
         tests.create_tokens(self.session, project_id=None)
@@ -1931,8 +1931,8 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_api_pull_request_add_comment_pr_disabled(self):
-        """ Test the api_pull_request_add_comment method of the flask api
-        when PRs are disabled. """
+        """Test the api_pull_request_add_comment method of the flask api
+        when PRs are disabled."""
 
         tests.create_projects(self.session)
         tests.create_tokens(self.session, project_id=None)
@@ -2391,8 +2391,8 @@ class PagureFlaskApiForktests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_api_subscribe_pull_request_logged_in(self, p_send_email, p_ugt):
-        """ Test the api_subscribe_pull_request method of the flask api
-        when the user is logged in via the UI. """
+        """Test the api_subscribe_pull_request method of the flask api
+        when the user is logged in via the UI."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -2468,7 +2468,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_api_pull_request_open_invalid_project(self):
-        """ Test the api_pull_request_create method of the flask api when
+        """Test the api_pull_request_create method of the flask api when
         not the project doesn't exist.
         """
 
@@ -2502,7 +2502,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_api_pull_request_open_missing_title(self):
-        """ Test the api_pull_request_create method of the flask api when
+        """Test the api_pull_request_create method of the flask api when
         not title is submitted.
         """
 
@@ -2541,7 +2541,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_api_pull_request_open_missing_branch_to(self):
-        """ Test the api_pull_request_create method of the flask api when
+        """Test the api_pull_request_create method of the flask api when
         not branch to is submitted.
         """
 
@@ -2580,7 +2580,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_api_pull_request_open_missing_branch_from(self):
-        """ Test the api_pull_request_create method of the flask api when
+        """Test the api_pull_request_create method of the flask api when
         not branch from is submitted.
         """
 
@@ -2619,7 +2619,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_api_pull_request_open_pr_disabled(self):
-        """ Test the api_pull_request_create method of the flask api when
+        """Test the api_pull_request_create method of the flask api when
         the parent repo disabled pull-requests.
         """
 
@@ -2666,7 +2666,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_api_pull_request_open_signed_pr(self):
-        """ Test the api_pull_request_create method of the flask api when
+        """Test the api_pull_request_create method of the flask api when
         the parent repo enforces signed-off pull-requests.
         """
 
@@ -2714,7 +2714,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_api_pull_request_open_invalid_branch_from(self):
-        """ Test the api_pull_request_create method of the flask api when
+        """Test the api_pull_request_create method of the flask api when
         the branch from does not exist.
         """
 
@@ -2762,7 +2762,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_api_pull_request_open_invalid_token(self):
-        """ Test the api_pull_request_create method of the flask api when
+        """Test the api_pull_request_create method of the flask api when
         queried with an invalid token.
         """
 
@@ -2803,7 +2803,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_api_pull_request_open_invalid_access(self):
-        """ Test the api_pull_request_create method of the flask api when
+        """Test the api_pull_request_create method of the flask api when
         the user opening the PR doesn't have commit access.
         """
 
@@ -2843,7 +2843,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_api_pull_request_open_invalid_branch_to(self):
-        """ Test the api_pull_request_create method of the flask api when
+        """Test the api_pull_request_create method of the flask api when
         the branch to does not exist.
         """
 
@@ -2959,7 +2959,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_api_pull_request_open_from_branch_to_origin(self):
         """Test the api_pull_request_create method from a fork to a master,
-       with project token of a origin with all the acls"""
+        with project token of a origin with all the acls"""
 
         tests.create_projects(self.session)
         tests.create_projects(
@@ -3182,7 +3182,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_api_pull_request_open_missing_initial_comment(self):
-        """ Test the api_pull_request_create method of the flask api when
+        """Test the api_pull_request_create method of the flask api when
         not initial comment is submitted.
         """
 
@@ -3337,8 +3337,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
 
 class PagureFlaskApiForkPRDiffStatstests(tests.Modeltests):
-    """ Tests for the flask API of pagure for the diff stats endpoint of PRs
-    """
+    """Tests for the flask API of pagure for the diff stats endpoint of PRs"""
 
     maxDiff = None
 
@@ -3530,8 +3529,7 @@ class PagureFlaskApiForkPRDiffStatstests(tests.Modeltests):
 
 
 class PagureApiThresholdReachedTests(tests.Modeltests):
-    """ Test the behavior of the threshold_reached value returned by the API.
-    """
+    """Test the behavior of the threshold_reached value returned by the API."""
 
     maxDiff = None
 
@@ -3712,8 +3710,7 @@ class PagureApiThresholdReachedTests(tests.Modeltests):
         }
 
     def test_api_pull_request_no_comments(self):
-        """ Check the value of threshold_reach when the PR has no comments.
-        """
+        """Check the value of threshold_reach when the PR has no comments."""
 
         # Check the PR with 0 comment:
         output = self.app.get("/api/0/test/pull-request/1")
@@ -3724,8 +3721,7 @@ class PagureApiThresholdReachedTests(tests.Modeltests):
         self.assertDictEqual(data, self.expected_data)
 
     def test_api_pull_request_one_comments(self):
-        """ Check the value of threshold_reach when the PR has one comment.
-        """
+        """Check the value of threshold_reach when the PR has one comment."""
         # Check the PR with 1 comment:
         headers = {"Authorization": "token aaabbbcccddd"}
         data = {"comment": "This is a very interesting solution :thumbsup:"}
@@ -3744,7 +3740,7 @@ class PagureApiThresholdReachedTests(tests.Modeltests):
         self.assertDictEqual(data, self.expected_data)
 
     def test_api_pull_request_two_comments_one_person(self):
-        """ Check the value of threshold_reach when the PR has two comments
+        """Check the value of threshold_reach when the PR has two comments
         but from the same person.
         """
         # Add two comments from the same user:
@@ -3774,7 +3770,7 @@ class PagureApiThresholdReachedTests(tests.Modeltests):
         self.assertDictEqual(data, self.expected_data)
 
     def test_api_pull_request_two_comments_two_persons(self):
-        """ Check the value of threshold_reach when the PR has two comments
+        """Check the value of threshold_reach when the PR has two comments
         from two different persons.
         """
         # Add two comments from two users:
@@ -3805,7 +3801,7 @@ class PagureApiThresholdReachedTests(tests.Modeltests):
         self.assertDictEqual(data, self.expected_data)
 
     def test_api_pull_request_three_comments_two_persons_changed_to_no(self):
-        """ Check the value of threshold_reach when the PR has three
+        """Check the value of threshold_reach when the PR has three
         comments from two person among which one changed their mind from
         +1 to -1.
         """
@@ -3847,7 +3843,7 @@ class PagureApiThresholdReachedTests(tests.Modeltests):
         self.assertDictEqual(data, self.expected_data)
 
     def test_api_pull_request_three_comments_two_persons_changed_to_yes(self):
-        """ Check the value of threshold_reach when the PR has three
+        """Check the value of threshold_reach when the PR has three
         comments from two person among which one changed their mind from
         -1 to +1
         """
@@ -3888,8 +3884,7 @@ class PagureApiThresholdReachedTests(tests.Modeltests):
 
 
 class PagureFlaskApiForkGetCommenttests(tests.Modeltests):
-    """ Tests for the flask API of pagure for the comment endpoint of PRs
-    """
+    """Tests for the flask API of pagure for the comment endpoint of PRs"""
 
     maxDiff = None
 

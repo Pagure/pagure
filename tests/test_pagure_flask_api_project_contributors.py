@@ -34,8 +34,7 @@ import tests
 
 
 class PagureFlaskApiProjectContributorsTests(tests.SimplePagureTest):
-    """ Tests for the flask API of pagure for listing contributors of a project
-    """
+    """Tests for the flask API of pagure for listing contributors of a project"""
 
     maxDiff = None
 

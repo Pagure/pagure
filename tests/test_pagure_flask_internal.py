@@ -421,7 +421,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_mergeable_request_pull_FF(self, send_email):
-        """ Test the mergeable_request_pull endpoint with a fast-forward
+        """Test the mergeable_request_pull endpoint with a fast-forward
         merge.
         """
         send_email.return_value = True
@@ -548,7 +548,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_mergeable_request_pull_no_change(self, send_email):
-        """ Test the mergeable_request_pull endpoint when there are no
+        """Test the mergeable_request_pull endpoint when there are no
         changes to merge.
         """
         send_email.return_value = True
@@ -666,7 +666,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_mergeable_request_pull_merge(self, send_email):
-        """ Test the mergeable_request_pull endpoint when the changes can
+        """Test the mergeable_request_pull endpoint when the changes can
         be merged with a merge commit.
         """
         send_email.return_value = True
@@ -832,7 +832,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_mergeable_request_pull_conflicts(self, send_email):
-        """ Test the mergeable_request_pull endpoint when the changes cannot
+        """Test the mergeable_request_pull endpoint when the changes cannot
         be merged due to conflicts.
         """
         send_email.return_value = True
@@ -980,7 +980,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_mergeable_request_pull_merge_no_nonff_merges(self, send_email):
-        """ Test the mergeable_request_pull endpoint when the changes can
+        """Test the mergeable_request_pull endpoint when the changes can
         be merged with a merge commit, but project settings prohibit this.
         """
         send_email.return_value = True
@@ -1139,7 +1139,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_mergeable_request_pull_minimum_score(self, send_email):
-        """ Test the mergeable_request_pull endpoint when the changes can
+        """Test the mergeable_request_pull endpoint when the changes can
         be merged with a merge FF, but project settings enforces vote on
         the PR.
         """
@@ -1284,7 +1284,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         MagicMock(side_effect=pagure.exceptions.PagureException("error")),
     )
     def test_mergeable_request_pull_merge_pagureerror(self):
-        """ Test the mergeable_request_pull endpoint when the backend
+        """Test the mergeable_request_pull endpoint when the backend
         raises an GitError exception.
         """
         # Create a git repo to play with
@@ -1419,7 +1419,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         MagicMock(side_effect=pygit2.GitError("git error")),
     )
     def test_mergeable_request_pull_merge_giterror(self):
-        """ Test the mergeable_request_pull endpoint when the backend
+        """Test the mergeable_request_pull endpoint when the backend
         raises an GitError exception.
         """
         # Create a git repo to play with
@@ -2750,7 +2750,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         )
 
     def test_task_info_task_running(self):
-        """ Test the task_info internal API endpoint when the task isn't
+        """Test the task_info internal API endpoint when the task isn't
         ready.
         """
         task = MagicMock()
@@ -2763,8 +2763,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
             self.assertEqual(output.status_code, 418)
 
     def test_task_info_task_passed(self):
-        """ Test the task_info internal API endpoint when the task failed.
-        """
+        """Test the task_info internal API endpoint when the task failed."""
         task = MagicMock()
         task.get = MagicMock(return_value="PASSED")
         with patch(
@@ -2776,8 +2775,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
             self.assertEqual(js_data, {"results": "PASSED"})
 
     def test_task_info_task_failed(self):
-        """ Test the task_info internal API endpoint when the task failed.
-        """
+        """Test the task_info internal API endpoint when the task failed."""
         task = MagicMock()
         task.get = MagicMock(return_value=Exception("Random error"))
         with patch(
@@ -2789,7 +2787,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
             self.assertEqual(js_data, {"results": "Random error"})
 
     def test_lookup_ssh_key(self):
-        """ Test the mergeable_request_pull endpoint when the backend
+        """Test the mergeable_request_pull endpoint when the backend
         raises an GitError exception.
         """
         tests.create_projects(self.session)

@@ -26,8 +26,7 @@ import tests  # noqa
 
 
 class PagureFlaskIssuesReadOnlytests(tests.Modeltests):
-    """ Tests for flask issues controller of pagure with read-only tickets
-    """
+    """Tests for flask issues controller of pagure with read-only tickets"""
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def setUp(self):
@@ -71,7 +70,7 @@ class PagureFlaskIssuesReadOnlytests(tests.Modeltests):
         self.assertEqual(msg.title, "Test issue #2")
 
     def test_issue_list_authenticated_commit(self):
-        """ Test the list of issues when user is authenticated and has
+        """Test the list of issues when user is authenticated and has
         access to the project.
         """
 
@@ -88,8 +87,7 @@ class PagureFlaskIssuesReadOnlytests(tests.Modeltests):
             )
 
     def test_field_comment(self):
-        """ Test if the field commit is present on the issue page.
-        """
+        """Test if the field commit is present on the issue page."""
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
             output = self.app.get("/test/issue/1")
@@ -107,8 +105,7 @@ class PagureFlaskIssuesReadOnlytests(tests.Modeltests):
             self.assertIn("This issue tracker is read-only.", output_text)
 
     def test_update_ticket(self):
-        """ Test updating a ticket.
-        """
+        """Test updating a ticket."""
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
             output = self.app.post(
@@ -125,8 +122,7 @@ class PagureFlaskIssuesReadOnlytests(tests.Modeltests):
             )
 
     def test_edit_comment(self):
-        """ Test editing a comment from a ticket.
-        """
+        """Test editing a comment from a ticket."""
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
             output = self.app.post(
@@ -143,8 +139,7 @@ class PagureFlaskIssuesReadOnlytests(tests.Modeltests):
             )
 
     def test_edit_ticket(self):
-        """ Test editing a ticket.
-        """
+        """Test editing a ticket."""
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
             output = self.app.post(
@@ -161,8 +156,7 @@ class PagureFlaskIssuesReadOnlytests(tests.Modeltests):
             )
 
     def test_new_issue(self):
-        """ Test creating a new ticket.
-        """
+        """Test creating a new ticket."""
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
             output = self.app.post("/test/new_issue/", data={})
@@ -177,8 +171,7 @@ class PagureFlaskIssuesReadOnlytests(tests.Modeltests):
             )
 
     def test_deleting_issue(self):
-        """ Test deleting a new ticket.
-        """
+        """Test deleting a new ticket."""
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
             output = self.app.post("/test/issue/1/drop", data={})
@@ -193,8 +186,7 @@ class PagureFlaskIssuesReadOnlytests(tests.Modeltests):
             )
 
     def test_uploading_to_issue(self):
-        """ Test uploading to a new ticket.
-        """
+        """Test uploading to a new ticket."""
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
             output = self.app.post("/test/issue/1/upload", data={})
@@ -210,8 +202,7 @@ class PagureFlaskIssuesReadOnlytests(tests.Modeltests):
 
 
 class PagureFlaskAPIIssuesReadOnlytests(PagureFlaskIssuesReadOnlytests):
-    """ Tests for flask API issues controller of pagure with read-only tickets
-    """
+    """Tests for flask API issues controller of pagure with read-only tickets"""
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def setUp(self):
@@ -219,8 +210,7 @@ class PagureFlaskAPIIssuesReadOnlytests(PagureFlaskIssuesReadOnlytests):
         super(PagureFlaskAPIIssuesReadOnlytests, self).setUp()
 
     def test_api_new_issue(self):
-        """ Test creating a new ticket.
-        """
+        """Test creating a new ticket."""
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
             output = self.app.post("/api/0/test/new_issue", data={})
@@ -341,7 +331,7 @@ class PagureFlaskAPIIssuesReadOnlytests(PagureFlaskIssuesReadOnlytests):
 
 
 class PagureFlaskIssuesAndPRDisabledtests(tests.Modeltests):
-    """ Tests for flask issues controller of pagure with tickets and PRs
+    """Tests for flask issues controller of pagure with tickets and PRs
     disabled.
     """
 
@@ -388,8 +378,7 @@ class PagureFlaskIssuesAndPRDisabledtests(tests.Modeltests):
         self.assertEqual(msg.title, "Test issue #2")
 
     def test_edit_tag(self):
-        """ Test editing a ticket tag.
-        """
+        """Test editing a ticket tag."""
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
             output = self.app.post("/test/tag/tag1/edit", data={})
@@ -404,8 +393,7 @@ class PagureFlaskIssuesAndPRDisabledtests(tests.Modeltests):
             )
 
     def test_drop_tags(self):
-        """ Test dropping a ticket tag.
-        """
+        """Test dropping a ticket tag."""
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
             output = self.app.post("/test/droptag/", data={})

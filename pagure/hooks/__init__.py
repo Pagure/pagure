@@ -27,7 +27,7 @@ from pagure.lib.plugins import get_enabled_plugins
 
 
 class RequiredIf(wtforms.validators.DataRequired):
-    """ Wtforms validator setting a field as required if another field
+    """Wtforms validator setting a field as required if another field
     has a value.
     """
 
@@ -64,7 +64,7 @@ class BaseRunner(object):
     def runhook(
         cls, session, username, hooktype, project, repotype, repodir, changes
     ):
-        """ Run a specific hook on a project.
+        """Run a specific hook on a project.
 
         By default, this calls out to the pre_receive, update or post_receive
         functions as appropriate.
@@ -115,7 +115,7 @@ class BaseRunner(object):
 
     @staticmethod
     def pre_receive(session, username, project, repotype, repodir, changes):
-        """ Run the pre-receive tasks of a hook.
+        """Run the pre-receive tasks of a hook.
 
         For args, see BaseRunner.runhook.
         """
@@ -123,7 +123,7 @@ class BaseRunner(object):
 
     @staticmethod
     def update(session, username, project, repotype, repodir, changes):
-        """ Run the update tasks of a hook.
+        """Run the update tasks of a hook.
 
         For args, see BaseRunner.runhook.
         Note that the "changes" list has exactly one element.
@@ -132,7 +132,7 @@ class BaseRunner(object):
 
     @staticmethod
     def post_receive(session, username, project, repotype, repodir, changes):
-        """ Run the post-receive tasks of a hook.
+        """Run the post-receive tasks of a hook.
 
         For args, see BaseRunner.runhook.
         """
@@ -154,7 +154,7 @@ class BaseHook(object):
 
     @classmethod
     def set_up(cls, project):
-        """ Install the generic post-receive hook that allow us to call
+        """Install the generic post-receive hook that allow us to call
         multiple post-receive hooks as set per plugin.
         """
         if project.is_on_repospanner:
@@ -186,7 +186,7 @@ class BaseHook(object):
 
     @classmethod
     def base_install(cls, repopaths, dbobj, hook_name, filein):
-        """ Method called to install the hook for a project.
+        """Method called to install the hook for a project.
 
         :arg project: a ``pagure.model.Project`` object to which the hook
             should be installed
@@ -222,7 +222,7 @@ class BaseHook(object):
 
     @classmethod
     def base_remove(cls, repopaths, hook_name):
-        """ Method called to remove the hook of a project.
+        """Method called to remove the hook of a project.
 
         :arg project: a ``pagure.model.Project`` object to which the hook
             should be installed
@@ -240,7 +240,7 @@ class BaseHook(object):
 
     @classmethod
     def install(cls, *args):
-        """ In sub-classess, this can be used for installation of the hook.
+        """In sub-classess, this can be used for installation of the hook.
 
         However, this is not required anymore for hooks with a Runner.
         This class is here as backwards compatibility.
@@ -252,7 +252,7 @@ class BaseHook(object):
 
     @classmethod
     def remove(cls, *args):
-        """ In sub-classess, this can be used for removal of the hook.
+        """In sub-classess, this can be used for removal of the hook.
 
         However, this is not required anymore for hooks with a Runner.
         This class is here as backwards compatibility.
@@ -264,7 +264,7 @@ class BaseHook(object):
 
     @classmethod
     def is_enabled_for(cls, project):
-        """ Determine if this hook should be run for given project.
+        """Determine if this hook should be run for given project.
 
         On some Pagure instances, some hooks should be run on all projects
         that fulfill certain criteria. It is therefore not necessary to keep
@@ -294,7 +294,7 @@ def run_project_hooks(
     is_internal,
     pull_request,
 ):
-    """ Function to run the hooks on a project
+    """Function to run the hooks on a project
 
     This will first call all the plugins with a Runner on the project,
     and afterwards, for a non-repoSpanner repo, run all hooks/<hooktype>.*
@@ -470,7 +470,7 @@ def run_project_hooks(
 
 
 def extract_changes(from_stdin):
-    """ Extracts a changes dict from either stdin or argv
+    """Extracts a changes dict from either stdin or argv
 
     Args:
         from_stdin (bool): Whether to use stdin. If false, uses argv
@@ -491,7 +491,7 @@ def extract_changes(from_stdin):
 
 
 def run_hook_file(hooktype):
-    """ Runs a specific hook by grabbing the changes and running functions.
+    """Runs a specific hook by grabbing the changes and running functions.
 
     Args:
         hooktype (string): The name of the hook to run: pre-receive, update

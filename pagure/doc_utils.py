@@ -56,8 +56,7 @@ def modify_rst(rst, view_file_url=None):
 
 
 def modify_html(html):
-    """ Perform style substitutions where docutils doesn't do what we want.
-    """
+    """Perform style substitutions where docutils doesn't do what we want."""
 
     substitutions = {
         '<tt class="docutils literal">': "<code>",
@@ -98,7 +97,7 @@ def convert_doc(rst_string, view_file_url=None):
 
 
 def convert_readme(content, ext, view_file_url=None):
-    """ Convert the provided content according to the extension of the file
+    """Convert the provided content according to the extension of the file
     provided.
     """
     output = pagure.lib.encoding_utils.decode(ktc.to_bytes(content))

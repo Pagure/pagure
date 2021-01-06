@@ -79,8 +79,7 @@ class PagureLibAddUserToProjecttests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_update_user_to_project_default(self):
-        """ Update an existing user without any required group membership.
-        """
+        """Update an existing user without any required group membership."""
         repo = pagure.lib.query._get_project(self.session, "test")
 
         # Update the access of the user

@@ -75,8 +75,7 @@ def build_docs_section(name, endpoints):
 
 
 class APIERROR(enum.Enum):
-    """ Clast listing as Enum all the possible error thrown by the API.
-    """
+    """Clast listing as Enum all the possible error thrown by the API."""
 
     ENOCODE = "Variable message describing the issue"
     ENOPROJECT = "Project not found"
@@ -171,7 +170,7 @@ def get_request_data():
 
 
 def api_login_required(acls=None, optional=False):
-    """ Decorator used to indicate that authentication is required for some
+    """Decorator used to indicate that authentication is required for some
     API endpoint.
 
     :arg acls: A list of access control
@@ -227,7 +226,7 @@ def api_login_required(acls=None, optional=False):
 
 
 def api_login_optional(acls=None):
-    """ Decorator used to indicate that authentication is optional for some
+    """Decorator used to indicate that authentication is optional for some
     API endpoint.
     """
 
@@ -284,7 +283,7 @@ def api_method(function):
 
 
 def get_page():
-    """ Returns the page value specified in the request.
+    """Returns the page value specified in the request.
     Defaults to 1.
     raises APIERROR.EINVALIDREQ if the page provided isn't an integer
     raises APIERROR.EINVALIDREQ if the page provided is lower than 1
@@ -310,7 +309,7 @@ def get_page():
 
 
 def get_per_page():
-    """ Returns the per_page value specified in the request.
+    """Returns the per_page value specified in the request.
     Defaults to 20.
     raises APIERROR.EINVALIDREQ if the page provided isn't an integer
     raises APIERROR.EINVALIDPERPAGEVALUE if the page provided is lower

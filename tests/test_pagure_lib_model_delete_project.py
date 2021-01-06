@@ -148,8 +148,8 @@ class DeleteProjectTests(tests.Modeltests):
         self.assertEqual(self.session.query(model.TagColored).count(), 0)
 
     def test_delete_project_with_coloredtags_and_issues(self):
-        """ Test the model when we delete a project with Colored tags and
-        issues. """
+        """Test the model when we delete a project with Colored tags and
+        issues."""
 
         # Create a project
         item = model.Project(
@@ -212,8 +212,8 @@ class DeleteProjectTests(tests.Modeltests):
         self.assertEqual(self.session.query(model.Issue).count(), 0)
 
     def test_delete_project_with_coloredtags_and_tagged_issues(self):
-        """ Test the model when we delete a project with Colored tags and
-        tagged issues. """
+        """Test the model when we delete a project with Colored tags and
+        tagged issues."""
 
         # Create a project
         item = model.Project(

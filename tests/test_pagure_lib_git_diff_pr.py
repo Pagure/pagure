@@ -326,7 +326,7 @@ class PagureFlaskForkPrtests(tests.Modeltests):
         "pagure.config.config", {"FEDORA_MESSAGING_NOTIFICATIONS": True}
     )
     def test_diff_pull_request_updated(self):
-        """ Test that calling pagure.lib.git.diff_pull_request on an updated
+        """Test that calling pagure.lib.git.diff_pull_request on an updated
         PR updates the PR reference
         """
         gitrepo = os.path.join(self.path, "repos", "test.git")
@@ -758,7 +758,7 @@ class PagureFlaskForkPrtests(tests.Modeltests):
         self.assertNotEqual(commit.oid.hex, commit2.oid.hex)
 
     def test_two_diff_pull_request_sequentially(self):
-        """ Test calling pagure.lib.git.diff_pull_request twice returns
+        """Test calling pagure.lib.git.diff_pull_request twice returns
         the same data
         """
         gitrepo = os.path.join(self.path, "repos", "test.git")

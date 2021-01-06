@@ -349,7 +349,7 @@ class AutolinkPattern2(markdown.inlinepatterns.Pattern):
     """ Return a link Element given an autolink (`<http://example/com>`). """
 
     def handleMatch(self, m):
-        """ When the pattern matches, update the text.
+        """When the pattern matches, update the text.
 
         :arg m: the matched object
 
@@ -617,7 +617,7 @@ def _obj_anchor_tag(user, namespace, repo, obj, text):
 
 
 def _get_ns_repo_user():
-    """ Return the namespace, repo, user corresponding to the given request
+    """Return the namespace, repo, user corresponding to the given request
 
     :return: A tuple of three string corresponding to namespace, repo, user
     :rtype: tuple(str, str, str)

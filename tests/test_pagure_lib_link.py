@@ -41,8 +41,7 @@ class PagureLibLinktests(tests.Modeltests):
     """ Tests for pagure.lib.link """
 
     def test_get_relation_relates(self):
-        """ Test the get_relation function of pagure.lib.link with relates.
-        """
+        """Test the get_relation function of pagure.lib.link with relates."""
 
         link = pagure.lib.link.get_relation(
             self.session,
@@ -142,8 +141,7 @@ class PagureLibLinktests(tests.Modeltests):
                 self.assertEqual(link, [])
 
     def test_get_relation_fixes(self):
-        """ Test the get_relation function of pagure.lib.link with fixes.
-        """
+        """Test the get_relation function of pagure.lib.link with fixes."""
 
         link = pagure.lib.link.get_relation(
             self.session,

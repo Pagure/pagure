@@ -78,8 +78,7 @@ _log = logging.getLogger(__name__)
 @login_required
 @is_repo_admin
 def view_plugin(repo, plugin, username=None, namespace=None, full=True):
-    """ Presents the settings of the project.
-    """
+    """Presents the settings of the project."""
     repo = flask.g.repo
 
     # Private repos are not allowed to leak information outside so disabling CI

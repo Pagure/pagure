@@ -38,7 +38,7 @@ from pagure.lib.repo import PagureRepo
 
 
 def _get_commits(output):
-    """ Returns the commits message in the output. All commits must have
+    """Returns the commits message in the output. All commits must have
     been made by `Alice Author` or `PY C` to be found.
     """
     commits = []
@@ -75,7 +75,7 @@ def set_up_git_repo(
     prid=1,
     name_from="test",
 ):
-    """ Set up the git repo and create the corresponding PullRequest
+    """Set up the git repo and create the corresponding PullRequest
     object.
     """
 
@@ -3078,8 +3078,7 @@ index 0000000..2a552bb
     )
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_update_pull_requests_assign(self):
-        """ Test the update_pull_requests endpoint when assigning a PR.
-        """
+        """Test the update_pull_requests endpoint when assigning a PR."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(
@@ -4184,8 +4183,7 @@ index 0000000..2a552bb
     )
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_update_pull_requests_tag(self):
-        """ Test the update_pull_requests endpoint when tagging a PR.
-        """
+        """Test the update_pull_requests endpoint when tagging a PR."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(
@@ -5002,8 +5000,8 @@ index 0000000..2a552bb
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_fork_project_non_master_default(self):
-        """ Test the fork_project endpoint with a project whose default branch
-        is not master. """
+        """Test the fork_project endpoint with a project whose default branch
+        is not master."""
 
         tests.create_projects(self.session)
         for folder in ["docs", "tickets", "requests", "repos"]:
@@ -6296,7 +6294,7 @@ More information</textarea>
 
     @patch("pagure.lib.notify.send_email")
     def test_new_request_pull_fork_to_other_unrelated_fork(self, send_email):
-        """ Test creating a PR from  fork to fork that isn't from the same
+        """Test creating a PR from  fork to fork that isn't from the same
         family.
         """
         send_email.return_value = True
@@ -7096,7 +7094,7 @@ More information</textarea>
 
     @patch("pagure.lib.notify.send_email")
     def test_merge_request_pull_FF_w_merge_commit(self, send_email):
-        """ Test the merge_request_pull endpoint with a FF PR but with a
+        """Test the merge_request_pull endpoint with a FF PR but with a
         merge commit.
         """
         send_email.return_value = True
@@ -7193,7 +7191,7 @@ More information</textarea>
 
     @patch("pagure.lib.notify.send_email")
     def test_internal_endpoint_main_ahead(self, send_email):
-        """ Test the new_request_pull endpoint when the main repo is ahead
+        """Test the new_request_pull endpoint when the main repo is ahead
         of the fork.
         """
         send_email.return_value = True
@@ -7445,7 +7443,8 @@ More information</textarea>
             )
             self.assertEqual(output.status_code, 400)
             self.assertIn(
-                b"<p>Cannot edit binary files</p>", output.data,
+                b"<p>Cannot edit binary files</p>",
+                output.data,
             )
 
         # Check fork-edit shows when user is not logged in
@@ -7793,8 +7792,8 @@ More information</textarea>
 
 
 class TestTicketAccessEditPRMetadata(tests.Modeltests):
-    """ Tests that people with ticket access on a project can edit the
-    meta-data of a PR """
+    """Tests that people with ticket access on a project can edit the
+    meta-data of a PR"""
 
     def setUp(self):
         """ Set up the environnment, ran before every tests. """
@@ -7820,8 +7819,8 @@ class TestTicketAccessEditPRMetadata(tests.Modeltests):
         self.assertEqual(msg, "User added")
 
     def test_unauth_cannot_view_edit_metadata_ui(self):
-        """ Test that unauthenticated users cannot view the edit the
-        metadata fields in the UI. """
+        """Test that unauthenticated users cannot view the edit the
+        metadata fields in the UI."""
 
         output = self.app.get("/test/pull-request/1")
         self.assertEqual(output.status_code, 200)
@@ -7844,8 +7843,8 @@ class TestTicketAccessEditPRMetadata(tests.Modeltests):
         )
 
     def test_admin_can_view_edit_metadata_ui(self):
-        """ Test that admin users can view the edit the metadata fields in
-        the UI. """
+        """Test that admin users can view the edit the metadata fields in
+        the UI."""
 
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
@@ -7903,8 +7902,8 @@ class TestTicketAccessEditPRMetadata(tests.Modeltests):
             )
 
     def test_ticket_can_view_edit_metadata_ui(self):
-        """ Test that users with ticket access can view the edit the
-        metadata fields in the UI. """
+        """Test that users with ticket access can view the edit the
+        metadata fields in the UI."""
 
         user = tests.FakeUser(username="foo")
         with tests.user_set(self.app.application, user):
@@ -7930,8 +7929,8 @@ class TestTicketAccessEditPRMetadata(tests.Modeltests):
             )
 
     def test_ticket_can_edit_metadata_ui(self):
-        """ Test that users with ticket access can edit the metadata in the
-        UI. """
+        """Test that users with ticket access can edit the metadata in the
+        UI."""
 
         user = tests.FakeUser(username="foo")
         with tests.user_set(self.app.application, user):

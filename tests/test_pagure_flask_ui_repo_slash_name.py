@@ -30,8 +30,7 @@ from pagure.lib.repo import PagureRepo
 
 
 class PagureFlaskSlashInNametests(tests.SimplePagureTest):
-    """ Tests for flask application when the project contains a '/'.
-    """
+    """Tests for flask application when the project contains a '/'."""
 
     def setUp(self):
         """ Set up the environnment, ran before every tests. """
@@ -74,7 +73,7 @@ class PagureFlaskSlashInNametests(tests.SimplePagureTest):
 
     @patch("pagure.lib.notify.send_email")
     def test_view_repo_empty(self, send_email):
-        """ Test the view_repo endpoint when the project has a slash in its
+        """Test the view_repo endpoint when the project has a slash in its
         name.
         """
         send_email.return_value = True
@@ -159,7 +158,7 @@ class PagureFlaskSlashInNametests(tests.SimplePagureTest):
 
     @patch("pagure.lib.notify.send_email")
     def test_view_repo(self, send_email):
-        """ Test the view_repo endpoint when the project has a slash in its
+        """Test the view_repo endpoint when the project has a slash in its
         name.
         """
         send_email.return_value = True

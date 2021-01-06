@@ -110,8 +110,8 @@ class PagureLibGitoliteConfigtests(tests.Modeltests):
         self.assertFalse(os.path.exists(self.outputconf))
 
     def test_write_gitolite_pre_post_projectNone(self):
-        """ Test the write_gitolite_acls function of pagure.lib.git with
-        a postconf set """
+        """Test the write_gitolite_acls function of pagure.lib.git with
+        a postconf set"""
 
         helper = pagure.lib.git_auth.get_git_auth_helper("gitolite3")
         helper.write_gitolite_acls(
@@ -147,8 +147,8 @@ class PagureLibGitoliteConfigtests(tests.Modeltests):
         self.assertEqual(data, exp)
 
     def test_write_gitolite_pre_post_projectNone_to_existing_file(self):
-        """ Test the write_gitolite_acls function of pagure.lib.git with
-        a postconf set with existing output file """
+        """Test the write_gitolite_acls function of pagure.lib.git with
+        a postconf set with existing output file"""
 
         with open(self.outputconf, "w") as stream:
             pass
@@ -168,8 +168,8 @@ class PagureLibGitoliteConfigtests(tests.Modeltests):
         self.assertEqual(data, "")
 
     def test_write_gitolite_pre_post_project_1(self):
-        """ Test the write_gitolite_acls function of pagure.lib.git with
-        a postconf set """
+        """Test the write_gitolite_acls function of pagure.lib.git with
+        a postconf set"""
 
         with open(self.outputconf, "w") as stream:
             pass
@@ -209,8 +209,8 @@ class PagureLibGitoliteConfigtests(tests.Modeltests):
         self.assertEqual(data, exp)
 
     def test_write_gitolite_pre_post_project_test(self):
-        """ Test the write_gitolite_acls function of pagure.lib.git with
-        a postconf set """
+        """Test the write_gitolite_acls function of pagure.lib.git with
+        a postconf set"""
 
         with open(self.outputconf, "w") as stream:
             pass
@@ -260,8 +260,8 @@ repo requests/test
         self.assertEqual(data, exp)
 
     def test_write_gitolite_pre_post_project_test_full_file(self):
-        """ Test the write_gitolite_acls function of pagure.lib.git with
-        a postconf set """
+        """Test the write_gitolite_acls function of pagure.lib.git with
+        a postconf set"""
 
         # Re-generate the gitolite config for all the projects
         self.test_write_gitolite_pre_post_project_1()
@@ -362,8 +362,8 @@ repo requests/test
         "pagure.config.config", {"ENABLE_DOCS": False, "ENABLE_TICKETS": False}
     )
     def test_write_gitolite_disabled_docs_tickets(self):
-        """ Test the write_gitolite_acls function when docs and tickets
-        are disabled """
+        """Test the write_gitolite_acls function when docs and tickets
+        are disabled"""
 
         # Re-generate the gitolite config for all the projects
         project = pagure.lib.query._get_project(self.session, "test")
@@ -421,7 +421,7 @@ repo requests/somenamespace/test3
 
 
 class PagureLibGitoliteGroupConfigtests(tests.Modeltests):
-    """ Tests for generating the gitolite configuration file for a group
+    """Tests for generating the gitolite configuration file for a group
     change
 
     """
@@ -741,7 +741,7 @@ repo requests/test
         self.assertEqual(data, exp)
 
     def test_write_gitolite_delete_group(self):
-        """ Test the updating the gitolite config after having
+        """Test the updating the gitolite config after having
         deleted a group.
         """
 
@@ -793,8 +793,8 @@ repo requests/test
 
     @patch("pagure.lib.git_auth.get_git_auth_helper")
     def test_task_generate_gitolite_acls_one_group(self, get_helper):
-        """ Test the generate_gitolite_acls task to ensure if group is None
-        then None is passed to the helper. """
+        """Test the generate_gitolite_acls task to ensure if group is None
+        then None is passed to the helper."""
         helper = MagicMock()
         get_helper.return_value = helper
         pagure.lib.query.SESSIONMAKER = self.session.session_factory
@@ -809,8 +809,8 @@ repo requests/test
         self.assertIsNotNone(args[1].get("project"))
 
     def test_write_gitolite_project_test_private(self):
-        """ Test the write_gitolite_acls function of pagure.lib.git with
-        a postconf set """
+        """Test the write_gitolite_acls function of pagure.lib.git with
+        a postconf set"""
 
         # Make the test project private
         project = pagure.lib.query._get_project(self.session, "test")
@@ -876,8 +876,8 @@ repo requests/somenamespace/test3
         self.assertEqual(data, exp)
 
     def test_remove_acls(self):
-        """ Test the remove_acls function of pagure.lib.git when deleting
-        a project """
+        """Test the remove_acls function of pagure.lib.git when deleting
+        a project"""
         pagure.config.config["GITOLITE_CONFIG"] = self.outputconf
 
         with open(self.outputconf, "w") as stream:
@@ -954,8 +954,8 @@ repo requests/somenamespace/test3
         self.assertEqual(data, exp)
 
     def test_remove_acls_no_project(self):
-        """ Test the remove_acls function of pagure.lib.git when no project
-        is specified """
+        """Test the remove_acls function of pagure.lib.git when no project
+        is specified"""
         pagure.config.config["GITOLITE_CONFIG"] = self.outputconf
 
         with open(self.outputconf, "w") as stream:

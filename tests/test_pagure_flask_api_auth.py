@@ -31,8 +31,7 @@ class PagureFlaskApiAuthtests(tests.SimplePagureTest):
     """ Tests for the authentication in the flask API of pagure """
 
     def test_auth_no_data(self):
-        """ Test the authentication when there is nothing in the database.
-        """
+        """Test the authentication when there is nothing in the database."""
 
         output = self.app.post("/api/0/foo/new_issue")
         self.assertEqual(output.status_code, 401)
@@ -53,8 +52,7 @@ class PagureFlaskApiAuthtests(tests.SimplePagureTest):
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data["error"])
 
     def test_auth_noacl(self):
-        """ Test the authentication when the token does not have any ACL.
-        """
+        """Test the authentication when the token does not have any ACL."""
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
 
@@ -77,8 +75,7 @@ class PagureFlaskApiAuthtests(tests.SimplePagureTest):
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data["error"])
 
     def test_auth_expired(self):
-        """ Test the authentication when the token has expired.
-        """
+        """Test the authentication when the token has expired."""
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
 
@@ -101,8 +98,7 @@ class PagureFlaskApiAuthtests(tests.SimplePagureTest):
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data["error"])
 
     def test_auth(self):
-        """ Test the token based authentication.
-        """
+        """Test the token based authentication."""
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
         tests.create_tokens_acl(self.session)

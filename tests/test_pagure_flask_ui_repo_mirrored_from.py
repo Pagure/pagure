@@ -33,8 +33,7 @@ from pagure.lib.repo import PagureRepo
 
 
 class PagureUiRepoMirroredFromTests(tests.Modeltests):
-    """ Tests for pagure project that are mirrored from a remote location
-    """
+    """Tests for pagure project that are mirrored from a remote location"""
 
     maxDiff = None
 
@@ -54,7 +53,7 @@ class PagureUiRepoMirroredFromTests(tests.Modeltests):
         self.session.commit()
 
     def test_custom_projecticon(self):
-        """ Ensure that the customized project icon is shown the main page of
+        """Ensure that the customized project icon is shown the main page of
         the project.
         """
         output = self.app.get("/test")
@@ -66,7 +65,7 @@ class PagureUiRepoMirroredFromTests(tests.Modeltests):
         )
 
     def test_regular_projecticon(self):
-        """ Ensure that the customized project icon is shown the main page of
+        """Ensure that the customized project icon is shown the main page of
         the project.
         """
         output = self.app.get("/test2")
@@ -77,7 +76,7 @@ class PagureUiRepoMirroredFromTests(tests.Modeltests):
         )
 
     def test_settings_shows(self):
-        """ Ensure that the box to edit the mirrored from value shows up
+        """Ensure that the box to edit the mirrored from value shows up
         in the settings.
         """
         user = tests.FakeUser(username="pingou")
@@ -96,7 +95,7 @@ class PagureUiRepoMirroredFromTests(tests.Modeltests):
             )
 
     def test_settings_not_show(self):
-        """ Ensure that the box to edit the mirrored from value does not
+        """Ensure that the box to edit the mirrored from value does not
         show up in the settings when it shouldn't.
         """
         user = tests.FakeUser(username="pingou")
@@ -114,7 +113,7 @@ class PagureUiRepoMirroredFromTests(tests.Modeltests):
             )
 
     def test_edit_mirrored_from(self):
-        """ Ensure that we can successfully edit the content of the
+        """Ensure that we can successfully edit the content of the
         mirrored_from field.
         """
         user = tests.FakeUser(username="pingou")

@@ -727,8 +727,7 @@ class PagureLibtests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_edit_issue_priority(self, p_send_email, p_ugt):
-        """ Test the edit_issue of pagure.lib when changing the priority.
-        """
+        """Test the edit_issue of pagure.lib when changing the priority."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -770,7 +769,7 @@ class PagureLibtests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_edit_issue_depending(self, p_send_email, p_ugt):
-        """ Test the edit_issue of pagure.lib when the issue depends on
+        """Test the edit_issue of pagure.lib when the issue depends on
         another.
         """
         p_send_email.return_value = True
@@ -2183,7 +2182,7 @@ class PagureLibtests(tests.Modeltests):
         clear=True,
     )
     def test_set_up_user_multiple_emaildomains(self):
-        """ Test the set_up_user of pagure.lib when there are
+        """Test the set_up_user of pagure.lib when there are
         multimple domains configured in ALLOWED_EMAIL_DOMAINS"""
 
         items = pagure.lib.query.search_user(self.session)
@@ -4430,8 +4429,7 @@ class PagureLibtests(tests.Modeltests):
         )
 
     def test_get_project_users(self):
-        """ Test the get_project_users method when combine is True
-        """
+        """Test the get_project_users method when combine is True"""
 
         tests.create_projects(self.session)
         project = pagure.lib.query.get_authorized_project(
@@ -4546,8 +4544,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(users[0].username, "foo")
 
     def test_get_project_users_combine_false(self):
-        """ Test the get_project_users method when combine is False
-        """
+        """Test the get_project_users method when combine is False"""
 
         tests.create_projects(self.session)
         project = pagure.lib.query.get_authorized_project(
@@ -4634,8 +4631,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(users[0].username, "foo")
 
     def test_get_project_groups(self):
-        """ Test the get_project_groups method when combine is True
-        """
+        """Test the get_project_groups method when combine is True"""
 
         # Create some projects
         tests.create_projects(self.session)
@@ -4766,8 +4762,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(project.groups[0].display_name, "Justice League")
 
     def test_get_project_groups_combine_false(self):
-        """ Test the get_project_groups method when combine is False
-        """
+        """Test the get_project_groups method when combine is False"""
 
         # Create some projects
         tests.create_projects(self.session)
@@ -4884,8 +4879,8 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(project.groups[0].display_name, "Justice League")
 
     def test_get_obj_access_user(self):
-        """ Test the get_obj_access method of pagure.lib
-        for model.User object """
+        """Test the get_obj_access method of pagure.lib
+        for model.User object"""
 
         # Create the projects
         tests.create_projects(self.session)
@@ -4948,8 +4943,8 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(access_obj.access, "ticket")
 
     def test_get_obj_access_group(self):
-        """ Test the get_obj_access method of pagure.lib
-        for model.PagureGroup object """
+        """Test the get_obj_access method of pagure.lib
+        for model.PagureGroup object"""
 
         # Create the projects
         tests.create_projects(self.session)
@@ -5206,7 +5201,7 @@ foo bar
             self.assertEqual(html, expected)
 
     def test_text2markdown_table_old_mk(self):
-        """ Test the text2markdown function with a markdown table using the old
+        """Test the text2markdown function with a markdown table using the old
         format where the orientation instruction are provided next to the column
         delimiter unlike what can be done with more recent version of markdown.
         """
@@ -5305,8 +5300,8 @@ foo bar
         self.assertEqual(key[3], "(RSA)")
 
     def test_create_deploykeys_ssh_keys_on_disk_empty(self):
-        """ Test the create_deploykeys_ssh_keys_on_disk function of
-        pagure.lib.query. """
+        """Test the create_deploykeys_ssh_keys_on_disk function of
+        pagure.lib.query."""
         self.assertIsNone(
             pagure.lib.query.create_deploykeys_ssh_keys_on_disk(None, None)
         )
@@ -5315,8 +5310,8 @@ foo bar
         )
 
     def test_create_deploykeys_ssh_keys_on_disk_nokey(self):
-        """ Test the create_deploykeys_ssh_keys_on_disk function of
-        pagure.lib.query. """
+        """Test the create_deploykeys_ssh_keys_on_disk function of
+        pagure.lib.query."""
         tests.create_projects(self.session)
         project = pagure.lib.query._get_project(self.session, "test")
 
@@ -5336,8 +5331,8 @@ foo bar
         "pagure.lib.query.is_valid_ssh_key", MagicMock(return_value="foo bar")
     )
     def test_create_deploykeys_ssh_keys_on_disk(self):
-        """ Test the create_deploykeys_ssh_keys_on_disk function of
-        pagure.lib.query. """
+        """Test the create_deploykeys_ssh_keys_on_disk function of
+        pagure.lib.query."""
         tests.create_projects(self.session)
         project = pagure.lib.query._get_project(self.session, "test")
 
@@ -5388,8 +5383,8 @@ foo bar
         MagicMock(return_value="\nfoo bar"),
     )
     def test_create_deploykeys_ssh_keys_on_disk_empty_first_key(self):
-        """ Test the create_deploykeys_ssh_keys_on_disk function of
-        pagure.lib.query. """
+        """Test the create_deploykeys_ssh_keys_on_disk function of
+        pagure.lib.query."""
         tests.create_projects(self.session)
         project = pagure.lib.query._get_project(self.session, "test")
 
@@ -5419,8 +5414,8 @@ foo bar
         )
 
     def test_create_deploykeys_ssh_keys_on_disk_invalid(self):
-        """ Test the create_deploykeys_ssh_keys_on_disk function of
-        pagure.lib.query. """
+        """Test the create_deploykeys_ssh_keys_on_disk function of
+        pagure.lib.query."""
         tests.create_projects(self.session)
         project = pagure.lib.query._get_project(self.session, "test")
 
@@ -5508,7 +5503,7 @@ foo bar
         clear=True,
     )
     def test_add_email_to_user_with_logs(self):
-        """ Test the add_email_to_user function of pagure.lib when there
+        """Test the add_email_to_user function of pagure.lib when there
         are log entries associated to the email added.
         """
         user = pagure.lib.query.search_user(self.session, username="pingou")

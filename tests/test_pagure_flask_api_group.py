@@ -149,8 +149,8 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
 
     def test_api_view_group_authenticated(self):
         """
-            Test the api_view_group method of the flask api with an
-            authenticated user. The tested group has one member.
+        Test the api_view_group method of the flask api with an
+        authenticated user. The tested group has one member.
         """
         tests.create_tokens(self.session)
 
@@ -180,8 +180,8 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
 
     def test_api_view_group_unauthenticated(self):
         """
-            Test the api_view_group method of the flask api with an
-            unauthenticated user. The tested group has one member.
+        Test the api_view_group method of the flask api with an
+        unauthenticated user. The tested group has one member.
         """
         output = self.app.get("/api/0/group/some_group")
         self.assertEqual(output.status_code, 200)
@@ -206,8 +206,8 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
 
     def test_api_view_group_two_members_authenticated(self):
         """
-            Test the api_view_group method of the flask api with an
-            authenticated user. The tested group has two members.
+        Test the api_view_group method of the flask api with an
+        authenticated user. The tested group has two members.
         """
         user = pagure.lib.model.User(
             user="mprahl",
@@ -257,8 +257,8 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
 
     def test_api_view_group_no_group_error(self):
         """
-            Test the api_view_group method of the flask api
-            The tested group has one member.
+        Test the api_view_group method of the flask api
+        The tested group has one member.
         """
         output = self.app.get("/api/0/group/some_group3")
         self.assertEqual(output.status_code, 404)
@@ -268,8 +268,8 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
 
     def test_api_view_group_w_projects_and_acl(self):
         """
-            Test the api_view_group method with project info and restricted
-            to the admin ACL
+        Test the api_view_group method with project info and restricted
+        to the admin ACL
         """
         tests.create_tokens(self.session)
 
@@ -381,8 +381,8 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
 
     def test_api_view_group_w_projects_and_acl_commit(self):
         """
-            Test the api_view_group method with project info and restricted
-            to the commit ACL
+        Test the api_view_group method with project info and restricted
+        to the commit ACL
         """
 
         output = self.app.get("/api/0/group/some_group?projects=1&acl=commit")
@@ -471,8 +471,8 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
 
     def test_api_view_group_w_projects_and_acl_ticket(self):
         """
-            Test the api_view_group method with project info and restricted
-            to the ticket ACL
+        Test the api_view_group method with project info and restricted
+        to the ticket ACL
         """
 
         output = self.app.get("/api/0/group/some_group?projects=1&acl=ticket")
@@ -561,8 +561,8 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
 
     def test_api_view_group_w_projects_and_acl_admin_no_project(self):
         """
-            Test the api_view_group method with project info and restricted
-            to the admin ACL
+        Test the api_view_group method with project info and restricted
+        to the admin ACL
         """
 
         # Make the group having only commit access
@@ -615,8 +615,8 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
 
     def test_api_view_group_w_projects_and_acl_commit_no_project(self):
         """
-            Test the api_view_group method with project info and restricted
-            to the commit ACL
+        Test the api_view_group method with project info and restricted
+        to the commit ACL
         """
 
         # Make the group having only ticket access
@@ -669,8 +669,8 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
 
     def test_api_view_group_w_projects_and_acl_ticket_no_project(self):
         """
-            Test the api_view_group method with project info and restricted
-            to the ticket ACL
+        Test the api_view_group method with project info and restricted
+        to the ticket ACL
         """
 
         # Create a group not linked to any project

@@ -32,7 +32,7 @@ from pagure.config import config as pagure_config, reload_config
 
 
 class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
-    """ Tests for flask application for dumping and re-loading the JSON of
+    """Tests for flask application for dumping and re-loading the JSON of
     a ticket.
     """
 
@@ -179,7 +179,8 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
         os.unlink(os.path.join(self.dbfolder, "db.sqlite"))
 
         self.db_session = pagure.lib.model.create_tables(
-            self.dbpath, acls=pagure_config.get("ACLS", {}),
+            self.dbpath,
+            acls=pagure_config.get("ACLS", {}),
         )
         self._prepare_db()
         tests.create_projects(self.session)

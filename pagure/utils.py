@@ -49,8 +49,7 @@ def set_up_logging(app=None, force=False, configkey="LOGGING"):
 
 
 def authenticated():
-    """ Utility function checking if the current user is logged in or not.
-    """
+    """Utility function checking if the current user is logged in or not."""
     fas_user = None
     try:
         fas_user = flask.g.fas_user
@@ -61,7 +60,7 @@ def authenticated():
 
 
 def api_authenticated():
-    """ Utility function checking if the current user is logged in or not
+    """Utility function checking if the current user is logged in or not
     in the API.
     """
     return (
@@ -73,7 +72,7 @@ def api_authenticated():
 
 
 def check_api_acls(acls, optional=False):
-    """ Checks if the user provided an API token with its request and if
+    """Checks if the user provided an API token with its request and if
     this token allows the user to access the endpoint desired.
 
     :arg acls: A list of access control
@@ -155,7 +154,7 @@ def check_api_acls(acls, optional=False):
 
 
 def is_safe_url(target):  # pragma: no cover
-    """ Checks that the target url is safe and sending to the current
+    """Checks that the target url is safe and sending to the current
     website not some other malicious one.
     """
     ref_url = urlparse(flask.request.host_url)
@@ -271,8 +270,8 @@ def is_repo_committer(repo_obj, username=None, session=None):
 
 
 def is_repo_collaborator(repo_obj, refname, username=None, session=None):
-    """ Return whether the user has commit on the specified branch of the
-    provided repo. """
+    """Return whether the user has commit on the specified branch of the
+    provided repo."""
     committer = is_repo_committer(repo_obj, username=username, session=session)
     if committer:
         _log.debug("User is a committer")
@@ -349,8 +348,8 @@ def is_repo_user(repo_obj, username=None):
 
 
 def get_user_repo_access(repo_obj, username):
-    """ return a string of the highest level of access
-        a user has on a repo.
+    """return a string of the highest level of access
+    a user has on a repo.
     """
     if repo_obj.user.username == username:
         return "main admin"
@@ -368,7 +367,7 @@ def get_user_repo_access(repo_obj, username):
 
 
 def login_required(function):
-    """ Flask decorator to retrict access to logged in user.
+    """Flask decorator to retrict access to logged in user.
     If the auth system is ``fas`` it will also require that the user sign
     the FPCA.
     """
@@ -400,7 +399,7 @@ def login_required(function):
 
 
 def __get_file_in_tree(repo_obj, tree, filepath, bail_on_tree=False):
-    """ Retrieve the entry corresponding to the provided filename in a
+    """Retrieve the entry corresponding to the provided filename in a
     given tree.
     """
 
@@ -643,7 +642,7 @@ ssh_urlpattern = re.compile(ssh_urlregex)
 
 
 def get_repo_path(repo):
-    """ Return the path of the git repository corresponding to the provided
+    """Return the path of the git repository corresponding to the provided
     Repository object from the DB.
     """
     repopath = repo.repopath("main")
@@ -654,7 +653,7 @@ def get_repo_path(repo):
 
 
 def get_remote_repo_path(remote_git, branch_from, ignore_non_exist=False):
-    """ Return the path of the remote git repository corresponding to the
+    """Return the path of the remote git repository corresponding to the
     provided information.
     """
     repopath = os.path.join(
@@ -725,7 +724,7 @@ def split_project_fullname(project_name):
 
 
 def get_parent_repo_path(repo, repotype="main"):
-    """ Return the path of the parent git repository corresponding to the
+    """Return the path of the parent git repository corresponding to the
     provided Repository object from the DB.
     """
     if repo.parent:
@@ -754,7 +753,7 @@ def is_true(value, trueish=("1", "true", "t", "y")):
 
 
 def validate_date(input_date, allow_empty=False):
-    """ Validate a given time.
+    """Validate a given time.
     The time can either be given as an unix timestamp or using the
     yyyy-mm-dd format.
     If either fail to parse, we raise a 400 error
@@ -779,7 +778,7 @@ def validate_date(input_date, allow_empty=False):
 
 
 def validate_date_range(value):
-    """ Validate a given date range specified using the format since..until.
+    """Validate a given date range specified using the format since..until.
     If .. is not present in the range, it is assumed that only since was
     provided.
     """
@@ -837,7 +836,7 @@ def get_merge_options(request, merge_status):
 
 
 def lookup_deploykey(project, username):
-    """ Finds the Deploy Key specified by the username.
+    """Finds the Deploy Key specified by the username.
 
     Args:
         project (model.Project): The project to look in
@@ -862,7 +861,7 @@ def lookup_deploykey(project, username):
 
 
 def project_has_hook_attr_value(project, hook, attr, value):
-    """ Finds out if project's hook has attribute of given value.
+    """Finds out if project's hook has attribute of given value.
 
     :arg project: The project to inspect
     :type project: pagure.lib.model.Project

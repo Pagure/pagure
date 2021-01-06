@@ -136,8 +136,7 @@ class PagureFlaskPrIssueLinkTest(tests.Modeltests):
         self.assertEqual(request.id, 3)
 
     def test_ticket_no_link(self):
-        """ Test that no Related PR(s) block is showing in the issue page.
-        """
+        """Test that no Related PR(s) block is showing in the issue page."""
         output = self.app.get("/test/issue/1")
         self.assertEqual(output.status_code, 200)
         self.assertNotIn(
@@ -145,15 +144,13 @@ class PagureFlaskPrIssueLinkTest(tests.Modeltests):
         )
 
     def test_ticket_link(self):
-        """ Test that a Related PR(s) block is showing in the issue page.
-        """
+        """Test that a Related PR(s) block is showing in the issue page."""
         output = self.app.get("/test/issue/2")
         self.assertEqual(output.status_code, 200)
         self.assertIn("Related Pull Requests", output.get_data(as_text=True))
 
     def test_pr_link_issue_list(self):
-        """ Test that the related PR(s) shows in the page listing issues
-        """
+        """Test that the related PR(s) shows in the page listing issues"""
         output = self.app.get("/test/issues")
         self.assertEqual(output.status_code, 200)
         self.assertIn(

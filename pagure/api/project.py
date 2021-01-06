@@ -3026,8 +3026,7 @@ def api_get_project_webhook_token(repo, username=None, namespace=None):
 
 
 def _check_value(value):
-    """ Convert the provided value into a boolean, an int or leave it as it.
-    """
+    """Convert the provided value into a boolean, an int or leave it as it."""
     if str(value).lower() in ["true"]:
         value = True
     elif str(value).lower() in ["false"]:

@@ -104,7 +104,7 @@ class PagureFlaskDocstests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 404)
 
     def test_view_docs_project_no_git(self):
-        """ Test the view_docs endpoint with a project that has no
+        """Test the view_docs endpoint with a project that has no
         corresponding git repo.
         """
         tests.create_projects(self.session)
@@ -128,7 +128,7 @@ class PagureFlaskDocstests(tests.SimplePagureTest):
         )
 
     def test_view_docs_project_no_docs(self):
-        """ Test the view_docs endpoint with a project that disabled the
+        """Test the view_docs endpoint with a project that disabled the
         docs.
         """
         tests.create_projects(self.session)

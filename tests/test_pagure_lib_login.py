@@ -107,8 +107,7 @@ class PagureLibLogintests(tests.Modeltests):
         )
 
     def test_unicode_required(self):
-        """ Test to check for non-ascii password
-        """
+        """Test to check for non-ascii password"""
         self.assertRaises(
             ValueError,
             pagure.lib.login.generate_hashed_value,

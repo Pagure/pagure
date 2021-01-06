@@ -25,8 +25,7 @@ import tests  # noqa
 
 
 class PagureFlaskIssuesPrivatetests(tests.Modeltests):
-    """ Tests for flask issues controller of pagure with private tickets
-    """
+    """Tests for flask issues controller of pagure with private tickets"""
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def setUp(self):
@@ -86,8 +85,7 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
         )
 
     def test_issue_list_admin(self):
-        """ Test the list of issues when user is an admin of the project.
-        """
+        """Test the list of issues when user is an admin of the project."""
 
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
@@ -101,8 +99,7 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
             )
 
     def test_issue_list_author(self):
-        """ Test the list of issues when user is an admin of the project.
-        """
+        """Test the list of issues when user is an admin of the project."""
 
         user = tests.FakeUser(username="foo")
         with tests.user_set(self.app.application, user):
@@ -116,7 +113,7 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
             )
 
     def test_issue_list_authenticated(self):
-        """ Test the list of issues when user is authenticated but has no
+        """Test the list of issues when user is authenticated but has no
         special access to the project.
         """
 
@@ -132,7 +129,7 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
             )
 
     def test_issue_list_authenticated_ticket(self):
-        """ Test the list of issues when user is authenticated but has
+        """Test the list of issues when user is authenticated but has
         ticket level access to the project.
         """
         repo = pagure.lib.query._get_project(self.session, "test")
@@ -158,7 +155,7 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
             )
 
     def test_issue_list_authenticated_commit(self):
-        """ Test the list of issues when user is authenticated but has
+        """Test the list of issues when user is authenticated but has
         commit level access to the project.
         """
         repo = pagure.lib.query._get_project(self.session, "test")
@@ -184,7 +181,7 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
             )
 
     def test_issue_list_authenticated_assigned(self):
-        """ Test the list of issues when user is authenticated and is
+        """Test the list of issues when user is authenticated and is
         assigned to one of the issue.
         """
 
@@ -212,7 +209,7 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
     def test_view_issue_admin(self):
-        """ Test accessing a private ticket when user is an admin of the
+        """Test accessing a private ticket when user is an admin of the
         project.
         """
 
@@ -232,8 +229,7 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
             )
 
     def test_view_issue_author(self):
-        """ Test accessing a private ticket when user opened the ticket.
-        """
+        """Test accessing a private ticket when user opened the ticket."""
 
         user = tests.FakeUser(username="foo")
         with tests.user_set(self.app.application, user):
@@ -251,7 +247,7 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
             )
 
     def test_view_issue_authenticated(self):
-        """ Test accessing a private ticket when user is authenticated but
+        """Test accessing a private ticket when user is authenticated but
         has no special access to the project.
         """
 
@@ -261,7 +257,7 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
     def test_view_issue_authenticated_ticket(self):
-        """ Test accessing a private ticket when user is authenticated and
+        """Test accessing a private ticket when user is authenticated and
         has ticket level access to the project.
         """
         repo = pagure.lib.query._get_project(self.session, "test")
@@ -281,7 +277,7 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
     def test_view_issue_authenticated_commit(self):
-        """ Test accessing a private ticket when user is authenticated and
+        """Test accessing a private ticket when user is authenticated and
         has commit level access to the project.
         """
         repo = pagure.lib.query._get_project(self.session, "test")
@@ -311,7 +307,7 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
             )
 
     def test_view_issue_authenticated_assigned(self):
-        """ Test accessing a private ticket when user is authenticated and
+        """Test accessing a private ticket when user is authenticated and
         is assigned to one of the issue.
         """
 

@@ -56,8 +56,8 @@ class TestStarProjectUI(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 404)
 
     def test_star_project_no_csrf(self):
-        """ Test the star_project endpoint for the case when there
-        is no CSRF token given """
+        """Test the star_project endpoint for the case when there
+        is no CSRF token given"""
 
         user = tests.FakeUser()
         user.username = "pingou"

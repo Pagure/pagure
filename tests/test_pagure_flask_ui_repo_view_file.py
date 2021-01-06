@@ -223,7 +223,7 @@ class PagureFlaskRepoViewFiletests(LocalBasetests):
         )
 
     def test_view_file_fork_and_edit_logged_out(self):
-        """ Test the view_file fork and edit button presence when logged
+        """Test the view_file fork and edit button presence when logged
         out.
         """
 
@@ -244,7 +244,7 @@ class PagureFlaskRepoViewFiletests(LocalBasetests):
         )
 
     def test_view_file_fork_and_edit_logged_in(self):
-        """ Test the view_file fork and edit button presence when logged
+        """Test the view_file fork and edit button presence when logged
         in.
         """
 
@@ -360,8 +360,7 @@ class PagureFlaskRepoViewFileForktests(LocalBasetests):
         )
 
     def test_view_file_fork_and_edit_on_your_fork(self):
-        """ Test the view_file on a text file on your fork when logged in.
-        """
+        """Test the view_file on a text file on your fork when logged in."""
 
         # logged in, but it's your own fork, so just edit button is there
         user = tests.FakeUser(username="pingou")
@@ -382,7 +381,7 @@ class PagureFlaskRepoViewFileForktests(LocalBasetests):
             )
 
     def test_view_file_fork_and_edit_on_a_fork(self):
-        """ Test the view_file on a text file on somone else's fork when
+        """Test the view_file on a text file on somone else's fork when
         logged in.
         """
 
@@ -406,7 +405,7 @@ class PagureFlaskRepoViewFileForktests(LocalBasetests):
             )
 
     def test_view_file_fork_and_edit_on_project(self):
-        """ Test the view_file on a text file on somone else's fork when
+        """Test the view_file on a text file on somone else's fork when
         logged in.
         """
 

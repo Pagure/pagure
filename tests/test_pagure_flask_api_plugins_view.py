@@ -25,12 +25,10 @@ import tests  # noqa: E402
 
 
 class PagureFlaskApiPluginViewtests(tests.Modeltests):
-    """ Tests for the flask API of pagure for viewing plugins
-    """
+    """Tests for the flask API of pagure for viewing plugins"""
 
     def test_view_plugin(self):
-        """ Test viewing every plugin available in pagure.
-        """
+        """Test viewing every plugin available in pagure."""
 
         output = self.app.get("/api/0/_plugins")
         self.assertEqual(output.status_code, 200)
@@ -76,8 +74,7 @@ class PagureFlaskApiPluginViewtests(tests.Modeltests):
 
     @patch.dict("pagure.config.config", {"DISABLED_PLUGINS": ["IRC"]})
     def test_view_plugin_disabled(self):
-        """ Test viewing every plugin available in pagure with one plugin disabled.
-        """
+        """Test viewing every plugin available in pagure with one plugin disabled."""
 
         output = self.app.get("/api/0/_plugins")
         self.assertEqual(output.status_code, 200)

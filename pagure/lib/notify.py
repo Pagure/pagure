@@ -206,7 +206,7 @@ def mqtt_publish(topic, message):
 
 
 def log(project, topic, msg, webhook=True):
-    """ This is the place where we send notifications to user about actions
+    """This is the place where we send notifications to user about actions
     occuring in pagure.
     """
 
@@ -246,7 +246,7 @@ def log(project, topic, msg, webhook=True):
 
 
 def _add_mentioned_users(emails, comment):
-    """ Check the comment to see if an user is mentioned in it and if
+    """Check the comment to see if an user is mentioned in it and if
     so add this user to the list of people to notify.
     """
     filtered_comment = re.sub(
@@ -260,7 +260,7 @@ def _add_mentioned_users(emails, comment):
 
 
 def _clean_emails(emails, user):
-    """ Remove the email of the user doing the action if it is in the list.
+    """Remove the email of the user doing the action if it is in the list.
 
     This avoids receiving emails about action you do.
     """
@@ -278,7 +278,7 @@ def _clean_emails(emails, user):
 
 
 def _get_emails_for_obj(obj):
-    """ Return the list of emails to send notification to when notifying
+    """Return the list of emails to send notification to when notifying
     about the specified issue or pull-request.
     """
     emails = set()
@@ -390,7 +390,7 @@ def _build_url(*args):
 
 
 def _fullname_to_url(fullname):
-    """ For forked projects, fullname is 'forks/user/...' but URL is
+    """For forked projects, fullname is 'forks/user/...' but URL is
     'fork/user/...'. This is why we can't have nice things.
     """
     if fullname.startswith("forks/"):
@@ -409,7 +409,7 @@ def send_email(
     reporter=None,
     assignee=None,
 ):  # pragma: no cover
-    """ Send an email with the specified information.
+    """Send an email with the specified information.
 
     :arg text: the content of the email to send
     :type text: unicode
@@ -529,7 +529,9 @@ def send_email(
                 keyfile = pagure_config.get("SMTP_KEYFILE") or None
                 certfile = pagure_config.get("SMTP_CERTFILE") or None
                 respcode, _ = smtp.starttls(
-                    keyfile=keyfile, certfile=certfile, context=context,
+                    keyfile=keyfile,
+                    certfile=certfile,
+                    context=context,
                 )
                 if respcode != 220:
                     _log.warning(
@@ -555,7 +557,7 @@ def send_email(
 
 
 def notify_new_comment(comment, user=None):
-    """ Notify the people following an issue that a new comment was added
+    """Notify the people following an issue that a new comment was added
     to the issue.
     """
 
@@ -601,7 +603,7 @@ def notify_new_comment(comment, user=None):
 
 
 def notify_new_issue(issue, user=None):
-    """ Notify the people following a project that a new issue was added
+    """Notify the people following a project that a new issue was added
     to it.
     """
     text = """
@@ -643,8 +645,7 @@ def notify_new_issue(issue, user=None):
 
 
 def notify_assigned_issue(issue, new_assignee, user):
-    """ Notify the people following an issue that the assignee changed.
-    """
+    """Notify the people following an issue that the assignee changed."""
     action = "reset"
     if new_assignee:
         action = "assigned to `%s`" % new_assignee.user
@@ -688,8 +689,7 @@ The issue: `%s` of project: `%s` has been %s by %s.
 
 
 def notify_status_change_issue(issue, user):
-    """ Notify the people following a project that an issue changed status.
-    """
+    """Notify the people following a project that an issue changed status."""
     status = issue.status
     if status.lower() != "open" and issue.close_status:
         status = "%s as %s" % (status, issue.close_status)
@@ -729,8 +729,7 @@ The status of the issue: `%s` of project: `%s` has been updated to: %s by %s.
 
 
 def notify_meta_change_issue(issue, user, msg):
-    """ Notify that a custom field changed
-    """
+    """Notify that a custom field changed"""
     text = """
 `%s` updated issue.
 
@@ -766,8 +765,7 @@ def notify_meta_change_issue(issue, user, msg):
 
 
 def notify_assigned_request(request, new_assignee, user):
-    """ Notify the people following a pull-request that the assignee changed.
-    """
+    """Notify the people following a pull-request that the assignee changed."""
     action = "reset"
     if new_assignee:
         action = "assigned to `%s`" % new_assignee.user
@@ -811,7 +809,7 @@ The pull-request: `%s` of project: `%s` has been %s by %s.
 
 
 def notify_new_pull_request(request):
-    """ Notify the people following a project that a new pull-request was
+    """Notify the people following a project that a new pull-request was
     added to it.
     """
     text = """
@@ -851,7 +849,7 @@ def notify_new_pull_request(request):
 
 
 def notify_merge_pull_request(request, user):
-    """ Notify the people following a project that a pull-request was merged
+    """Notify the people following a project that a pull-request was merged
     in it.
     """
     text = """
@@ -895,7 +893,7 @@ Merged pull-request:
 
 
 def notify_reopen_pull_request(request, user):
-    """ Notify the people following a project that a closed pull-request
+    """Notify the people following a project that a closed pull-request
     has been reopened.
     """
     text = """
@@ -939,7 +937,7 @@ Reopened pull-request:
 
 
 def notify_closed_pull_request(request, user):
-    """ Notify the people following a project that a pull-request was
+    """Notify the people following a project that a pull-request was
     closed in it.
     """
     text = """
@@ -984,7 +982,7 @@ Closed pull-request:
 
 
 def notify_pull_request_comment(comment, user):
-    """ Notify the people following a pull-request that a new comment was
+    """Notify the people following a pull-request that a new comment was
     added to it.
     """
     text = """
@@ -1031,7 +1029,7 @@ def notify_pull_request_comment(comment, user):
 
 
 def notify_pull_request_flag(flag, request, user):
-    """ Notify the people following a pull-request that a new flag was
+    """Notify the people following a pull-request that a new flag was
     added to it.
     """
     text = """
@@ -1068,8 +1066,7 @@ def notify_pull_request_flag(flag, request, user):
 
 
 def notify_new_email(email, user):
-    """ Ask the user to confirm to the email belong to them.
-    """
+    """Ask the user to confirm to the email belong to them."""
 
     root_url = pagure_config.get("APP_URL", flask.request.url_root)
 
@@ -1103,7 +1100,7 @@ Your pagure admin.
 
 
 def notify_new_commits(abspath, project, branch, commits):
-    """ Notify the people following a project's commits that new commits have
+    """Notify the people following a project's commits that new commits have
     been added.
     """
     # string note: abspath, project and branch can only contain ASCII
@@ -1160,7 +1157,7 @@ To view more about the commits, visit:
 
 
 def notify_commit_flag(flag, user):
-    """ Notify the people following a project that a new flag was added
+    """Notify the people following a project that a new flag was added
     to one of its commit.
     """
     text = """

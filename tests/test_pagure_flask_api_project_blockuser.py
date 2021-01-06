@@ -79,8 +79,7 @@ class PagureFlaskApiProjectBlockuserTests(tests.SimplePagureTest):
         super(PagureFlaskApiProjectBlockuserTests, self).tearDown()
 
     def test_api_blockuser_no_token(self):
-        """ Test api_project_block_user method when no token is provided.
-        """
+        """Test api_project_block_user method when no token is provided."""
 
         # No token
         output = self.app.post("/api/0/test/blockuser")
@@ -98,8 +97,7 @@ class PagureFlaskApiProjectBlockuserTests(tests.SimplePagureTest):
         )
 
     def test_api_blockuser_invalid_token(self):
-        """ Test api_project_block_user method when the token provided is invalid.
-        """
+        """Test api_project_block_user method when the token provided is invalid."""
 
         headers = {"Authorization": "token aaabbbcccd"}
 
@@ -119,8 +117,7 @@ class PagureFlaskApiProjectBlockuserTests(tests.SimplePagureTest):
         )
 
     def test_api_blockuser_no_data(self):
-        """ Test api_project_block_user method when no data is provided.
-        """
+        """Test api_project_block_user method when no data is provided."""
 
         headers = {"Authorization": "token aaabbbcccddd"}
 
@@ -131,7 +128,7 @@ class PagureFlaskApiProjectBlockuserTests(tests.SimplePagureTest):
         self.assertDictEqual(data, {"message": "User(s) blocked"})
 
     def test_api_blockuser_invalid_user(self):
-        """ Test api_project_block_user method when the data provided includes
+        """Test api_project_block_user method when the data provided includes
         an invalid username.
         """
 
@@ -149,7 +146,7 @@ class PagureFlaskApiProjectBlockuserTests(tests.SimplePagureTest):
         )
 
     def test_api_blockuser_insufficient_rights(self):
-        """ Test api_project_block_user method when the user doing the action
+        """Test api_project_block_user method when the user doing the action
         does not have admin priviledges.
         """
 
@@ -172,8 +169,7 @@ class PagureFlaskApiProjectBlockuserTests(tests.SimplePagureTest):
         )
 
     def test_api_blockuser_with_data(self):
-        """ Test api_pull_request_assign method when the project doesn't exist.
-        """
+        """Test api_pull_request_assign method when the project doesn't exist."""
         self.blocked_users = ["foo"]
 
         headers = {"Authorization": "token aaabbbcccddd"}
@@ -199,8 +195,7 @@ class PagureFlaskApiProjectBlockuserTests(tests.SimplePagureTest):
         self.assertDictEqual(data, {"message": "User(s) blocked"})
 
     def test_api_blockeduser_api(self):
-        """ Test doing a POST request to the API when the user is blocked.
-        """
+        """Test doing a POST request to the API when the user is blocked."""
         self.blocked_users = ["pingou"]
 
         headers = {"Authorization": "token aaabbbcccddd"}
@@ -232,8 +227,7 @@ class PagureFlaskApiProjectBlockuserTests(tests.SimplePagureTest):
         )
 
     def test_ui_new_issue_user_blocked(self):
-        """ Test doing a POST request to the UI when the user is blocked.
-        """
+        """Test doing a POST request to the UI when the user is blocked."""
 
         user = tests.FakeUser(username="foo")
         with tests.user_set(self.app.application, user):

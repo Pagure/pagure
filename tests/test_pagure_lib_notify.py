@@ -500,8 +500,8 @@ RW1haWwgY29udGVudA==
     @patch.dict("pagure.config.config", {"EVENTSOURCE_SOURCE": None})
     @patch("pagure.lib.notify.smtplib.SMTP")
     def test_send_email_no_reply_to(self, mock_smtp):
-        """ Test the send_email method from pagure.lib.notify when there
-        should not be a Reply-To header even if mail_id is defined. """
+        """Test the send_email method from pagure.lib.notify when there
+        should not be a Reply-To header even if mail_id is defined."""
         mock_smtp.return_value = MagicMock()
 
         email = pagure.lib.notify.send_email(

@@ -101,8 +101,7 @@ class PagureFlaskApiForkUpdatetests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 200)
 
     def test_api_pull_request_update_invalid_project_namespace(self):
-        """ Test api_pull_request_update method when the project doesn't exist.
-        """
+        """Test api_pull_request_update method when the project doesn't exist."""
 
         headers = {"Authorization": "token aaabbbcccddd"}
 
@@ -123,8 +122,7 @@ class PagureFlaskApiForkUpdatetests(tests.SimplePagureTest):
         )
 
     def test_api_pull_request_update_invalid_project(self):
-        """ Test api_pull_request_update method when the project doesn't exist.
-        """
+        """Test api_pull_request_update method when the project doesn't exist."""
 
         headers = {"Authorization": "token aaabbbcccddd"}
 
@@ -137,7 +135,7 @@ class PagureFlaskApiForkUpdatetests(tests.SimplePagureTest):
         )
 
     def test_api_pull_request_update_invalid_project_token(self):
-        """ Test api_pull_request_update method when the token doesn't correspond
+        """Test api_pull_request_update method when the token doesn't correspond
         to the project.
         """
 
@@ -154,8 +152,7 @@ class PagureFlaskApiForkUpdatetests(tests.SimplePagureTest):
         )
 
     def test_api_pull_request_update_invalid_pr(self):
-        """ Test api_assign_pull_request method when asking for an invalid PR
-        """
+        """Test api_assign_pull_request method when asking for an invalid PR"""
 
         headers = {"Authorization": "token aaabbbcccddd"}
 
@@ -168,8 +165,7 @@ class PagureFlaskApiForkUpdatetests(tests.SimplePagureTest):
         )
 
     def test_api_pull_request_update_no_input(self):
-        """ Test api_assign_pull_request method when no input is specified
-        """
+        """Test api_assign_pull_request method when no input is specified"""
 
         headers = {"Authorization": "token aaabbbcccddd"}
 
@@ -187,8 +183,7 @@ class PagureFlaskApiForkUpdatetests(tests.SimplePagureTest):
         )
 
     def test_api_pull_request_update_insufficient_input(self):
-        """ Test api_assign_pull_request method when no input is specified
-        """
+        """Test api_assign_pull_request method when no input is specified"""
 
         headers = {"Authorization": "token aaabbbcccddd"}
         data = {"initial_comment": "will not work"}
@@ -209,8 +204,7 @@ class PagureFlaskApiForkUpdatetests(tests.SimplePagureTest):
         )
 
     def test_api_pull_request_update_edited(self):
-        """ Test api_assign_pull_request method when with valid input
-        """
+        """Test api_assign_pull_request method when with valid input"""
 
         headers = {"Authorization": "token aaabbbcccddd"}
 
@@ -390,8 +384,7 @@ class PagureFlaskApiForkUpdatetests(tests.SimplePagureTest):
         )
 
     def test_api_pull_request_update_edited_no_comment(self):
-        """ Test api_assign_pull_request method when with valid input
-        """
+        """Test api_assign_pull_request method when with valid input"""
 
         headers = {"Authorization": "token aaabbbcccddd"}
 
@@ -568,8 +561,7 @@ class PagureFlaskApiForkUpdatetests(tests.SimplePagureTest):
         )
 
     def test_api_pull_request_update_edited_linked(self):
-        """ Test api_assign_pull_request method when with valid input
-        """
+        """Test api_assign_pull_request method when with valid input"""
         project = pagure.lib.query.get_authorized_project(self.session, "test")
         self.assertEqual(len(project.requests), 1)
         self.assertEqual(len(project.requests[0].related_issues), 0)

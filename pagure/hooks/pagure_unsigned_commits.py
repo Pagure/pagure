@@ -30,7 +30,7 @@ _config = pagure.config.reload_config()
 
 
 class PagureUnsignedCommitTable(BASE):
-    """ Stores information about the pagure hook deployed on a project.
+    """Stores information about the pagure hook deployed on a project.
 
     Table -- hook_pagure_unsigned_commit
     """
@@ -66,7 +66,7 @@ class PagureUnsignerRunner(BaseRunner):
 
     @staticmethod
     def pre_receive(session, username, project, repotype, repodir, changes):
-        """ Run the pre-receive tasks of a hook.
+        """Run the pre-receive tasks of a hook.
 
         For args, see BaseRunner.runhook.
         """

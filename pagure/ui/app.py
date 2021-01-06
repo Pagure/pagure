@@ -40,7 +40,7 @@ _log = logging.getLogger(__name__)
 
 
 def _filter_acls(repos, acl, user):
-    """ Filter the given list of repositories to return only the ones where
+    """Filter the given list of repositories to return only the ones where
     the user has the specified acl.
     """
     if acl.lower() == "main admin":
@@ -57,8 +57,7 @@ def _filter_acls(repos, acl, user):
 @UI_NS.route("/browse/projects/", endpoint="browse_projects")
 @UI_NS.route("/")
 def index():
-    """ Front page of the application.
-    """
+    """Front page of the application."""
     if (
         authenticated()
         and flask.request.path == "/"
@@ -152,8 +151,7 @@ def get_userdash_common(user):
 @UI_NS.route("/dashboard/projects")
 @login_required
 def userdash_projects():
-    """ User Dashboard page listing projects for the user
-    """
+    """User Dashboard page listing projects for the user"""
     user = _get_user(username=flask.g.fas_user.username)
     userdash_counts, search_data = get_userdash_common(user)
 
@@ -257,8 +255,7 @@ def userdash_projects():
 @UI_NS.route("/dashboard/activity")
 @login_required
 def userdash_activity():
-    """ User Dashboard page listing user activity
-    """
+    """User Dashboard page listing user activity"""
     user = _get_user(username=flask.g.fas_user.username)
     userdash_counts, search_data = get_userdash_common(user)
 
@@ -281,8 +278,7 @@ def userdash_activity():
 @UI_NS.route("/dashboard/groups")
 @login_required
 def userdash_groups():
-    """ User Dashboard page listing a user's groups
-    """
+    """User Dashboard page listing a user's groups"""
     user = _get_user(username=flask.g.fas_user.username)
     userdash_counts, search_data = get_userdash_common(user)
 
@@ -310,8 +306,7 @@ def userdash_groups():
 @UI_NS.route("/dashboard/forks")
 @login_required
 def userdash_forks():
-    """ Forks tab of the user dashboard
-    """
+    """Forks tab of the user dashboard"""
     user = _get_user(username=flask.g.fas_user.username)
     userdash_counts, search_data = get_userdash_common(user)
 
@@ -359,8 +354,7 @@ def userdash_forks():
 @UI_NS.route("/dashboard/watchlist")
 @login_required
 def userdash_watchlist():
-    """ User Dashboard page for a user's watchlist
-    """
+    """User Dashboard page for a user's watchlist"""
 
     watch_list = pagure.lib.query.user_watch_list(
         flask.g.session,
@@ -383,8 +377,7 @@ def userdash_watchlist():
 
 
 def index_auth():
-    """ Front page for authenticated user.
-    """
+    """Front page for authenticated user."""
     user = _get_user(username=flask.g.fas_user.username)
 
     acl = flask.request.args.get("acl", "").strip().lower() or None
@@ -482,8 +475,7 @@ def index_auth():
 @UI_NS.route("/search/")
 @UI_NS.route("/search")
 def search():
-    """ Search this pagure instance for projects or users.
-    """
+    """Search this pagure instance for projects or users."""
     stype = flask.request.args.get("type", "projects")
     term = flask.request.args.get("term")
     page = flask.request.args.get("page", 1)
@@ -517,8 +509,7 @@ def search():
 @UI_NS.route("/users")
 @UI_NS.route("/users/<username>")
 def view_users(username=None):
-    """ Present the list of users.
-    """
+    """Present the list of users."""
     page = flask.request.args.get("page", 1)
     try:
         page = int(page)
@@ -577,8 +568,7 @@ def view_users(username=None):
 @UI_NS.route("/projects/<pattern>")
 @UI_NS.route("/projects/<namespace>/<pattern>")
 def view_projects(pattern=None, namespace=None):
-    """ Present the list of projects.
-    """
+    """Present the list of projects."""
     forks = flask.request.args.get("forks")
     page = flask.request.args.get("page", 1)
 
@@ -678,8 +668,7 @@ def get_userprofile_common(user):
 @UI_NS.route("/user/<username>/")
 @UI_NS.route("/user/<username>")
 def view_user(username):
-    """ Front page of a specific user.
-    """
+    """Front page of a specific user."""
     user = _get_user(username=username)
 
     # public profile, so never show private repos,
@@ -712,8 +701,7 @@ def view_user(username):
 @UI_NS.route("/user/<username>/projects/")
 @UI_NS.route("/user/<username>/projects")
 def userprofile_projects(username):
-    """ Public Profile view of a user's projects.
-    """
+    """Public Profile view of a user's projects."""
     user = _get_user(username=username)
 
     repopage = flask.request.args.get("repopage", 1)
@@ -758,8 +746,7 @@ def userprofile_projects(username):
 @UI_NS.route("/user/<username>/forks/")
 @UI_NS.route("/user/<username>/forks")
 def userprofile_forks(username):
-    """ Public Profile view of a user's forks.
-    """
+    """Public Profile view of a user's forks."""
     user = _get_user(username=username)
 
     forkpage = flask.request.args.get("forkpage", 1)
@@ -804,8 +791,7 @@ def userprofile_forks(username):
 @UI_NS.route("/user2/<username>/")
 @UI_NS.route("/user2/<username>")
 def view_user2(username):
-    """ Front page of a specific user.
-    """
+    """Front page of a specific user."""
     user = _get_user(username=username)
 
     acl = flask.request.args.get("acl", "").strip().lower() or None
@@ -894,8 +880,7 @@ def view_user2(username):
 @UI_NS.route("/user/<username>/requests/")
 @UI_NS.route("/user/<username>/requests")
 def view_user_requests(username):
-    """ Shows the pull-requests for the specified user.
-    """
+    """Shows the pull-requests for the specified user."""
     user = _get_user(username=username)
 
     pr_type = flask.request.args.get("type", "filed").lower()
@@ -1055,8 +1040,7 @@ def userprofile_groups(username):
 @UI_NS.route("/new", methods=("GET", "POST"))
 @login_required
 def new_project():
-    """ Form to create a new project.
-    """
+    """Form to create a new project."""
 
     user = pagure.lib.query.search_user(
         flask.g.session, username=flask.g.fas_user.username
@@ -1178,8 +1162,7 @@ def wait_task(taskid):
 @UI_NS.route("/settings")
 @login_required
 def user_settings():
-    """ Update the user settings.
-    """
+    """Update the user settings."""
     if admin_session_timedout():
         return flask.redirect(
             flask.url_for("auth_login", next=flask.request.url)
@@ -1193,8 +1176,7 @@ def user_settings():
 @UI_NS.route("/settings/usersettings", methods=["POST"])
 @login_required
 def update_user_settings():
-    """ Update the user's settings set in the settings page.
-    """
+    """Update the user's settings set in the settings page."""
     if admin_session_timedout():
         if flask.request.method == "POST":
             flask.flash("Action canceled, try it again", "error")
@@ -1232,8 +1214,7 @@ def update_user_settings():
 @UI_NS.route("/settings/usersettings/addkey", methods=["POST"])
 @login_required
 def add_user_sshkey():
-    """ Add the specified SSH key to the user.
-    """
+    """Add the specified SSH key to the user."""
     if admin_session_timedout():
         if flask.request.method == "POST":
             flask.flash("Action canceled, try it again", "error")
@@ -1289,8 +1270,7 @@ def add_user_sshkey():
 @UI_NS.route("/settings/usersettings/removekey/<int:keyid>", methods=["POST"])
 @login_required
 def remove_user_sshkey(keyid):
-    """ Removes an SSH key from the user.
-    """
+    """Removes an SSH key from the user."""
     if admin_session_timedout():
         if flask.request.method == "POST":
             flask.flash("Action canceled, try it again", "error")
@@ -1342,7 +1322,7 @@ def remove_user_sshkey(keyid):
 
 @UI_NS.route("/markdown/", methods=["POST"])
 def markdown_preview():
-    """ Return the provided markdown text in html.
+    """Return the provided markdown text in html.
 
     The text has to be provided via the parameter 'content' of a POST query.
     """
@@ -1356,8 +1336,7 @@ def markdown_preview():
 @UI_NS.route("/settings/email/drop", methods=["POST"])
 @login_required
 def remove_user_email():
-    """ Remove the specified email from the logged in user.
-    """
+    """Remove the specified email from the logged in user."""
     if admin_session_timedout():
         return flask.redirect(
             flask.url_for("auth_login", next=flask.request.url)
@@ -1401,8 +1380,7 @@ def remove_user_email():
 @UI_NS.route("/settings/email/add", methods=["GET", "POST"])
 @login_required
 def add_user_email():
-    """ Add a new email for the logged in user.
-    """
+    """Add a new email for the logged in user."""
     if admin_session_timedout():
         return flask.redirect(
             flask.url_for("auth_login", next=flask.request.url)
@@ -1436,8 +1414,7 @@ def add_user_email():
 @UI_NS.route("/settings/email/default", methods=["POST"])
 @login_required
 def set_default_email():
-    """ Set the default email address of the user.
-    """
+    """Set the default email address of the user."""
     if admin_session_timedout():
         return flask.redirect(
             flask.url_for("auth_login", next=flask.request.url)
@@ -1474,8 +1451,7 @@ def set_default_email():
 @UI_NS.route("/settings/email/resend", methods=["POST"])
 @login_required
 def reconfirm_email():
-    """ Re-send the email address of the user.
-    """
+    """Re-send the email address of the user."""
     if admin_session_timedout():
         return flask.redirect(
             flask.url_for("auth_login", next=flask.request.url)
@@ -1504,8 +1480,7 @@ def reconfirm_email():
 @UI_NS.route("/settings/email/confirm/<token>/")
 @UI_NS.route("/settings/email/confirm/<token>")
 def confirm_email(token):
-    """ Confirm a new email.
-    """
+    """Confirm a new email."""
     if admin_session_timedout():
         return flask.redirect(
             flask.url_for("auth_login", next=flask.request.url)
@@ -1540,7 +1515,7 @@ def confirm_email(token):
 @UI_NS.route("/ssh_info/")
 @UI_NS.route("/ssh_info")
 def ssh_hostkey():
-    """ Endpoint returning information about the SSH hostkey and fingerprint
+    """Endpoint returning information about the SSH hostkey and fingerprint
     of the current pagure instance.
     """
     return flask.render_template("doc_ssh_keys.html")
@@ -1550,8 +1525,7 @@ def ssh_hostkey():
 @UI_NS.route("/settings/token/new", methods=("GET", "POST"))
 @login_required
 def add_api_user_token():
-    """ Create an user token (not project specific).
-    """
+    """Create an user token (not project specific)."""
     if admin_session_timedout():
         if flask.request.method == "POST":
             flask.flash("Action canceled, try it again", "error")
@@ -1602,8 +1576,7 @@ def add_api_user_token():
 @UI_NS.route("/settings/token/revoke/<token_id>", methods=["POST"])
 @login_required
 def revoke_api_user_token(token_id):
-    """ Revoke a user token (ie: not project specific).
-    """
+    """Revoke a user token (ie: not project specific)."""
     if admin_session_timedout():
         flask.flash("Action canceled, try it again", "error")
         url = flask.url_for(".user_settings")
@@ -1639,8 +1612,7 @@ def revoke_api_user_token(token_id):
 @UI_NS.route("/settings/token/renew/<token_id>", methods=["POST"])
 @login_required
 def renew_api_user_token(token_id):
-    """ Renew a user token (ie: not project specific).
-    """
+    """Renew a user token (ie: not project specific)."""
     if admin_session_timedout():
         flask.flash("Action canceled, try it again", "error")
         url = flask.url_for(".user_settings")
@@ -1684,8 +1656,7 @@ def renew_api_user_token(token_id):
 @UI_NS.route("/settings/forcelogout", methods=("POST",))
 @login_required
 def force_logout():
-    """ Set refuse_sessions_before, logging the user out everywhere
-    """
+    """Set refuse_sessions_before, logging the user out everywhere"""
     if admin_session_timedout():
         flask.flash("Action canceled, try it again", "error")
         return flask.redirect(
@@ -1707,7 +1678,7 @@ def force_logout():
 @UI_NS.route("/about")
 @UI_NS.route("/about/")
 def help():
-    """ A page to direct users to the appropriate places to get assistance,
-        or find basic instance information.
+    """A page to direct users to the appropriate places to get assistance,
+    or find basic instance information.
     """
     return flask.render_template("about.html")

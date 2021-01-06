@@ -32,7 +32,7 @@ from cryptography.hazmat.primitives import constant_time
 
 
 def id_generator(size=15, chars=string.ascii_uppercase + string.digits):
-    """ Generates a random identifier for the given size and using the
+    """Generates a random identifier for the given size and using the
     specified characters.
     If no size is specified, it uses 15 as default.
     If no characters are specified, it uses ascii char upper case and
@@ -45,7 +45,7 @@ def id_generator(size=15, chars=string.ascii_uppercase + string.digits):
 
 
 def get_session_by_visitkey(session, sessionid):
-    """ Return a specified VisitUser via its session identifier (visit_key).
+    """Return a specified VisitUser via its session identifier (visit_key).
 
     :arg session: the session with which to connect to the database.
 
@@ -58,7 +58,7 @@ def get_session_by_visitkey(session, sessionid):
 
 
 def generate_hashed_value(password):
-    """ Generate hash value for password.
+    """Generate hash value for password.
 
     :arg password: password for which the hash has to be generated.
     :type password: str (Python 3) or unicode (Python 2)
@@ -74,7 +74,7 @@ def generate_hashed_value(password):
 
 
 def check_password(entered_password, user_password, seed=None):
-    """ Version checking and returning the password
+    """Version checking and returning the password
 
     :arg entered_password: password entered by the user.
     :type entered_password: str (Python 3) or unicode (Python 2)
@@ -116,7 +116,7 @@ def check_password(entered_password, user_password, seed=None):
 
 
 def check_username_and_password(session, username, password):
-    """ Check if the provided username and password match what is in the
+    """Check if the provided username and password match what is in the
     database and raise an pagure.exceptions.PagureException if that is
     not the case.
     """

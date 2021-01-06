@@ -122,7 +122,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         shutil.rmtree(newpath)
 
     def test_api_git_branches_no_repo(self):
-        """ Test the api_git_branches method of the flask api when there is no
+        """Test the api_git_branches method of the flask api when there is no
         repo on a project.
         """
         tests.create_projects(self.session)
@@ -130,8 +130,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
     def test_api_git_urls(self):
-        """ Test the api_project_git_urls method of the flask api.
-        """
+        """Test the api_project_git_urls method of the flask api."""
         tests.create_projects(self.session)
         output = self.app.get("/api/0/test/git/urls")
         self.assertEqual(output.status_code, 200)
@@ -146,7 +145,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertDictEqual(data, expected_rv)
 
     def test_api_git_urls_no_project(self):
-        """ Test the api_project_git_urls method of the flask api when there is
+        """Test the api_project_git_urls method of the flask api when there is
         no project.
         """
         output = self.app.get("/api/0/test1234/git/urls")
@@ -160,7 +159,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
     @patch.dict("pagure.config.config", {"PRIVATE_PROJECTS": True})
     def test_api_git_urls_private_project(self):
-        """ Test the api_project_git_urls method of the flask api when the
+        """Test the api_project_git_urls method of the flask api when the
         project is private.
         """
         tests.create_projects(self.session)
@@ -187,7 +186,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
     @patch.dict("pagure.config.config", {"PRIVATE_PROJECTS": True})
     def test_api_git_urls_private_project_no_login(self):
-        """ Test the api_project_git_urls method of the flask api when the
+        """Test the api_project_git_urls method of the flask api when the
         project is private and the user is not logged in.
         """
         tests.create_projects(self.session)
@@ -1202,7 +1201,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertDictEqual(data, expected_data)
 
     def test_api_project_group_but_no_group(self):
-        """ Test the api_project method of the flask api when asking for
+        """Test the api_project method of the flask api when asking for
         group details while there are none associated.
         """
         tests.create_projects(self.session)
@@ -1438,8 +1437,8 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertDictEqual(data, expected_data)
 
     def test_api_projects_pagination_per_page(self):
-        """ Test the api_projects method of the flask api with pagination and
-        the `per_page` argument set. """
+        """Test the api_projects method of the flask api with pagination and
+        the `per_page` argument set."""
         tests.create_projects(self.session)
 
         output = self.app.get("/api/0/projects?page=2&per_page=2")
@@ -1520,24 +1519,24 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertDictEqual(data, expected_data)
 
     def test_api_projects_pagination_invalid_page(self):
-        """ Test the api_projects method of the flask api when an invalid page
-        value is entered. """
+        """Test the api_projects method of the flask api when an invalid page
+        value is entered."""
         tests.create_projects(self.session)
 
         output = self.app.get("/api/0/projects?page=-3")
         self.assertEqual(output.status_code, 400)
 
     def test_api_projects_pagination_invalid_page_str(self):
-        """ Test the api_projects method of the flask api when an invalid type
-        for the page value is entered. """
+        """Test the api_projects method of the flask api when an invalid type
+        for the page value is entered."""
         tests.create_projects(self.session)
 
         output = self.app.get("/api/0/projects?page=abcd")
         self.assertEqual(output.status_code, 400)
 
     def test_api_projects_pagination_invalid_per_page_too_low(self):
-        """ Test the api_projects method of the flask api when a per_page
-        value is below 1. """
+        """Test the api_projects method of the flask api when a per_page
+        value is below 1."""
         tests.create_projects(self.session)
 
         output = self.app.get("/api/0/projects?page=1&per_page=0")
@@ -1548,8 +1547,8 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         )
 
     def test_api_projects_pagination_invalid_per_page_too_high(self):
-        """ Test the api_projects method of the flask api when a per_page
-        value is above 100. """
+        """Test the api_projects method of the flask api when a per_page
+        value is above 100."""
         tests.create_projects(self.session)
 
         output = self.app.get("/api/0/projects?page=1&per_page=101")
@@ -1560,16 +1559,16 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         )
 
     def test_api_projects_pagination_invalid_per_page_str(self):
-        """ Test the api_projects method of the flask api when an invalid type
-        for the per_page value is entered. """
+        """Test the api_projects method of the flask api when an invalid type
+        for the per_page value is entered."""
         tests.create_projects(self.session)
 
         output = self.app.get("/api/0/projects?page=1&per_page=abcd")
         self.assertEqual(output.status_code, 400)
 
     def test_api_projects_pagination_beyond_last_page(self):
-        """ Test the api_projects method of the flask api when a page value
-        that is larger than the last page is entered. """
+        """Test the api_projects method of the flask api when a page value
+        that is larger than the last page is entered."""
         tests.create_projects(self.session)
 
         output = self.app.get("/api/0/projects?page=99999")
@@ -1613,8 +1612,8 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         )
 
     def test_api_modify_project_main_admin(self):
-        """ Test the api_modify_project method of the flask api when the
-        request is to change the main_admin of the project. """
+        """Test the api_modify_project method of the flask api when the
+        request is to change the main_admin of the project."""
         tests.create_projects(self.session)
         tests.create_tokens(self.session, project_id=None)
         tests.create_tokens_acl(self.session, "aaabbbcccddd", "modify_project")
@@ -1673,9 +1672,9 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertEqual(data, expected_output)
 
     def test_api_modify_project_main_admin_retain_access(self):
-        """ Test the api_modify_project method of the flask api when the
+        """Test the api_modify_project method of the flask api when the
         request is to change the main_admin of the project and retain_access
-        is true. """
+        is true."""
         tests.create_projects(self.session)
         tests.create_tokens(self.session, project_id=None)
         tests.create_tokens_acl(self.session, "aaabbbcccddd", "modify_project")
@@ -1736,9 +1735,9 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertEqual(data, expected_output)
 
     def test_api_modify_project_main_admin_retain_access_already_user(self):
-        """ Test the api_modify_project method of the flask api when the
+        """Test the api_modify_project method of the flask api when the
         request is to change the main_admin of the project and retain_access
-        is true and the user becoming the main_admin already has access. """
+        is true and the user becoming the main_admin already has access."""
         tests.create_projects(self.session)
         tests.create_tokens(self.session, project_id=None)
         tests.create_tokens_acl(self.session, "aaabbbcccddd", "modify_project")
@@ -1809,8 +1808,8 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertEqual(data, expected_output)
 
     def test_api_modify_project_main_admin_json(self):
-        """ Test the api_modify_project method of the flask api when the
-        request is to change the main_admin of the project using JSON. """
+        """Test the api_modify_project method of the flask api when the
+        request is to change the main_admin of the project using JSON."""
         tests.create_projects(self.session)
         tests.create_tokens(self.session, project_id=None)
         tests.create_tokens_acl(self.session, "aaabbbcccddd", "modify_project")
@@ -1875,9 +1874,9 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
     @patch.dict("pagure.config.config", {"PAGURE_ADMIN_USERS": "foo"})
     def test_api_modify_project_main_admin_as_site_admin(self):
-        """ Test the api_modify_project method of the flask api when the
+        """Test the api_modify_project method of the flask api when the
         request is to change the main_admin of the project and the user is a
-        Pagure site admin. """
+        Pagure site admin."""
         tests.create_projects(self.session)
         tests.create_tokens(self.session, user_id=2, project_id=None)
         tests.create_tokens_acl(self.session, "aaabbbcccddd", "modify_project")
@@ -1946,7 +1945,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertNotEqual(date_before, project.date_modified)
 
     def test_api_modify_project_main_admin_not_main_admin(self):
-        """ Test the api_modify_project method of the flask api when the
+        """Test the api_modify_project method of the flask api when the
         requester is not the main_admin of the project and requests to change
         the main_admin.
         """
@@ -1975,7 +1974,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         )
 
     def test_api_modify_project_not_admin(self):
-        """ Test the api_modify_project method of the flask api when the
+        """Test the api_modify_project method of the flask api when the
         requester is not an admin of the project.
         """
         tests.create_projects(self.session)
@@ -1996,7 +1995,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         )
 
     def test_api_modify_project_invalid_request(self):
-        """ Test the api_modify_project method of the flask api when the
+        """Test the api_modify_project method of the flask api when the
         request data is invalid.
         """
         tests.create_projects(self.session)
@@ -2015,7 +2014,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         )
 
     def test_api_modify_project_invalid_keys(self):
-        """ Test the api_modify_project method of the flask api when the
+        """Test the api_modify_project method of the flask api when the
         request data contains an invalid key.
         """
         tests.create_projects(self.session)
@@ -2036,7 +2035,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         )
 
     def test_api_modify_project_invalid_new_main_admin(self):
-        """ Test the api_modify_project method of the flask api when the
+        """Test the api_modify_project method of the flask api when the
         request is to change the main_admin of the project to a main_admin
         that doesn't exist.
         """
@@ -2579,8 +2578,8 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         )
 
     def test_api_generate_acls_wait_true(self):
-        """ Test the api_generate_acls method of the flask api when wait is
-        set to True """
+        """Test the api_generate_acls method of the flask api when wait is
+        set to True"""
         tests.create_projects(self.session)
         tests.create_tokens(self.session, project_id=None)
         tests.create_tokens_acl(
@@ -2608,8 +2607,8 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertTrue(task_result.get.called)
 
     def test_api_generate_acls_no_project(self):
-        """ Test the api_generate_acls method of the flask api when the project
-        doesn't exist """
+        """Test the api_generate_acls method of the flask api when the project
+        doesn't exist"""
         tests.create_projects(self.session)
         tests.create_tokens(self.session, project_id=None)
         tests.create_tokens_acl(
@@ -2700,8 +2699,8 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertIn("test123", repo_obj.listall_branches())
 
     def test_api_new_git_branch_already_exists(self):
-        """ Test the api_new_branch method of the flask api when branch already
-        exists """
+        """Test the api_new_branch method of the flask api when branch already
+        exists"""
         tests.create_projects(self.session)
         repo_path = os.path.join(self.path, "repos")
         tests.create_projects_git(repo_path, bare=True)
@@ -2745,8 +2744,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
 
 class PagureFlaskApiProjectFlagtests(tests.Modeltests):
-    """ Tests for the flask API of pagure for flagging commit in project
-    """
+    """Tests for the flask API of pagure for flagging commit in project"""
 
     def setUp(self):
         """ Set up the environnment, ran before every tests. """
@@ -3201,7 +3199,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_flag_commit_without_uid(self, mock_email):
-        """ Test flagging a commit with missing info.
+        """Test flagging a commit with missing info.
 
         Also ensure notifications aren't sent when they are not asked for.
         """
@@ -3340,8 +3338,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
         },
     )
     def test_flag_commit_with_custom_flags(self):
-        """ Test flagging when custom flags are set up
-        """
+        """Test flagging when custom flags are set up"""
         repo_obj = pygit2.Repository(self.git_path)
         commit = repo_obj.revparse_single("HEAD")
 
@@ -3473,8 +3470,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
 
 
 class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
-    """ Tests for the flask API of pagure for modifying ACLs in a project
-    """
+    """Tests for the flask API of pagure for modifying ACLs in a project"""
 
     maxDiff = None
 
@@ -3492,8 +3488,8 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
         )
 
     def test_api_modify_acls_no_project(self):
-        """ Test the api_modify_acls method of the flask api when the project
-        doesn't exist """
+        """Test the api_modify_acls method of the flask api when the project
+        doesn't exist"""
         headers = {"Authorization": "token aaabbbcccddd"}
 
         data = {"user_type": "user", "name": "bar", "acl": "commit"}
@@ -3509,8 +3505,8 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
         self.assertEqual(data, expected_output)
 
     def test_api_modify_acls_no_user(self):
-        """ Test the api_modify_acls method of the flask api when the user
-        doesn't exist """
+        """Test the api_modify_acls method of the flask api when the user
+        doesn't exist"""
         headers = {"Authorization": "token aaabbbcccddd"}
 
         data = {"user_type": "user", "name": "nosuchuser", "acl": "commit"}
@@ -3526,8 +3522,8 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
         self.assertEqual(data, expected_output)
 
     def test_api_modify_acls_no_group(self):
-        """ Test the api_modify_acls method of the flask api when the group
-        doesn't exist """
+        """Test the api_modify_acls method of the flask api when the group
+        doesn't exist"""
         headers = {"Authorization": "token aaabbbcccddd"}
 
         data = {"user_type": "group", "name": "nosuchgroup", "acl": "commit"}
@@ -3543,8 +3539,8 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
         self.assertEqual(data, expected_output)
 
     def test_api_modify_acls_no_permission(self):
-        """ Test the api_modify_acls method of the flask api when the user
-        doesn't have permissions """
+        """Test the api_modify_acls method of the flask api when the user
+        doesn't have permissions"""
         item = pagure.lib.model.Token(
             id="foo_token2",
             user_id=2,
@@ -3571,8 +3567,8 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
         self.assertEqual(data, expected_output)
 
     def test_api_modify_acls_neither_user_nor_group(self):
-        """ Test the api_modify_acls method of the flask api when neither
-        user nor group was set """
+        """Test the api_modify_acls method of the flask api when neither
+        user nor group was set"""
         headers = {"Authorization": "token aaabbbcccddd"}
 
         data = {"acl": "commit"}
@@ -3596,8 +3592,8 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
         self.assertEqual(data, expected_output)
 
     def test_api_modify_acls_invalid_acl(self):
-        """ Test the api_modify_acls method of the flask api when the ACL
-        doesn't exist. Must be one of ticket, commit or admin. """
+        """Test the api_modify_acls method of the flask api when the ACL
+        doesn't exist. Must be one of ticket, commit or admin."""
         headers = {"Authorization": "token aaabbbcccddd"}
 
         data = {"user_type": "user", "name": "bar", "acl": "invalidacl"}
@@ -3614,8 +3610,8 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
         self.assertEqual(data, expected_output)
 
     def test_api_modify_acls_user(self):
-        """ Test the api_modify_acls method of the flask api for
-        setting an ACL for a user. """
+        """Test the api_modify_acls method of the flask api for
+        setting an ACL for a user."""
         headers = {"Authorization": "token aaabbbcccddd"}
 
         data = {"user_type": "user", "name": "foo", "acl": "commit"}
@@ -3671,8 +3667,8 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
         self.assertEqual(data, expected_output)
 
     def test_api_modify_acls_group(self):
-        """ Test the api_modify_acls method of the flask api for
-        setting an ACL for a group. """
+        """Test the api_modify_acls method of the flask api for
+        setting an ACL for a group."""
         headers = {"Authorization": "token aaabbbcccddd"}
 
         # Create a group
@@ -3743,8 +3739,8 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
         self.assertEqual(data, expected_output)
 
     def test_api_modify_acls_no_acl(self):
-        """ Test the api_modify_acls method of the flask api when no ACL
-        are specified. """
+        """Test the api_modify_acls method of the flask api when no ACL
+        are specified."""
         headers = {"Authorization": "token aaabbbcccddd"}
 
         project = pagure.lib.query._get_project(self.session, "test")
@@ -3768,9 +3764,9 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
         self.assertEqual(data, expected_output)
 
     def test_api_modify_acls_remove_own_acl_no_access(self):
-        """ Test the api_modify_acls method of the flask api when no ACL
+        """Test the api_modify_acls method of the flask api when no ACL
         are specified, so the user tries to remove their own access but the
-        user is the project owner. """
+        user is the project owner."""
         headers = {"Authorization": "token aaabbbcccddd"}
 
         data = {"user_type": "user", "name": "pingou"}
@@ -3788,9 +3784,9 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
         self.assertEqual(data, expected_output)
 
     def test_api_modify_acls_remove_own_acl_(self):
-        """ Test the api_modify_acls method of the flask api when no ACL
+        """Test the api_modify_acls method of the flask api when no ACL
         are specified, so the user tries to remove their own access but the
-        user is the project owner. """
+        user is the project owner."""
         # Add the user `foo` to the project
         self.test_api_modify_acls_user()
 
@@ -3885,8 +3881,8 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
         )
 
     def test_api_modify_acls_remove_someone_else_acl(self):
-        """ Test the api_modify_acls method of the flask api an admin tries
-        to remove access from someone else. """
+        """Test the api_modify_acls method of the flask api an admin tries
+        to remove access from someone else."""
         # Add the user `foo` to the project
         self.test_api_modify_acls_user()
 
@@ -3966,8 +3962,8 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
         )
 
     def test_api_modify_acls_add_remove_group(self):
-        """ Test the api_modify_acls method of the flask api for
-        setting an ACL for a group. """
+        """Test the api_modify_acls method of the flask api for
+        setting an ACL for a group."""
         headers = {"Authorization": "token aaabbbcccddd"}
 
         # Create a group
@@ -4118,8 +4114,8 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
         )
 
     def test_api_modify_acls_remove_group_not_in_project(self):
-        """ Test the api_modify_acls method of the flask api for
-        setting an ACL for a group. """
+        """Test the api_modify_acls method of the flask api for
+        setting an ACL for a group."""
         headers = {"Authorization": "token aaabbbcccddd"}
 
         # Create a group
@@ -4204,8 +4200,7 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
 
 
 class PagureFlaskApiProjectOptionsTests(tests.Modeltests):
-    """ Tests for the flask API of pagure for modifying options ofs a project
-    """
+    """Tests for the flask API of pagure for modifying options ofs a project"""
 
     maxDiff = None
 
@@ -4285,8 +4280,7 @@ class PagureFlaskApiProjectOptionsTests(tests.Modeltests):
         )
 
     def test_api_modify_project_options_wrong_project(self):
-        """ Test accessing api_modify_project_options w/ an invalid project.
-        """
+        """Test accessing api_modify_project_options w/ an invalid project."""
 
         headers = {"Authorization": "token aaabbbcccddd"}
         output = self.app.post(
@@ -4487,8 +4481,8 @@ class PagureFlaskApiProjectOptionsTests(tests.Modeltests):
         self.assertEqual(after, before)
 
     def test_api_modify_project_options_json(self):
-        """ Test accessing api_modify_project_options w/ auth header and
-        input submitted as JSON instead of HTML arguments. """
+        """Test accessing api_modify_project_options w/ auth header and
+        input submitted as JSON instead of HTML arguments."""
 
         # check before
         headers = {"Authorization": "token aaabbbcccddd"}
@@ -4549,8 +4543,7 @@ class PagureFlaskApiProjectOptionsTests(tests.Modeltests):
 
 
 class PagureFlaskApiProjectCreateAPITokenTests(tests.Modeltests):
-    """ Tests for the flask API of pagure for creating user project API token
-    """
+    """Tests for the flask API of pagure for creating user project API token"""
 
     maxDiff = None
 
@@ -4639,7 +4632,7 @@ class PagureFlaskApiProjectCreateAPITokenTests(tests.Modeltests):
         )
 
     def test_api_createapitoken_as_unauthorized(self):
-        """ Test accessing api_project_create_token as project admin
+        """Test accessing api_project_create_token as project admin
         but with unauthorized token ACL.
         """
 
@@ -4683,7 +4676,7 @@ class PagureFlaskApiProjectCreateAPITokenTests(tests.Modeltests):
         self.assertEqual(output.status_code, 401)
 
     def test_api_createapitoken_as_unauthorized_2(self):
-        """ Test accessing api_project_create_token as project user
+        """Test accessing api_project_create_token as project user
         with unauthorized token ACL.
         """
 
@@ -4728,8 +4721,7 @@ class PagureFlaskApiProjectCreateAPITokenTests(tests.Modeltests):
 
 
 class PagureFlaskApiProjectConnectorTests(tests.Modeltests):
-    """ Tests for the flask API of pagure for getting connector of a project
-    """
+    """Tests for the flask API of pagure for getting connector of a project"""
 
     maxDiff = None
 
@@ -4848,7 +4840,7 @@ class PagureFlaskApiProjectConnectorTests(tests.Modeltests):
         )
 
     def test_api_get_project_connector_as_unauthorized(self):
-        """ Test accessing api_get_project_connector as project admin
+        """Test accessing api_get_project_connector as project admin
         but with unauthorized token ACL
         """
 
@@ -4883,7 +4875,7 @@ class PagureFlaskApiProjectConnectorTests(tests.Modeltests):
         self.assertEqual(output.status_code, 401)
 
     def test_api_get_project_connector_as_unauthorized_2(self):
-        """ Test accessing api_get_project_connector as project
+        """Test accessing api_get_project_connector as project
         but with unauthorized token ACL
         """
 
@@ -4919,8 +4911,7 @@ class PagureFlaskApiProjectConnectorTests(tests.Modeltests):
 
 
 class PagureFlaskApiProjectWebhookTokenTests(tests.Modeltests):
-    """ Tests for the flask API of pagure for getting webhook token of a project
-    """
+    """Tests for the flask API of pagure for getting webhook token of a project"""
 
     maxDiff = None
 
@@ -4998,8 +4989,7 @@ class PagureFlaskApiProjectWebhookTokenTests(tests.Modeltests):
 
 
 class PagureFlaskApiProjectCommitInfotests(tests.Modeltests):
-    """ Tests for the flask API of pagure for commit info
-    """
+    """Tests for the flask API of pagure for commit info"""
 
     def setUp(self):
         """ Set up the environnment, ran before every tests. """
@@ -5059,8 +5049,7 @@ class PagureFlaskApiProjectCommitInfotests(tests.Modeltests):
 
 
 class PagureFlaskApiProjectGitBranchestests(tests.Modeltests):
-    """ Tests for the flask API of pagure for git branches
-    """
+    """Tests for the flask API of pagure for git branches"""
 
     maxDiff = None
 
@@ -5123,13 +5112,15 @@ class PagureFlaskApiProjectGitBranchestests(tests.Modeltests):
                     "pats-win-49": self.commit.hex,
                     "pats-win-51": self.commit.hex,
                 },
-                "default": {"master": self.commit.hex,},
+                "default": {
+                    "master": self.commit.hex,
+                },
                 "total_branches": 3,
             },
         )
 
     def test_api_git_branches_empty_repo(self):
-        """ Test the api_git_branches method of the flask api when the repo is
+        """Test the api_git_branches method of the flask api when the repo is
         empty.
         """
         # Check that no branches show up on the API
@@ -5175,7 +5166,9 @@ class PagureFlaskApiProjectGitBranchestests(tests.Modeltests):
                     "pats-win-49": self.commit.hex,
                     "pats-win-51": self.commit.hex,
                 },
-                "default": {"pats-win-49": self.commit.hex,},
+                "default": {
+                    "pats-win-49": self.commit.hex,
+                },
                 "total_branches": 3,
             },
         )
@@ -5199,7 +5192,9 @@ class PagureFlaskApiProjectGitBranchestests(tests.Modeltests):
                     "pats-win-49": self.commit.hex,
                     "pats-win-51": self.commit.hex,
                 },
-                "default": {"pats-win-49": self.commit.hex,},
+                "default": {
+                    "pats-win-49": self.commit.hex,
+                },
                 "total_branches": 3,
             },
         )
@@ -5228,7 +5223,9 @@ class PagureFlaskApiProjectGitBranchestests(tests.Modeltests):
         headers = {"Authorization": "token aaabbbcccddd"}
         data = {"branch_name": "main"}
         output = self.app.post(
-            "/api/0/test/git/branches", data=data, headers=headers,
+            "/api/0/test/git/branches",
+            data=data,
+            headers=headers,
         )
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.get_data(as_text=True))
@@ -5244,7 +5241,7 @@ class PagureFlaskApiProjectGitBranchestests(tests.Modeltests):
         )
 
     def test_api_set_git_default_branch_empty_repo(self):
-        """ Test the api_git_branches method of the flask api when the repo is
+        """Test the api_git_branches method of the flask api when the repo is
         empty.
         """
         headers = {"Authorization": "token foo_token"}
@@ -5264,8 +5261,7 @@ class PagureFlaskApiProjectGitBranchestests(tests.Modeltests):
 
 
 class PagureFlaskApiProjectCreateProjectTests(tests.Modeltests):
-    """ Tests for the flask API of pagure for git branches
-    """
+    """Tests for the flask API of pagure for git branches"""
 
     maxDiff = None
 
@@ -5561,8 +5557,8 @@ class PagureFlaskApiProjectCreateProjectTests(tests.Modeltests):
 
     @patch.dict("pagure.config.config", {"PRIVATE_PROJECTS": True})
     def test_api_new_project_private(self):
-        """ Test the api_new_project method of the flask api to create
-        a private project. """
+        """Test the api_new_project method of the flask api to create
+        a private project."""
 
         headers = {"Authorization": "token aaabbbcccddd"}
 

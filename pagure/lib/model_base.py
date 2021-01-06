@@ -34,7 +34,7 @@ SESSIONMAKER = None
 
 
 def create_session(db_url=None, debug=False, pool_recycle=3600):
-    """ Create the Session object to use to query the database.
+    """Create the Session object to use to query the database.
 
     :arg db_url: URL used to connect to the database. The URL contains
     information with regards to the database engine, the host to connect

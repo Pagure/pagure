@@ -54,12 +54,12 @@ WATCH = {
 
 
 def _parser_refresh_gitolite(subparser):
-    """ Set up the CLI argument parser for the refresh-gitolite action.
+    """Set up the CLI argument parser for the refresh-gitolite action.
 
     :arg subparser: an argparse subparser allowing to have action's specific
         arguments
 
-     """
+    """
     local_parser = subparser.add_parser(
         "refresh-gitolite", help="Re-generate the gitolite config file"
     )
@@ -83,7 +83,7 @@ def _parser_refresh_gitolite(subparser):
 
 
 def _parser_refresh_ssh(subparser):
-    """ Set up the CLI argument parser for the refresh-ssh action.
+    """Set up the CLI argument parser for the refresh-ssh action.
 
     :arg subparser: an argparse subparser allowing to have action's specific
         arguments
@@ -97,7 +97,7 @@ def _parser_refresh_ssh(subparser):
 
 
 def _parser_clear_hook_token(subparser):
-    """ Set up the CLI argument parser for the clear-hook-token action.
+    """Set up the CLI argument parser for the clear-hook-token action.
 
     :arg subparser: an argparse subparser allowing to have action's specific
         arguments
@@ -111,7 +111,7 @@ def _parser_clear_hook_token(subparser):
 
 
 def _parser_admin_token_list(subparser):
-    """ Set up the CLI argument parser for the admin-token list action.
+    """Set up the CLI argument parser for the admin-token list action.
 
     :arg subparser: an argparse subparser allowing to have action's specific
         arguments
@@ -146,7 +146,7 @@ def _parser_admin_token_list(subparser):
 
 
 def _parser_admin_token_info(subparser):
-    """ Set up the CLI argument parser for the admin-token info action.
+    """Set up the CLI argument parser for the admin-token info action.
 
     :arg subparser: an argparse subparser allowing to have action's specific
         arguments
@@ -160,7 +160,7 @@ def _parser_admin_token_info(subparser):
 
 
 def _parser_admin_token_expire(subparser):
-    """ Set up the CLI argument parser for the admin-token expire action.
+    """Set up the CLI argument parser for the admin-token expire action.
 
     :arg subparser: an argparse subparser allowing to have action's specific
         arguments
@@ -181,7 +181,7 @@ def _parser_admin_token_expire(subparser):
 
 
 def _parser_admin_token_create(subparser):
-    """ Set up the CLI argument parser for the admin-token create action.
+    """Set up the CLI argument parser for the admin-token create action.
 
     :arg subparser: an argparse subparser allowing to have action's specific
         arguments
@@ -199,7 +199,7 @@ def _parser_admin_token_create(subparser):
 
 
 def _parser_admin_token_update(subparser):
-    """ Set up the CLI argument parser for the admin-token update action.
+    """Set up the CLI argument parser for the admin-token update action.
 
     :arg subparser: an argparse subparser allowing to have action's specific
         arguments
@@ -221,7 +221,7 @@ def _parser_admin_token_update(subparser):
 
 
 def _parser_admin_token(subparser):
-    """ Set up the CLI argument parser for the admin-token action.
+    """Set up the CLI argument parser for the admin-token action.
 
     :arg subparser: an argparse subparser allowing to have action's specific
         arguments
@@ -246,7 +246,7 @@ def _parser_admin_token(subparser):
 
 
 def _parser_get_watch(subparser):
-    """ Set up the CLI argument parser for the get-watch action.
+    """Set up the CLI argument parser for the get-watch action.
 
     :arg subparser: an argparse subparser allowing to have action's specific
         arguments
@@ -266,7 +266,7 @@ def _parser_get_watch(subparser):
 
 
 def _parser_update_watch(subparser):
-    """ Set up the CLI argument parser for the update-watch action.
+    """Set up the CLI argument parser for the update-watch action.
 
     :arg subparser: an argparse subparser allowing to have action's specific
         arguments
@@ -291,7 +291,7 @@ def _parser_update_watch(subparser):
 
 
 def _parser_read_only(subparser):
-    """ Set up the CLI argument parser for the read-only action.
+    """Set up the CLI argument parser for the read-only action.
 
     :arg subparser: an argparse subparser allowing to have action's specific
         arguments
@@ -317,7 +317,7 @@ def _parser_read_only(subparser):
 
 
 def _parser_new_group(subparser):
-    """ Set up the CLI argument parser for the new-group action.
+    """Set up the CLI argument parser for the new-group action.
 
     :arg subparser: an argparse subparser allowing to have action's specific
         arguments
@@ -340,7 +340,7 @@ def _parser_new_group(subparser):
 
 
 def _parser_list_groups(subparser):
-    """ Set up the CLI argument parser for the list-groups action.
+    """Set up the CLI argument parser for the list-groups action.
 
     :arg subparser: an argparse subparser allowing to have action's specific
         arguments
@@ -353,7 +353,7 @@ def _parser_list_groups(subparser):
 
 
 def _parser_block_user(subparser):
-    """ Set up the CLI argument parser for the block-user action.
+    """Set up the CLI argument parser for the block-user action.
 
     :arg subparser: an argparse subparser allowing to have action's specific
         arguments
@@ -384,7 +384,7 @@ def _parser_block_user(subparser):
 
 
 def _parser_upload_repospanner_hooks(subparser):
-    """ Set up the CLI argument parser to upload repospanner hook.
+    """Set up the CLI argument parser to upload repospanner hook.
 
     Args:
         subparser: An argparse subparser
@@ -399,7 +399,7 @@ def _parser_upload_repospanner_hooks(subparser):
 
 
 def _parser_ensure_project_hooks(subparser):
-    """ Set up the CLI argument parser to ensure project hooks are setup
+    """Set up the CLI argument parser to ensure project hooks are setup
 
     Args:
         subparser: An argparse subparser
@@ -415,12 +415,12 @@ def _parser_ensure_project_hooks(subparser):
 
 
 def _parser_delete_project(subparser):
-    """ Set up the CLI argument parser for the delete-project action.
+    """Set up the CLI argument parser for the delete-project action.
 
     :arg subparser: an argparse subparser allowing to have action's specific
         arguments
 
-     """
+    """
     local_parser = subparser.add_parser(
         "delete-project", help="Delete the project specified"
     )
@@ -441,12 +441,12 @@ def _parser_delete_project(subparser):
 
 
 def _parser_create_branch(subparser):
-    """ Set up the CLI argument parser for the create-branch action.
+    """Set up the CLI argument parser for the create-branch action.
 
     :arg subparser: an argparse subparser allowing to have action's specific
         arguments
 
-     """
+    """
     local_parser = subparser.add_parser(
         "create-branch",
         help="Create the specified branch in the specified project",
@@ -481,12 +481,12 @@ def _parser_create_branch(subparser):
 
 
 def _parser_set_default_branch(subparser):
-    """ Set up the CLI argument parser for the set-default-branch action.
+    """Set up the CLI argument parser for the set-default-branch action.
 
     :arg subparser: an argparse subparser allowing to have action's specific
         arguments
 
-     """
+    """
     local_parser = subparser.add_parser(
         "set-default-branch", help="Set the specified branch as default"
     )
@@ -505,12 +505,12 @@ def _parser_set_default_branch(subparser):
 
 
 def _parser_update_acls(subparser):
-    """ Set up the CLI argument parser for the update-acls action.
+    """Set up the CLI argument parser for the update-acls action.
 
     :arg subparser: an argparse subparser allowing to have action's specific
         arguments
 
-     """
+    """
 
     local_parser = subparser.add_parser(
         "update-acls",
@@ -592,8 +592,7 @@ def parse_arguments(args=None):
 
 
 def _ask_confirmation():
-    """ Ask to confirm an action.
-    """
+    """Ask to confirm an action."""
     action = input("Do you want to continue? [y/N]")
     return action.lower() in ["y", "yes"]
 
@@ -604,8 +603,7 @@ def _get_input(text):
 
 
 def _get_project(arg_project, user=None):
-    """ From the project specified to the CLI, extract the actual project.
-    """
+    """From the project specified to the CLI, extract the actual project."""
     namespace = None
     if "/" in arg_project:
         if arg_project.count("/") > 1:
@@ -634,7 +632,7 @@ def _check_project(_project, **kwargs):
 
 
 def do_generate_acl(args):
-    """ Regenerate the gitolite ACL file.
+    """Regenerate the gitolite ACL file.
 
 
     :arg args: the argparse object returned by ``parse_arguments()``.
@@ -688,7 +686,7 @@ def do_generate_acl(args):
 
 
 def do_refresh_ssh(_):
-    """ Regenerate the user key files.
+    """Regenerate the user key files.
 
     :arg _: the argparse object returned by ``parse_arguments()``, which is
         ignored as there are no argument to pass to this action.
@@ -706,7 +704,7 @@ def do_refresh_ssh(_):
 
 
 def do_generate_hook_token(_):
-    """ Regenerate the hook_token for each projects in the DB.
+    """Regenerate the hook_token for each projects in the DB.
 
     :arg _: the argparse object returned by ``parse_arguments()``, which is
         ignored as there are no argument to pass to this action.
@@ -723,7 +721,7 @@ def do_generate_hook_token(_):
 
 
 def do_list_admin_token(args):
-    """ List the admin token.
+    """List the admin token.
 
     :arg args: the argparse object returned by ``parse_arguments()``.
 
@@ -748,7 +746,7 @@ def do_list_admin_token(args):
 
 
 def do_info_admin_token(args):
-    """ Print out information about the specified API token.
+    """Print out information about the specified API token.
 
     :arg args: the argparse object returned by ``parse_arguments()``.
 
@@ -766,7 +764,7 @@ def do_info_admin_token(args):
 
 
 def do_expire_admin_token(args):
-    """ Expire a specific admin token.
+    """Expire a specific admin token.
 
     :arg args: the argparse object returned by ``parse_arguments()``.
 
@@ -795,7 +793,7 @@ def do_expire_admin_token(args):
 
 
 def do_update_admin_token(args):
-    """ Update the expiration date of an admin token.
+    """Update the expiration date of an admin token.
 
     :arg args: the argparse object returned by ``parse_arguments()``.
 
@@ -843,7 +841,7 @@ def do_update_admin_token(args):
 
 
 def do_create_admin_token(args):
-    """ Create a new admin token.
+    """Create a new admin token.
 
     :arg args: the argparse object returned by ``parse_arguments()``.
 
@@ -892,7 +890,7 @@ def do_create_admin_token(args):
 
 
 def do_delete_project(args):
-    """ Delete a project.
+    """Delete a project.
 
     :arg args: the argparse object returned by ``parse_arguments()``.
 
@@ -928,7 +926,7 @@ def do_delete_project(args):
 
 
 def do_update_acls(args):
-    """ Update the ACLs in the database from the list present in the
+    """Update the ACLs in the database from the list present in the
     configuration file.
 
     :arg args: the argparse object returned by ``parse_arguments()``.
@@ -944,7 +942,7 @@ def do_update_acls(args):
 
 
 def do_get_watch_status(args):
-    """ Get the watch status of an user on a project.
+    """Get the watch status of an user on a project.
 
     :arg args: the argparse object returned by ``parse_arguments()``.
 
@@ -981,7 +979,7 @@ def do_get_watch_status(args):
 
 
 def do_update_watch_status(args):
-    """ Update the watch status of an user on a project.
+    """Update the watch status of an user on a project.
 
     :arg args: the argparse object returned by ``parse_arguments()``.
 
@@ -1025,7 +1023,7 @@ def do_update_watch_status(args):
 
 
 def do_read_only(args):
-    """ Set or update the read-only status of a project.
+    """Set or update the read-only status of a project.
 
     :arg args: the argparse object returned by ``parse_arguments()``.
 
@@ -1067,7 +1065,7 @@ def do_read_only(args):
 
 
 def do_new_group(args):
-    """ Create a new group in this pagure instance.
+    """Create a new group in this pagure instance.
 
     :arg args: the argparse object returned by ``parse_arguments()``.
 
@@ -1112,7 +1110,7 @@ def do_new_group(args):
 
 
 def do_list_groups(args):
-    """ Lists existing groups in this pagure instance.
+    """Lists existing groups in this pagure instance.
 
     :arg args: the argparse object returned by ``parse_arguments()``.
 
@@ -1128,7 +1126,7 @@ def do_list_groups(args):
 
 
 def do_list_blocked_users(args):
-    """ List all the blocked users.
+    """List all the blocked users.
 
     :arg args: the argparse object returned by ``parse_arguments()``.
 
@@ -1163,7 +1161,7 @@ def do_list_blocked_users(args):
 
 
 def do_block_user(args):
-    """ Block the specified user from all interactions with pagure until the
+    """Block the specified user from all interactions with pagure until the
     specified date.
 
     :arg args: the argparse object returned by ``parse_arguments()``.
@@ -1207,7 +1205,7 @@ def do_block_user(args):
 
 
 def do_upload_repospanner_hooks(args):
-    """ Upload hooks to repoSpanner
+    """Upload hooks to repoSpanner
 
     Args:
         args (argparse.Namespace): Parsed arguments
@@ -1253,7 +1251,7 @@ def do_upload_repospanner_hooks(args):
 
 
 def do_ensure_project_hooks(args):
-    """ Ensures that all projects have their hooks setup
+    """Ensures that all projects have their hooks setup
 
     Args:
         args (argparse.Namespace): Parsed arguments
@@ -1272,7 +1270,7 @@ def do_ensure_project_hooks(args):
 
 
 def do_create_branch(args):
-    """ Creates the specified git branch
+    """Creates the specified git branch
 
     Args:
         args (argparse.Namespace): Parsed arguments
@@ -1323,7 +1321,7 @@ def do_create_branch(args):
 
 
 def do_set_default_branch(args):
-    """ Sets the specified git branch as default
+    """Sets the specified git branch as default
 
     Args:
         args (argparse.Namespace): Parsed arguments

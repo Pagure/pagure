@@ -31,7 +31,7 @@ BUILD_STATS = {
 
 
 def process_jenkins_build(session, project, build_id, iteration=0):
-    """  Gets the build info from jenkins and flags that particular
+    """Gets the build info from jenkins and flags that particular
     pull-request.
     """
     import jenkins
