@@ -2920,18 +2920,18 @@ class ConfigOptionsEnvironmentMixin(ConfigEnvironmentMixin):
 class FilterLinesEnvironmentMixin(Environment):
     """Handle encoding and maximum line length of body lines.
 
-        email_max_line_length (int or None)
+    email_max_line_length (int or None)
 
-            The maximum length of any single line in the email body.
-            Longer lines are truncated at that length with ' [...]'
-            appended.
+        The maximum length of any single line in the email body.
+        Longer lines are truncated at that length with ' [...]'
+        appended.
 
-        strict_utf8 (bool)
+    strict_utf8 (bool)
 
-            If this field is set to True, then the email body text is
-            expected to be UTF-8.  Any invalid characters are
-            converted to U+FFFD, the Unicode replacement character
-            (encoded as UTF-8, of course).
+        If this field is set to True, then the email body text is
+        expected to be UTF-8.  Any invalid characters are
+        converted to U+FFFD, the Unicode replacement character
+        (encoded as UTF-8, of course).
 
     """
 
@@ -3623,8 +3623,7 @@ class Push(object):
 
     @property
     def _other_ref_sha1s(self):
-        """The GitObjects referred to by references unaffected by this push.
-        """
+        """The GitObjects referred to by references unaffected by this push."""
         if self.__other_ref_sha1s is None:
             # The refnames being changed by this push:
             updated_refs = set(change.refname for change in self.changes)
@@ -3708,7 +3707,7 @@ class Push(object):
         new_or_old is either the string 'new' or the string 'old'.  If
         'new', the commits to be excluded are those that were in the
         repository before the push.  If 'old', the commits to be
-        excluded are those that are currently in the repository.  """
+        excluded are those that are currently in the repository."""
 
         old_or_new = {"old": "new", "new": "old"}[new_or_old]
         excl_revs = self._other_ref_sha1s.union(

@@ -255,7 +255,7 @@ def user_set(APP, user, keep_get_user=False):
 
 
 def create_user(session, username, fullname, emails):
-    """ Create an user with the provided information.
+    """Create an user with the provided information.
     Note that `emails` should be a list of emails.
     """
     user = pagure.lib.model.User(
@@ -335,7 +335,8 @@ class SimplePagureTest(unittest.TestCase):
         self.dbfolder = tempfile.mkdtemp(prefix="pagure-tests-")
         self.dbpath = "sqlite:///%s/db.sqlite" % self.dbfolder
         session = pagure.lib.model.create_tables(
-            self.dbpath, acls=pagure_config.get("ACLS", {}),
+            self.dbpath,
+            acls=pagure_config.get("ACLS", {}),
         )
         self.db_session = session
 
@@ -561,7 +562,7 @@ class Modeltests(SimplePagureTest):
         super(Modeltests, self).tearDown()
 
     def create_project_full(self, projectname, extra=None):
-        """ Create a project via the API.
+        """Create a project via the API.
 
         This makes sure that the repo is fully setup the way a normal new
         project would be, with hooks and all setup.
@@ -582,12 +583,12 @@ class Modeltests(SimplePagureTest):
 
 
 class FakeGroup(object):  # pylint: disable=too-few-public-methods
-    """ Fake object used to make the FakeUser object closer to the
+    """Fake object used to make the FakeUser object closer to the
     expectations.
     """
 
     def __init__(self, name):
-        """ Constructor.
+        """Constructor.
         :arg name: the name given to the name attribute of this object.
         """
         self.name = name
@@ -600,7 +601,7 @@ class FakeUser(object):  # pylint: disable=too-few-public-methods
     def __init__(
         self, groups=None, username="username", cla_done=True, id=None
     ):
-        """ Constructor.
+        """Constructor.
         :arg groups: list of the groups in which this fake user is
             supposed to be.
         """
@@ -733,7 +734,7 @@ def create_tokens(session, user_id=1, project_id=1, suffix=None):
 
 
 def create_tokens_acl(session, token_id="aaabbbcccddd", acl_name=None):
-    """ Create some ACLs for the token. If acl_name is not set, the token will
+    """Create some ACLs for the token. If acl_name is not set, the token will
     have all the ACLs enabled.
     """
     if acl_name is None:
@@ -753,7 +754,7 @@ def create_tokens_acl(session, token_id="aaabbbcccddd", acl_name=None):
 
 
 def _clone_and_top_commits(folder, branch, branch_ref=False):
-    """ Clone the repository, checkout the specified branch and return
+    """Clone the repository, checkout the specified branch and return
     the top commit of that branch if there is one.
     Returns the repo, the path to the clone and the top commit(s) in a tuple
     or the repo, the path to the clone and the reference to the branch
@@ -1150,9 +1151,9 @@ def add_pull_request_git_repo(
     user="pingou",
     allow_rebase=False,
 ):
-    """ Set up the git repo and create the corresponding PullRequest
-        object.
-        """
+    """Set up the git repo and create the corresponding PullRequest
+    object.
+    """
 
     # Clone the main repo
     gitrepo = os.path.join(folder, "repos", repo.path)

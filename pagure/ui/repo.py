@@ -3401,7 +3401,7 @@ def update_tags(repo, username=None, namespace=None):
 @is_repo_admin
 @has_issue_or_pr_enabled
 def remove_tag(repo, username=None, namespace=None):
-    """Remove the specified tag, associated with the issues, from the project."""
+    """Remove the specified tag, associated with the issues, from the project"""
     repo = flask.g.repo
 
     form = pagure.forms.DeleteIssueTagForm()
