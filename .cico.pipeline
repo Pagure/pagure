@@ -25,7 +25,7 @@ def syncfromduffynode(rsyncpath){
     sh 'rsync -e "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root " -Ha --include=' +  rsyncpath +  " ${DUFFY_NODE}.ci.centos.org:~/ ./"
 }
 
-node('pagure') {
+node('cico-workspace') {
 
     properties([
             parameters([
