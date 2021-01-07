@@ -7,7 +7,7 @@ binaryornot
 bleach
 blinker
 celery
-chardet
+chardet<4.0
 cryptography
 docutils
 enum34;python_version<"3.4"
