@@ -88,7 +88,8 @@ def fedora_messaging_publish(topic, message):  # pragma: no cover
 
         if not hasattr(msg_cls, "app_name") is False:
             _log.warning(
-                "pagure is about to send a message that has no schemas: %s",
+                "pagure is about to send a message that has no schemas: "
+                "pagure.%s",
                 topic,
             )
 
