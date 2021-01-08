@@ -128,11 +128,15 @@ def send_action_notification(
     """Send out-going notifications about the branch/tag."""
     email = pagure.lib.git.get_author_email(rev, repodir)
     name = pagure.lib.git.get_author(rev, repodir)
-    author = pagure.lib.query.search_user(session, email=email)
-    if author:
+    author = pagure.lib.query.search_user(session, email=email) or name
+    if not isinstance(author, six.string_types):
         author = author.to_json(public=True)
     else:
-        author = name
+        author = {
+            "fullname": author,
+            "name": None,
+            "url_path": None,
+        }
 
     topic = "git.%s.%s" % (subject, action)
     msg = dict(
