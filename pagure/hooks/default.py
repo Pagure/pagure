@@ -180,7 +180,6 @@ def send_notifications(
         else:
             author = {
                 "fullname": author,
-                "email": None,
                 "name": None,
                 "url_path": None,
             }
