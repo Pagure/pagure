@@ -3,12 +3,12 @@ Contributors to pagure
 
 Pagure would be nothing without its contributors.
 
-On January 6, 2021 (release 5.12.0) the list looks as follow:
+On January 8, 2021 (release 5.12.1) the list looks as follow:
 
 =================  ===========
 Number of commits  Contributor
 =================  ===========
-  6873              Pierre-Yves Chibon <pingou@pingoured.fr>
+  6880              Pierre-Yves Chibon <pingou@pingoured.fr>
    328              Ryan Lerch <rlerch@redhat.com>
    172              Vivek Anand <vivekanand1101@gmail.com>
    147              Julen Landa Alustiza <jlanda@fedoraproject.org>

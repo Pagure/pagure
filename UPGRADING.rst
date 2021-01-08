@@ -1,6 +1,16 @@
 Upgrading Pagure
 ================
 
+From 5.12 to 5.12.1
+-------------------
+
+The 5.12.1 release contains a database schema updates, so:
+
+* Update the data schema using alembic: ``alembic upgrade head``
+
+(As usual, do your backups before).
+
+
 From 5.11 to 5.12
 -----------------
 

@@ -3,6 +3,14 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
+5.12.1 (2021-01-08)
+-------------------
+- Block chardet 4.0, we're not compatible with it yet
+- Be consistent in the messages sent and with the schemas defined in
+  pagure-schemas (0.0.4+)
+- Make the token_id column of the commit_flags table nullable
+
+
 5.12.0 (2021-01-06)
 -------------------
 
