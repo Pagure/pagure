@@ -2552,7 +2552,9 @@ class CommitFlag(BASE):
         index=True,
     )
     token_id = sa.Column(
-        sa.String(64), sa.ForeignKey("tokens.id"), nullable=False
+        sa.String(64),
+        sa.ForeignKey("tokens.id", ondelete="CASCADE", onupdate="CASCADE"),
+        nullable=True,
     )
     user_id = sa.Column(
         sa.Integer,
