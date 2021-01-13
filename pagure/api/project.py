@@ -3522,3 +3522,83 @@ def delete_project(repo, username=None, namespace=None):
         {"message": "Project deleted", "project": project_json}
     )
     return jsonout
+
+
+@API.route("/<repo>/hascommit")
+@API.route("/<namespace>/<repo>/hascommit")
+@API.route("/fork/<username>/<repo>/hascommit")
+@API.route("/fork/<username>/<namespace>/<repo>/hascommit")
+@api_method
+def api_project_hascommit(repo, namespace=None, username=None):
+    """
+    Has commit on a project
+    -----------------------
+    Checks whether a specified user has commit access on a specified branch of
+    the git repo.
+
+    ::
+
+        GET /api/0/<repo>/hascommit?user=<username>&branch=<branchname>
+        GET /api/0/<namespace>/<repo>/hascommit?user=<username>&branch=<branchname>
+
+    ::
+
+        GET /api/0/fork/<username>/<repo>/hascommit?user=<username>&branch=<branchname>
+        GET /api/0/fork/<username>/<namespace>/<repo>/hascommit?user=<username>&branch=<branchname>
+
+
+    Input
+    ^^^^^
+
+    +------------------+---------+---------------+---------------------------+
+    | Key              | Type    | Optionality   | Description               |
+    +==================+=========+===============+===========================+
+    | ``user``         | String  | optional      | The username of the user  |
+    |                  |         |               | to check access for       |
+    +------------------+---------+---------------+---------------------------+
+    | ``branch``       | String  | optional      | The branch of the git repo|
+    |                  |         |               | to check access for.      |
+    |                  |         |               | Note that there is no need|
+    |                  |         |               | to specify it using       |
+    |                  |         |               | ``refs/heads/`` the name  |
+    |                  |         |               | is enough.                |
+    +------------------+---------+---------------+---------------------------+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "args": {
+            "username": "pingou",
+            "branch": "main",
+            "project": {
+            }
+          },
+          "hascommit": true
+        }
+
+    """  # noqa
+
+    project = _get_repo(repo, username, namespace)
+    req_branch = flask.request.args.get("branch")
+    req_username = flask.request.args.get("user")
+    if not req_branch or not req_username:
+        raise pagure.exceptions.APIError(
+            400,
+            error_code=APIERROR.EINVALIDREQ,
+            error="Invalid input, branch or user argument missing",
+        )
+    args = {
+        "project": project.to_json(public=True),
+        "branch": req_branch,
+        "user": req_username,
+    }
+
+    hascommit = pagure.utils.is_repo_collaborator(
+        project, "refs/heads/%s" % req_branch, req_username, flask.g.session
+    )
+
+    jsonout = flask.jsonify({"args": args, "hascommit": hascommit})
+    return jsonout
