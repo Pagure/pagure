@@ -47,6 +47,21 @@ class PagureFlaskApiProjectContributorsTests(tests.SimplePagureTest):
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
 
+    def test_private_project(self):
+        project = pagure.lib.query.get_authorized_project(self.session, "test")
+        project.private = True
+        self.session.add(project)
+        self.session.commit()
+
+        output = self.app.get("/api/0/test/contributors")
+        self.assertEqual(output.status_code, 404)
+        expected_rv = {
+            "error": "Project not found",
+            "error_code": "ENOPROJECT",
+        }
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(data, expected_rv)
+
     def test_just_main_admin(self):
 
         output = self.app.get("/api/0/test/contributors")
