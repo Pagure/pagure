@@ -232,15 +232,17 @@ def send_notifications(
             )
 
 
-def inform_pull_request_urls(
-    session, project, commits, refname, default_branch, username
-):
+def inform_pull_request_urls(session, project, commits, refname, username):
     """Inform the user about the URLs to open a new pull-request or visit
     the existing one.
     """
     target_repo = project
     if project.is_fork:
         target_repo = project.parent
+
+    taget_repo_obj = pygit2.Repository(target_repo.repopath("main"))
+    if not taget_repo_obj.is_empty and not taget_repo_obj.head_is_unborn:
+        default_branch = taget_repo_obj.head.shorthand
 
     pr_uids = []
 
