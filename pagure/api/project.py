@@ -1996,8 +1996,8 @@ def api_drop_git_alias(repo, username=None, namespace=None):
     ::
 
         {
-          'alias_from': 'master',
-          'alias_to': 'main'
+          'alias_from': 'main',
+          'alias_to': 'rawhide'
         }
 
 
@@ -2096,7 +2096,7 @@ def api_new_git_alias(repo, username=None, namespace=None):
     ::
 
         {
-            "refs/heads/main": "refs/heads/master"
+            "refs/heads/rawhide": "refs/heads/main"
         }
 
     """
@@ -2156,7 +2156,7 @@ def api_list_git_alias(repo, username=None, namespace=None):
     ::
 
         {
-            "refs/heads/main": "refs/heads/master"
+            "refs/heads/rawhide": "refs/heads/main"
         }
 
     """
