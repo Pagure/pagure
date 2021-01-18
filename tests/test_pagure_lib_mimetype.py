@@ -30,13 +30,13 @@ class TestMIMEType(unittest.TestCase):
                 "hello.html",
                 b"#!",
                 "text/html",
-                "ascii" if cchardet is None else "utf-8",
+                "ascii" if cchardet is None else "ASCII",
             ),
             (
                 "hello",
                 b"#!",
                 "text/plain",
-                "ascii" if cchardet is None else "utf-8",
+                "ascii" if cchardet is None else "ASCII",
             ),
             ("hello.jpg", None, "image/jpeg", None),
             ("hello.jpg", b"#!", "image/jpeg", None),
@@ -70,7 +70,7 @@ class TestMIMEType(unittest.TestCase):
                 b"#!",
                 "text/plain; charset=ascii"
                 if cchardet is None
-                else "text/plain; charset=utf-8",
+                else "text/plain; charset=ASCII",
             ),
             ("hello.jpg", None, "image/jpeg"),
             ("hello.jpg", b"#!", "image/jpeg"),

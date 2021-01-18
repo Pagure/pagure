@@ -51,14 +51,23 @@ def detect_encodings(data):
     # of the detector to bias the utf-8 result.
     if cchardet is not None:
         detector = cchardet.UniversalDetector()
+        detector.reset()
+        detector.feed(data)
+        detector.close()
+        result = detector.result
     else:
         detector = universaldetector.UniversalDetector()
-    detector.reset()
-    detector.feed(data)
-    result = detector.close()
-    if not result:
+        detector.reset()
+        detector.feed(data)
+        result = detector.close()
+
+    if not result or not result["encoding"]:
         return {"utf-8": 1.0}
     encodings = {result["encoding"]: result["confidence"]}
+
+    if cchardet:
+        return encodings
+
     if ch_version[0] in ("3", "4"):
         for prober in detector._charset_probers:
             if hasattr(prober, "probers"):

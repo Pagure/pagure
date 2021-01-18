@@ -32,7 +32,7 @@ class TestGuessEncoding(unittest.TestCase):
         data = "Twas bryllyg, and the slythy toves did gyre and gymble"
         result = encoding_utils.guess_encoding(data.encode("ascii"))
         if cchardet is not None:
-            self.assertEqual(result, "utf-8")
+            self.assertEqual(result, "ASCII")
         else:
             self.assertEqual(result, "ascii")
 
@@ -46,11 +46,14 @@ class TestGuessEncoding(unittest.TestCase):
         data = "Šabata".encode("utf-8")
         result = encoding_utils.guess_encoding(data)
         chardet_result = chardet.detect(data)
-        self.assertEqual(result, "utf-8")
-        if chardet.__version__[0] == "3":
-            self.assertEqual(chardet_result["encoding"], "ISO-8859-9")
+        if cchardet:
+            self.assertEqual(result, "WINDOWS-1250")
         else:
-            self.assertEqual(chardet_result["encoding"], "ISO-8859-2")
+            self.assertEqual(result, "utf-8")
+            if chardet.__version__[0] in ("3", "4"):
+                self.assertEqual(chardet_result["encoding"], "ISO-8859-9")
+            else:
+                self.assertEqual(chardet_result["encoding"], "ISO-8859-2")
 
     def test_guess_encoding_no_data(self):
         """ Test encoding_utils.guess_encoding() with an empty string """
@@ -64,25 +67,22 @@ class TestGuessEncodings(unittest.TestCase):
         data = "Šabata".encode("utf-8")
         result = encoding_utils.guess_encodings(data)
         chardet_result = chardet.detect(data)
-        if chardet.__version__[0] == "3":
-            # The first three have different confidence values
-            if cchardet is not None:
-                expexted_list = ["utf-8"]
-                # The last one in the list (which apparently has only one)
-                self.assertEqual(result[-1].encoding, "utf-8")
-            else:
+        if cchardet is not None:
+            # The last one in the list (which apparently has only one)
+            self.assertEqual(result[-1].encoding, "WINDOWS-1250")
+        else:
+            if chardet.__version__[0] in ("3", "4"):
+                # The first three have different confidence values
                 expexted_list = ["utf-8", "ISO-8859-9", "ISO-8859-1"]
                 # This is the one with the least confidence
                 self.assertEqual(result[-1].encoding, "windows-1255")
-            self.assertListEqual(
-                [encoding.encoding for encoding in result][:3], expexted_list
-            )
+                self.assertListEqual(
+                    [encoding.encoding for encoding in result][:3],
+                    expexted_list,
+                )
 
-            # The values in the middle of the list all have the same confidence
-            # value and can't be sorted reliably: use sets.
-            if cchardet is not None:
-                expected_list = sorted(["utf-8"])
-            else:
+                # The values in the middle of the list all have the same confidence
+                # value and can't be sorted reliably: use sets.
                 expected_list = sorted(
                     [
                         "utf-8",
@@ -107,17 +107,17 @@ class TestGuessEncodings(unittest.TestCase):
                         "windows-1255",
                     ]
                 )
-            self.assertListEqual(
-                sorted(set([encoding.encoding for encoding in result])),
-                expected_list,
-            )
-            self.assertEqual(chardet_result["encoding"], "ISO-8859-9")
-        else:
-            self.assertListEqual(
-                [encoding.encoding for encoding in result],
-                ["utf-8", "ISO-8859-2", "windows-1252"],
-            )
-            self.assertEqual(chardet_result["encoding"], "ISO-8859-2")
+                self.assertListEqual(
+                    sorted(set([encoding.encoding for encoding in result])),
+                    expected_list,
+                )
+                self.assertEqual(chardet_result["encoding"], "ISO-8859-9")
+            else:
+                self.assertListEqual(
+                    [encoding.encoding for encoding in result],
+                    ["utf-8", "ISO-8859-2", "windows-1252"],
+                )
+                self.assertEqual(chardet_result["encoding"], "ISO-8859-2")
 
     def test_guess_encodings_no_data(self):
         """ Test encoding_utils.guess_encodings() with an emtpy string """
@@ -128,7 +128,12 @@ class TestGuessEncodings(unittest.TestCase):
 class TestDecode(unittest.TestCase):
     def test_decode(self):
         """ Test encoding_utils.decode() """
-        data = "Šabata"
+        data = (
+            "This is a little longer text for testing Šabata's encoding. "
+            "With more characters, let's see if it become more clear as to what "
+            "encoding should be used for this. We'll include from french words "
+            "in there for non-ascii: français, gagné!"
+        )
         self.assertEqual(data, encoding_utils.decode(data.encode("utf-8")))
 
 
