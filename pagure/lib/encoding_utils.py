@@ -59,7 +59,7 @@ def detect_encodings(data):
     if not result:
         return {"utf-8": 1.0}
     encodings = {result["encoding"]: result["confidence"]}
-    if ch_version[0] == "3":
+    if ch_version[0] in ("3", "4"):
         for prober in detector._charset_probers:
             if hasattr(prober, "probers"):
                 for prober in prober.probers:
