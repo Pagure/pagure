@@ -3,6 +3,17 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
+5.13.0 (2021-01-19)
+-------------------
+- When failing to find a git repo, log where pagure looked
+- Get the default branch of the target repo when linking for new PR
+- Add an hascommit API endpoint
+- Fixing sample input and output for alias related api (Mohan Boddu)
+- Add missing API endpoints related to git aliases and re-order a little
+- Add support for chardet 4.0+
+- Fix support for cchardet
+
+
 5.12.1 (2021-01-08)
 -------------------
 - Block chardet 4.0, we're not compatible with it yet

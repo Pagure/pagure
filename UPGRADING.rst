@@ -1,6 +1,12 @@
 Upgrading Pagure
 ================
 
+From 5.12 to 5.13
+-----------------
+
+The 5.13 release does not contain any database schema changes.
+
+
 From 5.12 to 5.12.1
 -------------------
 
