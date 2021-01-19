@@ -49,6 +49,15 @@ def set_user(return_url):
     if not user:
         flask.session["_new_user"] = True
     else:
+        if not flask.g.fas_user.email:
+            flask.flash(
+                "No email address was returned by your OpenID provider, this "
+                "information is mandatory for pagure",
+                "error",
+            )
+            logout()
+            return flask.redirect(return_url)
+
         user_email = pagure.lib.query.search_user(
             flask.g.session, email=flask.g.fas_user.email
         )
