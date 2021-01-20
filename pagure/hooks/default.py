@@ -446,7 +446,6 @@ class DefaultRunner(BaseRunner):
                     project,
                     commits,
                     refname,
-                    default_branch,
                     username,
                 )
             )
