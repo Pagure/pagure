@@ -3,6 +3,12 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
+5.13.1 (2021-01-29)
+-------------------
+- Add the api_project_hascommit endpoint to the API doc
+- Do not return a 500 error when the OpenID provider doesn't provide an email
+- Fix bug in the default hook
+
 5.13.0 (2021-01-19)
 -------------------
 - When failing to find a git repo, log where pagure looked
