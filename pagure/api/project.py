@@ -1967,7 +1967,7 @@ def api_drop_git_alias(repo, username=None, namespace=None):
 
     ::
 
-        POST /api/0/rpms/python-requests/alias/drop
+        POST /api/0/rpms/python-requests/git/alias/drop
 
 
     Input
@@ -2056,7 +2056,7 @@ def api_new_git_alias(repo, username=None, namespace=None):
 
     ::
 
-        POST /api/0/rpms/python-requests/alias/new
+        POST /api/0/rpms/python-requests/git/alias/new
 
 
     Input
@@ -2147,7 +2147,7 @@ def api_list_git_alias(repo, username=None, namespace=None):
 
     ::
 
-        GET /api/0/rpms/python-requests/alias
+        GET /api/0/rpms/python-requests/git/alias
 
 
     Sample response
