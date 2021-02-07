@@ -15,7 +15,6 @@ hljs.registerLanguage("rpm-specfile", function(e) {
     aliases: ['rpm', 'spec', 'rpm-spec', 'specfile'],
     c:[
         hljs.HCM,
-        hljs.ASM,
         hljs.QSM,
         {
             cN: "type",
