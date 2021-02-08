@@ -278,7 +278,7 @@ def api_view_group(group):
         )
         query_start = (page - 1) * per_page
         query_limit = per_page
-        page_projects = group_projects[query_start:query_start+query_limit]
+        page_projects = group_projects[query_start : query_start + query_limit]
 
         output["total_projects"] = projects_cnt
         output["pagination"] = pagination_metadata
