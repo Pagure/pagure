@@ -719,6 +719,57 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
         data["pagination"]["last"] = "http://localhost..."
         self.assertDictEqual(data, exp)
 
+    def test_api_view_group_w_projects_and_acl_pagination(self):
+        """
+        Tests the pagination for the api_view_group method
+        """
+
+        project = pagure.lib.query._get_project(self.session, "test2")
+        msg = pagure.lib.query.add_group_to_project(
+            session=self.session,
+            project=project,
+            new_group="some_group",
+            user="pingou",
+            access="commit",
+        )
+        self.session.commit()
+        self.assertEqual(msg, "Group access updated")
+
+        project_another = pagure.lib.query._get_project(self.session, "test")
+        msg = pagure.lib.query.add_group_to_project(
+            session=self.session,
+            project=project_another,
+            new_group="some_group",
+            user="pingou",
+            access="commit",
+        )
+        self.session.commit()
+        self.assertEqual(msg, "Group added")
+
+        tests.create_tokens(self.session)
+
+        headers = {"Authorization": "token aaabbbcccddd"}
+        output = self.app.get(
+            "/api/0/group/some_group?projects=1&per_page=1", headers=headers
+        )
+        self.assertEqual(output.status_code, 200)
+
+        data = json.loads(output.get_data(as_text=True))
+        projects = [project["name"] for project in data["projects"]]
+
+        # Test the result we've got from the first page out of two
+        assert projects == ["test"]
+
+        output_last = self.app.get(data["pagination"]["next"], headers=headers)
+        self.assertEqual(output_last.status_code, 200)
+        data_last = json.loads(output_last.get_data(as_text=True))
+
+        projects.extend([project["name"] for project in data_last["projects"]])
+
+        # Note that pagure sorts projects alphabetically, so we're comparing
+        # a different order that was the order of requests
+        assert projects == ["test", "test2"]
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
