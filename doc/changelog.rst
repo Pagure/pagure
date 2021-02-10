@@ -3,11 +3,20 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
+5.13.2 (2021-01-29)
+-------------------
+- Fix broken pagination of group API (Lukas Brabec and František Zatloukal)
+- Fixing the alias url in the examples (Mohan Boddu)
+- Pull in upstream fix for apostrophes from highlightjs-rpm-specfile (David Auer)
+- Improve logging when trying to interract with a git repo via http(s)
+
+
 5.13.1 (2021-01-29)
 -------------------
 - Add the api_project_hascommit endpoint to the API doc
 - Do not return a 500 error when the OpenID provider doesn't provide an email
 - Fix bug in the default hook
+
 
 5.13.0 (2021-01-19)
 -------------------

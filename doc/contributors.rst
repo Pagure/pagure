@@ -3,12 +3,12 @@ Contributors to pagure
 
 Pagure would be nothing without its contributors.
 
-On January 29, 2021 (release 5.13.1) the list looks as follow:
+On February 10, 2021 (release 5.13.2) the list looks as follow:
 
 =================  ===========
 Number of commits  Contributor
 =================  ===========
-  6893              Pierre-Yves Chibon <pingou@pingoured.fr>
+  6895              Pierre-Yves Chibon <pingou@pingoured.fr>
    328              Ryan Lerch <rlerch@redhat.com>
    172              Vivek Anand <vivekanand1101@gmail.com>
    147              Julen Landa Alustiza <jlanda@fedoraproject.org>
@@ -96,10 +96,12 @@ Number of commits  Contributor
      2              Carlos Mogas da Silva <r3pek@r3pek.org>
      2              Daniel Mach <dmach@redhat.com>
      2              Fabian Arrotin <fabian.arrotin@arrfab.net>
+     2              František Zatloukal <fzatlouk@redhat.com>
      2              Hervé Beraud <hberaud@redhat.com>
      2              Kamil Páral <kparal@redhat.com>
      2              Luis Guzman <ark@switnet.org>
      2              MR <mrx@mailinator.com>
+     2              Mohan Boddu <mboddu@bhujji.com>
      2              Neha Kandpal <iec2015048@iiita.ac.in>
      2              Nuno Maltez <nuno@cognitiva.com>
      2              Ompragash <om.apsara@gmail.com>
@@ -131,6 +133,7 @@ Number of commits  Contributor
      1              Brian (bex) Exelbierd <bex@pobox.com>
      1              Carl George <carl@george.computer>
      1              Charelle Collett <ccollett@redhat.com>
+     1              David Auer <dreua@posteo.de>
      1              David Caro <dcaroest@redhat.com>
      1              Devesh Kumar Singh <deveshkusingh@gmail.com>
      1              Eashan <eashankadam@gmail.com>
@@ -147,10 +150,10 @@ Number of commits  Contributor
      1              Ken Dreyer <kdreyer@redhat.com>
      1              Koichi MATSUMOTO <mzch@me.com>
      1              Kunaal Jain <kunaalus@gmail.com>
+     1              Lukas Brabec <lbrabec@redhat.com>
      1              Mary Kate Fain <mk@marykatefain.com>
      1              Mathew Robinson <mathew.robinson3114@gmail.com>
      1              Michal Srb <michal@redhat.com>
-     1              Mohan Boddu <mboddu@bhujji.com>
      1              Mohan Boddu <mboddu@redhat.com>
      1              Nils Philippsen <nils@redhat.com>
      1              Pavel Raiskup <praiskup@redhat.com>
