@@ -311,7 +311,7 @@ def clone_proxy(project, username=None, namespace=None):
     p1 = pagure.lib.query.get_authorized_project(
         flask.g.session, project, user=username, namespace=namespace
     )
-    p1_path = "invalid repo"
+    p1_path = "invalid repo: %s/%s/%s" % (username, namespace, project)
     if p1:
         p1_path = p1.path
     remote_user = _get_remote_user(p1)
