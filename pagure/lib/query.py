@@ -4516,6 +4516,7 @@ def clean_input(text, ignore=None):
         "del",
         "cite",
         "noscript",
+        "colgroup",
     ]
     if ignore:
         for tag in ignore:
