@@ -750,7 +750,7 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
 
         headers = {"Authorization": "token aaabbbcccddd"}
         output = self.app.get(
-            "/api/0/group/some_group?projects=1&per_page=1", headers=headers
+            "/api/0/group/some_group?per_page=1&projects=1", headers=headers
         )
         self.assertEqual(output.status_code, 200)
 
@@ -760,7 +760,10 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
         # Test the result we've got from the first page out of two
         assert projects == ["test"]
 
-        output_last = self.app.get(data["pagination"]["next"], headers=headers)
+        output_last = self.app.get(
+            data["pagination"]["next"].replace("http://localhost", ""),
+            headers=headers,
+        )
         self.assertEqual(output_last.status_code, 200)
         data_last = json.loads(output_last.get_data(as_text=True))
 
