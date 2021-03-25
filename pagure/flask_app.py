@@ -490,6 +490,8 @@ def auth_login():  # pragma: no cover
                 )
             ]
         groups = set(groups).union(admins)
+        if auth == "fas":
+            groups.add("signed_fpca")
         ext_committer = set(pagure_config.get("EXTERNAL_COMMITTER", {}))
         groups = set(groups).union(ext_committer)
         flask.g.unsafe_javascript = True
