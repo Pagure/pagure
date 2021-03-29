@@ -77,7 +77,7 @@ It is different from the fedmsg setting present in the project options block
 which publishes notifications about events happening in the project via
 pagure's (web) user interface, for example: new tickets, new comments, new
 pull-requests and so on.
-This hook on the other only acts on commits.
+This hook on the other hand only acts on commits.
 """
 
 
