@@ -27,6 +27,7 @@ python-openid-cla
 python-openid-teams
 redis
 requests
+setuptools
 six
 # sqlalchemy minimum 0.8
 sqlalchemy >= 0.8
