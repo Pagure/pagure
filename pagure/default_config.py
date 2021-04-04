@@ -283,7 +283,7 @@ SESSION_COOKIE_NAME = "pagure"
 CHECK_SESSION_IP = True
 
 # Lenght for short commits ids or file hex
-SHORT_LENGTH = 6
+SHORT_LENGTH = 7
 
 # Used by SESSION_COOKIE_PATH
 APPLICATION_ROOT = "/"
