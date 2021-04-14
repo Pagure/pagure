@@ -1316,7 +1316,7 @@ FEDMSG_NOTIFICATIONS
 ~~~~~~~~~~~~~~~~~~~~
 
 This configuration key can be used to turn on or off notifications via `fedmsg
-<http://www.fedmsg.com/>`_.
+<https://fedmsg.readthedocs.io/>`_.
 
 Defaults to: ``False``.
 
@@ -1333,7 +1333,7 @@ Defaults to: ``False``.
 ALWAYS_FEDMSG_ON_COMMITS
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-This configuration key can be used to enforce `fedmsg <http://www.fedmsg.com/>`_
+This configuration key can be used to enforce `fedmsg <https://fedmsg.readthedocs.io/>`_
 notifications on commits made on all projects in a pagure instance.
 
 Defaults to: ``True``.

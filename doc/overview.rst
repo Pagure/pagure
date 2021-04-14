@@ -110,7 +110,7 @@ Pagure web-hook Server
 
 Sends notifications to third party services using POST http requests.
 
-This is the second notifications system in pagure with `fedmsg <http://fedmsg.com/>`_.
+This is the second notifications system in pagure with `fedmsg <https://fedmsg.readthedocs.io/>`_.
 These notifications are running on their own service to prevent blocking the
 main web application in case the third part service is timing-out or just
 being slow.
