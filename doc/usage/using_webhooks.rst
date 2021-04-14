@@ -17,7 +17,7 @@ Pagure will send a notification to this/these URL(s) for every action made
 on this project: new issue, new pull-request, new comments, new commits...
 
 .. note:: The notifications sent via web-hooks have the same payload as the
-    notifications sent via `fedmsg <http://www.fedmsg.com/en/latest/>`_.
+    notifications sent via `fedmsg <https://fedmsg.readthedocs.io/en/latest/>`_.
     Therefore, the list of pagure topics as well as example messages can be
     found in the `fedmsg documentation about pagure
     <https://fedora-fedmsg.readthedocs.io/en/latest/topics.html#id550>`_

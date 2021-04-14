@@ -369,7 +369,7 @@ The release 3.11 brings some changes to the database schema.
 
 In addition, if you are deploying pagure with fedmsg support you had to set
 fedmsg to the
-`active <http://www.fedmsg.com/en/stable/publishing/#publishing-through-a-relay>`_
+`active <https://fedmsg.readthedocs.io/en/stable/publishing/#publishing-through-a-relay>`_
 mode for the workers to be able to send fedmsg messages. This is now the
 default and forced configuration.
 
