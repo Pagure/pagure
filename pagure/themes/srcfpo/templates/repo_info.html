@@ -41,6 +41,10 @@
     padding-left: 33px;
     background: url({{ url_for('theme.static', filename='icons/koschei.png')}}?version={{ g.version}}) 0 50% no-repeat;
   }
+  a.transtats button {
+    padding-left: 20px;
+    background: url({{ url_for('theme.static', filename='icons/transtats.png')}}?version={{ g.version}}) 0 50% no-repeat;
+  }
   .projectinfo {
     white-space: pre-wrap;
     white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
@@ -377,6 +381,9 @@
                   </a>
                 </div>
 
+                {% if repo.namespace == 'rpms' %}
+                  <span id="transtats"></span>
+                {% endif %}
               </div>
             </div>
             {% endif %}
@@ -530,6 +537,18 @@ $(document).ready(function() {
         console.log(res);
         $("#bodhi_updates").html("<p>Failed to retrieve updates from bodhi</p>");
       }
+    });
+
+    $.ajax({
+	  url: 'https://transtats.fedoraproject.org/api/package/{{ repo.name }}/exist?format=json',
+	  type: 'GET',
+	  dataType: 'json',
+	  success: function(res){
+	     console.log(res);
+	     if (res[{{ repo.name }}]) {
+              $("#transtats").html("<div class='btn-group'><a class='transtats' href='https://transtats.fedoraproject.org/packages/view/{{ repo.name }}'><button type='button' class='btn btn-sm btn-outline-primary font-weight-bold'>&nbsp;Translation Status</button></a></div>");
+	     }
+	  }
     });
   {% endif %}
 
