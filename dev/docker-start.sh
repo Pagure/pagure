@@ -12,7 +12,12 @@ mkdir -p lcl/{repos,remotes,attachments,releases}
 
 docker image build -f dev/containers/base -t pagure-base .
 
-docker-compose -f dev/docker-compose.yml build
+COMPOSE=docker-compose
+if ! command -v "$COMPOSE" &> /dev/null
+then
+  echo "docker-compose not found, trying podman-compose.."
+  COMPOSE=podman-compose
+fi
 
-docker-compose -f dev/docker-compose.yml up
-
+"$COMPOSE" -f dev/docker-compose.yml build
+"$COMPOSE" -f dev/docker-compose.yml up
