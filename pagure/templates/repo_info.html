@@ -225,7 +225,7 @@
                       <div class="dropdown-menu dropdown-menu-right" id="maintainers_dropdown">
                           <div>
                               <div class="media p-2">
-                                  <img class=" align-self-center mr-3" src="{{ repo.user.default_email | avatar_url }}" width=50px height=50px>
+                                  <img class=" align-self-center mr-3" src="{{ repo.user.default_email | avatar_url }}" width="50" height="50">
                                   <div class="media-body align-self-center">
                                     <h4 class="my-0 font-weight-bold">
                                       <a href="{{ url_for('ui_ns.view_user', username=repo.user.user)}}">{{ repo.user.user }}</a>
@@ -237,7 +237,7 @@
                               {% for access in repo.contributors %}
                                 {% for user in repo.contributors[access] %}
                                   <div class="media p-2">
-                                      <img class=" align-self-center mr-3" src="{{ user.default_email | avatar_url }}" width=50px height=50px>
+                                      <img class=" align-self-center mr-3" src="{{ user.default_email | avatar_url }}" width="50" height="50">
                                       <div class="media-body align-self-center">
                                         <h4 class="my-0 font-weight-bold">
                                           <a href="{{ url_for('ui_ns.view_user', username=user.user)}}">{{ user.user }}</a>
