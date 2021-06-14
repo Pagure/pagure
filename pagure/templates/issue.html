@@ -661,7 +661,7 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
   var UPLOAD_URL = "{{ url_for('ui_ns.upload_issue', repo=repo.name, username=username, namespace=repo.namespace, issueid=issue.id) }}";
 </script>
 
-<script type="text/javascript" nonce="{{ g.nonce }}"src="{{
+<script nonce="{{ g.nonce }}" src="{{
   url_for('static', filename='vendor/jquery.textcomplete/jquery.textcomplete.min.js') }}?version={{ g.version}}"></script>
 <script type="text/javascript" nonce="{{ g.nonce }}" src="{{
   url_for('static', filename='vendor/emojione/emojione.min.js') }}?version={{ g.version}}"></script>
