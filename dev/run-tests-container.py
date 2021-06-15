@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#!/usr/bin/env -S python -u
 
 import argparse
 import os
@@ -87,6 +87,8 @@ if __name__ == "__main__":
         ]
 
     failed = []
+    print("Running for {} containers:".format(len(container_names)))
+    print("  - " + "\n  - ".join(container_names))
     for idx, container_name in enumerate(container_names):
         if args.skip_build is not False:
             print("------ Building Container Image -----")
