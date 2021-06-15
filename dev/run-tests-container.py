@@ -5,6 +5,9 @@ import os
 import subprocess as sp
 
 
+ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+
+
 def setup_parser():
     """ Setup the cli arguments """
     parser = argparse.ArgumentParser(prog="pagure-test")
@@ -98,8 +101,8 @@ if __name__ == "__main__":
                 "-t",
                 container_name,
                 "-f",
-                "dev/containers/%s" % container_files[idx],
-                "dev/containers",
+                ROOT + "/dev/containers/%s" % container_files[idx],
+                ROOT + "/dev/containers",
             ]
             print(" ".join(cmd))
             output_code = sp.call(cmd)
