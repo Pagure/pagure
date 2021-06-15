@@ -2827,7 +2827,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             )
             self.assertIn('<a class="pointer">1 more commits...', output_text)
             self.assertIn(
-                'title="View file as of 4829cf">Šource</a>', output_text
+                'title="View file as of 4829cfa">Šource</a>', output_text
             )
             self.assertIn(
                 '<div class="btn btn-outline-success disabled opacity-100 border-0 font-weight-bold">\n'
@@ -2859,7 +2859,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             )
             self.assertIn('<a class="pointer">1 more commits...', output_text)
             self.assertIn(
-                'title="View file as of 000000">Šource</a>', output_text
+                'title="View file as of 0000000">Šource</a>', output_text
             )
             self.assertIn(
                 '<div class="btn btn-outline-danger disabled opacity-100 border-0 font-weight-bold">\n'

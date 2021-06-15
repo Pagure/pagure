@@ -291,7 +291,7 @@ class PagureFlaskForktests(tests.Modeltests):
         #'  PR from the feature branch\n</h3>',
         # output_text)
         self.assertIn(
-            'title="View file as of 2a552b">sources</a>', output_text
+            'title="View file as of 2a552bb">sources</a>', output_text
         )
 
         # Test if the `open changed file icon` is displayed.
@@ -359,7 +359,7 @@ class PagureFlaskForktests(tests.Modeltests):
             output_text,
         )
         self.assertIn(
-            'title="View file as of 2a552b">sources</a>', output_text
+            'title="View file as of 2a552bb">sources</a>', output_text
         )
         # Un-authenticated user cannot see this checkbox
         self.assertNotIn(
@@ -399,7 +399,7 @@ class PagureFlaskForktests(tests.Modeltests):
                 output_text,
             )
             self.assertIn(
-                'title="View file as of 2a552b">sources</a>', output_text
+                'title="View file as of 2a552bb">sources</a>', output_text
             )
             self.assertIn(
                 '<input id="delete_branch" name="delete_branch" type="checkbox" '
@@ -443,7 +443,7 @@ class PagureFlaskForktests(tests.Modeltests):
                 output_text,
             )
             self.assertIn(
-                'title="View file as of 2a552b">sources</a>', output_text
+                'title="View file as of 2a552bb">sources</a>', output_text
             )
             self.assertIn(
                 '<input id="delete_branch" name="delete_branch" type="checkbox" '
@@ -487,7 +487,7 @@ class PagureFlaskForktests(tests.Modeltests):
                 output_text,
             )
             self.assertIn(
-                'title="View file as of 2a552b">sources</a>', output_text
+                'title="View file as of 2a552bb">sources</a>', output_text
             )
             self.assertNotIn(
                 '<input id="delete_branch" name="delete_branch" type="checkbox" '
@@ -528,7 +528,7 @@ class PagureFlaskForktests(tests.Modeltests):
             output_text,
         )
         self.assertIn(
-            'title="View file as of 2a552b">sources</a>', output_text
+            'title="View file as of 2a552bb">sources</a>', output_text
         )
 
         # Add a new commit on the repo from
@@ -791,7 +791,7 @@ class PagureFlaskForktests(tests.Modeltests):
             #'  PR from the feature branch\n</h3>',
             # output_text)
             self.assertIn(
-                'title="View file as of 2a552b">sources</a>', output_text
+                'title="View file as of 2a552bb">sources</a>', output_text
             )
 
             # Wrong project
@@ -1254,7 +1254,7 @@ class PagureFlaskForktests(tests.Modeltests):
         output_text = output.get_data(as_text=True)
         self.assertIsNotNone(re.search(MERGED_PATTERN, output_text))
         self.assertIn(
-            'title="View file as of 2a552b">sources</a>', output_text
+            'title="View file as of 2a552bb">sources</a>', output_text
         )
 
     @patch("pagure.lib.notify.send_email")
@@ -7129,7 +7129,7 @@ More information</textarea>
                 output_text,
             )
             self.assertIn(
-                'title="View file as of 2a552b">sources</a>', output_text
+                'title="View file as of 2a552bb">sources</a>', output_text
             )
 
             # Wrong project

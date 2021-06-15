@@ -83,7 +83,7 @@ class PagureFlaskRepoOldUrltests(tests.SimplePagureTest):
         )
 
         self.assertTrue(
-            'title="View file as of %s"' % commit.oid.hex[0:6]
+            'title="View file as of %s"' % commit.oid.hex[0:7]
             in output.get_data(as_text=True)
         )
 
@@ -168,7 +168,7 @@ class PagureFlaskRepoOldUrltests(tests.SimplePagureTest):
         )
 
         self.assertTrue(
-            'title="View file as of %s"' % commit.oid.hex[0:6]
+            'title="View file as of %s"' % commit.oid.hex[0:7]
             in output.get_data(as_text=True)
         )
 
