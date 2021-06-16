@@ -100,8 +100,6 @@
 {% else %}
   <div class="card-body p-0">
   {% if output_type in ('file','binary','image','markup') %}
-        {% if content is not none %}
-          {% if output_type in ('file','binary','image','markup') %}
             <div class="bg-light border text-right pr-2">
                 {% if output_type in ('file','markup') and g.repo_admin %}
                 <a class="btn btn-sm btn-secondary" href="{{ url_for(
@@ -181,8 +179,6 @@
                     identifier=branchname,
                     filename=filename) | unicode }}" title="View as raw">Raw</a>
             </div>
-          {% endif %}
-        {% endif %}
 
     {% if output_type=='file' %}
         <pre class="syntaxhighlightblock"><code class="{{filename|syntax_alias}}">{{ content }}</code></pre>
