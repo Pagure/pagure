@@ -100,7 +100,7 @@
 {% else %}
   <div class="card-body p-0">
   {% if output_type in ('file','binary','image','markup') %}
-            <div class="bg-light border text-right pr-2">
+            <div class="bg-light border text-right pr-2 py-1">
                 {% if output_type in ('file','markup') and g.repo_admin %}
                 <a class="btn btn-sm btn-secondary" href="{{ url_for(
                     'ui_ns.edit_file',
@@ -122,7 +122,7 @@
                         )
                     )
                 %}
-                <form class="btn btn-sm" method="POST" name="fork_project"
+                <form class="d-inline mx-2" method="POST" name="fork_project"
                     action="{{ url_for('ui_ns.fork_edit_file',
                         repo=repo.name,
                         username=username,
@@ -209,6 +209,16 @@
         </p>
     {% endif %}
   {% else %}
+      <div class="bg-light border text-right pr-2 py-1">
+          <a class="btn btn-secondary btn-sm" href="{{ url_for(
+                    'ui_ns.view_history_file',
+                    repo=repo.name,
+                    username=username,
+                    namespace=repo.namespace,
+                    identifier=branchname,
+                    filename=filename) | unicode }}" title="View git log for this path">History</a>
+
+      </div>
       <table class="table table-sm mb-0">
         <tbody>
           {% for entry in content %}
