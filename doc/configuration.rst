@@ -1106,7 +1106,7 @@ PAGURE_AUTH
 This configuration key specifies which authentication method to use.
 Valid options are ``fas``, ``openid``, ``oidc``, or ``local``.
 
-* ``fas`` uses the Fedora Account System `FAS <https://admin.fedoraproject.org/accounts>`
+* ``fas`` uses the Fedora Account System `FAS <https://accounts.fedoraproject.org>`
   to provide user authentication and enforces that users sign the FPCA.
 
 * ``openid`` uses OpenID authentication.  Any provider may be used by
