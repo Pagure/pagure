@@ -74,7 +74,7 @@
             <div><strong>{{group.users|count}} Members</strong></div>
             {% if g.authenticated and (member or admin) %}
               <div id="add_user_button" class="btn btn-outline-primary btn-sm ml-auto">
-                <a href="https://admin.fedoraproject.org/accounts/group/view/{{
+                <a href="https://accounts.fedoraproject.org/group/{{
                   group.group_name }}">
                     <span class="fa fa-user-plus"></span>
                 </a>

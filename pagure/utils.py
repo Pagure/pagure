@@ -386,8 +386,8 @@ def login_required(function):
             flask.session["_requires_fpca"] = True
             flask.flash(
                 flask.Markup(
-                    'You must <a href="https://admin.fedoraproject'
-                    '.org/accounts/">sign the FPCA</a> (Fedora Project '
+                    'You must <a href="https://accounts.fedoraproject'
+                    '.org/">sign the FPCA</a> (Fedora Project '
                     "Contributor Agreement) to use pagure"
                 ),
                 "errors",

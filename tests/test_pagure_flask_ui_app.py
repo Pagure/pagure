@@ -1942,7 +1942,7 @@ class PagureFlaskApptests(tests.Modeltests):
             output_text = output.get_data(as_text=True)
             self.assertIn("<title>Home - Pagure</title>", output_text)
             self.assertIn(
-                '</i> You must <a href="https://admin.fedoraproject.org/accounts/'
+                '</i> You must <a href="https://accounts.fedoraproject.org/'
                 '">sign the FPCA</a> (Fedora Project Contributor Agreement) '
                 "to use pagure</div>",
                 output_text,
