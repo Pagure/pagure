@@ -63,7 +63,7 @@
     <div class="card">
       <div class="card-header">
         <ol class="breadcrumb p-0 bg-transparent mb-0">
-          <li>
+          <li class="breadcrumb-item">
             <a href="{{ url_for('ui_ns.view_tree',
                 repo=repo.name,
                 username=username,
@@ -81,7 +81,7 @@
           {% else %}
           {% set path = path + '/' + file %}
           {% endif %}
-          {% if loop.index != loop.length %}<li><a
+          {% if loop.index != loop.length %}<li class="breadcrumb-item"><a
           href="{{ url_for('ui_ns.view_file',
                 repo=repo.name,
                 username=username,
@@ -91,7 +91,7 @@
             <span class="fa fa-folder"></span>&nbsp; {{ file }}</a>
           </li>
           {% elif file %}
-          <li class="active">
+          <li class="breadcrumb-item active">
             <span class="fa {% if output_type == 'tree' %}fa-folder{% else %}fa-file{% endif %}">
             </span>&nbsp; {{ file }}
           </li>
