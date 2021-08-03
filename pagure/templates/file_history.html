@@ -76,21 +76,20 @@
           </li>
         {% for file in filename.split('/') %}
           {% set path = '/'.join(filename.split('/')[:loop.index]) %}
-          {% if loop.index != loop.length %}<li class="breadcrumb-item"><a
-          href="{{ url_for('ui_ns.view_file',
+          {% if loop.last %}
+          {% set path_type = 'file' %}
+          {% else %}
+          {% set path_type = 'folder' %}
+          {% endif %}
+          <li class="breadcrumb-item">
+            <a href="{{ url_for('ui_ns.view_file',
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace,
                 identifier=branchname,
                 filename=path | unicode)}}">
-            <span class="fa fa-folder"></span>&nbsp; {{ file }}</a>
+            <span class="fa fa-{{ path_type }}"></span>&nbsp; {{ file }}</a>
           </li>
-          {% elif file %}
-          <li class="breadcrumb-item active">
-            <span class="fa {% if output_type == 'tree' %}fa-folder{% else %}fa-file{% endif %}">
-            </span>&nbsp; {{ file }}
-          </li>
-          {% endif %}
         {% endfor %}
         </ol>
       </div>
