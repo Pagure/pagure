@@ -74,13 +74,8 @@
               </span>&nbsp; {{ branchname }}
             </a>
           </li>
-        {% set path = '' %}
         {% for file in filename.split('/') %}
-          {% if loop.first %}
-          {% set path = file %}
-          {% else %}
-          {% set path = path + '/' + file %}
-          {% endif %}
+          {% set path = '/'.join(filename.split('/')[:loop.index]) %}
           {% if loop.index != loop.length %}<li class="breadcrumb-item"><a
           href="{{ url_for('ui_ns.view_file',
                 repo=repo.name,
