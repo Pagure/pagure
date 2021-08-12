@@ -773,7 +773,10 @@ def api_pull_request_close(repo, requestid, username=None, namespace=None):
     _check_token(repo, project_token=False)
     request = _get_request(repo, requestid)
 
-    if not is_repo_committer(repo):
+    if (
+        not is_repo_committer(repo)
+        and not flask.g.fas_user.username == request.user.username
+    ):
         raise pagure.exceptions.APIError(403, error_code=APIERROR.ENOPRCLOSE)
 
     try:
