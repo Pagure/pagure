@@ -770,7 +770,7 @@ def api_pull_request_close(repo, requestid, username=None, namespace=None):
 
     repo = _get_repo(repo, username, namespace)
     _check_pull_request(repo)
-    _check_token(repo)
+    _check_token(repo, project_token=False)
     request = _get_request(repo, requestid)
 
     if not is_repo_committer(repo):
