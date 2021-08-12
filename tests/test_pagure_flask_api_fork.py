@@ -1115,6 +1115,66 @@ class PagureFlaskApiForktests(tests.Modeltests):
         )
 
     @patch("pagure.lib.notify.send_email")
+    def test_api_pull_request_close_cross_project_token(self, send_email):
+        """ Test the api_pull_request_close method of the flask api for cross-project API token. """
+        send_email.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        # Create the pull-request to close
+        repo = pagure.lib.query.get_authorized_project(self.session, "test")
+        forked_repo = pagure.lib.query.get_authorized_project(
+            self.session, "test"
+        )
+        req = pagure.lib.query.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from="master",
+            repo_to=repo,
+            branch_to="master",
+            title="test pull-request",
+            user="foo",
+        )
+        self.session.commit()
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, "test pull-request")
+        self.assertEqual(req.user.id, 2)
+
+        # Create a token for foo
+        item = pagure.lib.model.Token(
+            id="foobar_token",
+            user_id=2,
+            project_id=None,
+            expiration=datetime.datetime.utcnow()
+            + datetime.timedelta(days=30),
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        # Allow the token to close PR
+        acls = pagure.lib.query.get_acls(self.session)
+        for acl in acls:
+            if acl.name == "pull_request_close":
+                break
+        item = pagure.lib.model.TokenAcl(
+            token_id="foobar_token", acl_id=acl.id
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        headers = {"Authorization": "token foobar_token"}
+
+        # User is the same that created this PR
+        output = self.app.post(
+            "/api/0/test/pull-request/1/close", headers=headers
+        )
+        self.assertEqual(output.status_code, 403)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(data, {"message": "Pull-request closed!"})
+
+    @patch("pagure.lib.notify.send_email")
     def test_api_pull_request_close(self, send_email):
         """ Test the api_pull_request_close method of the flask api. """
         send_email.return_value = True
