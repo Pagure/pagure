@@ -1170,7 +1170,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         output = self.app.post(
             "/api/0/test/pull-request/1/close", headers=headers
         )
-        self.assertEqual(output.status_code, 403)
+        self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(data, {"message": "Pull-request closed!"})
 
