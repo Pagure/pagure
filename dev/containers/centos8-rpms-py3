@@ -1,0 +1,48 @@
+FROM quay.io/centos/centos:8stream
+
+ARG repo=https://pagure.io/pagure.git
+ARG branch=master
+
+ENV REPO=$repo
+ENV BRANCH=$branch
+
+RUN dnf -y install \
+    epel-release epel-next-release
+
+RUN dnf -y config-manager --enable epel-testing epel-next-testing powertools
+
+RUN dnf -y install \
+    python3-setuptools \
+    python3-coverage \
+    python3-mock \
+    python3-docutils \
+    python3-black \
+    python3-flake8 \
+    python3-pytest-xdist \
+    python3-cchardet \
+    python3-fedora-messaging \
+    python3-pip \
+    redis \
+    which \
+    git
+
+RUN pip install pagure-messages
+
+RUN cd / \
+    && GIT_TRACE=1 GIT_CURL_VERBOSE=1 git clone -b $BRANCH $REPO \
+    && chmod +x /pagure/dev/containers/runtests_py3.sh
+
+# Install all the requirements from the spec file and replace the macro
+# %{python_pkgversion} by '3' which thus installs all the py3 version of
+# the dependencies.
+RUN sed -i "/Requires:           python%{python_pkgversion}-enum34/d" /pagure/files/pagure.spec && \
+    dnf -y install `grep "Requires:" /pagure/files/pagure.spec | \
+    awk '{split($0, a, " "); print a[2]}' |grep -v "%{name}" | \
+    sed -e "s|%{python_pkgversion}|3|"` && \
+    dnf clean all && \
+    cd /pagure && \
+    python3 setup.py build
+
+WORKDIR /pagure
+ENTRYPOINT ["/pagure/dev/containers/runtests_py3.sh"]
+CMD []

@@ -66,8 +66,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.centos is True:
-        container_names = ["pagure-c7-rpms-py2"]
-        container_files = ["centos7-rpms-py2"]
+        container_names = ["pagure-c8s-rpms-py3"]
+        container_files = ["centos8-rpms-py3"]
     elif args.fedora is True:
         container_names = ["pagure-fedora-rpms-py3"]
         container_files = ["fedora-rpms-py3"]
@@ -77,12 +77,12 @@ if __name__ == "__main__":
     else:
         container_names = [
             "pagure-fedora-rpms-py3",
-            "pagure-c7-rpms-py2",
+            "pagure-c8s-rpms-py3",
             "pagure-fedora-pip-py3",
         ]
         container_files = [
             "fedora-rpms-py3",
-            "centos7-rpms-py2",
+            "centos8-rpms-py3",
             "fedora-pip-py3",
         ]
 

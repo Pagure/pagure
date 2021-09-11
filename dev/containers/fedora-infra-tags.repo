@@ -1,6 +1,0 @@
-[infrastructure-tags]
-name=Fedora Infrastructure tag epel7-infra - x86_64
-baseurl=https://kojipkgs.fedoraproject.org/repos-dist/epel7-infra/latest/x86_64/
-enabled=1
-gpgcheck=1
-gpgkey=https://infrastructure.fedoraproject.org/repo/infra/RPM-GPG-KEY-INFRA-TAGS
