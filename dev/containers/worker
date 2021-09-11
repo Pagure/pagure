@@ -6,7 +6,7 @@ VOLUME ["/repos"]
 RUN mkdir /code
 WORKDIR /code
 
-ENTRYPOINT ["/usr/bin/celery-3", "-A", "pagure.lib.tasks", "worker", "--loglevel", "info"]
+ENTRYPOINT ["/usr/bin/celery-3", "-A", "pagure.lib.tasks", "worker", "--loglevel", "INFO"]
 
 # Code injection is last to make optimal use of caches
 VOLUME ["/code"]

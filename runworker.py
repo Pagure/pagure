@@ -53,7 +53,7 @@ if args.config:
         config = os.path.join(here, config)
     env["PAGURE_CONFIG"] = config
 
-cmd = [sys.executable, "-m", "celery", "worker", "-A", args.tasks]
+cmd = [sys.executable, "-m", "celery", "-A", "worker", args.tasks]
 
 if args.queue:
     cmd.extend(["-Q", args.queue])

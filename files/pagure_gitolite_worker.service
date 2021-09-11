@@ -4,7 +4,7 @@ After=redis.target
 Documentation=https://pagure.io/pagure
 
 [Service]
-ExecStart=/usr/bin/celery worker -A pagure.lib.tasks --loglevel=info -c 1 -Q gitolite_queue
+ExecStart=/usr/bin/celery -A pagure.lib.tasks worker --loglevel=INFO -c 1 -Q gitolite_queue
 Environment="PAGURE_CONFIG=/etc/pagure/pagure.cfg"
 Type=simple
 User=git

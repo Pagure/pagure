@@ -10,7 +10,7 @@ After=redis.target
 Documentation=https://pagure.io/pagure
 
 [Service]
-ExecStart=/usr/bin/celery worker -A pagure.lib.tasks --loglevel=info -Q <queue_name>
+ExecStart=/usr/bin/celery -A pagure.lib.tasks worker --loglevel=INFO -Q <queue_name>
 Environment="PAGURE_CONFIG=/etc/pagure/pagure.cfg"
 Type=simple
 User=git
