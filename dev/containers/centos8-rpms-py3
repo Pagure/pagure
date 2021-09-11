@@ -16,7 +16,6 @@ RUN dnf -y install \
     python3-coverage \
     python3-mock \
     python3-docutils \
-    python3-black \
     python3-flake8 \
     python3-pytest-xdist \
     python3-cchardet \
