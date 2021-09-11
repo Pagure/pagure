@@ -1,4 +1,4 @@
-FROM quay.io/centos/centos:8stream
+FROM quay.io/centos/centos:stream8
 
 ARG repo=https://pagure.io/pagure.git
 ARG branch=master
