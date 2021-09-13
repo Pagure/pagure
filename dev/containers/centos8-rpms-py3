@@ -25,7 +25,7 @@ RUN dnf -y install \
     which \
     git
 
-RUN pip install pagure-messages
+RUN pip3 install pagure-messages
 
 RUN cd / \
     && GIT_TRACE=1 GIT_CURL_VERBOSE=1 git clone -b $BRANCH $REPO \
