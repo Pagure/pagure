@@ -1,15 +1,8 @@
 %{?python_enable_dependency_generator}
 
-%if 0%{?rhel} && 0%{?rhel} < 8
-# Since the Python 3 stack in EPEL is missing too many dependencies,
-# we're sticking with Python 2 there for now.
-%global __python %{__python2}
-%global python_pkgversion %{nil}
-%else
 # Default to Python 3 when not EL
 %global __python %{__python3}
 %global python_pkgversion %{python3_pkgversion}
-%endif
 
 # For now, to keep behavior consistent
 %global _python_bytecompile_extra 1
@@ -31,16 +24,12 @@ BuildRequires:      systemd
 BuildRequires:      python%{python_pkgversion}-devel
 BuildRequires:      python%{python_pkgversion}-setuptools
 
-%if 0%{?rhel} && 0%{?rhel} < 8
 # Required only for the `fas` and `openid` authentication backends
-Requires:           python%{python_pkgversion}-fedora-flask
-# Required only for the `oidc` authentication backend
-# flask-oidc
-# Required only if `USE_FLASK_SESSION_EXT` is set to `True`
-# flask-session
-%else
 Recommends:         python%{python_pkgversion}-fedora-flask
-%endif
+# Required only for the `oidc` authentication backend
+Recommends:         python%{python_pkgversion}-flask-oidc
+# Required only if `USE_FLASK_SESSION_EXT` is set to `True`
+Recommends:         python%{python_pkgversion}-flask-session
 
 # We require OpenSSH 7.4+ for SHA256 support
 Requires:           openssh >= 7.4
@@ -56,10 +45,7 @@ Requires:           python%{python_pkgversion}-celery
 Requires:           python%{python_pkgversion}-chardet
 Requires:           python%{python_pkgversion}-cryptography
 Requires:           python%{python_pkgversion}-docutils
-%if ! (0%{?rhel} && 0%{?rhel} < 8)
 Requires:           python%{python_pkgversion}-email-validator
-%endif
-Requires:           python%{python_pkgversion}-enum34
 Requires:           python%{python_pkgversion}-flask
 Requires:           python%{python_pkgversion}-flask-wtf
 Requires:           python%{python_pkgversion}-flask-oidc
@@ -97,9 +83,6 @@ create/merge pull-requests across or within projects.
 Summary:            Apache HTTPD configuration for Pagure
 BuildArch:          noarch
 Requires:           %{name} = %{version}-%{release}
-%if 0%{?rhel} && 0%{?rhel} < 8
-Requires:           mod_wsgi
-%else
 Requires:           httpd-filesystem
 Requires:           python%{python_pkgversion}-mod_wsgi
 %endif
@@ -229,16 +212,6 @@ of this pagure instance.
 %prep
 %autosetup -p1
 
-%if 0%{?rhel} && 0%{?rhel} < 8
-# Fix requirements.txt for EL7 setuptools
-## Remove environment markers, as they're not supported
-sed -e "s/;python_version.*$//g" -i requirements.txt
-## Drop email-validator requirement
-sed -e "s/^email_validator.*//g" -i requirements.txt
-## Drop python3-openid requirement
-sed -e "s/^python3-openid$//g" -i requirements.txt
-%endif
-
 
 %build
 %py_build
@@ -367,13 +340,11 @@ sed -e "s|#!/usr/bin/env python|#!%{__python}|" -i \
 # Switch interpreter for systemd units
 sed -e "s|/usr/bin/python|%{__python}|g" -i $RPM_BUILD_ROOT/%{_unitdir}/*.service
 
-%if ! (0%{?rhel} && 0%{?rhel} < 8)
 # Switch all systemd units to use the correct celery
 sed -e "s|/usr/bin/celery|/usr/bin/celery-3|g" -i $RPM_BUILD_ROOT/%{_unitdir}/*.service
 
 # Switch all systemd units to use the correct gunicorn
 sed -e "s|/usr/bin/gunicorn|/usr/bin/gunicorn-3|g" -i $RPM_BUILD_ROOT/%{_unitdir}/*.service
-%endif
 
 # Make log directories
 mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/log/pagure
@@ -392,12 +363,10 @@ for runnerhook in $runnerhooks; do
    ln -sf hookrunner $RPM_BUILD_ROOT/%{python_sitelib}/pagure/hooks/files/$runnerhook
 done
 
-%if 0%{?fedora} || 0%{?rhel} >= 8
 # Byte compile everything not in sitelib
 %py_byte_compile %{__python} %{buildroot}%{_datadir}/pagure/
 %py_byte_compile %{__python} %{buildroot}%{_libexecdir}/pagure/
 %py_byte_compile %{__python} %{buildroot}%{_libexecdir}/pagure-ev/
-%endif
 
 %post
 %systemd_post pagure_worker.service
@@ -477,9 +446,7 @@ done
 %dir %{_sysconfdir}/pagure/
 %dir %{_datadir}/pagure/
 %{_datadir}/pagure/*.py*
-%if ! (0%{?rhel} && 0%{?rhel} < 8)
 %{_datadir}/pagure/__pycache__/
-%endif
 %{_datadir}/pagure/alembic/
 %{_libexecdir}/pagure/
 %{python_sitelib}/pagure/

@@ -10,9 +10,7 @@ celery
 chardet
 cryptography
 docutils
-enum34;python_version<"3.4"
-# this is only needed with wtforms on py3
-email_validator;python_version>="3.0"
+email_validator
 flask
 flask-wtf
 kitchen
@@ -21,8 +19,7 @@ munch
 Pillow
 psutil
 pygit2 >= 0.26.0
-python-openid;python_version<="2.7"
-python3-openid;python_version>="3.0"
+python3-openid
 python-openid-cla
 python-openid-teams
 redis
@@ -31,9 +28,7 @@ setuptools
 six
 # sqlalchemy minimum 0.8
 sqlalchemy >= 0.8
-# 1.4.0 is broken, 1.4.0-post-1 works but gives odd results on newer setuptools
-# the latest version 1.5.0 is also known to work
-straight.plugin
+straight.plugin >= 1.5.0
 whitenoise
 wtforms
 
