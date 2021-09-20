@@ -49,6 +49,7 @@ Requires:           python%{python_pkgversion}-email-validator
 Requires:           python%{python_pkgversion}-flask
 Requires:           python%{python_pkgversion}-flask-wtf
 Requires:           python%{python_pkgversion}-flask-oidc
+Requires:           python%{python_pkgversion}-kitchen
 Requires:           python%{python_pkgversion}-markdown
 Requires:           python%{python_pkgversion}-munch
 Requires:           python%{python_pkgversion}-pillow
@@ -61,7 +62,7 @@ Requires:           python%{python_pkgversion}-redis
 Requires:           python%{python_pkgversion}-requests
 Requires:           python%{python_pkgversion}-six
 Requires:           python%{python_pkgversion}-sqlalchemy >= 0.8
-Requires:           python%{python_pkgversion}-straight-plugin
+Requires:           python%{python_pkgversion}-straight-plugin >= 1.5.0
 Requires:           python%{python_pkgversion}-whitenoise
 Requires:           python%{python_pkgversion}-wtforms
 %endif
