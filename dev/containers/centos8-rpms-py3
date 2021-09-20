@@ -13,12 +13,14 @@ RUN dnf -y config-manager --enable epel-testing epel-next-testing powertools
 
 RUN dnf -y install \
     python3-setuptools \
+    python3-beautifulsoup4 \
     python3-coverage \
     python3-mock \
     python3-docutils \
     python3-flake8 \
     python3-pytest-xdist \
     python3-cchardet \
+    python3-flask-oidc \
     python3-fedora-messaging \
     python3-pip \
     redis \
@@ -34,8 +36,7 @@ RUN cd / \
 # Install all the requirements from the spec file and replace the macro
 # %{python_pkgversion} by '3' which thus installs all the py3 version of
 # the dependencies.
-RUN sed -i "/Requires:           python%{python_pkgversion}-enum34/d" /pagure/files/pagure.spec && \
-    dnf -y install `grep "Requires:" /pagure/files/pagure.spec | \
+RUN dnf -y install `grep "Requires:" /pagure/files/pagure.spec | \
     awk '{split($0, a, " "); print a[2]}' |grep -v "%{name}" | \
     sed -e "s|%{python_pkgversion}|3|"` && \
     dnf clean all && \
