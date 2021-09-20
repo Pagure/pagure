@@ -29,7 +29,7 @@ Recommends:         python%{python_pkgversion}-fedora-flask
 # Required only for the `oidc` authentication backend
 Recommends:         python%{python_pkgversion}-flask-oidc
 # Required only if `USE_FLASK_SESSION_EXT` is set to `True`
-Recommends:         python%{python_pkgversion}-flask-session
+# flask-session
 
 # We require OpenSSH 7.4+ for SHA256 support
 Requires:           openssh >= 7.4
