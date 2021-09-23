@@ -16,6 +16,7 @@ import shutil
 import sys
 import os
 
+import six
 import pygit2
 import markdown
 from mock import patch, MagicMock, Mock
@@ -4344,8 +4345,8 @@ class PagureLibtests(tests.Modeltests):
             '<div class="markdown"><p>but not someone@pingou.com</p></div>',
         ]
 
-        if mk_321:
-            print("**** Markdown 3.2.1+ behavior")
+        if mk_321 or six.PY3:
+            print("**** Markdown 3.2.1+ and Markdown on Python 3 behavior")
             expected.append(
                 # '[![Fedora_infinity_small.png]'
                 # '(/test/issue/raw/Fedora_infinity_small.png)]'
