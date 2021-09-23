@@ -34,7 +34,14 @@ class TestStyle(unittest.TestCase):
 
         This test runs flake8 on the code, and will fail if it returns a
         non-zero exit code.
+        If flake8 is not installed, this test auto-skips.
         """
+        try:
+            import flake8
+        except ImportError as e:
+            raise unittest.SkipTest(
+                "flake8 is not installed, skipping flake8 style check..."
+            )
         # We ignore E712, which disallows non-identity comparisons with True and False
         # We ignore W503, which disallows line break before binary operator
         flake8_command = [
@@ -77,7 +84,14 @@ class TestStyle(unittest.TestCase):
 
         This test runs black on the code, and will fail if it returns a
         non-zero exit code.
+        If black is not installed, this test auto-skips.
         """
+        try:
+            import black
+        except ImportError as e:
+            raise unittest.SkipTest(
+                "black is not installed, skipping black style check..."
+            )
         black_command = [
             sys.executable,
             "-m",
