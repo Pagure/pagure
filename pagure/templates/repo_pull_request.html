@@ -132,7 +132,8 @@
 
 
       </h4>
-    <div class="ml-auto d-flex">
+    <div class="ml-auto d-flex flex-column">
+      <div class="d-flex justify-content-end">
         {% if pull_request.status == 'Open' %}
           {% if g.authenticated and (g.fas_user.username == pull_request.user.username
             or g.repo_committer) %}
@@ -161,7 +162,7 @@
               </button>
             </form>
           {% endif %}
-          <div class="dropdown float-right ml-1">
+          <div class="dropdown inline ml-1">
             <span class="dropdown dropdown-btn">
               <a href="#" id="merge_dropdown_btn"
                   class="btn btn-outline-secondary btn-sm disabled dropdown-toggle" data-toggle="dropdown">
@@ -236,7 +237,19 @@
             </button>
           </form>
        {% endif %}
+      </div>
+      {% if warning_characters %}
+      <div>
+          <span class="badge badge-danger font-size-09">warning</span>
+        <small>
+          Special characters such as: <a
+              href="https://en.wikipedia.org/wiki/Bidirectional_text">Bidirectional
+              characters</a>, found in this PR.
+        </small>
+      </div>
+      {% endif %}
     </div>
+
   </div>
 
 

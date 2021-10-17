@@ -6216,3 +6216,26 @@ def update_ticket_board_status(
             user=user,
             notification=True,
         )
+
+
+def find_warning_characters(repo_obj, commits):
+    """Return whether the given list of commits of the specified repository
+    object contains forbidden characters or not.
+    """
+    warn_characters = pagure_config["PR_WARN_CHARACTERS"]
+
+    for commit in commits:
+        if commit.parents:
+            diff = repo_obj.diff(commit.parents[0], commit)
+        else:
+            # First commit in the repo
+            diff = commit.tree.diff_to_tree(swap=True)
+
+        for patch in diff:
+            for hunk in patch.hunks:
+                for line in hunk.lines:
+                    subset = [c for c in line.content if c in warn_characters]
+                    if subset:
+                        return True
+
+    return False

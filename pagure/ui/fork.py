@@ -320,6 +320,10 @@ def request_pull(repo, requestid, username=None, namespace=None):
     if diff:
         diff.find_similar()
 
+    warning_characters = pagure.lib.query.find_warning_characters(
+        repo_obj, diff_commits
+    )
+
     form = pagure.forms.MergePRForm()
     trigger_ci_pr_form = pagure.forms.TriggerCIPRForm()
 
@@ -369,6 +373,7 @@ def request_pull(repo, requestid, username=None, namespace=None):
         trigger_ci=trigger_ci,
         trigger_ci_pr_form=trigger_ci_pr_form,
         flag_statuses_labels=json.dumps(pagure_config["FLAG_STATUSES_LABELS"]),
+        warning_characters=warning_characters,
     )
 
 

@@ -1931,6 +1931,20 @@ used.
 Defaults to: ``None`` (which results in the default branch being ``master``).
 
 
+PR_WARN_CHARACTERS
+~~~~~~~~~~~~~~~~~~
+
+List of characters that triggers a warning to the users when met in a commit of
+a pull-request (each commit being made checked).
+
+Defaults to:
+::
+
+    set([
+        chr(0x202a), chr(0x202b), chr(0x202c), chr(0x202d), chr(0x202e),
+        chr(0x2066), chr(0x2067), chr(0x2068), chr(0x2069)
+    ])
+
 
 RepoSpanner Options
 -------------------
