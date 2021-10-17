@@ -643,3 +643,17 @@ CSP_HEADERS = (
     "base-uri 'self';"
     "img-src 'self' https:;"
 )
+
+PR_WARN_CHARACTERS = set(
+    [
+        chr(0x202A),
+        chr(0x202B),
+        chr(0x202C),
+        chr(0x202D),
+        chr(0x202E),
+        chr(0x2066),
+        chr(0x2067),
+        chr(0x2068),
+        chr(0x2069),
+    ]
+)
