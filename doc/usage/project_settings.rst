@@ -30,6 +30,13 @@ If the `Always merge` option is on, then the `fast-forward` option
 above is disabled in favor of the `merge` option.
 
 
+`Boards`
+--------------------------
+
+The boards feature provides simple kanban board functionality by showing issues in columns that represent state.
+The settings page lists existing boards and allows adminisrators to add new boards.
+
+
 `Comment editing`
 --------------------------
 
