@@ -59,6 +59,7 @@ Contents:
    upgrade_db
    pagure_ci
    quick_replies
+   board
    troubleshooting
    tips_tricks
 
