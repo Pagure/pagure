@@ -1150,6 +1150,7 @@ def add_pull_request_git_repo(
     branch_from="feature",
     user="pingou",
     allow_rebase=False,
+    append_content=None,
 ):
     """Set up the git repo and create the corresponding PullRequest
     object.
@@ -1198,8 +1199,11 @@ def add_pull_request_git_repo(
     remote.fetch()
 
     # Edit the sources file again
+    content = "foo\n bar\nbaz\n boose"
+    if append_content:
+        content = content + append_content
     with open(os.path.join(new_gitrepo, "sources"), "w") as stream:
-        stream.write("foo\n bar\nbaz\n boose")
+        stream.write(content)
     clone_repo.index.add("sources")
     clone_repo.index.write()
 
