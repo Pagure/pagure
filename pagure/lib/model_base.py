@@ -48,7 +48,7 @@ def create_session(db_url=None, debug=False, pool_recycle=3600):
     global SESSIONMAKER
 
     if SESSIONMAKER is None or (
-        db_url and db_url != ("%s" % SESSIONMAKER.kw["bind"].engine.url)
+        db_url and db_url != ("{}".format(SESSIONMAKER.kw["bind"].engine.url))
     ):
         if db_url is None:
             raise ValueError("First call to create_session needs db_url")
