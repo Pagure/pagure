@@ -3,6 +3,29 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
+5.13.3 (2021-11-01)
+-------------------
+- Warn users when a PR contains some characters
+- srcfpo theme: Change "Packages" link to new packages website (Brendan Early)
+- srcfpo theme: left-align the lines in description (Zbigniew Jędrzejewski-Szmek)
+- fas user url updated for new accounts system (Mark O Brien)
+- Change fas link from admin.fp.o to accounts.fp.o (Lenka Segura)
+- Remove message about 60 day key length (Ken Dreyer)
+- Escape $ to fix Jenkins interpolation warning (#5178) (Anatoli Babenia)
+- Fix another invalid <img> width/height attribute (Anatoli Babenia)
+- Fix missing space before src in <script> (Anatoli Babenia)
+- Remove duplicate class attribute from Clone dropdown (Anatoli Babenia)
+- Fix invalid <img> height (no px is allowed here) (Anatoli Babenia)
+- Add Translation status link on repo_info page at src.fp.o (Sundeep Anand)
+- Update fedmsg homepage (Rafael Fontenelle)
+- Add support for noggin with the FAS auth backend
+- Update collaborator access level descriptions (Michel Alexandre Salim)
+- Fix a type, add missing work hand (Jan Kuparinen)
+- Explicitly require setuptools, pagure/lib/git_auth.py imports pkg_resources (Miro Hrončok)
+- Fix getting the tests to run on CentOS
+- Fix Pagure's overview page verbatim error (ankitapareek)
+
+
 5.13.2 (2021-01-29)
 -------------------
 - Fix broken pagination of group API (Lukas Brabec and František Zatloukal)
