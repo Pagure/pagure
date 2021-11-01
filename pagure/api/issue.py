@@ -454,8 +454,12 @@ def api_view_issues(repo, username=None, namespace=None):
 
     updated_after = None
     if since:
+        try:
+            since = float(since)
+        except ValueError:
+            pass
         # Validate and convert the time
-        if since.isdigit():
+        if isinstance(since, float):
             # We assume its a timestamp, so convert it to datetime
             try:
                 updated_after = arrow.get(int(since)).datetime
