@@ -152,4 +152,9 @@ def set_user(return_url):
     except pagure.exceptions.PagureException as err:
         flask.flash(str(err), "error")
 
+    if flask.g.fas_user.get("ssh_key"):
+        del(flask.g.fas_user.ssh_key)
+    if flask.session.get("FLASK_FAS_OPENID_USER").get("ssh_key"):
+        del(flask.session["FLASK_FAS_OPENID_USER"]["ssh_key"])
+
     return flask.redirect(return_url)
