@@ -1745,7 +1745,9 @@ def api_fork_project():
     if form.validate_on_submit():
         repo = form.repo.data
         username = form.username.data or None
-        namespace = form.namespace.data.strip() or None
+        namespace = None
+        if form.namespace.data:
+            namespace = form.namespace.data.strip()
 
         repo = get_authorized_api_project(
             flask.g.session, repo, user=username, namespace=namespace
