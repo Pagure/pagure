@@ -122,8 +122,8 @@ The Vagrant pagure doesn't have its own log file, use ``journalctl -f`` to
 show the pagure output. The verbosity can be configured in the pagure config file
 with the ``LOGGING`` parameter.
 
-Running the unit-tests
-**********************
+Running the unit-tests in container
+***********************************
 
 To run the unit-tests, there is container available with all the dependencies needed.
 
@@ -159,6 +159,43 @@ Or a single test ::
 You can also get `run-tests-container` help ::
 
     $ ./dev/run-tests-container.py --help
+
+Run the tests on your own development branch in your fork ::
+
+    $ ./dev/run-tests-container.py --repo https://pagure.io/forks/<username>/pagure.git --branch <name of branch to test>
+
+  .. note:: This run could take pretty long to finish and there isn't any useful summary.
+            So it's better to redirect the output to some file. You can use `tee` for this.
+
+ 
+Running the unit-tests in tox
+*****************************
+
+You can run the tests using tox. This allows you to run the tests on local version of the code.
+
+  .. note:: This way of running tests could help you test your local changes,
+            but the output could be different then from the containerized tests.
+            Always check your branch after push with containerized tests as well.
+
+* Install the needed system libraries::
+
+     sudo dnf install libgit2-devel redis gcc tox python-alembic
+
+
+  .. note:: You can also install any missing python interpreter.
+            For example `sudo dnf install python35`
+
+* Run the whole test suite::
+
+     tox
+
+* Or just single environment::
+
+     tox -e py39
+
+* Or single module::
+
+     tox tests/test_style.py
 
 Manually
 ^^^^^^^^
