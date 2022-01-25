@@ -335,7 +335,7 @@ class RequestPullEditForm(RequestPullForm):
 
     branch_to = wtforms.SelectField(
         "Target branch",
-        [wtforms.validators.Required()],
+        [wtforms.validators.DataRequired()],
         choices=[],
         coerce=convert_value,
     )
@@ -964,7 +964,7 @@ class TriggerCIPRForm(PagureForm):
         self.comment.choices = choices
 
     comment = wtforms.SelectField(
-        "comment", [wtforms.validators.Required()], choices=[]
+        "comment", [wtforms.validators.DataRequired()], choices=[]
     )
 
 
