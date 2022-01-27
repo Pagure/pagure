@@ -1406,18 +1406,24 @@ def update_project(repo, username=None, namespace=None):
 
         try:
             repo.description = form.description.data
-            repo.avatar_email = form.avatar_email.data.strip()
-            repo.url = form.url.data.strip()
+            # Check if the optional value is filled
+            if form.avatar_email.data is not None:
+                repo.avatar_email = form.avatar_email.data.strip()
+            # Check if the optional value is filled
+            if form.url.data:
+                repo.url = form.url.data.strip()
             if repo.private:
                 repo.private = form.private.data
             if repo.mirrored_from:
                 repo.mirrored_from = form.mirrored_from.data
-            pagure.lib.query.update_tags(
-                flask.g.session,
-                repo,
-                tags=[t.strip() for t in form.tags.data.split(",")],
-                username=flask.g.fas_user.username,
-            )
+            # Check if the optional value is filled
+            if form.tags.data:
+                pagure.lib.query.update_tags(
+                    flask.g.session,
+                    repo,
+                    tags=[t.strip() for t in form.tags.data.split(",")],
+                    username=flask.g.fas_user.username,
+                )
             flask.g.session.add(repo)
             flask.g.session.commit()
             flask.flash("Project updated")
