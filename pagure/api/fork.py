@@ -512,7 +512,10 @@ def api_pull_request_update(repo, requestid, username=None, namespace=None):
         )
     else:
         request.title = form.title.data.strip()
-        request.initial_comment = form.initial_comment.data.strip()
+        request.initial_comment = ""
+        # This value is optional, check first if it's filled
+        if form.initial_comment.data:
+            request.initial_comment = form.initial_comment.data.strip()
         flask.g.session.add(request)
         if not request.private and not request.project.private:
             pagure.lib.notify.log(
@@ -1535,7 +1538,10 @@ def api_pull_request_create(repo, username=None, namespace=None):
     if orig_commit:
         orig_commit = orig_commit.oid.hex
 
-    initial_comment = form.initial_comment.data.strip() or None
+    initial_comment = None
+    # This value is optional, check first if it's filled
+    if form.initial_comment.data:
+        initial_comment = form.initial_comment.data.strip()
 
     commit_start = commit_stop = None
     if diff_commits:
