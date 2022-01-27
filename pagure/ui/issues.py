@@ -185,12 +185,14 @@ def update_issue(repo, issueid, username=None, namespace=None):
 
         comment = form.comment.data
         depends = []
-        for depend in form.depending.data.split(","):
-            if depend.strip():
-                try:
-                    depends.append(int(depend.strip()))
-                except ValueError:
-                    pass
+        # This field is optional, check if it's filled first
+        if form.depending.data:
+            for depend in form.depending.data.split(","):
+                if depend.strip():
+                    try:
+                        depends.append(int(depend.strip()))
+                    except ValueError:
+                        pass
 
         blocks = []
         for block in form.blocking.data.split(","):
