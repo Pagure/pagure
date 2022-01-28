@@ -1543,10 +1543,14 @@ def add_api_user_token():
 
     if form.validate_on_submit():
         try:
+            description = None
+            # Check if the optional value is filled
+            if form.description.data:
+                description = form.description.data.strip()
             pagure.lib.query.add_token_to_user(
                 flask.g.session,
                 project=None,
-                description=form.description.data.strip() or None,
+                description=description,
                 acls=form.acls.data,
                 username=user.username,
                 expiration_date=form.expiration_date.data,
