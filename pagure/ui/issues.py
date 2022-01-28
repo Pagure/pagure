@@ -195,14 +195,19 @@ def update_issue(repo, issueid, username=None, namespace=None):
                         pass
 
         blocks = []
-        for block in form.blocking.data.split(","):
-            if block.strip():
-                try:
-                    blocks.append(int(block.strip()))
-                except ValueError:
-                    pass
+        # Check if the optional field is filled
+        if form.blocking.data:
+            for block in form.blocking.data.split(","):
+                if block.strip():
+                    try:
+                        blocks.append(int(block.strip()))
+                    except ValueError:
+                        pass
 
-        assignee = form.assignee.data.strip() or None
+        assignee = None
+        # Check if the optional field is filled
+        if form.assignee.data:
+            assignee = form.assignee.data.strip()
         new_status = form.status.data.strip() or None
         close_status = form.close_status.data or None
         if close_status not in repo.close_status:
@@ -213,7 +218,10 @@ def update_issue(repo, issueid, username=None, namespace=None):
             new_priority = int(form.priority.data)
         except (ValueError, TypeError):
             pass
-        tags = [tag.strip() for tag in form.tag.data.split(",") if tag.strip()]
+        tags = []
+        # Check if the optional field is filled
+        if form.tag.data:
+            tags = [tag.strip() for tag in form.tag.data.split(",")]
 
         new_milestone = None
         try:
