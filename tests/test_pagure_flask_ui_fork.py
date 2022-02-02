@@ -6382,7 +6382,7 @@ More information</textarea>
             self.assertIn(
                 "<p>fork/foo/test is not part of fork/ralph/test2's "
                 "family</p>",
-                output.get_data(as_text=True),
+                output.get_data(as_text=True).replace("&#x27;", "'"),
             )
 
     @patch("pagure.lib.notify.send_email")
