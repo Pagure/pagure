@@ -74,6 +74,11 @@ def format_ts(string):
     # always use UTC timezone, and we don't use localized forms like
     # %b or %d because they will be 'localized' for the *server*.
     # This format should be pretty 'locale-neutral'.
+
+    # Return empty string if timestamp is None
+    # This will prevent any formatting error in arrow
+    if string is None:
+        return ""
     arr = arrow.get(string)
     return arr.strftime("%Y-%m-%d %H:%M:%S %Z")
 
