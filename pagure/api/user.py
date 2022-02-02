@@ -634,10 +634,10 @@ def api_view_user_activity_stats(username):
             # aim for noon on the desired date.
             try:
 
-                return arrow.get(d, tz).replace(hour=12).timestamp
+                return int(arrow.get(d, tz).replace(hour=12).float_timestamp)
             except (arrow.parser.ParserError, ValueError):
                 # if tz is invalid for some reason, just go with UTC
-                return arrow.get(d).replace(hour=12).timestamp
+                return int(arrow.get(d).replace(hour=12).float_timestamp)
         else:
             d = d.isoformat()
         return d
