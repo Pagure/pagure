@@ -160,7 +160,8 @@ def is_safe_url(target):  # pragma: no cover
     ref_url = urlparse(flask.request.host_url)
     test_url = urlparse(urljoin(flask.request.host_url, target))
     return (
-        test_url.scheme in ("http", "https")
+        target is not None
+        and test_url.scheme in ("http", "https")
         and ref_url.netloc == test_url.netloc
     )
 
