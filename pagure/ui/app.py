@@ -1135,7 +1135,7 @@ def wait_task(taskid):
 
     prev = flask.request.args.get("prev")
     if not is_safe_url(prev):
-        prev = flask.url_for("index")
+        prev = flask.url_for("ui_ns.index")
 
     count = flask.request.args.get("count", 0)
     try:
