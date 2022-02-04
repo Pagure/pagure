@@ -2460,7 +2460,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
 
         # Create 1st tickets
-        start = arrow.utcnow().timestamp
+        start = int(arrow.utcnow().float_timestamp)
         issue = pagure.lib.model.Issue(
             id=pagure.lib.query.get_next_id(self.session, repo.id),
             project_id=repo.id,
@@ -2474,7 +2474,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.session.commit()
 
         time.sleep(1)
-        middle = arrow.utcnow().timestamp
+        middle = int(arrow.utcnow().float_timestamp)
 
         # Create 2nd tickets
         issue = pagure.lib.model.Issue(
@@ -2490,7 +2490,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.session.commit()
 
         time.sleep(1)
-        final = arrow.utcnow().timestamp
+        final = int(arrow.utcnow().float_timestamp)
 
         # Create private issue
         issue = pagure.lib.model.Issue(
@@ -2553,7 +2553,6 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
         time.sleep(1)
-        late = arrow.utcnow().timestamp
 
         # List all opened issues from the start
         output = self.app.get("/api/0/test/issues?since=%s" % start)
