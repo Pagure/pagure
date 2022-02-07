@@ -33,11 +33,11 @@ class PagureFlaskSlashInNametests(tests.SimplePagureTest):
     """Tests for flask application when the project contains a '/'."""
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskSlashInNametests, self).setUp()
 
     def set_up_git_repo(self, name="test"):
-        """ Set up the git repo to play with. """
+        """Set up the git repo to play with."""
 
         # Create a git repo to play with
         gitrepo = os.path.join(self.path, "repos", "%s.git" % name)

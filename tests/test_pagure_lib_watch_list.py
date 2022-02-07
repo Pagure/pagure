@@ -29,10 +29,10 @@ import tests
 @mock.patch("pagure.lib.git.update_git", mock.MagicMock(return_value=True))
 @mock.patch("pagure.lib.notify.send_email", mock.MagicMock(return_value=True))
 class PagureLibGetWatchListtests(tests.Modeltests):
-    """ Tests for pagure.lib.query.get_watch_list """
+    """Tests for pagure.lib.query.get_watch_list"""
 
     def test_get_watch_list_invalid_object(self):
-        """ Test get_watch_list when given an invalid object """
+        """Test get_watch_list when given an invalid object"""
         # Create a project ns/test
         item = pagure.lib.model.Project(
             user_id=1,  # pingou

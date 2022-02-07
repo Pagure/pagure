@@ -37,10 +37,10 @@ import pagure.ui.login
 
 
 class PagureFlaskLogintests(tests.SimplePagureTest):
-    """ Tests for flask app controller of pagure """
+    """Tests for flask app controller of pagure"""
 
     def setUp(self):
-        """ Create the application with PAGURE_AUTH being local. """
+        """Create the application with PAGURE_AUTH being local."""
         super(PagureFlaskLogintests, self).setUp()
 
         app = pagure.flask_app.create_app(
@@ -53,7 +53,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
 
     @patch.dict("pagure.config.config", {"PAGURE_AUTH": "local"})
     def test_front_page(self):
-        """ Test the front page. """
+        """Test the front page."""
         # First access the front page
         output = self.app.get("/")
         self.assertEqual(output.status_code, 200)
@@ -64,7 +64,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
     @patch.dict("pagure.config.config", {"PAGURE_AUTH": "local"})
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_new_user(self):
-        """ Test the new_user endpoint. """
+        """Test the new_user endpoint."""
 
         # Check before:
         items = pagure.lib.query.search_user(self.session)
@@ -153,7 +153,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
     @patch.dict("pagure.config.config", {"ALLOW_USER_REGISTRATION": False})
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_new_user_disabled(self):
-        """ Test the disabling of the new_user endpoint. """
+        """Test the disabling of the new_user endpoint."""
 
         # Check before:
         items = pagure.lib.query.search_user(self.session)
@@ -176,7 +176,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
     @patch.dict("pagure.config.config", {"PAGURE_AUTH": "local"})
     @patch.dict("pagure.config.config", {"CHECK_SESSION_IP": False})
     def test_do_login(self):
-        """ Test the do_login endpoint. """
+        """Test the do_login endpoint."""
 
         output = self.app.get("/login/")
         self.assertEqual(output.status_code, 200)
@@ -419,7 +419,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
     @patch.dict("pagure.config.config", {"PAGURE_AUTH": "local"})
     @patch.dict("pagure.config.config", {"CHECK_SESSION_IP": False})
     def test_do_login_and_redirect(self):
-        """ Test the do_login endpoint with a non-default redirect. """
+        """Test the do_login endpoint with a non-default redirect."""
         # This has all the data needed
         data = {
             "username": "foouser",
@@ -697,7 +697,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         self.assertEqual(item.token, None)
 
     def test_confirm_user(self):
-        """ Test the confirm_user endpoint. """
+        """Test the confirm_user endpoint."""
 
         output = self.app.get("/confirm/foo", follow_redirects=True)
         self.assertEqual(output.status_code, 200)
@@ -733,7 +733,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
     @patch.dict("pagure.config.config", {"PAGURE_AUTH": "local"})
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_lost_password(self):
-        """ Test the lost_password endpoint. """
+        """Test the lost_password endpoint."""
 
         output = self.app.get("/password/lost")
         self.assertEqual(output.status_code, 200)
@@ -810,7 +810,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
     @patch.dict("pagure.config.config", {"PAGURE_AUTH": "local"})
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_reset_password(self):
-        """ Test the reset_password endpoint. """
+        """Test the reset_password endpoint."""
 
         output = self.app.get("/password/reset/foo", follow_redirects=True)
         self.assertEqual(output.status_code, 200)
@@ -887,7 +887,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
     )
     @patch.dict("pagure.config.config", {"PAGURE_AUTH": "local"})
     def test_change_password(self):
-        """ Test the change_password endpoint. """
+        """Test the change_password endpoint."""
 
         # Not logged in, redirects
         output = self.app.get("/password/change", follow_redirects=True)
@@ -1034,7 +1034,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
 
     @patch.dict("pagure.config.config", {"PAGURE_AUTH": "local"})
     def test_logout(self):
-        """ Test the auth_logout endpoint for local login. """
+        """Test the auth_logout endpoint for local login."""
 
         output = self.app.get("/logout/", follow_redirects=True)
         self.assertEqual(output.status_code, 200)
@@ -1070,7 +1070,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
 
     @patch.dict("pagure.config.config", {"PAGURE_AUTH": "local"})
     def test_settings_admin_session_timedout(self):
-        """ Test the admin_session_timedout with settings endpoint. """
+        """Test the admin_session_timedout with settings endpoint."""
         lifetime = pagure.config.config.get(
             "ADMIN_SESSION_LIFETIME", datetime.timedelta(minutes=15)
         )
@@ -1094,7 +1094,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
 
     @patch("flask.flash")
     def test_admin_session_timedout(self, flash):
-        """ Test the call to admin_session_timedout. """
+        """Test the call to admin_session_timedout."""
         lifetime = pagure.config.config.get(
             "ADMIN_SESSION_LIFETIME", datetime.timedelta(minutes=15)
         )
@@ -1116,7 +1116,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
 
     @patch.dict("pagure.config.config", {"PAGURE_AUTH": "local"})
     def test_force_logout(self):
-        """ Test forcing logout. """
+        """Test forcing logout."""
         user = tests.FakeUser(username="foo")
         with tests.user_set(self.app.application, user, keep_get_user=True):
             # Test that accessing settings works

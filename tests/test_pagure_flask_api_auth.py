@@ -28,7 +28,7 @@ import tests
 
 
 class PagureFlaskApiAuthtests(tests.SimplePagureTest):
-    """ Tests for the authentication in the flask API of pagure """
+    """Tests for the authentication in the flask API of pagure"""
 
     def test_auth_no_data(self):
         """Test the authentication when there is nothing in the database."""

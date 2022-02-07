@@ -76,12 +76,12 @@ repo requests/somenamespace/test3
 
 
 class PagureLibGitoliteConfigtests(tests.Modeltests):
-    """ Tests for pagure.lib.git """
+    """Tests for pagure.lib.git"""
 
     maxDiff = None
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureLibGitoliteConfigtests, self).setUp()
 
         tests.create_projects(self.session)
@@ -102,7 +102,7 @@ class PagureLibGitoliteConfigtests(tests.Modeltests):
             stream.write("\n# end of footer\n")
 
     def tearDown(self):
-        """ Tearn down the environnment, ran before every tests. """
+        """Tearn down the environnment, ran before every tests."""
         super(PagureLibGitoliteConfigtests, self).tearDown()
 
         if os.path.exists(self.outputconf):
@@ -429,7 +429,7 @@ class PagureLibGitoliteGroupConfigtests(tests.Modeltests):
     maxDiff = None
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureLibGitoliteGroupConfigtests, self).setUp()
 
         tests.create_projects(self.session)
@@ -472,7 +472,7 @@ class PagureLibGitoliteGroupConfigtests(tests.Modeltests):
             stream.write("\n# end of footer\n")
 
     def tearDown(self):
-        """ Tearn down the environnment, ran before every tests. """
+        """Tearn down the environnment, ran before every tests."""
         super(PagureLibGitoliteGroupConfigtests, self).tearDown()
 
         if os.path.exists(self.outputconf):
@@ -480,7 +480,7 @@ class PagureLibGitoliteGroupConfigtests(tests.Modeltests):
         self.assertFalse(os.path.exists(self.outputconf))
 
     def test_write_gitolite_project_test_group(self):
-        """ Test the write_gitolite_acls when updating a single group. """
+        """Test the write_gitolite_acls when updating a single group."""
 
         with open(self.outputconf, "w") as stream:
             pass
@@ -534,7 +534,7 @@ repo requests/test
         self.assertEqual(data, exp)
 
     def test_write_gitolite_project_test_all_groups(self):
-        """ Test the write_gitolite_acls when updating all groups. """
+        """Test the write_gitolite_acls when updating all groups."""
 
         with open(self.outputconf, "w") as stream:
             pass
@@ -588,7 +588,7 @@ repo requests/test
         self.assertEqual(data, exp)
 
     def test_write_gitolite_project_all_projects_groups(self):
-        """ Test the generating the entire gitolite config. """
+        """Test the generating the entire gitolite config."""
 
         with open(self.outputconf, "w") as stream:
             pass
@@ -631,7 +631,7 @@ repo requests/test
         self.assertEqual(data, exp)
 
     def test_write_gitolite_project_all_projects_one_group(self):
-        """ Test the generating the entire gitolite config. """
+        """Test the generating the entire gitolite config."""
 
         # Generate the full gitolite config that we will update
         self.test_write_gitolite_project_all_projects_groups()

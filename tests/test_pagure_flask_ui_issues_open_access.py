@@ -41,10 +41,10 @@ import tests
 
 
 class PagureFlaskIssuesOpenAccesstests(tests.Modeltests):
-    """ Tests for flask issues controller of pagure """
+    """Tests for flask issues controller of pagure"""
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskIssuesOpenAccesstests, self).setUp()
 
         tests.create_projects(self.session)
@@ -187,7 +187,7 @@ class PagureFlaskIssuesOpenAccesstests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_view_issue(self):
-        """ Test the view_issue endpoint. """
+        """Test the view_issue endpoint."""
         output = self.app.get("/test/issue/1")
         self.assertEqual(output.status_code, 404)
 
@@ -286,7 +286,7 @@ class PagureFlaskIssuesOpenAccesstests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_view_issue_user_ticket(self):
-        """ Test the view_issue endpoint. """
+        """Test the view_issue endpoint."""
 
         output = self.app.get("/test/issue/1")
         self.assertEqual(output.status_code, 404)
@@ -355,7 +355,7 @@ class PagureFlaskIssuesOpenAccesstests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_view_issue_custom_field_user_ticket(self):
-        """ Test the view_issue endpoint. """
+        """Test the view_issue endpoint."""
         output = self.app.get("/test/issue/1")
         self.assertEqual(output.status_code, 404)
 
@@ -475,7 +475,7 @@ class PagureFlaskIssuesOpenAccesstests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_view_issue_non_ascii_milestone(self):
-        """ Test the view_issue endpoint with non-ascii milestone. """
+        """Test the view_issue endpoint with non-ascii milestone."""
         output = self.app.get("/test/issue/1")
         self.assertEqual(output.status_code, 404)
 
@@ -561,7 +561,7 @@ class PagureFlaskIssuesOpenAccesstests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_update_issue(self):
-        """ Test the update_issue endpoint. """
+        """Test the update_issue endpoint."""
         output = self.app.get("/test/issue/1/update")
         self.assertEqual(output.status_code, 302)
 
@@ -873,7 +873,7 @@ class PagureFlaskIssuesOpenAccesstests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_update_issue_depend(self):
-        """ Test adding dependency via the update_issue endpoint. """
+        """Test adding dependency via the update_issue endpoint."""
         # Create issues to play with
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
         msg = pagure.lib.query.new_issue(
@@ -957,7 +957,7 @@ class PagureFlaskIssuesOpenAccesstests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_update_issue_block(self):
-        """ Test adding blocked issue via the update_issue endpoint. """
+        """Test adding blocked issue via the update_issue endpoint."""
         # Create issues to play with
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
         msg = pagure.lib.query.new_issue(
@@ -1040,7 +1040,7 @@ class PagureFlaskIssuesOpenAccesstests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_update_issue_edit_comment(self):
-        """ Test the issues edit comment endpoint """
+        """Test the issues edit comment endpoint"""
         # Create issues to play with
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
         msg = pagure.lib.query.new_issue(
@@ -1276,7 +1276,7 @@ class PagureFlaskIssuesOpenAccesstests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_view_issue_closed(self):
-        """ Test viewing a closed issue. """
+        """Test viewing a closed issue."""
         # Create issues to play with
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
         msg = pagure.lib.query.new_issue(

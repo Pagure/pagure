@@ -45,13 +45,13 @@ def get_plugin_names(blacklist=None, without_backref=False):
 
 
 def get_plugin_tables():
-    """ Return the list of all plugins. """
+    """Return the list of all plugins."""
     plugins = load("pagure.hooks", subclasses=BASE)
     return plugins
 
 
 def get_plugin(plugin_name):
-    """ Return the list of plugins names. """
+    """Return the list of plugins names."""
     from pagure.hooks import BaseHook
 
     plugins = load("pagure.hooks", subclasses=BaseHook)

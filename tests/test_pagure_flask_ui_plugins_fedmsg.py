@@ -25,10 +25,10 @@ import pagure.config
 
 
 class PagureFlaskPluginFedmsgtests(tests.SimplePagureTest):
-    """ Tests for fedmsg plugin of pagure """
+    """Tests for fedmsg plugin of pagure"""
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskPluginFedmsgtests, self).setUp()
 
         tests.create_projects(self.session)
@@ -36,12 +36,12 @@ class PagureFlaskPluginFedmsgtests(tests.SimplePagureTest):
         tests.create_projects_git(os.path.join(self.path, "docs"))
 
     def tearDown(self):
-        """ Tear Down the environment after the tests. """
+        """Tear Down the environment after the tests."""
         super(PagureFlaskPluginFedmsgtests, self).tearDown()
         pagure.config.config["DOCS_FOLDER"] = None
 
     def test_plugin_fedmsg_defaul_page(self):
-        """ Test the fedmsg plugin endpoint's default page. """
+        """Test the fedmsg plugin endpoint's default page."""
 
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):

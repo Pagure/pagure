@@ -31,12 +31,12 @@ from pagure.lib.repo import PagureRepo
 
 
 class PagureFlaskRoadmaptests(tests.Modeltests):
-    """ Tests for the pagure's roadmap """
+    """Tests for the pagure's roadmap"""
 
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_ticket_with_no_roadmap(self, p_send_email, p_ugt):
-        """ Test creating a ticket without roadmap. """
+        """Test creating a ticket without roadmap."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -86,7 +86,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_ticket_with_roadmap(self, p_send_email, p_ugt):
-        """ Test creating a ticket with roadmap. """
+        """Test creating a ticket with roadmap."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -157,7 +157,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
             )
 
     def test_update_milestones(self):
-        """ Test updating milestones of a repo. """
+        """Test updating milestones of a repo."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
 
@@ -427,7 +427,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_milestones_without_dates(self, p_send_email, p_ugt):
-        """ Test creating two milestones with no dates. """
+        """Test creating two milestones with no dates."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
 
@@ -480,7 +480,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_roadmap_ui(self, p_send_email, p_ugt):
-        """ Test viewing the roadmap of a repo. """
+        """Test viewing the roadmap of a repo."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 

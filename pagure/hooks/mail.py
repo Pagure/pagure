@@ -61,7 +61,7 @@ class MailTable(BASE):
 
 
 class MailForm(FlaskForm):
-    """ Form to configure the mail hook. """
+    """Form to configure the mail hook."""
 
     mail_to = wtforms.StringField("Mail to", [RequiredIf("active")])
     active = wtforms.BooleanField("Active", [wtforms.validators.Optional()])
@@ -136,7 +136,7 @@ class MailRunner(BaseRunner):
 
 
 class Mail(BaseHook):
-    """ Mail hooks. """
+    """Mail hooks."""
 
     name = "Mail"
     description = (

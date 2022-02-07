@@ -1128,7 +1128,7 @@ def new_project():
 
 @UI_NS.route("/wait/<taskid>")
 def wait_task(taskid):
-    """ Shows a wait page until the task finishes. """
+    """Shows a wait page until the task finishes."""
     task = pagure.lib.tasks.get_result(taskid)
 
     is_js = is_true(flask.request.args.get("js"))

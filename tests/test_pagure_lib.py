@@ -406,12 +406,12 @@ class PagureLibtests_search_projects(tests.Modeltests):
 
 
 class PagureLibtests(tests.Modeltests):
-    """ Tests for pagure.lib """
+    """Tests for pagure.lib"""
 
     maxDiff = None
 
     def test_get_repotypes(self):
-        """ Test the get_repotypes function of pagure.lib.query. """
+        """Test the get_repotypes function of pagure.lib.query."""
         with patch.dict(
             pagure.config.config,
             {"ENABLE_TICKETS": False, "ENABLE_DOCS": False},
@@ -448,14 +448,14 @@ class PagureLibtests(tests.Modeltests):
             )
 
     def test_get_next_id(self):
-        """ Test the get_next_id function of pagure.lib.query. """
+        """Test the get_next_id function of pagure.lib.query."""
         tests.create_projects(self.session)
         self.assertEqual(1, pagure.lib.query.get_next_id(self.session, 1))
 
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_new_issue(self, p_send_email, p_ugt):
-        """ Test the new_issue of pagure.lib.query. """
+        """Test the new_issue of pagure.lib.query."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -548,7 +548,7 @@ class PagureLibtests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_edit_issue(self, p_send_email, p_ugt):
-        """ Test the edit_issue of pagure.lib.query. """
+        """Test the edit_issue of pagure.lib.query."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -675,7 +675,7 @@ class PagureLibtests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_edit_issue_close_status(self, p_send_email, p_ugt):
-        """ Test the edit_issue of pagure.lib.query. """
+        """Test the edit_issue of pagure.lib.query."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -865,7 +865,7 @@ class PagureLibtests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_add_issue_dependency(self):
-        """ Test the add_issue_dependency of pagure.lib.query. """
+        """Test the add_issue_dependency of pagure.lib.query."""
 
         self.test_new_issue()
         repo = pagure.lib.query._get_project(self.session, "test")
@@ -917,7 +917,7 @@ class PagureLibtests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_edit_comment(self, mock_redis):
-        """ Test the edit_issue of pagure.lib.query. """
+        """Test the edit_issue of pagure.lib.query."""
         mock_redis.return_value = True
 
         self.test_add_issue_comment()
@@ -954,7 +954,7 @@ class PagureLibtests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_edit_comment_private(self, mock_redis):
-        """ Test the edit_issue of pagure.lib.query. """
+        """Test the edit_issue of pagure.lib.query."""
 
         self.test_add_issue_comment_private()
 
@@ -990,7 +990,7 @@ class PagureLibtests(tests.Modeltests):
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     @patch("pagure.lib.query.REDIS")
     def test_add_tag_obj(self, mock_redis):
-        """ Test the add_tag_obj of pagure.lib.query. """
+        """Test the add_tag_obj of pagure.lib.query."""
         mock_redis.return_value = True
 
         self.test_edit_issue()
@@ -1037,7 +1037,7 @@ class PagureLibtests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_remove_tags(self, p_send_email, p_ugt):
-        """ Test the remove_tags of pagure.lib.query. """
+        """Test the remove_tags of pagure.lib.query."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -1063,7 +1063,7 @@ class PagureLibtests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_remove_tags_obj(self):
-        """ Test the remove_tags_obj of pagure.lib.query. """
+        """Test the remove_tags_obj of pagure.lib.query."""
 
         self.test_add_tag_obj()
         repo = pagure.lib.query._get_project(self.session, "test")
@@ -1077,7 +1077,7 @@ class PagureLibtests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_remove_tags_obj_from_project(self, p_send_email, p_ugt):
-        """ Test the remove_tags_obj of pagure.lib from a project. """
+        """Test the remove_tags_obj of pagure.lib from a project."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -1109,7 +1109,7 @@ class PagureLibtests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_edit_issue_tags(self, p_send_email, p_ugt):
-        """ Test the edit_issue_tags of pagure.lib.query. """
+        """Test the edit_issue_tags of pagure.lib.query."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -1211,7 +1211,7 @@ class PagureLibtests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_search_issues(self, p_send_email, p_ugt):
-        """ Test the search_issues of pagure.lib.query. """
+        """Test the search_issues of pagure.lib.query."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -1297,7 +1297,7 @@ class PagureLibtests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_add_issue_assignee(self):
-        """ Test the add_issue_assignee of pagure.lib.query. """
+        """Test the add_issue_assignee of pagure.lib.query."""
 
         self.test_new_issue()
         repo = pagure.lib.query._get_project(self.session, "test")
@@ -1398,7 +1398,7 @@ class PagureLibtests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_add_issue_comment(self):
-        """ Test the add_issue_comment of pagure.lib.query. """
+        """Test the add_issue_comment of pagure.lib.query."""
 
         self.test_new_issue()
         repo = pagure.lib.query._get_project(self.session, "test")
@@ -1437,7 +1437,7 @@ class PagureLibtests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_add_issue_comment_private(self):
-        """ Test the add_issue_comment of pagure.lib.query. """
+        """Test the add_issue_comment of pagure.lib.query."""
         tests.create_projects(self.session)
         project = pagure.lib.query._get_project(self.session, "test")
 
@@ -1481,7 +1481,7 @@ class PagureLibtests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_add_user_to_project(self, p_send_email):
-        """ Test the add_user_to_project of pagure.lib.query. """
+        """Test the add_user_to_project of pagure.lib.query."""
         p_send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -1538,7 +1538,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(repo.committers[0].user, "foo")
 
     def test_new_project(self):
-        """ Test the new_project of pagure.lib.query. """
+        """Test the new_project of pagure.lib.query."""
         gitfolder = os.path.join(self.path, "repos")
         docfolder = os.path.join(gitfolder, "docs")
         ticketfolder = os.path.join(gitfolder, "tickets")
@@ -1792,7 +1792,7 @@ class PagureLibtests(tests.Modeltests):
         )
 
     def test_new_project_user_ns(self):
-        """ Test the new_project of pagure.lib with user_ns on. """
+        """Test the new_project of pagure.lib with user_ns on."""
         gitfolder = os.path.join(self.path, "repos")
         docfolder = os.path.join(gitfolder, "docs")
         ticketfolder = os.path.join(gitfolder, "tickets")
@@ -1875,7 +1875,7 @@ class PagureLibtests(tests.Modeltests):
 
     @patch("pagure.lib.notify.log")
     def test_update_project_settings(self, mock_log):
-        """ Test the update_project_settings of pagure.lib.query. """
+        """Test the update_project_settings of pagure.lib.query."""
 
         tests.create_projects(self.session)
 
@@ -1973,7 +1973,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertFalse(repo.settings["pull_requests"])
 
     def test_search_issues_milestones_invalid(self):
-        """ Test the search_issues of pagure.lib.query. """
+        """Test the search_issues of pagure.lib.query."""
 
         self.test_edit_issue()
         repo = pagure.lib.query._get_project(self.session, "test")
@@ -1990,7 +1990,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(len(issues), 2)
 
     def test_search_issues_custom_search(self):
-        """ Test the search_issues of pagure.lib.query. """
+        """Test the search_issues of pagure.lib.query."""
 
         self.test_edit_issue()
         repo = pagure.lib.query._get_project(self.session, "test")
@@ -2002,7 +2002,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(len(issues), 0)
 
     def test_search_issues_offset(self):
-        """ Test the search_issues of pagure.lib.query. """
+        """Test the search_issues of pagure.lib.query."""
 
         self.test_edit_issue()
         repo = pagure.lib.query._get_project(self.session, "test")
@@ -2016,7 +2016,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual([i.id for i in issues], [1])
 
     def test_search_issues_tags(self):
-        """ Test the search_issues of pagure.lib.query. """
+        """Test the search_issues of pagure.lib.query."""
 
         self.test_edit_issue()
         repo = pagure.lib.query._get_project(self.session, "test")
@@ -2065,7 +2065,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual([tag.tag for tag in issues[0].tags], ["tag2"])
 
     def test_get_tags_of_project(self):
-        """ Test the get_tags_of_project of pagure.lib.query. """
+        """Test the get_tags_of_project of pagure.lib.query."""
 
         self.test_add_tag_obj()
         repo = pagure.lib.query._get_project(self.session, "test")
@@ -2084,7 +2084,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual([tag.tag for tag in tags], [])
 
     def test_get_issue_statuses(self):
-        """ Test the get_issue_statuses of pagure.lib.query. """
+        """Test the get_issue_statuses of pagure.lib.query."""
         statuses = pagure.lib.query.get_issue_statuses(self.session)
         self.assertEqual(sorted(statuses), ["Closed", "Open"])
 
@@ -2092,7 +2092,7 @@ class PagureLibtests(tests.Modeltests):
         pagure.config.config, {"ALLOWED_EMAIL_DOMAINS": ["fp.o"]}, clear=True
     )
     def test_set_up_user(self):
-        """ Test the set_up_user of pagure.lib.query. """
+        """Test the set_up_user of pagure.lib.query."""
 
         items = pagure.lib.query.search_user(self.session)
         self.assertEqual(2, len(items))
@@ -2238,7 +2238,7 @@ class PagureLibtests(tests.Modeltests):
         )
 
     def avatar_url_from_email(self):
-        """ Test the avatar_url_from_openid of pagure.lib.query. """
+        """Test the avatar_url_from_openid of pagure.lib.query."""
         output = pagure.lib.query.avatar_url_from_email(
             "pingou@fedoraproject.org"
         )
@@ -2258,7 +2258,7 @@ class PagureLibtests(tests.Modeltests):
         )
 
     def test_fork_project_with_branch(self):
-        """ Test the fork_project of pagure.lib.query. """
+        """Test the fork_project of pagure.lib.query."""
         gitfolder = os.path.join(self.path, "repos")
         docfolder = os.path.join(gitfolder, "docs")
         ticketfolder = os.path.join(gitfolder, "tickets")
@@ -2338,7 +2338,7 @@ class PagureLibtests(tests.Modeltests):
         )
 
     def test_fork_project_preserves_tags(self):
-        """ Test the fork_project of pagure.lib.query pushes tags to the fork. """
+        """Test the fork_project of pagure.lib.query pushes tags to the fork."""
         gitfolder = os.path.join(self.path, "repos")
         docfolder = os.path.join(gitfolder, "docs")
         ticketfolder = os.path.join(gitfolder, "tickets")
@@ -2417,7 +2417,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(tag.message, "release 1.2.3")
 
     def test_fork_project_namespaced(self):
-        """ Test the fork_project of pagure.lib on a namespaced project. """
+        """Test the fork_project of pagure.lib on a namespaced project."""
         gitfolder = os.path.join(self.path, "repos")
         docfolder = os.path.join(gitfolder, "docs")
         ticketfolder = os.path.join(gitfolder, "tickets")
@@ -2502,7 +2502,7 @@ class PagureLibtests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_new_pull_request(self, mockemail):
-        """ test new_pull_request of pagure.lib.query. """
+        """test new_pull_request of pagure.lib.query."""
         mockemail.return_value = True
 
         tests.create_projects(self.session)
@@ -2574,7 +2574,7 @@ class PagureLibtests(tests.Modeltests):
     @patch("pagure.lib.query.REDIS")
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_add_pull_request_comment(self, mock_redis):
-        """ Test add_pull_request_comment of pagure.lib.query. """
+        """Test add_pull_request_comment of pagure.lib.query."""
         mock_redis.return_value = True
 
         self.test_new_pull_request()
@@ -2606,7 +2606,7 @@ class PagureLibtests(tests.Modeltests):
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     @patch("pagure.lib.query.PAGURE_CI", MagicMock(return_value=True))
     def test_add_pull_request_comment_to_re_run_ci(self, mock_redis):
-        """ Test add_pull_request_comment of pagure.lib.query. """
+        """Test add_pull_request_comment of pagure.lib.query."""
         mock_redis.return_value = True
 
         self.test_new_pull_request()
@@ -2646,7 +2646,7 @@ class PagureLibtests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_add_pull_request_flag(self, mockemail):
-        """ Test add_pull_request_flag of pagure.lib.query. """
+        """Test add_pull_request_flag of pagure.lib.query."""
         mockemail.return_value = True
 
         self.test_new_pull_request()
@@ -2689,7 +2689,7 @@ class PagureLibtests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_search_pull_requests(self):
-        """ Test search_pull_requests of pagure.lib.query. """
+        """Test search_pull_requests of pagure.lib.query."""
 
         self.test_new_pull_request()
 
@@ -2799,7 +2799,7 @@ class PagureLibtests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_close_pull_request(self, send_email):
-        """ Test close_pull_request of pagure.lib.query. """
+        """Test close_pull_request of pagure.lib.query."""
         send_email.return_value = True
 
         self.test_new_pull_request()
@@ -2838,7 +2838,7 @@ class PagureLibtests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_remove_issue_dependency(self):
-        """ Test remove_issue_dependency of pagure.lib.query. """
+        """Test remove_issue_dependency of pagure.lib.query."""
 
         self.test_add_issue_dependency()
         repo = pagure.lib.query._get_project(self.session, "test")
@@ -2896,7 +2896,7 @@ class PagureLibtests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_get_issue_comment(self, p_send_email, p_ugt):
-        """ Test the get_issue_comment of pagure.lib.query. """
+        """Test the get_issue_comment of pagure.lib.query."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -2918,7 +2918,7 @@ class PagureLibtests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_get_issue_by_uid(self, p_send_email, p_ugt):
-        """ Test the get_issue_by_uid of pagure.lib.query. """
+        """Test the get_issue_by_uid of pagure.lib.query."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -2937,7 +2937,7 @@ class PagureLibtests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_update_tags(self, p_send_email, p_ugt):
-        """ Test the update_tags of pagure.lib.query. """
+        """Test the update_tags of pagure.lib.query."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -2982,7 +2982,7 @@ class PagureLibtests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_update_dependency_issue(self, p_send_email, p_ugt):
-        """ Test the update_dependency_issue of pagure.lib.query. """
+        """Test the update_dependency_issue of pagure.lib.query."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -3038,7 +3038,7 @@ class PagureLibtests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_update_blocked_issue(self, p_send_email, p_ugt):
-        """ Test the update_blocked_issue of pagure.lib.query. """
+        """Test the update_blocked_issue of pagure.lib.query."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -3087,7 +3087,7 @@ class PagureLibtests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_add_pull_request_assignee(self, mockemail):
-        """ Test add_pull_request_assignee of pagure.lib.query. """
+        """Test add_pull_request_assignee of pagure.lib.query."""
         mockemail.return_value = True
 
         self.test_new_pull_request()
@@ -3127,7 +3127,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(msg, None)
 
     def test_search_pending_email(self):
-        """ Test search_pending_email of pagure.lib.query. """
+        """Test search_pending_email of pagure.lib.query."""
 
         self.assertEqual(
             pagure.lib.query.search_pending_email(self.session), None
@@ -3166,7 +3166,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(pend.token, "abcdef")
 
     def test_generate_hook_token(self):
-        """ Test generate_hook_token of pagure.lib.query. """
+        """Test generate_hook_token of pagure.lib.query."""
 
         tests.create_projects(self.session)
 
@@ -3186,7 +3186,7 @@ class PagureLibtests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_pull_request_score(self, mockemail):
-        """ Test PullRequest.score of pagure.lib.model. """
+        """Test PullRequest.score of pagure.lib.model."""
         mockemail.return_value = True
 
         self.test_new_pull_request()
@@ -3238,7 +3238,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(request.score, 2)
 
     def test_add_group(self):
-        """ Test the add_group method of pagure.lib.query. """
+        """Test the add_group method of pagure.lib.query."""
         groups = pagure.lib.query.search_groups(self.session)
         self.assertEqual(len(groups), 0)
         self.assertEqual(groups, [])
@@ -3354,7 +3354,7 @@ class PagureLibtests(tests.Modeltests):
         )
 
     def test_add_user_to_group(self):
-        """ Test the add_user_to_group method of pagure.lib.query. """
+        """Test the add_user_to_group method of pagure.lib.query."""
         self.test_add_group()
         group = pagure.lib.query.search_groups(self.session, group_name="foo")
         self.assertNotEqual(group, None)
@@ -3416,7 +3416,7 @@ class PagureLibtests(tests.Modeltests):
         )
 
     def test_is_group_member(self):
-        """ Test the is_group_member method of pagure.lib.query. """
+        """Test the is_group_member method of pagure.lib.query."""
         self.test_add_group()
 
         self.assertFalse(
@@ -3436,7 +3436,7 @@ class PagureLibtests(tests.Modeltests):
         )
 
     def test_get_user_group(self):
-        """ Test the get_user_group method of pagure.lib.query. """
+        """Test the get_user_group method of pagure.lib.query."""
 
         self.test_add_group()
 
@@ -3451,7 +3451,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(item, None)
 
     def test_get_group_types(self):
-        """ Test the get_group_types method of pagure.lib.query. """
+        """Test the get_group_types method of pagure.lib.query."""
 
         self.test_add_group()
 
@@ -3465,7 +3465,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(groups[1].group_type, "user")
 
     def test_search_groups(self):
-        """ Test the search_groups method of pagure.lib.query. """
+        """Test the search_groups method of pagure.lib.query."""
 
         self.assertEqual(pagure.lib.query.search_groups(self.session), [])
 
@@ -3520,7 +3520,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(groups.group_name, "foo")
 
     def test_delete_user_of_group(self):
-        """ Test the delete_user_of_group method of pagure.lib.query. """
+        """Test the delete_user_of_group method of pagure.lib.query."""
         self.test_add_user_to_group()
 
         groups = pagure.lib.query.search_groups(self.session)
@@ -3621,7 +3621,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(len(group.users), 1)
 
     def test_edit_group_info(self):
-        """ Test the edit_group_info method of pagure.lib.query. """
+        """Test the edit_group_info method of pagure.lib.query."""
         self.test_add_group()
         group = pagure.lib.query.search_groups(self.session, group_name="foo")
         self.assertNotEqual(group, None)
@@ -3686,7 +3686,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(msg, "Nothing changed")
 
     def test_add_group_to_project(self):
-        """ Test the add_group_to_project method of pagure.lib.query. """
+        """Test the add_group_to_project method of pagure.lib.query."""
         tests.create_projects(self.session)
         self.test_add_group()
 
@@ -3796,7 +3796,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(project.committer_groups[0].group_name, "bar")
 
     def test_update_watch_status(self):
-        """ Test the update_watch_status method of pagure.lib.query. """
+        """Test the update_watch_status method of pagure.lib.query."""
         tests.create_projects(self.session)
 
         project = pagure.lib.query._get_project(self.session, "test")
@@ -3852,7 +3852,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(msg, "Watch status reset")
 
     def test_get_watch_level_on_repo_invalid(self):
-        """ test the get_watch_level_on_repo method of pagure.lib.query. """
+        """test the get_watch_level_on_repo method of pagure.lib.query."""
 
         self.assertRaises(
             RuntimeError,
@@ -3865,7 +3865,7 @@ class PagureLibtests(tests.Modeltests):
         )
 
     def test_get_watch_level_on_repo(self):
-        """ Test the get_watch_level_on_repo method of pagure.lib.query. """
+        """Test the get_watch_level_on_repo method of pagure.lib.query."""
         tests.create_projects(self.session)
         self.test_add_group()
 
@@ -4035,7 +4035,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(watch_level, [])
 
     def test_user_watch_list(self):
-        """ test user watch list method of pagure.lib """
+        """test user watch list method of pagure.lib"""
 
         tests.create_projects(self.session)
 
@@ -4086,7 +4086,7 @@ class PagureLibtests(tests.Modeltests):
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     @patch("pagure.pfmarkdown._commit_exists", MagicMock(return_value=True))
     def test_text2markdown(self):
-        """ Test the text2markdown method in pagure.lib.query. """
+        """Test the text2markdown method in pagure.lib.query."""
         pagure.config.config["TESTING"] = True
         pagure.config.config["SERVER_NAME"] = "localhost.localdomain"
 
@@ -4403,7 +4403,7 @@ class PagureLibtests(tests.Modeltests):
                     self.assertEqual(html, expected[idx])
 
     def test_text2markdown_exception(self):
-        """ Test the text2markdown method in pagure.lib.query. """
+        """Test the text2markdown method in pagure.lib.query."""
 
         text = "test#1 bazinga!"
         expected_html = "test#1 bazinga!"
@@ -4413,7 +4413,7 @@ class PagureLibtests(tests.Modeltests):
             self.assertEqual(html, expected_html)
 
     def test_text2markdown_empty_string(self):
-        """ Test the text2markdown method in pagure.lib.query. """
+        """Test the text2markdown method in pagure.lib.query."""
 
         text = ""
         expected_html = ""
@@ -4422,7 +4422,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(html, expected_html)
 
     def test_get_access_levels(self):
-        """ Test the get_access_levels method in pagure.lib """
+        """Test the get_access_levels method in pagure.lib"""
 
         acls = pagure.lib.query.get_access_levels(self.session)
         self.assertEqual(
@@ -5022,7 +5022,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(access_obj.access, "ticket")
 
     def test_set_watch_obj(self):
-        """ Test the set_watch_obj method in pagure.lib """
+        """Test the set_watch_obj method in pagure.lib"""
         # Create the project ns/test
         item = pagure.lib.model.Project(
             user_id=1,  # pingou
@@ -5087,7 +5087,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(out, "You are no longer watching this issue")
 
     def test_tokenize_search_string(self):
-        """ Test the tokenize_search_string function. """
+        """Test the tokenize_search_string function."""
         # These are the tests performed to make sure we tokenize correctly.
         # This is in the form: input string, custom fields, remaining pattern
         tests = [
@@ -5111,7 +5111,7 @@ class PagureLibtests(tests.Modeltests):
             )
 
     def test_save_report(self):
-        """ Test the save_report function. """
+        """Test the save_report function."""
         # Create the projects
         tests.create_projects(self.session)
 
@@ -5153,7 +5153,7 @@ class PagureLibtests(tests.Modeltests):
         )
 
     def test_text2markdown_table(self):
-        """ Test the text2markdown function with a markdown table. """
+        """Test the text2markdown function with a markdown table."""
         try:
             md_version = markdown.__version__.version_info
         except AttributeError:
@@ -5245,20 +5245,20 @@ foo bar
             self.assertEqual(html, expected)
 
     def test_set_redis(self):
-        """ Test the set_redis function of pagure.lib.query. """
+        """Test the set_redis function of pagure.lib.query."""
         self.assertIsNone(pagure.lib.query.REDIS)
         pagure.lib.query.set_redis("0.0.0.0", 6379, 0)
         self.assertIsNotNone(pagure.lib.query.REDIS)
 
     def test_set_pagure_ci(self):
-        """ Test the set_pagure_ci function of pagure.lib.query. """
+        """Test the set_pagure_ci function of pagure.lib.query."""
         # self.assertIn(pagure.lib.query.PAGURE_CI, [None, ['jenkins']])
         pagure.lib.query.set_pagure_ci(True)
         self.assertIsNotNone(pagure.lib.query.PAGURE_CI)
         self.assertTrue(pagure.lib.query.PAGURE_CI)
 
     def test_get_user_invalid_user(self):
-        """ Test the get_user function of pagure.lib.query. """
+        """Test the get_user function of pagure.lib.query."""
         self.assertRaises(
             pagure.exceptions.PagureException,
             pagure.lib.query.get_user,
@@ -5267,25 +5267,25 @@ foo bar
         )
 
     def test_get_user_username(self):
-        """ Test the get_user function of pagure.lib.query. """
+        """Test the get_user function of pagure.lib.query."""
         user = pagure.lib.query.get_user(self.session, "foo")
         self.assertEqual(user.username, "foo")
 
     def test_get_user_email(self):
-        """ Test the get_user function of pagure.lib.query. """
+        """Test the get_user function of pagure.lib.query."""
         user = pagure.lib.query.get_user(self.session, "bar@pingou.com")
         self.assertEqual(user.username, "pingou")
 
     def test_is_valid_ssh_key_empty(self):
-        """ Test the is_valid_ssh_key function of pagure.lib.query. """
+        """Test the is_valid_ssh_key function of pagure.lib.query."""
         self.assertIsNone(pagure.lib.query.is_valid_ssh_key(""))
 
     def test_is_valid_ssh_key_invalid(self):
-        """ Test the is_valid_ssh_key function of pagure.lib.query. """
+        """Test the is_valid_ssh_key function of pagure.lib.query."""
         self.assertEqual(pagure.lib.query.is_valid_ssh_key("nonsense"), False)
 
     def test_is_valid_ssh_key(self):
-        """ Test the is_valid_ssh_key function of pagure.lib.query. """
+        """Test the is_valid_ssh_key function of pagure.lib.query."""
         keyinfo = pagure.lib.query.is_valid_ssh_key(
             """ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDtgzSO9d1IrKdmyBFUvtAJPLgGOhp0lSySkWRSe+/+3KXYjSnsLnCJQlO5M7JfaXhtTHEow86rh4W9+FoJdzo5iocAwH5xPZ5ttHLy7VHgTzNMUeMgKpjy6bBOdPoGPPG4mo7QCMCRJdWBRDv4OSEMLU5jQAvC272YK2V8L918VQ== root@test"""
         )
@@ -5446,13 +5446,13 @@ foo bar
         )
 
     def test_create_user_ssh_keys_on_disk_none(self):
-        """ Test the create_user_ssh_keys_on_disk function of pagure.lib.query. """
+        """Test the create_user_ssh_keys_on_disk function of pagure.lib.query."""
         self.assertIsNone(
             pagure.lib.query.create_user_ssh_keys_on_disk(None, None)
         )
 
     def test_update_user_settings_invalid_user(self):
-        """ Test the update_user_settings function of pagure.lib.query. """
+        """Test the update_user_settings function of pagure.lib.query."""
         self.assertRaises(
             pagure.exceptions.PagureException,
             pagure.lib.query.update_user_settings,
@@ -5462,7 +5462,7 @@ foo bar
         )
 
     def test_update_user_settings_no_change(self):
-        """ Test the update_user_settings function of pagure.lib.query. """
+        """Test the update_user_settings function of pagure.lib.query."""
 
         # First update the setting
         msg = pagure.lib.query.update_user_settings(
@@ -5479,7 +5479,7 @@ foo bar
         self.assertEqual(msg, "Successfully edited your settings")
 
     def test_update_user_settings_no_data(self):
-        """ Test the update_user_settings function of pagure.lib.query. """
+        """Test the update_user_settings function of pagure.lib.query."""
 
         msg = pagure.lib.query.update_user_settings(
             session=self.session,
@@ -5489,7 +5489,7 @@ foo bar
         self.assertEqual(msg, "No settings to change")
 
     def test_update_user_settings(self):
-        """ Test the update_user_settings function of pagure.lib.query. """
+        """Test the update_user_settings function of pagure.lib.query."""
 
         msg = pagure.lib.query.update_user_settings(
             session=self.session,
@@ -5572,7 +5572,7 @@ foo bar
         "pagure.lib.query.is_valid_ssh_key", MagicMock(return_value="foo bar")
     )
     def test_update_user_ssh_valid_key(self):
-        """ Test the update_user_ssh function of pagure.lib.query. """
+        """Test the update_user_ssh function of pagure.lib.query."""
         pagure.SESSION = self.session
 
         pagure.lib.query.update_user_ssh(
@@ -5586,7 +5586,7 @@ foo bar
         )
 
     def test_add_user_pending_email_existing_email(self):
-        """ Test the add_user_pending_email function of pagure.lib.query. """
+        """Test the add_user_pending_email function of pagure.lib.query."""
         user = pagure.lib.query.search_user(self.session, username="pingou")
 
         self.assertRaises(
@@ -5604,7 +5604,7 @@ foo bar
         clear=True,
     )
     def test_add_user_pending_email(self):
-        """ Test the add_user_pending_email function of pagure.lib.query. """
+        """Test the add_user_pending_email function of pagure.lib.query."""
         user = pagure.lib.query.search_user(self.session, username="pingou")
 
         self.assertEqual(len(user.emails), 2)
@@ -5631,7 +5631,7 @@ foo bar
         self.assertEqual(len(user.emails_pending), 1)
 
     def test_resend_pending_email_someone_else_email(self):
-        """ Test the resend_pending_email function of pagure.lib.query. """
+        """Test the resend_pending_email function of pagure.lib.query."""
         user = pagure.lib.query.search_user(self.session, username="pingou")
 
         self.assertRaises(
@@ -5643,7 +5643,7 @@ foo bar
         )
 
     def test_resend_pending_email_email_validated(self):
-        """ Test the resend_pending_email function of pagure.lib.query. """
+        """Test the resend_pending_email function of pagure.lib.query."""
         user = pagure.lib.query.search_user(self.session, username="pingou")
 
         self.assertRaises(
@@ -5655,7 +5655,7 @@ foo bar
         )
 
     def test_get_acls(self):
-        """ Test the get_acls function of pagure.lib.query. """
+        """Test the get_acls function of pagure.lib.query."""
         acls = pagure.lib.query.get_acls(self.session)
         self.assertEqual(
             sorted([a.name for a in acls]),
@@ -5694,14 +5694,14 @@ foo bar
         )
 
     def test_get_acls_restrict_one(self):
-        """ Test the get_acls function of pagure.lib.query. """
+        """Test the get_acls function of pagure.lib.query."""
         acls = pagure.lib.query.get_acls(
             self.session, restrict="create_project"
         )
         self.assertEqual([a.name for a in acls], ["create_project"])
 
     def test_get_acls_restrict_two(self):
-        """ Test the get_acls function of pagure.lib.query. """
+        """Test the get_acls function of pagure.lib.query."""
         acls = pagure.lib.query.get_acls(
             self.session, restrict=["create_project", "issue_create"]
         )
@@ -5710,7 +5710,7 @@ foo bar
         )
 
     def test_filter_img_src(self):
-        """ Test the filter_img_src function of pagure.lib.query. """
+        """Test the filter_img_src function of pagure.lib.query."""
         for name in ("alt", "height", "width", "class"):
             self.assertTrue(pagure.lib.query.filter_img_src(name, "caption"))
 
@@ -5735,13 +5735,13 @@ foo bar
         )
 
     def test_clean_input(self):
-        """ Test the clean_input function of pagure.lib.query. """
+        """Test the clean_input function of pagure.lib.query."""
         text = '<a href="/path" title="click me!">Click here</a>'
         output = pagure.lib.query.clean_input(text)
         self.assertEqual(output, text)
 
     def test_could_be_text(self):
-        """ Test the could_be_text function of pagure.lib.query. """
+        """Test the could_be_text function of pagure.lib.query."""
         self.assertTrue(pagure.lib.query.could_be_text(b"foo"))
         self.assertTrue(pagure.lib.query.could_be_text("fâö".encode("utf-8")))
         self.assertFalse(
@@ -5749,7 +5749,7 @@ foo bar
         )
 
     def test_set_custom_key_fields_empty(self):
-        """ Test the set_custom_key_fields function of pagure.lib.query. """
+        """Test the set_custom_key_fields function of pagure.lib.query."""
         tests.create_projects(self.session)
         project = pagure.lib.query._get_project(self.session, "test")
         self.assertIsNotNone(project)
@@ -5766,7 +5766,7 @@ foo bar
         self.assertEqual(msg, "List of custom fields updated")
 
     def test_set_custom_key_fields(self):
-        """ Test the set_custom_key_fields function of pagure.lib.query. """
+        """Test the set_custom_key_fields function of pagure.lib.query."""
         tests.create_projects(self.session)
         project = pagure.lib.query._get_project(self.session, "test")
         self.assertIsNotNone(project)
@@ -5809,7 +5809,7 @@ foo bar
 
     @patch("pagure.lib.query.REDIS")
     def test_set_custom_key_value_boolean(self, mock_redis):
-        """ Test the set_custom_key_value function of pagure.lib.query. """
+        """Test the set_custom_key_value function of pagure.lib.query."""
         mock_redis.return_value = True
 
         tests.create_projects(self.session)
@@ -5870,7 +5870,7 @@ foo bar
 
     @patch("pagure.lib.query.REDIS")
     def test_set_custom_key_value_boolean_private_issue(self, mock_redis):
-        """ Test the set_custom_key_value function of pagure.lib.query. """
+        """Test the set_custom_key_value function of pagure.lib.query."""
         mock_redis.return_value = True
 
         tests.create_projects(self.session)
@@ -5933,7 +5933,7 @@ foo bar
 
     @patch("pagure.lib.query.REDIS")
     def test_set_custom_key_value_text(self, mock_redis):
-        """ Test the set_custom_key_value function of pagure.lib.query. """
+        """Test the set_custom_key_value function of pagure.lib.query."""
         mock_redis.return_value = True
 
         tests.create_projects(self.session)
@@ -5992,7 +5992,7 @@ foo bar
         self.assertEqual(mock_redis.publish.call_count, 2)
 
     def test_log_action_invalid(self):
-        """ Test the log_action function of pagure.lib.query. """
+        """Test the log_action function of pagure.lib.query."""
         obj = MagicMock
         obj.isa = "invalid"
         self.assertRaises(
@@ -6005,7 +6005,7 @@ foo bar
         )
 
     def test_search_token_no_acls(self):
-        """ Test the search_token function of pagure.lib.query. """
+        """Test the search_token function of pagure.lib.query."""
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
         tests.create_tokens_acl(self.session)
@@ -6015,7 +6015,7 @@ foo bar
         self.assertEqual(out[0].id, "aaabbbcccddd")
 
     def test_search_token_single_acls(self):
-        """ Test the search_token function of pagure.lib.query. """
+        """Test the search_token function of pagure.lib.query."""
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
         tests.create_tokens_acl(self.session)
@@ -6025,7 +6025,7 @@ foo bar
         self.assertEqual(out[0].id, "aaabbbcccddd")
 
     def test_search_token_single_acls_user(self):
-        """ Test the search_token function of pagure.lib.query. """
+        """Test the search_token function of pagure.lib.query."""
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
         tests.create_tokens_acl(self.session)
@@ -6042,7 +6042,7 @@ foo bar
         self.assertEqual(len(out), 0)
 
     def test_search_token_single_acls_active(self):
-        """ Test the search_token function of pagure.lib.query. """
+        """Test the search_token function of pagure.lib.query."""
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
         tests.create_tokens_acl(self.session)
@@ -6059,7 +6059,7 @@ foo bar
         self.assertEqual(len(out), 0)
 
     def test_update_read_only_mode(self):
-        """ Test the update_read_only_mode method of pagure.lib """
+        """Test the update_read_only_mode method of pagure.lib"""
 
         tests.create_projects(self.session)
 

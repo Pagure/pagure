@@ -56,7 +56,7 @@ class PagureNoNewBranchesTable(BASE):
 
 
 class PagureNoNewBranchRunner(BaseRunner):
-    """ Runner for the hook blocking new branches from being created. """
+    """Runner for the hook blocking new branches from being created."""
 
     @staticmethod
     def pre_receive(session, username, project, repotype, repodir, changes):
@@ -84,13 +84,13 @@ class PagureNoNewBranchRunner(BaseRunner):
 
 
 class PagureNoNewBranchesForm(FlaskForm):
-    """ Form to configure the pagure hook. """
+    """Form to configure the pagure hook."""
 
     active = wtforms.BooleanField("Active", [wtforms.validators.Optional()])
 
 
 class PagureNoNewBranchesHook(BaseHook):
-    """ PagureNoNewBranches hook. """
+    """PagureNoNewBranches hook."""
 
     name = "Prevent creating new branches by git push"
     description = "This hook prevents creating new branches by git push."

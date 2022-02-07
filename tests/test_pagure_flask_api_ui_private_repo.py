@@ -250,12 +250,12 @@ FULL_ISSUE_LIST = [
 
 
 class PagurePrivateRepotest(tests.Modeltests):
-    """ Tests for private repo in pagure """
+    """Tests for private repo in pagure"""
 
     maxDiff = None
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagurePrivateRepotest, self).setUp()
 
         pagure.config.config["TESTING"] = True
@@ -411,7 +411,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         shutil.rmtree(newpath)
 
     def test_index(self):
-        """ Test the index endpoint. """
+        """Test the index endpoint."""
 
         output = self.app.get("/")
         self.assertEqual(output.status_code, 200)
@@ -469,7 +469,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             )
 
     def test_view_user(self):
-        """ Test the view_user endpoint. """
+        """Test the view_user endpoint."""
 
         output = self.app.get("/user/foo?repopage=abc&forkpage=def")
         self.assertEqual(output.status_code, 200)
@@ -703,7 +703,7 @@ class PagurePrivateRepotest(tests.Modeltests):
 
     @patch("pagure.decorators.admin_session_timedout")
     def test_private_settings_ui(self, ast):
-        """ Test UI for private repo"""
+        """Test UI for private repo"""
         ast.return_value = False
 
         # Add private repo
@@ -758,7 +758,7 @@ class PagurePrivateRepotest(tests.Modeltests):
 
     @patch("pagure.decorators.admin_session_timedout")
     def test_private_settings_ui_update_privacy_false(self, ast):
-        """ Test UI for private repo"""
+        """Test UI for private repo"""
         ast.return_value = False
 
         # Add private repo
@@ -815,7 +815,7 @@ class PagurePrivateRepotest(tests.Modeltests):
 
     @patch("pagure.decorators.admin_session_timedout")
     def test_private_settings_ui_update_privacy_true(self, ast):
-        """ Test UI for private repo"""
+        """Test UI for private repo"""
         ast.return_value = False
 
         # Add private repo
@@ -980,7 +980,7 @@ class PagurePrivateRepotest(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_private_repo_issues_ui(self, p_send_email, p_ugt):
-        """ Test issues made to private repo"""
+        """Test issues made to private repo"""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -1086,7 +1086,7 @@ class PagurePrivateRepotest(tests.Modeltests):
 
     @patch("pagure.decorators.admin_session_timedout")
     def test_private_repo_ui_for_different_repo_user(self, ast):
-        """ Test the private repo for different ACLS"""
+        """Test the private repo for different ACLS"""
         ast.return_value = False
 
         # Add private repo
@@ -1183,7 +1183,7 @@ class PagurePrivateRepotest(tests.Modeltests):
 
     # API checks
     def test_api_private_repo_projects(self):
-        """ Test api points for private repo for projects"""
+        """Test api points for private repo for projects"""
 
         # Add private repo
         item = pagure.lib.model.Project(
@@ -1514,7 +1514,7 @@ class PagurePrivateRepotest(tests.Modeltests):
     # Api pull-request views
     @patch("pagure.lib.notify.send_email")
     def test_api_private_repo_fork(self, send_email):
-        """ Test api endpoints in api/fork"""
+        """Test api endpoints in api/fork"""
 
         send_email.return_value = True
 
@@ -1858,7 +1858,7 @@ class PagurePrivateRepotest(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_api_pr_private_repo_add_comment(self, mockemail):
-        """ Test the api_pull_request_add_comment method of the flask api. """
+        """Test the api_pull_request_add_comment method of the flask api."""
         mockemail.return_value = True
         pagure.config.config["REQUESTS_FOLDER"] = None
 
@@ -1942,7 +1942,7 @@ class PagurePrivateRepotest(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_api_private_repo_pr_add_flag(self, mockemail):
-        """ Test the api_pull_request_add_flag method of the flask api. """
+        """Test the api_pull_request_add_flag method of the flask api."""
         mockemail.return_value = True
         pagure.config.config["REQUESTS_FOLDER"] = None
 
@@ -2179,7 +2179,7 @@ class PagurePrivateRepotest(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_api_private_repo_pr_close(self, send_email):
-        """ Test the api_pull_request_close method of the flask api. """
+        """Test the api_pull_request_close method of the flask api."""
         send_email.return_value = True
 
         pagure.config.config["REQUESTS_FOLDER"] = None
@@ -2305,7 +2305,7 @@ class PagurePrivateRepotest(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_api_private_repo_pr_merge(self, send_email):
-        """ Test the api_pull_request_merge method of the flask api. """
+        """Test the api_pull_request_merge method of the flask api."""
         send_email.return_value = True
 
         pagure.config.config["REQUESTS_FOLDER"] = None
@@ -2441,7 +2441,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertDictEqual(data, {"message": "Changes merged!"})
 
     def test_api_private_repo_new_issue(self):
-        """ Test the api_new_issue method of the flask api. """
+        """Test the api_new_issue method of the flask api."""
         # Add private repo
         item = pagure.lib.model.Project(
             user_id=1,  # pingou
@@ -2552,7 +2552,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         )
 
     def test_api_private_repo_view_issues(self):
-        """ Test the api_view_issues method of the flask api. """
+        """Test the api_view_issues method of the flask api."""
         self.test_api_private_repo_new_issue()
 
         # Invalid repo
@@ -3024,7 +3024,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         )
 
     def test_api_pivate_repo_view_issue(self):
-        """ Test the api_view_issue method of the flask api. """
+        """Test the api_view_issue method of the flask api."""
         self.test_api_private_repo_new_issue()
 
         # Invalid repo
@@ -3151,7 +3151,7 @@ class PagurePrivateRepotest(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_api_private_repo_change_status_issue(self):
-        """ Test the api_change_status_issue method of the flask api. """
+        """Test the api_change_status_issue method of the flask api."""
         item = pagure.lib.model.Project(
             user_id=1,  # pingou
             name="test4",
@@ -3293,7 +3293,7 @@ class PagurePrivateRepotest(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_api_private_repo_comment_issue(self, p_send_email, p_ugt):
-        """ Test the api_comment_issue method of the flask api. """
+        """Test the api_comment_issue method of the flask api."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -3412,7 +3412,7 @@ class PagurePrivateRepotest(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_api_view_issue_comment(self, p_send_email, p_ugt):
-        """ Test the api_view_issue_comment endpoint. """
+        """Test the api_view_issue_comment endpoint."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 

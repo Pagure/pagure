@@ -90,10 +90,10 @@ STRIKE_THROUGH_RE = r"~~(.*?)~~"
 
 
 class MentionPattern(markdown.inlinepatterns.Pattern):
-    """ @user pattern class. """
+    """@user pattern class."""
 
     def handleMatch(self, m):
-        """ When the pattern matches, update the text. """
+        """When the pattern matches, update the text."""
         _log.debug("MentionPattern: %s", m.groups())
 
         name = markdown.util.AtomicString(m.group(2))
@@ -113,10 +113,10 @@ class MentionPattern(markdown.inlinepatterns.Pattern):
 
 
 class ExplicitLinkPattern(markdown.inlinepatterns.Pattern):
-    """ Explicit link pattern. """
+    """Explicit link pattern."""
 
     def handleMatch(self, m):
-        """ When the pattern matches, update the text. """
+        """When the pattern matches, update the text."""
         _log.debug("ExplicitLinkPattern: %s", m.groups())
 
         is_fork = m.group(2)
@@ -154,10 +154,10 @@ class ExplicitLinkPattern(markdown.inlinepatterns.Pattern):
 
 
 class CommitLinkPattern(markdown.inlinepatterns.Pattern):
-    """ Commit link pattern. """
+    """Commit link pattern."""
 
     def handleMatch(self, m):
-        """ When the pattern matches, update the text. """
+        """When the pattern matches, update the text."""
         _log.debug("CommitLinkPattern: %s", m.groups())
 
         is_fork = m.group(2)
@@ -238,10 +238,10 @@ class ImplicitIssuePreprocessor(markdown.preprocessors.Preprocessor):
 
 
 class ImplicitIssuePattern(markdown.inlinepatterns.Pattern):
-    """ Implicit issue pattern. """
+    """Implicit issue pattern."""
 
     def handleMatch(self, m):
-        """ When the pattern matches, update the text. """
+        """When the pattern matches, update the text."""
         _log.debug("ImplicitIssuePattern: %s", m.groups())
         idx = markdown.util.AtomicString(m.group(2))
         text = "#%s" % idx
@@ -280,10 +280,10 @@ class ImplicitIssuePattern(markdown.inlinepatterns.Pattern):
 
 
 class ImplicitPRPattern(markdown.inlinepatterns.Pattern):
-    """ Implicit pull-request pattern. """
+    """Implicit pull-request pattern."""
 
     def handleMatch(self, m):
-        """ When the pattern matches, update the text. """
+        """When the pattern matches, update the text."""
         _log.debug("ImplicitPRPattern: %s", m.groups())
         idx = markdown.util.AtomicString(m.group(2))
         text = "PR#%s" % idx
@@ -309,10 +309,10 @@ class ImplicitPRPattern(markdown.inlinepatterns.Pattern):
 
 
 class ImplicitCommitPattern(markdown.inlinepatterns.Pattern):
-    """ Implicit commit pattern. """
+    """Implicit commit pattern."""
 
     def handleMatch(self, m):
-        """ When the pattern matches, update the text. """
+        """When the pattern matches, update the text."""
         _log.debug("ImplicitCommitPattern: %s", m.groups())
 
         githash = markdown.util.AtomicString(m.group(2))
@@ -332,10 +332,10 @@ class ImplicitCommitPattern(markdown.inlinepatterns.Pattern):
 
 
 class StrikeThroughPattern(markdown.inlinepatterns.Pattern):
-    """ ~~striked~~ pattern class. """
+    """~~striked~~ pattern class."""
 
     def handleMatch(self, m):
-        """ When the pattern matches, update the text. """
+        """When the pattern matches, update the text."""
         _log.debug("StrikeThroughPattern: %s", m.groups())
 
         text = markdown.util.AtomicString(m.group(2))
@@ -346,7 +346,7 @@ class StrikeThroughPattern(markdown.inlinepatterns.Pattern):
 
 
 class AutolinkPattern2(markdown.inlinepatterns.Pattern):
-    """ Return a link Element given an autolink (`<http://example/com>`). """
+    """Return a link Element given an autolink (`<http://example/com>`)."""
 
     def handleMatch(self, m):
         """When the pattern matches, update the text.
@@ -368,7 +368,7 @@ class AutolinkPattern2(markdown.inlinepatterns.Pattern):
 
 
 class ImagePatternLazyLoad(ImagePattern):
-    """ Customize the image element matched for lazyloading. """
+    """Customize the image element matched for lazyloading."""
 
     def handleMatch(self, m, *args):
         out = super(ImagePatternLazyLoad, self).handleMatch(m, *args)
@@ -516,7 +516,7 @@ def makeExtension(*arg, **kwargs):
 
 
 def _issue_exists(user, namespace, repo, idx):
-    """ Utility method checking if a given issue exists. """
+    """Utility method checking if a given issue exists."""
 
     repo_obj = pagure.lib.query.get_authorized_project(
         flask.g.session, project_name=repo, user=user, namespace=namespace
@@ -535,7 +535,7 @@ def _issue_exists(user, namespace, repo, idx):
 
 
 def _pr_exists(user, namespace, repo, idx):
-    """ Utility method checking if a given PR exists. """
+    """Utility method checking if a given PR exists."""
     repo_obj = pagure.lib.query.get_authorized_project(
         flask.g.session, project_name=repo, user=user, namespace=namespace
     )
@@ -553,7 +553,7 @@ def _pr_exists(user, namespace, repo, idx):
 
 
 def _commit_exists(user, namespace, repo, githash):
-    """ Utility method checking if a given commit exists. """
+    """Utility method checking if a given commit exists."""
     repo_obj = pagure.lib.query.get_authorized_project(
         flask.g.session, project_name=repo, user=user, namespace=namespace
     )

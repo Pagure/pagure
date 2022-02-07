@@ -35,10 +35,10 @@ from pagure.lib.git import _make_signature
 
 
 class PagureRemotePRtests(tests.Modeltests):
-    """ Tests for remote PRs in pagure """
+    """Tests for remote PRs in pagure"""
 
     def setUp(self):
-        """ Set up the environment. """
+        """Set up the environment."""
         super(PagureRemotePRtests, self).setUp()
 
         self.newpath = tempfile.mkdtemp(prefix="pagure-fork-test")
@@ -48,7 +48,7 @@ class PagureRemotePRtests(tests.Modeltests):
         )
 
     def tearDown(self):
-        """ Clear things up. """
+        """Clear things up."""
         super(PagureRemotePRtests, self).tearDown()
 
         pagure.config.config["REMOTE_GIT_FOLDER"] = self.old_value
@@ -158,7 +158,7 @@ class PagureRemotePRtests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_new_remote_pr_unauth(self):
-        """ Test creating a new remote PR un-authenticated. """
+        """Test creating a new remote PR un-authenticated."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(
@@ -181,7 +181,7 @@ class PagureRemotePRtests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_new_remote_pr_auth(self):
-        """ Test creating a new remote PR authenticated. """
+        """Test creating a new remote PR authenticated."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(
@@ -498,7 +498,7 @@ class PagureRemotePRtests(tests.Modeltests):
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     @patch("pagure.lib.tasks_services.trigger_ci_build")
     def test_new_remote_pr_ci_off(self, trigger_ci):
-        """ Test creating a new remote PR when CI is not configured. """
+        """Test creating a new remote PR when CI is not configured."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(
@@ -563,7 +563,7 @@ class PagureRemotePRtests(tests.Modeltests):
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     @patch("pagure.lib.tasks_services.trigger_ci_build")
     def test_new_remote_pr_ci_on(self, trigger_ci):
-        """ Test creating a new remote PR when CI is configured. """
+        """Test creating a new remote PR when CI is configured."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(

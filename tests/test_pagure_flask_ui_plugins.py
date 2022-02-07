@@ -25,17 +25,17 @@ import tests
 
 
 class FakeForm(wtforms.Form):
-    """ Form to configure the mail hook. """
+    """Form to configure the mail hook."""
 
     field1 = wtforms.StringField("Title", [pagure.hooks.RequiredIf("active")])
     field2 = wtforms.BooleanField("Title2", [wtforms.validators.Optional()])
 
 
 class PagureFlaskPluginstests(tests.SimplePagureTest):
-    """ Tests for flask plugins controller of pagure """
+    """Tests for flask plugins controller of pagure"""
 
     def test_get_plugin_names(self):
-        """ Test the get_plugin_names function. """
+        """Test the get_plugin_names function."""
         names = pagure.lib.plugins.get_plugin_names()
         self.assertEqual(
             sorted(names),
@@ -56,12 +56,12 @@ class PagureFlaskPluginstests(tests.SimplePagureTest):
         )
 
     def test_get_plugin(self):
-        """ Test the get_plugin function. """
+        """Test the get_plugin function."""
         name = pagure.lib.plugins.get_plugin("Mail")
         self.assertEqual(str(name), "<class 'pagure.hooks.mail.Mail'>")
 
     def test_view_plugin_page(self):
-        """ Test the view_plugin_page endpoint. """
+        """Test the view_plugin_page endpoint."""
 
         # No Git repo
         output = self.app.get("/foo/settings/Mail")
@@ -130,7 +130,7 @@ class PagureFlaskPluginstests(tests.SimplePagureTest):
             self.assertIn("Hook Mail deactivated", output_text)
 
     def test_RequiredIf(self):
-        """ Test the behavior of the RequiredIf validator. """
+        """Test the behavior of the RequiredIf validator."""
         form = FakeForm()
 
         try:

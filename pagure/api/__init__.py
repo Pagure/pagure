@@ -46,7 +46,7 @@ _log = logging.getLogger(__name__)
 
 
 def preload_docs(endpoint):
-    """ Utility to load an RST file and turn it into fancy HTML. """
+    """Utility to load an RST file and turn it into fancy HTML."""
 
     here = os.path.dirname(os.path.abspath(__file__))
     fname = os.path.join(here, "..", "doc", endpoint + ".rst")
@@ -64,7 +64,7 @@ APIDOC = preload_docs("api")
 
 
 def build_docs_section(name, endpoints):
-    """ Utility to build a documentation section to feed the template. """
+    """Utility to build a documentation section to feed the template."""
 
     result = {"name": name, "endpoints": []}
 
@@ -151,7 +151,7 @@ class APIERROR(enum.Enum):
 
 
 def get_authorized_api_project(session, repo, user=None, namespace=None):
-    """ Helper function to get an authorized_project with optional lock. """
+    """Helper function to get an authorized_project with optional lock."""
     repo = pagure.lib.query.get_authorized_project(
         flask.g.session, repo, user=user, namespace=namespace
     )
@@ -178,11 +178,11 @@ def api_login_required(acls=None, optional=False):
     """
 
     def decorator(function):
-        """ The decorator of the function """
+        """The decorator of the function"""
 
         @functools.wraps(function)
         def decorated_function(*args, **kwargs):
-            """ Actually does the job with the arguments provided. """
+            """Actually does the job with the arguments provided."""
 
             response = check_api_acls(acls, optional)
             if response:
@@ -231,11 +231,11 @@ def api_login_optional(acls=None):
     """
 
     def decorator(function):
-        """ The decorator of the function """
+        """The decorator of the function"""
 
         @functools.wraps(function)
         def decorated_function(*args, **kwargs):
-            """ Actually does the job with the arguments provided. """
+            """Actually does the job with the arguments provided."""
 
             response = check_api_acls(acls, optional=True)
             if response:
@@ -248,11 +248,11 @@ def api_login_optional(acls=None):
 
 
 def api_method(function):
-    """ Runs an API endpoint and catch all the APIException thrown. """
+    """Runs an API endpoint and catch all the APIException thrown."""
 
     @functools.wraps(function)
     def wrapper(*args, **kwargs):
-        """ Actually does the job with the arguments provided. """
+        """Actually does the job with the arguments provided."""
         try:
             result = function(*args, **kwargs)
         except APIError as err:
@@ -518,7 +518,7 @@ def api_error_codes():
 
 @API.route("/")
 def api():
-    """ Display the api information page. """
+    """Display the api information page."""
 
     sections = []
 

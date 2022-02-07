@@ -27,7 +27,7 @@ import tests
 
 
 class PagureLibDropIssuetests(tests.Modeltests):
-    """ Tests for pagure.lib.query.drop_issue """
+    """Tests for pagure.lib.query.drop_issue"""
 
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")

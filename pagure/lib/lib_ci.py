@@ -145,7 +145,7 @@ def trigger_jenkins_build(
     ci_username=None,
     ci_password=None,
 ):
-    """ Trigger a build on a jenkins instance."""
+    """Trigger a build on a jenkins instance."""
     try:
         import jenkins
     except ImportError:

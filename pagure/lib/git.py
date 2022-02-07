@@ -175,7 +175,7 @@ def generate_gitolite_acls(project=None, group=None):
 
 
 def update_git(obj, repo):
-    """ Schedules an update_repo task after determining arguments. """
+    """Schedules an update_repo task after determining arguments."""
     ticketuid = None
     requestuid = None
     if obj.isa == "issue":
@@ -1005,7 +1005,7 @@ class TemporaryClone(object):
         self._parent = parent
 
     def __enter__(self):
-        """ Enter the context manager, creating the clone. """
+        """Enter the context manager, creating the clone."""
         self.repopath = tempfile.mkdtemp(prefix="pagure-%s-" % self._action)
         self._origrepopath = self.repopath
         if self._parent:
@@ -1089,7 +1089,7 @@ class TemporaryClone(object):
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
-        """ Exit the context manager, removing the temorary clone. """
+        """Exit the context manager, removing the temorary clone."""
         shutil.rmtree(self.repopath)
 
     def change_project_association(self, new_project):
@@ -1409,7 +1409,7 @@ def read_git_lines(args, abspath, keepends=False, error=False, **kw):
 
 
 def get_revs_between(oldrev, newrev, abspath, refname, forced=False):
-    """ Yield revisions between HEAD and BASE. """
+    """Yield revisions between HEAD and BASE."""
 
     cmd = ["rev-list", "%s...%s" % (oldrev, newrev)]
     if forced:
@@ -1448,7 +1448,7 @@ def get_base_revision(torev, fromrev, abspath):
 
 
 def get_default_branch(abspath):
-    """ Return the default branch of a repo. """
+    """Return the default branch of a repo."""
     cmd = ["rev-parse", "--abbrev-ref", "HEAD"]
     out = pagure.lib.git.read_git_lines(cmd, abspath)
     if out:
@@ -1458,7 +1458,7 @@ def get_default_branch(abspath):
 
 
 def get_author(commit, abspath):
-    """ Return the name of the person that authored the commit. """
+    """Return the name of the person that authored the commit."""
     user = pagure.lib.git.read_git_lines(
         ["log", "-1", '--pretty=format:"%an"', commit], abspath
     )[0].replace('"', "")
@@ -1466,7 +1466,7 @@ def get_author(commit, abspath):
 
 
 def get_author_email(commit, abspath):
-    """ Return the email of the person that authored the commit. """
+    """Return the email of the person that authored the commit."""
     user = pagure.lib.git.read_git_lines(
         ["log", "-1", '--pretty=format:"%ae"', commit], abspath
     )[0].replace('"', "")
@@ -1474,7 +1474,7 @@ def get_author_email(commit, abspath):
 
 
 def get_commit_subject(commit, abspath):
-    """ Return the subject of the commit. """
+    """Return the subject of the commit."""
     subject = pagure.lib.git.read_git_lines(
         ["log", "-1", '--pretty=format:"%s"', commit], abspath
     )[0].replace('"', "")
@@ -2527,7 +2527,7 @@ def get_git_tags_objects(project):
 
 
 def log_commits_to_db(session, project, commits, gitdir):
-    """ Log the given commits to the DB. """
+    """Log the given commits to the DB."""
     repo_obj = PagureRepo(gitdir)
 
     for commitid in commits:
@@ -3076,7 +3076,7 @@ def generate_archive(project, commit, tag, name, archive_fmt):
 
 
 def mirror_pull_project(session, project, debug=False):
-    """ Mirror locally a project from a remote URL. """
+    """Mirror locally a project from a remote URL."""
     remote = project.mirrored_from
     if not remote:
         _log.info("No remote found, ignoring")

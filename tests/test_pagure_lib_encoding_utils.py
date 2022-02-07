@@ -56,14 +56,14 @@ class TestGuessEncoding(unittest.TestCase):
                 self.assertEqual(chardet_result["encoding"], "ISO-8859-2")
 
     def test_guess_encoding_no_data(self):
-        """ Test encoding_utils.guess_encoding() with an empty string """
+        """Test encoding_utils.guess_encoding() with an empty string"""
         result = encoding_utils.guess_encoding("".encode("utf-8"))
         self.assertEqual(result, "ascii")
 
 
 class TestGuessEncodings(unittest.TestCase):
     def test_guess_encodings(self):
-        """ Test the encoding_utils.guess_encodings() method. """
+        """Test the encoding_utils.guess_encodings() method."""
         data = "Šabata".encode("utf-8")
         result = encoding_utils.guess_encodings(data)
         chardet_result = chardet.detect(data)
@@ -120,14 +120,14 @@ class TestGuessEncodings(unittest.TestCase):
                 self.assertEqual(chardet_result["encoding"], "ISO-8859-2")
 
     def test_guess_encodings_no_data(self):
-        """ Test encoding_utils.guess_encodings() with an emtpy string """
+        """Test encoding_utils.guess_encodings() with an emtpy string"""
         result = encoding_utils.guess_encodings("".encode("utf-8"))
         self.assertEqual([encoding.encoding for encoding in result], ["ascii"])
 
 
 class TestDecode(unittest.TestCase):
     def test_decode(self):
-        """ Test encoding_utils.decode() """
+        """Test encoding_utils.decode()"""
         data = (
             "This is a little longer text for testing Šabata's encoding. "
             "With more characters, let's see if it become more clear as to what "

@@ -26,10 +26,10 @@ import tests
 
 
 class PagureFlaskRepoOldUrltests(tests.SimplePagureTest):
-    """ Tests for flask app controller of pagure """
+    """Tests for flask app controller of pagure"""
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskRepoOldUrltests, self).setUp()
 
         pagure.config.config["EMAIL_SEND"] = False
@@ -39,7 +39,7 @@ class PagureFlaskRepoOldUrltests(tests.SimplePagureTest):
 
     @patch.dict("pagure.config.config", {"OLD_VIEW_COMMIT_ENABLED": True})
     def test_view_commit_old_with_bogus_url(self):
-        """ Test the view_commit_old endpoint. """
+        """Test the view_commit_old endpoint."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
@@ -54,7 +54,7 @@ class PagureFlaskRepoOldUrltests(tests.SimplePagureTest):
 
     @patch.dict("pagure.config.config", {"OLD_VIEW_COMMIT_ENABLED": True})
     def test_view_commit_old(self):
-        """ Test the view_commit_old endpoint. """
+        """Test the view_commit_old endpoint."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)

@@ -29,10 +29,10 @@ import tests
 
 
 class PagureFlaskQuickReplytest(tests.Modeltests):
-    """ Tests for configuring and displaying quick replies. """
+    """Tests for configuring and displaying quick replies."""
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskQuickReplytest, self).setUp()
 
         tests.create_projects(self.session)

@@ -29,7 +29,7 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskIssuesPrivatetests, self).setUp()
 
         # Create a 3rd user
@@ -73,7 +73,7 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
         self.assertEqual(msg.title, "Test issue #2")
 
     def test_issue_list_anonymous(self):
-        """ Test the list of issues when user is logged out. """
+        """Test the list of issues when user is logged out."""
 
         output = self.app.get("/test/issues")
         self.assertEqual(output.status_code, 200)
@@ -203,7 +203,7 @@ class PagureFlaskIssuesPrivatetests(tests.Modeltests):
             )
 
     def test_view_issue_anonymous(self):
-        """ Test accessing a private ticket when user is logged out. """
+        """Test accessing a private ticket when user is logged out."""
 
         output = self.app.get("/test/issue/1")
         self.assertEqual(output.status_code, 404)

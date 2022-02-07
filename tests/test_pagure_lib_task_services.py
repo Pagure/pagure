@@ -34,12 +34,12 @@ import pagure.lib.tasks_services
 
 
 class PagureLibTaskServicestests(tests.Modeltests):
-    """ Tests for pagure.lib.task_services """
+    """Tests for pagure.lib.task_services"""
 
     maxDiff = None
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureLibTaskServicestests, self).setUp()
 
         tests.create_projects(self.session)
@@ -63,7 +63,7 @@ class PagureLibTaskServicestests(tests.Modeltests):
         self.session.commit()
 
     def test_webhook_notification_invalid_project(self):
-        """ Test the webhook_notification method. """
+        """Test the webhook_notification method."""
 
         self.assertRaises(
             RuntimeError,
@@ -77,7 +77,7 @@ class PagureLibTaskServicestests(tests.Modeltests):
 
     @patch("pagure.lib.tasks_services.call_web_hooks")
     def test_webhook_notification_no_webhook(self, call_wh):
-        """ Test the webhook_notification method. """
+        """Test the webhook_notification method."""
 
         output = pagure.lib.tasks_services.webhook_notification(
             topic="topic",
@@ -91,7 +91,7 @@ class PagureLibTaskServicestests(tests.Modeltests):
 
     @patch("pagure.lib.git.log_commits_to_db")
     def test_log_commit_send_notifications_invalid_project(self, log):
-        """ Test the log_commit_send_notifications method. """
+        """Test the log_commit_send_notifications method."""
         output = pagure.lib.tasks_services.log_commit_send_notifications(
             name="invalid",
             commits=[],
@@ -107,7 +107,7 @@ class PagureLibTaskServicestests(tests.Modeltests):
     @patch("pagure.lib.notify.notify_new_commits")
     @patch("pagure.lib.git.log_commits_to_db")
     def test_log_commit_send_notifications_valid_project(self, log, notif):
-        """ Test the log_commit_send_notifications method. """
+        """Test the log_commit_send_notifications method."""
         output = pagure.lib.tasks_services.log_commit_send_notifications(
             name="test",
             commits=["hash1", "hash2"],
@@ -127,7 +127,7 @@ class PagureLibTaskServicestests(tests.Modeltests):
 
     @patch("pagure.lib.tasks_services.trigger_jenkins_build")
     def test_trigger_ci_build_invalid_project(self, trigger_jenk):
-        """ Test the trigger_ci_build method. """
+        """Test the trigger_ci_build method."""
         output = pagure.lib.tasks_services.trigger_ci_build(
             project_name="invalid",
             cause="PR#ID",
@@ -140,7 +140,7 @@ class PagureLibTaskServicestests(tests.Modeltests):
 
     @patch("pagure.lib.tasks_services.trigger_jenkins_build")
     def test_trigger_ci_build_not_configured_project(self, trigger_jenk):
-        """ Test the trigger_ci_build method. """
+        """Test the trigger_ci_build method."""
         self.assertRaises(
             pagure.exceptions.PagureException,
             pagure.lib.tasks_services.trigger_ci_build,
@@ -154,7 +154,7 @@ class PagureLibTaskServicestests(tests.Modeltests):
 
     @patch("pagure.lib.tasks_services.trigger_jenkins_build")
     def test_trigger_ci_build_not_configured_project_fork(self, trigger_jenk):
-        """ Test the trigger_ci_build method. """
+        """Test the trigger_ci_build method."""
         self.assertRaises(
             pagure.exceptions.PagureException,
             pagure.lib.tasks_services.trigger_ci_build,
@@ -168,7 +168,7 @@ class PagureLibTaskServicestests(tests.Modeltests):
 
     @patch("pagure.lib.query._get_project")
     def test_load_json_commits_to_db_invalid_data_type(self, get_project):
-        """ Test the load_json_commits_to_db method. """
+        """Test the load_json_commits_to_db method."""
         output = pagure.lib.tasks_services.load_json_commits_to_db(
             name="test",
             commits=["hash1", "hash2"],
@@ -183,7 +183,7 @@ class PagureLibTaskServicestests(tests.Modeltests):
 
     @patch("pagure.lib.tasks_services.get_files_to_load")
     def test_load_json_commits_to_db_invalid_project(self, get_files):
-        """ Test the load_json_commits_to_db method. """
+        """Test the load_json_commits_to_db method."""
         output = pagure.lib.tasks_services.load_json_commits_to_db(
             name="invalid",
             commits=["hash1", "hash2"],
@@ -199,7 +199,7 @@ class PagureLibTaskServicestests(tests.Modeltests):
     @patch("pagure.lib.git.update_request_from_git")
     @patch("pagure.lib.git.update_ticket_from_git")
     def test_load_json_commits_to_db_invalid_path(self, up_issue, up_pr):
-        """ Test the load_json_commits_to_db method. """
+        """Test the load_json_commits_to_db method."""
         output = pagure.lib.tasks_services.load_json_commits_to_db(
             name="test",
             commits=["hash1", "hash2"],
@@ -218,7 +218,7 @@ class PagureLibTaskServicestests(tests.Modeltests):
     def test_load_json_commits_to_db_invalid_path_one_commit(
         self, up_issue, up_pr
     ):
-        """ Test the load_json_commits_to_db method. """
+        """Test the load_json_commits_to_db method."""
         output = pagure.lib.tasks_services.load_json_commits_to_db(
             name="test",
             commits=["hash1"],
@@ -236,7 +236,7 @@ class PagureLibTaskServicestests(tests.Modeltests):
     @patch("pagure.lib.git.update_request_from_git")
     @patch("pagure.lib.git.update_ticket_from_git")
     def test_load_json_commits_to_db_no_agent(self, up_issue, up_pr, send):
-        """ Test the load_json_commits_to_db method. """
+        """Test the load_json_commits_to_db method."""
         output = pagure.lib.tasks_services.load_json_commits_to_db(
             name="test",
             commits=[],
@@ -258,7 +258,7 @@ class PagureLibTaskServicestests(tests.Modeltests):
     def test_load_json_commits_to_db_no_agent(
         self, git, up_issue, up_pr, send
     ):
-        """ Test the load_json_commits_to_db method. """
+        """Test the load_json_commits_to_db method."""
         git.side_effect = [["file1"], ["file2"], ["files/image"], ["file1"]]
 
         output = pagure.lib.tasks_services.load_json_commits_to_db(
@@ -283,7 +283,7 @@ class PagureLibTaskServicestests(tests.Modeltests):
     def test_load_json_commits_to_db_tickets(
         self, git, up_issue, up_pr, send, json_loads
     ):
-        """ Test the load_json_commits_to_db method. """
+        """Test the load_json_commits_to_db method."""
         git.side_effect = [["file1"], ["file2"], ["files/image"], ["file1"]]
         json_loads.return_value = "foobar"
 
@@ -330,7 +330,7 @@ class PagureLibTaskServicestests(tests.Modeltests):
     def test_load_json_commits_to_db_prs(
         self, git, up_issue, up_pr, send, json_loads
     ):
-        """ Test the load_json_commits_to_db method. """
+        """Test the load_json_commits_to_db method."""
         git.side_effect = [["file1"], ["file2"], ["files/image"], ["file1"]]
         json_loads.return_value = "foobar"
 
@@ -388,7 +388,7 @@ class PagureLibTaskServicestests(tests.Modeltests):
     def test_load_json_commits_to_db_prs_raises_error(
         self, git, up_issue, up_pr, send, json_loads
     ):
-        """ Test the load_json_commits_to_db method. """
+        """Test the load_json_commits_to_db method."""
         git.side_effect = [["file1"], ["file2"], ["files/image"], ["file1"]]
         json_loads.return_value = "foobar"
         up_pr.side_effect = Exception("foo error")
@@ -433,12 +433,12 @@ class PagureLibTaskServicestests(tests.Modeltests):
 
 
 class PagureLibTaskServicesWithWebHooktests(tests.Modeltests):
-    """ Tests for pagure.lib.task_services """
+    """Tests for pagure.lib.task_services"""
 
     maxDiff = None
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureLibTaskServicesWithWebHooktests, self).setUp()
 
         pagure.config.config["REQUESTS_FOLDER"] = None
@@ -455,7 +455,7 @@ class PagureLibTaskServicesWithWebHooktests(tests.Modeltests):
 
     @patch("pagure.lib.tasks_services.call_web_hooks")
     def test_webhook_notification_no_webhook(self, call_wh):
-        """ Test the webhook_notification method. """
+        """Test the webhook_notification method."""
 
         output = pagure.lib.tasks_services.webhook_notification(
             topic="topic",
@@ -479,7 +479,7 @@ class PagureLibTaskServicesWithWebHooktests(tests.Modeltests):
     @patch("datetime.datetime")
     @patch("requests.post")
     def test_webhook_notification_no_webhook(self, post, dt):
-        """ Test the webhook_notification method. """
+        """Test the webhook_notification method."""
         post.return_value = False
         utcnow = MagicMock()
         utcnow.year = 2018
@@ -552,12 +552,12 @@ class PagureLibTaskServicesWithWebHooktests(tests.Modeltests):
 
 
 class PagureLibTaskServicesJenkinsCItests(tests.Modeltests):
-    """ Tests for pagure.lib.task_services """
+    """Tests for pagure.lib.task_services"""
 
     maxDiff = None
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureLibTaskServicesJenkinsCItests, self).setUp()
 
         pagure.config.config["REQUESTS_FOLDER"] = None
@@ -597,7 +597,7 @@ class PagureLibTaskServicesJenkinsCItests(tests.Modeltests):
 
     @patch("pagure.lib.tasks_services.trigger_jenkins_build")
     def test_trigger_ci_build_invalid_ci(self, trigger_jenk):
-        """ Test the trigger_ci_build method. """
+        """Test the trigger_ci_build method."""
         output = pagure.lib.tasks_services.trigger_ci_build(
             project_name="test",
             cause="PR#ID",
@@ -610,7 +610,7 @@ class PagureLibTaskServicesJenkinsCItests(tests.Modeltests):
 
     @patch("pagure.lib.tasks_services.trigger_jenkins_build")
     def test_trigger_ci_build_invalid_ci_fork(self, trigger_jenk):
-        """ Test the trigger_ci_build method. """
+        """Test the trigger_ci_build method."""
         output = pagure.lib.tasks_services.trigger_ci_build(
             project_name="forks/foo/test",
             cause="PR#ID",
@@ -623,7 +623,7 @@ class PagureLibTaskServicesJenkinsCItests(tests.Modeltests):
 
     @patch("pagure.lib.tasks_services.trigger_jenkins_build")
     def test_trigger_ci_build_valid_project(self, trigger_jenk):
-        """ Test the trigger_ci_build method. """
+        """Test the trigger_ci_build method."""
         output = pagure.lib.tasks_services.trigger_ci_build(
             project_name="test",
             cause="PR#ID",
@@ -646,7 +646,7 @@ class PagureLibTaskServicesJenkinsCItests(tests.Modeltests):
 
     @patch("pagure.lib.tasks_services.trigger_jenkins_build")
     def test_trigger_ci_build_valid_project_fork(self, trigger_jenk):
-        """ Test the trigger_ci_build method. """
+        """Test the trigger_ci_build method."""
         output = pagure.lib.tasks_services.trigger_ci_build(
             project_name="forks/foo/test",
             cause="PR#ID",
@@ -669,12 +669,12 @@ class PagureLibTaskServicesJenkinsCItests(tests.Modeltests):
 
 
 class PagureLibTaskServicesJenkinsCIAuthtests(tests.Modeltests):
-    """ Tests for pagure.lib.task_services """
+    """Tests for pagure.lib.task_services"""
 
     maxDiff = None
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureLibTaskServicesJenkinsCIAuthtests, self).setUp()
 
         pagure.config.config["REQUESTS_FOLDER"] = None
@@ -716,7 +716,7 @@ class PagureLibTaskServicesJenkinsCIAuthtests(tests.Modeltests):
 
     @patch("pagure.lib.tasks_services.trigger_jenkins_build")
     def test_trigger_ci_build_invalid_ci(self, trigger_jenk):
-        """ Test the trigger_ci_build method. """
+        """Test the trigger_ci_build method."""
         output = pagure.lib.tasks_services.trigger_ci_build(
             project_name="test",
             cause="PR#ID",
@@ -729,7 +729,7 @@ class PagureLibTaskServicesJenkinsCIAuthtests(tests.Modeltests):
 
     @patch("pagure.lib.tasks_services.trigger_jenkins_build")
     def test_trigger_ci_build_invalid_ci_fork(self, trigger_jenk):
-        """ Test the trigger_ci_build method. """
+        """Test the trigger_ci_build method."""
         output = pagure.lib.tasks_services.trigger_ci_build(
             project_name="forks/foo/test",
             cause="PR#ID",
@@ -742,7 +742,7 @@ class PagureLibTaskServicesJenkinsCIAuthtests(tests.Modeltests):
 
     @patch("pagure.lib.tasks_services.trigger_jenkins_build")
     def test_trigger_ci_build_valid_project(self, trigger_jenk):
-        """ Test the trigger_ci_build method. """
+        """Test the trigger_ci_build method."""
         output = pagure.lib.tasks_services.trigger_ci_build(
             project_name="test",
             cause="PR#ID",
@@ -765,7 +765,7 @@ class PagureLibTaskServicesJenkinsCIAuthtests(tests.Modeltests):
 
     @patch("pagure.lib.tasks_services.trigger_jenkins_build")
     def test_trigger_ci_build_valid_project_fork(self, trigger_jenk):
-        """ Test the trigger_ci_build method. """
+        """Test the trigger_ci_build method."""
         output = pagure.lib.tasks_services.trigger_ci_build(
             project_name="forks/foo/test",
             cause="PR#ID",
@@ -788,12 +788,12 @@ class PagureLibTaskServicesJenkinsCIAuthtests(tests.Modeltests):
 
 
 class PagureLibTaskServicesLoadJsonTickettests(tests.Modeltests):
-    """ Tests for pagure.lib.task_services """
+    """Tests for pagure.lib.task_services"""
 
     maxDiff = None
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureLibTaskServicesLoadJsonTickettests, self).setUp()
 
         tests.create_projects(self.session)
@@ -845,7 +845,7 @@ class PagureLibTaskServicesLoadJsonTickettests(tests.Modeltests):
     @patch("pagure.lib.notify.send_email")
     @patch("pagure.lib.git.update_request_from_git")
     def test_loading_issue_json(self, up_pr, send):
-        """ Test loading the JSON file of a ticket. """
+        """Test loading the JSON file of a ticket."""
         project = pagure.lib.query.get_authorized_project(self.session, "test")
         issue = pagure.lib.query.search_issues(
             self.session, project, issueid=1

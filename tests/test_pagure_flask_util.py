@@ -25,10 +25,10 @@ import tests
 
 
 class PagureUtilSSHPatterntests(tests.Modeltests):
-    """ Tests for the ssh_urlpattern in pagure.util """
+    """Tests for the ssh_urlpattern in pagure.util"""
 
     def test_ssh_pattern_valid(self):
-        """ Test the ssh_urlpattern with valid patterns. """
+        """Test the ssh_urlpattern with valid patterns."""
         patterns = [
             "ssh://user@host.com/repo.git",
             "git+ssh://user@host.com/repo.git",
@@ -43,7 +43,7 @@ class PagureUtilSSHPatterntests(tests.Modeltests):
             self.assertIsNotNone(ssh_urlpattern.match(pattern))
 
     def test_ssh_pattern_invalid(self):
-        """ Test the ssh_urlpattern with invalid patterns. """
+        """Test the ssh_urlpattern with invalid patterns."""
         patterns = [
             "http://user@host.com/repo.git",
             "git+http://user@host.com/repo.git",

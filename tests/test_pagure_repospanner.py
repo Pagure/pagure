@@ -101,14 +101,14 @@ hooks:
 
 
 class PagureRepoSpannerTests(tests.Modeltests):
-    """ Tests for repoSpanner integration of pagure """
+    """Tests for repoSpanner integration of pagure"""
 
     repospanner_binary = None
     repospanner_runlog = None
     repospanner_proc = None
 
     def run_cacmd(self, logfile, *args):
-        """ Run a repoSpanner CA command. """
+        """Run a repoSpanner CA command."""
         subprocess.check_call(
             [
                 self.repospanner_binary,
@@ -124,7 +124,7 @@ class PagureRepoSpannerTests(tests.Modeltests):
         )
 
     def setUp(self):
-        """ set up the environment. """
+        """set up the environment."""
         possible_paths = ["./repospanner", "/usr/bin/repospanner"]
 
         for option in possible_paths:
@@ -303,7 +303,7 @@ class PagureRepoSpannerTests(tests.Modeltests):
         pagure.config.config["REPOSPANNER_REGIONS"]["default"]["hook"] = hookid
 
     def tearDown(self):
-        """ Tear down the repoSpanner instance. """
+        """Tear down the repoSpanner instance."""
         if self.repospanner_proc:
             # Tear down
             self.repospanner_proc.terminate()
@@ -340,7 +340,7 @@ class PagureRepoSpannerTestsNewRepoDefault(PagureRepoSpannerTests):
     @print_repospanner_log
     @patch("pagure.ui.app.admin_session_timedout")
     def test_new_project(self, ast):
-        """ Test creating a new repo by default on repoSpanner works. """
+        """Test creating a new repo by default on repoSpanner works."""
         ast.return_value = False
 
         user = tests.FakeUser(username="foo")
@@ -418,7 +418,7 @@ class PagureRepoSpannerTestsNewRepoDefault(PagureRepoSpannerTests):
         },
     )
     def test_http_pull(self):
-        """ Test that the HTTP pull endpoint works for repoSpanner. """
+        """Test that the HTTP pull endpoint works for repoSpanner."""
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
         tests.create_tokens_acl(self.session)
@@ -461,7 +461,7 @@ class PagureRepoSpannerTestsNewRepoDefault(PagureRepoSpannerTests):
         },
     )
     def test_http_push(self):
-        """ Test that the HTTP push endpoint works for repoSpanner. """
+        """Test that the HTTP push endpoint works for repoSpanner."""
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
         tests.create_tokens_acl(self.session)
@@ -490,7 +490,7 @@ class PagureRepoSpannerTestsNewRepoDefault(PagureRepoSpannerTests):
     @print_repospanner_log
     @patch("pagure.ui.app.admin_session_timedout")
     def test_hooks(self, ast):
-        """ Test hook setting and running works. """
+        """Test hook setting and running works."""
         ast.return_value = False
         pagure.cli.admin.session = self.session
 
@@ -599,7 +599,7 @@ class PagureRepoSpannerTestsNewRepoDefault(PagureRepoSpannerTests):
     )
     @patch("pagure.ui.app.admin_session_timedout")
     def test_adopt_project(self, ast):
-        """ Test adopting a project in repoSpanner works. """
+        """Test adopting a project in repoSpanner works."""
         ast.return_value = False
 
         user = tests.FakeUser(username="foo")

@@ -33,11 +33,11 @@ from pagure.lib.repo import PagureRepo  # noqa
 
 
 class PagureFlaskForkPrtests(tests.Modeltests):
-    """ Tests for flask fork controller of pagure regarding diffing PRs """
+    """Tests for flask fork controller of pagure regarding diffing PRs"""
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskForkPrtests, self).setUp()
 
         # Create the main project in the DB
@@ -230,7 +230,7 @@ class PagureFlaskForkPrtests(tests.Modeltests):
         self.assertEqual(req.title, "test pull-request")
 
     def test_get_pr_info(self):
-        """ Test pagure.ui.fork._get_pr_info """
+        """Test pagure.ui.fork._get_pr_info"""
 
         gitrepo = os.path.join(self.path, "repos", "test.git")
         gitrepo2 = os.path.join(
@@ -257,7 +257,7 @@ class PagureFlaskForkPrtests(tests.Modeltests):
         )
 
     def test_get_pr_info_raises(self):
-        """ Test pagure.ui.fork._get_pr_info """
+        """Test pagure.ui.fork._get_pr_info"""
 
         gitrepo = os.path.join(self.path, "repos", "test.git")
         gitrepo2 = os.path.join(
@@ -283,7 +283,7 @@ class PagureFlaskForkPrtests(tests.Modeltests):
         )
 
     def test_diff_pull_request(self):
-        """ Test pagure.lib.git.diff_pull_request """
+        """Test pagure.lib.git.diff_pull_request"""
         gitrepo = os.path.join(self.path, "repos", "test.git")
         gitrepo2 = os.path.join(
             self.path, "repos", "forks", "pingou", "test.git"

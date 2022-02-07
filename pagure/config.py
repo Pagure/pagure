@@ -15,7 +15,7 @@ import flask  # noqa: E402
 
 
 def reload_config():
-    """ Reload the configuration. """
+    """Reload the configuration."""
     config = flask.config.Config(
         os.path.dirname(os.path.abspath(__file__)), flask.Flask.default_config
     )

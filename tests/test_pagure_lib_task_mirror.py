@@ -35,12 +35,12 @@ import pagure.lib.tasks_mirror
 
 
 class PagureLibTaskMirrortests(tests.Modeltests):
-    """ Tests for pagure.lib.task_mirror """
+    """Tests for pagure.lib.task_mirror"""
 
     maxDiff = None
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureLibTaskMirrortests, self).setUp()
 
         pagure.config.config["REQUESTS_FOLDER"] = None
@@ -50,7 +50,7 @@ class PagureLibTaskMirrortests(tests.Modeltests):
         tests.create_projects(self.session)
 
     def test_create_ssh_key(self):
-        """ Test the _create_ssh_key method. """
+        """Test the _create_ssh_key method."""
         # before
         self.assertFalse(os.path.exists(self.sshkeydir))
         os.mkdir(self.sshkeydir)
@@ -65,7 +65,7 @@ class PagureLibTaskMirrortests(tests.Modeltests):
         )
 
     def test_setup_mirroring(self):
-        """ Test the setup_mirroring method. """
+        """Test the setup_mirroring method."""
 
         # before
         self.assertFalse(os.path.exists(self.sshkeydir))
@@ -92,7 +92,7 @@ class PagureLibTaskMirrortests(tests.Modeltests):
         self.assertTrue(project.mirror_hook.public_key.startswith("ssh-rsa "))
 
     def test_setup_mirroring_ssh_folder_exists_wrong_permissions(self):
-        """ Test the setup_mirroring method. """
+        """Test the setup_mirroring method."""
 
         os.makedirs(self.sshkeydir)
 
@@ -122,7 +122,7 @@ class PagureLibTaskMirrortests(tests.Modeltests):
         self.assertIsNone(project.mirror_hook.public_key)
 
     def test_setup_mirroring_ssh_folder_symlink(self):
-        """ Test the setup_mirroring method. """
+        """Test the setup_mirroring method."""
 
         os.symlink(self.path, self.sshkeydir)
 
@@ -175,7 +175,7 @@ class PagureLibTaskMirrortests(tests.Modeltests):
 
     @patch("os.getuid", MagicMock(return_value=450))
     def test_setup_mirroring_ssh_folder_owner(self):
-        """ Test the setup_mirroring method. """
+        """Test the setup_mirroring method."""
         os.makedirs(self.sshkeydir, mode=0o700)
 
         # before
@@ -205,12 +205,12 @@ class PagureLibTaskMirrortests(tests.Modeltests):
 
 
 class PagureLibTaskMirrorSetuptests(tests.Modeltests):
-    """ Tests for pagure.lib.task_mirror """
+    """Tests for pagure.lib.task_mirror"""
 
     maxDiff = None
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureLibTaskMirrorSetuptests, self).setUp()
 
         pagure.config.config["REQUESTS_FOLDER"] = None
@@ -233,7 +233,7 @@ class PagureLibTaskMirrorSetuptests(tests.Modeltests):
         )
 
     def test_setup_mirroring_twice(self):
-        """ Test the setup_mirroring method. """
+        """Test the setup_mirroring method."""
 
         # before
         self.assertEqual(
@@ -261,7 +261,7 @@ class PagureLibTaskMirrorSetuptests(tests.Modeltests):
         self.assertEqual(project.mirror_hook.public_key, before_key)
 
     def test_teardown_mirroring(self):
-        """ Test the teardown_mirroring method. """
+        """Test the teardown_mirroring method."""
 
         # before
         self.assertEqual(
@@ -283,7 +283,7 @@ class PagureLibTaskMirrorSetuptests(tests.Modeltests):
 
     @patch("pagure.lib.git.read_git_lines")
     def test_mirror_project(self, rgl):
-        """ Test the mirror_project method. """
+        """Test the mirror_project method."""
         rgl.return_value = ("stdout", "stderr")
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
 

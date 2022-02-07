@@ -100,7 +100,7 @@ activation.
 
 
 class PagureCiForm(FlaskForm):
-    """ Form to configure the CI hook. """
+    """Form to configure the CI hook."""
 
     ci_type = wtforms.SelectField(
         "Type of CI service",
@@ -162,7 +162,7 @@ class PagureCiForm(FlaskForm):
 
 
 class PagureCi(BaseHook):
-    """ Continuous Integration (CI) hooks. """
+    """Continuous Integration (CI) hooks."""
 
     name = "Pagure CI"
     description = (

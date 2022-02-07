@@ -30,7 +30,7 @@ class PagureFlaskIssuesReadOnlytests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskIssuesReadOnlytests, self).setUp()
 
         tests.create_projects(self.session)
@@ -206,7 +206,7 @@ class PagureFlaskAPIIssuesReadOnlytests(PagureFlaskIssuesReadOnlytests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskAPIIssuesReadOnlytests, self).setUp()
 
     def test_api_new_issue(self):
@@ -225,7 +225,7 @@ class PagureFlaskAPIIssuesReadOnlytests(PagureFlaskIssuesReadOnlytests):
             )
 
     def test_api_change_status_issue(self):
-        """ Test closing a ticket. """
+        """Test closing a ticket."""
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
             output = self.app.post("/api/0/test/issue/1/status", data={})
@@ -240,7 +240,7 @@ class PagureFlaskAPIIssuesReadOnlytests(PagureFlaskIssuesReadOnlytests):
             )
 
     def test_api_change_milestone_issue(self):
-        """ Test change the milestone of a ticket. """
+        """Test change the milestone of a ticket."""
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
             output = self.app.post("/api/0/test/issue/1/milestone", data={})
@@ -255,7 +255,7 @@ class PagureFlaskAPIIssuesReadOnlytests(PagureFlaskIssuesReadOnlytests):
             )
 
     def test_api_comment_issue(self):
-        """ Test comment on a ticket. """
+        """Test comment on a ticket."""
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
             output = self.app.post("/api/0/test/issue/1/comment", data={})
@@ -270,7 +270,7 @@ class PagureFlaskAPIIssuesReadOnlytests(PagureFlaskIssuesReadOnlytests):
             )
 
     def test_api_assign_issue(self):
-        """ Test assigning a ticket. """
+        """Test assigning a ticket."""
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
             output = self.app.post("/api/0/test/issue/1/assign", data={})
@@ -285,7 +285,7 @@ class PagureFlaskAPIIssuesReadOnlytests(PagureFlaskIssuesReadOnlytests):
             )
 
     def test_api_subscribe_issue(self):
-        """ Test subscribing to a ticket. """
+        """Test subscribing to a ticket."""
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
             output = self.app.post("/api/0/test/issue/1/subscribe", data={})
@@ -300,7 +300,7 @@ class PagureFlaskAPIIssuesReadOnlytests(PagureFlaskIssuesReadOnlytests):
             )
 
     def test_api_update_custom_field(self):
-        """ Test updating a specific custom fields on a ticket. """
+        """Test updating a specific custom fields on a ticket."""
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
             output = self.app.post("/api/0/test/issue/1/custom/foo", data={})
@@ -315,7 +315,7 @@ class PagureFlaskAPIIssuesReadOnlytests(PagureFlaskIssuesReadOnlytests):
             )
 
     def test_api_update_custom_fields(self):
-        """ Test updating custom fields on a ticket. """
+        """Test updating custom fields on a ticket."""
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
             output = self.app.post("/api/0/test/issue/1/custom", data={})
@@ -337,7 +337,7 @@ class PagureFlaskIssuesAndPRDisabledtests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskIssuesAndPRDisabledtests, self).setUp()
 
         tests.create_projects(self.session)

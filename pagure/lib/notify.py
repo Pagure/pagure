@@ -47,7 +47,7 @@ if pagure_config["EVENTSOURCE_SOURCE"]:
 
 
 def fedmsg_publish(*args, **kwargs):  # pragma: no cover
-    """ Try to publish a message on the fedmsg bus. """
+    """Try to publish a message on the fedmsg bus."""
     if not pagure_config.get("FEDMSG_NOTIFICATIONS", True):
         return
 
@@ -73,7 +73,7 @@ def fedmsg_publish(*args, **kwargs):  # pragma: no cover
 
 
 def fedora_messaging_publish(topic, message):  # pragma: no cover
-    """ Try to publish a message on AMQP using fedora-messaging. """
+    """Try to publish a message on AMQP using fedora-messaging."""
     if not pagure_config.get("FEDORA_MESSAGING_NOTIFICATIONS", False):
         return
 
@@ -116,7 +116,7 @@ stomp_conn = None
 
 
 def stomp_publish(topic, message):
-    """ Try to publish a message on a Stomp-compliant message bus. """
+    """Try to publish a message on a Stomp-compliant message bus."""
     if not pagure_config.get("STOMP_NOTIFICATIONS", False):
         return
     # We catch Exception if we want :-p
@@ -156,7 +156,7 @@ def blinker_publish(topic, message):
 
 
 def mqtt_publish(topic, message):
-    """ Try to publish a message on a MQTT message bus. """
+    """Try to publish a message on a MQTT message bus."""
     if not pagure_config.get("MQTT_NOTIFICATIONS", False):
         return
 
@@ -377,7 +377,7 @@ def _get_emails_for_commit_notification(project):
 
 
 def _build_url(*args):
-    """ Build a URL from a given list of arguments. """
+    """Build a URL from a given list of arguments."""
     items = []
     for idx, arg in enumerate(args):
         arg = "%s" % arg

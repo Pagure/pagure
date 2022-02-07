@@ -24,15 +24,15 @@ import tests
 
 
 class TestStarProjectLib(tests.SimplePagureTest):
-    """ Test the star project feature of pagure """
+    """Test the star project feature of pagure"""
 
     def setUp(self):
-        """ Set up the environnment for running each star project lib tests """
+        """Set up the environnment for running each star project lib tests"""
         super(TestStarProjectLib, self).setUp()
         tests.create_projects(self.session)
 
     def test_update_star_project(self):
-        """ Test the update_star_project endpoint of pagure.lib """
+        """Test the update_star_project endpoint of pagure.lib"""
 
         repo_obj = pagure.lib.query._get_project(self.session, "test")
         # test with invalud Star object, should return None
@@ -67,7 +67,7 @@ class TestStarProjectLib(tests.SimplePagureTest):
         self.assertEqual(len(user_obj.stars), 0)
 
     def test_star_project(self):
-        """ Test the _star_project endpoint of pagure.lib """
+        """Test the _star_project endpoint of pagure.lib"""
 
         # test with not all arguments present
         user_obj = pagure.lib.query.get_user(self.session, "pingou")
@@ -85,7 +85,7 @@ class TestStarProjectLib(tests.SimplePagureTest):
         self.assertEqual(len(user_obj.stars), 1)
 
     def test_unstar_project(self):
-        """ Test the _unstar_project endpoint of pagure.lib """
+        """Test the _unstar_project endpoint of pagure.lib"""
 
         # test with not all arguments present
         user_obj = pagure.lib.query.get_user(self.session, "pingou")
@@ -123,7 +123,7 @@ class TestStarProjectLib(tests.SimplePagureTest):
         self.assertEqual(len(user_obj.stars), 0)
 
     def test_get_stargazer_obj(self):
-        """ Test the _get_stargazer_obj test of pagure.lib """
+        """Test the _get_stargazer_obj test of pagure.lib"""
 
         # star the project first
         repo_obj = pagure.lib.query._get_project(self.session, "test")
@@ -161,7 +161,7 @@ class TestStarProjectLib(tests.SimplePagureTest):
         self.assertEqual(star_obj is None, True)
 
     def test_has_starred(self):
-        """ Test the has_starred endpoint of pagure.lib """
+        """Test the has_starred endpoint of pagure.lib"""
 
         # star the project
         repo_obj = pagure.lib.query._get_project(self.session, "test")

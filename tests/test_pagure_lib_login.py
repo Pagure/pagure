@@ -30,28 +30,28 @@ import tests
 
 
 class PagureLibLogintests(tests.Modeltests):
-    """ Tests for pagure.lib.login """
+    """Tests for pagure.lib.login"""
 
     def test_id_generator(self):
-        """ Test pagure.lib.login.id_generator. """
+        """Test pagure.lib.login.id_generator."""
         self.assertEqual(
             pagure.lib.login.id_generator(size=3, chars=["a"]), "aaa"
         )
 
     def test_get_session_by_visitkey(self):
-        """ Test pagure.lib.login.get_session_by_visitkey. """
+        """Test pagure.lib.login.get_session_by_visitkey."""
 
         session = pagure.lib.login.get_session_by_visitkey(self.session, "foo")
         self.assertEqual(session, None)
 
     def test_generate_hashed_value(self):
-        """ Test pagure.lib.login.generate_hashed_value. """
+        """Test pagure.lib.login.generate_hashed_value."""
         password = pagure.lib.login.generate_hashed_value("foo")
         self.assertTrue(password.startswith("$2$"))
         self.assertEqual(len(password), 63)
 
     def test_check_password(self):
-        """ Test pagure.lib.login.check_password. """
+        """Test pagure.lib.login.check_password."""
 
         # Version 2
         password = pagure.lib.login.generate_hashed_value("foo")

@@ -24,10 +24,10 @@ from pagure.utils import __get_file_in_tree as get_file_in_tree
 
 
 class PagureFlaskRepoViewBlameFileSimpletests(tests.Modeltests):
-    """ Tests for view_blame_file endpoint of the flask pagure app """
+    """Tests for view_blame_file endpoint of the flask pagure app"""
 
     def test_view_blame_file_no_project(self):
-        """ Test the view_blame_file endpoint """
+        """Test the view_blame_file endpoint"""
         output = self.app.get("/foo/blame/sources")
         # No project registered in the DB
         self.assertEqual(output.status_code, 404)
@@ -39,7 +39,7 @@ class PagureFlaskRepoViewBlameFileSimpletests(tests.Modeltests):
         self.assertIn("<p>Project not found</p>", output_text)
 
     def test_view_blame_file_no_git_repo(self):
-        """ Test the view_blame_file endpoint """
+        """Test the view_blame_file endpoint"""
         tests.create_projects(self.session)
 
         output = self.app.get("/test/blame/sources")
@@ -47,7 +47,7 @@ class PagureFlaskRepoViewBlameFileSimpletests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
     def test_view_blame_file_no_git_content(self):
-        """ Test the view_blame_file endpoint """
+        """Test the view_blame_file endpoint"""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
 
@@ -63,10 +63,10 @@ class PagureFlaskRepoViewBlameFileSimpletests(tests.Modeltests):
 
 
 class PagureFlaskRepoViewBlameFiletests(tests.Modeltests):
-    """ Tests for view_blame_file endpoint of the flask pagure app """
+    """Tests for view_blame_file endpoint of the flask pagure app"""
 
     def setUp(self):
-        """ Set up the environment, ran before every tests. """
+        """Set up the environment, ran before every tests."""
         super(PagureFlaskRepoViewBlameFiletests, self).setUp()
         self.regex = re.compile(r'>(\w+)</a></td>\n<td class="cell2">')
         tests.create_projects(self.session)
@@ -89,7 +89,7 @@ class PagureFlaskRepoViewBlameFiletests(tests.Modeltests):
         )
 
     def test_view_blame_file_default_branch_master(self):
-        """ Test the view_blame_file endpoint """
+        """Test the view_blame_file endpoint"""
         output = self.app.get("/test/blame/sources")
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
@@ -108,7 +108,7 @@ class PagureFlaskRepoViewBlameFiletests(tests.Modeltests):
         self.assertEqual(len(data), 2)
 
     def test_view_blame_file_default_branch_non_master(self):
-        """ Test the view_blame_file endpoint """
+        """Test the view_blame_file endpoint"""
         repo = pygit2.Repository(os.path.join(self.path, "repos", "test.git"))
         reference = repo.lookup_reference("refs/heads/feature").resolve()
         repo.set_head(reference.name)
@@ -130,7 +130,7 @@ class PagureFlaskRepoViewBlameFiletests(tests.Modeltests):
         self.assertEqual(len(data), 3)
 
     def test_view_blame_file_on_commit(self):
-        """ Test the view_blame_file endpoint """
+        """Test the view_blame_file endpoint"""
         repo_obj = pygit2.Repository(
             os.path.join(self.path, "repos", "test.git")
         )
@@ -157,7 +157,7 @@ class PagureFlaskRepoViewBlameFiletests(tests.Modeltests):
         self.assertEqual(len(data), 1)
 
     def test_view_blame_file_on_branch(self):
-        """ Test the view_blame_file endpoint """
+        """Test the view_blame_file endpoint"""
         output = self.app.get("/test/blame/sources?identifier=feature")
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
@@ -176,7 +176,7 @@ class PagureFlaskRepoViewBlameFiletests(tests.Modeltests):
         self.assertEqual(len(data), 3)
 
     def test_view_blame_file_on_tag(self):
-        """ Test the view_blame_file endpoint """
+        """Test the view_blame_file endpoint"""
         # set a tag on the head's parent commit
         repo_obj = pygit2.Repository(
             os.path.join(self.path, "repos", "test.git")
@@ -206,7 +206,7 @@ class PagureFlaskRepoViewBlameFiletests(tests.Modeltests):
         self.assertEqual(len(data), 1)
 
     def test_view_blame_file_on_blob(self):
-        """ Test the view_blame_file endpoint """
+        """Test the view_blame_file endpoint"""
         # Retrieve the blob of the `sources` file in head
         repo_obj = pygit2.Repository(
             os.path.join(self.path, "repos", "test.git")
@@ -224,7 +224,7 @@ class PagureFlaskRepoViewBlameFiletests(tests.Modeltests):
         self.assertIn("Invalid identified provided", output_text)
 
     def test_view_blame_file_binary(self):
-        """ Test the view_blame_file endpoint """
+        """Test the view_blame_file endpoint"""
         # Add binary content
         tests.add_binary_git_repo(
             os.path.join(self.path, "repos", "test.git"), "test.jpg"
@@ -236,7 +236,7 @@ class PagureFlaskRepoViewBlameFiletests(tests.Modeltests):
         self.assertIn("<p>Binary files cannot be blamed</p>", output_text)
 
     def test_view_blame_file_non_ascii_name(self):
-        """ Test the view_blame_file endpoint """
+        """Test the view_blame_file endpoint"""
         tests.add_commit_git_repo(
             os.path.join(self.path, "repos", "test.git"),
             ncommits=1,
@@ -261,7 +261,7 @@ class PagureFlaskRepoViewBlameFiletests(tests.Modeltests):
         )
 
     def test_view_blame_file_fork_of_a_fork(self):
-        """ Test the view_blame_file endpoint """
+        """Test the view_blame_file endpoint"""
         item = pagure.lib.model.Project(
             user_id=1,  # pingou
             name="test3",
@@ -304,7 +304,7 @@ class PagureFlaskRepoViewBlameFiletests(tests.Modeltests):
         )
 
     def test_view_blame_file_no_file(self):
-        """ Test the view_blame_file endpoint """
+        """Test the view_blame_file endpoint"""
         output = self.app.get("/test/blame/foofile")
         self.assertEqual(output.status_code, 404)
         output_text = output.get_data(as_text=True)
@@ -315,7 +315,7 @@ class PagureFlaskRepoViewBlameFiletests(tests.Modeltests):
         self.assertIn("<p>File not found</p>", output_text)
 
     def test_view_blame_file_folder(self):
-        """ Test the view_blame_file endpoint """
+        """Test the view_blame_file endpoint"""
         tests.add_commit_git_repo(
             os.path.join(self.path, "repos", "test.git/folder1"),
             ncommits=1,

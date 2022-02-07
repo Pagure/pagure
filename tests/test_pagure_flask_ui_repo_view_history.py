@@ -22,10 +22,10 @@ import pagure.lib.model
 
 
 class PagureFlaskRepoViewHistoryFileSimpletests(tests.Modeltests):
-    """ Tests for view_history_file endpoint of the flask pagure app """
+    """Tests for view_history_file endpoint of the flask pagure app"""
 
     def test_view_history_file_no_project(self):
-        """ Test the view_history_file endpoint """
+        """Test the view_history_file endpoint"""
         output = self.app.get("/foo/history/sources")
         # No project registered in the DB
         self.assertEqual(output.status_code, 404)
@@ -37,7 +37,7 @@ class PagureFlaskRepoViewHistoryFileSimpletests(tests.Modeltests):
         self.assertIn("<p>Project not found</p>", output_text)
 
     def test_view_history_file_no_git_repo(self):
-        """ Test the view_history_file endpoint """
+        """Test the view_history_file endpoint"""
         tests.create_projects(self.session)
 
         output = self.app.get("/test/history/sources")
@@ -45,7 +45,7 @@ class PagureFlaskRepoViewHistoryFileSimpletests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
     def test_view_history_file_no_git_content(self):
-        """ Test the view_history_file endpoint """
+        """Test the view_history_file endpoint"""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
 
@@ -61,10 +61,10 @@ class PagureFlaskRepoViewHistoryFileSimpletests(tests.Modeltests):
 
 
 class PagureFlaskRepoViewHistoryFiletests(tests.Modeltests):
-    """ Tests for view_history_file endpoint of the flask pagure app """
+    """Tests for view_history_file endpoint of the flask pagure app"""
 
     def setUp(self):
-        """ Set up the environment, ran before every tests. """
+        """Set up the environment, ran before every tests."""
         super(PagureFlaskRepoViewHistoryFiletests, self).setUp()
         self.regex = re.compile(r' <div class="list-group-item " id="c_')
         tests.create_projects(self.session)
@@ -87,7 +87,7 @@ class PagureFlaskRepoViewHistoryFiletests(tests.Modeltests):
         )
 
     def test_view_history_file_default_branch_master(self):
-        """ Test the view_history_file endpoint """
+        """Test the view_history_file endpoint"""
         output = self.app.get("/test/history/sources")
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
@@ -96,7 +96,7 @@ class PagureFlaskRepoViewHistoryFiletests(tests.Modeltests):
         self.assertEqual(len(data), 2)
 
     def test_view_history_file_default_branch_non_master(self):
-        """ Test the view_history_file endpoint """
+        """Test the view_history_file endpoint"""
         repo = pygit2.Repository(os.path.join(self.path, "repos", "test.git"))
         reference = repo.lookup_reference("refs/heads/feature").resolve()
         repo.set_head(reference.name)
@@ -108,7 +108,7 @@ class PagureFlaskRepoViewHistoryFiletests(tests.Modeltests):
         self.assertEqual(len(data), 3)
 
     def test_view_history_file_on_commit(self):
-        """ Test the view_history_file endpoint """
+        """Test the view_history_file endpoint"""
         repo_obj = pygit2.Repository(
             os.path.join(self.path, "repos", "test.git")
         )
@@ -125,7 +125,7 @@ class PagureFlaskRepoViewHistoryFiletests(tests.Modeltests):
         self.assertEqual(len(data), 1)
 
     def test_view_history_file_on_branch(self):
-        """ Test the view_history_file endpoint """
+        """Test the view_history_file endpoint"""
         output = self.app.get("/test/history/sources?identifier=feature")
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
@@ -134,7 +134,7 @@ class PagureFlaskRepoViewHistoryFiletests(tests.Modeltests):
         self.assertEqual(len(data), 3)
 
     def test_view_history_file_on_tag(self):
-        """ Test the view_history_file endpoint """
+        """Test the view_history_file endpoint"""
         # set a tag on the head's parent commit
         repo_obj = pygit2.Repository(
             os.path.join(self.path, "repos", "test.git")
@@ -154,7 +154,7 @@ class PagureFlaskRepoViewHistoryFiletests(tests.Modeltests):
         self.assertEqual(len(data), 1)
 
     def test_view_history_file_binary(self):
-        """ Test the view_history_file endpoint """
+        """Test the view_history_file endpoint"""
         # Add binary content
         tests.add_binary_git_repo(
             os.path.join(self.path, "repos", "test.git"), "test.jpg"
@@ -165,7 +165,7 @@ class PagureFlaskRepoViewHistoryFiletests(tests.Modeltests):
         self.assertIn("<strong>Add a fake image file</strong>", output_text)
 
     def test_view_history_file_non_ascii_name(self):
-        """ Test the view_history_file endpoint """
+        """Test the view_history_file endpoint"""
         tests.add_commit_git_repo(
             os.path.join(self.path, "repos", "test.git"),
             ncommits=1,
@@ -181,7 +181,7 @@ class PagureFlaskRepoViewHistoryFiletests(tests.Modeltests):
         self.assertIn("<strong>Add row 0 to Šource file</strong>", output_text)
 
     def test_view_history_file_fork_of_a_fork(self):
-        """ Test the view_history_file endpoint """
+        """Test the view_history_file endpoint"""
         item = pagure.lib.model.Project(
             user_id=1,  # pingou
             name="test3",
@@ -216,14 +216,14 @@ class PagureFlaskRepoViewHistoryFiletests(tests.Modeltests):
         )
 
     def test_view_history_file_no_file(self):
-        """ Test the view_history_file endpoint """
+        """Test the view_history_file endpoint"""
         output = self.app.get("/test/history/foofile")
         self.assertEqual(output.status_code, 400)
         output_text = output.get_data(as_text=True)
         self.assertIn("No history could be found for this file", output_text)
 
     def test_view_history_file_folder(self):
-        """ Test the view_history_file endpoint """
+        """Test the view_history_file endpoint"""
         tests.add_commit_git_repo(
             os.path.join(self.path, "repos", "test.git/folder1"),
             ncommits=1,
@@ -235,7 +235,7 @@ class PagureFlaskRepoViewHistoryFiletests(tests.Modeltests):
         self.assertIn("No history could be found for this file", output_text)
 
     def test_view_history_file_existing_folder(self):
-        """ Test the view_history_file endpoint """
+        """Test the view_history_file endpoint"""
         tests.add_content_to_git(
             os.path.join(self.path, "repos", "test.git"), folders="foo/bar"
         )

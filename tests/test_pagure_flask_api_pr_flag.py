@@ -29,13 +29,13 @@ import tests  # noqa
 
 
 class PagureFlaskApiPRFlagtests(tests.Modeltests):
-    """ Tests for the flask API of pagure for flagging pull-requests """
+    """Tests for the flask API of pagure for flagging pull-requests"""
 
     maxDiff = None
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskApiPRFlagtests, self).setUp()
 
         pagure.config.config["REQUESTS_FOLDER"] = None
@@ -73,7 +73,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         self.assertEqual(len(request.flags), 0)
 
     def test_invalid_project(self):
-        """ Test the flagging a PR on an invalid project. """
+        """Test the flagging a PR on an invalid project."""
 
         headers = {"Authorization": "token aaabbbcccddd"}
 
@@ -88,7 +88,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         )
 
     def test_incorrect_project(self):
-        """ Test the flagging a PR on the wrong project. """
+        """Test the flagging a PR on the wrong project."""
         headers = {"Authorization": "token aaabbbcccddd"}
 
         # Valid token, wrong project
@@ -103,7 +103,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data["error"])
 
     def test_pr_disabled(self):
-        """ Test the flagging a PR when PRs are disabled. """
+        """Test the flagging a PR when PRs are disabled."""
 
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
         settings = repo.settings
@@ -129,7 +129,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         )
 
     def test_no_pr(self):
-        """ Test the flagging a PR when the PR doesn't exist. """
+        """Test the flagging a PR when the PR doesn't exist."""
         headers = {"Authorization": "token aaabbbcccddd"}
 
         # No PR
@@ -143,7 +143,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         )
 
     def test_no_input(self):
-        """ Test the flagging an existing PR but with no data. """
+        """Test the flagging an existing PR but with no data."""
         headers = {"Authorization": "token aaabbbcccddd"}
 
         # No input
@@ -166,7 +166,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         )
 
     def test_no_comment(self):
-        """ Test the flagging an existing PR but with incomplete data. """
+        """Test the flagging an existing PR but with incomplete data."""
         headers = {"Authorization": "token aaabbbcccddd"}
 
         data = {
@@ -203,7 +203,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         MagicMock(side_effect=pagure.exceptions.PagureException("error")),
     )
     def test_raise_exception(self):
-        """ Test the flagging a PR when adding a flag raises an exception. """
+        """Test the flagging a PR when adding a flag raises an exception."""
 
         headers = {"Authorization": "token aaabbbcccddd"}
         data = {
@@ -226,7 +226,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
     )
     @patch("pagure.lib.notify.send_email")
     def test_flagging_a_pul_request_with_notification(self, mock_email):
-        """ Test the flagging a PR. """
+        """Test the flagging a PR."""
         headers = {"Authorization": "token aaabbbcccddd"}
 
         # Enable PR notifications
@@ -451,7 +451,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         "pagure.config.config", {"FEDORA_MESSAGING_NOTIFICATIONS": True}
     )
     def test_updating_flag(self):
-        """ Test the updating the flag of a PR. """
+        """Test the updating the flag of a PR."""
         headers = {"Authorization": "token aaabbbcccddd"}
 
         data = {
@@ -706,7 +706,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         self.assertEqual(flags[0].percent, 100)
 
     def test_adding_two_flags(self):
-        """ Test the adding two flags to a PR. """
+        """Test the adding two flags to a PR."""
         headers = {"Authorization": "token aaabbbcccddd"}
 
         data = {
@@ -845,7 +845,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         },
     )
     def test_flagging_a_pull_request_while_having_custom_statuses(self):
-        """ Test flagging a PR while having custom statuses. """
+        """Test flagging a PR while having custom statuses."""
         headers = {"Authorization": "token aaabbbcccddd"}
 
         # No status and no percent => should use FLAG_PENDING
@@ -916,7 +916,7 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskApiPRFlagUserTokentests, self).setUp()
 
         pagure.config.config["REQUESTS_FOLDER"] = None
@@ -954,7 +954,7 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
         self.assertEqual(len(request.flags), 0)
 
     def test_no_pr(self):
-        """ Test flagging a non-existing PR. """
+        """Test flagging a non-existing PR."""
         headers = {"Authorization": "token aaabbbcccddd"}
 
         # Invalid project
@@ -968,7 +968,7 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
         )
 
     def test_no_pr_other_project(self):
-        """ Test flagging a non-existing PR on a different project. """
+        """Test flagging a non-existing PR on a different project."""
         headers = {"Authorization": "token aaabbbcccddd"}
         # Valid token, wrong project
         output = self.app.post(
@@ -981,7 +981,7 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
         )
 
     def test_no_input(self):
-        """ Test flagging an existing PR but without submitting any data. """
+        """Test flagging an existing PR but without submitting any data."""
         headers = {"Authorization": "token aaabbbcccddd"}
 
         # No input
@@ -1271,7 +1271,7 @@ class PagureFlaskApiGetPRFlagtests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskApiGetPRFlagtests, self).setUp()
 
         pagure.config.config["REQUESTS_FOLDER"] = None
@@ -1309,7 +1309,7 @@ class PagureFlaskApiGetPRFlagtests(tests.Modeltests):
         self.assertEqual(len(request.flags), 0)
 
     def test_invalid_project(self):
-        """ Test the retrieving the flags of a PR on an invalid project. """
+        """Test the retrieving the flags of a PR on an invalid project."""
 
         # Invalid project
         output = self.app.get("/api/0/foo/pull-request/1/flag")
@@ -1320,7 +1320,7 @@ class PagureFlaskApiGetPRFlagtests(tests.Modeltests):
         )
 
     def test_pr_disabled(self):
-        """ Test the retrieving the flags of a PR when PRs are disabled. """
+        """Test the retrieving the flags of a PR when PRs are disabled."""
 
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
         settings = repo.settings
@@ -1342,7 +1342,7 @@ class PagureFlaskApiGetPRFlagtests(tests.Modeltests):
         )
 
     def test_no_pr(self):
-        """ Test the retrieving the flags of a PR when the PR doesn't exist. """
+        """Test the retrieving the flags of a PR when the PR doesn't exist."""
 
         # No PR
         output = self.app.get("/api/0/test/pull-request/10/flag")
@@ -1353,7 +1353,7 @@ class PagureFlaskApiGetPRFlagtests(tests.Modeltests):
         )
 
     def test_no_flag(self):
-        """ Test the retrieving the flags of a PR when the PR has no flags. """
+        """Test the retrieving the flags of a PR when the PR has no flags."""
 
         # No flag
         output = self.app.get("/api/0/test/pull-request/1/flag")
@@ -1362,7 +1362,7 @@ class PagureFlaskApiGetPRFlagtests(tests.Modeltests):
         self.assertDictEqual(data, {"flags": []})
 
     def test_get_flag(self):
-        """ Test the retrieving the flags of a PR when the PR has one flag. """
+        """Test the retrieving the flags of a PR when the PR has one flag."""
 
         # Add a flag to the PR
         request = pagure.lib.query.search_pull_requests(
@@ -1422,7 +1422,7 @@ class PagureFlaskApiGetPRFlagtests(tests.Modeltests):
         )
 
     def test_get_flags(self):
-        """ Test the retrieving the flags of a PR when the PR has one flag. """
+        """Test the retrieving the flags of a PR when the PR has one flag."""
 
         # Add two flags to the PR
         request = pagure.lib.query.search_pull_requests(

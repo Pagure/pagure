@@ -76,7 +76,7 @@ _log = logging.getLogger(__name__)
 @login_required
 @has_issue_tracker
 def update_issue(repo, issueid, username=None, namespace=None):
-    """ Add comment or update metadata of an issue. """
+    """Add comment or update metadata of an issue."""
     is_js = flask.request.args.get("js", False)
 
     repo = flask.g.repo

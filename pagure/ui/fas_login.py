@@ -31,7 +31,7 @@ _log = logging.getLogger(__name__)
 
 @FAS.postlogin
 def set_user(return_url):
-    """ After login method. """
+    """After login method."""
     if flask.g.fas_user.username is None:
         flask.flash(
             "It looks like your OpenID provider did not provide an "
@@ -153,8 +153,8 @@ def set_user(return_url):
         flask.flash(str(err), "error")
 
     if flask.g.fas_user.get("ssh_key"):
-        del(flask.g.fas_user.ssh_key)
+        del flask.g.fas_user.ssh_key
     if flask.session.get("FLASK_FAS_OPENID_USER").get("ssh_key"):
-        del(flask.session["FLASK_FAS_OPENID_USER"]["ssh_key"])
+        del flask.session["FLASK_FAS_OPENID_USER"]["ssh_key"]
 
     return flask.redirect(return_url)

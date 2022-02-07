@@ -31,12 +31,12 @@ from pagure.lib.repo import PagureRepo
 
 
 class PagureFlaskPrioritiestests(tests.Modeltests):
-    """ Tests for the behavior of priorities in pagure """
+    """Tests for the behavior of priorities in pagure"""
 
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_ticket_with_no_priority(self, p_send_email, p_ugt):
-        """ Test creating a ticket without priority. """
+        """Test creating a ticket without priority."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -90,7 +90,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_ticket_with_priorities(self, p_send_email, p_ugt):
-        """ Test creating a ticket with priorities. """
+        """Test creating a ticket with priorities."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -148,7 +148,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             self.assertIn('<option value="1">High</option>', output_text)
 
     def test_update_priorities(self):
-        """ Test updating priorities of a repo. """
+        """Test updating priorities of a repo."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
 
@@ -416,7 +416,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_reset_priorities(self, p_send_email, p_ugt):
-        """ Test resetting the priorities of a repo. """
+        """Test resetting the priorities of a repo."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -549,7 +549,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_reset_priorities_None(self, p_send_email, p_ugt):
-        """ Test resetting the priorities of a repo. """
+        """Test resetting the priorities of a repo."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -682,7 +682,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_set_priority_1_and_back(self):
-        """ Test setting the priority of a ticket to 1. """
+        """Test setting the priority of a ticket to 1."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
@@ -850,7 +850,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_set_priority_0(self):
-        """ Test setting the priority of a ticket to 0. """
+        """Test setting the priority of a ticket to 0."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
@@ -992,7 +992,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_set_priority_minus1(self):
-        """ Test setting the priority of a ticket to -1. """
+        """Test setting the priority of a ticket to -1."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
@@ -1132,7 +1132,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_default_priority(self):
-        """ Test updating the default priority of a repo. """
+        """Test updating the default priority of a repo."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
 
@@ -1439,7 +1439,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_default_priority_on_new_ticket(self):
-        """ Test updating the default priority of a repo. """
+        """Test updating the default priority of a repo."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
 

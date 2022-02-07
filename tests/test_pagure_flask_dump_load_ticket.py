@@ -39,7 +39,7 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
     @patch("pagure.lib.notify.send_email")
     @patch("pagure.lib.git._maybe_wait")
     def test_dumping_reloading_ticket(self, mw, send_email):
-        """ Test dumping a ticket into a JSON blob. """
+        """Test dumping a ticket into a JSON blob."""
         mw.side_effect = lambda result: result.get()
         send_email.return_value = True
 

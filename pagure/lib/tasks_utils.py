@@ -25,7 +25,7 @@ def pagure_task(function):
 
     @wraps(function)
     def decorated_function(self, *args, **kwargs):
-        """ Decorated function, actually does the work. """
+        """Decorated function, actually does the work."""
         if self is not None:
             try:
                 self.update_state(state="RUNNING")
@@ -47,6 +47,6 @@ def pagure_task(function):
 
 
 def gc_clean():
-    """ Force a run of the garbage collector. """
+    """Force a run of the garbage collector."""
     # https://pagure.io/pagure/issue/2302
     gc.collect()

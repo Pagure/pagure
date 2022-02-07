@@ -64,7 +64,7 @@ class FedmsgRunner(BaseRunner):
 
 
 class FedmsgForm(FlaskForm):
-    """ Form to configure the fedmsg hook. """
+    """Form to configure the fedmsg hook."""
 
     active = wtforms.BooleanField("Active", [wtforms.validators.Optional()])
 
@@ -82,7 +82,7 @@ This hook on the other hand only acts on commits.
 
 
 class Fedmsg(BaseHook):
-    """ Fedmsg hooks. """
+    """Fedmsg hooks."""
 
     name = "Fedmsg"
     description = DESCRIPTION

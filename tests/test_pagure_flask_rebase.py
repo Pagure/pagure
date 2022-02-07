@@ -31,14 +31,14 @@ import tests
 
 
 class PagureRebaseBasetests(tests.Modeltests):
-    """ Tests rebasing pull-request in pagure """
+    """Tests rebasing pull-request in pagure"""
 
     maxDiff = None
     config_values = {"authbackend": "pagure"}
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureRebaseBasetests, self).setUp()
 
         pagure.config.config["REQUESTS_FOLDER"] = None
@@ -104,10 +104,10 @@ class PagureRebaseBasetests(tests.Modeltests):
 
 
 class PagureRebasetests(PagureRebaseBasetests):
-    """ Tests rebasing pull-request in pagure """
+    """Tests rebasing pull-request in pagure"""
 
     def test_merge_status_merge(self):
-        """ Test that the PR can be merged with a merge commit. """
+        """Test that the PR can be merged with a merge commit."""
 
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
@@ -160,7 +160,7 @@ class PagureRebasetests(PagureRebaseBasetests):
             )
 
     def test_rebase_task(self):
-        """ Test the rebase PR task and its outcome. """
+        """Test the rebase PR task and its outcome."""
         pagure.lib.tasks.rebase_pull_request(
             "test",
             namespace=None,
@@ -377,7 +377,7 @@ class PagureRebasetests(PagureRebaseBasetests):
             )
 
     def test_rebase_api_api_logged_in_unknown_project(self):
-        """ Test the rebase PR API endpoint when the project doesn't exist """
+        """Test the rebase PR API endpoint when the project doesn't exist"""
 
         tests.create_tokens(self.session)
         tests.create_tokens_acl(self.session)
@@ -394,7 +394,7 @@ class PagureRebasetests(PagureRebaseBasetests):
         )
 
     def test_rebase_api_api_logged_in_unknown_pr(self):
-        """ Test the rebase PR API endpoint when the PR doesn't exist """
+        """Test the rebase PR API endpoint when the PR doesn't exist"""
 
         tests.create_tokens(self.session)
         tests.create_tokens_acl(self.session)
@@ -411,7 +411,7 @@ class PagureRebasetests(PagureRebaseBasetests):
         )
 
     def test_rebase_api_api_logged_in_unknown_token(self):
-        """ Test the rebase PR API endpoint with an invalid API token """
+        """Test the rebase PR API endpoint with an invalid API token"""
 
         tests.create_tokens(self.session)
         tests.create_tokens_acl(self.session)
@@ -436,7 +436,7 @@ class PagureRebasetests(PagureRebaseBasetests):
 
 
 class PagureRebaseNoHooktests(PagureRebaseBasetests):
-    """ Tests rebasing pull-request in pagure """
+    """Tests rebasing pull-request in pagure"""
 
     config_values = {"authbackend": "pagure", "nogithooks": True}
 
@@ -826,13 +826,13 @@ class PagureRebaseNoHooktests(PagureRebaseBasetests):
 
 
 class PagureRebaseNotAllowedtests(tests.Modeltests):
-    """ Tests rebasing pull-request in pagure """
+    """Tests rebasing pull-request in pagure"""
 
     maxDiff = None
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureRebaseNotAllowedtests, self).setUp()
 
         pagure.config.config["REQUESTS_FOLDER"] = None

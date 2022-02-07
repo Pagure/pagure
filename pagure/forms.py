@@ -49,7 +49,7 @@ if hasattr(wtf, "__version__"):
 
 
 class PagureForm(FlaskForm):
-    """ Local form allowing us to form set the time limit. """
+    """Local form allowing us to form set the time limit."""
 
     def __init__(self, *args, **kwargs):
         delta = pagure_config.get("WTF_CSRF_TIME_LIMIT", 3600)
@@ -65,7 +65,7 @@ class PagureForm(FlaskForm):
 
 
 def convert_value(val):
-    """ Convert the provided values to strings when possible. """
+    """Convert the provided values to strings when possible."""
     if val:
         if not isinstance(val, (list, tuple, six.text_type)):
             return val.decode("utf-8")
@@ -126,13 +126,13 @@ def file_virus_validator(form, field):
 
 
 def ssh_key_validator(form, field):
-    """ Form for ssh key validation """
+    """Form for ssh key validation"""
     if not pagure.lib.query.are_valid_ssh_keys(field.data):
         raise wtforms.ValidationError("Invalid SSH keys")
 
 
 class ProjectFormSimplified(PagureForm):
-    """ Form to edit the description of a project. """
+    """Form to edit the description of a project."""
 
     description = wtforms.StringField(
         "Description",
@@ -166,7 +166,7 @@ class ProjectFormSimplified(PagureForm):
 
 
 class ProjectForm(ProjectFormSimplified):
-    """ Form to create or edit project. """
+    """Form to create or edit project."""
 
     name = wtforms.StringField("Project name")
     mirrored_from = wtforms.StringField(
@@ -249,7 +249,7 @@ class ProjectForm(ProjectFormSimplified):
 
 
 class IssueFormSimplied(PagureForm):
-    """ Form to create or edit an issue. """
+    """Form to create or edit an issue."""
 
     title = wtforms.StringField(
         "Title",
@@ -295,7 +295,7 @@ class IssueFormSimplied(PagureForm):
 
 
 class IssueForm(IssueFormSimplied):
-    """ Form to create or edit an issue. """
+    """Form to create or edit an issue."""
 
     status = wtforms.SelectField(
         "Status", [wtforms.validators.DataRequired()], choices=[]
@@ -314,7 +314,7 @@ class IssueForm(IssueFormSimplied):
 
 
 class RequestPullForm(PagureForm):
-    """ Form to create a pull request. """
+    """Form to create a pull request."""
 
     title = wtforms.StringField(
         "Title",
@@ -331,7 +331,7 @@ class RequestPullForm(PagureForm):
 
 
 class RequestPullEditForm(RequestPullForm):
-    """ Form to edit a pull request. """
+    """Form to edit a pull request."""
 
     branch_to = wtforms.SelectField(
         "Target branch",
@@ -353,7 +353,7 @@ class RequestPullEditForm(RequestPullForm):
 
 
 class RemoteRequestPullForm(RequestPullForm):
-    """ Form to create a remote pull request. """
+    """Form to create a remote pull request."""
 
     git_repo = wtforms.StringField(
         "Git repo address",
@@ -373,7 +373,7 @@ class RemoteRequestPullForm(RequestPullForm):
 
 
 class DeleteIssueTagForm(PagureForm):
-    """ Form to remove a tag to from a project. """
+    """Form to remove a tag to from a project."""
 
     tag = wtforms.StringField(
         "Tag",
@@ -386,7 +386,7 @@ class DeleteIssueTagForm(PagureForm):
 
 
 class AddIssueTagForm(DeleteIssueTagForm):
-    """ Form to add a tag to a project. """
+    """Form to add a tag to a project."""
 
     tag_description = wtforms.StringField(
         "Tag Description", [wtforms.validators.Optional()]
@@ -397,7 +397,7 @@ class AddIssueTagForm(DeleteIssueTagForm):
 
 
 class ApiAddIssueTagForm(PagureForm):
-    """ Form to add a tag to a project from the API endpoint """
+    """Form to add a tag to a project from the API endpoint"""
 
     tag = wtforms.StringField(
         "Tag",
@@ -417,7 +417,7 @@ class ApiAddIssueTagForm(PagureForm):
 
 
 class StatusForm(PagureForm):
-    """ Form to add/change the status of an issue. """
+    """Form to add/change the status of an issue."""
 
     status = wtforms.SelectField(
         "Status", [wtforms.validators.DataRequired()], choices=[]
@@ -444,7 +444,7 @@ class StatusForm(PagureForm):
 
 
 class MilestoneForm(PagureForm):
-    """ Form to change the milestone of an issue. """
+    """Form to change the milestone of an issue."""
 
     milestone = wtforms.SelectField(
         "Milestone",
@@ -467,7 +467,7 @@ class MilestoneForm(PagureForm):
 
 
 class NewTokenForm(PagureForm):
-    """ Form to add a new token. """
+    """Form to add a new token."""
 
     description = wtforms.StringField(
         "description", [wtforms.validators.Optional()]
@@ -496,7 +496,7 @@ class NewTokenForm(PagureForm):
 
 
 class UpdateIssueForm(PagureForm):
-    """ Form to add a comment to an issue. """
+    """Form to add a comment to an issue."""
 
     tag = wtforms.StringField(
         "tag",
@@ -568,7 +568,7 @@ class UpdateIssueForm(PagureForm):
 
 
 class AddPullRequestCommentForm(PagureForm):
-    """ Form to add a comment to a pull-request. """
+    """Form to add a comment to a pull-request."""
 
     commit = wtforms.HiddenField("commit identifier")
     filename = wtforms.HiddenField("file changed")
@@ -582,7 +582,7 @@ class AddPullRequestCommentForm(PagureForm):
 
 
 class AddPullRequestFlagFormV1(PagureForm):
-    """ Form to add a flag to a pull-request or commit. """
+    """Form to add a flag to a pull-request or commit."""
 
     username = wtforms.StringField(
         "Username", [wtforms.validators.DataRequired()]
@@ -604,7 +604,7 @@ class AddPullRequestFlagFormV1(PagureForm):
 
 
 class AddPullRequestFlagForm(AddPullRequestFlagFormV1):
-    """ Form to add a flag to a pull-request or commit. """
+    """Form to add a flag to a pull-request or commit."""
 
     def __init__(self, *args, **kwargs):
         # we need to instantiate dynamically because the configuration
@@ -624,7 +624,7 @@ class AddPullRequestFlagForm(AddPullRequestFlagFormV1):
 
 
 class AddSSHKeyForm(PagureForm):
-    """ Form to add a SSH key to a user. """
+    """Form to add a SSH key to a user."""
 
     ssh_key = wtforms.StringField(
         "SSH Key",
@@ -634,7 +634,7 @@ class AddSSHKeyForm(PagureForm):
 
 
 class AddDeployKeyForm(AddSSHKeyForm):
-    """ Form to add a deploy key to a project. """
+    """Form to add a deploy key to a project."""
 
     pushaccess = wtforms.BooleanField(
         "Push access",
@@ -644,7 +644,7 @@ class AddDeployKeyForm(AddSSHKeyForm):
 
 
 class AddUserForm(PagureForm):
-    """ Form to add a user to a project. """
+    """Form to add a user to a project."""
 
     user = wtforms.StringField(
         "Username",
@@ -661,7 +661,7 @@ class AddUserForm(PagureForm):
 
 
 class AddUserToGroupForm(PagureForm):
-    """ Form to add a user to a pagure group. """
+    """Form to add a user to a pagure group."""
 
     user = wtforms.StringField(
         "Username",
@@ -670,7 +670,7 @@ class AddUserToGroupForm(PagureForm):
 
 
 class AssignIssueForm(PagureForm):
-    """ Form to assign an user to an issue. """
+    """Form to assign an user to an issue."""
 
     assignee = wtforms.StringField(
         "Assignee",
@@ -679,7 +679,7 @@ class AssignIssueForm(PagureForm):
 
 
 class AddGroupForm(PagureForm):
-    """ Form to add a group to a project. """
+    """Form to add a group to a project."""
 
     group = wtforms.StringField(
         "Group",
@@ -699,13 +699,13 @@ class AddGroupForm(PagureForm):
 
 
 class ConfirmationForm(PagureForm):
-    """ Simple form used just for CSRF protection. """
+    """Simple form used just for CSRF protection."""
 
     pass
 
 
 class ModifyACLForm(PagureForm):
-    """ Form to change ACL of a user or a group to a project. """
+    """Form to change ACL of a user or a group to a project."""
 
     user_type = wtforms.SelectField(
         "User type",
@@ -730,7 +730,7 @@ class ModifyACLForm(PagureForm):
 
 
 class UploadFileForm(PagureForm):
-    """ Form to upload a file. """
+    """Form to upload a file."""
 
     filestream = wtforms.FileField(
         "File", [wtforms.validators.DataRequired(), file_virus_validator]
@@ -738,7 +738,7 @@ class UploadFileForm(PagureForm):
 
 
 class UserEmailForm(PagureForm):
-    """ Form to edit the description of a project. """
+    """Form to edit the description of a project."""
 
     email = wtforms.StringField("email", [wtforms.validators.DataRequired()])
 
@@ -754,7 +754,7 @@ class UserEmailForm(PagureForm):
 
 
 class ProjectCommentForm(PagureForm):
-    """ Form to represent project. """
+    """Form to represent project."""
 
     objid = wtforms.StringField(
         "Ticket/Request id", [wtforms.validators.DataRequired()]
@@ -765,7 +765,7 @@ class ProjectCommentForm(PagureForm):
 
 
 class CommentForm(PagureForm):
-    """ Form to upload a file. """
+    """Form to upload a file."""
 
     comment = wtforms.FileField(
         "Comment", [wtforms.validators.DataRequired(), file_virus_validator]
@@ -773,7 +773,7 @@ class CommentForm(PagureForm):
 
 
 class EditGroupForm(PagureForm):
-    """ Form to ask for a password change. """
+    """Form to ask for a password change."""
 
     display_name = wtforms.StringField(
         "Group name to display",
@@ -792,7 +792,7 @@ class EditGroupForm(PagureForm):
 
 
 class NewGroupForm(EditGroupForm):
-    """ Form to ask for a password change. """
+    """Form to ask for a password change."""
 
     group_name = wtforms.StringField(
         "Group name",
@@ -819,7 +819,7 @@ class NewGroupForm(EditGroupForm):
 
 
 class EditFileForm(PagureForm):
-    """ Form used to edit a file. """
+    """Form used to edit a file."""
 
     content = wtforms.TextAreaField("content", [wtforms.validators.Optional()])
     commit_title = wtforms.StringField(
@@ -893,7 +893,7 @@ class EditCommentForm(PagureForm):
 
 
 class ForkRepoForm(PagureForm):
-    """ Form to fork a project in the API. """
+    """Form to fork a project in the API."""
 
     repo = wtforms.StringField(
         "The project name", [wtforms.validators.DataRequired()]
@@ -930,7 +930,7 @@ class PublicNotificationForm(PagureForm):
 
 
 class SubscribtionForm(PagureForm):
-    """ Form to subscribe to or unsubscribe from an issue or a PR. """
+    """Form to subscribe to or unsubscribe from an issue or a PR."""
 
     status = wtforms.BooleanField(
         "Subscription status",
@@ -969,7 +969,7 @@ class TriggerCIPRForm(PagureForm):
 
 
 class AddGitTagForm(PagureForm):
-    """ Form to create a new git tag. """
+    """Form to create a new git tag."""
 
     tagname = wtforms.StringField(
         "Name of the tag",

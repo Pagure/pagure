@@ -31,10 +31,10 @@ import tests
 
 
 class PagureFlaskPluginDefaultHooktests(tests.Modeltests):
-    """ Tests for default_hook plugin of pagure """
+    """Tests for default_hook plugin of pagure"""
 
     def test_plugin_default_active_on_project(self):
-        """ Test that the default hook is active on random project. """
+        """Test that the default hook is active on random project."""
 
         tests.create_projects(self.session)
         test = pagure.lib.query.search_projects(self.session)[0]

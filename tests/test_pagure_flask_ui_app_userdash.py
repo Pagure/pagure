@@ -30,7 +30,7 @@ import tests
 
 
 class PagureFlaskAppUserdashTests(tests.Modeltests):
-    """ Tests for the index page of flask app controller of pagure """
+    """Tests for the index page of flask app controller of pagure"""
 
     def test_index_commit_access_while_admin(self):
         """Test the index endpoint filter for commit access only when user
@@ -344,7 +344,7 @@ class PagureFlaskAppUserdashTests(tests.Modeltests):
 
     @patch.dict("pagure.config.config", {"PRIVATE_PROJECTS": True})
     def test_index_logged_in_private_project(self):
-        """ Test the index endpoint when logged in with a private project. """
+        """Test the index endpoint when logged in with a private project."""
         tests.create_projects(self.session)
 
         # Add a 3rd project with a long description

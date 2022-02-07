@@ -24,10 +24,10 @@ import tests
 
 
 class PagureFlaskPluginPagureTicketHooktests(tests.SimplePagureTest):
-    """ Tests for pagure_hook plugin of pagure """
+    """Tests for pagure_hook plugin of pagure"""
 
     def test_plugin_pagure_ticket(self):
-        """ Test the pagure_ticket plugin on/off endpoint. """
+        """Test the pagure_ticket plugin on/off endpoint."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"))

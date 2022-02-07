@@ -31,10 +31,10 @@ import tests
 
 
 class PagureFlaskApptests(tests.Modeltests):
-    """ Tests for flask app controller of pagure """
+    """Tests for flask app controller of pagure"""
 
     def test_watch_list(self):
-        """ Test for watch list of a user """
+        """Test for watch list of a user"""
 
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
@@ -55,7 +55,7 @@ class PagureFlaskApptests(tests.Modeltests):
             )
 
     def test_view_users(self):
-        """ Test the view_users endpoint. """
+        """Test the view_users endpoint."""
 
         output = self.app.get("/users/?page=abc")
         self.assertEqual(output.status_code, 200)
@@ -78,7 +78,7 @@ class PagureFlaskApptests(tests.Modeltests):
 
     @patch.dict("pagure.config.config", {"ITEM_PER_PAGE": 2})
     def test_view_user_repo_cnt(self):
-        """ Test the repo counts on the view_user endpoint. """
+        """Test the repo counts on the view_user endpoint."""
         tests.create_projects(self.session)
         self.gitrepos = tests.create_projects_git(
             pagure.config.config["GIT_FOLDER"]
@@ -113,7 +113,7 @@ class PagureFlaskApptests(tests.Modeltests):
         )
 
     def test_view_user(self):
-        """ Test the view_user endpoint. """
+        """Test the view_user endpoint."""
 
         output = self.app.get("/user/pingou?repopage=abc&forkpage=def")
         self.assertEqual(output.status_code, 200)
@@ -188,7 +188,7 @@ class PagureFlaskApptests(tests.Modeltests):
         },
     )
     def test_adopt_repos(self):
-        """ Test the new_project endpoint with existing git repo. """
+        """Test the new_project endpoint with existing git repo."""
         # Before
         projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 0)
@@ -221,7 +221,7 @@ class PagureFlaskApptests(tests.Modeltests):
         {"PAGURE_ADMIN_USERS": [], "USERS_IGNORE_EXISTING_REPOS": ["pingou"]},
     )
     def test_adopt_repos_non_admin(self):
-        """ Test the new_project endpoint with existing git repo for non-admins. """
+        """Test the new_project endpoint with existing git repo for non-admins."""
         # Before
         projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 0)
@@ -254,7 +254,7 @@ class PagureFlaskApptests(tests.Modeltests):
         {"PAGURE_ADMIN_USERS": [], "USERS_IGNORE_EXISTING_REPOS": []},
     )
     def test_adopt_repos_not_allowed(self):
-        """ Test the new_project endpoint with existing git repo for no access. """
+        """Test the new_project endpoint with existing git repo for no access."""
         # Before
         projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 0)
@@ -284,7 +284,7 @@ class PagureFlaskApptests(tests.Modeltests):
 
     @patch.dict("pagure.config.config", {"PROJECT_NAME_REGEX": "^1[a-z]*$"})
     def test_new_project_diff_regex(self):
-        """ Test the new_project endpoint with a different regex. """
+        """Test the new_project endpoint with a different regex."""
         # Before
         projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 0)
@@ -317,7 +317,7 @@ class PagureFlaskApptests(tests.Modeltests):
 
     @patch.dict("pagure.config.config", {"PRIVATE_PROJECTS": True})
     def test_new_project_private(self):
-        """ Test the new_project endpoint for a private project. """
+        """Test the new_project endpoint for a private project."""
         # Before
         projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 0)
@@ -436,7 +436,7 @@ class PagureFlaskApptests(tests.Modeltests):
         )
 
     def test_non_ascii_new_project(self):
-        """ Test the new_project endpoint with a non-ascii project. """
+        """Test the new_project endpoint with a non-ascii project."""
         # Before
         projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 0)
@@ -659,7 +659,7 @@ class PagureFlaskApptests(tests.Modeltests):
 
     @patch("pagure.ui.app.admin_session_timedout")
     def test_user_settings(self, ast):
-        """ Test the user_settings endpoint. """
+        """Test the user_settings endpoint."""
         ast.return_value = False
 
         user = tests.FakeUser()
@@ -685,7 +685,7 @@ class PagureFlaskApptests(tests.Modeltests):
 
     @patch("pagure.decorators.admin_session_timedout")
     def test_add_user_sshkey(self, ast):
-        """ Test the add_user_sshkey endpoint. """
+        """Test the add_user_sshkey endpoint."""
         ast.return_value = False
 
         # User not logged in
@@ -786,7 +786,7 @@ class PagureFlaskApptests(tests.Modeltests):
 
     @patch("pagure.decorators.admin_session_timedout")
     def test_remove_user_sshkey(self, ast):
-        """ Test the remove_sshkey endpoint. """
+        """Test the remove_sshkey endpoint."""
         ast.return_value = False
 
         user = tests.FakeUser()
@@ -865,7 +865,7 @@ class PagureFlaskApptests(tests.Modeltests):
         MagicMock(side_effect=patched_commit_exists),
     )
     def test_patched_markdown_preview(self):
-        """ Test the markdown_preview endpoint. """
+        """Test the markdown_preview endpoint."""
 
         data = {"content": "test\n----\n\n * 1\n * item 2"}
 
@@ -958,7 +958,7 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertEqual(exp, output.get_data(as_text=True))
 
     def test_markdown_preview_valid_commit(self):
-        """ Test the markdown_preview endpoint with an existing commit. """
+        """Test the markdown_preview endpoint with an existing commit."""
 
         user = tests.FakeUser()
         user.username = "foo"
@@ -996,7 +996,7 @@ class PagureFlaskApptests(tests.Modeltests):
 
     @patch("pagure.ui.app.admin_session_timedout")
     def test_remove_user_email(self, ast):
-        """ Test the remove_user_email endpoint. """
+        """Test the remove_user_email endpoint."""
         ast.return_value = False
 
         user = tests.FakeUser()
@@ -1096,7 +1096,7 @@ class PagureFlaskApptests(tests.Modeltests):
     @patch("pagure.lib.notify.send_email")
     @patch("pagure.ui.app.admin_session_timedout")
     def test_add_api_user_email(self, ast, send_email):
-        """ Test the add_api_user_email endpoint. """
+        """Test the add_api_user_email endpoint."""
         send_email.return_value = True
         ast.return_value = False
 
@@ -1231,7 +1231,7 @@ class PagureFlaskApptests(tests.Modeltests):
     @patch("pagure.lib.notify.send_email")
     @patch("pagure.ui.app.admin_session_timedout")
     def test_set_default_email(self, ast, send_email):
-        """ Test the set_default_email endpoint. """
+        """Test the set_default_email endpoint."""
         send_email.return_value = True
         ast.return_value = False
 
@@ -1308,7 +1308,7 @@ class PagureFlaskApptests(tests.Modeltests):
     @patch("pagure.lib.notify.send_email")
     @patch("pagure.ui.app.admin_session_timedout")
     def test_reconfirm_email(self, ast, send_email):
-        """ Test the reconfirm_email endpoint. """
+        """Test the reconfirm_email endpoint."""
         send_email.return_value = True
         ast.return_value = False
 
@@ -1391,7 +1391,7 @@ class PagureFlaskApptests(tests.Modeltests):
 
     @patch("pagure.ui.app.admin_session_timedout")
     def test_confirm_email(self, ast):
-        """ Test the confirm_email endpoint. """
+        """Test the confirm_email endpoint."""
         output = self.app.get("/settings/email/confirm/foobar")
         self.assertEqual(output.status_code, 302)
 
@@ -1448,7 +1448,7 @@ class PagureFlaskApptests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_view_my_requests(self):
-        """Test the view_user_requests endpoint. """
+        """Test the view_user_requests endpoint."""
         # Create the PR
         tests.create_projects(self.session)
         repo = pagure.lib.query._get_project(self.session, "test")
@@ -1733,7 +1733,7 @@ class PagureFlaskApptests(tests.Modeltests):
 
     @patch("pagure.ui.app.admin_session_timedout")
     def test_add_user_token(self, ast):
-        """ Test the add_user_token endpoint. """
+        """Test the add_user_token endpoint."""
         ast.return_value = False
 
         user = tests.FakeUser()
@@ -1825,7 +1825,7 @@ class PagureFlaskApptests(tests.Modeltests):
 
     @patch("pagure.ui.app.admin_session_timedout")
     def test_revoke_api_user_token(self, ast):
-        """ Test the revoke_api_user_token endpoint. """
+        """Test the revoke_api_user_token endpoint."""
         ast.return_value = False
 
         user = tests.FakeUser()
@@ -1950,10 +1950,10 @@ class PagureFlaskApptests(tests.Modeltests):
 
 
 class PagureFlaskAppAboutPagetests(tests.Modeltests):
-    """ Unit-tests for the about page. """
+    """Unit-tests for the about page."""
 
     def test_about_page(self):
-        """ Test the about page when an admin_email is set. """
+        """Test the about page when an admin_email is set."""
         output = self.app.get("/about/")
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
@@ -1970,7 +1970,7 @@ class PagureFlaskAppAboutPagetests(tests.Modeltests):
 
     @patch.dict("pagure.config.config", {"ADMIN_EMAIL": "admin@fp.o"})
     def test_about_page_admin_email(self):
-        """ Test the about page when an admin_email is set. """
+        """Test the about page when an admin_email is set."""
         output = self.app.get("/about/")
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
@@ -1985,12 +1985,12 @@ class PagureFlaskAppAboutPagetests(tests.Modeltests):
 
 
 class PagureFlaskAppNoDocstests(tests.Modeltests):
-    """ Tests for flask app controller of pagure """
+    """Tests for flask app controller of pagure"""
 
     config_values = {"enable_docs": False, "docs_folder": None}
 
     def test_new_project_no_docs_folder(self):
-        """ Test the new_project endpoint with DOCS_FOLDER is None. """
+        """Test the new_project endpoint with DOCS_FOLDER is None."""
         # Before
         projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 0)
@@ -2059,12 +2059,12 @@ class PagureFlaskAppNoDocstests(tests.Modeltests):
 
 
 class PagureFlaskAppNoTicketstests(tests.Modeltests):
-    """ Tests for flask app controller of pagure """
+    """Tests for flask app controller of pagure"""
 
     config_values = {"enable_tickets": False, "tickets_folder": None}
 
     def test_new_project_no_tickets_folder(self):
-        """ Test the new_project endpoint with TICKETS_FOLDER is None. """
+        """Test the new_project endpoint with TICKETS_FOLDER is None."""
         # Before
         projects = pagure.lib.query.search_projects(self.session)
         self.assertEqual(len(projects), 0)
@@ -2135,7 +2135,7 @@ class PagureFlaskAppNoTicketstests(tests.Modeltests):
 class PagureFlaskAppRenewUserApiTokentests(tests.Modeltests):
     @patch("pagure.decorators.admin_session_timedout")
     def setUp(self, ast):
-        """ Constructor """
+        """Constructor"""
         super(PagureFlaskAppRenewUserApiTokentests, self).setUp()
 
         self.ast = ast
@@ -2171,14 +2171,14 @@ class PagureFlaskAppRenewUserApiTokentests(tests.Modeltests):
         self.token = userobj.tokens[0].id
 
     def test_renew_api_token_not_in(self):
-        """ Test the renew_api_token endpoint. """
+        """Test the renew_api_token endpoint."""
         # User not logged in
         output = self.app.post("/settings/token/renew/123")
         self.assertEqual(output.status_code, 302)
 
     @patch("pagure.ui.app.admin_session_timedout")
     def test_renew_api_token_session_old(self, ast):
-        """ Test the renew_api_token endpoint. """
+        """Test the renew_api_token endpoint."""
         ast.return_value = True
 
         user = tests.FakeUser(username="pingou")
@@ -2194,7 +2194,7 @@ class PagureFlaskAppRenewUserApiTokentests(tests.Modeltests):
             self.assertIn("Action canceled, try it again", output_text)
 
     def test_renew_api_token_invalid_token(self):
-        """ Test the renew_api_token endpoint. """
+        """Test the renew_api_token endpoint."""
 
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
@@ -2207,7 +2207,7 @@ class PagureFlaskAppRenewUserApiTokentests(tests.Modeltests):
             self.assertIn("<p>Token not found</p>", output_text)
 
     def test_renew_api_token(self):
-        """ Test the renew_api_token endpoint. """
+        """Test the renew_api_token endpoint."""
 
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
@@ -2246,10 +2246,10 @@ class PagureFlaskAppRenewUserApiTokentests(tests.Modeltests):
 
 
 class PagureFlaskAppNewProjecttests(tests.Modeltests):
-    """ Tests creating new project via the flask app controller of pagure """
+    """Tests creating new project via the flask app controller of pagure"""
 
     def setUp(self):
-        """ Setup the environment. """
+        """Setup the environment."""
         super(PagureFlaskAppNewProjecttests, self).setUp()
 
         # Before
@@ -2671,7 +2671,7 @@ class PagureFlaskAppNewProjecttests(tests.Modeltests):
         pagure.config.config["ENABLE_NEW_PROJECTS"] = True
 
     def test_new_project_mirrored_invalid_url(self):
-        """ Test the new_project with a mirrored repo but an invalid URL. """
+        """Test the new_project with a mirrored repo but an invalid URL."""
 
         user = tests.FakeUser(username="foo")
         with tests.user_set(self.app.application, user):
@@ -2719,7 +2719,7 @@ class PagureFlaskAppNewProjecttests(tests.Modeltests):
             self.assertIn("Invalid input.&nbsp;", output_text)
 
     def test_new_project_mirrored_valid_url(self):
-        """ Test the new_project with a mirrored repo with a valid url. """
+        """Test the new_project with a mirrored repo with a valid url."""
 
         user = tests.FakeUser(username="foo")
         with tests.user_set(self.app.application, user):
@@ -2790,7 +2790,7 @@ class PagureFlaskAppNewProjecttests(tests.Modeltests):
             )
 
     def test_new_project(self):
-        """ Test the new_project endpoint. """
+        """Test the new_project endpoint."""
 
         user = tests.FakeUser()
         with tests.user_set(self.app.application, user):

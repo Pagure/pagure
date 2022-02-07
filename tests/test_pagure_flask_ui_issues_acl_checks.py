@@ -37,12 +37,12 @@ import tests
 
 
 class PagureFlaskIssuesACLtests(tests.Modeltests):
-    """ Tests for flask issues controller of pagure for acls """
+    """Tests for flask issues controller of pagure for acls"""
 
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_view_issue_no_access(self, p_send_email, p_ugt):
-        """ Test the view_issue endpoint. when a user has no access on repo """
+        """Test the view_issue endpoint. when a user has no access on repo"""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -295,7 +295,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_view_issue_ticket_access(self, p_send_email, p_ugt):
-        """ Test the view_issue endpoint. when a user has ticket access on repo """
+        """Test the view_issue endpoint. when a user has ticket access on repo"""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -550,7 +550,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_view_issue_commit_access(self, p_send_email, p_ugt):
-        """ Test the view_issue endpoint. when a user has commit access on repo """
+        """Test the view_issue endpoint. when a user has commit access on repo"""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -804,7 +804,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_view_issue_admin_access(self, p_send_email, p_ugt):
-        """ Test the view_issue endpoint. when a user has admin access on repo """
+        """Test the view_issue endpoint. when a user has admin access on repo"""
         p_send_email.return_value = True
         p_ugt.return_value = True
 

@@ -30,10 +30,10 @@ import tests
 
 
 class PagureUtilsTests(tests.SimplePagureTest):
-    """ Tests for pagure.utils """
+    """Tests for pagure.utils"""
 
     def setUp(self):
-        """ Set up the environnment, run before every tests. """
+        """Set up the environnment, run before every tests."""
         super(PagureUtilsTests, self).setUp()
 
         tests.create_projects(self.session)
@@ -57,25 +57,25 @@ class PagureUtilsTests(tests.SimplePagureTest):
         self.session.commit()
 
     def test_lookup_deploykey_non_deploykey(self):
-        """ Test lookup_deploykey with a non-deploykey username. """
+        """Test lookup_deploykey with a non-deploykey username."""
         project = pagure.lib.query._get_project(self.session, "test")
         res = pagure.utils.lookup_deploykey(project, "pingou")
         self.assertEquals(res, None)
 
     def test_lookup_deploykey_different_project(self):
-        """ Test lookup_deploykey with a username for another project. """
+        """Test lookup_deploykey with a username for another project."""
         project = pagure.lib.query._get_project(self.session, "test2")
         res = pagure.utils.lookup_deploykey(project, "deploykey_test_1")
         self.assertEquals(res, None)
 
     def test_lookup_deploykey_non_existent_key(self):
-        """ Test lookup_deploykey with a non-existing deploykey. """
+        """Test lookup_deploykey with a non-existing deploykey."""
         project = pagure.lib.query._get_project(self.session, "test")
         res = pagure.utils.lookup_deploykey(project, "deploykey_test_2")
         self.assertEquals(res, None)
 
     def test_lookup_deploykey(self):
-        """ Test lookup_deploykey with a correct username. """
+        """Test lookup_deploykey with a correct username."""
         project = pagure.lib.query._get_project(self.session, "test")
         res = pagure.utils.lookup_deploykey(project, "deploykey_test_1")
         self.assertNotEquals(res, None)

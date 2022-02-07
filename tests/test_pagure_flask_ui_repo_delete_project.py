@@ -26,10 +26,10 @@ import tests
 
 
 class PagureFlaskDeleteRepotests(tests.Modeltests):
-    """ Tests for deleting a project in pagure """
+    """Tests for deleting a project in pagure"""
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskDeleteRepotests, self).setUp()
 
         # Create some projects

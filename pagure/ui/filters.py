@@ -812,7 +812,7 @@ def user_can_clone_ssh(username):
 
 @UI_NS.app_template_filter("user_group_can_ssh_commit")
 def user_group_can_ssh_commit(username):
-    """ Returns whether the user is in a group that has ssh access. """
+    """Returns whether the user is in a group that has ssh access."""
     ssh_access_groups = pagure_config.get("SSH_ACCESS_GROUPS") or []
     if not ssh_access_groups:
         # ssh access is not restricted to one or more groups
@@ -846,7 +846,7 @@ def get_git_url_ssh(complement=""):
 
 @UI_NS.app_template_filter("patch_stats")
 def get_patch_stats(patch):
-    """ Return a dict of stats about the provided patch."""
+    """Return a dict of stats about the provided patch."""
     try:
         output = pagure.lib.git.get_stats_patch(patch)
     except pagure.exceptions.PagureException:
@@ -857,7 +857,7 @@ def get_patch_stats(patch):
 
 @UI_NS.app_template_filter("get_default_branch")
 def get_default_branch(repo):
-    """ Given a pygit2.Repository object, extracts the default branch. """
+    """Given a pygit2.Repository object, extracts the default branch."""
     default_branch = None
 
     try:

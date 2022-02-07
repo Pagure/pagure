@@ -28,10 +28,10 @@ import tests
 
 
 class DeleteProjectTests(tests.Modeltests):
-    """ Tests for flask issues controller of pagure """
+    """Tests for flask issues controller of pagure"""
 
     def test_delete_project_with_group(self):
-        """ Test the model when we delete a project with a group. """
+        """Test the model when we delete a project with a group."""
 
         # Create a project
         item = model.Project(
@@ -76,7 +76,7 @@ class DeleteProjectTests(tests.Modeltests):
         self.assertEqual(self.session.query(model.ProjectGroup).count(), 0)
 
     def test_delete_project_with_user(self):
-        """ Test the model when we delete a project with users. """
+        """Test the model when we delete a project with users."""
 
         # Create a project
         item = model.Project(
@@ -112,7 +112,7 @@ class DeleteProjectTests(tests.Modeltests):
         self.assertEqual(self.session.query(model.User).count(), 2)
 
     def test_delete_project_with_coloredtags(self):
-        """ Test the model when we delete a project with Colored tags. """
+        """Test the model when we delete a project with Colored tags."""
 
         # Create a project
         item = model.Project(

@@ -29,7 +29,7 @@ import tests
 
 
 class PagureFlaskFormTests(tests.SimplePagureTest):
-    """ Tests for forms of the flask application """
+    """Tests for forms of the flask application"""
 
     @patch.dict(
         "pagure.config.config", {"SERVER_NAME": "localhost.localdomain"}
@@ -38,14 +38,14 @@ class PagureFlaskFormTests(tests.SimplePagureTest):
         super(PagureFlaskFormTests, self).setUp()
 
     def test_csrf_form_no_input(self):
-        """ Test the CSRF validation if not CSRF is specified. """
+        """Test the CSRF validation if not CSRF is specified."""
         with self.app.application.test_request_context(method="POST"):
             flask.g.session = MagicMock()
             form = pagure.forms.ConfirmationForm()
             self.assertFalse(form.validate_on_submit())
 
     def test_csrf_form_w_invalid_input(self):
-        """ Test the CSRF validation with an invalid CSRF specified. """
+        """Test the CSRF validation with an invalid CSRF specified."""
         with self.app.application.test_request_context(method="POST"):
             flask.g.session = MagicMock()
             form = pagure.forms.ConfirmationForm()
@@ -53,7 +53,7 @@ class PagureFlaskFormTests(tests.SimplePagureTest):
             self.assertFalse(form.validate_on_submit())
 
     def test_csrf_form_w_input(self):
-        """ Test the CSRF validation with a valid CSRF specified. """
+        """Test the CSRF validation with a valid CSRF specified."""
         with self.app.application.test_request_context(method="POST"):
             flask.g.session = MagicMock()
             form = pagure.forms.ConfirmationForm()
@@ -61,7 +61,7 @@ class PagureFlaskFormTests(tests.SimplePagureTest):
             self.assertTrue(form.validate_on_submit())
 
     def test_csrf_form_w_expired_input(self):
-        """ Test the CSRF validation with an expired CSRF specified. """
+        """Test the CSRF validation with an expired CSRF specified."""
         with self.app.application.test_request_context(method="POST"):
             flask.g.session = MagicMock()
             form = pagure.forms.ConfirmationForm()
@@ -101,7 +101,7 @@ class PagureFlaskFormTests(tests.SimplePagureTest):
             self.assertFalse(form.validate_on_submit())
 
     def test_csrf_form_w_unexpiring_input(self):
-        """ Test the CSRF validation with a CSRF not expiring. """
+        """Test the CSRF validation with a CSRF not expiring."""
         pagure.config.config["WTF_CSRF_TIME_LIMIT"] = None
         with self.app.application.test_request_context(method="POST"):
             flask.g.session = MagicMock()
@@ -119,7 +119,7 @@ class PagureFlaskFormTests(tests.SimplePagureTest):
             self.assertTrue(form.validate_on_submit())
 
     def test_add_user_form(self):
-        """ Test the AddUserForm of pagure.forms """
+        """Test the AddUserForm of pagure.forms"""
         with self.app.application.test_request_context(method="POST"):
             flask.g.session = MagicMock()
             form = pagure.forms.AddUserForm()
@@ -133,7 +133,7 @@ class PagureFlaskFormTests(tests.SimplePagureTest):
             self.assertTrue(form.validate_on_submit())
 
     def test_add_user_to_group_form(self):
-        """ Test the AddUserToGroup form of pagure.forms """
+        """Test the AddUserToGroup form of pagure.forms"""
         with self.app.application.test_request_context(method="POST"):
             flask.g.session = MagicMock()
             form = pagure.forms.AddUserToGroupForm()
@@ -145,7 +145,7 @@ class PagureFlaskFormTests(tests.SimplePagureTest):
             self.assertTrue(form.validate_on_submit())
 
     def test_add_group_form(self):
-        """ Test the AddGroupForm form of pagure.forms """
+        """Test the AddGroupForm form of pagure.forms"""
         with self.app.application.test_request_context(method="POST"):
             flask.g.session = MagicMock()
             form = pagure.forms.AddGroupForm()

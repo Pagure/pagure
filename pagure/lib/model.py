@@ -75,7 +75,7 @@ def create_tables(db_url, alembic_ini=None, acls=None, debug=False):
         # Ignore the warning about con_record
         # pylint: disable=unused-argument
         def _fk_pragma_on_connect(dbapi_con, _):  # pragma: no cover
-            """ Tries to enforce referential constraints on sqlite. """
+            """Tries to enforce referential constraints on sqlite."""
             dbapi_con.execute("pragma foreign_keys=ON")
 
         sa.event.listen(engine, "connect", _fk_pragma_on_connect)
@@ -156,7 +156,7 @@ def arrow_ts(value):
 
 
 class AccessLevels(BASE):
-    """ Different access levels a user/group can have for a project """
+    """Different access levels a user/group can have for a project"""
 
     __tablename__ = "access_levels"
 
@@ -226,7 +226,7 @@ class User(BASE):
 
     @property
     def username(self):
-        """ Return the username. """
+        """Return the username."""
         return self.user
 
     @property
@@ -247,7 +247,7 @@ class User(BASE):
 
     @property
     def groups(self):
-        """ Return the list of Group.group_name in which the user is. """
+        """Return the list of Group.group_name in which the user is."""
         return [group.group_name for group in self.group_objs]
 
     @property
@@ -271,22 +271,22 @@ class User(BASE):
 
     @settings.setter
     def settings(self, settings):
-        """ Ensures the settings are properly saved. """
+        """Ensures the settings are properly saved."""
         self._settings = json.dumps(settings)
 
     @property
     def full_url(self):
-        """ Returns the default status of the board. """
+        """Returns the default status of the board."""
         base_url = pagure_config["APP_URL"].rstrip("/")
         return "/".join([base_url, "user", self.user])
 
     def __repr__(self):
-        """ Return a string representation of this object. """
+        """Return a string representation of this object."""
 
         return "User: %s - name %s" % (self.id, self.user)
 
     def to_json(self, public=False):
-        """ Return a representation of the User in a dictionary. """
+        """Return a representation of the User in a dictionary."""
         output = {
             "name": self.user,
             "fullname": self.fullname,
@@ -524,7 +524,7 @@ class Project(BASE):
 
     @property
     def isa(self):
-        """ A string to allow finding out that this is a project. """
+        """A string to allow finding out that this is a project."""
         return "project"
 
     @property
@@ -536,12 +536,12 @@ class Project(BASE):
 
     @property
     def is_on_repospanner(self):
-        """ Returns whether this repo is on repoSpanner. """
+        """Returns whether this repo is on repoSpanner."""
         return self.repospanner_region is not None
 
     @property
     def path(self):
-        """ Return the name of the git repo on the filesystem. """
+        """Return the name of the git repo on the filesystem."""
         return "%s.git" % self.fullname
 
     def repospanner_repo_info(self, repotype, region=None):
@@ -659,13 +659,13 @@ class Project(BASE):
 
     @property
     def full_url(self):
-        """ Returns the default status of the board. """
+        """Returns the default status of the board."""
         base_url = pagure_config["APP_URL"].rstrip("/")
         return "/".join([base_url, self.url_path])
 
     @property
     def tags_text(self):
-        """ Return the list of tags in a simple text form. """
+        """Return the list of tags in a simple text form."""
         return [tag.tag for tag in self.tags]
 
     @property
@@ -714,7 +714,7 @@ class Project(BASE):
 
     @settings.setter
     def settings(self, settings):
-        """ Ensures the settings are properly saved. """
+        """Ensures the settings are properly saved."""
         self._settings = json.dumps(settings)
 
     @property
@@ -743,7 +743,7 @@ class Project(BASE):
 
     @milestones.setter
     def milestones(self, milestones):
-        """ Ensures the milestones are properly saved. """
+        """Ensures the milestones are properly saved."""
         self._milestones = json.dumps(milestones)
 
     @property
@@ -758,7 +758,7 @@ class Project(BASE):
 
     @milestones_keys.setter
     def milestones_keys(self, milestones_keys):
-        """ Ensures the milestones keys are properly saved. """
+        """Ensures the milestones keys are properly saved."""
         self._milestones_keys = json.dumps(milestones_keys)
 
     @property
@@ -775,7 +775,7 @@ class Project(BASE):
 
     @priorities.setter
     def priorities(self, priorities):
-        """ Ensures the priorities are properly saved. """
+        """Ensures the priorities are properly saved."""
         self._priorities = json.dumps(priorities)
 
     @property
@@ -792,7 +792,7 @@ class Project(BASE):
 
     @block_users.setter
     def block_users(self, block_users):
-        """ Ensures the block_users are properly saved. """
+        """Ensures the block_users are properly saved."""
         self._block_users = json.dumps(block_users)
 
     @property
@@ -809,7 +809,7 @@ class Project(BASE):
 
     @quick_replies.setter
     def quick_replies(self, quick_replies):
-        """ Ensures the quick replies are properly saved. """
+        """Ensures the quick replies are properly saved."""
         self._quick_replies = json.dumps(quick_replies)
 
     @property
@@ -826,7 +826,7 @@ class Project(BASE):
 
     @notifications.setter
     def notifications(self, notifications):
-        """ Ensures the notifications are properly saved. """
+        """Ensures the notifications are properly saved."""
         self._notifications = json.dumps(notifications)
 
     @property
@@ -843,7 +843,7 @@ class Project(BASE):
 
     @reports.setter
     def reports(self, reports):
-        """ Ensures the reports are properly saved. """
+        """Ensures the reports are properly saved."""
         self._reports = json.dumps(reports)
 
     @property
@@ -860,12 +860,12 @@ class Project(BASE):
 
     @close_status.setter
     def close_status(self, close_status):
-        """ Ensures the different close status are properly saved. """
+        """Ensures the different close status are properly saved."""
         self._close_status = json.dumps(close_status)
 
     @property
     def open_requests(self):
-        """ Returns the number of open pull-requests for this project. """
+        """Returns the number of open pull-requests for this project."""
         return (
             BASE.metadata.bind.query(PullRequest)
             .filter(self.id == PullRequest.project_id)
@@ -875,7 +875,7 @@ class Project(BASE):
 
     @property
     def open_tickets(self):
-        """ Returns the number of open tickets for this project. """
+        """Returns the number of open tickets for this project."""
         return (
             BASE.metadata.bind.query(Issue)
             .filter(self.id == Issue.project_id)
@@ -885,7 +885,7 @@ class Project(BASE):
 
     @property
     def open_tickets_public(self):
-        """ Returns the number of open tickets for this project. """
+        """Returns the number of open tickets for this project."""
         return (
             BASE.metadata.bind.query(Issue)
             .filter(self.id == Issue.project_id)
@@ -1095,7 +1095,7 @@ class Project(BASE):
 
     @property
     def active_boards(self):
-        """ Returns the list of active boards. """
+        """Returns the list of active boards."""
         return [board for board in self.boards if board.active]
 
     def lock(self, ltype):
@@ -1289,14 +1289,14 @@ class SSHKey(BASE):
     # assigned to a Project or a User, but not both.
     @validates("project_id")
     def validate_project_id(self, key, value):
-        """ Validates that user_id is not set. """
+        """Validates that user_id is not set."""
         if self.user_id is not None:
             raise ValueError("SSHKey can't have both project and user")
         return value
 
     @validates("user_id")
     def validate_user_id(self, key, value):
-        """ Validates that project_id is not set. """
+        """Validates that project_id is not set."""
         if self.project_id is not None:
             raise ValueError("SSHKey can't have both user and project")
         return value
@@ -1497,12 +1497,12 @@ class Issue(BASE):
 
     @property
     def isa(self):
-        """ A string to allow finding out that this is an issue. """
+        """A string to allow finding out that this is an issue."""
         return "issue"
 
     @property
     def repotype(self):
-        """ A string returning the repotype for repopath() calls. """
+        """A string returning the repotype for repopath() calls."""
         return "tickets"
 
     @property
@@ -1514,17 +1514,17 @@ class Issue(BASE):
 
     @property
     def tags_text(self):
-        """ Return the list of tags in a simple text form. """
+        """Return the list of tags in a simple text form."""
         return sorted([tag.tag for tag in self.tags])
 
     @property
     def depending_text(self):
-        """ Return the list of issue this issue depends on in simple text. """
+        """Return the list of issue this issue depends on in simple text."""
         return [issue.id for issue in self.parents]
 
     @property
     def blocking_text(self):
-        """ Return the list of issue this issue blocks on in simple text. """
+        """Return the list of issue this issue blocks on in simple text."""
         return [issue.id for issue in self.children]
 
     @property
@@ -1550,7 +1550,7 @@ class Issue(BASE):
 
     @property
     def full_url(self):
-        """ Returns the default status of the board. """
+        """Returns the default status of the board."""
         base_url = pagure_config["APP_URL"].rstrip("/")
         return "/".join(
             [base_url, self.project.url_path, "issue", str(self.id)]
@@ -1732,7 +1732,7 @@ class IssueComment(BASE):
 
     @property
     def parent(self):
-        """ Return the parent, in this case the issue object. """
+        """Return the parent, in this case the issue object."""
         return self.issue
 
     @property
@@ -1746,7 +1746,7 @@ class IssueComment(BASE):
 
     @reactions.setter
     def reactions(self, reactions):
-        """ Ensures that reactions are properly saved. """
+        """Ensures that reactions are properly saved."""
         self._reactions = json.dumps(reactions)
 
     def to_json(self, public=False):
@@ -1803,7 +1803,7 @@ class IssueKeys(BASE):
 
     @property
     def data(self):
-        """ Return the list of items """
+        """Return the list of items"""
         if self.key_data:
             return json.loads(self.key_data)
         else:
@@ -1811,7 +1811,7 @@ class IssueKeys(BASE):
 
     @data.setter
     def data(self, data_obj):
-        """ Store the list data in JSON. """
+        """Store the list data in JSON."""
         if data_obj is None:
             self.key_data = None
         else:
@@ -2175,12 +2175,12 @@ class PullRequest(BASE):
 
     @property
     def isa(self):
-        """ A string to allow finding out that this is an pull-request. """
+        """A string to allow finding out that this is an pull-request."""
         return "pull-request"
 
     @property
     def repotype(self):
-        """ A string returning the repotype for repopath() calls. """
+        """A string returning the repotype for repopath() calls."""
         return "requests"
 
     @property
@@ -2192,7 +2192,7 @@ class PullRequest(BASE):
 
     @property
     def tags_text(self):
-        """ Return the list of tags in a simple text form. """
+        """Return the list of tags in a simple text form."""
         return sorted([tag.tag for tag in self.tags])
 
     @property
@@ -2272,7 +2272,7 @@ class PullRequest(BASE):
 
     @property
     def full_url(self):
-        """ Returns the default status of the board. """
+        """Returns the default status of the board."""
         base_url = pagure_config["APP_URL"].rstrip("/")
         return "/".join(
             [base_url, self.project.url_path, "pull-request", str(self.id)]
@@ -2402,7 +2402,7 @@ class PullRequestComment(BASE):
 
     @property
     def parent(self):
-        """ Return the parent, in this case the pull_request object. """
+        """Return the parent, in this case the pull_request object."""
         return self.pull_request
 
     @property
@@ -2416,11 +2416,11 @@ class PullRequestComment(BASE):
 
     @reactions.setter
     def reactions(self, reactions):
-        """ Ensures that reactions are properly saved. """
+        """Ensures that reactions are properly saved."""
         self._reactions = json.dumps(reactions)
 
     def to_json(self, public=False):
-        """ Return a dict representation of the pull-request comment. """
+        """Return a dict representation of the pull-request comment."""
 
         return {
             "id": self.id,
@@ -2600,7 +2600,7 @@ class CommitFlag(BASE):
 
     @property
     def isa(self):
-        """ A string to allow finding out that this is a commit flag. """
+        """A string to allow finding out that this is a commit flag."""
         return "commit-flag"
 
     @property
@@ -2689,7 +2689,7 @@ class PagureGroupType(BASE):
     )
 
     def __repr__(self):
-        """ Return a string representation of this object. """
+        """Return a string representation of this object."""
 
         return "GroupType: %s" % (self.group_type)
 
@@ -2731,13 +2731,13 @@ class PagureGroup(BASE):
     )
 
     def __repr__(self):
-        """ Return a string representation of this object. """
+        """Return a string representation of this object."""
 
         return "Group: %s - name %s" % (self.id, self.group_name)
 
     @property
     def full_url(self):
-        """ Returns the default status of the board. """
+        """Returns the default status of the board."""
         base_url = pagure_config["APP_URL"].rstrip("/")
         return "/".join([base_url, "group", self.group_name])
 
@@ -2965,7 +2965,7 @@ class PagureLog(BASE):
         return output
 
     def __str__(self):
-        """ A string representation of this log entry. """
+        """A string representation of this log entry."""
         verb = ""
         desc = "%(user)s %(verb)s %(project)s#%(obj_id)s"
         arg = {
@@ -3117,7 +3117,7 @@ class ACL(BASE):
     )
 
     def __repr__(self):
-        """ Return a string representation of this object. """
+        """Return a string representation of this object."""
 
         return "ACL: %s - name %s" % (self.id, self.name)
 
@@ -3176,7 +3176,7 @@ class Token(BASE):
     )
 
     def __repr__(self):
-        """ Return a string representation of this object. """
+        """Return a string representation of this object."""
 
         return "Token: %s - name %s - expiration: %s" % (
             self.id,
@@ -3186,7 +3186,7 @@ class Token(BASE):
 
     @property
     def expired(self):
-        """ Returns whether a token has expired or not. """
+        """Returns whether a token has expired or not."""
         if datetime.datetime.utcnow().date() >= self.expiration.date():
             return True
         else:
@@ -3287,7 +3287,7 @@ class Board(BASE):
 
     @property
     def default_status(self):
-        """ Returns the default status of the board. """
+        """Returns the default status of the board."""
         out = None
         for status in self.statuses:
             if status.default:
@@ -3297,12 +3297,12 @@ class Board(BASE):
 
     @property
     def full_url(self):
-        """ Returns the default status of the board. """
+        """Returns the default status of the board."""
         base_url = pagure_config["APP_URL"].rstrip("/")
         return "/".join([base_url, self.project.url_path, "boards", self.name])
 
     def __repr__(self):
-        """ Return a string representation of this object. """
+        """Return a string representation of this object."""
 
         return "Board: %s - name %s" % (
             self.id,
@@ -3310,7 +3310,7 @@ class Board(BASE):
         )
 
     def to_json(self):
-        """ The JSON representation of a board. """
+        """The JSON representation of a board."""
         return {
             "name": self.name,
             "active": self.active,
@@ -3362,7 +3362,7 @@ class BoardStatus(BASE):
     )
 
     def __repr__(self):
-        """ Return a string representation of this object. """
+        """Return a string representation of this object."""
 
         return "BoardStatus: %s - board: %s - name %s" % (
             self.id,
@@ -3393,7 +3393,7 @@ class BoardStatus(BASE):
         ]
 
     def to_json(self):
-        """ The JSON representation of these objects. """
+        """The JSON representation of these objects."""
         return {
             "name": self.name,
             "bg_color": self.bg_color,
@@ -3460,7 +3460,7 @@ class BoardIssues(BASE):
     )
 
     def to_json(self):
-        """ The JSON representation of these objects. """
+        """The JSON representation of these objects."""
         return {
             "board": self.board.to_json() if self.board else None,
             "status": self.status.to_json(),

@@ -65,7 +65,7 @@ class RtdTable(BASE):
 
 
 class RtdForm(FlaskForm):
-    """ Form to configure the pagure hook. """
+    """Form to configure the pagure hook."""
 
     api_url = wtforms.StringField(
         "URL endpoint used to trigger the builds",
@@ -156,7 +156,7 @@ class RtdRunner(BaseRunner):
 
 
 class RtdHook(BaseHook):
-    """ Read The Doc hook. """
+    """Read The Doc hook."""
 
     name = "Read the Doc"
     description = DESCRIPTION

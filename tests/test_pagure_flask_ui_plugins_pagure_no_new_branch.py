@@ -25,10 +25,10 @@ import pagure.config
 
 
 class PagureFlaskPluginPagureNoNewBranchHooktests(tests.SimplePagureTest):
-    """ Tests for pagure_no_new_branches plugin of pagure """
+    """Tests for pagure_no_new_branches plugin of pagure"""
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskPluginPagureNoNewBranchHooktests, self).setUp()
 
         tests.create_projects(self.session)
@@ -40,7 +40,7 @@ class PagureFlaskPluginPagureNoNewBranchHooktests(tests.SimplePagureTest):
             self.csrf_token = self.get_csrf()
 
     def test_plugin_pagure_ticket_no_data(self):
-        """ Test the pagure_ticket plugin on/off endpoint. """
+        """Test the pagure_ticket plugin on/off endpoint."""
 
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
@@ -80,7 +80,7 @@ class PagureFlaskPluginPagureNoNewBranchHooktests(tests.SimplePagureTest):
             )
 
     def test_plugin_pagure_ticket_deactivate(self):
-        """ Test the pagure_ticket plugin on/off endpoint. """
+        """Test the pagure_ticket plugin on/off endpoint."""
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
             data = {"csrf_token": self.csrf_token}
@@ -131,7 +131,7 @@ class PagureFlaskPluginPagureNoNewBranchHooktests(tests.SimplePagureTest):
             )
 
     def test_plugin_pagure_ticket_activate(self):
-        """ Test the pagure_ticket plugin on/off endpoint. """
+        """Test the pagure_ticket plugin on/off endpoint."""
 
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
@@ -219,7 +219,7 @@ class PagureFlaskPluginPagureNoNewBranchHooktests(tests.SimplePagureTest):
             )
 
     def test_plugin_pagure_ticket_activate_w_no_repo(self):
-        """ Test the pagure_ticket plugin on/off endpoint. """
+        """Test the pagure_ticket plugin on/off endpoint."""
         shutil.rmtree(os.path.join(self.path, "repos", "test.git"))
 
         user = tests.FakeUser(username="pingou")

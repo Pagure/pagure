@@ -304,7 +304,7 @@ def inform_pull_request_urls(session, project, commits, refname, username):
 
 
 class DefaultRunner(BaseRunner):
-    """ Runner for the default hook."""
+    """Runner for the default hook."""
 
     @staticmethod
     def post_receive(session, username, project, repotype, repodir, changes):
@@ -476,7 +476,7 @@ class DefaultRunner(BaseRunner):
 
 
 class Default(BaseHook):
-    """ Default hooks. """
+    """Default hooks."""
 
     name = "default"
     description = (

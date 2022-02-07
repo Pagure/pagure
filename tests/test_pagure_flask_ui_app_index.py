@@ -30,10 +30,10 @@ import tests
 
 
 class PagureFlaskAppIndextests(tests.Modeltests):
-    """ Tests for the index page of flask app controller of pagure """
+    """Tests for the index page of flask app controller of pagure"""
 
     def test_index_logged_out(self):
-        """ Test the index endpoint when logged out. """
+        """Test the index endpoint when logged out."""
 
         output = self.app.get("/")
         self.assertEqual(output.status_code, 200)

@@ -78,7 +78,7 @@ def set_up_board(self):
 
 
 class PagureFlaskApiBoardstests(tests.SimplePagureTest):
-    """ Tests for flask API Boards controller of pagure """
+    """Tests for flask API Boards controller of pagure"""
 
     maxDiff = None
 

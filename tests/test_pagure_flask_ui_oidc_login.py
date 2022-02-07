@@ -44,12 +44,12 @@ CLIENT_SECRETS = {
 
 
 class PagureFlaskOIDCLogintests(tests.SimplePagureTest):
-    """ Tests for OIDC login in the flask app controller of pagure """
+    """Tests for OIDC login in the flask app controller of pagure"""
 
     populate_db = False
 
     def setUp(self):
-        """ Create the application with PAGURE_AUTH being local. """
+        """Create the application with PAGURE_AUTH being local."""
         super(PagureFlaskOIDCLogintests, self).setUp()
 
         self.app = pagure.flask_app.create_app(
@@ -93,7 +93,7 @@ class PagureFlaskOIDCLogintests(tests.SimplePagureTest):
         self.config_patcher.stop()
 
     def test_fas_user_from_oidc(self):
-        """ Test the user creation function. """
+        """Test the user creation function."""
         user_info = self.user_info.copy()
         flask.g._oidc_userinfo = user_info
         fas_user_from_oidc()
@@ -104,7 +104,7 @@ class PagureFlaskOIDCLogintests(tests.SimplePagureTest):
         self.assertEqual(flask.g.fas_user.groups, [])
 
     def test_fas_user_from_oidc_groups(self):
-        """ Test the user creation function. """
+        """Test the user creation function."""
         user_info = self.user_info.copy()
         user_info["groups"] = ["group1", "group2"]
         flask.g._oidc_userinfo = user_info
@@ -112,7 +112,7 @@ class PagureFlaskOIDCLogintests(tests.SimplePagureTest):
         self.assertEqual(flask.g.fas_user.groups, ["group1", "group2"])
 
     def test_fas_user_from_oidc_ssh(self):
-        """ Test the user creation function. """
+        """Test the user creation function."""
         user_info = self.user_info.copy()
         user_info["ssh_key"] = "dummy ssh key"
         flask.g._oidc_userinfo = user_info

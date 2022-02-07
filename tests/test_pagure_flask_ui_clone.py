@@ -32,7 +32,7 @@ import tests
 
 
 class PagureFlaskAppClonetests(tests.Modeltests):
-    """ Tests for the clone bridging. """
+    """Tests for the clone bridging."""
 
     def setUp(self):
         super(PagureFlaskAppClonetests, self).setUp()
@@ -48,7 +48,7 @@ class PagureFlaskAppClonetests(tests.Modeltests):
 
     @patch.dict("pagure.config.config", {"ALLOW_HTTP_PULL_PUSH": False})
     def test_http_clone_disabled(self):
-        """ Test that the HTTP clone endpoint gets correctly closed. """
+        """Test that the HTTP clone endpoint gets correctly closed."""
         output = self.app.get(
             "/clonetest.git/info/refs?service=git-upload-pack"
         )
@@ -57,14 +57,14 @@ class PagureFlaskAppClonetests(tests.Modeltests):
 
     @patch.dict("pagure.config.config", {"ALLOW_HTTP_PULL_PUSH": True})
     def test_http_clone_invalid_service(self):
-        """ Test that the HTTP endpoint refuses invalid services. """
+        """Test that the HTTP endpoint refuses invalid services."""
         output = self.app.get("/clonetest.git/info/refs?service=myservice")
         self.assertEqual(output.status_code, 400)
         self.assertIn("Unknown service", output.get_data(as_text=True))
 
     @patch.dict("pagure.config.config", {"ALLOW_HTTP_PULL_PUSH": True})
     def test_http_clone_invalid_project(self):
-        """ Test that the HTTP endpoint refuses invalid projects. """
+        """Test that the HTTP endpoint refuses invalid projects."""
         output = self.app.get(
             "/nosuchrepo.git/info/refs?service=git-upload-pack"
         )
@@ -73,7 +73,7 @@ class PagureFlaskAppClonetests(tests.Modeltests):
 
     @patch.dict("pagure.config.config", {"ALLOW_HTTP_PULL_PUSH": True})
     def test_http_clone_dumb(self):
-        """ Test that the HTTP endpoint refuses dumb service request. """
+        """Test that the HTTP endpoint refuses dumb service request."""
         output = self.app.get("/clonetest.git/info/refs")
         self.assertEqual(output.status_code, 400)
         self.assertIn("Please switch", output.get_data(as_text=True))
@@ -87,7 +87,7 @@ class PagureFlaskAppClonetests(tests.Modeltests):
         },
     )
     def test_http_push_disabled(self):
-        """ Test that the HTTP push gets refused. """
+        """Test that the HTTP push gets refused."""
         output = self.app.get(
             "/clonetest.git/info/refs?service=git-receive-pack"
         )
@@ -106,7 +106,7 @@ class PagureFlaskAppClonetests(tests.Modeltests):
         },
     )
     def test_http_push_unauthed(self):
-        """ Test that the HTTP push gets refused unauthed. """
+        """Test that the HTTP push gets refused unauthed."""
         output = self.app.get(
             "/clonetest.git/info/refs?service=git-receive-pack"
         )
@@ -115,7 +115,7 @@ class PagureFlaskAppClonetests(tests.Modeltests):
 
     @patch.dict("pagure.config.config", {"ALLOW_HTTP_PULL_PUSH": True})
     def test_http_clone_private_project_unauthed(self):
-        """ Test that the HTTP endpoint enforced project.private. """
+        """Test that the HTTP endpoint enforced project.private."""
         project = pagure.lib.query._get_project(self.session, "clonetest")
         project.private = True
         self.session.add(project)
@@ -136,7 +136,7 @@ class PagureFlaskAppClonetests(tests.Modeltests):
         },
     )
     def test_http_clone(self):
-        """ Test that HTTP cloning gives reasonable output. """
+        """Test that HTTP cloning gives reasonable output."""
         # Unfortunately, actually testing a git clone would need the app to
         # run on a TCP port, which the test environment doesn't do.
 
@@ -165,7 +165,7 @@ class PagureFlaskAppClonetests(tests.Modeltests):
         },
     )
     def test_http_clone_private(self):
-        """ Test that HTTP cloning gives reasonable output with project.private. """
+        """Test that HTTP cloning gives reasonable output with project.private."""
         # Unfortunately, actually testing a git clone would need the app to
         # run on a TCP port, which the test environment doesn't do.
         project = pagure.lib.query._get_project(self.session, "clonetest")
@@ -197,7 +197,7 @@ class PagureFlaskAppClonetests(tests.Modeltests):
         },
     )
     def test_http_push(self):
-        """ Test that the HTTP push gets accepted. """
+        """Test that the HTTP push gets accepted."""
         output = self.app.get(
             "/clonetest.git/info/refs?service=git-receive-pack",
             environ_overrides={"REMOTE_USER": "pingou"},
@@ -216,7 +216,7 @@ class PagureFlaskAppClonetests(tests.Modeltests):
         },
     )
     def test_http_push_api_token(self):
-        """ Test that the HTTP push gets accepted. """
+        """Test that the HTTP push gets accepted."""
 
         headers = {
             "Authorization": b"Basic %s"
@@ -240,7 +240,7 @@ class PagureFlaskAppClonetests(tests.Modeltests):
         },
     )
     def test_http_push_projectless_api_token(self):
-        """ Test that the HTTP push gets accepted. """
+        """Test that the HTTP push gets accepted."""
         tests.create_tokens(self.session, project_id=None, suffix="2")
         tests.create_tokens_acl(
             self.session, token_id="aaabbbcccddd2", acl_name="commit"
@@ -268,7 +268,7 @@ class PagureFlaskAppClonetests(tests.Modeltests):
         },
     )
     def test_http_push__invalid_project_for_api_token(self):
-        """ Test that the HTTP push gets accepted. """
+        """Test that the HTTP push gets accepted."""
 
         headers = {
             "Authorization": b"Basic %s"
@@ -290,7 +290,7 @@ class PagureFlaskAppClonetests(tests.Modeltests):
         },
     )
     def test_http_push_api_token_invalid_user(self):
-        """ Test that the HTTP push gets accepted. """
+        """Test that the HTTP push gets accepted."""
 
         headers = {
             "Authorization": b"Basic %s"
@@ -312,7 +312,7 @@ class PagureFlaskAppClonetests(tests.Modeltests):
         },
     )
     def test_http_push_invalid_api_token(self):
-        """ Test that the HTTP push gets accepted. """
+        """Test that the HTTP push gets accepted."""
 
         headers = {
             "Authorization": b"Basic %s"
@@ -334,7 +334,7 @@ class PagureFlaskAppClonetests(tests.Modeltests):
         },
     )
     def test_http_push_invalid_acl_on_token(self):
-        """ Test that the HTTP push gets accepted. """
+        """Test that the HTTP push gets accepted."""
         tests.create_tokens(self.session, suffix="2")
         tests.create_tokens_acl(
             self.session, token_id="aaabbbcccddd2", acl_name="commit_flag"
@@ -361,7 +361,7 @@ class PagureFlaskAppClonetests(tests.Modeltests):
         },
     )
     def test_http_push_local_auth(self):
-        """ Test that the HTTP push gets accepted. """
+        """Test that the HTTP push gets accepted."""
 
         headers = {
             "Authorization": b"Basic %s" % base64.b64encode(b"pingou:foo")
@@ -385,7 +385,7 @@ class PagureFlaskAppClonetests(tests.Modeltests):
         },
     )
     def test_http_push_local_auth_invalid_username(self):
-        """ Test that the HTTP push gets accepted. """
+        """Test that the HTTP push gets accepted."""
 
         headers = {
             "Authorization": b"Basic %s" % base64.b64encode(b"invalid:foo")

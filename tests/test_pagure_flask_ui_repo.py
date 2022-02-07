@@ -43,10 +43,10 @@ from pagure.utils import __get_file_in_tree as get_file_in_tree
 
 
 class PagureFlaskRepotests(tests.Modeltests):
-    """ Tests for flask app controller of pagure """
+    """Tests for flask app controller of pagure"""
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskRepotests, self).setUp()
 
         pagure.config.config["VIRUS_SCAN_ATTACHMENTS"] = False
@@ -109,7 +109,7 @@ class PagureFlaskRepotests(tests.Modeltests):
 
     @patch("pagure.decorators.admin_session_timedout")
     def test_add_deploykey(self, ast):
-        """ Test the add_deploykey endpoint. """
+        """Test the add_deploykey endpoint."""
         ast.return_value = False
 
         # No git repo
@@ -252,7 +252,7 @@ class PagureFlaskRepotests(tests.Modeltests):
     )
     @patch("pagure.decorators.admin_session_timedout")
     def test_add_user(self, ast):
-        """ Test the add_user endpoint. """
+        """Test the add_user endpoint."""
         ast.return_value = False
 
         # No git repo
@@ -563,7 +563,7 @@ class PagureFlaskRepotests(tests.Modeltests):
     )
     @patch("pagure.decorators.admin_session_timedout")
     def test_add_group_project(self, ast):
-        """ Test the add_group_project endpoint. """
+        """Test the add_group_project endpoint."""
         ast.return_value = False
 
         # No Git repo
@@ -837,7 +837,7 @@ class PagureFlaskRepotests(tests.Modeltests):
 
     @patch("pagure.decorators.admin_session_timedout")
     def test_remove_deploykey(self, ast):
-        """ Test the remove_deploykey endpoint. """
+        """Test the remove_deploykey endpoint."""
         ast.return_value = False
 
         # Git repo not found
@@ -952,7 +952,7 @@ class PagureFlaskRepotests(tests.Modeltests):
     )
     @patch("pagure.decorators.admin_session_timedout")
     def test_remove_user(self, ast):
-        """ Test the remove_user endpoint. """
+        """Test the remove_user endpoint."""
         ast.return_value = False
 
         # Git repo not found
@@ -1110,7 +1110,7 @@ class PagureFlaskRepotests(tests.Modeltests):
     @patch("pagure.decorators.admin_session_timedout")
     @patch("pagure.lib.notify.log")
     def test_remove_user_self(self, mock_log, ast):
-        """ Test the remove_user endpoint when removing themselves. """
+        """Test the remove_user endpoint when removing themselves."""
         ast.return_value = False
 
         tests.create_projects(self.session)
@@ -1230,7 +1230,7 @@ class PagureFlaskRepotests(tests.Modeltests):
     )
     @patch("pagure.decorators.admin_session_timedout")
     def test_remove_group_project(self, ast):
-        """ Test the remove_group_project endpoint. """
+        """Test the remove_group_project endpoint."""
         ast.return_value = False
 
         # No Git repo
@@ -1405,7 +1405,7 @@ class PagureFlaskRepotests(tests.Modeltests):
 
     @patch("pagure.decorators.admin_session_timedout")
     def test_update_project(self, ast):
-        """ Test the update_project endpoint. """
+        """Test the update_project endpoint."""
         ast.return_value = True
 
         # Git repo not found
@@ -1622,7 +1622,7 @@ class PagureFlaskRepotests(tests.Modeltests):
     )
     @patch("pagure.decorators.admin_session_timedout")
     def test_view_settings(self, ast):
-        """ Test the view_settings endpoint. """
+        """Test the view_settings endpoint."""
         ast.return_value = False
 
         # No Git repo
@@ -1883,7 +1883,7 @@ class PagureFlaskRepotests(tests.Modeltests):
     @patch("pagure.lib.git.generate_gitolite_acls")
     @patch("pagure.decorators.admin_session_timedout")
     def test_view_settings_pr_only(self, ast, gen_acl):
-        """ Test the view_settings endpoint when turning on PR only. """
+        """Test the view_settings endpoint when turning on PR only."""
         ast.return_value = False
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"))
@@ -1959,7 +1959,7 @@ class PagureFlaskRepotests(tests.Modeltests):
 
     @patch("pagure.decorators.admin_session_timedout")
     def test_fields_in_view_settings(self, ast):
-        """ Test the default fields in view_settings endpoint. """
+        """Test the default fields in view_settings endpoint."""
         ast.return_value = False
 
         # No Git repo
@@ -2084,7 +2084,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             )
 
     def test_view_forks(self):
-        """ Test the view_forks endpoint. """
+        """Test the view_forks endpoint."""
 
         output = self.app.get("/foo/forks", follow_redirects=True)
         self.assertEqual(output.status_code, 404)
@@ -2099,7 +2099,7 @@ class PagureFlaskRepotests(tests.Modeltests):
 
     @patch.dict("pagure.config.config", {"CASE_SENSITIVE": True})
     def test_view_repo_case_sensitive(self):
-        """ Test the view_repo endpoint. """
+        """Test the view_repo endpoint."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
@@ -2246,7 +2246,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn("Cloning over SSH is disabled.", output_text)
 
     def test_view_repo(self):
-        """ Test the view_repo endpoint. """
+        """Test the view_repo endpoint."""
 
         output = self.app.get("/foo")
         # No project registered in the DB
@@ -2444,7 +2444,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.perfReset()
 
     def test_view_repo_empty(self):
-        """ Test the view_repo endpoint on a repo w/o master branch. """
+        """Test the view_repo endpoint on a repo w/o master branch."""
 
         tests.create_projects(self.session)
         # Create a git repo to play with
@@ -2558,7 +2558,7 @@ class PagureFlaskRepotests(tests.Modeltests):
     '''
 
     def test_view_commits(self):
-        """ Test the view_commits endpoint. """
+        """Test the view_commits endpoint."""
         output = self.app.get("/foo/commits")
         # No project registered in the DB
         self.assertEqual(output.status_code, 404)
@@ -2666,7 +2666,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertIn("Forked from", output_text)
 
     def test_view_commits_from_tag(self):
-        """ Test the view_commits endpoint given a tag. """
+        """Test the view_commits endpoint given a tag."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
@@ -2697,7 +2697,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output_text.count('<span id="commit-actions">'), 1)
 
     def test_view_commits_from_blob(self):
-        """ Test the view_commits endpoint given a blob. """
+        """Test the view_commits endpoint given a blob."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
@@ -2719,7 +2719,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertIn("Invalid branch/identifier provided", output_text)
 
     def test_view_commit_from_tag(self):
-        """ Test the view_commit endpoint given a tag. """
+        """Test the view_commit endpoint given a tag."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
@@ -2757,7 +2757,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         )
 
     def test_compare_commits(self):
-        """ Test the compare_commits endpoint. """
+        """Test the compare_commits endpoint."""
 
         # First two commits comparison
         def compare_first_two(c1, c2):
@@ -2942,7 +2942,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             compare_with_symlink(c3, c4)
 
     def test_view_file(self):
-        """ Test the view_file endpoint. """
+        """Test the view_file endpoint."""
         output = self.app.get("/foo/blob/foo/f/sources")
         # No project registered in the DB
         self.assertEqual(output.status_code, 404)
@@ -3129,7 +3129,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         MagicMock(side_effect=pagure.exceptions.PagureException),
     )
     def test_view_file_with_wrong_encoding(self):
-        """ Test the view_file endpoint. """
+        """Test the view_file endpoint."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
@@ -3153,7 +3153,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual("foo\n bar", output_text)
 
     def test_view_raw_file(self):
-        """ Test the view_raw_file endpoint. """
+        """Test the view_raw_file endpoint."""
         output = self.app.get("/foo/raw/foo/sources")
         # No project registered in the DB
         self.assertEqual(output.status_code, 404)
@@ -3300,7 +3300,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertIn("foo\n bar", output_text)
 
     def test_view_commit(self):
-        """ Test the view_commit endpoint. """
+        """Test the view_commit endpoint."""
         output = self.app.get("/foo/c/bar")
         # No project registered in the DB
         self.assertEqual(output.status_code, 404)
@@ -3559,7 +3559,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         )
 
     def test_view_commit_patch(self):
-        """ Test the view_commit_patch endpoint. """
+        """Test the view_commit_patch endpoint."""
 
         # No project registered in the DB
         output = self.app.get("/foo/c/bar.patch")
@@ -3701,7 +3701,7 @@ index 0000000..fb7093d
         )
 
     def test_view_commit_diff(self):
-        """ Test the view_commit_diff endpoint. """
+        """Test the view_commit_diff endpoint."""
 
         # No project registered in the DB
         output = self.app.get("/foo/c/bar.diff")
@@ -3755,7 +3755,7 @@ index 0000000..fb7093d
         )
 
     def test_view_tree(self):
-        """ Test the view_tree endpoint. """
+        """Test the view_tree endpoint."""
         output = self.app.get("/foo/tree/")
         # No project registered in the DB
         self.assertEqual(output.status_code, 404)
@@ -4097,7 +4097,7 @@ index 0000000..fb7093d
     @patch("pagure.lib.notify.send_email")
     @patch("pagure.decorators.admin_session_timedout")
     def test_delete_read_only_repo(self, ast, send_email):
-        """ Test the delete_repo endpoint when the repo is read_only """
+        """Test the delete_repo endpoint when the repo is read_only"""
         ast.return_value = False
         send_email.return_value = True
 
@@ -4146,7 +4146,7 @@ index 0000000..fb7093d
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     @patch("pagure.decorators.admin_session_timedout")
     def test_delete_repo(self, ast):
-        """ Test the delete_repo endpoint. """
+        """Test the delete_repo endpoint."""
         ast.return_value = False
 
         # No Git repo
@@ -4633,7 +4633,7 @@ index 0000000..fb7093d
     @patch("pagure.lib.notify.send_email")
     @patch("pagure.decorators.admin_session_timedout")
     def test_delete_repo_with_users(self, ast, send_email):
-        """ Test the delete_repo endpoint. """
+        """Test the delete_repo endpoint."""
         ast.return_value = False
         send_email.return_value = True
 
@@ -4763,7 +4763,7 @@ index 0000000..fb7093d
     @patch("pagure.lib.notify.send_email")
     @patch("pagure.decorators.admin_session_timedout")
     def test_delete_repo_with_group(self, ast, send_email):
-        """ Test the delete_repo endpoint. """
+        """Test the delete_repo endpoint."""
         ast.return_value = False
         send_email.return_value = True
 
@@ -4905,7 +4905,7 @@ index 0000000..fb7093d
     @patch("pagure.lib.notify.send_email")
     @patch("pagure.decorators.admin_session_timedout")
     def test_delete_repo_with_coloredtag(self, ast, send_email):
-        """ Test the delete_repo endpoint. """
+        """Test the delete_repo endpoint."""
         ast.return_value = False
         send_email.return_value = True
 
@@ -5039,7 +5039,7 @@ index 0000000..fb7093d
 
     @patch("pagure.decorators.admin_session_timedout")
     def test_new_repo_hook_token(self, ast):
-        """ Test the new_repo_hook_token endpoint. """
+        """Test the new_repo_hook_token endpoint."""
         ast.return_value = False
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"))
@@ -5101,7 +5101,7 @@ index 0000000..fb7093d
         self.assertNotEqual(repo.hook_token, "aaabbbccc")
 
     def test_view_tags(self):
-        """ Test the view_tags endpoint. """
+        """Test the view_tags endpoint."""
         output = self.app.get("/foo/releases")
         # No project registered in the DB
         self.assertEqual(output.status_code, 404)
@@ -5145,7 +5145,7 @@ index 0000000..fb7093d
         )
 
     def test_edit_file_no_signed_off(self):
-        """ Test the edit_file endpoint when signed-off isn't enforced. """
+        """Test the edit_file endpoint when signed-off isn't enforced."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
 
@@ -5180,7 +5180,7 @@ index 0000000..fb7093d
             )
 
     def test_edit_file_signed_off(self):
-        """ Test the edit_file endpoint when signed-off is enforced. """
+        """Test the edit_file endpoint when signed-off is enforced."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
 
@@ -5222,7 +5222,7 @@ index 0000000..fb7093d
             )
 
     def test_edit_file(self):
-        """ Test the edit_file endpoint. """
+        """Test the edit_file endpoint."""
 
         # No Git repo
         output = self.app.get("/foo/edit/foo/f/sources")
@@ -5438,7 +5438,7 @@ index 0000000..fb7093d
             self.assertIn("<p>No content found</p>", output_text)
 
     def test_edit_file_default_email(self):
-        """ Test the default email shown by the edit_file endpoint. """
+        """Test the default email shown by the edit_file endpoint."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
@@ -5482,7 +5482,7 @@ index 0000000..fb7093d
 
     @patch("pagure.decorators.admin_session_timedout")
     def test_change_ref_head(self, ast):
-        """ Test the change_ref_head endpoint. """
+        """Test the change_ref_head endpoint."""
         ast.return_value = True
 
         # No Git repo
@@ -5626,7 +5626,7 @@ index 0000000..fb7093d
             self.assertIn("Default branch updated " "to master", output_text)
 
     def test_new_release(self):
-        """ Test the new_release endpoint. """
+        """Test the new_release endpoint."""
 
         # No Git repo
         output = self.app.post("/foo/upload/")
@@ -5723,7 +5723,7 @@ index 0000000..fb7093d
             self.assertIn("This project has not been tagged.", output_text)
 
     def test_new_release_two_files(self):
-        """ Test the new_release endpoint when uploading two files. """
+        """Test the new_release endpoint when uploading two files."""
         tests.create_projects(self.session)
         repo = tests.create_projects_git(os.path.join(self.path, "repos"))
 
@@ -5805,7 +5805,7 @@ index 0000000..fb7093d
 
     @patch("pagure.decorators.admin_session_timedout")
     def test_add_token_all_tokens(self, ast):
-        """ Test the add_token endpoint. """
+        """Test the add_token endpoint."""
         ast.return_value = False
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
@@ -5824,7 +5824,7 @@ index 0000000..fb7093d
     @patch.dict("pagure.config.config", {"USER_ACLS": ["create_project"]})
     @patch("pagure.decorators.admin_session_timedout")
     def test_add_token_one_token(self, ast):
-        """ Test the add_token endpoint. """
+        """Test the add_token endpoint."""
         ast.return_value = False
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
@@ -5841,7 +5841,7 @@ index 0000000..fb7093d
 
     @patch("pagure.decorators.admin_session_timedout")
     def test_add_token(self, ast):
-        """ Test the add_token endpoint. """
+        """Test the add_token endpoint."""
         ast.return_value = False
 
         # No Git repo
@@ -5923,7 +5923,7 @@ index 0000000..fb7093d
 
     @patch("pagure.decorators.admin_session_timedout")
     def test_revoke_api_token(self, ast):
-        """ Test the revoke_api_token endpoint. """
+        """Test the revoke_api_token endpoint."""
         ast.return_value = False
 
         # No Git repo
@@ -6022,7 +6022,7 @@ index 0000000..fb7093d
 
     @patch("pagure.decorators.admin_session_timedout")
     def test_renew_api_token(self, ast):
-        """ Test the renew_api_token endpoint. """
+        """Test the renew_api_token endpoint."""
         ast.return_value = False
 
         # No Git repo
@@ -6126,7 +6126,7 @@ index 0000000..fb7093d
             )
 
     def test_delete_branch(self):
-        """ Test the delete_branch endpoint. """
+        """Test the delete_branch endpoint."""
         # No Git repo
         output = self.app.post("/foo/b/master/delete")
         self.assertEqual(output.status_code, 404)
@@ -6213,7 +6213,7 @@ index 0000000..fb7093d
             )
 
     def test_delete_branch_unicode(self):
-        """ Test the delete_branch endpoint with an unicode branch. """
+        """Test the delete_branch endpoint with an unicode branch."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
@@ -6248,7 +6248,7 @@ index 0000000..fb7093d
             self.assertNotIn('<form id="delete_branch_form-☃️"', output_text)
 
     def test_delete_branch_master(self):
-        """ Test the delete_branch endpoint with the master branch. """
+        """Test the delete_branch endpoint with the master branch."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
@@ -6391,7 +6391,7 @@ index 0000000..fb7093d
             )
 
     def test_view_docs(self):
-        """ Test the view_docs endpoint. """
+        """Test the view_docs endpoint."""
         output = self.app.get("/docs/foo/")
         # No project registered in the DB
         self.assertEqual(output.status_code, 404)
@@ -6408,7 +6408,7 @@ index 0000000..fb7093d
         self.assertEqual(output.status_code, 404)
 
     def test_view_project_activity(self):
-        """ Test the view_project_activity endpoint. """
+        """Test the view_project_activity endpoint."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
 
@@ -6429,7 +6429,7 @@ index 0000000..fb7093d
         self.assertEqual(output.status_code, 404)
 
     def test_goimport(self):
-        """ Test the go-import tag. """
+        """Test the go-import tag."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
         output = self.app.get("/test/")
@@ -6443,7 +6443,7 @@ index 0000000..fb7093d
         )
 
     def test_watch_repo(self):
-        """ Test the  watch_repo endpoint. """
+        """Test the  watch_repo endpoint."""
 
         output = self.app.post("/watch/")
         self.assertEqual(output.status_code, 405)
@@ -6655,7 +6655,7 @@ index 0000000..fb7093d
             )
 
     def test_delete_report(self):
-        """ Test the  delete_report endpoint. """
+        """Test the  delete_report endpoint."""
 
         output = self.app.post("/test/delete/report")
         self.assertEqual(output.status_code, 404)
@@ -6745,7 +6745,7 @@ index 0000000..fb7093d
             self.assertEqual(project.reports, {})
 
     def test_delete_report_ns_project(self):
-        """ Test the  delete_report endpoint on a namespaced project. """
+        """Test the  delete_report endpoint on a namespaced project."""
 
         output = self.app.post("/foo/test/delete/report")
         self.assertEqual(output.status_code, 404)
@@ -6849,7 +6849,7 @@ index 0000000..fb7093d
             self.assertEqual(project.reports, {})
 
     def test_open_pr_button_empty_repo(self):
-        """ Test "Open Pull-Request" button on empty project. """
+        """Test "Open Pull-Request" button on empty project."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
@@ -6881,10 +6881,10 @@ index 0000000..fb7093d
 
 
 class PagureFlaskRepoTestHooktests(tests.Modeltests):
-    """ Tests for the web hook test function """
+    """Tests for the web hook test function"""
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskRepoTestHooktests, self).setUp()
 
         tests.create_projects(self.session)
@@ -6895,7 +6895,7 @@ class PagureFlaskRepoTestHooktests(tests.Modeltests):
         MagicMock(return_value=False),
     )
     def test_test_hook_no_project(self):
-        """ Test the test_hook endpoint when the project doesn't exist. """
+        """Test the test_hook endpoint when the project doesn't exist."""
         # No project
         output = self.app.post("/foo/settings/test_hook")
         self.assertEqual(output.status_code, 404)
@@ -6905,7 +6905,7 @@ class PagureFlaskRepoTestHooktests(tests.Modeltests):
         MagicMock(return_value=False),
     )
     def test_test_hook_existing_project(self):
-        """ Test the test_hook endpoint when the project doesn't exist. """
+        """Test the test_hook endpoint when the project doesn't exist."""
         user = tests.FakeUser()
         with tests.user_set(self.app.application, user):
             output = self.app.post("/test/settings/test_hook")
@@ -6916,7 +6916,7 @@ class PagureFlaskRepoTestHooktests(tests.Modeltests):
         MagicMock(return_value=False),
     )
     def test_test_hook_logged_out(self):
-        """ Test the test_hook endpoint when the project isn't logged in. """
+        """Test the test_hook endpoint when the project isn't logged in."""
         # User not logged in
         output = self.app.post("/test/settings/test_hook")
         self.assertEqual(output.status_code, 302)
@@ -6926,7 +6926,7 @@ class PagureFlaskRepoTestHooktests(tests.Modeltests):
         MagicMock(return_value=False),
     )
     def test_test_hook_logged_in_no_csrf(self):
-        """ Test the test_hook endpoint when the user is logged in. """
+        """Test the test_hook endpoint when the user is logged in."""
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
             output = self.app.post("/test/settings/test_hook")
@@ -6938,7 +6938,7 @@ class PagureFlaskRepoTestHooktests(tests.Modeltests):
         MagicMock(return_value=False),
     )
     def test_test_hook_logged_in_csrf(self):
-        """ Test the test_hook endpoint when the user is logged in. """
+        """Test the test_hook endpoint when the user is logged in."""
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
             data = {"csrf_token": self.get_csrf()}
@@ -6947,7 +6947,7 @@ class PagureFlaskRepoTestHooktests(tests.Modeltests):
 
 
 class PagureFlaskRepoTestRegenerateGittests(tests.Modeltests):
-    """ Tests for the regenerate git repo function """
+    """Tests for the regenerate git repo function"""
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     @patch(
@@ -6955,7 +6955,7 @@ class PagureFlaskRepoTestRegenerateGittests(tests.Modeltests):
         MagicMock(return_value=False),
     )
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskRepoTestRegenerateGittests, self).setUp()
 
         tests.create_projects(self.session)
@@ -6966,14 +6966,14 @@ class PagureFlaskRepoTestRegenerateGittests(tests.Modeltests):
             self.csrf_token = self.get_csrf()
 
     def test_regenerate_git_invalid_project(self):
-        """ Test the regenerate_git endpoint. """
+        """Test the regenerate_git endpoint."""
         user = tests.FakeUser()
         with tests.user_set(self.app.application, user):
             output = self.app.post("/foo/regenerate")
             self.assertEqual(output.status_code, 404)
 
     def test_regenerate_git_invalid_user(self):
-        """ Test the regenerate_git endpoint. """
+        """Test the regenerate_git endpoint."""
         user = tests.FakeUser()
         with tests.user_set(self.app.application, user):
             output = self.app.post("/test/regenerate")
@@ -6984,21 +6984,21 @@ class PagureFlaskRepoTestRegenerateGittests(tests.Modeltests):
         MagicMock(return_value=True),
     )
     def test_regenerate_git_user_session_timeout(self):
-        """ Test the regenerate_git endpoint. """
+        """Test the regenerate_git endpoint."""
         user = tests.FakeUser()
         with tests.user_set(self.app.application, user):
             output = self.app.post("/test/regenerate")
             self.assertEqual(output.status_code, 302)
 
     def test_regenerate_git_no_csrf(self):
-        """ Test the regenerate_git endpoint. """
+        """Test the regenerate_git endpoint."""
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
             output = self.app.post("/test/regenerate")
             self.assertEqual(output.status_code, 400)
 
     def test_regenerate_git_missing_repo_type(self):
-        """ Test the regenerate_git endpoint. """
+        """Test the regenerate_git endpoint."""
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
             data = {"csrf_token": self.csrf_token}
@@ -7007,7 +7007,7 @@ class PagureFlaskRepoTestRegenerateGittests(tests.Modeltests):
             self.assertEqual(output.status_code, 400)
 
     def test_regenerate_git_missing_invalid_regenerate(self):
-        """ Test the regenerate_git endpoint. """
+        """Test the regenerate_git endpoint."""
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
             data = {"csrf_token": self.csrf_token, "regenerate": "ticket"}
@@ -7016,7 +7016,7 @@ class PagureFlaskRepoTestRegenerateGittests(tests.Modeltests):
 
     @patch("pagure.lib.git._update_git")
     def test_regenerate_git_tickets(self, upgit):
-        """ Test the regenerate_git endpoint. """
+        """Test the regenerate_git endpoint."""
         upgit.return_value = True
 
         user = tests.FakeUser(username="pingou")
@@ -7046,7 +7046,7 @@ class PagureFlaskRepoTestRegenerateGittests(tests.Modeltests):
 
     @patch("pagure.lib.git._update_git")
     def test_regenerate_git_requests(self, upgit):
-        """ Test the regenerate_git endpoint. """
+        """Test the regenerate_git endpoint."""
         # upgit.return_value = True
 
         user = tests.FakeUser(username="pingou")
@@ -7078,10 +7078,10 @@ class PagureFlaskRepoTestRegenerateGittests(tests.Modeltests):
 
 
 class PagureFlaskRepoTestGitSSHURL(tests.Modeltests):
-    """ Tests the display of the SSH url in the UI """
+    """Tests the display of the SSH url in the UI"""
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskRepoTestGitSSHURL, self).setUp()
 
         tests.create_projects(self.session)
@@ -7121,7 +7121,7 @@ class PagureFlaskRepoTestGitSSHURL(tests.Modeltests):
         self.assertEqual(msg, "SSH key added")
 
     def test_logged_out(self):
-        """ Test the default behavior with the user logged out. """
+        """Test the default behavior with the user logged out."""
 
         output = self.app.get("/test")
         self.assertEqual(output.status_code, 200)
@@ -7139,7 +7139,7 @@ class PagureFlaskRepoTestGitSSHURL(tests.Modeltests):
         )
 
     def test_logged_in(self):
-        """ Test the default behavior with the user logged in. """
+        """Test the default behavior with the user logged in."""
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
             output = self.app.get("/test")
@@ -7159,7 +7159,7 @@ class PagureFlaskRepoTestGitSSHURL(tests.Modeltests):
 
     @patch.dict("pagure.config.config", {"SSH_ACCESS_GROUPS": ["packager"]})
     def test_ssh_restricted_user_member(self):
-        """ Test when ssh is restricted and the user has access. """
+        """Test when ssh is restricted and the user has access."""
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
             output = self.app.get("/test")
@@ -7179,7 +7179,7 @@ class PagureFlaskRepoTestGitSSHURL(tests.Modeltests):
 
     @patch.dict("pagure.config.config", {"SSH_ACCESS_GROUPS": ["invalid"]})
     def test_ssh_restricted_user_non_member(self):
-        """ Test when ssh is restricted and the user does not have access. """
+        """Test when ssh is restricted and the user does not have access."""
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
             output = self.app.get("/test")

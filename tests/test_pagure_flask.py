@@ -30,10 +30,10 @@ import tests
 
 
 class PagureGetRemoteRepoPath(tests.SimplePagureTest):
-    """ Tests for pagure """
+    """Tests for pagure"""
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureGetRemoteRepoPath, self).setUp()
 
         tests.create_projects(self.session)
@@ -47,7 +47,7 @@ class PagureGetRemoteRepoPath(tests.SimplePagureTest):
         mock.MagicMock(side_effect=pygit2.GitError),
     )
     def test_passing(self):
-        """ Test get_remote_repo_path in pagure. """
+        """Test get_remote_repo_path in pagure."""
         output = pagure.utils.get_remote_repo_path(
             os.path.join(self.path, "repos", "test2.git"),
             "master",

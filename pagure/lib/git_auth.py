@@ -193,7 +193,7 @@ def _read_file(filename):
 
 
 class Gitolite2Auth(GitAuthHelper):
-    """ A gitolite 2 authentication module. """
+    """A gitolite 2 authentication module."""
 
     @classmethod
     def _process_project(cls, project, config, global_pr_only):
@@ -805,7 +805,7 @@ class Gitolite2Auth(GitAuthHelper):
 
 
 class Gitolite3Auth(Gitolite2Auth):
-    """ A gitolite 3 authentication module. """
+    """A gitolite 3 authentication module."""
 
     @staticmethod
     def _individual_repos_command(config_file):
@@ -852,18 +852,18 @@ class Gitolite3Auth(Gitolite2Auth):
 
 
 class PagureGitAuth(GitAuthHelper):
-    """ Standard Pagure git auth implementation. """
+    """Standard Pagure git auth implementation."""
 
     is_dynamic = True
 
     @classmethod
     def generate_acls(self, project, group=None):
-        """ This function is required but not used. """
+        """This function is required but not used."""
         pass
 
     @classmethod
     def remove_acls(self, session, project):
-        """ This function is required but not used. """
+        """This function is required but not used."""
         pass
 
     def info(self, msg):
@@ -914,7 +914,7 @@ class PagureGitAuth(GitAuthHelper):
 
 
 class GitAuthTestHelper(GitAuthHelper):
-    """ Simple test auth module to check the auth customization system. """
+    """Simple test auth module to check the auth customization system."""
 
     is_dynamic = True
 

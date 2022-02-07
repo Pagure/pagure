@@ -31,7 +31,7 @@ class PagureFlaskApiIssueCreatetests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskApiIssueCreatetests, self).setUp()
 
         pagure.config.config["TICKETS_FOLDER"] = None

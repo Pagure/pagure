@@ -26,10 +26,10 @@ import tests
 
 
 class ViewCommitFlagtests(tests.SimplePagureTest):
-    """ Tests for the UI related to commit flags """
+    """Tests for the UI related to commit flags"""
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(ViewCommitFlagtests, self).setUp()
 
         tests.create_projects(self.session)
@@ -41,7 +41,7 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
         self.commit = repo.revparse_single("HEAD")
 
     def test_view_commit_no_flag(self):
-        """ Test the view_commit endpoint. """
+        """Test the view_commit endpoint."""
 
         # View first commit
         output = self.app.get("/test/c/%s" % self.commit.oid.hex)
@@ -59,7 +59,7 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
         )
 
     def test_view_commit_pending_flag(self):
-        """ Test the view_commit endpoint with a pending flag. """
+        """Test the view_commit endpoint with a pending flag."""
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
 
         msg = pagure.lib.query.add_commit_flag(
@@ -104,7 +104,7 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
         self.assertIn("<span>Build is running</span>", output_text)
 
     def test_view_commit_success_flag(self):
-        """ Test the view_commit endpoint with a successful flag. """
+        """Test the view_commit endpoint with a successful flag."""
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
 
         msg = pagure.lib.query.add_commit_flag(
@@ -149,7 +149,7 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
         self.assertIn("<span>Build passed</span>", output_text)
 
     def test_view_commit_error_flag(self):
-        """ Test the view_commit endpoint with a error flag. """
+        """Test the view_commit endpoint with a error flag."""
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
 
         msg = pagure.lib.query.add_commit_flag(
@@ -194,7 +194,7 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
         self.assertIn("<span>Build errored</span>", output_text)
 
     def test_view_commit_failure_flag(self):
-        """ Test the view_commit endpoint with a failure flag. """
+        """Test the view_commit endpoint with a failure flag."""
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
 
         msg = pagure.lib.query.add_commit_flag(
@@ -238,7 +238,7 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
         self.assertIn("<span>Build failed</span>", output_text)
 
     def test_view_commit_canceled_flag(self):
-        """ Test the view_commit endpoint with a canceled flag. """
+        """Test the view_commit endpoint with a canceled flag."""
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
 
         msg = pagure.lib.query.add_commit_flag(
@@ -291,7 +291,7 @@ class ViewCommitFlagtests(tests.SimplePagureTest):
         },
     )
     def test_view_commit_with_custom_flags(self):
-        """ Test the view_commit endpoint while having custom flags. """
+        """Test the view_commit endpoint while having custom flags."""
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
 
         msg = pagure.lib.query.add_commit_flag(

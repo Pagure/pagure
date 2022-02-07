@@ -79,7 +79,7 @@ def set_up_board(self):
 
 
 class PagureFlaskUiBoardstests(tests.SimplePagureTest):
-    """ Tests for flask UI Boards controller of pagure """
+    """Tests for flask UI Boards controller of pagure"""
 
     maxDiff = None
 
@@ -188,7 +188,7 @@ class PagureFlaskUiBoardstests(tests.SimplePagureTest):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_update_issue_add_tags_check_board_not_tagged(self):
-        """ Test the update_issue endpoint. """
+        """Test the update_issue endpoint."""
 
         # Before update, list tags
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
@@ -244,7 +244,7 @@ class PagureFlaskUiBoardstests(tests.SimplePagureTest):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_update_issue_add_tags_check_board(self):
-        """ Test the update_issue endpoint. """
+        """Test the update_issue endpoint."""
 
         # Before update, list tags
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
@@ -300,7 +300,7 @@ class PagureFlaskUiBoardstests(tests.SimplePagureTest):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_update_issue_add_tags_check_board_remove_tag_check_board(self):
-        """ Test the update_issue endpoint. """
+        """Test the update_issue endpoint."""
 
         # Before update, list tags
         repo = pagure.lib.query.get_authorized_project(self.session, "test")

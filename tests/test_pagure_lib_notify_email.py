@@ -34,7 +34,7 @@ class PagureLibNotifyEmailtests(tests.Modeltests):
     """
 
     def setUp(self):
-        """ Override setUp to add more fixtures used for many tests. """
+        """Override setUp to add more fixtures used for many tests."""
         super(PagureLibNotifyEmailtests, self).setUp()
 
         tests.create_projects(self.session)

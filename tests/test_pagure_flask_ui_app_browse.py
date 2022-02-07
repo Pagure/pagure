@@ -25,10 +25,10 @@ import tests
 
 
 class PagureFlaskAppBrowsetests(tests.Modeltests):
-    """ Tests for the browse pages of flask app controller of pagure """
+    """Tests for the browse pages of flask app controller of pagure"""
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskAppBrowsetests, self).setUp()
 
         tests.create_projects(self.session)
@@ -207,10 +207,10 @@ class PagureFlaskAppBrowsetests(tests.Modeltests):
 
 
 class PagureFlaskAppBrowseGroupAdmintests(tests.Modeltests):
-    """ Tests for the browse pages of flask app controller of pagure """
+    """Tests for the browse pages of flask app controller of pagure"""
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskAppBrowseGroupAdmintests, self).setUp()
 
         tests.create_projects(self.session)
@@ -311,10 +311,10 @@ class PagureFlaskAppBrowseGroupAdmintests(tests.Modeltests):
 
 
 class PagureFlaskAppBrowseGroupCommittests(tests.Modeltests):
-    """ Tests for the browse pages of flask app controller of pagure """
+    """Tests for the browse pages of flask app controller of pagure"""
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskAppBrowseGroupCommittests, self).setUp()
 
         tests.create_projects(self.session)
@@ -415,10 +415,10 @@ class PagureFlaskAppBrowseGroupCommittests(tests.Modeltests):
 
 
 class PagureFlaskAppBrowseGroupTickettests(tests.Modeltests):
-    """ Tests for the browse pages of flask app controller of pagure """
+    """Tests for the browse pages of flask app controller of pagure"""
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskAppBrowseGroupTickettests, self).setUp()
 
         tests.create_projects(self.session)

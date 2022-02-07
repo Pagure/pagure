@@ -23,10 +23,10 @@ import tests
 
 
 class PagureFlaskPluginNoFFtests(tests.SimplePagureTest):
-    """ Tests for Block non fast-forward pushes plugin of pagure """
+    """Tests for Block non fast-forward pushes plugin of pagure"""
 
     def test_plugin_noff(self):
-        """ Test the noff plugin on/off endpoint. """
+        """Test the noff plugin on/off endpoint."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"))

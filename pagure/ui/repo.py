@@ -968,7 +968,7 @@ def view_commit_diff(repo, commitid, username=None, namespace=None):
 def view_commit_patch_or_diff(
     repo, commitid, username=None, namespace=None, diff=False, is_js=False
 ):
-    """ Renders a commit either as a patch or as a diff. """
+    """Renders a commit either as a patch or as a diff."""
 
     repo_obj = flask.g.repo_obj
 
@@ -2746,7 +2746,7 @@ def view_project_activity(repo, namespace=None):
 @UI_NS.route("/<namespace>/<repo>/stargazers/")
 @UI_NS.route("/fork/<username>/<namespace>/<repo>/stargazers/")
 def view_stargazers(repo, username=None, namespace=None):
-    """ View all the users who have starred the project """
+    """View all the users who have starred the project"""
 
     stargazers = flask.g.repo.stargazers
     users = [star.user for star in stargazers]

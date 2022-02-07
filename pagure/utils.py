@@ -167,7 +167,7 @@ def is_safe_url(target):  # pragma: no cover
 
 
 def is_admin():
-    """ Return whether the user is admin for this application or not. """
+    """Return whether the user is admin for this application or not."""
     if not authenticated():
         return False
 
@@ -194,7 +194,7 @@ def is_admin():
 
 
 def is_repo_admin(repo_obj, username=None):
-    """ Return whether the user is an admin of the provided repo. """
+    """Return whether the user is an admin of the provided repo."""
     if not authenticated():
         return False
 
@@ -216,7 +216,7 @@ def is_repo_admin(repo_obj, username=None):
 
 
 def is_repo_committer(repo_obj, username=None, session=None):
-    """ Return whether the user is a committer of the provided repo. """
+    """Return whether the user is a committer of the provided repo."""
     import pagure.lib.query
 
     usergroups = set()
@@ -328,7 +328,7 @@ def is_repo_collaborator(repo_obj, refname, username=None, session=None):
 
 
 def is_repo_user(repo_obj, username=None):
-    """ Return whether the user has some access in the provided repo. """
+    """Return whether the user has some access in the provided repo."""
     if username:
         user = username
     else:
@@ -375,7 +375,7 @@ def login_required(function):
 
     @wraps(function)
     def decorated_function(*args, **kwargs):
-        """ Decorated function, actually does the work. """
+        """Decorated function, actually does the work."""
         auth_method = pagure_config.get("PAGURE_AUTH", None)
         if flask.session.get("_justloggedout", False):
             return flask.redirect(flask.url_for("ui_ns.index"))

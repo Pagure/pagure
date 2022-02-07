@@ -33,7 +33,7 @@ class PagureFlaskNoMasterBranchtests(tests.SimplePagureTest):
     """Tests for flask application when the git repo has no master branch."""
 
     def set_up_git_repo(self):
-        """ Set up the git repo to play with. """
+        """Set up the git repo to play with."""
 
         # Create a git repo to play with
         gitrepo = os.path.join(self.path, "repos", "test.git")

@@ -37,7 +37,7 @@ class PagureFlaskApiIssueChangeStatustests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskApiIssueChangeStatustests, self).setUp()
 
         pagure.config.config["TICKETS_FOLDER"] = None
@@ -97,7 +97,7 @@ class PagureFlaskApiIssueChangeStatustests(tests.Modeltests):
         tests.create_tokens_acl(self.session, token_id="project-less-pingou")
 
     def test_api_change_status_issue_invalid_project(self):
-        """ Test the api_change_status_issue method of the flask api. """
+        """Test the api_change_status_issue method of the flask api."""
 
         headers = {"Authorization": "token aaabbbcccddd"}
 
@@ -110,7 +110,7 @@ class PagureFlaskApiIssueChangeStatustests(tests.Modeltests):
         )
 
     def test_api_change_status_issue_token_not_for_project(self):
-        """ Test the api_change_status_issue method of the flask api. """
+        """Test the api_change_status_issue method of the flask api."""
 
         headers = {"Authorization": "token aaabbbcccddd"}
 
@@ -124,7 +124,7 @@ class PagureFlaskApiIssueChangeStatustests(tests.Modeltests):
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data["error"])
 
     def test_api_change_status_issue_invalid_issue(self):
-        """ Test the api_change_status_issue method of the flask api. """
+        """Test the api_change_status_issue method of the flask api."""
 
         headers = {"Authorization": "token aaabbbcccddd"}
 
@@ -137,7 +137,7 @@ class PagureFlaskApiIssueChangeStatustests(tests.Modeltests):
         )
 
     def test_api_change_status_issue_incomplete(self):
-        """ Test the api_change_status_issue method of the flask api. """
+        """Test the api_change_status_issue method of the flask api."""
 
         headers = {"Authorization": "token aaabbbcccddd"}
 
@@ -169,7 +169,7 @@ class PagureFlaskApiIssueChangeStatustests(tests.Modeltests):
         self.assertEqual(issue.status, "Open")
 
     def test_api_change_status_issue_no_change(self):
-        """ Test the api_change_status_issue method of the flask api. """
+        """Test the api_change_status_issue method of the flask api."""
 
         headers = {"Authorization": "token aaabbbcccddd"}
 
@@ -194,7 +194,7 @@ class PagureFlaskApiIssueChangeStatustests(tests.Modeltests):
         MagicMock(side_effect=pagure.exceptions.PagureException("error")),
     )
     def test_api_change_status_issue_raise_error(self):
-        """ Test the api_change_status_issue method of the flask api. """
+        """Test the api_change_status_issue method of the flask api."""
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
         close_status = repo.close_status
         close_status = ["Fixed", "Upstream", "Invalid"]
@@ -217,7 +217,7 @@ class PagureFlaskApiIssueChangeStatustests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_api_change_status_issue(self):
-        """ Test the api_change_status_issue method of the flask api. """
+        """Test the api_change_status_issue method of the flask api."""
 
         headers = {"Authorization": "token aaabbbcccddd"}
 
@@ -255,7 +255,7 @@ class PagureFlaskApiIssueChangeStatustests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_api_change_status_issue_closed_status(self):
-        """ Test the api_change_status_issue method of the flask api. """
+        """Test the api_change_status_issue method of the flask api."""
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
         close_status = repo.close_status
         close_status = ["Fixed", "Upstream", "Invalid"]
@@ -286,7 +286,7 @@ class PagureFlaskApiIssueChangeStatustests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_api_change_status_issue_no_ticket_project_less(self):
-        """ Test the api_change_status_issue method of the flask api. """
+        """Test the api_change_status_issue method of the flask api."""
 
         headers = {"Authorization": "token project-less-foo"}
 
@@ -309,7 +309,7 @@ class PagureFlaskApiIssueChangeStatustests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_api_change_status_issue_project_less(self):
-        """ Test the api_change_status_issue method of the flask api. """
+        """Test the api_change_status_issue method of the flask api."""
 
         headers = {"Authorization": "token project-less-pingou"}
 

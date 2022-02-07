@@ -27,7 +27,7 @@ import tests
 
 
 def get_tag_name(tags):
-    """ Return a list of the tag names """
+    """Return a list of the tag names"""
     output = []
     for tag in tags:
         output.append(tag["tagname"])
@@ -35,7 +35,7 @@ def get_tag_name(tags):
 
 
 def add_repo_tag(git_dir, repo, tags, repo_name):
-    """ Use a list to create multiple tags on a git repo """
+    """Use a list to create multiple tags on a git repo"""
     for tag in reversed(tags):
         time.sleep(1)
         tests.add_commit_git_repo(
@@ -54,7 +54,7 @@ def add_repo_tag(git_dir, repo, tags, repo_name):
 
 class PagureLibGitGetTagstests(tests.Modeltests):
     def test_get_git_tags_objects(self):
-        """ Test the get_git_tags_objects method of pagure.lib.git. """
+        """Test the get_git_tags_objects method of pagure.lib.git."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
         project = pagure.lib.query._get_project(self.session, "test")

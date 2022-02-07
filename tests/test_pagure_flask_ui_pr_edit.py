@@ -25,7 +25,7 @@ import pygit2
 
 class PagureFlaskPrEditSimpletests(tests.Modeltests):
     def test_pr_edit_no_project(self):
-        """ Test the edit pull request endpoint """
+        """Test the edit pull request endpoint"""
         output = self.app.get("/foo/pull-request/1/edit")
         self.assertEqual(output.status_code, 404)
         output_text = output.get_data(as_text=True)
@@ -35,7 +35,7 @@ class PagureFlaskPrEditSimpletests(tests.Modeltests):
         self.assertIn("<h2>Page not found (404)</h2>", output_text)
 
     def test_pr_edit_no_git_repo(self):
-        """ Test the edit pull request endpoint """
+        """Test the edit pull request endpoint"""
         tests.create_projects(self.session)
         output = self.app.get("/test/pull-request/1/edit")
         self.assertEqual(output.status_code, 404)
@@ -46,14 +46,14 @@ class PagureFlaskPrEditSimpletests(tests.Modeltests):
         self.assertIn("<p>No git repo found</p>", output_text)
 
     def test_pr_edit_no_pull_requests_no_login(self):
-        """ Test the edit pull request endpoint """
+        """Test the edit pull request endpoint"""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
         output = self.app.get("/test/pull-request/1/edit")
         self.assertEqual(output.status_code, 302)
 
     def test_pr_edit_no_pull_requests(self):
-        """ Test the edit pull request endpoint """
+        """Test the edit pull request endpoint"""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
         user = tests.FakeUser()

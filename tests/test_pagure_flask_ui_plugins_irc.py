@@ -22,10 +22,10 @@ import tests
 
 
 class PagureFlaskPluginIRCtests(tests.SimplePagureTest):
-    """ Tests for pagure_hook plugin of pagure """
+    """Tests for pagure_hook plugin of pagure"""
 
     def test_plugin_mail(self):
-        """ Test the irc plugin on/off endpoint. """
+        """Test the irc plugin on/off endpoint."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"))

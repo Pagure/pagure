@@ -26,14 +26,14 @@ import tests
 
 
 class PagureFlaskPrBiditests(tests.Modeltests):
-    """ Tests PR in pagure when the PR has bi-directional characters """
+    """Tests PR in pagure when the PR has bi-directional characters"""
 
     maxDiff = None
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     @patch("pagure.lib.notify.fedmsg_publish", MagicMock(return_value=True))
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskPrBiditests, self).setUp()
 
         tests.create_projects(self.session)
@@ -76,7 +76,7 @@ class PagureFlaskPrBiditests(tests.Modeltests):
         tests.clean_pull_requests_path()
 
     def test_accessing_pr_no_bidi(self):
-        """ Test accessing the PR which has no bidi characters. """
+        """Test accessing the PR which has no bidi characters."""
         project = pagure.lib.query.get_authorized_project(self.session, "test")
         fork = pagure.lib.query.get_authorized_project(
             self.session, "test", user="foo"
@@ -101,7 +101,7 @@ class PagureFlaskPrBiditests(tests.Modeltests):
         )
 
     def test_accessing_pr_bidi(self):
-        """ Test accessing the PR which has no bidi characters. """
+        """Test accessing the PR which has no bidi characters."""
         project = pagure.lib.query.get_authorized_project(self.session, "test")
         fork = pagure.lib.query.get_authorized_project(
             self.session, "test", user="foo"

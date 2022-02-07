@@ -28,10 +28,10 @@ import tests
 
 
 class PagureFlaskGiveRepotests(tests.SimplePagureTest):
-    """ Tests for give a project on pagure """
+    """Tests for give a project on pagure"""
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskGiveRepotests, self).setUp()
 
         pagure.config.config["VIRUS_SCAN_ATTACHMENTS"] = False
@@ -52,14 +52,14 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
         self.assertEqual(project.user.user, user)
 
     def test_give_project_no_project(self):
-        """ Test the give_project endpoint. """
+        """Test the give_project endpoint."""
 
         # No such project
         output = self.app.post("/test42/give")
         self.assertEqual(output.status_code, 404)
 
     def test_give_project_no_csrf(self):
-        """ Test the give_project endpoint. """
+        """Test the give_project endpoint."""
 
         user = tests.FakeUser()
         user.username = "pingou"
@@ -82,7 +82,7 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
             self._check_user()
 
     def test_give_project_invalid_user(self):
-        """ Test the give_project endpoint. """
+        """Test the give_project endpoint."""
 
         user = tests.FakeUser()
         user.username = "pingou"
@@ -106,7 +106,7 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
             self._check_user()
 
     def test_give_project_no_user(self):
-        """ Test the give_project endpoint. """
+        """Test the give_project endpoint."""
 
         user = tests.FakeUser()
         user.username = "pingou"
@@ -129,7 +129,7 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
             self._check_user()
 
     def test_give_project_not_owner(self):
-        """ Test the give_project endpoint. """
+        """Test the give_project endpoint."""
 
         user = tests.FakeUser()
         user.username = "foo"
@@ -154,7 +154,7 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
             self._check_user()
 
     def test_give_project_not_admin(self):
-        """ Test the give_project endpoint. """
+        """Test the give_project endpoint."""
 
         user = tests.FakeUser()
         user.username = "foo"
@@ -179,7 +179,7 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
             self._check_user()
 
     def test_give_project_not_owner_but_is_admin(self):
-        """ Test the give_project endpoint. """
+        """Test the give_project endpoint."""
         project = pagure.lib.query.get_authorized_project(
             self.session, project_name="test"
         )
@@ -250,7 +250,7 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
     @patch.dict("pagure.config.config", {"PAGURE_ADMIN_USERS": "foo"})
     @patch("pagure.lib.git.generate_gitolite_acls", MagicMock())
     def test_give_project(self):
-        """ Test the give_project endpoint. """
+        """Test the give_project endpoint."""
 
         user = tests.FakeUser()
         user.username = "pingou"
@@ -327,7 +327,7 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
     @patch.dict("pagure.config.config", {"PAGURE_ADMIN_USERS": "foo"})
     @patch("pagure.lib.git.generate_gitolite_acls", MagicMock())
     def test_give_project_not_in_required_group(self):
-        """ Test the give_project endpoint. """
+        """Test the give_project endpoint."""
 
         user = tests.FakeUser()
         user.username = "pingou"
@@ -357,7 +357,7 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
     @patch.dict("pagure.config.config", {"PAGURE_ADMIN_USERS": "foo"})
     @patch("pagure.lib.git.generate_gitolite_acls", MagicMock())
     def test_give_project_in_required_group(self):
-        """ Test the give_project endpoint. """
+        """Test the give_project endpoint."""
 
         # Create the packager group
         msg = pagure.lib.query.add_group(

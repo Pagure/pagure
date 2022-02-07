@@ -31,7 +31,7 @@ class PagureFlaskApiPluginViewProjecttests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskApiPluginViewProjecttests, self).setUp()
 
         tests.create_projects(self.session)

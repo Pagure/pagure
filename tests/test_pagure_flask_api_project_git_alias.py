@@ -70,7 +70,7 @@ def set_up_board(self):
 
 
 class PagureFlaskApiProjectGitAliastests(tests.SimplePagureTest):
-    """ Tests for flask API for branch alias in pagure """
+    """Tests for flask API for branch alias in pagure"""
 
     maxDiff = None
 

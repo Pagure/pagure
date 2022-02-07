@@ -36,7 +36,7 @@ class PagureFlaskApiProjectUpdateWatchTests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskApiProjectUpdateWatchTests, self).setUp()
 
         tests.create_projects(self.session)
@@ -78,7 +78,7 @@ class PagureFlaskApiProjectUpdateWatchTests(tests.Modeltests):
         tests.create_tokens_acl(self.session, token_id="project-less-foo")
 
     def test_api_update_project_watchers_invalid_project(self):
-        """ Test the api_update_project_watchers method of the flask api. """
+        """Test the api_update_project_watchers method of the flask api."""
 
         headers = {"Authorization": "token aaabbbcccddd"}
 
@@ -93,7 +93,7 @@ class PagureFlaskApiProjectUpdateWatchTests(tests.Modeltests):
         )
 
     def test_api_change_status_issue_token_not_for_project(self):
-        """ Test the api_update_project_watchers method of the flask api. """
+        """Test the api_update_project_watchers method of the flask api."""
 
         headers = {"Authorization": "token aaabbbcccddd"}
 
@@ -107,7 +107,7 @@ class PagureFlaskApiProjectUpdateWatchTests(tests.Modeltests):
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data["error"])
 
     def test_api_update_project_watchers_no_user_watching(self):
-        """ Test the api_update_project_watchers method of the flask api. """
+        """Test the api_update_project_watchers method of the flask api."""
 
         headers = {"Authorization": "token aaabbbcccddd"}
         data = {"status": "42"}
@@ -126,7 +126,7 @@ class PagureFlaskApiProjectUpdateWatchTests(tests.Modeltests):
         )
 
     def test_api_update_project_watchers_no_watch_status(self):
-        """ Test the api_update_project_watchers method of the flask api. """
+        """Test the api_update_project_watchers method of the flask api."""
 
         headers = {"Authorization": "token aaabbbcccddd"}
         data = {"watcher": "pingou"}
@@ -145,7 +145,7 @@ class PagureFlaskApiProjectUpdateWatchTests(tests.Modeltests):
         )
 
     def test_api_update_project_watchers_invalid_status(self):
-        """ Test the api_update_project_watchers method of the flask api. """
+        """Test the api_update_project_watchers method of the flask api."""
 
         headers = {"Authorization": "token aaabbbcccddd"}
         data = {"watcher": "pingou", "status": "42"}
@@ -164,7 +164,7 @@ class PagureFlaskApiProjectUpdateWatchTests(tests.Modeltests):
         )
 
     def test_api_update_project_watchers_invalid_user(self):
-        """ Test the api_update_project_watchers method of the flask api. """
+        """Test the api_update_project_watchers method of the flask api."""
 
         headers = {"Authorization": "token aaabbbcccddd"}
         data = {"watcher": "example", "status": "2"}
@@ -183,7 +183,7 @@ class PagureFlaskApiProjectUpdateWatchTests(tests.Modeltests):
         )
 
     def test_api_update_project_watchers_other_user(self):
-        """ Test the api_update_project_watchers method of the flask api. """
+        """Test the api_update_project_watchers method of the flask api."""
 
         headers = {"Authorization": "token aaabbbcccddd"}
         data = {"watcher": "foo", "status": "2"}
@@ -202,7 +202,7 @@ class PagureFlaskApiProjectUpdateWatchTests(tests.Modeltests):
         )
 
     def test_api_update_project_watchers_all_good(self):
-        """ Test the api_update_project_watchers method of the flask api. """
+        """Test the api_update_project_watchers method of the flask api."""
 
         headers = {"Authorization": "token aaabbbcccddd"}
         data = {"watcher": "pingou", "status": 1}
@@ -222,7 +222,7 @@ class PagureFlaskApiProjectUpdateWatchTests(tests.Modeltests):
 
     @patch("pagure.utils.is_admin", MagicMock(return_value=True))
     def test_api_update_project_watchers_other_user_admin(self):
-        """ Test the api_update_project_watchers method of the flask api. """
+        """Test the api_update_project_watchers method of the flask api."""
 
         headers = {"Authorization": "token aaabbbcccddd"}
         data = {"watcher": "foo", "status": "2"}
@@ -242,7 +242,7 @@ class PagureFlaskApiProjectUpdateWatchTests(tests.Modeltests):
 
     @patch("pagure.utils.is_admin", MagicMock(return_value=True))
     def test_api_update_project_watchers_set_then_reset(self):
-        """ Test the api_update_project_watchers method of the flask api. """
+        """Test the api_update_project_watchers method of the flask api."""
 
         headers = {"Authorization": "token aaabbbcccddd_project_less"}
         data = {"watcher": "foo", "status": "2"}
@@ -274,7 +274,7 @@ class PagureFlaskApiProjectUpdateWatchTests(tests.Modeltests):
 
     @patch("pagure.utils.is_admin", MagicMock(return_value=True))
     def test_api_update_project_watchers_invalid_user_admin(self):
-        """ Test the api_update_project_watchers method of the flask api. """
+        """Test the api_update_project_watchers method of the flask api."""
 
         headers = {"Authorization": "token aaabbbcccddd"}
         data = {"watcher": "example", "status": "2"}
@@ -294,7 +294,7 @@ class PagureFlaskApiProjectUpdateWatchTests(tests.Modeltests):
 
     @patch("pagure.utils.is_admin", MagicMock(return_value=True))
     def test_api_update_project_watchers_missing_user_admin(self):
-        """ Test the api_update_project_watchers method of the flask api. """
+        """Test the api_update_project_watchers method of the flask api."""
 
         headers = {"Authorization": "token aaabbbcccddd"}
         data = {"status": "2"}

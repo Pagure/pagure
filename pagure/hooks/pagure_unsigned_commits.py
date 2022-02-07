@@ -62,7 +62,7 @@ class PagureUnsignedCommitTable(BASE):
 
 
 class PagureUnsignerRunner(BaseRunner):
-    """ Runner for the hook blocking unsigned commits. """
+    """Runner for the hook blocking unsigned commits."""
 
     @staticmethod
     def pre_receive(session, username, project, repotype, repodir, changes):
@@ -106,13 +106,13 @@ class PagureUnsignerRunner(BaseRunner):
 
 
 class PagureUnsignedCommitForm(FlaskForm):
-    """ Form to configure the pagure hook. """
+    """Form to configure the pagure hook."""
 
     active = wtforms.BooleanField("Active", [wtforms.validators.Optional()])
 
 
 class PagureUnsignedCommitHook(BaseHook):
-    """ PagurPagureUnsignedCommit hook. """
+    """PagurPagureUnsignedCommit hook."""
 
     name = "Block Un-Signed commits"
     description = (

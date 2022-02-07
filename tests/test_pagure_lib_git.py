@@ -33,7 +33,7 @@ from pagure.lib.repo import PagureRepo
 
 
 class PagureLibGittests(tests.Modeltests):
-    """ Tests for pagure.lib.git """
+    """Tests for pagure.lib.git"""
 
     maxDiff = None
 
@@ -365,7 +365,7 @@ repo requests/somenamespace/test3
         self.assertFalse(os.path.exists(outputconf))
 
     def test_write_gitolite_acls_deploykeys(self):
-        """ Test write_gitolite_acls function to add deploy keys. """
+        """Test write_gitolite_acls function to add deploy keys."""
         tests.create_projects(self.session)
 
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
@@ -1362,7 +1362,7 @@ repo requests/forks/pingou/test3
 
     @patch("pagure.lib.notify.send_email")
     def test_update_git(self, email_f):
-        """ Test the update_git of pagure.lib.git. """
+        """Test the update_git of pagure.lib.git."""
         email_f.return_value = True
 
         # Create project
@@ -1594,7 +1594,7 @@ index 458821a..77674a8
         self.assertEqual(commit_patch, exp)
 
     def test_clean_git(self):
-        """ Test the clean_git method of pagure.lib.git. """
+        """Test the clean_git method of pagure.lib.git."""
         self.test_update_git()
 
         gitpath = os.path.join(
@@ -1628,7 +1628,7 @@ index 458821a..77674a8
 
     @patch("pagure.lib.notify.send_email")
     def test_update_git_requests(self, email_f):
-        """ Test the update_git of pagure.lib.git for pull-requests. """
+        """Test the update_git of pagure.lib.git for pull-requests."""
         email_f.return_value = True
 
         # Create project
@@ -1892,7 +1892,7 @@ index 0000000..60f7480
         self.assertEqual(patch, exp)
 
     def test_update_ticket_from_git_no_priority(self):
-        """ Test the update_ticket_from_git method from pagure.lib.git. """
+        """Test the update_ticket_from_git method from pagure.lib.git."""
         tests.create_projects(self.session)
 
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
@@ -1997,7 +1997,7 @@ index 0000000..60f7480
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_update_ticket_from_git_close_ticket(self):
-        """ Test the update_ticket_from_git method from pagure.lib.git. """
+        """Test the update_ticket_from_git method from pagure.lib.git."""
         tests.create_projects(self.session)
 
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
@@ -2081,7 +2081,7 @@ index 0000000..60f7480
         )
 
     def test_update_ticket_from_git(self):
-        """ Test the update_ticket_from_git method from pagure.lib.git. """
+        """Test the update_ticket_from_git method from pagure.lib.git."""
         tests.create_projects(self.session)
 
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
@@ -2268,7 +2268,7 @@ index 0000000..60f7480
         )
 
     def test_update_request_from_git(self):
-        """ Test the update_request_from_git method from pagure.lib.git. """
+        """Test the update_request_from_git method from pagure.lib.git."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"))
 
@@ -2667,7 +2667,7 @@ index 0000000..60f7480
         )
 
     def test_update_ticket_from_git_with_boards(self):
-        """ Test the update_ticket_from_git method from pagure.lib.git. """
+        """Test the update_ticket_from_git method from pagure.lib.git."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"))
 
@@ -2801,7 +2801,7 @@ index 0000000..60f7480
         self.assertEqual(len(namespaced_repo.boards), 1)
 
     def test_update_ticket_from_git_with_boards_twice(self):
-        """ Test the update_ticket_from_git method from pagure.lib.git. """
+        """Test the update_ticket_from_git method from pagure.lib.git."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"))
 
@@ -2963,7 +2963,7 @@ index 0000000..60f7480
         self.assertEqual(len(namespaced_repo.boards), 1)
 
     def test_update_request_from_git(self):
-        """ Test the update_request_from_git method from pagure.lib.git. """
+        """Test the update_request_from_git method from pagure.lib.git."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"))
 
@@ -3086,7 +3086,7 @@ index 0000000..60f7480
         self.assertEqual(repo.requests[0].tags_text, ["WIP", "core"])
 
     def test_read_git_lines(self):
-        """ Test the read_git_lines method of pagure.lib.git. """
+        """Test the read_git_lines method of pagure.lib.git."""
         self.test_update_git()
 
         gitrepo = os.path.join(
@@ -3107,7 +3107,7 @@ index 0000000..60f7480
         self.assertTrue(output[0].endswith(": Test issue'\n"))
 
     def test_get_revs_between(self):
-        """ Test the get_revs_between method of pagure.lib.git. """
+        """Test the get_revs_between method of pagure.lib.git."""
 
         self.test_update_git()
 
@@ -3179,7 +3179,7 @@ index 0000000..60f7480
         self.assertEqual(output4, [branch_commit.oid.hex])
 
     def test_get_author(self):
-        """ Test the get_author method of pagure.lib.git. """
+        """Test the get_author method of pagure.lib.git."""
 
         self.test_update_git()
 
@@ -3196,7 +3196,7 @@ index 0000000..60f7480
             self.assertEqual(output, "pagure")
 
     def get_author_email(self):
-        """ Test the get_author_email method of pagure.lib.git. """
+        """Test the get_author_email method of pagure.lib.git."""
 
         self.test_update_git()
 
@@ -3211,7 +3211,7 @@ index 0000000..60f7480
             self.assertEqual(output, "pagure")
 
     def test_get_repo_name(self):
-        """ Test the get_repo_name method of pagure.lib.git. """
+        """Test the get_repo_name method of pagure.lib.git."""
 
         def runtest(reponame, *path):
             gitrepo = os.path.join(self.path, "repos", *path)
@@ -3224,7 +3224,7 @@ index 0000000..60f7480
         runtest("foo.test", "foo.test.git")
 
     def test_get_username(self):
-        """ Test the get_username method of pagure.lib.git. """
+        """Test the get_username method of pagure.lib.git."""
 
         def runtest(username, *path):
             gitrepo = os.path.join(self.path, "repos", *path)
@@ -3239,7 +3239,7 @@ index 0000000..60f7480
         runtest("pingou", "forks", "pingou", "bar/foo.test.git")
 
     def test_get_repo_namespace(self):
-        """ Test the get_repo_namespace method of pagure.lib.git. """
+        """Test the get_repo_namespace method of pagure.lib.git."""
 
         def runtest(namespace, *path):
             gitrepo = os.path.join(self.path, "repos", *path)
@@ -3257,7 +3257,7 @@ index 0000000..60f7480
         runtest("bar", "forks", "user", "bar", "foo.test.git")
 
     def test_update_custom_fields_from_json(self):
-        """ Test the update_custom_fields_from_json method of lib.git """
+        """Test the update_custom_fields_from_json method of lib.git"""
 
         tests.create_projects(self.session)
         repo = pagure.lib.query._get_project(self.session, "test")
@@ -3526,7 +3526,7 @@ index 0000000..60f7480
 
     @patch("subprocess.Popen")
     def test_generate_gitolite_acls(self, popen):
-        """ Test calling generate_gitolite_acls. """
+        """Test calling generate_gitolite_acls."""
         pagure.SESSION = self.session
         pagure.lib.git.SESSION = self.session
         pagure.config.config["GITOLITE_HOME"] = "/tmp"
@@ -3611,12 +3611,12 @@ index 0000000..60f7480
 
 
 class PagureLibGitCommitToPatchtests(tests.Modeltests):
-    """ Tests for pagure.lib.git """
+    """Tests for pagure.lib.git"""
 
     maxDiff = None
 
     def setUp(self):
-        """ Set up the environment for the tests. """
+        """Set up the environment for the tests."""
         super(PagureLibGitCommitToPatchtests, self).setUp()
 
         # Create a git repo to play with
@@ -3686,7 +3686,7 @@ class PagureLibGitCommitToPatchtests(tests.Modeltests):
         self.third_commit = repo.revparse_single("HEAD")
 
     def test_commit_to_patch_first_commit(self):
-        """ Test the commit_to_patch function of pagure.lib.git. """
+        """Test the commit_to_patch function of pagure.lib.git."""
         repo = pygit2.init_repository(self.gitrepo)
 
         patch = pagure.lib.git.commit_to_patch(repo, self.first_commit)
@@ -3720,7 +3720,7 @@ index 0000000..9f44358
         self.assertEqual(patch, exp)
 
     def test_commit_to_patch_single_commit(self):
-        """ Test the commit_to_patch function of pagure.lib.git. """
+        """Test the commit_to_patch function of pagure.lib.git."""
         repo = pygit2.init_repository(self.gitrepo)
 
         patch = pagure.lib.git.commit_to_patch(repo, self.second_commit)
@@ -3758,7 +3758,7 @@ index 9f44358..2a552bb 100644
         self.assertEqual(patch, exp)
 
     def test_commit_to_patch_2_commits(self):
-        """ Test the commit_to_patch function of pagure.lib.git. """
+        """Test the commit_to_patch function of pagure.lib.git."""
         repo = pygit2.init_repository(self.gitrepo)
 
         patch = pagure.lib.git.commit_to_patch(
@@ -3815,7 +3815,7 @@ index 9f44358..2a552bb 100644
         self.assertEqual(patch, exp)
 
     def test_commit_to_patch_first_commit_diff(self):
-        """ Test the commit_to_patch function of pagure.lib.git. """
+        """Test the commit_to_patch function of pagure.lib.git."""
         repo = pygit2.init_repository(self.gitrepo)
 
         patch = pagure.lib.git.commit_to_patch(
@@ -3843,7 +3843,7 @@ index 0000000..9f44358
         self.assertEqual(patch, exp)
 
     def test_commit_to_patch_single_commit_diff(self):
-        """ Test the commit_to_patch function of pagure.lib.git. """
+        """Test the commit_to_patch function of pagure.lib.git."""
         repo = pygit2.init_repository(self.gitrepo)
 
         patch = pagure.lib.git.commit_to_patch(
@@ -3874,7 +3874,7 @@ index 9f44358..2a552bb 100644
         self.assertEqual(patch, exp)
 
     def test_commit_to_patch_two_commits_diff(self):
-        """ Test the commit_to_patch function of pagure.lib.git. """
+        """Test the commit_to_patch function of pagure.lib.git."""
         repo = pygit2.init_repository(self.gitrepo)
 
         patch = pagure.lib.git.commit_to_patch(
@@ -3914,7 +3914,7 @@ index 9f44358..2a552bb 100644
         self.assertEqual(patch, exp)
 
     def test_commit_to_patch_first_commit_diff_separated(self):
-        """ Test the commit_to_patch function of pagure.lib.git. """
+        """Test the commit_to_patch function of pagure.lib.git."""
         repo = pygit2.init_repository(self.gitrepo)
 
         patches = pagure.lib.git.commit_to_patch(
@@ -3946,7 +3946,7 @@ index 0000000..9f44358
         self.assertEqual(output, [exp])
 
     def test_commit_to_patch_single_commit_diff_separated(self):
-        """ Test the commit_to_patch function of pagure.lib.git. """
+        """Test the commit_to_patch function of pagure.lib.git."""
         repo = pygit2.init_repository(self.gitrepo)
 
         patches = pagure.lib.git.commit_to_patch(
@@ -3981,7 +3981,7 @@ index 9f44358..2a552bb 100644
         self.assertEqual(output, [exp])
 
     def test_commit_to_patch_two_commits_diff_separated(self):
-        """ Test the commit_to_patch function of pagure.lib.git. """
+        """Test the commit_to_patch function of pagure.lib.git."""
         repo = pygit2.init_repository(self.gitrepo)
 
         patches = pagure.lib.git.commit_to_patch(
@@ -4030,7 +4030,7 @@ index 9f44358..2a552bb 100644
         self.assertEqual(output, exp)
 
     def test_commit_to_patch_empty_commit(self):
-        """ Test the commit_to_path function of pagure.lib.git. """
+        """Test the commit_to_path function of pagure.lib.git."""
         repo = pygit2.init_repository(self.gitrepo)
 
         patch = pagure.lib.git.commit_to_patch(repo, self.third_commit)
@@ -4038,7 +4038,7 @@ index 9f44358..2a552bb 100644
         self.assertEqual(patch, exp)
 
     def test_commit_to_patch_empty_commit_diff(self):
-        """ Test the commit_to_patch function of pagure.lib.git. """
+        """Test the commit_to_patch function of pagure.lib.git."""
         repo = pygit2.init_repository(self.gitrepo)
 
         patch = pagure.lib.git.commit_to_patch(

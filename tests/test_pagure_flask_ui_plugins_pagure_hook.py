@@ -25,10 +25,10 @@ import pagure.config
 
 
 class PagureFlaskPluginPagureHooktests(tests.SimplePagureTest):
-    """ Tests for pagure_hook plugin of pagure """
+    """Tests for pagure_hook plugin of pagure"""
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskPluginPagureHooktests, self).setUp()
 
         tests.create_projects(self.session)
@@ -36,12 +36,12 @@ class PagureFlaskPluginPagureHooktests(tests.SimplePagureTest):
         tests.create_projects_git(os.path.join(self.path, "repos", "docs"))
 
     def tearDown(self):
-        """ Tear Down the environment after the tests. """
+        """Tear Down the environment after the tests."""
         super(PagureFlaskPluginPagureHooktests, self).tearDown()
         pagure.config.config["DOCS_FOLDER"] = None
 
     def test_plugin_mail_page(self):
-        """ Test the default page of the pagure hook plugin. """
+        """Test the default page of the pagure hook plugin."""
 
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
@@ -58,7 +58,7 @@ class PagureFlaskPluginPagureHooktests(tests.SimplePagureTest):
             )
 
     def test_plugin_mail_no_data(self):
-        """ Test the pagure hook plugin endpoint when no data is sent. """
+        """Test the pagure hook plugin endpoint when no data is sent."""
 
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):

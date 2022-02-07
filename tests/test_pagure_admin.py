@@ -40,7 +40,7 @@ class PagureAdminAdminTokenEmptytests(tests.Modeltests):
     populate_db = False
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureAdminAdminTokenEmptytests, self).setUp()
         pagure.cli.admin.session = self.session
 
@@ -79,12 +79,12 @@ class PagureAdminAdminTokenEmptytests(tests.Modeltests):
 
 
 class PagureAdminAdminRefreshGitolitetests(tests.Modeltests):
-    """ Tests for pagure-admin refresh-gitolite """
+    """Tests for pagure-admin refresh-gitolite"""
 
     populate_db = False
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureAdminAdminRefreshGitolitetests, self).setUp()
         pagure.cli.admin.session = self.session
 
@@ -123,7 +123,7 @@ class PagureAdminAdminRefreshGitolitetests(tests.Modeltests):
     @patch("pagure.cli.admin._ask_confirmation")
     @patch("pagure.lib.git_auth.get_git_auth_helper")
     def test_do_refresh_gitolite_no_args(self, get_helper, conf):
-        """ Test the do_generate_acl function with no special args. """
+        """Test the do_generate_acl function with no special args."""
         conf.return_value = True
         helper = MagicMock()
         get_helper.return_value = helper
@@ -141,7 +141,7 @@ class PagureAdminAdminRefreshGitolitetests(tests.Modeltests):
     @patch("pagure.cli.admin._ask_confirmation")
     @patch("pagure.lib.git_auth.get_git_auth_helper")
     def test_do_refresh_gitolite_all_project(self, get_helper, conf):
-        """ Test the do_generate_acl function for all projects. """
+        """Test the do_generate_acl function for all projects."""
         conf.return_value = True
         helper = MagicMock()
         get_helper.return_value = helper
@@ -159,7 +159,7 @@ class PagureAdminAdminRefreshGitolitetests(tests.Modeltests):
     @patch("pagure.cli.admin._ask_confirmation")
     @patch("pagure.lib.git_auth.get_git_auth_helper")
     def test_do_refresh_gitolite_one_project(self, get_helper, conf):
-        """ Test the do_generate_acl function for a certain project. """
+        """Test the do_generate_acl function for a certain project."""
         conf.return_value = True
         helper = MagicMock()
         get_helper.return_value = helper
@@ -195,7 +195,7 @@ class PagureAdminAdminRefreshGitolitetests(tests.Modeltests):
     @patch("pagure.cli.admin._ask_confirmation")
     @patch("pagure.lib.git_auth.get_git_auth_helper")
     def test_do_refresh_gitolite_one_group(self, get_helper, conf):
-        """ Test the do_generate_acl function for a certain group. """
+        """Test the do_generate_acl function for a certain group."""
         conf.return_value = True
         helper = MagicMock()
         get_helper.return_value = helper
@@ -212,12 +212,12 @@ class PagureAdminAdminRefreshGitolitetests(tests.Modeltests):
 
 
 class PagureAdminAdminTokentests(tests.Modeltests):
-    """ Tests for pagure-admin admin-token """
+    """Tests for pagure-admin admin-token"""
 
     populate_db = False
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureAdminAdminTokentests, self).setUp()
         pagure.cli.admin.session = self.session
 
@@ -239,7 +239,7 @@ class PagureAdminAdminTokentests(tests.Modeltests):
     @patch("pagure.cli.admin._get_input")
     @patch("pagure.cli.admin._ask_confirmation")
     def test_do_create_admin_token(self, conf, rinp):
-        """ Test the do_create_admin_token function of pagure-admin. """
+        """Test the do_create_admin_token function of pagure-admin."""
         conf.return_value = True
         rinp.return_value = "1,2,3"
 
@@ -272,7 +272,7 @@ class PagureAdminAdminTokentests(tests.Modeltests):
     @patch("pagure.cli.admin._get_input")
     @patch("pagure.cli.admin._ask_confirmation")
     def test_do_list_admin_token(self, conf, rinp):
-        """ Test the do_list_admin_token function of pagure-admin. """
+        """Test the do_list_admin_token function of pagure-admin."""
         # Create an admin token to use
         conf.return_value = True
         rinp.return_value = "1,2,3"
@@ -365,7 +365,7 @@ class PagureAdminAdminTokentests(tests.Modeltests):
     @patch("pagure.cli.admin._get_input")
     @patch("pagure.cli.admin._ask_confirmation")
     def test_do_info_admin_token(self, conf, rinp):
-        """ Test the do_info_admin_token function of pagure-admin. """
+        """Test the do_info_admin_token function of pagure-admin."""
         # Create an admin token to use
         conf.return_value = True
         rinp.return_value = "2,4,5"
@@ -459,7 +459,7 @@ class PagureAdminAdminTokentests(tests.Modeltests):
     @patch("pagure.cli.admin._get_input")
     @patch("pagure.cli.admin._ask_confirmation")
     def test_do_expire_admin_token(self, conf, rinp):
-        """ Test the do_expire_admin_token function of pagure-admin. """
+        """Test the do_expire_admin_token function of pagure-admin."""
         # Create an admin token to use
         conf.return_value = True
         rinp.return_value = "1,2,3"
@@ -737,7 +737,7 @@ class PagureAdminAdminTokentests(tests.Modeltests):
     @patch("pagure.cli.admin._get_input")
     @patch("pagure.cli.admin._ask_confirmation")
     def test_do_update_admin_token(self, conf, rinp):
-        """ Test the do_update_admin_token function of pagure-admin. """
+        """Test the do_update_admin_token function of pagure-admin."""
 
         # Create an admin token to use
         conf.return_value = True
@@ -893,12 +893,12 @@ class PagureAdminAdminTokentests(tests.Modeltests):
 
 
 class PagureAdminGetWatchTests(tests.Modeltests):
-    """ Tests for pagure-admin get-watch """
+    """Tests for pagure-admin get-watch"""
 
     populate_db = False
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureAdminGetWatchTests, self).setUp()
         pagure.cli.admin.session = self.session
 
@@ -1029,12 +1029,12 @@ class PagureAdminGetWatchTests(tests.Modeltests):
 
 
 class PagureAdminUpdateWatchTests(tests.Modeltests):
-    """ Tests for pagure-admin update-watch """
+    """Tests for pagure-admin update-watch"""
 
     populate_db = False
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureAdminUpdateWatchTests, self).setUp()
         pagure.cli.admin.session = self.session
 
@@ -1169,12 +1169,12 @@ class PagureAdminUpdateWatchTests(tests.Modeltests):
 
 
 class PagureAdminReadOnlyTests(tests.Modeltests):
-    """ Tests for pagure-admin read-only """
+    """Tests for pagure-admin read-only"""
 
     populate_db = False
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureAdminReadOnlyTests, self).setUp()
         pagure.cli.admin.session = self.session
 
@@ -1350,12 +1350,12 @@ class PagureAdminReadOnlyTests(tests.Modeltests):
 
 
 class PagureNewGroupTests(tests.Modeltests):
-    """ Tests for pagure-admin new-group """
+    """Tests for pagure-admin new-group"""
 
     populate_db = False
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureNewGroupTests, self).setUp()
         pagure.cli.admin.session = self.session
 
@@ -1519,12 +1519,12 @@ class PagureNewGroupTests(tests.Modeltests):
 
 
 class PagureListGroupEmptyTests(tests.Modeltests):
-    """ Tests for pagure-admin list-groups """
+    """Tests for pagure-admin list-groups"""
 
     populate_db = False
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureListGroupEmptyTests, self).setUp()
         pagure.cli.admin.session = self.session
 
@@ -1566,12 +1566,12 @@ class PagureListGroupEmptyTests(tests.Modeltests):
 
 
 class PagureListGroupTests(tests.Modeltests):
-    """ Tests for pagure-admin list-groups """
+    """Tests for pagure-admin list-groups"""
 
     populate_db = False
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureListGroupTests, self).setUp()
         pagure.cli.admin.session = self.session
 
@@ -1625,12 +1625,12 @@ class PagureListGroupTests(tests.Modeltests):
 
 
 class PagureBlockUserTests(tests.Modeltests):
-    """ Tests for pagure-admin block-user """
+    """Tests for pagure-admin block-user"""
 
     populate_db = False
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureBlockUserTests, self).setUp()
         pagure.cli.admin.session = self.session
 
@@ -1853,12 +1853,12 @@ class PagureBlockUserTests(tests.Modeltests):
 
 
 class PagureAdminDeleteProjectTests(tests.Modeltests):
-    """ Tests for pagure-admin delete-project """
+    """Tests for pagure-admin delete-project"""
 
     populate_db = False
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureAdminDeleteProjectTests, self).setUp()
         pagure.cli.admin.session = self.session
 
@@ -2002,12 +2002,12 @@ class PagureAdminDeleteProjectTests(tests.Modeltests):
 
 
 class PagureCreateBranchTests(tests.Modeltests):
-    """ Tests for pagure-admin create-branch """
+    """Tests for pagure-admin create-branch"""
 
     populate_db = True
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureCreateBranchTests, self).setUp()
 
         # Create a couple of projects
@@ -2128,7 +2128,7 @@ class PagureCreateBranchTests(tests.Modeltests):
         )
 
     def test_create_branch_from_branch(self):
-        """ Test the do_create_admin_token function of pagure-admin. """
+        """Test the do_create_admin_token function of pagure-admin."""
 
         gitrepo_path = os.path.join(self.path, "repos", "test.git")
         tests.add_content_git_repo(gitrepo_path)
@@ -2161,12 +2161,12 @@ class PagureCreateBranchTests(tests.Modeltests):
 
 
 class PagureSetDefaultBranchTests(tests.Modeltests):
-    """ Tests for pagure-admin set-default-branch """
+    """Tests for pagure-admin set-default-branch"""
 
     populate_db = True
 
     def setUp(self):
-        """ Set up the environment, run before every tests. """
+        """Set up the environment, run before every tests."""
         super(PagureSetDefaultBranchTests, self).setUp()
 
         # Create a couple of projects
@@ -2232,7 +2232,7 @@ class PagureSetDefaultBranchTests(tests.Modeltests):
         )
 
     def test_set_default_branch(self):
-        """ Test the set-default-branch funcion of pagure-admin. """
+        """Test the set-default-branch funcion of pagure-admin."""
 
         gitrepo_path = os.path.join(self.path, "repos", "test.git")
         tests.add_content_git_repo(gitrepo_path)
@@ -2254,13 +2254,13 @@ class PagureSetDefaultBranchTests(tests.Modeltests):
 
 
 class PagureAdminUpdateAclsTests(tests.Modeltests):
-    """ Tests for pagure-admin update-acls """
+    """Tests for pagure-admin update-acls"""
 
     populate_db = False
     maxDiff = None
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureAdminUpdateAclsTests, self).setUp()
         pagure.cli.admin.session = self.session
 

@@ -119,7 +119,7 @@ def generate_revision_change_log(
 
 
 def relates_commit(session, username, commitid, issue, app_url=None):
-    """ Add a comment to an issue that this commit relates to it. """
+    """Add a comment to an issue that this commit relates to it."""
 
     url = "../%s" % commitid[:8]
     if app_url:
@@ -212,7 +212,7 @@ def fixes_relation(session, username, commitid, relation, app_url=None):
 
 
 class PagureRunner(BaseRunner):
-    """ Runner for the pagure's specific git hook. """
+    """Runner for the pagure's specific git hook."""
 
     @staticmethod
     def post_receive(session, username, project, repotype, repodir, changes):
@@ -259,7 +259,7 @@ class PagureRunner(BaseRunner):
 
 
 class PagureForm(FlaskForm):
-    """ Form to configure the pagure hook. """
+    """Form to configure the pagure hook."""
 
     active = wtforms.BooleanField("Active", [wtforms.validators.Optional()])
 
@@ -300,7 +300,7 @@ number.
 
 
 class PagureHook(BaseHook):
-    """ Pagure hook. """
+    """Pagure hook."""
 
     name = "Pagure"
     description = DESCRIPTION

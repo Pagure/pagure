@@ -33,7 +33,7 @@ from pagure.lib.repo import PagureRepo
 
 
 class PagureFlaskApiProjectViewFiletests(tests.Modeltests):
-    """ Tests for the flask API of pagure for issue """
+    """Tests for the flask API of pagure for issue"""
 
     maxDiff = None
 

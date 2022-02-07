@@ -17,10 +17,10 @@ import tests
 
 
 class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
-    """ Tests for flask plugins controller of pagure """
+    """Tests for flask plugins controller of pagure"""
 
     def test_plugin_pagure_ci(self):
-        """ Test the pagure ci plugin on/off endpoint. """
+        """Test the pagure ci plugin on/off endpoint."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"))
@@ -260,7 +260,7 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
             )
 
     def test_plugin_pagure_ci_namespaced(self):
-        """ Test the pagure ci plugin on/off endpoint. """
+        """Test the pagure ci plugin on/off endpoint."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"))
@@ -356,7 +356,7 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
 
     @mock.patch("pagure.lib.tasks_services.trigger_jenkins_build")
     def test_plugin_pagure_ci_namespaced_auth(self, trigger_jenk):
-        """ Test the pagure ci plugin on/off endpoint. """
+        """Test the pagure ci plugin on/off endpoint."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"))

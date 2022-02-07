@@ -34,12 +34,12 @@ from pagure.lib.repo import PagureRepo
 
 
 class PagureFlaskPrIssueLinkTest(tests.Modeltests):
-    """ Tests pagure when linking PRs to tickets """
+    """Tests pagure when linking PRs to tickets"""
 
     maxDiff = None
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskPrIssueLinkTest, self).setUp()
 
         tests.create_projects(self.session)

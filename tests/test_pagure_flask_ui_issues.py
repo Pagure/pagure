@@ -42,7 +42,7 @@ import tests
 
 
 class PagureFlaskIssuestests(tests.Modeltests):
-    """ Tests for flask issues controller of pagure """
+    """Tests for flask issues controller of pagure"""
 
     @patch.dict(
         "pagure.config.config", {"ENABLE_TICKETS_NAMESPACE": ["foobar"]}
@@ -50,7 +50,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_new_issue_wrong_namespace(self):
-        """ Test the new_issue endpoint. """
+        """Test the new_issue endpoint."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
@@ -101,7 +101,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_new_issue(self, p_send_email, p_ugt):
-        """ Test the new_issue endpoint. """
+        """Test the new_issue endpoint."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -204,7 +204,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_new_issue_customized(self):
-        """ Test the new_issue endpoint. """
+        """Test the new_issue endpoint."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
         tests.create_projects_git(
@@ -233,7 +233,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_new_issue_w_file(self, p_send_email, p_ugt):
-        """ Test the new_issue endpoint with a file. """
+        """Test the new_issue endpoint with a file."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -292,7 +292,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_new_issue_w_file_no_issue_tracker(self, p_send_email, p_ugt):
-        """ Test the new_issue endpoint with a file. """
+        """Test the new_issue endpoint with a file."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -329,7 +329,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_new_issue_w_file_namespace(self, p_send_email, p_ugt):
-        """ Test the new_issue endpoint with a file. """
+        """Test the new_issue endpoint with a file."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -391,7 +391,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_new_issue_w_files(self, p_send_email, p_ugt):
-        """ Test the new_issue endpoint with two files. """
+        """Test the new_issue endpoint with two files."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -470,7 +470,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_new_issue_w_files_namespace(self, p_send_email, p_ugt):
-        """ Test the new_issue endpoint with two files. """
+        """Test the new_issue endpoint with two files."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -737,7 +737,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_view_issues_wrong_namespace(self):
-        """ Test the view_issues endpoint. """
+        """Test the view_issues endpoint."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
@@ -766,7 +766,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_view_issues(self, p_send_email, p_ugt):
-        """ Test the view_issues endpoint. """
+        """Test the view_issues endpoint."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -1222,7 +1222,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_search_issues_unicode(self, p_send_email, p_ugt):
-        """ Test the view_issues endpoint filtering for an unicode char. """
+        """Test the view_issues endpoint filtering for an unicode char."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -1323,7 +1323,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_view_issue(self, p_send_email, p_ugt):
-        """ Test the view_issue endpoint. """
+        """Test the view_issue endpoint."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -1462,7 +1462,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_view_issue_author(self):
-        """ Test the view_issue endpoint when you're the author. """
+        """Test the view_issue endpoint when you're the author."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
 
@@ -1541,7 +1541,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_view_issue_user_ticket(self, p_send_email, p_ugt):
-        """ Test the view_issue endpoint. """
+        """Test the view_issue endpoint."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -1618,7 +1618,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_view_issue_custom_field_user_ticket(self, p_send_email, p_ugt):
-        """ Test the view_issue endpoint. """
+        """Test the view_issue endpoint."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -1747,7 +1747,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_view_issue_non_ascii_milestone(self, p_send_email, p_ugt):
-        """ Test the view_issue endpoint with non-ascii milestone. """
+        """Test the view_issue endpoint with non-ascii milestone."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -1866,7 +1866,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_update_issue_wrong_namespace(self):
-        """ Test the update_issue endpoint. """
+        """Test the update_issue endpoint."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
@@ -1942,7 +1942,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_update_issue_add_tags(self, p_send_email, p_ugt):
-        """ Test the update_issue endpoint. """
+        """Test the update_issue endpoint."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -2231,7 +2231,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_update_issue(self, p_send_email, p_ugt):
-        """ Test the update_issue endpoint. """
+        """Test the update_issue endpoint."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -2567,7 +2567,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_update_issue_drop_comment(self, p_send_email, p_ugt):
-        """ Test droping comment via the update_issue endpoint. """
+        """Test droping comment via the update_issue endpoint."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -2778,7 +2778,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_update_issue_depend(self, p_send_email, p_ugt):
-        """ Test adding dependency via the update_issue endpoint. """
+        """Test adding dependency via the update_issue endpoint."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -3068,7 +3068,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_update_issue_block(self, p_send_email, p_ugt):
-        """ Test adding blocked issue via the update_issue endpoint. """
+        """Test adding blocked issue via the update_issue endpoint."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -3468,7 +3468,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_upload_issue(self, p_send_email, p_ugt):
-        """ Test the upload_issue endpoint. """
+        """Test the upload_issue endpoint."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -3565,7 +3565,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_upload_issue_virus(self, p_send_email, p_ugt):
-        """ Test the upload_issue endpoint. """
+        """Test the upload_issue endpoint."""
         if not pyclamd:
             raise SkipTest()
         p_send_email.return_value = True
@@ -3619,7 +3619,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_upload_issue_two_files(self, p_send_email, p_ugt):
-        """ Test the upload_issue endpoint with two files. """
+        """Test the upload_issue endpoint with two files."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -3685,7 +3685,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertDictEqual(json_data, exp)
 
     def test_view_issue_raw_file_empty(self):
-        """ Test the view_issue_raw_file endpoint. """
+        """Test the view_issue_raw_file endpoint."""
         # Create the project and git repos
         tests.create_projects(self.session)
         tests.create_projects_git(
@@ -3727,7 +3727,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
     def test_view_issue_raw_file(self):
-        """ Test the view_issue_raw_file endpoint. """
+        """Test the view_issue_raw_file endpoint."""
         # Create the issue and upload to it
         self.test_upload_issue()
 
@@ -3769,7 +3769,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_edit_issue(self, p_send_email, p_ugt):
-        """ Test the edit_issue endpoint. """
+        """Test the edit_issue endpoint."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -3955,7 +3955,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_edit_issue_no_change(self):
-        """ Test the edit_issue endpoint. """
+        """Test the edit_issue endpoint."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
@@ -4012,7 +4012,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_edit_tag_issue_disabled(self):
-        """ Test the edit_tag endpoint when issues are disabled. """
+        """Test the edit_tag endpoint when issues are disabled."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"))
 
@@ -4083,7 +4083,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_edit_tag(self, p_send_email, p_ugt):
-        """ Test the edit_tag endpoint. """
+        """Test the edit_tag endpoint."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -4252,7 +4252,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_remove_tag_issue_disabled(self):
-        """ Test the remove_tag endpoint. """
+        """Test the remove_tag endpoint."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"))
 
@@ -4355,7 +4355,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_remove_tag(self, p_send_email, p_ugt):
-        """ Test the remove_tag endpoint. """
+        """Test the remove_tag endpoint."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -4453,7 +4453,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_delete_issue(self, p_send_email, p_ugt):
-        """ Test the delete_issue endpoint. """
+        """Test the delete_issue endpoint."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -4609,7 +4609,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_update_issue_edit_comment(self, p_send_email, p_ugt):
-        """ Test the issues edit comment endpoint """
+        """Test the issues edit comment endpoint"""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -4905,7 +4905,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_update_tags_issue_disabled(self):
-        """ Test the update_tags endpoint. """
+        """Test the update_tags endpoint."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"))
 
@@ -4974,7 +4974,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_update_tags(self, p_send_email, p_ugt):
-        """ Test the update_tags endpoint. """
+        """Test the update_tags endpoint."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -5324,7 +5324,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_update_tags_with_colon(self, p_send_email, p_ugt):
-        """ Test the update_tags endpoint with a tag containing a colon. """
+        """Test the update_tags endpoint with a tag containing a colon."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -5392,7 +5392,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_update_tags_with_coma(self, p_send_email, p_ugt):
-        """ Test the update_tags endpoint with a tag containing a coma. """
+        """Test the update_tags endpoint with a tag containing a coma."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -5648,7 +5648,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_view_issue_closed(self, p_send_email, p_ugt):
-        """ Test viewing a closed issue. """
+        """Test viewing a closed issue."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -5758,7 +5758,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_add_reaction(self, p_send_email, p_ugt):
-        """ Test adding a reaction to an issue comment."""
+        """Test adding a reaction to an issue comment."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 

@@ -29,10 +29,10 @@ import tests
 
 
 class PagureFlaskGroupstests(tests.Modeltests):
-    """ Tests for flask groups controller of pagure """
+    """Tests for flask groups controller of pagure"""
 
     def test_group_lists(self):
-        """ Test the group_lists endpoint. """
+        """Test the group_lists endpoint."""
         output = self.app.get("/groups")
         self.assertIn(
             '<h3 class="font-weight-bold">\n'
@@ -41,7 +41,7 @@ class PagureFlaskGroupstests(tests.Modeltests):
         )
 
     def test_add_group(self):
-        """ Test the add_group endpoint. """
+        """Test the add_group endpoint."""
         output = self.app.get("/group/add")
         self.assertEqual(output.status_code, 302)
 
@@ -167,7 +167,7 @@ class PagureFlaskGroupstests(tests.Modeltests):
         "pagure.config.config", {"FEDORA_MESSAGING_NOTIFICATIONS": True}
     )
     def test_edit_group(self):
-        """ Test the edit_group endpoint. """
+        """Test the edit_group endpoint."""
 
         output = self.app.get("/group/test_group/edit")
         self.assertEqual(output.status_code, 302)
@@ -311,7 +311,7 @@ class PagureFlaskGroupstests(tests.Modeltests):
             )
 
     def test_give_group(self):
-        """ Test the give_group endpoint. """
+        """Test the give_group endpoint."""
 
         output = self.app.post("/group/test_group/give")
         self.assertEqual(output.status_code, 302)
@@ -393,7 +393,7 @@ class PagureFlaskGroupstests(tests.Modeltests):
             )
 
     def test_group_delete(self):
-        """ Test the group_delete endpoint. """
+        """Test the group_delete endpoint."""
         output = self.app.post("/group/foo/delete")
         self.assertEqual(output.status_code, 302)
 
@@ -487,7 +487,7 @@ class PagureFlaskGroupstests(tests.Modeltests):
             )
 
     def test_view_group(self):
-        """ Test the view_group endpoint. """
+        """Test the view_group endpoint."""
         output = self.app.get("/group/foo")
         self.assertEqual(output.status_code, 404)
 
@@ -571,7 +571,7 @@ class PagureFlaskGroupstests(tests.Modeltests):
             )
 
     def test_group_user_delete(self):
-        """ Test the group_user_delete endpoint. """
+        """Test the group_user_delete endpoint."""
         output = self.app.post("/group/foo/bar/delete")
         self.assertEqual(output.status_code, 302)
 

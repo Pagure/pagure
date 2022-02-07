@@ -24,10 +24,10 @@ import tests  # noqa: E402
 
 
 class PagureFlaskApiCustomFieldIssuetests(tests.Modeltests):
-    """ Tests for the flask API of pagure for issue's custom fields """
+    """Tests for the flask API of pagure for issue's custom fields"""
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         self.maxDiff = None
         super(PagureFlaskApiCustomFieldIssuetests, self).setUp()
 

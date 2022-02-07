@@ -1448,7 +1448,7 @@ def refresh_request_pull(repo, requestid, username=None, namespace=None):
 )
 @login_required
 def update_pull_requests(repo, requestid, username=None, namespace=None):
-    """ Update the metadata of a pull-request. """
+    """Update the metadata of a pull-request."""
     repo = flask.g.repo
 
     if not repo.settings.get("pull_requests", True):

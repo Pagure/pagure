@@ -25,10 +25,10 @@ import tests
 
 
 class PagureLibAddUserToProjecttests(tests.Modeltests):
-    """ Tests for pagure.lib.query.add_user_to_project """
+    """Tests for pagure.lib.query.add_user_to_project"""
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureLibAddUserToProjecttests, self).setUp()
 
         tests.create_projects(self.session)
@@ -63,7 +63,7 @@ class PagureLibAddUserToProjecttests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_re_add_user_to_project_default(self):
-        """ Update an existing user but to the same access level. """
+        """Update an existing user but to the same access level."""
         repo = pagure.lib.query._get_project(self.session, "test")
 
         # Try adding the same user with the same access
@@ -223,10 +223,10 @@ class PagureLibAddUserToProjecttests(tests.Modeltests):
 
 
 class PagureLibAddUserToProjectWithGrouptests(PagureLibAddUserToProjecttests):
-    """ Tests for pagure.lib.query.add_user_to_project """
+    """Tests for pagure.lib.query.add_user_to_project"""
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureLibAddUserToProjectWithGrouptests, self).setUp()
 
         # Create group

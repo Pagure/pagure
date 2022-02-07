@@ -29,7 +29,7 @@ from pagure.lib.repo import PagureRepo
 
 
 class PagureLibGitAuthPagureGitAuthtests(tests.Modeltests):
-    """ Tests for pagure.lib.git_auth PagureGitAuth dynamic ACL """
+    """Tests for pagure.lib.git_auth PagureGitAuth dynamic ACL"""
 
     config_values = {"authbackend": "pagure"}
 

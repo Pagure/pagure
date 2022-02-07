@@ -25,10 +25,10 @@ import tests
 
 
 class PagureFlaskPluginMirrortests(tests.Modeltests):
-    """ Tests for mirror plugin of pagure """
+    """Tests for mirror plugin of pagure"""
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskPluginMirrortests, self).setUp()
 
         tests.create_projects(self.session)
@@ -50,7 +50,7 @@ class PagureFlaskPluginMirrortests(tests.Modeltests):
             self.assertIsNotNone(pagure.utils.ssh_urlpattern.match(el))
 
     def test_plugin_mirror_no_csrf(self):
-        """ Test setting up the mirror plugin with no csrf. """
+        """Test setting up the mirror plugin with no csrf."""
 
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):

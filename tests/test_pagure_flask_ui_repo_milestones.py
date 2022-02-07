@@ -25,11 +25,11 @@ import tests
 
 
 class PagureFlaskRepoMilestonestests(tests.Modeltests):
-    """ Tests for milestones in pagure """
+    """Tests for milestones in pagure"""
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskRepoMilestonestests, self).setUp()
 
         tests.create_projects(self.session)
@@ -52,7 +52,7 @@ class PagureFlaskRepoMilestonestests(tests.Modeltests):
         MagicMock(return_value=False),
     )
     def test_milestones_settings_empty(self):
-        """ Test the settings page when no milestones are set. """
+        """Test the settings page when no milestones are set."""
 
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
         self.assertEqual(repo.milestones, {})
@@ -96,7 +96,7 @@ class PagureFlaskRepoMilestonestests(tests.Modeltests):
         MagicMock(return_value=False),
     )
     def test_setting_retrieving_milestones(self):
-        """ Test setting and retrieving milestones off a project. """
+        """Test setting and retrieving milestones off a project."""
 
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
 

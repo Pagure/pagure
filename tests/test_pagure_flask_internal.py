@@ -31,12 +31,12 @@ from pagure.lib.repo import PagureRepo
 
 
 class PagureFlaskInternaltests(tests.Modeltests):
-    """ Tests for flask Internal controller of pagure """
+    """Tests for flask Internal controller of pagure"""
 
     maxDiff = None
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskInternaltests, self).setUp()
 
         pagure.config.config["IP_ALLOWED_INTERNAL"] = list(
@@ -75,7 +75,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_pull_request_add_comment(self, send_email):
-        """ Test the pull_request_add_comment function.  """
+        """Test the pull_request_add_comment function."""
         send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -150,7 +150,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_ticket_add_comment(self, send_email):
-        """ Test the ticket_add_comment function.  """
+        """Test the ticket_add_comment function."""
         send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -221,7 +221,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_private_ticket_add_comment(self, send_email):
-        """ Test the ticket_add_comment function on a private ticket.  """
+        """Test the ticket_add_comment function on a private ticket."""
         send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -298,7 +298,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_private_ticket_add_comment_acl(self, send_email):
-        """ Test the ticket_add_comment function on a private ticket.  """
+        """Test the ticket_add_comment function on a private ticket."""
         send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -1549,7 +1549,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
             self.assertDictEqual(js_data, exp)
 
     def test_get_branches_of_commit(self):
-        """ Test the get_branches_of_commit from the internal API. """
+        """Test the get_branches_of_commit from the internal API."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"))
 
@@ -1720,7 +1720,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         )
 
     def test_get_branches_of_commit_with_unrelated_branches(self):
-        """ Test the get_branches_of_commit from the internal API. """
+        """Test the get_branches_of_commit from the internal API."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"))
 
@@ -1791,7 +1791,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         self.assertDictEqual(js_data, {"code": "OK", "branches": ["feature"]})
 
     def test_get_branches_head(self):
-        """ Test the get_branches_head from the internal API. """
+        """Test the get_branches_head from the internal API."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"))
 
@@ -1942,7 +1942,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         self.assertEqual(len(js_data["branches"]), 3)
 
     def test_get_stats_commits_no_token(self):
-        """ Test the get_stats_commits from the internal API. """
+        """Test the get_stats_commits from the internal API."""
         # No CSRF token
         data = {"repo": "fakerepo"}
         output = self.app.post("/pv/stats/commits/authors", data=data)
@@ -1953,7 +1953,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         )
 
     def test_get_stats_commits_invalid_repo(self):
-        """ Test the get_stats_commits from the internal API. """
+        """Test the get_stats_commits from the internal API."""
         user = tests.FakeUser()
         user.username = "pingou"
         with tests.user_set(self.app.application, user):
@@ -1973,7 +1973,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         )
 
     def test_get_stats_commits_empty_git(self):
-        """ Test the get_stats_commits from the internal API. """
+        """Test the get_stats_commits from the internal API."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"))
 
@@ -2005,7 +2005,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         )
 
     def test_get_stats_commits_git_populated(self):
-        """ Test the get_stats_commits from the internal API. """
+        """Test the get_stats_commits from the internal API."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
         tests.add_content_git_repo(
@@ -2084,7 +2084,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         )
 
     def test_get_stats_commits_trend_no_token(self):
-        """ Test the get_stats_commits_trend from the internal API. """
+        """Test the get_stats_commits_trend from the internal API."""
         # No CSRF token
         data = {"repo": "fakerepo"}
         output = self.app.post("/pv/stats/commits/trend", data=data)
@@ -2095,7 +2095,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         )
 
     def test_get_stats_commits_trend_invalid_repo(self):
-        """ Test the get_stats_commits_trend from the internal API. """
+        """Test the get_stats_commits_trend from the internal API."""
         user = tests.FakeUser()
         user.username = "pingou"
         with tests.user_set(self.app.application, user):
@@ -2115,7 +2115,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         )
 
     def test_get_stats_commits_trend_empty_git(self):
-        """ Test the get_stats_commits_trend from the internal API. """
+        """Test the get_stats_commits_trend from the internal API."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"))
 
@@ -2147,7 +2147,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         )
 
     def test_get_stats_commits_trend_git_populated(self):
-        """ Test the get_stats_commits_trend from the internal API. """
+        """Test the get_stats_commits_trend from the internal API."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
         tests.add_content_git_repo(
@@ -2177,12 +2177,12 @@ class PagureFlaskInternaltests(tests.Modeltests):
         self.assertDictEqual(js_data2, {"results": [[str(today), 2]]})
 
     def test_get_project_family_no_project(self):
-        """ Test the get_project_family from the internal API. """
+        """Test the get_project_family from the internal API."""
         output = self.app.post("/pv/test/family")
         self.assertEqual(output.status_code, 404)
 
     def test_get_project_family_no_csrf(self):
-        """ Test the get_project_family from the internal API. """
+        """Test the get_project_family from the internal API."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
         tests.add_content_git_repo(
@@ -2197,7 +2197,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         self.assertEqual(js_data["message"], "Invalid input submitted")
 
     def test_get_project_family(self):
-        """ Test the get_project_family from the internal API. """
+        """Test the get_project_family from the internal API."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
         tests.add_content_git_repo(
@@ -2218,7 +2218,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         self.assertEqual(js_data["family"], ["test"])
 
     def test_get_project_larger_family(self):
-        """ Test the get_project_family from the internal API. """
+        """Test the get_project_family from the internal API."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
 
@@ -2284,7 +2284,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         )
 
     def test_get_project_larger_family_pr_only(self):
-        """ Test the get_project_family from the internal API. """
+        """Test the get_project_family from the internal API."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
 
@@ -2858,7 +2858,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         {"REPOSPANNER_REGIONS": {"region": {"repo_prefix": "prefix"}}},
     )
     def test_check_ssh_access(self):
-        """ Test the SSH access check endpoint. """
+        """Test the SSH access check endpoint."""
         tests.create_projects(self.session)
         self.session.query(pagure.lib.model.Project).filter(
             pagure.lib.model.Project.name == "test2"

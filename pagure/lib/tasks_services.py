@@ -57,7 +57,7 @@ def augment_celery_log(**kwargs):
 
 
 def call_web_hooks(project, topic, msg, urls):
-    """ Sends the web-hook notification. """
+    """Sends the web-hook notification."""
     _log.info("Processing project: %s - topic: %s", project.fullname, topic)
     _log.debug("msg: %s", msg)
 

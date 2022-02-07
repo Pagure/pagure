@@ -27,10 +27,10 @@ import tests
 
 
 class PagureExcludeGroupIndex(tests.Modeltests):
-    """ Tests the EXCLUDE_GROUP_INDEX configuration key in pagure """
+    """Tests the EXCLUDE_GROUP_INDEX configuration key in pagure"""
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureExcludeGroupIndex, self).setUp()
 
         tests.create_projects(self.session)
@@ -64,7 +64,7 @@ class PagureExcludeGroupIndex(tests.Modeltests):
         self.assertEqual(msg, "Group added")
 
     def test_defaults_pingou(self):
-        """ Test which repo pingou has by default. """
+        """Test which repo pingou has by default."""
 
         repos = pagure.lib.query.search_projects(
             self.session, username="pingou", fork=False
@@ -75,7 +75,7 @@ class PagureExcludeGroupIndex(tests.Modeltests):
             self.assertEqual(repos[idx].name, name)
 
     def test_defaults_foo(self):
-        """ Test which repo foo has by default. """
+        """Test which repo foo has by default."""
 
         repos = pagure.lib.query.search_projects(
             self.session, username="foo", fork=False
@@ -84,7 +84,7 @@ class PagureExcludeGroupIndex(tests.Modeltests):
         self.assertEqual(len(repos), 0)
 
     def test_add_foo_test(self):
-        """ Test adding foo to the test project. """
+        """Test adding foo to the test project."""
 
         group = pagure.lib.query.search_groups(
             self.session, group_name="provenpackager"
@@ -119,7 +119,7 @@ class PagureExcludeGroupIndex(tests.Modeltests):
         self.assertEqual(repos[0].name, "test2")
 
     def test_excluding_provenpackager(self):
-        """ Test retrieving user's repo with a group excluded. """
+        """Test retrieving user's repo with a group excluded."""
 
         # Add `foo` to `provenpackager`
         group = pagure.lib.query.search_groups(

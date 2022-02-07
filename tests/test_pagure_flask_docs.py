@@ -31,10 +31,10 @@ from pagure.lib.repo import PagureRepo
 
 
 class PagureFlaskDocstests(tests.SimplePagureTest):
-    """ Tests for flask docs of pagure """
+    """Tests for flask docs of pagure"""
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskDocstests, self).setUp()
 
         pagure.docs_server.APP.config["TESTING"] = True
@@ -98,7 +98,7 @@ class PagureFlaskDocstests(tests.SimplePagureTest):
         self.session.commit()
 
     def test_view_docs_no_project(self):
-        """ Test the view_docs endpoint with no project. """
+        """Test the view_docs endpoint with no project."""
 
         output = self.app.get("/foo/docs")
         self.assertEqual(output.status_code, 404)
@@ -146,7 +146,7 @@ class PagureFlaskDocstests(tests.SimplePagureTest):
         self.assertEqual(output.status_code, 404)
 
     def test_view_docs_empty_repo(self):
-        """ Test the view_docs endpoint when the git repo is empty. """
+        """Test the view_docs endpoint when the git repo is empty."""
         tests.create_projects(self.session)
         repo = pygit2.init_repository(
             os.path.join(self.path, "repos", "docs", "test.git"), bare=True
@@ -169,7 +169,7 @@ class PagureFlaskDocstests(tests.SimplePagureTest):
         )
 
     def test_view_docs(self):
-        """ Test the view_docs endpoint. """
+        """Test the view_docs endpoint."""
         tests.create_projects(self.session)
         repo = pygit2.init_repository(
             os.path.join(self.path, "repos", "docs", "test.git"), bare=True
@@ -220,7 +220,7 @@ class PagureFlaskDocstests(tests.SimplePagureTest):
         mock.MagicMock(side_effect=pagure.exceptions.PagureEncodingException),
     )
     def test_view_docs_encoding_error(self):
-        """ Test viewing a file of which we cannot find the encoding. """
+        """Test viewing a file of which we cannot find the encoding."""
         tests.create_projects(self.session)
         repo = pygit2.init_repository(
             os.path.join(self.path, "repos", "docs", "test.git"), bare=True
@@ -246,7 +246,7 @@ class PagureFlaskDocstests(tests.SimplePagureTest):
         "pagure.lib.encoding_utils.decode", mock.MagicMock(side_effect=IOError)
     )
     def test_view_docs_unknown_error(self):
-        """ Test viewing a file of which we cannot find the encoding. """
+        """Test viewing a file of which we cannot find the encoding."""
         tests.create_projects(self.session)
         repo = pygit2.init_repository(
             os.path.join(self.path, "repos", "docs", "test.git"), bare=True

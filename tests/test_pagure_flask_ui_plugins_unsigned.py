@@ -23,10 +23,10 @@ import tests
 
 
 class PagureFlaskPluginUnsignedtests(tests.SimplePagureTest):
-    """ Tests for Block pushes with unsigned commit plugin of pagure """
+    """Tests for Block pushes with unsigned commit plugin of pagure"""
 
     def test_plugin_unsigned(self):
-        """ Test the noff plugin on/off endpoint. """
+        """Test the noff plugin on/off endpoint."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"))

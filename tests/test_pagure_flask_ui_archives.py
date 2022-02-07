@@ -29,10 +29,10 @@ from tests.test_pagure_lib_git_get_tags_objects import add_repo_tag
 
 
 class PagureFlaskUiArchivesTest(tests.Modeltests):
-    """ Tests checking the archiving mechanism. """
+    """Tests checking the archiving mechanism."""
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskUiArchivesTest, self).setUp()
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
@@ -56,7 +56,7 @@ class PagureFlaskUiArchivesTest(tests.Modeltests):
         os.mkdir(self.archive_path)
 
     def test_project_no_conf(self):
-        """ Test getting the archive when pagure isn't configured. """
+        """Test getting the archive when pagure isn't configured."""
         output = self.app.get(
             "/somenamespace/test3/archive/tag1/test3-tag1.zip",
             follow_redirects=True,
@@ -72,7 +72,7 @@ class PagureFlaskUiArchivesTest(tests.Modeltests):
         self.assertEqual(os.listdir(self.archive_path), [])
 
     def test_project_invalid_conf(self):
-        """ Test getting the archive when pagure is wrongly configured. """
+        """Test getting the archive when pagure is wrongly configured."""
         with mock.patch.dict(
             "pagure.config.config",
             {"ARCHIVE_FOLDER": os.path.join(self.path, "invalid")},
@@ -91,7 +91,7 @@ class PagureFlaskUiArchivesTest(tests.Modeltests):
         self.assertEqual(os.listdir(self.archive_path), [])
 
     def test_project_invalid_format(self):
-        """ Test getting the archive when the format provided is invalid. """
+        """Test getting the archive when the format provided is invalid."""
         with mock.patch.dict(
             "pagure.config.config",
             {"ARCHIVE_FOLDER": os.path.join(self.path, "archives")},
@@ -106,7 +106,7 @@ class PagureFlaskUiArchivesTest(tests.Modeltests):
         self.assertEqual(os.listdir(self.archive_path), [])
 
     def test_project_no_commit(self):
-        """ Test getting the archive of an empty project. """
+        """Test getting the archive of an empty project."""
         with mock.patch.dict(
             "pagure.config.config",
             {"ARCHIVE_FOLDER": os.path.join(self.path, "archives")},
@@ -142,7 +142,7 @@ class PagureFlaskUiArchivesTest(tests.Modeltests):
         self.assertEqual(os.listdir(self.archive_path), [])
 
     def test_project_no_tag(self):
-        """ Test getting the archive of an empty project. """
+        """Test getting the archive of an empty project."""
         with mock.patch.dict(
             "pagure.config.config",
             {"ARCHIVE_FOLDER": os.path.join(self.path, "archives")},
@@ -159,7 +159,7 @@ class PagureFlaskUiArchivesTest(tests.Modeltests):
         self.assertEqual(os.listdir(self.archive_path), [])
 
     def test_project_w_tag_zip(self):
-        """ Test getting the archive from a tag. """
+        """Test getting the archive from a tag."""
         with mock.patch.dict(
             "pagure.config.config",
             {"ARCHIVE_FOLDER": os.path.join(self.path, "archives")},
@@ -201,7 +201,7 @@ class PagureFlaskUiArchivesTest(tests.Modeltests):
         )
 
     def test_project_w_tag_tar(self):
-        """ Test getting the archive from a tag. """
+        """Test getting the archive from a tag."""
         with mock.patch.dict(
             "pagure.config.config",
             {"ARCHIVE_FOLDER": os.path.join(self.path, "archives")},
@@ -243,7 +243,7 @@ class PagureFlaskUiArchivesTest(tests.Modeltests):
         )
 
     def test_project_w_tag_tar_gz(self):
-        """ Test getting the archive from a tag. """
+        """Test getting the archive from a tag."""
         with mock.patch.dict(
             "pagure.config.config",
             {"ARCHIVE_FOLDER": os.path.join(self.path, "archives")},
@@ -285,7 +285,7 @@ class PagureFlaskUiArchivesTest(tests.Modeltests):
         )
 
     def test_project_w_commit_tar_gz(self):
-        """ Test getting the archive from a commit. """
+        """Test getting the archive from a commit."""
         repopath = os.path.join(self.path, "repos", "test.git")
         repo = pygit2.Repository(repopath)
         commit = repo.head.target.hex

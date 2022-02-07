@@ -358,17 +358,17 @@ LCL_ISSUES = [
 
 
 class PagureFlaskApiIssuetests(tests.SimplePagureTest):
-    """ Tests for the flask API of pagure for issue """
+    """Tests for the flask API of pagure for issue"""
 
     maxDiff = None
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskApiIssuetests, self).setUp()
         pagure.config.config["TICKETS_FOLDER"] = None
 
     def test_api_new_issue_wrong_token(self):
-        """ Test the api_new_issue method of the flask api. """
+        """Test the api_new_issue method of the flask api."""
         tests.create_projects(self.session)
         tests.create_projects_git(
             os.path.join(self.path, "tickets"), bare=True
@@ -392,7 +392,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         "pagure.config.config", {"ENABLE_TICKETS_NAMESPACE": ["foobar"]}
     )
     def test_api_new_issue_wrong_namespace(self):
-        """ Test the api_new_issue method of the flask api. """
+        """Test the api_new_issue method of the flask api."""
         tests.create_projects(self.session)
         tests.create_projects_git(
             os.path.join(self.path, "tickets"), bare=True
@@ -417,7 +417,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
     def test_api_new_issue_no_input(self):
-        """ Test the api_new_issue method of the flask api. """
+        """Test the api_new_issue method of the flask api."""
         tests.create_projects(self.session)
         tests.create_projects_git(
             os.path.join(self.path, "tickets"), bare=True
@@ -444,7 +444,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
     def test_api_new_issue_invalid_repo(self):
-        """ Test the api_new_issue method of the flask api. """
+        """Test the api_new_issue method of the flask api."""
         tests.create_projects(self.session)
         tests.create_projects_git(
             os.path.join(self.path, "tickets"), bare=True
@@ -467,7 +467,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
     def test_api_new_issue_invalid_request(self):
-        """ Test the api_new_issue method of the flask api. """
+        """Test the api_new_issue method of the flask api."""
         tests.create_projects(self.session)
         tests.create_projects_git(
             os.path.join(self.path, "tickets"), bare=True
@@ -499,7 +499,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         "pagure.config.config", {"FEDORA_MESSAGING_NOTIFICATIONS": True}
     )
     def test_api_new_issue(self):
-        """ Test the api_new_issue method of the flask api. """
+        """Test the api_new_issue method of the flask api."""
         tests.create_projects(self.session)
         tests.create_projects_git(
             os.path.join(self.path, "tickets"), bare=True
@@ -604,7 +604,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
     def test_api_new_issue_img(self):
-        """ Test the api_new_issue method of the flask api. """
+        """Test the api_new_issue method of the flask api."""
         tests.create_projects(self.session)
         tests.create_projects_git(
             os.path.join(self.path, "tickets"), bare=True
@@ -645,7 +645,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             )
 
     def test_api_new_issue_invalid_milestone(self):
-        """ Test the api_new_issue method of the flask api. """
+        """Test the api_new_issue method of the flask api."""
         tests.create_projects(self.session)
         tests.create_projects_git(
             os.path.join(self.path, "tickets"), bare=True
@@ -676,7 +676,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
     def test_api_new_issue_milestone(self):
-        """ Test the api_new_issue method of the flask api. """
+        """Test the api_new_issue method of the flask api."""
         tests.create_projects(self.session)
         tests.create_projects_git(
             os.path.join(self.path, "tickets"), bare=True
@@ -715,7 +715,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
     def test_api_new_issue_public(self):
-        """ Test the api_new_issue method of the flask api. """
+        """Test the api_new_issue method of the flask api."""
         tests.create_projects(self.session)
         tests.create_projects_git(
             os.path.join(self.path, "tickets"), bare=True
@@ -818,7 +818,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
     def test_api_new_issue_private(self):
-        """ Test the api_new_issue method of the flask api. """
+        """Test the api_new_issue method of the flask api."""
         tests.create_projects(self.session)
         tests.create_projects_git(
             os.path.join(self.path, "tickets"), bare=True
@@ -875,7 +875,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         "pagure.config.config", {"FEDORA_MESSAGING_NOTIFICATIONS": True}
     )
     def test_api_new_issue_private_no_fedora_messaging_notifs(self):
-        """ Test the api_new_issue method of the flask api. """
+        """Test the api_new_issue method of the flask api."""
         tests.create_projects(self.session)
         tests.create_projects_git(
             os.path.join(self.path, "tickets"), bare=True
@@ -926,7 +926,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
 
     @patch("pagure.utils.check_api_acls", MagicMock(return_value=None))
     def test_api_new_issue_raise_db_error(self):
-        """ Test the api_new_issue method of the flask api. """
+        """Test the api_new_issue method of the flask api."""
         tests.create_projects(self.session)
         tests.create_projects_git(
             os.path.join(self.path, "tickets"), bare=True
@@ -965,7 +965,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
                 )
 
     def test_api_new_issue_user_token_no_input(self):
-        """ Test the api_new_issue method of the flask api. """
+        """Test the api_new_issue method of the flask api."""
         tests.create_projects(self.session)
         tests.create_projects_git(
             os.path.join(self.path, "tickets"), bare=True
@@ -992,7 +992,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
     def test_api_new_issue_user_token_invalid_user(self):
-        """ Test the api_new_issue method of the flask api. """
+        """Test the api_new_issue method of the flask api."""
         tests.create_projects(self.session)
         tests.create_projects_git(
             os.path.join(self.path, "tickets"), bare=True
@@ -1019,7 +1019,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
     def test_api_new_issue_user_token_invalid_repo(self):
-        """ Test the api_new_issue method of the flask api. """
+        """Test the api_new_issue method of the flask api."""
         tests.create_projects(self.session)
         tests.create_projects_git(
             os.path.join(self.path, "tickets"), bare=True
@@ -1041,7 +1041,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
     def test_api_new_issue_user_token_invalid_request(self):
-        """ Test the api_new_issue method of the flask api. """
+        """Test the api_new_issue method of the flask api."""
         tests.create_projects(self.session)
         tests.create_projects_git(
             os.path.join(self.path, "tickets"), bare=True
@@ -1069,7 +1069,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
     def test_api_new_issue_user_token(self):
-        """ Test the api_new_issue method of the flask api. """
+        """Test the api_new_issue method of the flask api."""
         tests.create_projects(self.session)
         tests.create_projects_git(
             os.path.join(self.path, "tickets"), bare=True
@@ -1097,7 +1097,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
     def test_api_new_issue_user_token_milestone(self):
-        """ Test the api_new_issue method of the flask api. """
+        """Test the api_new_issue method of the flask api."""
         tests.create_projects(self.session)
         tests.create_projects_git(
             os.path.join(self.path, "tickets"), bare=True
@@ -1136,7 +1136,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
     def test_api_new_issue_user_token_public(self):
-        """ Test the api_new_issue method of the flask api. """
+        """Test the api_new_issue method of the flask api."""
         tests.create_projects(self.session)
         tests.create_projects_git(
             os.path.join(self.path, "tickets"), bare=True
@@ -1239,7 +1239,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
     def test_api_new_issue_user_token_private(self):
-        """ Test the api_new_issue method of the flask api. """
+        """Test the api_new_issue method of the flask api."""
         tests.create_projects(self.session)
         tests.create_projects_git(
             os.path.join(self.path, "tickets"), bare=True
@@ -1316,7 +1316,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.assertDictEqual(data, {"issue": exp, "message": "Issue created"})
 
     def test_api_view_issues(self):
-        """ Test the api_view_issues method of the flask api. """
+        """Test the api_view_issues method of the flask api."""
         self.test_api_new_issue()
 
         # Invalid repo
@@ -1733,7 +1733,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
     def test_api_view_issues_user_token(self):
-        """ Test the api_new_issue method of the flask api. """
+        """Test the api_new_issue method of the flask api."""
         tests.create_projects(self.session)
         tests.create_projects_git(
             os.path.join(self.path, "tickets"), bare=True
@@ -1800,7 +1800,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
     def test_api_view_issues_private_user_token(self):
-        """ Test the api_new_issue method of the flask api. """
+        """Test the api_new_issue method of the flask api."""
         tests.create_projects(self.session)
         tests.create_projects_git(
             os.path.join(self.path, "tickets"), bare=True
@@ -1909,7 +1909,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
     def test_api_view_issues_since_invalid_format(self):
-        """ Test the api_view_issues method of the flask api. """
+        """Test the api_view_issues method of the flask api."""
         self.test_api_new_issue()
 
         # Invalid repo
@@ -1922,7 +1922,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
     def test_api_view_issues_since_invalid_timestamp(self):
-        """ Test the api_view_issues method of the flask api. """
+        """Test the api_view_issues method of the flask api."""
         self.test_api_new_issue()
 
         # Invalid repo
@@ -2448,7 +2448,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
     def test_api_view_issues_since(self):
-        """ Test the api_view_issues method of the flask api for since option """
+        """Test the api_view_issues method of the flask api for since option"""
 
         tests.create_projects(self.session)
         tests.create_projects_git(
@@ -2744,7 +2744,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
     def test_api_view_issue(self):
-        """ Test the api_view_issue method of the flask api. """
+        """Test the api_view_issue method of the flask api."""
         self.test_api_new_issue()
 
         # Invalid repo
@@ -2946,7 +2946,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
     def test_api_change_milestone_issue_invalid_project(self):
-        """ Test the api_change_milestone_issue method of the flask api. """
+        """Test the api_change_milestone_issue method of the flask api."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "tickets"))
         tests.create_tokens(self.session)
@@ -2972,7 +2972,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         "pagure.config.config", {"ENABLE_TICKETS_NAMESPACE": ["foobar"]}
     )
     def test_api_change_milestone_issue_wrong_namespace(self):
-        """ Test the api_new_issue method of the flask api. """
+        """Test the api_new_issue method of the flask api."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "tickets"))
         tests.create_tokens(self.session)
@@ -3016,7 +3016,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
     def test_api_change_milestone_issue_wrong_token(self):
-        """ Test the api_change_milestone_issue method of the flask api. """
+        """Test the api_change_milestone_issue method of the flask api."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "tickets"))
         tests.create_tokens(self.session)
@@ -3043,7 +3043,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
     def test_api_change_milestone_issue_no_issue(self):
-        """ Test the api_change_milestone_issue method of the flask api. """
+        """Test the api_change_milestone_issue method of the flask api."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "tickets"))
         tests.create_tokens(self.session)
@@ -3068,7 +3068,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
     def test_api_change_milestone_issue_no_milestone(self):
-        """ Test the api_change_milestone_issue method of the flask api. """
+        """Test the api_change_milestone_issue method of the flask api."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "tickets"))
         tests.create_tokens(self.session)
@@ -3115,7 +3115,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.assertEqual(issue.milestone, None)
 
     def test_api_change_milestone_issue_invalid_milestone(self):
-        """ Test the api_change_milestone_issue method of the flask api. """
+        """Test the api_change_milestone_issue method of the flask api."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "tickets"))
         tests.create_tokens(self.session)
@@ -3167,7 +3167,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         "pagure.config.config", {"FEDORA_MESSAGING_NOTIFICATIONS": True}
     )
     def test_api_change_milestone_issue(self):
-        """ Test the api_change_milestone_issue method of the flask api. """
+        """Test the api_change_milestone_issue method of the flask api."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "tickets"))
         tests.create_tokens(self.session)
@@ -3292,7 +3292,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
     def test_api_change_milestone_issue_remove_milestone(self):
-        """ Test the api_change_milestone_issue method of the flask api. """
+        """Test the api_change_milestone_issue method of the flask api."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "tickets"))
         tests.create_tokens(self.session)
@@ -3354,7 +3354,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.assertEqual(issue.milestone, None)
 
     def test_api_change_milestone_issue_remove_milestone2(self):
-        """ Test the api_change_milestone_issue method of the flask api. """
+        """Test the api_change_milestone_issue method of the flask api."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "tickets"))
         tests.create_tokens(self.session)
@@ -3416,7 +3416,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.assertEqual(issue.milestone, None)
 
     def test_api_change_milestone_issue_unauthorized(self):
-        """ Test the api_change_milestone_issue method of the flask api. """
+        """Test the api_change_milestone_issue method of the flask api."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "tickets"))
         tests.create_tokens(self.session)
@@ -3466,7 +3466,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         MagicMock(side_effect=pagure.exceptions.PagureException("error")),
     )
     def test_api_change_milestone_issue_raises_exception(self):
-        """ Test the api_change_milestone_issue method of the flask api. """
+        """Test the api_change_milestone_issue method of the flask api."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "tickets"))
         tests.create_tokens(self.session)
@@ -3559,7 +3559,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_api_view_issue_comment(self, p_send_email, p_ugt):
-        """ Test the api_view_issue_comment endpoint. """
+        """Test the api_view_issue_comment endpoint."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -3676,7 +3676,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_api_view_issue_comment_private(self, p_send_email, p_ugt):
-        """ Test the api_view_issue_comment endpoint. """
+        """Test the api_view_issue_comment endpoint."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -3777,7 +3777,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         "pagure.config.config", {"ENABLE_TICKETS_NAMESPACE": ["foobar"]}
     )
     def test_api_assign_issue_wrong_namespace(self):
-        """ Test the api_new_issue method of the flask api. """
+        """Test the api_new_issue method of the flask api."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "tickets"))
         tests.create_tokens(self.session)
@@ -3828,7 +3828,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_api_assign_issue(self, p_send_email, p_ugt):
-        """ Test the api_assign_issue method of the flask api. """
+        """Test the api_assign_issue method of the flask api."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -4232,7 +4232,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_api_assign_issue_issuer(self, p_send_email, p_ugt):
-        """ Test the api_assign_issue method of the flask api. """
+        """Test the api_assign_issue method of the flask api."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -4289,7 +4289,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_api_subscribe_issue(self, p_send_email, p_ugt):
-        """ Test the api_subscribe_issue method of the flask api. """
+        """Test the api_subscribe_issue method of the flask api."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -4470,7 +4470,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
 
     def test_api_update_custom_field(self):
-        """ Test the api_update_custom_field method of the flask api. """
+        """Test the api_update_custom_field method of the flask api."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "tickets"))
         tests.create_tokens(self.session)
@@ -4700,7 +4700,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         MagicMock(side_effect=pagure.exceptions.PagureException("error")),
     )
     def test_api_update_custom_field_raises_error(self):
-        """ Test the api_update_custom_field method of the flask api. """
+        """Test the api_update_custom_field method of the flask api."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "tickets"))
         tests.create_tokens(self.session)
@@ -4757,7 +4757,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.assertDictEqual(data, {"error": "error", "error_code": "ENOCODE"})
 
     def test_api_view_issues_history_stats(self):
-        """ Test the api_view_issues_history_stats method of the flask api. """
+        """Test the api_view_issues_history_stats method of the flask api."""
         self.test_api_new_issue()
 
         # Create private issue, closed and without a closed_at date
@@ -4786,7 +4786,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             self.assertEqual(data["stats"][k], 0)
 
     def test_api_view_issues_history_stats_detailed(self):
-        """ Test the api_view_issues_history_stats method of the flask api. """
+        """Test the api_view_issues_history_stats method of the flask api."""
         self.test_api_new_issue()
 
         output = self.app.get("/api/0/test/issues/history/detailed_stats")
@@ -4807,7 +4807,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             )
 
     def test_api_view_issues_history_stats_detailed_invalid_range(self):
-        """ Test the api_view_issues_history_stats method of the flask api. """
+        """Test the api_view_issues_history_stats method of the flask api."""
         self.test_api_new_issue()
 
         output = self.app.get(
@@ -4830,7 +4830,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             )
 
     def test_api_view_issues_history_stats_detailed_one_week(self):
-        """ Test the api_view_issues_history_stats method of the flask api. """
+        """Test the api_view_issues_history_stats method of the flask api."""
         self.test_api_new_issue()
 
         output = self.app.get(
@@ -5117,7 +5117,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         self.assertEqual(data["total_issues_created_pages"], 1)
 
     def api_api_view_issue_user_token(self):
-        """ Testhe the api view issues of the flask api with valid user token """
+        """Testhe the api view issues of the flask api with valid user token"""
         tests.create_projects(self.session)
         tests.create_projects_git(
             os.path.join(self.path, "tickets", bare=True)

@@ -34,7 +34,7 @@ from pagure.lib.repo import PagureRepo
 
 
 class PagureFlaskApiProjectDeleteProjecttests(tests.Modeltests):
-    """ Tests for the flask API of pagure for deleting projects """
+    """Tests for the flask API of pagure for deleting projects"""
 
     maxDiff = None
 

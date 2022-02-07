@@ -463,7 +463,7 @@ def _check_session_cookie():
 
 
 def _send_session_cookie(response):
-    """ Set the session cookie if the user is authenticated. """
+    """Set the session cookie if the user is authenticated."""
     cookie_name = pagure.config.config.get("SESSION_COOKIE_NAME", "pagure")
     secure = pagure.config.config.get("SESSION_COOKIE_SECURE", True)
 

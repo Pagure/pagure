@@ -34,14 +34,14 @@ import tests
 
 
 class PagureFlaskApiProjectBlockuserTests(tests.SimplePagureTest):
-    """ Tests for the flask API of pagure for assigning a PR """
+    """Tests for the flask API of pagure for assigning a PR"""
 
     maxDiff = None
 
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskApiProjectBlockuserTests, self).setUp()
 
         tests.create_projects(self.session)
@@ -72,7 +72,7 @@ class PagureFlaskApiProjectBlockuserTests(tests.SimplePagureTest):
         self.session.commit()
 
     def tearDown(self):
-        """ Tears down the environment at the end of the tests. """
+        """Tears down the environment at the end of the tests."""
         project = pagure.lib.query.get_authorized_project(self.session, "test")
         self.assertEqual(project.block_users, self.blocked_users)
 

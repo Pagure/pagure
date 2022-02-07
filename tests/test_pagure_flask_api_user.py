@@ -32,18 +32,18 @@ import tests
 
 
 class PagureFlaskApiUSertests(tests.Modeltests):
-    """ Tests for the flask API of pagure for issue """
+    """Tests for the flask API of pagure for issue"""
 
     maxDiff = None
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskApiUSertests, self).setUp()
 
         pagure.config.config["REQUESTS_FOLDER"] = None
 
     def test_api_users(self):
-        """ Test the api_users function.  """
+        """Test the api_users function."""
 
         output = self.app.get("/api/0/users")
         self.assertEqual(output.status_code, 200)
@@ -759,12 +759,12 @@ class PagureFlaskApiUSertests(tests.Modeltests):
 
 
 class PagureFlaskApiUsertestrequests(tests.Modeltests):
-    """ Tests for the user requests endpoints """
+    """Tests for the user requests endpoints"""
 
     maxDiff = None
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskApiUsertestrequests, self).setUp()
 
         pagure.config.config["REQUESTS_FOLDER"] = None
@@ -1288,7 +1288,7 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_api_view_user_requests_filed_foo_grp_access(self, mockemail):
-        """ Test when the user has accessed to some PRs via a group. """
+        """Test when the user has accessed to some PRs via a group."""
 
         # Add the user to a group
         msg = pagure.lib.query.add_group(
@@ -1652,12 +1652,12 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
 
 
 class PagureFlaskApiUsertestissues(tests.Modeltests):
-    """ Tests for the user issues endpoints """
+    """Tests for the user issues endpoints"""
 
     maxDiff = None
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskApiUsertestissues, self).setUp()
 
         pagure.config.config["REQUESTS_FOLDER"] = None
@@ -1678,7 +1678,7 @@ class PagureFlaskApiUsertestissues(tests.Modeltests):
         self.assertEqual(msg.title, "Test issue")
 
     def test_user_issues_empty(self):
-        """ Return the list of issues associated with the specified user. """
+        """Return the list of issues associated with the specified user."""
 
         output = self.app.get("/api/0/user/foo/issues")
         self.assertEqual(output.status_code, 200)
@@ -1733,7 +1733,7 @@ class PagureFlaskApiUsertestissues(tests.Modeltests):
         )
 
     def test_user_issues(self):
-        """ Return the list of issues associated with the specified user. """
+        """Return the list of issues associated with the specified user."""
 
         output = self.app.get("/api/0/user/pingou/issues")
         self.assertEqual(output.status_code, 200)

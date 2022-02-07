@@ -150,7 +150,7 @@ WAIT_REGEX = re.compile(r"""var _url = '(\/wait\/[a-z0-9-]+\??.*)'""")
 
 
 def get_wait_target(html):
-    """ This parses the window.location out of the HTML for the wait page. """
+    """This parses the window.location out of the HTML for the wait page."""
     found = WAIT_REGEX.findall(html)
     if len(found) == 0:
         raise Exception("Not able to get wait target in %s" % html)
@@ -158,7 +158,7 @@ def get_wait_target(html):
 
 
 def get_post_target(html):
-    """ This parses the wait page form to get the POST url. """
+    """This parses the wait page form to get the POST url."""
     soup = BeautifulSoup(html, "html.parser")
     form = soup.find(id="waitform")
     if not form:
@@ -167,7 +167,7 @@ def get_post_target(html):
 
 
 def get_post_args(html):
-    """ This parses the wait page for the hidden arguments of the form. """
+    """This parses the wait page for the hidden arguments of the form."""
     soup = BeautifulSoup(html, "html.parser")
     output = {}
     inputs = soup.find_all("input")
@@ -181,7 +181,7 @@ def get_post_args(html):
 
 def create_maybe_waiter(method, getter):
     def maybe_waiter(*args, **kwargs):
-        """ A wrapper for self.app.get()/.post() that will resolve wait's """
+        """A wrapper for self.app.get()/.post() that will resolve wait's"""
         result = method(*args, **kwargs)
 
         # Handle the POST wait case
@@ -223,7 +223,7 @@ def create_maybe_waiter(method, getter):
 
 @contextmanager
 def user_set(APP, user, keep_get_user=False):
-    """ Set the provided user as fas_user in the provided application."""
+    """Set the provided user as fas_user in the provided application."""
 
     # Hack used to remove the before_request function set by
     # flask.ext.fas_openid.FAS which otherwise kills our effort to set a
@@ -296,7 +296,7 @@ class SimplePagureTest(unittest.TestCase):
 
     @mock.patch("pagure.lib.notify.fedmsg_publish", mock.MagicMock())
     def __init__(self, method_name="runTest"):
-        """ Constructor. """
+        """Constructor."""
         unittest.TestCase.__init__(self, method_name)
         self.session = None
         self.path = None
@@ -305,7 +305,7 @@ class SimplePagureTest(unittest.TestCase):
         self.results = {}
 
     def perfMaxWalks(self, max_walks, max_steps):
-        """ Check that we have not performed too many walks/steps. """
+        """Check that we have not performed too many walks/steps."""
         num_walks = 0
         num_steps = 0
         for reqstat in perfrepo.REQUESTS:
@@ -326,7 +326,7 @@ class SimplePagureTest(unittest.TestCase):
         )
 
     def perfReset(self):
-        """ Reset perfrepo stats. """
+        """Reset perfrepo stats."""
         perfrepo.reset_stats()
         perfrepo.REQUESTS = []
 
@@ -488,7 +488,7 @@ class SimplePagureTest(unittest.TestCase):
         self.session.commit()
 
     def set_auth_status(self, value):
-        """ Set the return value for the test auth """
+        """Set the return value for the test auth"""
         with open(
             os.path.join(self.path, "testauth_status.json"), "w"
         ) as statusfile:
@@ -520,7 +520,7 @@ class SimplePagureTest(unittest.TestCase):
         return tuple(wtforms_v)
 
     def get_arrow_version(self):
-        """ Returns the arrow version as a tuple."""
+        """Returns the arrow version as a tuple."""
         import arrow
 
         arrow_v = arrow.__version__.split(".")
@@ -544,10 +544,10 @@ class SimplePagureTest(unittest.TestCase):
 
 
 class Modeltests(SimplePagureTest):
-    """ Model tests. """
+    """Model tests."""
 
     def setUp(self):  # pylint: disable=invalid-name
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         # Clean up test performance info
         super(Modeltests, self).setUp()
         self.app.get = create_maybe_waiter(self.app.get, self.app.get)
@@ -557,7 +557,7 @@ class Modeltests(SimplePagureTest):
         self.session = pagure.lib.query.create_session(self.dbpath)
 
     def tearDown(self):  # pylint: disable=invalid-name
-        """ Remove the test.db database if there is one. """
+        """Remove the test.db database if there is one."""
         self.broker_client.flushall()
         super(Modeltests, self).tearDown()
 
@@ -596,7 +596,7 @@ class FakeGroup(object):  # pylint: disable=too-few-public-methods
 
 
 class FakeUser(object):  # pylint: disable=too-few-public-methods
-    """ Fake user used to test the fedocallib library. """
+    """Fake user used to test the fedocallib library."""
 
     def __init__(
         self, groups=None, username="username", cla_done=True, id=None
@@ -637,7 +637,7 @@ def create_locks(session, project):
 
 
 def create_projects(session, is_fork=False, user_id=1, hook_token_suffix=""):
-    """ Create some projects in the database. """
+    """Create some projects in the database."""
     item = pagure.lib.model.Project(
         user_id=user_id,  # pingou
         name="test",
@@ -681,7 +681,7 @@ def create_projects(session, is_fork=False, user_id=1, hook_token_suffix=""):
 
 
 def create_projects_git(folder, bare=False):
-    """ Create some projects in the database. """
+    """Create some projects in the database."""
     repos = []
     for project in [
         "test.git",
@@ -697,7 +697,7 @@ def create_projects_git(folder, bare=False):
 
 
 def create_tokens(session, user_id=1, project_id=1, suffix=None):
-    """ Create some tokens for the project in the database. """
+    """Create some tokens for the project in the database."""
     token = "aaabbbcccddd"
     if suffix:
         token += suffix
@@ -791,7 +791,7 @@ def _clone_and_top_commits(folder, branch, branch_ref=False):
 
 
 def add_content_git_repo(folder, branch="master", append=None):
-    """ Create some content for the specified git repo. """
+    """Create some content for the specified git repo."""
     repo, newfolder, parents = _clone_and_top_commits(folder, branch)
 
     # Create a file in that git repo
@@ -864,7 +864,7 @@ def add_content_git_repo(folder, branch="master", append=None):
 
 
 def add_readme_git_repo(folder, readme_name="README.rst", branch="master"):
-    """ Create a README file for the specified git repo. """
+    """Create a README file for the specified git repo."""
     repo, newfolder, parents = _clone_and_top_commits(folder, branch)
 
     if readme_name == "README.rst":
@@ -930,7 +930,7 @@ that should never get displayed on the website if there is a README.rst in the r
 def add_commit_git_repo(
     folder, ncommits=10, filename="sources", branch="master", symlink_to=None
 ):
-    """ Create some more commits for the specified git repo. """
+    """Create some more commits for the specified git repo."""
     repo, newfolder, branch_ref_obj = _clone_and_top_commits(
         folder, branch, branch_ref=True
     )
@@ -982,7 +982,7 @@ def add_commit_git_repo(
 
 
 def add_tag_git_repo(folder, tagname, obj_hash, message):
-    """ Add a tag to the given object of the given repo annotated by given message. """
+    """Add a tag to the given object of the given repo annotated by given message."""
     repo, newfolder, branch_ref_obj = _clone_and_top_commits(
         folder, "master", branch_ref=True
     )
@@ -1015,7 +1015,7 @@ def add_content_to_git(
     author=("Alice Author", "alice@authors.tld"),
     commiter=("Cecil Committer", "cecil@committers.tld"),
 ):
-    """ Create some more commits for the specified git repo. """
+    """Create some more commits for the specified git repo."""
     repo, newfolder, branch_ref_obj = _clone_and_top_commits(
         folder, branch, branch_ref=True
     )
@@ -1069,7 +1069,7 @@ def add_content_to_git(
 
 
 def add_binary_git_repo(folder, filename):
-    """ Create a fake image file for the specified git repo. """
+    """Create a fake image file for the specified git repo."""
     repo, newfolder, parents = _clone_and_top_commits(folder, "master")
 
     content = b"""\x00\x00\x01\x00\x01\x00\x18\x18\x00\x00\x01\x00 \x00\x88
@@ -1111,7 +1111,7 @@ def add_binary_git_repo(folder, filename):
 
 
 def remove_file_git_repo(folder, filename, branch="master"):
-    """ Delete the specified file on the give git repo and branch. """
+    """Delete the specified file on the give git repo and branch."""
     repo, newfolder, parents = _clone_and_top_commits(folder, branch)
 
     # Remove file
@@ -1281,7 +1281,7 @@ def get_alerts(html):
 
 
 def definitely_wait(result):
-    """ Helper function for definitely waiting in _maybe_wait. """
+    """Helper function for definitely waiting in _maybe_wait."""
     result.wait()
 
 

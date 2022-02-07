@@ -33,12 +33,12 @@ from pagure.lib.repo import PagureRepo
 
 
 class PagureLibGitMirrorProjecttests(tests.Modeltests):
-    """ Tests for pagure.lib.git.mirror_pull_project """
+    """Tests for pagure.lib.git.mirror_pull_project"""
 
     maxDiff = None
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureLibGitMirrorProjecttests, self).setUp()
 
         tests.create_projects(self.session)
@@ -55,7 +55,7 @@ class PagureLibGitMirrorProjecttests(tests.Modeltests):
     @patch("subprocess.Popen")
     @patch("subprocess.check_output")
     def test_mirror_pull_project(self, ck_out_mock, popen_mock):
-        """ Test the mirror_pull_project method of pagure.lib.git. """
+        """Test the mirror_pull_project method of pagure.lib.git."""
 
         tmp = MagicMock()
         tmp.communicate.return_value = ("", "")

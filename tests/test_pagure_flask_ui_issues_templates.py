@@ -99,12 +99,12 @@ def create_templates(repopath):
 
 
 class PagureFlaskIssuesTemplatetests(tests.Modeltests):
-    """ Tests for flask issues controller of pagure """
+    """Tests for flask issues controller of pagure"""
 
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def setUp(self):
-        """ Set up the environnment, run before every tests. """
+        """Set up the environnment, run before every tests."""
         super(PagureFlaskIssuesTemplatetests, self).setUp()
 
         pagure.config.config["TICKETS_FOLDER"] = os.path.join(
@@ -140,7 +140,7 @@ class PagureFlaskIssuesTemplatetests(tests.Modeltests):
             self.assertNotIn("Issue Templates", output_text)
 
     def test_new_issue_w_template(self):
-        """ Test the new_issue endpoint when the project has templates. """
+        """Test the new_issue endpoint when the project has templates."""
 
         user = tests.FakeUser()
         with tests.user_set(self.app.application, user):
@@ -171,7 +171,7 @@ class PagureFlaskIssuesTemplatetests(tests.Modeltests):
             )
 
     def test_new_issue_w_specific_template(self):
-        """ Test the new_issue endpoint when the project has templates. """
+        """Test the new_issue endpoint when the project has templates."""
 
         user = tests.FakeUser()
         with tests.user_set(self.app.application, user):

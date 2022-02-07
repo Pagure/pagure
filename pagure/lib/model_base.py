@@ -68,7 +68,7 @@ def create_session(db_url=None, debug=False, pool_recycle=3600):
             # Ignore the warning about con_record
             # pylint: disable=unused-argument
             def _fk_pragma_on_connect(dbapi_con, _):  # pragma: no cover
-                """ Tries to enforce referential constraints on sqlite. """
+                """Tries to enforce referential constraints on sqlite."""
                 dbapi_con.execute("pragma foreign_keys=ON")
 
             sqlalchemy.event.listen(engine, "connect", _fk_pragma_on_connect)

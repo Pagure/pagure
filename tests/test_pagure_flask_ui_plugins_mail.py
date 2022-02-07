@@ -23,10 +23,10 @@ import tests
 
 
 class PagureFlaskPluginMailtests(tests.SimplePagureTest):
-    """ Tests for flask plugins controller of pagure """
+    """Tests for flask plugins controller of pagure"""
 
     def test_plugin_mail(self):
-        """ Test the mail plugin on/off endpoint. """
+        """Test the mail plugin on/off endpoint."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"))

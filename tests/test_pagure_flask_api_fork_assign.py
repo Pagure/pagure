@@ -34,14 +34,14 @@ import tests
 
 
 class PagureFlaskApiForkAssigntests(tests.SimplePagureTest):
-    """ Tests for the flask API of pagure for assigning a PR """
+    """Tests for the flask API of pagure for assigning a PR"""
 
     maxDiff = None
 
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskApiForkAssigntests, self).setUp()
 
         tests.create_projects(self.session)

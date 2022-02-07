@@ -140,7 +140,7 @@ class BaseRunner(object):
 
 
 class BaseHook(object):
-    """ Base class for pagure's hooks. """
+    """Base class for pagure's hooks."""
 
     name = None
     form = None

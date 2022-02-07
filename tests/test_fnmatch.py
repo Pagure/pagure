@@ -25,7 +25,7 @@ class FnmatchTests(unittest.TestCase):
     """Tests for the streaming server."""
 
     def test_fnmatch(self):
-        """ Test the matching done by fnmatch. """
+        """Test the matching done by fnmatch."""
         matrix = [
             ["pagure", "*", True],
             ["ns/pagure", "*", True],

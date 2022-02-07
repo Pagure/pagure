@@ -53,7 +53,7 @@ class FileNotFoundException(PagureException):
 
 
 class APIError(PagureException):
-    """ Exception raised by the API when something goes wrong. """
+    """Exception raised by the API when something goes wrong."""
 
     def __init__(self, status_code, error_code, error=None, errors=None):
         self.status_code = status_code
@@ -85,7 +85,7 @@ class GitConflictsException(PagureException):
 
 
 class HookInactiveException(PagureException):
-    """ Exception raised when the hook is inactive. """
+    """Exception raised when the hook is inactive."""
 
     pass
 
@@ -98,7 +98,7 @@ class NoCorrespondingPR(PagureException):
 
 
 class InvalidObjectException(PagureException):
-    """ Exception raised when a given object is not what was expected. """
+    """Exception raised when a given object is not what was expected."""
 
     pass
 
@@ -112,18 +112,18 @@ class PagureEncodingException(PagureException, ValueError):
 
 
 class PagurePushDenied(PagureException):
-    """ Exception raised if a remote hook rejected a push """
+    """Exception raised if a remote hook rejected a push"""
 
     pass
 
 
 class InvalidTimestampException(PagureException):
-    """ Exception raised when the hook is inactive. """
+    """Exception raised when the hook is inactive."""
 
     pass
 
 
 class InvalidDateformatException(PagureException):
-    """ Exception raised when the hook is inactive. """
+    """Exception raised when the hook is inactive."""
 
     pass

@@ -65,7 +65,7 @@ class IrcTable(BASE):
 
 
 class IrcForm(FlaskForm):
-    """ Form to configure the irc hook. """
+    """Form to configure the irc hook."""
 
     server = wtforms.StringField(
         'Server <span class="error">*</span>', [RequiredIf("active")]
@@ -89,7 +89,7 @@ class IrcForm(FlaskForm):
 
 
 class Hook(BaseHook):
-    """ IRC hooks. """
+    """IRC hooks."""
 
     name = "IRC"
     description = (

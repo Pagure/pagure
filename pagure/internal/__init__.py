@@ -94,7 +94,7 @@ def internal_access_only(function):
 @PV.route("/ssh/lookupkey/", methods=["POST"])
 @internal_access_only
 def lookup_ssh_key():
-    """ Looks up an SSH key by search_key for keyhelper.py """
+    """Looks up an SSH key by search_key for keyhelper.py"""
     search_key = flask.request.form["search_key"]
     username = flask.request.form.get("username")
     _auth_log.info(
@@ -125,7 +125,7 @@ def lookup_ssh_key():
 @PV.route("/ssh/checkaccess/", methods=["POST"])
 @internal_access_only
 def check_ssh_access():
-    """ Determines whether a user has read access to the requested repo. """
+    """Determines whether a user has read access to the requested repo."""
     gitdir = flask.request.form["gitdir"]
     remoteuser = flask.request.form["username"]
     _auth_log.info(

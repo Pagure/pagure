@@ -35,7 +35,7 @@ from pagure.lib.repo import PagureRepo
 
 
 class PagureLibGitAuthtests(tests.Modeltests):
-    """ Tests for pagure.lib.git_auth """
+    """Tests for pagure.lib.git_auth"""
 
     config_values = {"authbackend": "test_auth"}
 
@@ -233,7 +233,7 @@ class PagureLibGitAuthtests(tests.Modeltests):
 
 
 class PagureLibGitAuthPagureBackendtests(tests.Modeltests):
-    """ Tests for pagure.lib.git_auth """
+    """Tests for pagure.lib.git_auth"""
 
     config_values = {"authbackend": "pagure"}
 

@@ -229,10 +229,10 @@ def set_up_git_repo(
 
 
 class PagureFlaskForktests(tests.Modeltests):
-    """ Tests for flask fork controller of pagure """
+    """Tests for flask fork controller of pagure"""
 
     def test_request_pull_reference(self):
-        """ Test if there is a reference created for a new PR. """
+        """Test if there is a reference created for a new PR."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(
@@ -259,7 +259,7 @@ class PagureFlaskForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_request_pull(self, send_email):
-        """ Test the request_pull endpoint. """
+        """Test the request_pull endpoint."""
         send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -334,7 +334,7 @@ class PagureFlaskForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_request_pull_delete_branch_button_no_auth(self, send_email):
-        """ Test the request_pull endpoint. """
+        """Test the request_pull endpoint."""
         send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -371,7 +371,7 @@ class PagureFlaskForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_request_pull_delete_branch_button(self, send_email):
-        """ Test the request_pull endpoint. """
+        """Test the request_pull endpoint."""
         send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -412,7 +412,7 @@ class PagureFlaskForktests(tests.Modeltests):
     def test_request_pull_delete_branch_button_no_project_from(
         self, send_email
     ):
-        """ Test the request_pull endpoint. """
+        """Test the request_pull endpoint."""
         send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -456,7 +456,7 @@ class PagureFlaskForktests(tests.Modeltests):
     def test_request_pull_delete_branch_button_no_project_from_no_acl(
         self, send_email
     ):
-        """ Test the request_pull endpoint. """
+        """Test the request_pull endpoint."""
         send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -498,7 +498,7 @@ class PagureFlaskForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_task_update_request_pull(self, send_email):
-        """ Test the task update_pull_request endpoint. """
+        """Test the task update_pull_request endpoint."""
         send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -588,7 +588,7 @@ class PagureFlaskForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_request_pull_ci_dropdown(self, send_email):
-        """ Test presence of the "Rerun CI" dropdown with various settings. """
+        """Test presence of the "Rerun CI" dropdown with various settings."""
         send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -698,7 +698,7 @@ class PagureFlaskForktests(tests.Modeltests):
         {"TRIGGER_CI": {"CI1": {"name": "CI1", "description": "CI1!"}}},
     )
     def test_request_pull_ci_rerun(self, send_email):
-        """ Test rerunning CI using button from the "Rerun CI" dropdown. """
+        """Test rerunning CI using button from the "Rerun CI" dropdown."""
         send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -763,7 +763,7 @@ class PagureFlaskForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_merge_request_pull_FF(self, send_email):
-        """ Test the merge_request_pull endpoint with a FF PR. """
+        """Test the merge_request_pull endpoint with a FF PR."""
         send_email.return_value = True
 
         self.test_request_pull()
@@ -964,7 +964,7 @@ class PagureFlaskForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_merge_request_pull_merge(self, send_email):
-        """ Test the merge_request_pull endpoint with a merge PR. """
+        """Test the merge_request_pull endpoint with a merge PR."""
         send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -1007,7 +1007,7 @@ class PagureFlaskForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_merge_request_pull_merge_with_comment(self, send_email):
-        """ Test the merge_request_pull endpoint with a merge PR. """
+        """Test the merge_request_pull endpoint with a merge PR."""
         send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -1067,7 +1067,7 @@ class PagureFlaskForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_merge_request_pull_merge_with_delete_branch(self, send_email):
-        """ Test the merge_request_pull endpoint with a merge PR and delete source branch. """
+        """Test the merge_request_pull endpoint with a merge PR and delete source branch."""
         send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -1110,7 +1110,7 @@ class PagureFlaskForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_merge_request_pull_conflicts(self, send_email):
-        """ Test the merge_request_pull endpoint with a conflicting PR. """
+        """Test the merge_request_pull endpoint with a conflicting PR."""
         send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -1154,7 +1154,7 @@ class PagureFlaskForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_merge_request_pull_conflicts_with_delete_branch(self, send_email):
-        """ Test the merge_request_pull endpoint with a conflicting PR and request deletion of branch. """
+        """Test the merge_request_pull endpoint with a conflicting PR and request deletion of branch."""
         send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -1201,7 +1201,7 @@ class PagureFlaskForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_merge_request_pull_nochange(self, send_email):
-        """ Test the merge_request_pull endpoint. """
+        """Test the merge_request_pull endpoint."""
         send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -1244,7 +1244,7 @@ class PagureFlaskForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_request_pull_close(self, send_email):
-        """ Test the request_pull endpoint with a closed PR. """
+        """Test the request_pull endpoint with a closed PR."""
         send_email.return_value = True
 
         self.test_merge_request_pull_FF()
@@ -1259,7 +1259,7 @@ class PagureFlaskForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_request_pull_disabled(self, send_email):
-        """ Test the request_pull endpoint with PR disabled. """
+        """Test the request_pull endpoint with PR disabled."""
         send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -1284,7 +1284,7 @@ class PagureFlaskForktests(tests.Modeltests):
     @patch("pagure.lib.notify.send_email")
     @patch("pagure.lib.git.update_pull_ref")
     def test_request_pull_empty_repo(self, send_email, update_pull_ref):
-        """ Test the request_pull endpoint against an empty repo. """
+        """Test the request_pull endpoint against an empty repo."""
         # Mock update_pull_ref or the repo won't be empty anymore
         # (the PR will have been pushed to refs/pull)
         send_email.return_value = True
@@ -1375,7 +1375,7 @@ class PagureFlaskForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_request_pull_empty_fork(self, send_email):
-        """ Test the request_pull endpoint from an empty fork. """
+        """Test the request_pull endpoint from an empty fork."""
         send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -1610,7 +1610,7 @@ class PagureFlaskForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_request_pulls(self, send_email):
-        """ Test the request_pulls endpoint. """
+        """Test the request_pulls endpoint."""
         send_email.return_value = True
 
         # No such project
@@ -1876,7 +1876,7 @@ class PagureFlaskForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_request_pull_patch(self, send_email):
-        """ Test the request_pull_patch endpoint. """
+        """Test the request_pull_patch endpoint."""
         send_email.return_value = True
 
         output = self.app.get("/test/pull-request/1.patch")
@@ -1956,7 +1956,7 @@ index 9f44358..2a552bb 100644
 
     @patch("pagure.lib.notify.send_email")
     def test_request_pull_diff(self, send_email):
-        """ Test the request_pull_patch endpoint. """
+        """Test the request_pull_patch endpoint."""
         send_email.return_value = True
 
         output = self.app.get("/test/pull-request/1.diff")
@@ -2017,7 +2017,7 @@ index 9f44358..2a552bb 100644
 
     @patch("pagure.lib.notify.send_email")
     def test_request_pull_patch_close(self, send_email):
-        """ Test the request_pull_patch endpoint with a closed PR. """
+        """Test the request_pull_patch endpoint with a closed PR."""
         send_email.return_value = True
 
         self.test_merge_request_pull_FF()
@@ -2063,7 +2063,7 @@ index 9f44358..2a552bb 100644
     @patch("pagure.lib.notify.send_email")
     @patch("pagure.lib.git.update_pull_ref")
     def test_request_pull_patch_empty_repo(self, send_email, update_pull_ref):
-        """ Test the request_pull_patch endpoint against an empty repo. """
+        """Test the request_pull_patch endpoint against an empty repo."""
         # Mock update_pull_ref or the repo won't be empty anymore
         # (the PR will have been pushed to refs/pull)
         send_email.return_value = True
@@ -2178,7 +2178,7 @@ index 0000000..2a552bb
 
     @patch("pagure.lib.notify.send_email")
     def test_request_pull_patch_empty_fork(self, send_email):
-        """ Test the request_pull_patch endpoint from an empty fork. """
+        """Test the request_pull_patch endpoint from an empty fork."""
         send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -2243,7 +2243,7 @@ index 0000000..2a552bb
 
     @patch("pagure.lib.notify.send_email")
     def test_close_request_pull(self, send_email):
-        """ Test the close_request_pull endpoint. """
+        """Test the close_request_pull endpoint."""
         send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -2342,7 +2342,7 @@ index 0000000..2a552bb
     )
     @patch("pagure.lib.notify.send_email")
     def test_reopen_request_pull(self, send_email):
-        """ Test the reopen_request_pull endpoint. """
+        """Test the reopen_request_pull endpoint."""
         send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -4871,7 +4871,7 @@ index 0000000..2a552bb
     )
     @patch("pagure.lib.notify.send_email")
     def test_fork_project(self, send_email):
-        """ Test the fork_project endpoint. """
+        """Test the fork_project endpoint."""
         send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -5052,7 +5052,7 @@ index 0000000..2a552bb
 
     @patch("pagure.lib.notify.send_email")
     def test_new_request_pull_branch_space(self, send_email):
-        """ Test the new_request_pull endpoint. """
+        """Test the new_request_pull endpoint."""
         send_email.return_value = True
 
         self.test_fork_project()
@@ -5086,7 +5086,7 @@ index 0000000..2a552bb
     )
     @patch("pagure.lib.notify.send_email")
     def test_new_request_pull(self, send_email):
-        """ Test the new_request_pull endpoint. """
+        """Test the new_request_pull endpoint."""
         send_email.return_value = True
 
         self.test_fork_project()
@@ -5352,7 +5352,7 @@ More information</textarea>
 
     @patch("pagure.lib.notify.send_email")
     def test_new_request_pull_filename_unicode(self, send_email):
-        """ Test the new_request_pull endpoint. """
+        """Test the new_request_pull endpoint."""
         send_email.return_value = True
 
         # Create the main project in the DB
@@ -5552,7 +5552,7 @@ More information</textarea>
 
     @patch("pagure.lib.notify.send_email")
     def test_new_request_pull_req_sign_off_view(self, send_email):
-        """ Test the new_request_pull endpoint. """
+        """Test the new_request_pull endpoint."""
         send_email.return_value = True
 
         self.test_fork_project()
@@ -5610,7 +5610,7 @@ More information</textarea>
 
     @patch("pagure.lib.notify.send_email")
     def test_new_request_pull_req_sign_off_submit(self, send_email):
-        """ Test the new_request_pull endpoint. """
+        """Test the new_request_pull endpoint."""
         send_email.return_value = True
 
         self.test_fork_project()
@@ -5699,7 +5699,7 @@ More information</textarea>
 
     @patch("pagure.lib.notify.send_email")
     def test_request_pull_commit_start_stop(self, send_email):
-        """ Test the the commit start and stop of brand new PR. """
+        """Test the the commit start and stop of brand new PR."""
         send_email.return_value = True
 
         self.test_fork_project()
@@ -5766,7 +5766,7 @@ More information</textarea>
 
     @patch("pagure.lib.notify.send_email")
     def test_new_request_pull_from_fork_branch(self, send_email):
-        """ Test creating a fork to fork PR. """
+        """Test creating a fork to fork PR."""
         send_email.return_value = True
 
         # Create main repo with some content
@@ -5852,7 +5852,7 @@ More information</textarea>
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_new_request_pull_from_fork_fixing_ticket(self):
-        """ Test creating a fork to fork PR fixing a ticket. """
+        """Test creating a fork to fork PR fixing a ticket."""
         # Create main repo with some content
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
@@ -5982,7 +5982,7 @@ More information</textarea>
 
     @patch("pagure.lib.notify.send_email")
     def test_new_request_pull_fork_to_fork_pr_disabled(self, send_email):
-        """ Test creating a fork to fork PR. """
+        """Test creating a fork to fork PR."""
         send_email.return_value = True
 
         self.test_fork_project()
@@ -6047,7 +6047,7 @@ More information</textarea>
 
     @patch("pagure.lib.notify.send_email")
     def test_new_request_pull_fork_to_fork(self, send_email):
-        """ Test creating a fork to fork PR. """
+        """Test creating a fork to fork PR."""
         send_email.return_value = True
 
         self.test_fork_project()
@@ -6162,7 +6162,7 @@ More information</textarea>
 
     @patch("pagure.lib.notify.send_email")
     def test_new_request_pull_fork_to_other_fork(self, send_email):
-        """ Test creating a PR from fork to a fork of the same family. """
+        """Test creating a PR from fork to a fork of the same family."""
         send_email.return_value = True
 
         self.test_fork_project()
@@ -6387,7 +6387,7 @@ More information</textarea>
 
     @patch("pagure.lib.notify.send_email")
     def test_new_request_pull_empty_repo(self, send_email):
-        """ Test the new_request_pull endpoint against an empty repo. """
+        """Test the new_request_pull endpoint against an empty repo."""
         send_email.return_value = True
 
         self.test_fork_project()
@@ -6442,7 +6442,7 @@ More information</textarea>
 
     @patch("pagure.lib.notify.send_email")
     def test_new_request_pull_empty_fork(self, send_email):
-        """ Test the new_request_pull endpoint against an empty repo. """
+        """Test the new_request_pull endpoint against an empty repo."""
         send_email.return_value = True
 
         self.test_fork_project()
@@ -6485,7 +6485,7 @@ More information</textarea>
     )
     @patch("pagure.lib.notify.send_email")
     def test_pull_request_add_comment(self, send_email):
-        """ Test the pull_request_add_comment endpoint. """
+        """Test the pull_request_add_comment endpoint."""
         send_email.return_value = True
 
         self.test_request_pull()
@@ -6687,7 +6687,7 @@ More information</textarea>
 
     @patch("pagure.lib.notify.send_email")
     def test_pull_request_drop_comment(self, send_email):
-        """ Test the pull_request_drop_comment endpoint. """
+        """Test the pull_request_drop_comment endpoint."""
         send_email.return_value = True
 
         self.test_pull_request_add_comment()
@@ -6789,7 +6789,7 @@ More information</textarea>
     )
     @patch("pagure.lib.notify.send_email")
     def test_pull_request_edit_comment(self, send_email):
-        """ Test the pull request edit comment endpoint """
+        """Test the pull request edit comment endpoint"""
         send_email.return_value = True
 
         self.test_request_pull()
@@ -7304,7 +7304,7 @@ More information</textarea>
 
     @patch("pagure.lib.notify.send_email")
     def test_fork_edit_file(self, send_email):
-        """ Test the fork_edit file endpoint. """
+        """Test the fork_edit file endpoint."""
 
         send_email.return_value = True
 
@@ -7474,7 +7474,7 @@ More information</textarea>
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_fork_edit_file_namespace(self):
-        """ Test the fork_edit file endpoint on a namespaced project. """
+        """Test the fork_edit file endpoint on a namespaced project."""
 
         tests.create_projects(self.session)
         for folder in ["docs", "tickets", "requests", "repos"]:
@@ -7631,7 +7631,7 @@ More information</textarea>
 
     @patch("pagure.lib.notify.send_email")
     def test_fork_without_main_repo(self, send_email):
-        """ Test the fork without the main repo. """
+        """Test the fork without the main repo."""
         send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -7736,7 +7736,7 @@ More information</textarea>
 
     @patch("pagure.lib.notify.send_email")
     def test_add_reaction(self, send_email):
-        """ Test the request_pull endpoint. """
+        """Test the request_pull endpoint."""
         send_email.return_value = True
 
         self._set_up_for_reaction_test()
@@ -7768,7 +7768,7 @@ More information</textarea>
 
     @patch("pagure.lib.notify.send_email")
     def test_add_reaction_unauthenticated(self, send_email):
-        """ Test the request_pull endpoint. """
+        """Test the request_pull endpoint."""
         send_email.return_value = True
 
         self._set_up_for_reaction_test()
@@ -7796,7 +7796,7 @@ class TestTicketAccessEditPRMetadata(tests.Modeltests):
     meta-data of a PR"""
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(TestTicketAccessEditPRMetadata, self).setUp()
         tests.create_projects(self.session)
         tests.create_projects_git(
@@ -7869,7 +7869,7 @@ class TestTicketAccessEditPRMetadata(tests.Modeltests):
             )
 
     def test_admin_can_edit_metadata_ui(self):
-        """ Test that admin users can edit the metadata in the UI. """
+        """Test that admin users can edit the metadata in the UI."""
 
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):

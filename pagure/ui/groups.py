@@ -29,7 +29,7 @@ _log = logging.getLogger(__name__)
 @UI_NS.route("/groups/")
 @UI_NS.route("/groups")
 def group_lists():
-    """ List all the groups associated with all the projects. """
+    """List all the groups associated with all the projects."""
 
     group_type = "user"
     if pagure.utils.is_admin():
@@ -56,7 +56,7 @@ def group_lists():
 @UI_NS.route("/group/<group>/", methods=["GET", "POST"])
 @UI_NS.route("/group/<group>", methods=["GET", "POST"])
 def view_group(group):
-    """ Displays information about this group. """
+    """Displays information about this group."""
     if flask.request.method == "POST" and not pagure_config.get(
         "ENABLE_USER_MNGT", True
     ):
@@ -128,7 +128,7 @@ def view_group(group):
 @UI_NS.route("/group/<group>/edit", methods=["GET", "POST"])
 @login_required
 def edit_group(group):
-    """ Allows editing the information about this group. """
+    """Allows editing the information about this group."""
     if not pagure_config.get("ENABLE_USER_MNGT", True):
         flask.abort(404)
 
@@ -183,7 +183,7 @@ def edit_group(group):
 @UI_NS.route("/group/<group>/give", methods=["POST"])
 @login_required
 def give_group(group):
-    """ Allows giving away a group. """
+    """Allows giving away a group."""
     if not pagure_config.get("ENABLE_USER_MNGT", True):
         flask.abort(404)
 

@@ -29,12 +29,12 @@ import tests
 
 
 class PagureFlaskApitests(tests.SimplePagureTest):
-    """ Tests for flask API controller of pagure """
+    """Tests for flask API controller of pagure"""
 
     maxDiff = None
 
     def test_api_doc(self):
-        """ Test the API documentation page. """
+        """Test the API documentation page."""
         print(dir(self.app))
         output = self.app.get("/api/0/")
         output_text = output.get_data(as_text=True)
@@ -42,7 +42,7 @@ class PagureFlaskApitests(tests.SimplePagureTest):
         self.assertIn(">Pagure API Reference</h5>\n", output_text)
 
     def test_api_doc_authenticated(self):
-        """ Test the API documentation page. """
+        """Test the API documentation page."""
         user = tests.FakeUser(username="foo")
         with tests.user_set(self.app.application, user):
             output = self.app.get("/api/0/")
@@ -68,7 +68,7 @@ class PagureFlaskApitests(tests.SimplePagureTest):
             self.assertEqual(pagure.api.get_request_data()["foo"], "bar")
 
     def test_api_version_old_url(self):
-        """ Test the api_version function.  """
+        """Test the api_version function."""
         output = self.app.get("/api/0/version")
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
@@ -76,7 +76,7 @@ class PagureFlaskApitests(tests.SimplePagureTest):
         self.assertEqual(sorted(data.keys()), ["version"])
 
     def test_api_version_new_url(self):
-        """ Test the api_version function at its new url.  """
+        """Test the api_version function at its new url."""
         output = self.app.get("/api/0/-/version")
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
@@ -84,7 +84,7 @@ class PagureFlaskApitests(tests.SimplePagureTest):
         self.assertEqual(sorted(data.keys()), ["version"])
 
     def test_api_groups(self):
-        """ Test the api_groups function.  """
+        """Test the api_groups function."""
 
         # Add a couple of groups so that we can list them
         item = pagure.lib.model.PagureGroup(
@@ -123,7 +123,7 @@ class PagureFlaskApitests(tests.SimplePagureTest):
         self.assertEqual(data["total_groups"], 1)
 
     def test_api_whoami_unauth(self):
-        """ Test the api_whoami function. """
+        """Test the api_whoami function."""
 
         output = self.app.post("/api/0/-/whoami")
         self.assertEqual(output.status_code, 401)
@@ -139,7 +139,7 @@ class PagureFlaskApitests(tests.SimplePagureTest):
         )
 
     def test_api_whoami_invalid_auth(self):
-        """ Test the api_whoami function with an invalid token. """
+        """Test the api_whoami function with an invalid token."""
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
 
@@ -160,7 +160,7 @@ class PagureFlaskApitests(tests.SimplePagureTest):
         )
 
     def test_api_whoami_auth(self):
-        """ Test the api_whoami function with a valid token. """
+        """Test the api_whoami function with a valid token."""
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
 
@@ -172,7 +172,7 @@ class PagureFlaskApitests(tests.SimplePagureTest):
         self.assertEqual(data, {"username": "pingou"})
 
     def test_api_error_codes(self):
-        """ Test the api_error_codes endpoint. """
+        """Test the api_error_codes endpoint."""
         output = self.app.get("/api/0/-/error_codes")
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))

@@ -26,14 +26,14 @@ import tests
 
 class TestStarProjectUI(tests.SimplePagureTest):
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(TestStarProjectUI, self).setUp()
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
 
     def _check_star_count(self, data, stars=1):
-        """ Check if the star count is correct or not """
+        """Check if the star count is correct or not"""
         output = self.app.get("/test/", data=data, follow_redirects=True)
         if stars == 1:
             self.assertIn(
@@ -49,7 +49,7 @@ class TestStarProjectUI(tests.SimplePagureTest):
             )
 
     def test_star_project_no_project(self):
-        """ Test the star_project endpoint. """
+        """Test the star_project endpoint."""
 
         # No such project
         output = self.app.post("/test42/star/1")
@@ -70,7 +70,7 @@ class TestStarProjectUI(tests.SimplePagureTest):
             self.assertEqual(output.status_code, 400)
 
     def test_star_project_invalid_star(self):
-        """ Test the star_project endpoint for invalid star """
+        """Test the star_project endpoint for invalid star"""
 
         user = tests.FakeUser()
         user.username = "pingou"
@@ -84,7 +84,7 @@ class TestStarProjectUI(tests.SimplePagureTest):
             self._check_star_count(data=data, stars=0)
 
     def test_star_project_valid_star(self):
-        """ Test the star_project endpoint for correct star """
+        """Test the star_project endpoint for correct star"""
 
         user = tests.FakeUser()
         user.username = "pingou"
@@ -115,7 +115,7 @@ class TestStarProjectUI(tests.SimplePagureTest):
             self._check_star_count(data=data, stars=0)
 
     def test_repo_stargazers(self):
-        """ Test the repo_stargazers endpoint of pagure.ui.repo """
+        """Test the repo_stargazers endpoint of pagure.ui.repo"""
 
         # make pingou star the project
         # first create pingou
@@ -174,7 +174,7 @@ class TestStarProjectUI(tests.SimplePagureTest):
         )
 
     def test_user_stars(self):
-        """ Test the user_stars endpoint of pagure.ui.app """
+        """Test the user_stars endpoint of pagure.ui.app"""
 
         # Check pingou's stars before
         output = self.app.get("/user/pingou/stars/")

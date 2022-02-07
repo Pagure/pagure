@@ -31,14 +31,14 @@ from pagure.lib.repo import PagureRepo
 
 
 class PagureFlaskPrNoSourcestests(tests.Modeltests):
-    """ Tests PR in pagure when the source is gone """
+    """Tests PR in pagure when the source is gone"""
 
     maxDiff = None
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     @patch("pagure.lib.notify.fedmsg_publish", MagicMock(return_value=True))
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskPrNoSourcestests, self).setUp()
 
         tests.create_projects(self.session)
@@ -91,7 +91,7 @@ class PagureFlaskPrNoSourcestests(tests.Modeltests):
         tests.clean_pull_requests_path()
 
     def test_request_pull_reference(self):
-        """ Test if there is a reference created for a new PR. """
+        """Test if there is a reference created for a new PR."""
 
         project = pagure.lib.query.get_authorized_project(self.session, "test")
         self.assertEqual(len(project.requests), 1)
@@ -104,7 +104,7 @@ class PagureFlaskPrNoSourcestests(tests.Modeltests):
         )
 
     def test_request_pull_fork_reference(self):
-        """ Test if there the references created on the fork. """
+        """Test if there the references created on the fork."""
 
         project = pagure.lib.query.get_authorized_project(
             self.session, "test", user="foo"
@@ -118,7 +118,7 @@ class PagureFlaskPrNoSourcestests(tests.Modeltests):
         )
 
     def test_accessing_pr_fork_deleted(self):
-        """ Test accessing the PR if the fork has been deleted. """
+        """Test accessing the PR if the fork has been deleted."""
 
         # Delete fork on disk
         project = pagure.lib.query.get_authorized_project(
@@ -138,7 +138,7 @@ class PagureFlaskPrNoSourcestests(tests.Modeltests):
         self.assertEqual(output2.status_code, 200)
 
     def test_accessing_pr_patch_fork_deleted(self):
-        """ Test accessing the PR's patch if the fork has been deleted. """
+        """Test accessing the PR's patch if the fork has been deleted."""
 
         # Delete fork on disk
         project = pagure.lib.query.get_authorized_project(

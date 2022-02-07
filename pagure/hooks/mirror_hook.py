@@ -65,7 +65,7 @@ class MirrorTable(BASE):
 
 
 class MirrorRunner(BaseRunner):
-    """ Runner for the mirror hook. """
+    """Runner for the mirror hook."""
 
     @staticmethod
     def post_receive(session, username, project, repotype, repodir, changes):
@@ -102,7 +102,7 @@ class CustomRegexp(wtforms.validators.Regexp):
 
 
 class MirrorForm(FlaskForm):
-    """ Form to configure the mirror hook. """
+    """Form to configure the mirror hook."""
 
     active = wtforms.BooleanField("Active", [wtforms.validators.Optional()])
 
@@ -137,7 +137,7 @@ Finally the log of the last sync at the bottom is meant.
 
 
 class MirrorHook(BaseHook):
-    """ Mirror hook. """
+    """Mirror hook."""
 
     name = "Mirroring"
     description = DESCRIPTION

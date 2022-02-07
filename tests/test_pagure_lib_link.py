@@ -38,7 +38,7 @@ COMMENTS = [
 
 
 class PagureLibLinktests(tests.Modeltests):
-    """ Tests for pagure.lib.link """
+    """Tests for pagure.lib.link"""
 
     def test_get_relation_relates(self):
         """Test the get_relation function of pagure.lib.link with relates."""
@@ -198,7 +198,7 @@ class PagureLibLinktests(tests.Modeltests):
                 self.assertEqual(link, [])
 
     def test_relates_regex(self):
-        """ Test the relates regex present in pagure.lib.link. """
+        """Test the relates regex present in pagure.lib.link."""
         text = "relates  to   http://localhost.localdomain/fork/pingou/test/issue/1"
         for index, regex in enumerate(pagure.lib.link.RELATES):
             if index == 1:
@@ -238,7 +238,7 @@ class PagureLibLinktests(tests.Modeltests):
                 self.assertEqual(regex.match(text), None)
 
     def test_fixes_regex(self):
-        """ Test the fixes regex present in pagure.lib.link. """
+        """Test the fixes regex present in pagure.lib.link."""
 
         # project/issue matches
         def project_match(text, groups):

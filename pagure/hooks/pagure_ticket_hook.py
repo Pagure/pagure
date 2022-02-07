@@ -62,7 +62,7 @@ class PagureTicketsTable(BASE):
 
 
 class PagureTicketRunner(BaseRunner):
-    """ Runner for the git hook updating the DB of tickets on push. """
+    """Runner for the git hook updating the DB of tickets on push."""
 
     @staticmethod
     def post_receive(session, username, project, repotype, repodir, changes):
@@ -106,13 +106,13 @@ class PagureTicketRunner(BaseRunner):
 
 
 class PagureTicketsForm(FlaskForm):
-    """ Form to configure the pagure hook. """
+    """Form to configure the pagure hook."""
 
     active = wtforms.BooleanField("Active", [wtforms.validators.Optional()])
 
 
 class PagureTicketHook(BaseHook):
-    """ Pagure ticket hook. """
+    """Pagure ticket hook."""
 
     name = "Pagure tickets"
     description = (

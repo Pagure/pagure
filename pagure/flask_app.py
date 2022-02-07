@@ -61,7 +61,7 @@ if pagure_config.get("PAGURE_CI_SERVICES"):
 
 
 def create_app(config=None):
-    """ Create the flask application. """
+    """Create the flask application."""
     app = flask.Flask(__name__)
     app.config = pagure_config
 
@@ -265,7 +265,7 @@ def logout():
 
 
 def set_request():
-    """ Prepare every request. """
+    """Prepare every request."""
     flask.session.permanent = True
     if not hasattr(flask.g, "session") or not flask.g.session:
         flask.g.session = pagure.lib.model_base.create_session(
@@ -440,7 +440,7 @@ def set_request():
 
 
 def auth_login():  # pragma: no cover
-    """ Method to log into the application using FAS OpenID. """
+    """Method to log into the application using FAS OpenID."""
     return_point = flask.url_for("ui_ns.index")
     if "next" in flask.request.args:
         if pagure.utils.is_safe_url(flask.request.args["next"]):
@@ -504,7 +504,7 @@ def auth_login():  # pragma: no cover
 
 
 def auth_logout():  # pragma: no cover
-    """ Method to log out from the application. """
+    """Method to log out from the application."""
     return_point = flask.url_for("ui_ns.index")
     if "next" in flask.request.args:
         if pagure.utils.is_safe_url(flask.request.args["next"]):
@@ -533,7 +533,7 @@ def end_request(exception=None):
 
 
 def after_request(response):
-    """ After request callback, adjust the headers returned """
+    """After request callback, adjust the headers returned"""
     if not hasattr(flask.g, "nonce"):
         return response
 

@@ -60,7 +60,7 @@ class PagureForceCommitTable(BASE):
 
 
 class PagureForceCommitRunner(BaseRunner):
-    """ Runner for the hook blocking force push. """
+    """Runner for the hook blocking force push."""
 
     @staticmethod
     def pre_receive(session, username, project, repotype, repodir, changes):
@@ -93,7 +93,7 @@ class PagureForceCommitRunner(BaseRunner):
 
 
 class PagureForceCommitForm(FlaskForm):
-    """ Form to configure the pagure hook. """
+    """Form to configure the pagure hook."""
 
     branches = wtforms.StringField("Branches", [RequiredIf("active")])
 
@@ -101,7 +101,7 @@ class PagureForceCommitForm(FlaskForm):
 
 
 class PagureForceCommitHook(BaseHook):
-    """ PagurPagureForceCommit hook. """
+    """PagurPagureForceCommit hook."""
 
     name = "Block non fast-forward pushes"
     description = (

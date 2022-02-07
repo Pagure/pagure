@@ -109,14 +109,14 @@ class Unspecified(object):
 
 
 def set_redis(host, port, dbname):
-    """ Set the redis connection with the specified information. """
+    """Set the redis connection with the specified information."""
     global REDIS
     pool = redis.ConnectionPool(host=host, port=port, db=dbname)
     REDIS = redis.StrictRedis(connection_pool=pool)
 
 
 def set_pagure_ci(services):
-    """ Set the list of CI services supported by this pagure instance. """
+    """Set the list of CI services supported by this pagure instance."""
     global PAGURE_CI
     PAGURE_CI = services
 
@@ -220,7 +220,7 @@ def search_user(session, username=None, email=None, token=None, pattern=None):
 
 
 def is_valid_ssh_key(key, fp_hash="SHA256"):
-    """ Validates the ssh key using ssh-keygen. """
+    """Validates the ssh key using ssh-keygen."""
     key = key.strip()
     if not key:
         return None
@@ -244,7 +244,7 @@ def is_valid_ssh_key(key, fp_hash="SHA256"):
 
 
 def are_valid_ssh_keys(keys):
-    """ Checks if all the ssh keys are valid or not. """
+    """Checks if all the ssh keys are valid or not."""
     return all(
         [is_valid_ssh_key(key) is not False for key in keys.split("\n")]
     )
@@ -373,7 +373,7 @@ def add_issue_comment(
     date_created=None,
     notification=False,
 ):
-    """ Add a comment to an issue. """
+    """Add a comment to an issue."""
     user_obj = get_user(session, user)
 
     issue_comment = model.IssueComment(
@@ -445,7 +445,7 @@ def add_issue_comment(
 
 
 def add_tag_obj(session, obj, tags, user):
-    """ Add a tag to an object (either an issue or a project). """
+    """Add a tag to an object (either an issue or a project)."""
     user_obj = get_user(session, user)
 
     if isinstance(tags, six.string_types):
@@ -563,7 +563,7 @@ def add_tag_obj(session, obj, tags, user):
 
 
 def add_issue_assignee(session, issue, assignee, user, notify=True):
-    """ Add an assignee to an issue, in other words, assigned an issue. """
+    """Add an assignee to an issue, in other words, assigned an issue."""
     user_obj = get_user(session, user)
 
     old_assignee = issue.assignee
@@ -640,7 +640,7 @@ def add_issue_assignee(session, issue, assignee, user, notify=True):
 
 
 def add_pull_request_assignee(session, request, assignee, user):
-    """ Add an assignee to a request, in other words, assigned an issue. """
+    """Add an assignee to a request, in other words, assigned an issue."""
     get_user(session, assignee)
     user_obj = get_user(session, user)
 
@@ -719,7 +719,7 @@ def add_pull_request_assignee(session, request, assignee, user):
 
 
 def add_issue_dependency(session, issue, issue_blocked, user):
-    """ Add a dependency between two issues. """
+    """Add a dependency between two issues."""
     user_obj = get_user(session, user)
 
     if issue.uid == issue_blocked.uid:
@@ -777,7 +777,7 @@ def add_issue_dependency(session, issue, issue_blocked, user):
 
 
 def remove_issue_dependency(session, issue, issue_blocked, user):
-    """ Remove a dependency between two issues. """
+    """Remove a dependency between two issues."""
     user_obj = get_user(session, user)
 
     if issue.uid == issue_blocked.uid:
@@ -839,7 +839,7 @@ def remove_issue_dependency(session, issue, issue_blocked, user):
 
 
 def remove_tags(session, project, tags, user):
-    """ Removes the specified tag of a project. """
+    """Removes the specified tag of a project."""
     user_obj = get_user(session, user)
 
     if not isinstance(tags, list):
@@ -885,7 +885,7 @@ def remove_tags(session, project, tags, user):
 
 
 def remove_tags_obj(session, obj, tags, user):
-    """ Removes the specified tag(s) of a given object. """
+    """Removes the specified tag(s) of a given object."""
     user_obj = get_user(session, user)
 
     if isinstance(tags, six.string_types):
@@ -971,7 +971,7 @@ def edit_issue_tags(
     new_tag_color,
     user,
 ):
-    """ Edits the specified tag of a project. """
+    """Edits the specified tag of a project."""
     user_obj = get_user(session, user)
     old_tag_name = old_tag
 
@@ -1068,7 +1068,7 @@ def edit_issue_tags(
 def add_sshkey_to_project_or_user(
     session, ssh_key, pushaccess, creator, project=None, user=None
 ):
-    """ Add a deploy key to a specified project. """
+    """Add a deploy key to a specified project."""
     if project is None and user is None:
         raise ValueError(
             "SSH Keys need to be added to either a project or a user"
@@ -1234,7 +1234,7 @@ def add_group_to_project(
     create=False,
     is_admin=False,
 ):
-    """ Add a specified group to a specified project with some access """
+    """Add a specified group to a specified project with some access"""
 
     user_obj = search_user(session, username=user)
     if not user_obj:
@@ -1351,7 +1351,7 @@ def add_pull_request_comment(
     notification=False,
     trigger_ci=None,
 ):
-    """ Add a comment to a pull-request. """
+    """Add a comment to a pull-request."""
     user_obj = get_user(session, user)
 
     pr_comment = model.PullRequestComment(
@@ -1455,7 +1455,7 @@ def add_pull_request_comment(
 
 
 def edit_comment(session, parent, comment, user, updated_comment):
-    """ Edit a comment. """
+    """Edit a comment."""
     user_obj = get_user(session, user)
     comment.comment = updated_comment
     comment.edited_on = datetime.datetime.utcnow()
@@ -1529,7 +1529,7 @@ def edit_comment(session, parent, comment, user, updated_comment):
 def add_pull_request_flag(
     session, request, username, percent, comment, url, status, uid, user, token
 ):
-    """ Add a flag to a pull-request. """
+    """Add a flag to a pull-request."""
     user_obj = get_user(session, user)
 
     action, flag_uid = add_commit_flag(
@@ -1583,7 +1583,7 @@ def add_commit_flag(
     user,
     token,
 ):
-    """ Add a flag to a add_commit_flag. """
+    """Add a flag to a add_commit_flag."""
     user_obj = get_user(session, user)
 
     action = "added"
@@ -1791,7 +1791,7 @@ def new_issue(
     assignee=None,
     tags=None,
 ):
-    """ Create a new issue for the specified repo. """
+    """Create a new issue for the specified repo."""
     user_obj = get_user(session, user)
 
     # Only store the priority if there is one in the project
@@ -1876,7 +1876,7 @@ def new_issue(
 
 
 def drop_issue(session, issue, user):
-    """ Delete a specified issue. """
+    """Delete a specified issue."""
     user_obj = get_user(session, user)
 
     repotype = issue.repotype
@@ -1924,7 +1924,7 @@ def new_pull_request(
     commit_start=None,
     commit_stop=None,
 ):
-    """ Create a new pull request on the specified repo. """
+    """Create a new pull request on the specified repo."""
     if not repo_from and not remote_git:
         raise pagure.exceptions.PagureException(
             "Invalid input, you must specify either a local repo or a "
@@ -2058,7 +2058,7 @@ def link_pr_to_issue_on_description(session, request):
 
 
 def new_tag(session, tag_name, tag_description, tag_color, project_id):
-    """ Return a new tag object """
+    """Return a new tag object"""
     tagobj = model.TagColored(
         tag=tag_name,
         tag_description=tag_description,
@@ -2305,7 +2305,7 @@ def update_project_settings(session, repo, settings, user, from_api=False):
 
 
 def update_user_settings(session, settings, user):
-    """ Update the settings of a project. """
+    """Update the settings of a project."""
     user_obj = get_user(session, user)
 
     update = []
@@ -2331,7 +2331,7 @@ def update_user_settings(session, settings, user):
 
 
 def fork_project(session, user, repo, editbranch=None, editfile=None):
-    """ Fork a given project into the user's forks. """
+    """Fork a given project into the user's forks."""
     if _get_project(session, repo.name, user, repo.namespace) is not None:
         raise pagure.exceptions.RepoExistsException(
             'Repo "forks/%s/%s" already exists' % (user, repo.name)
@@ -3532,7 +3532,7 @@ def reset_status_pull_request(session, project, but_uids=None):
 
 
 def add_attachment(repo, issue, attachmentfolder, user, filename, filestream):
-    """ Add a file to the attachments folder of repo and update git. """
+    """Add a file to the attachments folder of repo and update git."""
     _log.info(
         "Adding file: %s to the git repo: %s",
         repo.path,
@@ -3704,7 +3704,7 @@ def set_up_user(
     ssh_key=None,
     keydir=None,
 ):
-    """ Set up a new user into the database or update its information. """
+    """Set up a new user into the database or update its information."""
     user = search_user(session, username=username)
     if not user:
         user = model.User(
@@ -3753,7 +3753,7 @@ def allowed_emailaddress(email):
 
 
 def add_email_to_user(session, user, user_email):
-    """ Add the provided email to the specified user. """
+    """Add the provided email to the specified user."""
     try:
         allowed_emailaddress(user_email)
     except pagure.exceptions.PagureException:
@@ -3768,7 +3768,7 @@ def add_email_to_user(session, user, user_email):
 
 
 def update_user_ssh(session, user, ssh_key, keydir, update_only=False):
-    """ Set up a new user into the database or update its information. """
+    """Set up a new user into the database or update its information."""
     if isinstance(user, six.string_types):
         user = get_user(session, user)
 
@@ -4312,7 +4312,7 @@ def get_user_group(session, userid, groupid):
 
 
 def is_group_member(session, user, groupname):
-    """ Return whether the user is a member of the specified group. """
+    """Return whether the user is a member of the specified group."""
     if not user:
         return False
 
@@ -4447,7 +4447,7 @@ def text2markdown(text, extended=True, readme=False):
 
 
 def filter_img_src(name, value):
-    """ Filter in img html tags images coming from a different domain. """
+    """Filter in img html tags images coming from a different domain."""
     if name in ("alt", "height", "width", "class", "data-src"):
         return True
     if name == "src":
@@ -4830,7 +4830,7 @@ def get_watch_level_on_repo(
 
 
 def user_watch_list(session, user, exclude_groups=None):
-    """ Returns list of all the projects which the user is watching """
+    """Returns list of all the projects which the user is watching"""
 
     user_obj = search_user(session, username=user)
     if not user_obj:
@@ -5198,7 +5198,7 @@ def get_watchlist_messages(session, user, limit=None):
 
 
 def log_action(session, action, obj, user_obj):
-    """ Log an user action on a project/issue/PR. """
+    """Log an user action on a project/issue/PR."""
     project_id = None
     if obj.isa in ["issue", "pull-request"]:
         project_id = obj.project_id
@@ -5232,7 +5232,7 @@ def log_action(session, action, obj, user_obj):
 
 
 def email_logs_count(session, email):
-    """ Returns the number of logs associated with a given email."""
+    """Returns the number of logs associated with a given email."""
     query = session.query(model.PagureLog).filter(
         model.PagureLog.user_email == email
     )
@@ -5250,7 +5250,7 @@ def update_log_email_user(session, email, user):
 
 
 def get_custom_key(session, project, keyname):
-    """ Returns custom key object given it's name and the project """
+    """Returns custom key object given it's name and the project"""
 
     query = (
         session.query(model.IssueKeys)
@@ -5376,7 +5376,7 @@ def tokenize_search_string(pattern):
 
 
 def get_access_levels(session):
-    """ Returns all the access levels a user/group can have for a project """
+    """Returns all the access levels a user/group can have for a project"""
 
     access_level_objs = session.query(model.AccessLevels).all()
     return [access_level.access for access_level in access_level_objs]

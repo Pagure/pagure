@@ -24,10 +24,10 @@ import tests  # noqa: E402
 
 
 class PagureFlaskApiIssueUpdatetests(tests.Modeltests):
-    """ Tests for the flask API of pagure for updating an issue """
+    """Tests for the flask API of pagure for updating an issue"""
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskApiIssueUpdatetests, self).setUp()
 
         pagure.config.config["TICKETS_FOLDER"] = None
@@ -35,7 +35,7 @@ class PagureFlaskApiIssueUpdatetests(tests.Modeltests):
         tests.create_tokens(self.session)
 
     def test_api_issue_update_wrong_token(self):
-        """ Test the api_issue_update method of flask API """
+        """Test the api_issue_update method of flask API"""
         tests.create_tokens_acl(self.session)
         headers = {"Authorization": "token aaa"}
         output = self.app.post("/api/0/foo/issue/1", headers=headers)
@@ -51,7 +51,7 @@ class PagureFlaskApiIssueUpdatetests(tests.Modeltests):
         self.assertDictEqual(data, expected_rv)
 
     def test_api_issue_update_wrong_project(self):
-        """ Test the api_issue_update method of flask API """
+        """Test the api_issue_update method of flask API"""
         tests.create_tokens_acl(self.session)
         headers = {"Authorization": "token aaabbbcccddd"}
         output = self.app.post("/api/0/foo/issue/1", headers=headers)
@@ -64,7 +64,7 @@ class PagureFlaskApiIssueUpdatetests(tests.Modeltests):
         self.assertDictEqual(data, expected_rv)
 
     def test_api_issue_update_wrong_acls(self):
-        """ Test the api_issue_update method of flask API """
+        """Test the api_issue_update method of flask API"""
         tests.create_tokens_acl(self.session, acl_name="issue_create")
         headers = {"Authorization": "token aaabbbcccddd"}
         output = self.app.post("/api/0/test/issue/1", headers=headers)
@@ -81,7 +81,7 @@ class PagureFlaskApiIssueUpdatetests(tests.Modeltests):
 
     @patch.dict("pagure.config.config", {"ENABLE_TICKETS": False})
     def test_api_issue_update_instance_tickets_disabled(self):
-        """ Test the api_issue_update method of flask API """
+        """Test the api_issue_update method of flask API"""
         tests.create_tokens_acl(self.session)
         headers = {"Authorization": "token aaabbbcccddd"}
         output = self.app.post("/api/0/test/issue/1", headers=headers)
@@ -94,7 +94,7 @@ class PagureFlaskApiIssueUpdatetests(tests.Modeltests):
         self.assertDictEqual(data, expected_rv)
 
     def test_api_issue_update_project_tickets_disabled(self):
-        """ Test the api_issue_update method of flask API """
+        """Test the api_issue_update method of flask API"""
         tests.create_tokens_acl(self.session)
         # disable tickets on this repo
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
@@ -114,7 +114,7 @@ class PagureFlaskApiIssueUpdatetests(tests.Modeltests):
         self.assertDictEqual(data, expected_rv)
 
     def test_api_issue_update_project_read_only_issue_tracker(self):
-        """ Test the api_issue_update method of flask API """
+        """Test the api_issue_update method of flask API"""
         tests.create_tokens_acl(self.session)
         # set read only issue tracke on this repo
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
@@ -134,7 +134,7 @@ class PagureFlaskApiIssueUpdatetests(tests.Modeltests):
         self.assertDictEqual(data, expected_rv)
 
     def test_api_issue_update_wrong_issue(self):
-        """ Test the api_issue_update method of flask API """
+        """Test the api_issue_update method of flask API"""
         tests.create_tokens_acl(self.session)
         tests.create_projects_git(os.path.join(self.path, "tickets"))
         headers = {"Authorization": "token aaabbbcccddd"}
@@ -145,7 +145,7 @@ class PagureFlaskApiIssueUpdatetests(tests.Modeltests):
         self.assertDictEqual(data, expected_rv)
 
     def test_api_issue_update_no_input(self):
-        """ Test the api_issue_update method of flask API """
+        """Test the api_issue_update method of flask API"""
         tests.create_tokens_acl(self.session)
         tests.create_projects_git(os.path.join(self.path, "tickets"))
         headers = {"Authorization": "token aaabbbcccddd"}
@@ -177,7 +177,7 @@ class PagureFlaskApiIssueUpdatetests(tests.Modeltests):
         self.assertDictEqual(data, expected_rv)
 
     def test_api_issue_update_partial_input(self):
-        """ Test the api_issue_update method of flask API """
+        """Test the api_issue_update method of flask API"""
         tests.create_tokens_acl(self.session)
         tests.create_projects_git(os.path.join(self.path, "tickets"))
         headers = {"Authorization": "token aaabbbcccddd"}
@@ -223,7 +223,7 @@ class PagureFlaskApiIssueUpdatetests(tests.Modeltests):
         self.assertDictEqual(data, expected_rv)
 
     def test_api_issue_update(self):
-        """ Test the api_issue_update method of flask API """
+        """Test the api_issue_update method of flask API"""
         tests.create_tokens_acl(self.session)
         tests.create_projects_git(os.path.join(self.path, "tickets"))
         headers = {"Authorization": "token aaabbbcccddd"}

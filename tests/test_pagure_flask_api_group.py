@@ -26,12 +26,12 @@ import tests
 
 
 class PagureFlaskApiGroupTests(tests.SimplePagureTest):
-    """ Tests for the flask API of pagure for issue """
+    """Tests for the flask API of pagure for issue"""
 
     maxDiff = None
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskApiGroupTests, self).setUp()
 
         pagure.config.config["REQUESTS_FOLDER"] = None
@@ -61,7 +61,7 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
         self.assertEqual(msg, "Group added")
 
     def test_api_groups(self):
-        """ Test the api_groups function.  """
+        """Test the api_groups function."""
 
         # Add a couple of groups so that we can list them
         item = pagure.lib.model.PagureGroup(
@@ -100,7 +100,7 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
         self.assertEqual(data["total_groups"], 1)
 
     def test_api_groups_extended(self):
-        """ Test the api_groups function.  """
+        """Test the api_groups function."""
 
         # Add a couple of groups so that we can list them
         item = pagure.lib.model.PagureGroup(

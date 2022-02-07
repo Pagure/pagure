@@ -108,13 +108,13 @@ class PagureRequestRunner(BaseRunner):
 
 
 class PagureRequestsForm(FlaskForm):
-    """ Form to configure the pagure hook. """
+    """Form to configure the pagure hook."""
 
     active = wtforms.BooleanField("Active", [wtforms.validators.Optional()])
 
 
 class PagureRequestHook(BaseHook):
-    """ Pagure request hook. """
+    """Pagure request hook."""
 
     name = "Pagure requests"
     description = (

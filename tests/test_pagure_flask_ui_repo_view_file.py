@@ -26,10 +26,10 @@ from pagure.lib.repo import PagureRepo  # noqa
 
 
 class LocalBasetests(tests.Modeltests):
-    """ Tests for view_file endpoint of the flask pagure app """
+    """Tests for view_file endpoint of the flask pagure app"""
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(LocalBasetests, self).setUp()
 
         pagure.config.config["VIRUS_SCAN_ATTACHMENTS"] = False
@@ -40,16 +40,16 @@ class LocalBasetests(tests.Modeltests):
 
 
 class PagureFlaskRepoViewFileSimpletests(LocalBasetests):
-    """ Tests for view_file endpoint of the flask pagure app """
+    """Tests for view_file endpoint of the flask pagure app"""
 
     def test_view_file_no_project(self):
-        """ Test the view_file when the project is unknown. """
+        """Test the view_file when the project is unknown."""
         output = self.app.get("/foo/blob/foo/f/sources")
         # No project registered in the DB
         self.assertEqual(output.status_code, 404)
 
     def test_view_file_no_git(self):
-        """ Test the view_file when the project has no git repo. """
+        """Test the view_file when the project has no git repo."""
         tests.create_projects(self.session)
 
         output = self.app.get("/test/blob/foo/f/sources")
@@ -57,7 +57,7 @@ class PagureFlaskRepoViewFileSimpletests(LocalBasetests):
         self.assertEqual(output.status_code, 404)
 
     def test_view_file_no_git_content(self):
-        """ Test the view_file when the file doesn't exist. """
+        """Test the view_file when the file doesn't exist."""
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
 
@@ -66,10 +66,10 @@ class PagureFlaskRepoViewFileSimpletests(LocalBasetests):
 
 
 class PagureFlaskRepoViewFiletests(LocalBasetests):
-    """ Tests for view_file endpoint of the flask pagure app """
+    """Tests for view_file endpoint of the flask pagure app"""
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskRepoViewFiletests, self).setUp()
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
@@ -87,7 +87,7 @@ class PagureFlaskRepoViewFiletests(LocalBasetests):
         )
 
     def test_view_file_invalid_file(self):
-        """ Test the view_file when the file doesn't exist. """
+        """Test the view_file when the file doesn't exist."""
 
         output = self.app.get("/test/blob/master/foofile")
         self.assertEqual(output.status_code, 404)
@@ -97,7 +97,7 @@ class PagureFlaskRepoViewFiletests(LocalBasetests):
         self.assertEqual(output.status_code, 404)
 
     def test_view_file_basic_text(self):
-        """ Test the view_file with a basic text file. """
+        """Test the view_file with a basic text file."""
         output = self.app.get("/test/blob/master/f/sources")
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
@@ -108,7 +108,7 @@ class PagureFlaskRepoViewFiletests(LocalBasetests):
         )
 
     def test_view_file_empty_file(self):
-        """ Test the view_file with an empty file. """
+        """Test the view_file with an empty file."""
 
         # Empty files should also be displayed
         tests.add_content_to_git(
@@ -130,7 +130,7 @@ class PagureFlaskRepoViewFiletests(LocalBasetests):
         )
 
     def test_view_file_binary_file(self):
-        """ Test the view_file with a binary file. """
+        """Test the view_file with a binary file."""
 
         # View what's supposed to be an image
         output = self.app.get("/test/blob/master/f/test.jpg")
@@ -138,7 +138,7 @@ class PagureFlaskRepoViewFiletests(LocalBasetests):
         self.assertNotIn(b"<html", output.data)
 
     def test_view_file_by_commit(self):
-        """ Test the view_file in a specific commit. """
+        """Test the view_file in a specific commit."""
 
         # View by commit id
         repo = pygit2.Repository(os.path.join(self.path, "repos", "test.git"))
@@ -149,29 +149,29 @@ class PagureFlaskRepoViewFiletests(LocalBasetests):
         self.assertNotIn(b"<html", output.data)
 
     def test_view_file_invalid_branch(self):
-        """ Test the view_file via a image name. """
+        """Test the view_file via a image name."""
         output = self.app.get("/test/blob/sources/f/test.jpg")
         self.assertEqual(output.status_code, 404)
 
     def test_view_file_invalid_branch2(self):
-        """ Test the view_file with a binary file (2). """
+        """Test the view_file with a binary file (2)."""
         output = self.app.get("/test/blob/sources/f/test_binary")
         self.assertEqual(output.status_code, 404)
 
     def test_view_file_invalid_branch(self):
-        """ Test the view_file via a image name. """
+        """Test the view_file via a image name."""
         output = self.app.get("/test/blob/master/f/test.jpg")
         self.assertEqual(output.status_code, 200)
         self.assertNotIn(b"<html", output.data)
 
     def test_view_file_invalid_branch2(self):
-        """ Test the view_file with a binary file (2). """
+        """Test the view_file with a binary file (2)."""
         output = self.app.get("/test/blob/master/f/test_binary")
         self.assertEqual(output.status_code, 200)
         self.assertNotIn(b"<html", output.data)
 
     def test_view_file_for_folder(self):
-        """ Test the view_file with a folder. """
+        """Test the view_file with a folder."""
 
         # View folder
         output = self.app.get("/test/blob/master/f/folder1")
@@ -186,7 +186,7 @@ class PagureFlaskRepoViewFiletests(LocalBasetests):
         )
 
     def test_view_file_nested_file(self):
-        """ Test the view_file with a nested file. """
+        """Test the view_file with a nested file."""
 
         # Verify the nav links correctly when viewing a nested folder/file.
         output = self.app.get("/test/blob/master/f/folder1/folder2/file")
@@ -201,7 +201,7 @@ class PagureFlaskRepoViewFiletests(LocalBasetests):
         )
 
     def test_view_file_non_ascii_file(self):
-        """ Test the view_file with a non-ascii file name. """
+        """Test the view_file with a non-ascii file name."""
 
         # View file with a non-ascii name
         tests.add_commit_git_repo(
@@ -268,10 +268,10 @@ class PagureFlaskRepoViewFiletests(LocalBasetests):
 
 
 class PagureFlaskRepoViewFileForktests(LocalBasetests):
-    """ Tests for view_file endpoint of the flask pagure app for a fork """
+    """Tests for view_file endpoint of the flask pagure app for a fork"""
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskRepoViewFileForktests, self).setUp()
 
         tests.create_projects(self.session)
@@ -313,7 +313,7 @@ class PagureFlaskRepoViewFileForktests(LocalBasetests):
         )
 
     def test_view_file_nested_file_in_fork(self):
-        """ Test the view_file with a nested file in fork. """
+        """Test the view_file with a nested file in fork."""
         # Verify the nav links correctly when viewing a file/folder in a fork.
         output = self.app.get(
             "/fork/pingou/test/blob/master/f/folder1/folder2/file"
@@ -328,7 +328,7 @@ class PagureFlaskRepoViewFileForktests(LocalBasetests):
         )
 
     def test_view_file_in_branch_in_fork(self):
-        """ Test the view_file in a specific branch of a fork. """
+        """Test the view_file in a specific branch of a fork."""
         output = self.app.get("/fork/pingou/test/blob/master/f/sources")
         self.assertEqual(output.status_code, 200)
         output_text = output.get_data(as_text=True)
@@ -341,7 +341,7 @@ class PagureFlaskRepoViewFileForktests(LocalBasetests):
         )
 
     def test_view_file_fork_and_edit_on_fork_logged_out(self):
-        """ Test the view_file on a text file on a fork when logged out. """
+        """Test the view_file on a text file on a fork when logged out."""
 
         # not logged in, no edit button but fork & edit is there
         output = self.app.get("/fork/pingou/test/blob/master/f/sources")

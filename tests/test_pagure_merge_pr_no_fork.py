@@ -28,12 +28,12 @@ import tests
 
 
 class PagureMergePrNoForkTest(tests.Modeltests):
-    """ Tests merging a PR in pagure when the fork no longer exists """
+    """Tests merging a PR in pagure when the fork no longer exists"""
 
     maxDiff = None
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureMergePrNoForkTest, self).setUp()
 
         tests.create_projects(self.session)
@@ -94,7 +94,7 @@ class PagureMergePrNoForkTest(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_api_pull_request_diffstats(self):
-        """ Test the api_pull_request_merge method of the flask api. """
+        """Test the api_pull_request_merge method of the flask api."""
 
         # Check the PR stats in the API
         output = self.app.get("/api/0/test/pull-request/1/diffstats")
@@ -116,7 +116,7 @@ class PagureMergePrNoForkTest(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_api_pull_request_diffstats_no_fork(self):
-        """ Test the api_pull_request_merge method of the flask api. """
+        """Test the api_pull_request_merge method of the flask api."""
 
         pagure.lib.tasks.delete_project(
             namespace=None, name="test", user="pingou", action_user="pingou"
@@ -142,7 +142,7 @@ class PagureMergePrNoForkTest(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_api_pull_request_merge(self):
-        """ Test the api_pull_request_merge method of the flask api. """
+        """Test the api_pull_request_merge method of the flask api."""
 
         headers = {"Authorization": "token aaabbbcccddd"}
 
@@ -156,7 +156,7 @@ class PagureMergePrNoForkTest(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_api_pull_request_merge_no_fork(self):
-        """ Test the api_pull_request_merge method of the flask api. """
+        """Test the api_pull_request_merge method of the flask api."""
 
         pagure.lib.tasks.delete_project(
             namespace=None, name="test", user="pingou", action_user="pingou"
@@ -174,7 +174,7 @@ class PagureMergePrNoForkTest(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_ui_pull_request_merge(self):
-        """ Test the api_pull_request_merge method of the flask UI. """
+        """Test the api_pull_request_merge method of the flask UI."""
 
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):
@@ -197,7 +197,7 @@ class PagureMergePrNoForkTest(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_ui_pull_request_merge_no_fork(self):
-        """ Test the api_pull_request_merge method of the flask UI. """
+        """Test the api_pull_request_merge method of the flask UI."""
 
         pagure.lib.tasks.delete_project(
             namespace=None, name="test", user="pingou", action_user="pingou"
@@ -226,7 +226,7 @@ class PagureMergePrNoForkTest(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_internal_merge_status(self):
-        """ Test the api_pull_request_merge method of the flask UI. """
+        """Test the api_pull_request_merge method of the flask UI."""
 
         self.session = pagure.lib.query.create_session(self.dbpath)
         project = pagure.lib.query.get_authorized_project(self.session, "test")
@@ -254,7 +254,7 @@ class PagureMergePrNoForkTest(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_internal_merge_status_no_fork(self):
-        """ Test the api_pull_request_merge method of the flask UI. """
+        """Test the api_pull_request_merge method of the flask UI."""
 
         pagure.lib.tasks.delete_project(
             namespace=None, name="test", user="pingou", action_user="pingou"

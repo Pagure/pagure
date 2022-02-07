@@ -116,7 +116,7 @@ def __get_tree(repo_obj, tree, filepath, index=0, extended=False):
 
 
 def __get_tree_and_content(repo_obj, commit, path):
-    """ Return the tree and the content of the specified file. """
+    """Return the tree and the content of the specified file."""
 
     (blob_or_tree, tree_obj, extended) = __get_tree(
         repo_obj, commit.tree, path

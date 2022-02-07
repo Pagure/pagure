@@ -29,12 +29,12 @@ import tests
 
 
 class PagureFlaskApiForktests(tests.Modeltests):
-    """ Tests for the flask API of pagure for issue """
+    """Tests for the flask API of pagure for issue"""
 
     maxDiff = None
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskApiForktests, self).setUp()
 
         pagure.config.config["REQUESTS_FOLDER"] = None
@@ -338,7 +338,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_api_pull_request_views(self, send_email):
-        """ Test the api_pull_request_views method of the flask api. """
+        """Test the api_pull_request_views method of the flask api."""
         send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -662,7 +662,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_api_pull_request_view_pr_disabled(self, send_email):
-        """ Test the api_pull_request_view method of the flask api. """
+        """Test the api_pull_request_view method of the flask api."""
         send_email.return_value = True
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
@@ -706,7 +706,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_api_pull_request_view(self, send_email):
-        """ Test the api_pull_request_view method of the flask api. """
+        """Test the api_pull_request_view method of the flask api."""
         send_email.return_value = True
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
@@ -890,7 +890,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_api_pull_request_by_uid_view(self, send_email):
-        """ Test the api_pull_request_by_uid_view method of the flask api. """
+        """Test the api_pull_request_by_uid_view method of the flask api."""
         send_email.return_value = True
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
@@ -1067,7 +1067,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_api_pull_request_close_pr_disabled(self, send_email):
-        """ Test the api_pull_request_close method of the flask api. """
+        """Test the api_pull_request_close method of the flask api."""
         send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -1116,7 +1116,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_api_pull_request_close_cross_project_token(self, send_email):
-        """ Test the api_pull_request_close method of the flask api for cross-project API token. """
+        """Test the api_pull_request_close method of the flask api for cross-project API token."""
         send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -1176,7 +1176,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_api_pull_request_close(self, send_email):
-        """ Test the api_pull_request_close method of the flask api. """
+        """Test the api_pull_request_close method of the flask api."""
         send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -1524,7 +1524,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_api_pull_request_merge(self, send_email):
-        """ Test the api_pull_request_merge method of the flask api. """
+        """Test the api_pull_request_merge method of the flask api."""
         send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -1641,7 +1641,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_api_pull_request_merge_conflicting(self, send_email):
-        """ Test the api_pull_request_merge method of the flask api. """
+        """Test the api_pull_request_merge method of the flask api."""
         send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -1719,7 +1719,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_api_pull_request_merge_user_token(self, send_email):
-        """ Test the api_pull_request_merge method of the flask api. """
+        """Test the api_pull_request_merge method of the flask api."""
         send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -1836,7 +1836,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_api_pull_request_add_comment(self, mockemail):
-        """ Test the api_pull_request_add_comment method of the flask api. """
+        """Test the api_pull_request_add_comment method of the flask api."""
         mockemail.return_value = True
 
         tests.create_projects(self.session)
@@ -2050,7 +2050,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_api_pull_request_add_comment_user_token(self, mockemail):
-        """ Test the api_pull_request_add_comment method of the flask api. """
+        """Test the api_pull_request_add_comment method of the flask api."""
         mockemail.return_value = True
 
         tests.create_projects(self.session)
@@ -2157,7 +2157,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email")
     def test_api_subscribe_pull_request_pr_disabled(self, p_send_email):
-        """ Test the api_subscribe_pull_request method of the flask api. """
+        """Test the api_subscribe_pull_request method of the flask api."""
         p_send_email.return_value = True
 
         tests.create_projects(self.session)
@@ -2192,7 +2192,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
     def test_api_subscribe_pull_request_invalid_token(
         self, p_send_email, p_ugt
     ):
-        """ Test the api_subscribe_pull_request method of the flask api. """
+        """Test the api_subscribe_pull_request method of the flask api."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -2258,7 +2258,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_api_subscribe_pull_request(self, p_send_email, p_ugt):
-        """ Test the api_subscribe_pull_request method of the flask api. """
+        """Test the api_subscribe_pull_request method of the flask api."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -3088,7 +3088,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_api_pull_request_open(self):
-        """ Test the api_pull_request_create method of the flask api. """
+        """Test the api_pull_request_create method of the flask api."""
 
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
@@ -3402,7 +3402,7 @@ class PagureFlaskApiForkPRDiffStatstests(tests.Modeltests):
     maxDiff = None
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskApiForkPRDiffStatstests, self).setUp()
 
         pagure.config.config["REQUESTS_FOLDER"] = None
@@ -3438,7 +3438,7 @@ class PagureFlaskApiForkPRDiffStatstests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_api_pull_request_diffstats_no_repo(self):
-        """ Test the api_pull_request_merge method of the flask api. """
+        """Test the api_pull_request_merge method of the flask api."""
         output = self.app.get("/api/0/invalid/pull-request/404/diffstats")
         self.assertEqual(output.status_code, 404)
         data = json.loads(output.get_data(as_text=True))
@@ -3449,7 +3449,7 @@ class PagureFlaskApiForkPRDiffStatstests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_api_pull_request_diffstats_no_pr(self):
-        """ Test the api_pull_request_merge method of the flask api. """
+        """Test the api_pull_request_merge method of the flask api."""
         output = self.app.get("/api/0/test/pull-request/404/diffstats")
         self.assertEqual(output.status_code, 404)
         data = json.loads(output.get_data(as_text=True))
@@ -3460,7 +3460,7 @@ class PagureFlaskApiForkPRDiffStatstests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_api_pull_request_diffstats_file_modified(self):
-        """ Test the api_pull_request_merge method of the flask api. """
+        """Test the api_pull_request_merge method of the flask api."""
         output = self.app.get("/api/0/test/pull-request/1/diffstats")
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
@@ -3481,7 +3481,7 @@ class PagureFlaskApiForkPRDiffStatstests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_api_pull_request_diffstats_file_added_mofidied(self):
-        """ Test the api_pull_request_merge method of the flask api. """
+        """Test the api_pull_request_merge method of the flask api."""
         tests.add_commit_git_repo(
             os.path.join(self.path, "repos", "test.git"), ncommits=5
         )
@@ -3542,7 +3542,7 @@ class PagureFlaskApiForkPRDiffStatstests(tests.Modeltests):
     @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_api_pull_request_diffstats_file_modified_deleted(self):
-        """ Test the api_pull_request_merge method of the flask api. """
+        """Test the api_pull_request_merge method of the flask api."""
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
         self.assertEqual(len(repo.requests), 1)
         pagure.lib.tasks.update_pull_request(repo.requests[0].uid)
@@ -3609,7 +3609,7 @@ class PagureApiThresholdReachedTests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def setUp(self):
-        """ Set up the environment for the tests. """
+        """Set up the environment for the tests."""
         super(PagureApiThresholdReachedTests, self).setUp()
 
         tests.create_projects(self.session)
@@ -3949,7 +3949,7 @@ class PagureFlaskApiForkGetCommenttests(tests.Modeltests):
     maxDiff = None
 
     def setUp(self):
-        """ Set up the environment, ran before every tests. """
+        """Set up the environment, ran before every tests."""
         super(PagureFlaskApiForkGetCommenttests, self).setUp()
 
         pagure.config.config["REQUESTS_FOLDER"] = None
@@ -3999,7 +3999,7 @@ class PagureFlaskApiForkGetCommenttests(tests.Modeltests):
         self.assertEqual(req.comments[0].id, 1)
 
     def test_api_pull_request_get_comment_not_found(self):
-        """ Test the api_pull_request_get_comment method of the flask api. """
+        """Test the api_pull_request_get_comment method of the flask api."""
         output = self.app.get("/api/0/test/pull-request/1/comment/2")
         self.assertEqual(output.status_code, 404)
         data = json.loads(output.get_data(as_text=True))
@@ -4008,7 +4008,7 @@ class PagureFlaskApiForkGetCommenttests(tests.Modeltests):
         )
 
     def test_api_pull_request_get_comment(self):
-        """ Test the api_pull_request_get_comment method of the flask api. """
+        """Test the api_pull_request_get_comment method of the flask api."""
         output = self.app.get("/api/0/test/pull-request/1/comment/1")
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))

@@ -24,10 +24,10 @@ import tests
 
 
 class PagureHooksDefault(tests.SimplePagureTest):
-    """ Tests for pagure.hooks.default """
+    """Tests for pagure.hooks.default"""
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureHooksDefault, self).setUp()
         tests.create_projects(self.session)
         self.projects = tests.create_projects_git(

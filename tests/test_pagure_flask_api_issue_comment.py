@@ -34,7 +34,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskApiIssueCommenttests, self).setUp()
 
         pagure.config.config["TICKETS_FOLDER"] = None
@@ -82,7 +82,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         tests.create_tokens_acl(self.session, token_id="project-less-foo")
 
     def test_api_comment_issue_invalid_project(self):
-        """ Test the api_comment_issue method of the flask api. """
+        """Test the api_comment_issue method of the flask api."""
 
         headers = {"Authorization": "token aaabbbcccddd"}
 
@@ -95,7 +95,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         )
 
     def test_api_comment_issue_invalid_project_token(self):
-        """ Test the api_comment_issue method of the flask api. """
+        """Test the api_comment_issue method of the flask api."""
 
         headers = {"Authorization": "token aaabbbcccddd"}
 
@@ -109,7 +109,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data["error"])
 
     def test_api_comment_issue_invalid_issue(self):
-        """ Test the api_comment_issue method of the flask api. """
+        """Test the api_comment_issue method of the flask api."""
 
         headers = {"Authorization": "token aaabbbcccddd"}
         # Invalid issue
@@ -121,7 +121,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         )
 
     def test_api_comment_issue_incomplete_request(self):
-        """ Test the api_comment_issue method of the flask api. """
+        """Test the api_comment_issue method of the flask api."""
 
         headers = {"Authorization": "token aaabbbcccddd"}
         # Check comments before
@@ -152,7 +152,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         self.assertEqual(issue.status, "Open")
 
     def test_api_comment_issue(self):
-        """ Test the api_comment_issue method of the flask api. """
+        """Test the api_comment_issue method of the flask api."""
 
         headers = {"Authorization": "token aaabbbcccddd"}
 
@@ -180,7 +180,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         self.assertEqual(len(issue.comments), 1)
 
     def test_api_comment_issue_private_un_authorized(self):
-        """ Test the api_comment_issue method of the flask api. """
+        """Test the api_comment_issue method of the flask api."""
 
         # Check before
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
@@ -208,7 +208,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_api_comment_issue_private(self):
-        """ Test the api_comment_issue method of the flask api. """
+        """Test the api_comment_issue method of the flask api."""
 
         # Create token for user foo
         item = pagure.lib.model.Token(
@@ -242,7 +242,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         )
 
     def test_api_comment_issue_invalid_project_project_less(self):
-        """ Test the api_comment_issue method of the flask api. """
+        """Test the api_comment_issue method of the flask api."""
 
         headers = {"Authorization": "token project-less-foo"}
 
@@ -255,7 +255,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         )
 
     def test_api_comment_issue_invalid_project_token_project_less(self):
-        """ Test the api_comment_issue method of the flask api. """
+        """Test the api_comment_issue method of the flask api."""
 
         headers = {"Authorization": "token project-less-foo"}
 
@@ -268,7 +268,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         )
 
     def test_api_comment_issue_invalid_issue_project_less(self):
-        """ Test the api_comment_issue method of the flask api. """
+        """Test the api_comment_issue method of the flask api."""
 
         headers = {"Authorization": "token project-less-foo"}
         # Invalid issue
@@ -280,7 +280,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         )
 
     def test_api_comment_issue_incomplete_request_project_less(self):
-        """ Test the api_comment_issue method of the flask api. """
+        """Test the api_comment_issue method of the flask api."""
 
         headers = {"Authorization": "token project-less-foo"}
         # Check comments before
@@ -312,7 +312,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_api_comment_issue_project_less(self):
-        """ Test the api_comment_issue method of the flask api. """
+        """Test the api_comment_issue method of the flask api."""
 
         headers = {"Authorization": "token project-less-foo"}
 
@@ -340,7 +340,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
         self.assertEqual(len(issue.comments), 1)
 
     def test_api_comment_issue_private_un_authorized_project_less(self):
-        """ Test the api_comment_issue method of the flask api. """
+        """Test the api_comment_issue method of the flask api."""
 
         # Check before
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
@@ -368,7 +368,7 @@ class PagureFlaskApiIssueCommenttests(tests.Modeltests):
 
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_api_comment_issue_private_project_less(self):
-        """ Test the api_comment_issue method of the flask api. """
+        """Test the api_comment_issue method of the flask api."""
 
         # Create token for user foo
         item = pagure.lib.model.Token(

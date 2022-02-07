@@ -522,7 +522,7 @@ def _parser_update_acls(subparser):
 
 
 def parse_arguments(args=None):
-    """ Set-up the argument parsing. """
+    """Set-up the argument parsing."""
     parser = argparse.ArgumentParser(
         description="The admin CLI for this pagure instance"
     )
@@ -598,7 +598,7 @@ def _ask_confirmation():
 
 
 def _get_input(text):
-    """ Ask the user for input. """
+    """Ask the user for input."""
     return input(text)
 
 
@@ -620,7 +620,7 @@ def _get_project(arg_project, user=None):
 
 
 def _check_project(_project, **kwargs):
-    """ Check that the project extracted with args is a valid project """
+    """Check that the project extracted with args is a valid project"""
     if _project is None:
         raise pagure.exceptions.PagureException(
             "No project found with: {}".format(
@@ -1349,7 +1349,7 @@ def do_set_default_branch(args):
 
 
 def main():
-    """ Start of the application. """
+    """Start of the application."""
 
     # Parse the arguments
     args = parse_arguments()

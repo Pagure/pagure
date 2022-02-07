@@ -22,12 +22,12 @@ import pagure.lib.query
 
 
 class PagureFlaskApiProjectGitTagstests(tests.Modeltests):
-    """ Tests for the flask API of pagure for creating new git tags """
+    """Tests for the flask API of pagure for creating new git tags"""
 
     maxDiff = None
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureFlaskApiProjectGitTagstests, self).setUp()
 
         tests.create_projects(self.session)
@@ -41,7 +41,7 @@ class PagureFlaskApiProjectGitTagstests(tests.Modeltests):
         self.headers = {"Authorization": "token aaabbbcccddd"}
 
     def test_api_new_git_tags_no_project(self):
-        """ Test the api_new_git_tags function.  """
+        """Test the api_new_git_tags function."""
         output = self.app.post("/api/0/foo/git/tags", headers=self.headers)
         self.assertEqual(output.status_code, 404)
         expected_rv = {
@@ -52,7 +52,7 @@ class PagureFlaskApiProjectGitTagstests(tests.Modeltests):
         self.assertDictEqual(data, expected_rv)
 
     def test_api_new_git_tags_invalid_auth(self):
-        """ Test the api_new_git_tags function.  """
+        """Test the api_new_git_tags function."""
         headers = self.headers
         headers["Authorization"] += "foo"
         output = self.app.post("/api/0/foo/git/tags", headers=headers)
@@ -72,7 +72,7 @@ class PagureFlaskApiProjectGitTagstests(tests.Modeltests):
         self.assertEqual("Invalid token", data["errors"])
 
     def test_api_new_git_tag(self):
-        """ Test the api_new_git_tags function.  """
+        """Test the api_new_git_tags function."""
 
         # Before
         output = self.app.get("/api/0/test/git/tags")
@@ -113,7 +113,7 @@ class PagureFlaskApiProjectGitTagstests(tests.Modeltests):
         self.assertEqual(data["total_tags"], 1)
 
     def test_api_new_git_tag_with_commits(self):
-        """ Test the api_new_git_tags function.  """
+        """Test the api_new_git_tags function."""
 
         # Before
         output = self.app.get("/api/0/test/git/tags")
@@ -148,7 +148,7 @@ class PagureFlaskApiProjectGitTagstests(tests.Modeltests):
         self.assertEqual(data["tag_created"], True)
 
     def test_api_new_git_tag_with_message(self):
-        """ Test the api_new_git_tags function.  """
+        """Test the api_new_git_tags function."""
 
         # Before
         output = self.app.get("/api/0/test/git/tags")
@@ -180,7 +180,7 @@ class PagureFlaskApiProjectGitTagstests(tests.Modeltests):
         self.assertEqual(data["tag_created"], True)
 
     def test_api_new_git_tag_with_message_twice(self):
-        """ Test the api_new_git_tags function.  """
+        """Test the api_new_git_tags function."""
 
         # Before
         output = self.app.get("/api/0/test/git/tags")
@@ -231,7 +231,7 @@ class PagureFlaskApiProjectGitTagstests(tests.Modeltests):
         self.assertEqual(data["tag_created"], False)
 
     def test_api_new_git_tag_user_no_access(self):
-        """ Test the api_new_git_tags function.  """
+        """Test the api_new_git_tags function."""
 
         tests.create_tokens(
             self.session, user_id=2, project_id=2, suffix="foo"
@@ -269,7 +269,7 @@ class PagureFlaskApiProjectGitTagstests(tests.Modeltests):
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data["error"])
 
     def test_api_new_git_tag_user_global_token(self):
-        """ Test the api_new_git_tags function.  """
+        """Test the api_new_git_tags function."""
 
         tests.create_tokens(
             self.session, user_id=2, project_id=None, suffix="foo"
@@ -308,7 +308,7 @@ class PagureFlaskApiProjectGitTagstests(tests.Modeltests):
         self.assertEqual(data["tag_created"], True)
 
     def test_api_new_git_tag_forced(self):
-        """ Test the api_new_git_tags function.  """
+        """Test the api_new_git_tags function."""
 
         # Before
         output = self.app.get("/api/0/test/git/tags")

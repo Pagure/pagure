@@ -29,12 +29,12 @@ import munch
 
 
 class PagureLibNotifytests(tests.Modeltests):
-    """ Tests for pagure.lib.notify """
+    """Tests for pagure.lib.notify"""
 
     maxDiff = None
 
     def test_get_emails_for_obj_issue(self):
-        """ Test the _get_emails_for_obj method from pagure.lib.notify. """
+        """Test the _get_emails_for_obj method from pagure.lib.notify."""
 
         # Create the project ns/test
         item = pagure.lib.model.Project(
@@ -100,7 +100,7 @@ class PagureLibNotifytests(tests.Modeltests):
         self.assertEqual(out, exp)
 
     def test_get_emails_for_obj_issue_watching_project(self):
-        """ Test the _get_emails_for_obj method from pagure.lib.notify. """
+        """Test the _get_emails_for_obj method from pagure.lib.notify."""
 
         # Create the project ns/test
         item = pagure.lib.model.Project(
@@ -174,7 +174,7 @@ class PagureLibNotifytests(tests.Modeltests):
 
     @patch("pagure.lib.notify.smtplib.SMTP")
     def test_get_emails_for_obj_pr(self, mock_smtp):
-        """ Test the _get_emails_for_obj method from pagure.lib.notify. """
+        """Test the _get_emails_for_obj method from pagure.lib.notify."""
         mock_smtp.return_value = MagicMock()
 
         tests.create_projects(self.session)
@@ -251,7 +251,7 @@ class PagureLibNotifytests(tests.Modeltests):
 
     @patch("pagure.lib.notify.smtplib.SMTP")
     def test_get_emails_for_obj_pr_watching_project(self, mock_smtp):
-        """ Test the _get_emails_for_obj method from pagure.lib.notify. """
+        """Test the _get_emails_for_obj method from pagure.lib.notify."""
         mock_smtp.return_value = MagicMock()
 
         tests.create_projects(self.session)
@@ -332,7 +332,7 @@ class PagureLibNotifytests(tests.Modeltests):
         self.assertEqual(out, exp)
 
     def test_get_emails_for_obj_private_issue(self):
-        """ Test the _get_emails_for_obj method from pagure.lib.notify. """
+        """Test the _get_emails_for_obj method from pagure.lib.notify."""
 
         # Create the project ns/test
         item = pagure.lib.model.Project(
@@ -413,7 +413,7 @@ class PagureLibNotifytests(tests.Modeltests):
     )
     @patch("pagure.lib.notify.smtplib.SMTP")
     def test_send_email(self, mock_smtp):
-        """ Test the send_email method from pagure.lib.notify. """
+        """Test the send_email method from pagure.lib.notify."""
         mock_smtp.return_value = MagicMock()
 
         email = pagure.lib.notify.send_email(

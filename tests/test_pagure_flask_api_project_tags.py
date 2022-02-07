@@ -20,10 +20,10 @@ import pagure.lib.query
 
 
 class PagureFlaskApiProjectTagstests(tests.Modeltests):
-    """ Tests for the flask API of pagure project tags """
+    """Tests for the flask API of pagure project tags"""
 
     def test_api_project_tags_no_project(self):
-        """ Test the api_project_tags function.  """
+        """Test the api_project_tags function."""
         output = self.app.get("/api/0/foo/tags/")
         self.assertEqual(output.status_code, 404)
         expected_rv = {
@@ -34,7 +34,7 @@ class PagureFlaskApiProjectTagstests(tests.Modeltests):
         self.assertDictEqual(data, expected_rv)
 
     def test_api_project_tags(self):
-        """ Test the api_project_tags function.  """
+        """Test the api_project_tags function."""
         tests.create_projects(self.session)
 
         output = self.app.get("/api/0/test/tags/")
@@ -73,7 +73,7 @@ class PagureFlaskApiProjectTagstests(tests.Modeltests):
         self.assertEqual(data["total_tags"], 0)
 
     def test_api_project_tags_new_wrong_token(self):
-        """ Test the api_tags_new method of the flask api. """
+        """Test the api_tags_new method of the flask api."""
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
         tests.create_tokens_acl(self.session)
@@ -92,7 +92,7 @@ class PagureFlaskApiProjectTagstests(tests.Modeltests):
         self.assertDictEqual(data, expected_rv)
 
     def test_api_project_tags_new_wrong_project(self):
-        """ Test the api_tags_new method of the flask api. """
+        """Test the api_tags_new method of the flask api."""
 
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
@@ -109,7 +109,7 @@ class PagureFlaskApiProjectTagstests(tests.Modeltests):
         self.assertDictEqual(data, expected_rv)
 
     def test_api_project_tags_new_wrong_acls(self):
-        """ Test the api_tags_new method of the flask api. """
+        """Test the api_tags_new method of the flask api."""
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
         tests.create_tokens_acl(self.session, acl_name="create_project")
@@ -127,7 +127,7 @@ class PagureFlaskApiProjectTagstests(tests.Modeltests):
         self.assertDictEqual(data, expected_rv)
 
     def test_api_project_tags_new_no_input(self):
-        """ Test the api_tags_new method of the flask api. """
+        """Test the api_tags_new method of the flask api."""
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
         tests.create_tokens_acl(self.session)
@@ -146,7 +146,7 @@ class PagureFlaskApiProjectTagstests(tests.Modeltests):
         self.assertDictEqual(data, expected_rv)
 
     def test_api_project_tags_new(self):
-        """ Test the api_tags_new method of the flask api. """
+        """Test the api_tags_new method of the flask api."""
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
         tests.create_tokens_acl(self.session)
@@ -181,7 +181,7 @@ class PagureFlaskApiProjectTagstests(tests.Modeltests):
         self.assertDictEqual(data, expected_rv)
 
     def test_api_project_tags_new_existing_tag(self):
-        """ Test the api_tags_new method of the flask api. """
+        """Test the api_tags_new method of the flask api."""
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
         tests.create_tokens_acl(self.session)
@@ -219,7 +219,7 @@ class PagureFlaskApiProjectTagstests(tests.Modeltests):
         self.assertDictEqual(data, expected_rv)
 
     def test_api_project_tag_delete_wrong_token(self):
-        """ Test the api_project_tag_delete method of flask api. """
+        """Test the api_project_tag_delete method of flask api."""
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
         tests.create_tokens_acl(self.session)
@@ -238,7 +238,7 @@ class PagureFlaskApiProjectTagstests(tests.Modeltests):
         self.assertDictEqual(data, expected_rv)
 
     def test_api_project_tag_delete_wrong_project(self):
-        """ Test the api_project_tag_delete method of flask api. """
+        """Test the api_project_tag_delete method of flask api."""
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
         tests.create_tokens_acl(self.session)
@@ -254,7 +254,7 @@ class PagureFlaskApiProjectTagstests(tests.Modeltests):
         self.assertDictEqual(data, expected_rv)
 
     def test_api_project_tag_delete_wrong_tag(self):
-        """ Test the api_project_tag_delete method of flask api. """
+        """Test the api_project_tag_delete method of flask api."""
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
         tests.create_tokens_acl(self.session)
@@ -267,7 +267,7 @@ class PagureFlaskApiProjectTagstests(tests.Modeltests):
         self.assertDictEqual(data, expected_rv)
 
     def test_api_project_tag_delete(self):
-        """ Test the api_project_tag_delete method of flask api. """
+        """Test the api_project_tag_delete method of flask api."""
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
         tests.create_tokens_acl(self.session)
@@ -296,7 +296,7 @@ class PagureFlaskApiProjectTagstests(tests.Modeltests):
         self.assertDictEqual(data, expected_rv)
 
     def test_api_project_tag_delete_with_assigned_issue_and_pr(self):
-        """ Test the api_project_tag_delete method of flask api. """
+        """Test the api_project_tag_delete method of flask api."""
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
         tests.create_tokens_acl(self.session)
@@ -360,7 +360,7 @@ class PagureFlaskApiProjectTagstests(tests.Modeltests):
         self.assertDictEqual(data, expected_rv)
 
     def test_api_project_tag_view_no_project(self):
-        """ Test the api_project_tag_view method of the flask api.  """
+        """Test the api_project_tag_view method of the flask api."""
         output = self.app.get("/api/0/foo/tag/tag1")
         self.assertEqual(output.status_code, 404)
         expected_rv = {
@@ -371,7 +371,7 @@ class PagureFlaskApiProjectTagstests(tests.Modeltests):
         self.assertDictEqual(data, expected_rv)
 
     def test_api_project_tag_view_wrong_tag(self):
-        """ Test the api_project_tag_view method of the flask api.  """
+        """Test the api_project_tag_view method of the flask api."""
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
         tests.create_tokens_acl(self.session)
@@ -388,7 +388,7 @@ class PagureFlaskApiProjectTagstests(tests.Modeltests):
         self.assertDictEqual(data, expected_rv)
 
     def test_api_project_tag_view(self):
-        """ Test the api_project_tag_view method of the flask api.  """
+        """Test the api_project_tag_view method of the flask api."""
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
         tests.create_tokens_acl(self.session)

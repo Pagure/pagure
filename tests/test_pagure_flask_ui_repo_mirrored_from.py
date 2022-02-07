@@ -38,7 +38,7 @@ class PagureUiRepoMirroredFromTests(tests.Modeltests):
     maxDiff = None
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """Set up the environnment, ran before every tests."""
         super(PagureUiRepoMirroredFromTests, self).setUp()
 
         tests.create_projects(self.session)

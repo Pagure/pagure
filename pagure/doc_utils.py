@@ -26,7 +26,7 @@ import pagure.lib.encoding_utils
 
 
 def modify_rst(rst, view_file_url=None):
-    """ Downgrade some of our rst directives if docutils is too old. """
+    """Downgrade some of our rst directives if docutils is too old."""
     if view_file_url:
         rst = rst.replace(".. image:: ", ".. image:: %s" % view_file_url)
 
@@ -75,7 +75,7 @@ def modify_html(html):
 
 
 def convert_doc(rst_string, view_file_url=None):
-    """ Utility to load an RST file and turn it into fancy HTML. """
+    """Utility to load an RST file and turn it into fancy HTML."""
     rst = modify_rst(rst_string, view_file_url)
 
     overrides = {"report_level": "quiet"}
@@ -115,7 +115,7 @@ def convert_readme(content, ext, view_file_url=None):
 
 
 def load_doc(endpoint):
-    """ Utility to load an RST file and turn it into fancy HTML. """
+    """Utility to load an RST file and turn it into fancy HTML."""
 
     rst = modify_rst(textwrap.dedent(endpoint.__doc__))
 
@@ -128,7 +128,7 @@ def load_doc(endpoint):
 
 
 def load_doc_title(endpoint):
-    """ Utility to load docstring title from a method """
+    """Utility to load docstring title from a method"""
     rst = modify_rst(textwrap.dedent(endpoint.__doc__))
 
     parts = docutils.examples.html_parts(rst)
@@ -138,7 +138,7 @@ def load_doc_title(endpoint):
 
 
 def load_doc_title_and_name(endpoint):
-    """ Utility to load the HTML doc version and the title from a method. """
+    """Utility to load the HTML doc version and the title from a method."""
 
     result = {
         "doc": load_doc(endpoint),

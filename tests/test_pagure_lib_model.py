@@ -26,10 +26,10 @@ import tests
 
 
 class PagureLibModeltests(tests.Modeltests):
-    """ Tests for pagure.lib.model """
+    """Tests for pagure.lib.model"""
 
     def test_user__repr__(self):
-        """ Test the User.__repr__ function of pagure.lib.model. """
+        """Test the User.__repr__ function of pagure.lib.model."""
         item = pagure.lib.query.search_user(self.session, email="foo@bar.com")
         self.assertEqual(str(item), "User: 2 - name foo")
         self.assertEqual("foo", item.user)
@@ -39,7 +39,7 @@ class PagureLibModeltests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_issue__repr__(self, p_send_email, p_ugt):
-        """ Test the Issue.__repr__ function of pagure.lib.model. """
+        """Test the Issue.__repr__ function of pagure.lib.model."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -66,7 +66,7 @@ class PagureLibModeltests(tests.Modeltests):
     @patch("pagure.lib.git.update_git")
     @patch("pagure.lib.notify.send_email")
     def test_pullrequest__repr__(self, p_send_email, p_ugt):
-        """ Test the PullRequest.__repr__ function of pagure.lib.model. """
+        """Test the PullRequest.__repr__ function of pagure.lib.model."""
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -117,7 +117,7 @@ class PagureLibModeltests(tests.Modeltests):
         )
 
     def test_paguregroup__repr__(self):
-        """ Test the PagureGroup.__repr__ function of pagure.lib.model. """
+        """Test the PagureGroup.__repr__ function of pagure.lib.model."""
         item = pagure.lib.model.PagureGroup(
             group_name="admin",
             display_name="admin group",
@@ -130,7 +130,7 @@ class PagureLibModeltests(tests.Modeltests):
         self.assertEqual(str(item), "Group: 1 - name admin")
 
     def test_tagissue__repr__(self):
-        """ Test the TagIssue.__repr__ function of pagure.lib.model. """
+        """Test the TagIssue.__repr__ function of pagure.lib.model."""
         self.test_issue__repr__()
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
         issues = pagure.lib.query.search_issues(self.session, repo)
@@ -146,7 +146,7 @@ class PagureLibModeltests(tests.Modeltests):
         self.assertEqual(str(item), "TagIssue(issue:1, tag:foo)")
 
     def test_tagissuecolor__repr__(self):
-        """ Test the TagIssue.__repr__ function of pagure.lib.model. """
+        """Test the TagIssue.__repr__ function of pagure.lib.model."""
         self.test_issue__repr__()
         repo = pagure.lib.query.get_authorized_project(self.session, "test")
         issues = pagure.lib.query.search_issues(self.session, repo)
@@ -171,7 +171,7 @@ class PagureLibModeltests(tests.Modeltests):
         )
 
     def test_group_project_ordering(self):
-        """ Test the ordering of project.groups. """
+        """Test the ordering of project.groups."""
         # Create three projects
         item = pagure.lib.model.Project(
             user_id=1,  # pingou
