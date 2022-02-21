@@ -19,6 +19,7 @@ def upgrade():
     op.alter_column(
         'commit_flags',
         column_name='token_id',
+        existing_type=sa.String(64),
         nullable=False,
         existing_nullable=True
     )
@@ -28,6 +29,7 @@ def downgrade():
     op.alter_column(
         'commit_flags',
         column_name='token_id',
+        existing_type=sa.String(64),
         nullable=True,
         existing_nullable=False
     )
