@@ -42,6 +42,14 @@ New configuration key added (in 5.11.2):
 
 * LOGGING_GIT_HOOKS
 
+.. warning:: When upgrading MySQL database you can encounter issue with
+       incompatible columns. In this case try to check the collation of the
+       mentioned column by ``show full columns from <table>;`` in ``mysql``.
+       If the collation is something else then `utf8` you need to convert
+       your database to `utf8` first. See
+       `this guide <https://stackoverflow.com/questions/1294117/how-to-change-collation-of-database-table-column>`_
+       for how to do it or if you have SQL script for db setup,
+       you can change it directly in the script.
 
 From 5.9 to 5.10
 ----------------
