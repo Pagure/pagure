@@ -1,14 +1,14 @@
-Installing pagure
+Installing Pagure
 =================
 
-There are two ways to install pagure:
+There are two ways to install Pagure:
 
 * via the RPM package (recommended if you are using a RPM-based GNU/Linux distribution)
 * via the setup.py
 
 
 
-Installing pagure via RPM
+Installing Pagure via RPM
 -------------------------
 
 Here as well there are two ways of obtaining the RPM:
@@ -40,13 +40,13 @@ The ``pagure-ev`` package contains the eventsource server.
 The ``pagure-webhook`` package contains the web-hook server.
 
 
-.. note:: The last three packages are optional, pagure would work fine without
+.. note:: The last three packages are optional, Pagure would work fine without
         them but the live-update, the webhook and the comment by email
         services will not work.
 
 * From the sources
 
-If you wish to run a newer version of pagure than what is in the repositories
+If you wish to run a newer version of Pagure than what is in the repositories
 you can easily rebuild it as RPM.
 
 Simply follow these steps:
@@ -66,7 +66,7 @@ Simply follow these steps:
 
     rpmbuild -ta dist/pagure*.tar.gz
 
-This will build pagure from the version present in your clone.
+This will build Pagure from the version present in your clone.
 
 
 Once, the RPM is installed the services ``pagure_milter`` and ``pagure_ev``
@@ -75,14 +75,14 @@ need to be configured.
 
 
 
-Installing pagure via setup.py
+Installing Pagure via setup.py
 ------------------------------
 
 Pagure includes in its sources a ``setup.py`` automating the installation
-of the web applications of pagure (ie: the core + the doc server).
+of the web applications of Pagure (ie: the core + the doc server).
 
 
-To install pagure via this mechanism simply follow these steps:
+To install Pagure via this mechanism simply follow these steps:
 # Clone the sources::
 
     git clone https://pagure.io/pagure.git
@@ -117,10 +117,10 @@ To install pagure via this mechanism simply follow these steps:
 
 
 
-Set-up pagure
+Set-up Pagure
 -------------
 
-Once pagure's files are installed, you still need to set up some things.
+Once Pagure's files are installed, you still need to set up some things.
 
 
 * Create the folder release
@@ -196,19 +196,19 @@ Where ``/srv/git`` is the home of your gitolite user (which will thus need
 to be adjusted for your configuration).
 
 
-* Set up the configuration file of pagure
+* Set up the configuration file of Pagure
 
 This is an important step which concerns the file ``/etc/pagure/pagure.cfg``.
-If you have installed pagure by RPM, this file is already there, otherwise
+If you have installed Pagure by RPM, this file is already there, otherwise
 you can find an example one in the sources at: ``files/pagure.cfg.sample``
 that you will have to copy to the right location.
 
 Confer the ``Configuration`` section of this documentation for a full
-explanation of all the options of pagure.
+explanation of all the options of Pagure.
 
 * Create the database
 
-You first need to create the database itself. For this, since pagure can
+You first need to create the database itself. For this, since Pagure can
 work with: `PostgreSQL <http://www.postgresql.org/>`_,
 `MySQL <http://www.mysql.com/>`_ or `MariaDB <http://mariadb.org/>`_, we
 would like to invite you to consult the documentation of your database system
@@ -228,11 +228,11 @@ In the ``alembic.ini`` file, one of the configuration key is most important:
 ``script_location`` which is the path to the ``versions`` folder containing
 all the alembic migration files. The ``sqlalchemy.url`` configuration key if
 missing will be replaced by the url filled in the configuration file of
-pagure.
+Pagure.
 
 To create the database tables, you need to run the script
 ``/usr/share/pagure/pagure_createdb.py`` and specify the configuration
-to use for pagure and for alembic.
+to use for Pagure and for alembic.
 
 For example:
 ::
@@ -258,7 +258,7 @@ In the ``alembic.ini`` file, one of the configuration key is most important:
 ``script_location`` which is the path to the ``versions`` folder containing
 all the alembic migration files. The ``sqlalchemy.url`` configuration key if
 missing will be replaced by the url filled in the configuration file of
-pagure.
+Pagure.
 
 .. warning:: Calling ``pagure_createdb.py`` is asked regularly in the
         UPGRADING.rst documentation, especially to handle database schema

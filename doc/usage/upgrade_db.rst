@@ -11,7 +11,7 @@ To upgrade the database to the latest version simply run:
 
     alembic upgrade head
 
-.. note:: if pagure's configuration file isn't in ``/etc/pagure/pagure.cfg``
+.. note:: if Pagure's configuration file isn't in ``/etc/pagure/pagure.cfg``
         you will have to specify it to alembic using the command: ::
 
             PAGURE_CONFIG=/path/to/pagure.cfg alembic upgrade head

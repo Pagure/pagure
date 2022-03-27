@@ -20,7 +20,7 @@ Contributors:
 Dependencies
 ------------
 
-Install the build dependencies of pagure:
+Install the build dependencies of Pagure:
 
 ::
 
@@ -28,7 +28,7 @@ Install the build dependencies of pagure:
                    libjpeg-devel gcc libffi-devel redhat-rpm-config
 
 
-The python dependencies of pagure are listed in the file ``requirements.txt``
+The python dependencies of Pagure are listed in the file ``requirements.txt``
 at the top level of the sources.
 
 ::
@@ -45,16 +45,16 @@ at the top level of the sources.
           but the pygit2 `documentation has a solution for this
           <http://www.pygit2.org/install.html#libgit2-within-a-virtual-environment>`_.
 
-How to run pagure
+How to run Pagure
 -----------------
 
 There are several options when it comes to a development environment. Vagrant
 will provide you with a virtual machine which you can develop on, you can use
-a container to run pagure or you can install it directly on your host machine.
+a container to run Pagure or you can install it directly on your host machine.
 The README has detailed instructions for the different options.
 
 
-Run pagure for development
+Run Pagure for development
 --------------------------
 Adjust the configuration file (secret key, database URL, admin group...)
 See :doc:`configuration` for more detailed information about the
@@ -130,17 +130,17 @@ so you can see your change immediately.
 Create a pull-request for testing
 ----------------------------------
 
-When working on pagure, it is pretty often that one wanted to work on a
+When working on Pagure, it is pretty often that one wanted to work on a
 feature or a bug related to pull-requests needs to create one.
 
 Making a pull-request for development purposes isn't hard, if you remember
 that since you're running a local instance, the git repos created in your
-pagure instance are also local.
+Pagure instance are also local.
 
 So here are in a few steps that one could perform to create a pull-request in a
-local pagure instance.
+local Pagure instance.
 
-* Create a project on your pagure instance, let's say it will be called ``test``
+* Create a project on your Pagure instance, let's say it will be called ``test``
 
 * Create a folder ``clones`` somewhere in your system (you probably do not
   want it in the ``repos`` folder created above, next to it is fine though)::
@@ -179,7 +179,7 @@ local pagure instance.
     git push -u origin new_branch
 
 
-Then go back to your pagure instance running in your web-browser, check the
+Then go back to your Pagure instance running in your web-browser, check the
 ``test`` project. You should see two branches: ``master`` and ``new_branch``.
 From there you should be able to open a new pull-request, either from the
 front page or via the ``File Pull Request`` button in the ``Pull Requests``
@@ -215,7 +215,7 @@ yourself (which is simple: ``black /path/to/pagure``).
 Send patch
 ----------
 
-The easiest way to work on pagure is to make your own branch in git, make
+The easiest way to work on Pagure is to make your own branch in git, make
 your changes to this branch, commit whenever you want, rebase on master,
 whenever you need and when you are done, send the patch either by email,
 via the trac or a pull-request (using git or github).
@@ -238,7 +238,7 @@ The workflow would therefore be something like:
    git format-patch -2
 
 This will create two patch files that you can send by email to submit in a ticket
-on pagure, by email or after forking the project on pagure by submitting a
+on Pagure, by email or after forking the project on Pagure by submitting a
 pull-request (in which case the last step above ``git format-patch -2`` is not
 needed.
 
@@ -251,8 +251,8 @@ needed.
           uses the title on the Subject line and the rest of the commit in 
           the body.
           Pagure uses lines that contain only 'Fixes #number' as references
-          to issues. If for example a commit message of a pagure patch has 
-          a line 'Fixes #3547' and a pullrequest (PR) gets created in pagure, 
+          to issues. If for example a commit message of a Pagure patch has 
+          a line 'Fixes #3547' and a pullrequest (PR) gets created in Pagure, 
           this PR will be linked to from ``https://pagure.io/pagure/issue/3547``
 
 
@@ -273,7 +273,7 @@ as tests checking they work the way they are intended to.
 
 
 So here are a few steps that one could perform to run unit-tests in a
-local pagure instance. 
+local Pagure instance. 
 
 * Install the dependencies::
 
@@ -312,5 +312,5 @@ Use the following command to run the tests ::
 This command will build a fedora based container and execute the test suite.
 You can also limit the tests to unit-test files or single tests similar to the 
 options described above. You need set the environment variables REPO and BRANCH
-if the tests are not yet available in the upstream pagure master branch.
+if the tests are not yet available in the upstream Pagure master branch.
 

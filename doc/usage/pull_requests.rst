@@ -22,7 +22,7 @@ ready to contribute to the project.
 Pagure to Pagure pull request
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-You can create a pull request from a pagure project, using one of the following options
+You can create a pull request from a Pagure project, using one of the following options
 
 From the project overview
 *************************
@@ -144,7 +144,7 @@ to that section as **the first fetch line**, like this::
         fetch = +refs/pull/*/head:refs/remotes/origin/pr/*
         fetch = +refs/heads/*:refs/remotes/origin/*
 
-Obviously, the remote URL should be matching the URL of your project (pagure project in
+Obviously, the remote URL should be matching the URL of your project (Pagure project in
 this example).
 
 Now you can fetch the all the pull requests: ::

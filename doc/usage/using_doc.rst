@@ -61,7 +61,7 @@ Updating documentation hosted in a dedicated repo is like
 Example
 -------
 
-Pagure's documentation is kept in pagure's sources, in the `doc` folder there.
+Pagure's documentation is kept in Pagure's sources, in the `doc` folder there.
 You can see it at: `https://pagure.io/pagure/blob/master/f/doc
 <https://pagure.io/pagure/blob/master/f/doc>`_. This doc can be built with
 `Sphinx <http://sphinx-doc.org/>`_ to make it HTML and prettier.
@@ -71,7 +71,7 @@ The built documentation is available at: `https://docs.pagure.org/pagure/
 
 This is how it is built/updated:
 
-* Clone pagure's sources::
+* Clone Pagure's sources::
 
     git clone https://pagure.io/pagure.git
 
@@ -83,7 +83,7 @@ This is how it is built/updated:
 
     make html
 
-* Clone pagure's doc repository::
+* Clone Pagure's doc repository::
 
     git clone ssh://git@pagure.io/docs/pagure.git
 
@@ -129,7 +129,7 @@ used:
 It can be used by running `update_doc.sh <project>` from within the folder
 containing the doc.
 
-So for pagure it would be something like:
+So for Pagure it would be something like:
 
 ::
 

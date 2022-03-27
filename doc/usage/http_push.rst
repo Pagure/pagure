@@ -1,7 +1,7 @@
 HTTP PUSH
 =========
 
-When using git push over http against a pagure instance, there are two
+When using git push over http against a Pagure instance, there are two
 situations to distinguish.
 
 Git push over http with API token
@@ -31,11 +31,11 @@ For example:
 Git push over http with Username & Password
 -------------------------------------------
 
-This is only supported on pagure instance that are using the ``local``
-authentication system (ie: where pagure manages the registration of the
+This is only supported on Pagure instance that are using the ``local``
+authentication system (ie: where Pagure manages the registration of the
 user accounts, email confirmation, etc).
 
-For these pagure instances and for these only, when being prompted by git
+For these Pagure instances and for these only, when being prompted by git
 for an username and password the user can choose to enter either their
 username and actual password or their username and an API token.
 

@@ -1,16 +1,16 @@
 Usage
 =====
 
-Using pagure should come fairly easily, especially to people already used
+Using Pagure should come fairly easily, especially to people already used
 to forges such as GitHub or GitLab. There are however some tips and tricks
 which can be useful to know and that this section of the doc covers.
 
 
 One of the major difference with GitHub and GitLab is that for each project
-on pagure, four git repositories are made available:
+on Pagure, four git repositories are made available:
 
 * A git repository containing the source code, displayed in the main section
-  of the pagure project.
+  of the Pagure project.
 * A git repository for the documentation
 * A git repository for the issues and their metadata
 * A git repository for the metadata for pull-requests
@@ -26,7 +26,7 @@ pull-requests (the `pag-off <https://pagure.io/pag-off>`_ project for example
 relies on a local copy of the issue git repository). They are designed to
 allow you to have full access to all the data about your project.
 One of the original idea was also to allow syncing a project between multiple
-pagure instances by syncing these git repositories between the instances.
+Pagure instances by syncing these git repositories between the instances.
 
 You can find the URLs to access or clone these git repositories on the
 overview page of the project. On the top right of the page, in the drop-down
@@ -68,4 +68,4 @@ Pagure API
 ----------
 
 The API documentation can be found at `https://pagure.io/api/0/ <https://pagure.io/api/0/>`_
-or in ``/api/0/`` of you local pagure instance.
+or in ``/api/0/`` of you local Pagure instance.

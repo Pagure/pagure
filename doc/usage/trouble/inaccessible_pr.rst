@@ -41,7 +41,7 @@ This can be done using git simply by doing:
     git checkout -b <branch_name>
     git push origin <branch_name>
 
-It will create the branch named ``<branch_name>`` in pagure, allowing the
+It will create the branch named ``<branch_name>`` in Pagure, allowing the
 diff to be computed for that pull-request and thus allowing it to be
 displayed. It is then up to you to see if this pull-request is still relevant
 and should be merged or closed.

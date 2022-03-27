@@ -1,7 +1,7 @@
 Project Level Access Control
 ============================
 
-Till release 2.12, pagure had a very simple user model. If we added a new
+Till release 2.12, Pagure had a very simple user model. If we added a new
 user or a new group to a project, the user/group would be an admin of the project.
 The user/group  could do everything from changing the status of an issue to adding
 or removing any user on the project. With project ACL feature, we allow a more fine
@@ -50,7 +50,7 @@ Add/Update Access
 Points to be noted
 ------------------
 
-* The creator of a project in pagure holds a more unique position than a normal user
+* The creator of a project in Pagure holds a more unique position than a normal user
   with admin access. The creator can not be removed by an admin. His access level
   can not be changed. But, an admin's access can be updated by a fellow admin
   or the creator himself.

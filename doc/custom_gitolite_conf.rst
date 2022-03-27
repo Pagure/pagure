@@ -36,6 +36,6 @@ template::
     my_git_auth = my_pagure.my_module:MyGitAuthTestHelper
     """
 
-Then you can adjust pagure's configuration file to say::
+Then you can adjust Pagure's configuration file to say::
 
     GITOLITE_BACKEND = 'my_git_auth'

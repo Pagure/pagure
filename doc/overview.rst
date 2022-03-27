@@ -12,7 +12,7 @@ These components are:
 Before going into the overall picture, one should realize that most of the
 components listed above are optional.
 
-Here is a diagram representing pagure without all the optional components:
+Here is a diagram representing Pagure without all the optional components:
 
 .. image:: _static/overview_simple.png
         :target: _images/overview_simple.png
@@ -37,7 +37,7 @@ Pagure workers
 Interacting with git repos can be a long process, it varies depending on the
 size of the repository itself but also based on hardware performances or
 simply the load on the system.
-To make pagure capable of handling more load, since pagure 3.0 the interactions
+To make Pagure capable of handling more load, since Pagure 3.0 the interactions
 with the git repositories from the web UI is performed by dedicated workers,
 allowing async processing of the different tasks.
 
@@ -50,7 +50,7 @@ The communication between the core application and its worker is based on
 Gitolite
 --------
 
-Currently pagure uses `gitolite <http://gitolite.com/gitolite/index.html>`_
+Currently Pagure uses `gitolite <http://gitolite.com/gitolite/index.html>`_
 to grant or deny `ssh <https://en.wikipedia.org/wiki/Secure_Shell>`_ access
 to the git repositories, in other words to grant or deny read and/or write
 access to the git repositories.
@@ -67,7 +67,7 @@ for security concern, displaying information directly provided by the user
 without a clear/safe way of filtering for unsafe script or hacks is a
 security hole.
 For this reason we also strongly encourage anyone wanting to deploy their
-own instance of pagure with the doc server, to run this application on a
+own instance of Pagure with the doc server, to run this application on a
 completely different domain name (not just a sub-domain) in order to reduce
 the cross-site forgery risks.
 
@@ -81,7 +81,7 @@ Pagure milter
 The milter is a script, receiving an email as input and performing an action
 with it.
 
-In the case of pagure, the milter is used to allow replying on a comment
+In the case of Pagure, the milter is used to allow replying on a comment
 of a ticket or a pull-request by directly replying to the notification sent.
 No need to go to the page anymore to reply to a comment someone made.
 
@@ -94,12 +94,12 @@ Pagure EventSource Server
 
 Eventsource or Server Sent Events are messages sent from a server to a browser.
 
-For pagure this technology is used to allow live-refreshing of a page when
+For Pagure this technology is used to allow live-refreshing of a page when
 someone is viewing it. For example, while you are reading a ticket if someone
 comments on it, the comment will automatically show up on the page without
 the need for you to reload the entire page.
 
-The flow is: the main pagure server does an action, sends a message over
+The flow is: the main Pagure server does an action, sends a message over
 redis, the eventsource server picks it up and send it to the browsers waiting
 for it, then javascript code is executed to refresh the page based on the
 information received.
@@ -110,12 +110,12 @@ Pagure web-hook Server
 
 Sends notifications to third party services using POST http requests.
 
-This is the second notifications system in pagure with `fedmsg <https://fedmsg.readthedocs.io/>`_.
+This is the second notifications system in Pagure with `fedmsg <https://fedmsg.readthedocs.io/>`_.
 These notifications are running on their own service to prevent blocking the
 main web application in case the third part service is timing-out or just
 being slow.
 
-The flow is: the main pagure server does an action, sends a message over
+The flow is: the main Pagure server does an action, sends a message over
 redis, the web-hook server picks it up, build the query and performs the
 POST request to the specified URLs.
 

@@ -8,8 +8,8 @@ configured to integrate results coming from CI services, such as `Jenkins
 against the project.
 
 
-.. note: Currently, pagure only supports `Jenkins` but we welcome help to
-  integrate pagure with other services such as `travis-ci
+.. note: Currently, Pagure only supports `Jenkins` but we welcome help to
+  integrate Pagure with other services such as `travis-ci
   <https://en.wikipedia.org/wiki/Travis_CI>`_.
 
 
@@ -43,7 +43,7 @@ CI service when there is a new pull-request or a change to an existing one.
 
 The second file is the systemd service file.
 
-* Configure your pagure instance to support CI, add the following to your
+* Configure your Pagure instance to support CI, add the following to your
   configuration file
 
 ::

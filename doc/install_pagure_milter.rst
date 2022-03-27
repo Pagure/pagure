@@ -1,4 +1,4 @@
-Installing pagure's milter
+Installing Pagure's milter
 ==========================
 
 A milter is a script that is ran by a Mail Transfer Agent (`MTA

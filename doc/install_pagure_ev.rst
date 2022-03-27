@@ -1,4 +1,4 @@
-Installing pagure's EventSource server
+Installing Pagure's EventSource server
 ======================================
 
 Eventsource or Server Sent Events are messages sent from a server to a web

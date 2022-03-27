@@ -1,17 +1,17 @@
 .. _first-steps:
 
-First Steps on pagure
+First Steps on Pagure
 =====================
 
-When coming to pagure for the first time there are a few things one should
+When coming to Pagure for the first time there are a few things one should
 do or check to ensure all works as desired.
 
-Login to pagure or create your account
+Login to Pagure or create your account
 --------------------------------------
 
 Pagure has its own user account system.
 
-For instances of pagure such as the one at `pagure.io <https://pagure.io>`_
+For instances of Pagure such as the one at `pagure.io <https://pagure.io>`_
 where the authentication is delegated to a third party (in the case of
 pagure.io, the Fedora Account System) via OpenID, the local user account
 is created upon login.
@@ -19,7 +19,7 @@ is created upon login.
 This means, you cannot be added to a group or a project before you login for
 the first time as the system will simply not know you.
 
-If you run your own pagure instance which uses the local authentication
+If you run your own Pagure instance which uses the local authentication
 system, then you will find on the login page an option to create a new
 account.
 
@@ -50,11 +50,11 @@ folder).
 
 These two files will be named (for example) ``id_rsa`` and ``id_rsa.pub``.
 The first one is the private key that must never be shared. The second is
-the public key that can be uploaded on pagure to give you ssh access.
+the public key that can be uploaded on Pagure to give you ssh access.
 
-To upload your public key onto pagure:
+To upload your public key onto Pagure:
 
-1. Login into pagure and click on the user icon on
+1. Login into Pagure and click on the user icon on
 the top right corner, there, select ``My settings``.
 
 .. image:: _static/pagure_my_settings.png
@@ -76,9 +76,9 @@ the top right corner, there, select ``My settings``.
 Configure the default email address
 -----------------------------------
 
-If the pagure instance you use is using local user authentication, you can
+If the Pagure instance you use is using local user authentication, you can
 choose whichever email address you prefer to use during account creation.
-But in the case (like pagure.io) where the pagure instance relies
+But in the case (like pagure.io) where the Pagure instance relies
 on an external authentication service, the email address provided by this
 service may be different from the one you prefer.
 

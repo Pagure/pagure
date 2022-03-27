@@ -6,7 +6,7 @@ Pagure
 
 Pagure is a git-centered forge, python based using pygit2.
 
-With pagure you can host your project with its documentation, let your users
+With Pagure you can host your project with its documentation, let your users
 report issues or request enhancements using the ticketing system and build your
 community of contributors by allowing them to fork your projects and contribute
 to it via the now-popular pull-request mechanism.
@@ -19,7 +19,7 @@ See it at work: https://pagure.io
 
 Playground version: https://stg.pagure.io
 
-If you have any questions or just would like to discuss about pagure,
+If you have any questions or just would like to discuss about Pagure,
 feel free to drop by on IRC in the channel ``#pagure`` of the freenode server
 
 
@@ -51,7 +51,7 @@ To build and run the containers, use the following command::
 
     $ ./dev/docker-start.sh
 
-Once all the containers have started, you can access pagure on http://localhost:5000.
+Once all the containers have started, you can access Pagure on http://localhost:5000.
 To stop the containers, press Ctrl+C.
 
 Once the containers are up and running, run this command to populate the
@@ -114,12 +114,12 @@ When the vagrant VM is up and running, connect to it with::
 This will log you into the VM as the user ``vagrant`` which has a couple of aliases
 preconfigured::
 
-    $ pstart            # Starts pagure, the workers and other tasks
+    $ pstart            # Starts Pagure, the workers and other tasks
     $ pstop             # Stops all those tasks again
-    $ pstatus           # Shows pagure status
+    $ pstatus           # Shows Pagure status
 
-The Vagrant pagure doesn't have its own log file, use ``journalctl -f`` to
-show the pagure output. The verbosity can be configured in the pagure config file
+The Vagrant Pagure doesn't have its own log file, use ``journalctl -f`` to
+show the Pagure output. The verbosity can be configured in the Pagure config file
 with the ``LOGGING`` parameter.
 
 Running the unit-tests in container
@@ -276,7 +276,7 @@ Manually
 
 This will launch the application at http://127.0.0.1:5000
 
-* To run unit-tests on pagure
+* To run unit-tests on Pagure
 
   * Install the dependencies::
 
@@ -286,7 +286,7 @@ This will launch the application at http://127.0.0.1:5000
 
       pytest tests/
 
-    .. note:: While testing for worker tasks, pagure uses celery in /usr/bin/
+    .. note:: While testing for worker tasks, Pagure uses celery in /usr/bin/
             Celery then looks for eventlet (which we use for testing only) at
             system level and not in virtual environment. You will need to
             install eventlet outside of your virtual environment if you are

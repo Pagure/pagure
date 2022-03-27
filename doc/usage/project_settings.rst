@@ -14,16 +14,16 @@ This page presents the different settings and there effect.
 This Boolean enables or disables always making a merge commit when merging
 a pull-request.
 
-When merging a pull-request in pagure there are three states:
+When merging a pull-request in Pagure there are three states:
 
 * fast-forward: when the commits in the pull-request can be fast-forwarded
-  pagure signals it and just fast-forward the commit, keeping the history linear.
+  Pagure signals it and just fast-forward the commit, keeping the history linear.
 
 * merge: when the commits in the pull-request cannot be merged without a merge
-  commit, pagure signals it and performs this merge commit.
+  commit, Pagure signals it and performs this merge commit.
 
 * conflicts: when the commits in the pull-request cannot be merged at all
-  automatically due to one or more conflicts. Then pagure signals it and prevent
+  automatically due to one or more conflicts. Then Pagure signals it and prevent
   merging.
 
 If the `Always merge` option is on, then the `fast-forward` option
@@ -59,7 +59,7 @@ and this setting allows turning it on or off.
 This Boolean enables or disables checking for a 'Signed-off-by' line (case
 insensitive) in the commit messages of the pull-requests.
 
-If this line is missing, pagure will display a message near the `Merge`
+If this line is missing, Pagure will display a message near the `Merge`
 button, allowing project admin to request the PR to be updated.
 
 .. note:: This setting does not prevent commits without this 'signed-off-by'
@@ -71,7 +71,7 @@ button, allowing project admin to request the PR to be updated.
 
 This Boolean simply enables or disables the issue tracker for the project.
 So if you are tracking your ticket on a different system, you can simply
-disable reporting issue on pagure by un-checking this option.
+disable reporting issue on Pagure by un-checking this option.
 
 
 `Minimum score to merge pull-request`
@@ -149,13 +149,13 @@ prevent anyone from opening a pull-request against this project.
 
 Pagure offers the option of sending notification about event happening on a
 project via [web-hooks|https://en.wikipedia.org/wiki/Webhook]. This option
-is off by default and can be turned on for a pagure instance in its
+is off by default and can be turned on for a Pagure instance in its
 configuration file.
 
 The URL of the web-hooks can be entered in this field.
 
 .. note:: See the ``notifications`` documentation to learn more about
-          web-hooks in pagure and how to use them.
+          web-hooks in Pagure and how to use them.
 
 `Tags`
 ------
