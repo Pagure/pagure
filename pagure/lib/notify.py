@@ -161,7 +161,7 @@ def mqtt_publish(topic, message):
         return
 
     mqtt_host = pagure_config.get("MQTT_HOST")
-    mqtt_port = pagure_config.get("MQTT_PORT")
+    mqtt_port = int(pagure_config.get("MQTT_PORT"))
 
     mqtt_username = pagure_config.get("MQTT_USERNAME")
     mqtt_pass = pagure_config.get("MQTT_PASSWORD")
