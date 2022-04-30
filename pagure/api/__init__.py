@@ -589,6 +589,7 @@ def api():
         fork.api_pull_request_merge,
         fork.api_pull_request_rebase,
         fork.api_pull_request_close,
+        fork.api_pull_request_reopen,
         fork.api_pull_request_add_comment,
         fork.api_pull_request_add_flag,
         fork.api_pull_request_get_flag,
