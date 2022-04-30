@@ -797,6 +797,74 @@ def api_pull_request_close(repo, requestid, username=None, namespace=None):
     return jsonout
 
 
+@API.route("/<repo>/pull-request/<int:requestid>/reopen", methods=["POST"])
+@API.route(
+    "/<namespace>/<repo>/pull-request/<int:requestid>/reopen", methods=["POST"]
+)
+@API.route(
+    "/fork/<username>/<repo>/pull-request/<int:requestid>/reopen",
+    methods=["POST"],
+)
+@API.route(
+    "/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/reopen",
+    methods=["POST"],
+)
+@api_login_required(acls=["pull_request_close", "pull_request_update"])
+@api_method
+def api_pull_request_reopen(repo, requestid, username=None, namespace=None):
+    """
+    Reopen a pull-request
+    --------------------
+    Instruct Pagure to reopen a pull request.
+
+    ::
+
+        POST /api/0/<repo>/pull-request/<request id>/reopen
+        POST /api/0/<namespace>/<repo>/pull-request/<request id>/reopen
+
+    ::
+
+        POST /api/0/fork/<username>/<repo>/pull-request/<request id>/reopen
+        POST /api/0/fork/<username>/<namespace>/<repo>/pull-request/<request id>/reopen
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "message": "Pull-request reopened!"
+        }
+
+    """  # noqa
+    output = {}
+
+    repo = _get_repo(repo, username, namespace)
+    _check_pull_request(repo)
+    _check_token(repo, project_token=False)
+    request = _get_request(repo, requestid)
+
+    if (
+        not is_repo_committer(repo)
+        and not flask.g.fas_user.username == request.user.username
+    ):
+        raise pagure.exceptions.APIError(403, error_code=APIERROR.ENOPRCLOSE)
+
+    try:
+        pagure.lib.query.reopen_pull_request(
+            flask.g.session, request, flask.g.fas_user.username
+        )
+        flask.g.session.commit()
+        output["message"] = "Pull-request reopened!"
+    except SQLAlchemyError as err:  # pragma: no cover
+        flask.g.session.rollback()
+        _log.exception(err)
+        raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
+
+    jsonout = flask.jsonify(output)
+    return jsonout
+
+
 @API.route("/<repo>/pull-request/<int:requestid>/comment", methods=["POST"])
 @API.route(
     "/<namespace>/<repo>/pull-request/<int:requestid>/comment",
