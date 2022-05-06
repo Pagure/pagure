@@ -107,6 +107,46 @@
           </div>
         </div>
       </a>
+      <a class="dropdown-item pl-2" id="monitoring_all_option_button">
+        <div class="media">
+          <div class="align-self-center check-icon pr-2">
+            <span class="fa fa-fw"></span>
+          </div>
+          <div class="media-body">
+            Monitoring all
+          </div>
+        </div>
+      </a>
+      <a class="dropdown-item pl-2" id="monitoring_all_and_scratch_option_button">
+        <div class="media">
+          <div class="align-self-center check-icon pr-2">
+            <span class="fa fa-fw"></span>
+          </div>
+          <div class="media-body">
+            Monitoring all and scratch builds
+          </div>
+        </div>
+      </a>
+      <a class="dropdown-item pl-2" id="monitoring_stable_option_button">
+        <div class="media">
+          <div class="align-self-center check-icon pr-2">
+            <span class="fa fa-fw"></span>
+          </div>
+          <div class="media-body">
+            Monitoring stable only
+          </div>
+        </div>
+      </a>
+      <a class="dropdown-item pl-2" id="monitoring_stable_and_scratch_option_button">
+        <div class="media">
+          <div class="align-self-center check-icon pr-2">
+            <span class="fa fa-fw"></span>
+          </div>
+          <div class="media-body">
+            Monitoring stable only and scratch builds
+          </div>
+        </div>
+      </a>
     </div>
     <div id="monitoring_feedback"></div>
     {% else %}
@@ -273,6 +313,18 @@
         } else if (status === "monitoring-with-scratch") {
           _label = "Scratch builds"
           $("#monitoring-icon").attr("class", "fa fa-fw fa-eye")
+        } else if (status === "monitoring-all") {
+          _label = "Monitoring all"
+          $("#monitoring-icon").attr("class", "fa fa-fw fa-eye")
+        } else if (status === "monitoring-all-scratch") {
+          _label = "All - Scratch builds"
+          $("#monitoring-icon").attr("class", "fa fa-fw fa-eye")
+        } else if (status === "monitoring-stable") {
+          _label = "Monitoring stable"
+          $("#monitoring-icon").attr("class", "fa fa-fw fa-eye")
+        } else if (status === "monitoring-stable-scratch") {
+          _label = "Stable - Scratch builds"
+          $("#monitoring-icon").attr("class", "fa fa-fw fa-eye")
         } else {
           $("#monitoring-icon").attr("class", "fa fa-fw fa-eye-slash")
         }
@@ -300,6 +352,16 @@
             _status = "monitoring";
         } else if (selectedValue === "monitoring_and_scratch_option_button") {
             _status = "monitoring-with-scratch"
+        }
+        if (selectedValue === "monitoring_all_option_button") {
+            _status = "monitoring-all";
+        } else if (selectedValue === "monitoring_all_and_scratch_option_button") {
+            _status = "monitoring-all-scratch"
+        }
+        if (selectedValue === "monitoring_stable_option_button") {
+            _status = "monitoring-stable";
+        } else if (selectedValue === "monitoring_stable_and_scratch_option_button") {
+            _status = "monitoring-stable-scratch"
         }
 
         $.ajax({
