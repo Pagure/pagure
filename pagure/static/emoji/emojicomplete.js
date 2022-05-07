@@ -52,6 +52,6 @@ emoji_complete = function(json_url, folder) {
     maxCount: 10
   }
   ],{
-    footer: '<a href="http://www.emoji.codes" target="_blank">Browse All<span class="arrow">&raquo;</span></a>'
+    footer: '<a href="https://github.com/markdown-templates/markdown-emojis" target="_blank">Browse All<span class="arrow">&raquo;</span></a>'
   });
 };
