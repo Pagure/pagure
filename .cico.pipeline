@@ -35,7 +35,6 @@ node('cico-workspace') {
             ])
 
     stage('Allocate Node'){
-        env.CICO_API_KEY = env.DUFFY_KEY
         duffy_rtn=sh(
             script: 'cico --debug node get -f value -c hostname -c comment',
             returnStdout: true
