@@ -170,7 +170,7 @@ def handle_client(client_reader, client_writer):
     try:
         obj = get_obj_from_path(url.path)
     except PagureException as err:
-        log.warning(err.message)
+        log.warning(str(err))
         return
 
     origin = pagure.config.config.get("APP_URL")
