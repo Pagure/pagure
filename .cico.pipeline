@@ -36,7 +36,7 @@ node('cico-workspace') {
 
     stage('Allocate Node'){
         duffy_rtn=sh(
-            script: 'cico --debug node get -f value -c hostname -c comment',
+            script: 'cico --debug node get --release 8-stream -f value -c hostname -c comment',
             returnStdout: true
             ).trim().tokenize(' ')
         env.DUFFY_NODE=duffy_rtn[0]
