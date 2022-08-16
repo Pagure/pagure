@@ -36,12 +36,12 @@ node('cico-workspace') {
 
     stage('Allocate Node'){
         duffy_rtn=sh(
-            script: 'duffy client request-session pool=virt-ec2-t2-centos-9s-x86_64,quantity=1',
+            script: 'duffy client --url https://duffy.ci.centos.org/api/v1 --auth-name pagure --auth-key $CICO_API_KEY request-session pool=virt-ec2-t2-centos-8s-x86_64,quantity=1',
             returnStdout: true
-            ).trim().tokenize(' ')
+            )
         def jsonObj = readJSON text: duffy_rtn
-        env.DUFFY_NODE=jsonObj[`nodes`][`hostname']
-        env.SSID=jsonObj['session']['id']
+        env.DUFFY_NODE=jsonObj.session.nodes[0].hostname
+        env.SSID=jsonObj.session.id
         env.BRANCH=params.BRANCH
         env.REPO=params.REPO
     }
@@ -72,7 +72,7 @@ node('cico-workspace') {
     } finally {
 
         stage('Deallocate Node'){
-            sh 'duffy client retire-session ${SSID}'
+            sh 'duffy client  --url https://duffy.ci.centos.org/api/v1 --auth-name pagure --auth-key $CICO_API_KEY retire-session ${SSID}'
         }
 
         stage('Notify PR'){
