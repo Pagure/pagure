@@ -16,13 +16,13 @@ def notifyPagurePR(repo, msg, status, phase, credentials = 'pagure-auth'){
 def onmyduffynode(script){
     ansiColor('xterm'){
         timestamps{
-            sh 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root ${DUFFY_NODE}.ci.centos.org -t \"export REPO=${REPO}; export BRANCH=${BRANCH};\" "' + script + '"'
+            sh 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root ${DUFFY_NODE} -t \"export REPO=${REPO}; export BRANCH=${BRANCH};\" "' + script + '"'
         }
     }
 }
 
 def syncfromduffynode(rsyncpath){
-    sh 'rsync -e "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root " -Ha --include=' +  rsyncpath +  " ${DUFFY_NODE}.ci.centos.org:~/ ./"
+    sh 'rsync -e "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root " -Ha --include=' +  rsyncpath +  " ${DUFFY_NODE}:~/ ./"
 }
 
 node('cico-workspace') {
@@ -36,11 +36,12 @@ node('cico-workspace') {
 
     stage('Allocate Node'){
         duffy_rtn=sh(
-            script: 'cico --debug node get --release 8-stream -f value -c hostname -c comment',
+            script: 'duffy client request-session pool=virt-ec2-t2-centos-9s-x86_64,quantity=1',
             returnStdout: true
             ).trim().tokenize(' ')
-        env.DUFFY_NODE=duffy_rtn[0]
-        env.SSID=duffy_rtn[1]
+        def jsonObj = readJSON text: duffy_rtn
+        env.DUFFY_NODE=jsonObj[`nodes`][`hostname']
+        env.SSID=jsonObj['session']['id']
         env.BRANCH=params.BRANCH
         env.REPO=params.REPO
     }
@@ -71,7 +72,7 @@ node('cico-workspace') {
     } finally {
 
         stage('Deallocate Node'){
-            sh 'cico node done ${SSID}'
+            sh 'duffy client retire-session ${SSID}'
         }
 
         stage('Notify PR'){
