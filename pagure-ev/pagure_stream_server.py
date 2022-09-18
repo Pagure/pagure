@@ -253,7 +253,6 @@ def main():
             handle_client,
             host=None,
             port=pagure.config.config["EVENTSOURCE_PORT"],
-            loop=loop,
         )
         SERVER = loop.run_until_complete(coro)
         log.info(
@@ -264,7 +263,6 @@ def main():
                 stats,
                 host=None,
                 port=pagure.config.config.get("EV_STATS_PORT"),
-                loop=loop,
             )
             stats_server = loop.run_until_complete(stats_coro)
             log.info(
