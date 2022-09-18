@@ -8,7 +8,7 @@ After=redis.target
 Documentation=https://pagure.io/pagure
 
 [Service]
-ExecStart=/usr/bin/celery -A pagure.lib.tasks_services worker --loglevel=INFO -Q pagure_webhook
+ExecStart=/usr/bin/celery -A pagure.lib.tasks_services worker --loglevel=INFO -Q pagure_webhook -n webhook
 Environment="PAGURE_CONFIG=/etc/pagure/pagure.cfg"
 Type=simple
 User=git
