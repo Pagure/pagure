@@ -97,7 +97,7 @@
             <span class="text-muted" data-toggle="tooltip" title="{{issue.date_created | format_datetime}}">
                 <span class="font-weight-bold">Opened</span> {{ issue.date_created |humanize }}
             </span>
-            <span class="text-muted" title="{{ issue.user.html_title }}">by {{ issue.user.user }}.</span>
+            <span class="text-muted" data-toggle="tooltip" title="{{ issue.user.html_title }}">by {{ issue.user.user }}.</span>
           {% endif %}
           </small>
         </div>

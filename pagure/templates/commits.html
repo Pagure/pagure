@@ -115,6 +115,7 @@
                         {{ diff_commit_full.author | author2avatar(20) | safe }}
                         {{ diff_commit_full.author.name }}
                       <span class="commitdate"
+                            data-toggle="tooltip"
                       title="{{ diff_commit_full.commit_time|format_ts }}"> &bull;
                       {{ diff_commit_full.commit_time|humanize }}</span>&nbsp;&nbsp;
                     </div>
@@ -172,6 +173,7 @@
                           author=commit.author.email),
                       cssclass="notblue")|safe}}
                       <span class="commitdate"
+                            data-toggle="tooltip"
                       title="{{ commit.commit_time|format_ts }}"> &bull;
                     {{ commit.commit_time|humanize }}</span>&nbsp;&nbsp;
                       <span id="commit-actions"></span>

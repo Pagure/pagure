@@ -128,6 +128,7 @@
                           author=commit.author.email),
                       cssclass="notblue")|safe}}
                       <span class="commitdate"
+                            data-toggle="tooltip"
                       title="{{ commit.commit_time|format_ts }}"> &bull;
                     {{ commit.commit_time|humanize }}</span>&nbsp;&nbsp;
                       <span id="commit-actions"></span>

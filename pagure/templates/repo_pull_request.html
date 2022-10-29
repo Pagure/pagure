@@ -68,7 +68,7 @@
             <span class="text-muted" data-toggle="tooltip" title="{{pull_request.date_created | format_datetime}}">
                 <span class="font-weight-bold">Opened</span> {{ pull_request.date_created |humanize }}
             </span>
-            <span class="text-muted" title="{{ pull_request.user.html_title }}">by {{ pull_request.user.user }}.</span>
+            <span class="text-muted" data-toggle="tooltip" title="{{ pull_request.user.html_title }}">by {{ pull_request.user.user }}.</span>
           {% elif pull_request.status == 'Closed' %}
             <span data-toggle="tooltip" title="{{pull_request.closed_at | format_datetime}}">
               <span class="text-danger font-weight-bold">Closed</span> {{ pull_request.closed_at |humanize }}
@@ -78,7 +78,7 @@
             <span class="text-muted" data-toggle="tooltip" title="{{pull_request.date_created | format_datetime}}">
                 <span class="font-weight-bold">Opened</span> {{ pull_request.date_created |humanize }}
             </span>
-            <span class="text-muted" title="{{ pull_request.user.html_title }}">by {{ pull_request.user.user }}.</span>
+            <span class="text-muted" data-toggle="tooltip" title="{{ pull_request.user.html_title }}">by {{ pull_request.user.user }}.</span>
           {% endif %}
           </small>
         </div>
@@ -342,6 +342,7 @@
                           author=commit.author.email),
                       cssclass="notblue")|safe}}
                       <span class="commitdate"
+                            data-toggle="tooltip"
                       title="{{ commit.commit_time|format_ts }}"> &bull;
                     {{ commit.commit_time|humanize }}</span>&nbsp;&nbsp;
                 </div>
