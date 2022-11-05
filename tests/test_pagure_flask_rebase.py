@@ -18,6 +18,7 @@ import os
 
 import json
 import pagure_messages
+import pygit2
 from fedora_messaging import api, testing
 from mock import ANY, patch, MagicMock
 
@@ -249,7 +250,12 @@ class PagureRebasetests(PagureRebaseBasetests):
             output = self.app.get("/test/pull-request/1")
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
-            self.assertIn("rebased onto", output_text)
+            orig_repo_obj = pygit2.Repository(
+                os.path.join(self.path, "repos", "test.git")
+            )
+            orig_commit = orig_repo_obj.lookup_branch("master").peel().hex
+            expected = f'rebased onto <a href="/test/c/{orig_commit}"'
+            self.assertIn(expected, output_text)
             repo = pagure.lib.query._get_project(self.session, "test")
             self.assertEqual(repo.requests[0].comments[0].user.username, "bar")
 

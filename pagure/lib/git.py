@@ -2271,7 +2271,7 @@ def diff_pull_request(
     _log.debug("pagure.lib.git.diff_pull_request, started")
     diff = None
     diff_commits = []
-    diff, diff_commits, _ = get_diff_info(
+    diff, diff_commits, orig_commit = get_diff_info(
         repo_obj,
         orig_repo,
         request.branch_from,
@@ -2317,7 +2317,10 @@ def diff_pull_request(
                 and request.commit_start != first_commit.oid.hex
             ):
                 pr_action = "rebased"
-                commenttext = "rebased onto %s" % first_commit.oid.hex
+                if orig_commit:
+                    commenttext = "rebased onto %s" % orig_commit.oid.hex
+                else:
+                    commenttext = "rebased onto unknown target"
         request.commit_start = first_commit.oid.hex
         request.commit_stop = diff_commits[0].oid.hex
         session.add(request)
