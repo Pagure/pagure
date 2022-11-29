@@ -146,3 +146,7 @@ Example function used in Jenkins pipeline script
            sh "timeout 1 curl -X POST -d \'$json\' https://pagure.io/api/0/ci/jenkins/$repo/\${PAGURE_PUSH_SECRET}/build-finished -H \"Content-Type: application/json\" | true"
        }
    }
+
+* To be able to trigger builds from Pagure CI you need to change the Global Security. Go
+  to `Manage Jenkins` -> `Configure Global Security` and find `Authorization` section.
+  In `Matrix-based security` add Read permission to `Anonymous Users` for Overall/Job/View.
