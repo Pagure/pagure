@@ -121,3 +121,28 @@ Example Script
     fi
 
     # Part of the script specific to how you run the tests on your project
+
+* To use the URL to POST results you need to add API key to Jenkins instance.
+  This API key needs to have `Update an issue, status, comments, custom fields...`
+  ACL. In Jenkins add it in `Manage Jenkins` -> `Manage Credentials` -> `Stores scoped to Jenkins`
+  -> `Jenkins` -> `Global credentials (unrestricted)` -> `Add Credentials` as kind
+  `Secret text` (ID will be used in script).
+
+Example function used in Jenkins pipeline script
+
+::
+
+   # 'pagure-auth' is the ID of the credentials
+
+   def notifyPagurePR(repo, msg, status, phase, credentials = 'pagure-auth'){
+       def json = JsonOutput.toJson([name: 'pagure', url: env.JOB_NAME, build: [full_url: currentBuild.absoluteUrl, status: status, number: currentBuild.number, phase: phase]])
+       println json
+
+       withCredentials([string(credentialsId: credentials, variable: "PAGURE_PUSH_SECRET")]) {
+           /* We need to notify pagure that jenkins finished but then pagure will
+             wait for jenkins to be done, so if we wait for pagure's answer we're
+             basically stuck in a loop where both jenkins and pagure are waiting
+             for each other */
+           sh "timeout 1 curl -X POST -d \'$json\' https://pagure.io/api/0/ci/jenkins/$repo/\${PAGURE_PUSH_SECRET}/build-finished -H \"Content-Type: application/json\" | true"
+       }
+   }
