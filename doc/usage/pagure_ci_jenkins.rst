@@ -122,9 +122,9 @@ Example Script
 
     # Part of the script specific to how you run the tests on your project
 
-* To use the URL to POST results you need to add API key to Jenkins instance.
-  This API key needs to have `Update an issue, status, comments, custom fields...`
-  ACL. In Jenkins add it in `Manage Jenkins` -> `Manage Credentials` -> `Stores scoped to Jenkins`
+* To use the URL to POST results you need to add CI token to Jenkins instance.
+  This token could be found in Pagure project `Settings` -> `Hooks` -> `Pagure CI`.
+  In Jenkins add it in `Manage Jenkins` -> `Manage Credentials` -> `Stores scoped to Jenkins`
   -> `Jenkins` -> `Global credentials (unrestricted)` -> `Add Credentials` as kind
   `Secret text` (ID will be used in script).
 
