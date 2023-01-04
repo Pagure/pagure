@@ -1664,7 +1664,7 @@ def force_logout():
     if admin_session_timedout():
         flask.flash("Action canceled, try it again", "error")
         return flask.redirect(
-            flask.url_for("auth_login", next=flask.request.url)
+            flask.url_for("auth_login", next=flask.request.url, _external=True)
         )
 
     # we just need an empty form here to validate that csrf token is present
@@ -1676,7 +1676,7 @@ def force_logout():
         user.refuse_sessions_before = datetime.datetime.utcnow()
         flask.g.session.commit()
         flask.flash("All active sessions logged out")
-    return flask.redirect(flask.url_for("ui_ns.user_settings"))
+    return flask.redirect(flask.url_for("ui_ns.user_settings", _external=True))
 
 
 @UI_NS.route("/about")
