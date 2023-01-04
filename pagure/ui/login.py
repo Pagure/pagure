@@ -96,6 +96,8 @@ def do_login():
     next_url = flask.request.form.get("next_url")
     if not next_url or next_url == "None":
         next_url = flask.url_for("ui_ns.index")
+    else:
+        next_url = urljoin(flask.request.host_url, next_url)
 
     if form.validate_on_submit():
         username = form.username.data

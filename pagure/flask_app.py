@@ -17,6 +17,7 @@ import string
 import time
 import os
 import warnings
+from six.moves.urllib.parse import urljoin
 
 import flask
 import pygit2
@@ -445,7 +446,9 @@ def auth_login():  # pragma: no cover
     return_point = flask.url_for("ui_ns.index")
     if "next" in flask.request.args:
         if pagure.utils.is_safe_url(flask.request.args["next"]):
-            return_point = flask.request.args["next"]
+            return_point = urljoin(
+                flask.request.host_url, flask.request.args["next"]
+            )
 
     authenticated = pagure.utils.authenticated()
     auth = pagure_config.get("PAGURE_AUTH", None)
@@ -509,7 +512,9 @@ def auth_logout():  # pragma: no cover
     return_point = flask.url_for("ui_ns.index")
     if "next" in flask.request.args:
         if pagure.utils.is_safe_url(flask.request.args["next"]):
-            return_point = flask.request.args["next"]
+            return_point = urljoin(
+                flask.request.host_url, flask.request.args["next"]
+            )
 
     if not pagure.utils.authenticated():
         return flask.redirect(return_point)

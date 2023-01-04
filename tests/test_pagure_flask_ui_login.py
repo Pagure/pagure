@@ -474,6 +474,12 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
             '<span class="d-none d-md-inline">Settings</span>', output_text
         )
 
+        output = self.app.get("/login/?next=%2f%2f%09%2fgoogle.fr")
+        self.assertEqual(output.status_code, 302)
+        self.assertEqual(
+            output.location, "http://localhost/google.fr"
+        )
+
     @patch.dict("pagure.config.config", {"PAGURE_AUTH": "local"})
     @patch.dict("pagure.config.config", {"CHECK_SESSION_IP": False})
     def test_has_settings(self):
@@ -1066,6 +1072,14 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
                 '<a class="dropdown-item" href="/logout/?next='
                 'http://localhost/dashboard/projects">Log Out</a>',
                 output.get_data(as_text=True),
+            )
+
+        user = tests.FakeUser(username="foo")
+        with tests.user_set(self.app.application, user):
+            output = self.app.get("/logout/?next=%2f%2f%09%2fgoogle.fr")
+            self.assertEqual(output.status_code, 302)
+            self.assertTrue(
+                output.headers["location"] in ("http://localhost/google.fr",)
             )
 
     @patch.dict("pagure.config.config", {"PAGURE_AUTH": "local"})

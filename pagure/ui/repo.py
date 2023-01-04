@@ -25,6 +25,7 @@ import logging
 import os
 import re
 from math import ceil
+from six.moves.urllib.parse import urljoin
 
 import flask
 import pygit2
@@ -2775,7 +2776,7 @@ def star_project(repo, star, username=None, namespace=None):
     if flask.request.referrer is not None and pagure.utils.is_safe_url(
         flask.request.referrer
     ):
-        return_point = flask.request.referrer
+        return_point = urljoin(flask.request.host_url, flask.request.referrer)
 
     form = pagure.forms.ConfirmationForm()
     if not form.validate_on_submit():
@@ -2814,7 +2815,7 @@ def watch_repo(repo, watch, username=None, namespace=None):
 
     return_point = flask.url_for("ui_ns.index")
     if pagure.utils.is_safe_url(flask.request.referrer):
-        return_point = flask.request.referrer
+        return_point = urljoin(flask.request.host_url, flask.request.referrer)
 
     form = pagure.forms.ConfirmationForm()
     if not form.validate_on_submit():

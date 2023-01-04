@@ -27,6 +27,7 @@ import pygit2
 import werkzeug.datastructures
 from sqlalchemy.exc import SQLAlchemyError
 from binaryornot.helpers import is_binary_string
+from six.moves.urllib.parse import urljoin
 
 import pagure.doc_utils
 import pagure.exceptions
@@ -1645,7 +1646,7 @@ def save_reports(repo, username=None, namespace=None):
         "ui_ns.view_issues", repo=repo, username=username, namespace=namespace
     )
     if pagure.utils.is_safe_url(flask.request.referrer):
-        return_point = flask.request.referrer
+        return_point = urljoin(flask.request.host_url, flask.request.referrer)
 
     form = pagure.forms.AddReportForm()
     if not form.validate_on_submit():
