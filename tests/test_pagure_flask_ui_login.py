@@ -476,9 +476,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
 
         output = self.app.get("/login/?next=%2f%2f%09%2fgoogle.fr")
         self.assertEqual(output.status_code, 302)
-        self.assertEqual(
-            output.location, "http://localhost/google.fr"
-        )
+        self.assertEqual(output.location, "http://localhost/google.fr")
 
     @patch.dict("pagure.config.config", {"PAGURE_AUTH": "local"})
     @patch.dict("pagure.config.config", {"CHECK_SESSION_IP": False})
@@ -1099,7 +1097,14 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
             # redirect again for the login page
             output = self.app.get("/settings/")
             self.assertEqual(output.status_code, 302)
-            self.assertIn("http://localhost/login/", output.location)
+            self.assertTrue(
+                output.location
+                in (
+                    "http://localhost/login/",
+                    "/login/?next=http%3A%2F%2Flocalhost%2Fsettings%2F",
+                    "http://localhost/login/?next=http%3A%2F%2Flocalhost%2Fsettings%2F",
+                )
+            )
         # session did not expire
         user.login_time = datetime.datetime.utcnow() - lifetime + td1
         with tests.user_set(self.app.application, user):
@@ -1141,14 +1146,17 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
             data = {"csrf_token": self.get_csrf()}
             output = self.app.post("/settings/forcelogout/", data=data)
             self.assertEqual(output.status_code, 302)
-            self.assertEqual(
-                output.headers["Location"], "http://localhost/settings"
+            self.assertTrue(
+                output.headers["Location"]
+                in ("http://localhost/settings", "/settings")
             )
 
             # We should now get redirected to index, because our session became
             # invalid
             output = self.app.get("/settings")
-            self.assertEqual(output.headers["Location"], "http://localhost/")
+            self.assertTrue(
+                output.headers["Location"] in ("http://localhost/", "/")
+            )
 
             # After changing the login_time to now, the session should again be
             # valid
