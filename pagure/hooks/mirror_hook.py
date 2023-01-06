@@ -7,7 +7,7 @@
    Pierre-Yves Chibon <pingou@pingoured.fr>
 
 """
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import sqlalchemy as sa
 import wtforms
@@ -16,15 +16,14 @@ try:
     from flask_wtf import FlaskForm
 except ImportError:
     from flask_wtf import Form as FlaskForm
-from sqlalchemy.orm import relation
-from sqlalchemy.orm import backref
+
+from sqlalchemy.orm import backref, relation
 
 import pagure.config
 import pagure.lib.tasks_mirror
 from pagure.hooks import BaseHook, BaseRunner, RequiredIf
 from pagure.lib.model import BASE, Project
 from pagure.utils import get_repo_path, ssh_urlpattern
-
 
 _config = pagure.config.reload_config()
 

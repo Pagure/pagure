@@ -7,13 +7,7 @@
    Pierre-Yves Chibon <pingou@pingoured.fr>
 
 """
-from __future__ import print_function, unicode_literals, absolute_import
-
-# pylint: disable=too-many-branches
-# pylint: disable=too-many-arguments
-# pylint: disable=too-many-locals
-# pylint: disable=too-many-statements
-# pylint: disable=too-many-lines
+from __future__ import absolute_import, print_function, unicode_literals
 
 import datetime
 import json
@@ -21,31 +15,34 @@ import logging
 import os
 import shutil
 import subprocess
-import requests
-import tempfile
 import tarfile
+import tempfile
 import zipfile
 
 import arrow
 import pygit2
+import requests
 import six
-
-from sqlalchemy.exc import SQLAlchemyError
 
 # from sqlalchemy.orm.session import Session
 from pygit2.remote import RemoteCollection
+from sqlalchemy.exc import SQLAlchemyError
 
-import pagure.utils
 import pagure.exceptions
-import pagure.lib.query
+import pagure.hooks
 import pagure.lib.notify
+import pagure.lib.query
 import pagure.lib.tasks
+import pagure.utils
 from pagure.config import config as pagure_config
 from pagure.lib import model
 from pagure.lib.repo import PagureRepo
-import pagure.hooks
 
-# from pagure.hooks import run_project_hooks
+# pylint: disable=too-many-branches
+# pylint: disable=too-many-arguments
+# pylint: disable=too-many-locals
+# pylint: disable=too-many-statements
+# pylint: disable=too-many-lines
 
 
 _log = logging.getLogger(__name__)

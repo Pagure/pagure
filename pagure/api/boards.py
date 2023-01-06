@@ -8,32 +8,27 @@
 
 """
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import logging
 
 import flask
-from sqlalchemy.exc import SQLAlchemyError
 import werkzeug.datastructures
+from sqlalchemy.exc import SQLAlchemyError
 
 import pagure
 import pagure.exceptions
 import pagure.lib.query
 import pagure.lib.tasks
-from pagure.forms import TAGS_REGEX, TAGS_REGEX_RE
 from pagure.api import (
     API,
-    api_method,
-    api_login_required,
     APIERROR,
+    api_login_required,
+    api_method,
     get_request_data,
 )
-from pagure.api.utils import (
-    _get_repo,
-    _check_token,
-    _check_issue_tracker,
-)
-
+from pagure.api.utils import _check_issue_tracker, _check_token, _get_repo
+from pagure.forms import TAGS_REGEX, TAGS_REGEX_RE
 
 _log = logging.getLogger(__name__)
 

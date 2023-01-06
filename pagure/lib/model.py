@@ -8,36 +8,36 @@
 
 """
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
-import arrow
-import datetime
 import collections
-import logging
+import datetime
 import json
+import logging
 import operator
-import re
-import pygit2
 import os
+import re
 from operator import attrgetter
 
+import arrow
+import pygit2
 import six
 import sqlalchemy as sa
-
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import backref
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.orm import scoped_session
-from sqlalchemy.orm import relation
-from sqlalchemy.orm import validates
+from sqlalchemy.orm import (
+    backref,
+    relation,
+    scoped_session,
+    sessionmaker,
+    validates,
+)
 
 import pagure.exceptions
 from pagure.config import config as pagure_config
 from pagure.lib.model_base import BASE
 from pagure.lib.plugins import get_plugin_tables
 from pagure.utils import is_true
-
 
 _log = logging.getLogger(__name__)
 
@@ -86,8 +86,8 @@ def create_tables(db_url, alembic_ini=None, acls=None, debug=False):
 
         # Ignore the warning missing alembic
         # pylint: disable=import-error
-        from alembic.config import Config
         from alembic import command
+        from alembic.config import Config
 
         alembic_cfg = Config(alembic_ini)
         command.stamp(alembic_cfg, "head")

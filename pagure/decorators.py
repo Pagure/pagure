@@ -9,11 +9,13 @@
 
 """
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
+
+from functools import wraps
 
 import flask
+
 from pagure.flask_app import admin_session_timedout
-from functools import wraps
 
 
 def has_issue_tracker(function):

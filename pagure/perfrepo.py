@@ -9,16 +9,15 @@
 
 """
 
-from __future__ import print_function, unicode_literals, absolute_import
+from __future__ import absolute_import, print_function, unicode_literals
 
-
-import pprint
 import os
+import pprint
 import traceback
 import types
 
-import six
 import pygit2
+import six
 
 try:
     import _pygit2

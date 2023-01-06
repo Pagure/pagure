@@ -8,7 +8,7 @@
 
 """
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import datetime
 import fnmatch
@@ -16,21 +16,20 @@ import logging
 import logging.config
 import os
 import re
-from six.moves.urllib.parse import urlparse, urljoin
 from functools import wraps
 
 import flask
 import pygit2
 import six
 import werkzeug.utils
+from six.moves.urllib.parse import urljoin, urlparse
 
-from pagure.exceptions import (
-    PagureException,
-    InvalidTimestampException,
-    InvalidDateformatException,
-)
 from pagure.config import config as pagure_config
-
+from pagure.exceptions import (
+    InvalidDateformatException,
+    InvalidTimestampException,
+    PagureException,
+)
 
 _log = logging.getLogger(__name__)
 LOGGER_SETUP = False

@@ -11,23 +11,21 @@
 
 # pylint: disable=too-many-branches
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import logging
 
 import flask
 from flask import Markup
-
 from sqlalchemy.exc import SQLAlchemyError
 
 import pagure.exceptions
 import pagure.forms
 import pagure.lib.plugins
+from pagure.decorators import is_repo_admin
 from pagure.exceptions import FileNotFoundException
 from pagure.ui import UI_NS
 from pagure.utils import login_required
-from pagure.decorators import is_repo_admin
-
 
 _log = logging.getLogger(__name__)
 

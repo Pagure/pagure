@@ -8,21 +8,20 @@
 
 """
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import logging
 from base64 import b64decode
 
 import flask
+import flask_fas_openid
 from flask import Markup
-
 from sqlalchemy.exc import SQLAlchemyError
 
 import pagure.lib.query
 import pagure.utils
-from pagure.flask_app import logout
 from pagure.config import config as pagure_config
-import flask_fas_openid
+from pagure.flask_app import logout
 
 FAS = flask_fas_openid.FAS()
 

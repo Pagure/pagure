@@ -11,9 +11,10 @@ the repetitive task of identifying the character encoding and decoding the
 content to unicode is implemented here.
 """
 
-from __future__ import unicode_literals, division, absolute_import
-from collections import namedtuple
+from __future__ import absolute_import, division, unicode_literals
+
 import logging
+from collections import namedtuple
 
 try:
     import cchardet
@@ -23,7 +24,6 @@ except ImportError:
     from chardet import universaldetector, __version__ as ch_version
 
 from pagure.exceptions import PagureEncodingException
-
 
 _log = logging.getLogger(__name__)
 

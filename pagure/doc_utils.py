@@ -10,7 +10,9 @@
 
 """
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
+
+import textwrap
 
 import docutils
 import docutils.core
@@ -18,11 +20,10 @@ import docutils.examples
 import jinja2
 import kitchen.text.converters as ktc
 import markupsafe
-import textwrap
 
-from pagure.config import config as pagure_config
-import pagure.lib.query
 import pagure.lib.encoding_utils
+import pagure.lib.query
+from pagure.config import config as pagure_config
 
 
 def modify_rst(rst, view_file_url=None):

@@ -8,7 +8,7 @@
 
 """
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import os
 
@@ -19,8 +19,8 @@ try:
     from flask_wtf import FlaskForm
 except ImportError:
     from flask_wtf import Form as FlaskForm
-from sqlalchemy.orm import relation
-from sqlalchemy.orm import backref
+
+from sqlalchemy.orm import backref, relation
 
 import pagure.lib.git
 import pagure.lib.tasks_services

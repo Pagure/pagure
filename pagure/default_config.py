@@ -8,13 +8,12 @@
 
 """
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import os
 from datetime import timedelta
 
-from pagure.mail_logging import ContextInjector, MSG_FORMAT
-
+from pagure.mail_logging import MSG_FORMAT, ContextInjector  # noqa: I101
 
 # Set the time after which the admin session expires
 ADMIN_SESSION_LIFETIME = timedelta(minutes=20)

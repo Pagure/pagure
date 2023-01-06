@@ -9,7 +9,7 @@
 
 """
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 try:
     # Provided in Python 3.6+
@@ -21,14 +21,15 @@ except ImportError:
     random = random.SystemRandom()
     random_choice = random.choice
 
-import string
 import hashlib
+import string
+
 import bcrypt
 import six
+from cryptography.hazmat.primitives import constant_time
 
 import pagure.config
 from pagure.lib import model
-from cryptography.hazmat.primitives import constant_time
 
 
 def id_generator(size=15, chars=string.ascii_uppercase + string.digits):

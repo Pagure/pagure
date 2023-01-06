@@ -8,24 +8,23 @@
 
 """
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import logging
 import os
 
 import flask
 import pygit2
-
 from binaryornot.helpers import is_binary_string
 from whitenoise import WhiteNoise
 
 import pagure.config
 import pagure.doc_utils
 import pagure.exceptions
+import pagure.forms
 import pagure.lib.mimetype
 import pagure.lib.model_base
 import pagure.lib.query
-import pagure.forms
 
 # Create the application.
 APP = flask.Flask(__name__)

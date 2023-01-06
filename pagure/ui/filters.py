@@ -13,29 +13,27 @@
 # pylint: disable=too-many-locals
 
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
-import textwrap
 import logging
 import os
+import textwrap
 from os.path import splitext
 
 import arrow
 import bleach
 import flask
-import six
 import pygit2
-
-from six.moves.urllib.parse import urlparse, parse_qsl
+import six
 from jinja2 import escape
+from six.moves.urllib.parse import parse_qsl, urlparse
 
 import pagure.exceptions
-import pagure.lib.query
 import pagure.forms
+import pagure.lib.query
 from pagure.config import config as pagure_config
 from pagure.ui import UI_NS
 from pagure.utils import authenticated, is_repo_committer, is_true
-
 
 _log = logging.getLogger(__name__)
 # Jinja filters

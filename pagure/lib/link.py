@@ -10,14 +10,14 @@
 
 # pylint: disable=too-many-arguments
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import re
-import pagure.lib.query
+
 import pagure.exceptions
+import pagure.lib.query
 import pagure.utils
 from pagure.config import config as pagure_config
-
 
 FIXES = [
     re.compile(r"(?:.*\s+)?{0}?[sd]?:?\s*?#(\d+)".format(kw), re.I)

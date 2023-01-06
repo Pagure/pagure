@@ -9,26 +9,25 @@
 
 """
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import datetime
 import logging
 
 import flask
-from sqlalchemy.exc import SQLAlchemyError
 from six.moves.urllib.parse import urljoin
+from sqlalchemy.exc import SQLAlchemyError
 
-import pagure.login_forms as forms
 import pagure.config
 import pagure.lib.login
 import pagure.lib.model as model
 import pagure.lib.model_base
 import pagure.lib.notify
 import pagure.lib.query
-from pagure.utils import login_required
-from pagure.lib.login import generate_hashed_value, check_password
+import pagure.login_forms as forms
+from pagure.lib.login import check_password, generate_hashed_value
 from pagure.ui import UI_NS
-
+from pagure.utils import login_required
 
 _log = logging.getLogger(__name__)
 

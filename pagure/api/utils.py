@@ -8,21 +8,17 @@
 
 """
 
-from __future__ import print_function, unicode_literals, absolute_import
+from __future__ import absolute_import, print_function, unicode_literals
 
-import flask
 import logging
 
+import flask
 
 import pagure.exceptions
-
-from pagure.lib import plugins
-
-from pagure.config import config as pagure_config
 from pagure.api import APIERROR, get_authorized_api_project
-
+from pagure.config import config as pagure_config
+from pagure.lib import plugins
 from pagure.utils import api_authenticated, is_repo_committer, is_repo_user
-
 
 _log = logging.getLogger(__name__)
 

@@ -19,23 +19,21 @@ Author: Ralph Bean <rbean@redhat.com>
         Pierre-Yves Chibon <pingou@pingoured.fr>
 """
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import logging
+import re
 
 import flask
-
 import markdown.inlinepatterns
-import markdown.preprocessors
 import markdown.postprocessors
+import markdown.preprocessors
 import markdown.util
 import pygit2
-import re
 import six
 
 import pagure.lib.query
 from pagure.config import config as pagure_config
-
 
 try:
     from markdown.inlinepatterns import ImagePattern as ImagePattern

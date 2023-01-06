@@ -9,7 +9,7 @@
 
 """
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import flask
 
@@ -19,8 +19,8 @@ import pagure.lib.query
 from pagure.api import (
     API,
     APIERROR,
-    api_method,
     api_login_optional,
+    api_method,
     get_page,
     get_per_page,
 )

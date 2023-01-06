@@ -8,22 +8,21 @@
 
 """
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import logging
 from base64 import b64decode
 
 import flask
-from flask import Markup
 import munch
+from flask import Markup
+from flask_oidc import OpenIDConnect
 from sqlalchemy.exc import SQLAlchemyError
 
 import pagure.lib.query
 from pagure.config import config as pagure_config
 from pagure.flask_app import logout
 from pagure.utils import is_admin
-
-from flask_oidc import OpenIDConnect
 
 oidc = OpenIDConnect()
 

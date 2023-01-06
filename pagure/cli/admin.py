@@ -8,18 +8,18 @@
 
 """
 
-from __future__ import print_function, unicode_literals, absolute_import
+from __future__ import absolute_import, print_function, unicode_literals
 
 import argparse
 import datetime
 import logging
 import os
-import requests
-from string import Template
 import sys
-import pygit2
+from string import Template
 
 import arrow
+import pygit2
+import requests
 from six.moves import input
 
 if "PAGURE_CONFIG" not in os.environ and os.path.exists(
@@ -37,7 +37,6 @@ import pagure.lib.query  # noqa: E402
 import pagure.lib.tasks_utils  # noqa: E402
 from pagure.flask_app import generate_user_key_files  # noqa: E402
 from pagure.utils import get_repo_path  # noqa: E402
-
 
 _config = pagure.config.reload_config()
 session = pagure.lib.model_base.create_session(_config["DB_URL"])

@@ -7,7 +7,7 @@
    Pierre-Yves Chibon <pingou@pingoured.fr>
 
 """
-from __future__ import print_function, unicode_literals, absolute_import
+from __future__ import absolute_import, print_function, unicode_literals
 
 import logging
 import subprocess
@@ -16,7 +16,6 @@ import pygit2
 
 import pagure
 import pagure.exceptions
-
 
 _log = logging.getLogger(__name__)
 

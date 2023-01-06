@@ -8,25 +8,25 @@
 
 """
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import base64
 import logging
+import os
 import subprocess
 import tempfile
-import os
 
 import flask
 import requests
 import werkzeug.wsgi
 
 import pagure.exceptions
+import pagure.forms
 import pagure.lib.git
 import pagure.lib.mimetype
 import pagure.lib.plugins
 import pagure.lib.query
 import pagure.lib.tasks
-import pagure.forms
 import pagure.ui.plugins
 from pagure.config import config as pagure_config
 from pagure.ui import UI_NS

@@ -8,7 +8,7 @@
 
 """
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import logging
 
@@ -21,7 +21,6 @@ import pagure.lib.query
 from pagure.config import config as pagure_config
 from pagure.ui import UI_NS
 from pagure.utils import login_required
-
 
 _log = logging.getLogger(__name__)
 

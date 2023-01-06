@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import logging
 import mimetypes
+
 import kitchen.text.converters as ktc
 import six
 
 import pagure.lib.encoding_utils
-
 
 _log = logging.getLogger(__name__)
 

@@ -8,20 +8,19 @@
 
 """
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import datetime
 import gc
 import logging
+import os
 import string
 import time
-import os
 import warnings
-from six.moves.urllib.parse import urljoin
 
 import flask
 import pygit2
-
+from six.moves.urllib.parse import urljoin
 from whitenoise import WhiteNoise
 
 import pagure.doc_utils
@@ -100,7 +99,7 @@ def create_app(config=None):
         FAS.init_app(app)
     elif auth == "oidc":
         # Only import and set flask_fas_openid if it is needed
-        from pagure.ui.oidc_login import oidc, fas_user_from_oidc
+        from pagure.ui.oidc_login import fas_user_from_oidc, oidc
 
         oidc.init_app(app)
         app.before_request(fas_user_from_oidc)
@@ -453,7 +452,7 @@ def auth_login():  # pragma: no cover
     auth = pagure_config.get("PAGURE_AUTH", None)
 
     if not authenticated and auth == "oidc":
-        from pagure.ui.oidc_login import oidc, fas_user_from_oidc, set_user
+        from pagure.ui.oidc_login import fas_user_from_oidc, oidc, set_user
 
         # If oidc is used and user hits this endpoint, it will redirect
         # to IdP with destination=<pagure>/login?next=<location>

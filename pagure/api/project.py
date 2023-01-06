@@ -8,15 +8,14 @@
 
 """
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
-import flask
 import logging
 
+import flask
 import pygit2
-
-from sqlalchemy.exc import SQLAlchemyError
 from six import string_types
+from sqlalchemy.exc import SQLAlchemyError
 
 try:
     from pygit2 import AlreadyExistsError
@@ -25,25 +24,24 @@ except ImportError:
     AlreadyExistsError = ValueError
 
 import pagure
-import pagure.forms
 import pagure.exceptions
+import pagure.forms
 import pagure.lib.git
 import pagure.lib.query
 import pagure.utils
 from pagure.api import (
     API,
-    api_method,
     APIERROR,
-    api_login_required,
-    get_authorized_api_project,
     api_login_optional,
-    get_request_data,
+    api_login_required,
+    api_method,
+    get_authorized_api_project,
     get_page,
     get_per_page,
+    get_request_data,
 )
-from pagure.api.utils import _get_repo, _check_token, _get_project_tag
+from pagure.api.utils import _check_token, _get_project_tag, _get_repo
 from pagure.config import config as pagure_config
-
 
 _log = logging.getLogger(__name__)
 

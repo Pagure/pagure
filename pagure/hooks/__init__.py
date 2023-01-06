@@ -8,20 +8,20 @@
 
 """
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
+import os
 import subprocess
 import sys
 import traceback
-import os
 
 import six
 import wtforms
 
+import pagure.lib.git
+import pagure.lib.query
 from pagure.config import config as pagure_config
 from pagure.exceptions import FileNotFoundException
-import pagure.lib.query
-import pagure.lib.git
 from pagure.lib.git_auth import get_git_auth_helper
 from pagure.lib.plugins import get_enabled_plugins
 

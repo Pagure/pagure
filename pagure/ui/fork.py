@@ -16,10 +16,10 @@
 # pylint: disable=too-many-lines
 
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
-import logging
 import json
+import logging
 import os
 from math import ceil
 
@@ -30,20 +30,19 @@ from sqlalchemy.exc import SQLAlchemyError
 import pagure
 import pagure.doc_utils
 import pagure.exceptions
+import pagure.forms
 import pagure.lib.git
 import pagure.lib.plugins
 import pagure.lib.query
 import pagure.lib.tasks
-import pagure.forms
 from pagure.config import config as pagure_config
 from pagure.ui import UI_NS
 from pagure.utils import (
-    login_required,
     __get_file_in_tree,
     get_parent_repo_path,
     is_true,
+    login_required,
 )
-
 
 _log = logging.getLogger(__name__)
 

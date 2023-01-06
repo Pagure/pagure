@@ -14,23 +14,19 @@
 # pylint: disable=too-many-statements
 
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import logging
 
 import flask
 
-from pagure.ui import UI_NS
-from pagure.utils import (
-    authenticated,
-    login_required,
-)
 from pagure.decorators import (
-    is_repo_admin,
-    is_admin_sess_timedout,
     has_issue_tracker,
+    is_admin_sess_timedout,
+    is_repo_admin,
 )
-
+from pagure.ui import UI_NS
+from pagure.utils import authenticated, login_required
 
 _log = logging.getLogger(__name__)
 

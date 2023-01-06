@@ -14,15 +14,15 @@ API namespace version 0.
 # pylint: disable=too-few-public-methods
 # pylint: disable=too-many-locals
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import codecs
+import enum
 import functools
 import logging
 import os
 
 import docutils
-import enum
 import flask
 import markupsafe
 from six.moves.urllib_parse import urljoin
@@ -33,14 +33,13 @@ API = flask.Blueprint("api_ns", __name__, url_prefix="/api/0")
 import pagure.lib.query  # noqa: E402
 import pagure.lib.tasks  # noqa: E402
 from pagure.config import config as pagure_config  # noqa: E402
-from pagure.doc_utils import (  # noqa: E402
+from pagure.doc_utils import (  # noqa: E402, I202
     load_doc_title_and_name,
-    modify_rst,
     modify_html,
-)  # noqa: E402
+    modify_rst,
+)
 from pagure.exceptions import APIError  # noqa: E402
 from pagure.utils import authenticated, check_api_acls  # noqa: E402
-
 
 _log = logging.getLogger(__name__)
 
@@ -335,11 +334,12 @@ def get_per_page():
 if pagure_config.get("ENABLE_TICKETS", True):
     from pagure.api import issue  # noqa: E402
     from pagure.api import boards  # noqa: E402, F401
-from pagure.api import fork  # noqa: E402
-from pagure.api import project  # noqa: E402
-from pagure.api import user  # noqa: E402
-from pagure.api import group  # noqa: E402
-from pagure.api import plugins  # noqa: E402
+
+from pagure.api import fork  # noqa: E402, I202
+from pagure.api import group  # noqa: E402, I202
+from pagure.api import plugins  # noqa: E402, I202
+from pagure.api import project  # noqa: E402, I202
+from pagure.api import user  # noqa: E402, I202
 
 if pagure_config.get("PAGURE_CI_SERVICES", False):
     from pagure.api.ci import jenkins  # noqa: E402, F401

@@ -7,17 +7,17 @@
    Pierre-Yves Chibon <pingou@pingoured.fr>
 
 """
-from __future__ import print_function, unicode_literals, absolute_import
+from __future__ import absolute_import, print_function, unicode_literals
 
 import abc
 import json
 import logging
 import os
-import pkg_resources
 import subprocess
 import tempfile
 from io import open
 
+import pkg_resources
 import werkzeug.utils
 from six import with_metaclass
 from six.moves import dbm_gnu
@@ -28,7 +28,6 @@ import pagure.lib.query
 from pagure.config import config as pagure_config
 from pagure.lib import model
 from pagure.utils import is_repo_collaborator, lookup_deploykey
-
 
 # logging.config.dictConfig(pagure_config.get('LOGGING') or {'version': 1})
 _log = logging.getLogger(__name__)

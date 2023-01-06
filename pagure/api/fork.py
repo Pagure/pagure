@@ -8,7 +8,7 @@
 
 """
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import logging
 
@@ -22,25 +22,24 @@ import pagure.lib.query
 import pagure.lib.tasks
 from pagure.api import (
     API,
-    api_method,
-    api_login_required,
     APIERROR,
+    api_login_required,
+    api_method,
     get_authorized_api_project,
-    get_request_data,
     get_page,
     get_per_page,
+    get_request_data,
+)
+from pagure.api.utils import (
+    _check_private_pull_request_access,
+    _check_pull_request,
+    _check_pull_request_access,
+    _check_token,
+    _get_repo,
+    _get_request,
 )
 from pagure.config import config as pagure_config
 from pagure.utils import is_repo_committer, is_true
-from pagure.api.utils import (
-    _get_repo,
-    _check_token,
-    _get_request,
-    _check_pull_request,
-    _check_pull_request_access,
-    _check_private_pull_request_access,
-)
-
 
 _log = logging.getLogger(__name__)
 

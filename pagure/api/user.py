@@ -8,7 +8,7 @@
 
 """
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import collections
 import datetime
@@ -20,7 +20,7 @@ import six
 import pagure
 import pagure.exceptions
 import pagure.lib.query
-from pagure.api import API, api_method, APIERROR, get_page, get_per_page
+from pagure.api import API, APIERROR, api_method, get_page, get_per_page
 from pagure.utils import is_true, validate_date, validate_date_range
 
 

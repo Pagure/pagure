@@ -8,7 +8,7 @@
 
 """
 
-from __future__ import unicode_literals, print_function, absolute_import
+from __future__ import absolute_import, print_function, unicode_literals
 
 import logging
 
@@ -22,7 +22,6 @@ import pagure.lib.tasks
 import pagure.lib.tasks_services
 import pagure.utils
 from pagure.hooks import BaseHook, BaseRunner
-
 
 _config = pagure.config.reload_config()
 _log = logging.getLogger(__name__)

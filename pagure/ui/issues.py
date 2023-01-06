@@ -14,38 +14,36 @@
 # pylint: disable=too-many-statements
 
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import datetime
 import logging
 import os
-from collections import defaultdict, OrderedDict
+from collections import OrderedDict, defaultdict
 from math import ceil
 
 import flask
 import pygit2
 import werkzeug.datastructures
-from sqlalchemy.exc import SQLAlchemyError
 from binaryornot.helpers import is_binary_string
 from six.moves.urllib.parse import urljoin
+from sqlalchemy.exc import SQLAlchemyError
 
 import pagure.doc_utils
 import pagure.exceptions
-import pagure.lib.query
-import pagure.lib.mimetype
-from pagure.decorators import has_issue_tracker, is_repo_admin
-
 import pagure.forms
+import pagure.lib.mimetype
+import pagure.lib.query
 from pagure.config import config as pagure_config
+from pagure.decorators import has_issue_tracker, is_repo_admin
 from pagure.ui import UI_NS
 from pagure.utils import (
     __get_file_in_tree,
     authenticated,
+    is_true,
     login_required,
     urlpattern,
-    is_true,
 )
-
 
 _log = logging.getLogger(__name__)
 

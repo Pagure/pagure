@@ -8,22 +8,20 @@
 
 """
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import logging
 
 import flask
-
 from cryptography.hazmat.primitives import constant_time
 from kitchen.text.converters import to_bytes
 
 import pagure
 import pagure.exceptions
-import pagure.lib.query
-import pagure.lib.plugins
 import pagure.lib.lib_ci as lib_ci
+import pagure.lib.plugins
+import pagure.lib.query
 from pagure.api import API, APIERROR, api_method
-
 
 _log = logging.getLogger(__name__)
 

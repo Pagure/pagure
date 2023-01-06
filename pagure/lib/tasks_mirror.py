@@ -8,7 +8,7 @@
 
 """
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import base64
 import datetime
@@ -19,12 +19,11 @@ import struct
 
 import six
 import werkzeug.utils
-
 from celery import Celery
 from cryptography import utils
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
 
 import pagure.lib.query
 from pagure.config import config as pagure_config

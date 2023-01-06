@@ -10,17 +10,16 @@ Internal endpoints.
 
 """
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import collections
 import logging
 import os
+from functools import wraps
 
 import flask
 import pygit2
 import werkzeug.utils
-
-from functools import wraps
 from sqlalchemy.exc import SQLAlchemyError
 
 PV = flask.Blueprint("internal_ns", __name__, url_prefix="/pv")
@@ -31,10 +30,9 @@ import pagure.forms  # noqa: E402
 import pagure.lib.git  # noqa: E402
 import pagure.lib.query  # noqa: E402
 import pagure.lib.tasks  # noqa: E402
-import pagure.utils  # noqa: E402
 import pagure.ui.fork  # noqa: E402
+import pagure.utils  # noqa: E402
 from pagure.config import config as pagure_config  # noqa: E402
-
 
 _log = logging.getLogger(__name__)
 _auth_log = logging.getLogger("pagure_auth")

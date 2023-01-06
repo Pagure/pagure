@@ -8,12 +8,7 @@
 
 pagure notifications.
 """
-from __future__ import print_function, unicode_literals, absolute_import
-
-
-# pylint: disable=too-many-branches
-# pylint: disable=too-many-arguments
-
+from __future__ import absolute_import, print_function, unicode_literals
 
 import datetime
 import hashlib
@@ -22,20 +17,24 @@ import logging
 import os
 import re
 import smtplib
-import time
-import six
 import ssl
+import time
 from email.header import Header
 from email.mime.text import MIMEText
-from six.moves.urllib_parse import urljoin
 
 import blinker
 import flask
+import six
+from markdown.extensions.fenced_code import FencedBlockPreprocessor
+from six.moves.urllib_parse import urljoin
+
 import pagure.lib.query
 import pagure.lib.tasks_services
 from pagure.config import config as pagure_config
 from pagure.pfmarkdown import MENTION_RE
-from markdown.extensions.fenced_code import FencedBlockPreprocessor
+
+# pylint: disable=too-many-branches
+# pylint: disable=too-many-arguments
 
 
 _log = logging.getLogger(__name__)

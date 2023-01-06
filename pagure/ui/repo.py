@@ -17,7 +17,7 @@
 # pylint: disable=broad-except
 
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import datetime
 import json
@@ -25,44 +25,42 @@ import logging
 import os
 import re
 from math import ceil
-from six.moves.urllib.parse import urljoin
 
 import flask
-import pygit2
 import kitchen.text.converters as ktc
+import pygit2
 import six
 import werkzeug.utils
-
-from six import BytesIO
+from binaryornot.helpers import is_binary_string
 from PIL import Image
+from six import BytesIO
+from six.moves.urllib.parse import urljoin
 from sqlalchemy.exc import SQLAlchemyError
 
-from binaryornot.helpers import is_binary_string
-
 import pagure.exceptions
+import pagure.forms
 import pagure.lib.git
 import pagure.lib.mimetype
 import pagure.lib.plugins
 import pagure.lib.query
 import pagure.lib.tasks
-import pagure.forms
 import pagure.ui.plugins
 from pagure.config import config as pagure_config
+from pagure.decorators import (
+    has_issue_or_pr_enabled,
+    has_issue_tracker,
+    has_pr_enabled,
+    is_admin_sess_timedout,
+    is_repo_admin,
+)
 from pagure.flask_app import _get_user
 from pagure.lib import encoding_utils
 from pagure.ui import UI_NS
 from pagure.utils import (
     __get_file_in_tree,
-    login_required,
     is_true,
+    login_required,
     stream_template,
-)
-from pagure.decorators import (
-    is_repo_admin,
-    is_admin_sess_timedout,
-    has_issue_tracker,
-    has_issue_or_pr_enabled,
-    has_pr_enabled,
 )
 
 _log = logging.getLogger(__name__)

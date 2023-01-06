@@ -8,41 +8,41 @@
 
 """
 
-from __future__ import print_function, unicode_literals, absolute_import
+from __future__ import absolute_import, print_function, unicode_literals
 
-import flask
 import datetime
 import logging
 
 import arrow
+import flask
 from sqlalchemy.exc import SQLAlchemyError
 
 import pagure.exceptions
 import pagure.lib.query
 from pagure.api import (
     API,
-    api_method,
-    api_login_required,
-    api_login_optional,
     APIERROR,
-    get_request_data,
+    api_login_optional,
+    api_login_required,
+    api_method,
     get_page,
     get_per_page,
+    get_request_data,
+)
+from pagure.api.utils import (
+    _check_issue_tracker,
+    _check_private_issue_access,
+    _check_ticket_access,
+    _check_token,
+    _get_issue,
+    _get_repo,
 )
 from pagure.config import config as pagure_config
 from pagure.utils import (
     api_authenticated,
     is_repo_committer,
-    urlpattern,
     is_true,
-)
-from pagure.api.utils import (
-    _get_repo,
-    _check_token,
-    _get_issue,
-    _check_issue_tracker,
-    _check_ticket_access,
-    _check_private_issue_access,
+    urlpattern,
 )
 
 _log = logging.getLogger(__name__)

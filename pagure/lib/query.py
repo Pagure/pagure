@@ -9,7 +9,7 @@
 
 """
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 # pylint: disable=too-many-branches
 # pylint: disable=too-many-arguments
@@ -34,7 +34,6 @@ import shutil
 import subprocess
 import tempfile
 import uuid
-
 from collections import Counter
 from math import ceil
 
@@ -45,11 +44,10 @@ import six
 import sqlalchemy
 import sqlalchemy.schema
 import werkzeug.utils
-
-from six.moves.urllib_parse import urlparse, urlencode, parse_qsl
-from sqlalchemy import asc, desc, func, cast, Text
-from sqlalchemy.orm import aliased
 from flask import url_for
+from six.moves.urllib_parse import parse_qsl, urlencode, urlparse
+from sqlalchemy import Text, asc, cast, desc, func
+from sqlalchemy.orm import aliased
 
 import pagure.exceptions
 import pagure.lib.git
@@ -67,7 +65,6 @@ from pagure.lib import model
 
 # For backward compatibility since this function used to be in this file
 from pagure.lib.model_base import create_session  # noqa
-
 
 REDIS = None
 PAGURE_CI = None

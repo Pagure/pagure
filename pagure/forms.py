@@ -12,7 +12,7 @@
 # pylint: disable=no-init
 # pylint: disable=super-on-old-class
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import datetime
 import re
@@ -31,7 +31,7 @@ import wtforms
 import pagure.lib.query
 import pagure.validators
 from pagure.config import config as pagure_config
-from pagure.utils import urlpattern, is_admin
+from pagure.utils import is_admin, urlpattern
 
 STRICT_REGEX = "^[a-zA-Z0-9-_]+$"
 # This regex is used when creating tags, there we do not want to allow ','

@@ -8,18 +8,18 @@
 
 """
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
-import sqlalchemy as sa
 import pygit2
+import sqlalchemy as sa
 import wtforms
 
 try:
     from flask_wtf import FlaskForm
 except ImportError:
     from flask_wtf import Form as FlaskForm
-from sqlalchemy.orm import relation
-from sqlalchemy.orm import backref
+
+from sqlalchemy.orm import backref, relation
 
 from pagure.hooks import BaseHook, RequiredIf
 from pagure.lib.model import BASE, Project

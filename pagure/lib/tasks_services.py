@@ -8,7 +8,7 @@
 
 """
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import datetime
 import hashlib
@@ -21,7 +21,6 @@ import uuid
 
 import requests
 import six
-
 from celery import Celery
 from celery.signals import after_setup_task_logger
 from celery.utils.log import get_task_logger
@@ -30,10 +29,10 @@ from sqlalchemy.exc import SQLAlchemyError
 
 import pagure.lib.query
 from pagure.config import config as pagure_config
+from pagure.lib.lib_ci import trigger_jenkins_build
 from pagure.lib.tasks_utils import pagure_task
 from pagure.mail_logging import format_callstack
-from pagure.lib.lib_ci import trigger_jenkins_build
-from pagure.utils import split_project_fullname, set_up_logging
+from pagure.utils import set_up_logging, split_project_fullname
 
 # logging.config.dictConfig(pagure_config.get('LOGGING') or {'version': 1})
 _log = get_task_logger(__name__)

@@ -10,14 +10,14 @@
 
 """
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 # pylint: disable=too-many-locals
 import logging
 import time
+
 import pagure.exceptions
 import pagure.lib.query
-
 from pagure.config import config as pagure_config
 
 _log = logging.getLogger(__name__)

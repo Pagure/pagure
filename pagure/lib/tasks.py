@@ -8,7 +8,7 @@
 
 """
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import collections
 import datetime
@@ -22,7 +22,6 @@ import time
 import arrow
 import pygit2
 import six
-
 from celery import Celery
 from celery.result import AsyncResult
 from celery.signals import after_setup_task_logger
@@ -32,12 +31,12 @@ from sqlalchemy.exc import SQLAlchemyError
 import pagure.lib.git
 import pagure.lib.git_auth
 import pagure.lib.link
-import pagure.lib.query
 import pagure.lib.model
+import pagure.lib.query
 import pagure.lib.repo
 import pagure.utils
-from pagure.lib.tasks_utils import pagure_task
 from pagure.config import config as pagure_config
+from pagure.lib.tasks_utils import pagure_task
 from pagure.utils import get_parent_repo_path
 
 # logging.config.dictConfig(pagure_config.get('LOGGING') or {'version': 1})

@@ -9,7 +9,7 @@
 
 """
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import datetime
 import logging
@@ -19,22 +19,21 @@ import flask
 from sqlalchemy.exc import SQLAlchemyError
 
 import pagure.exceptions
+import pagure.forms
 import pagure.lib.git
 import pagure.lib.query
 import pagure.lib.tasks
-import pagure.forms
 import pagure.ui.filters
 from pagure.config import config as pagure_config
 from pagure.flask_app import _get_user, admin_session_timedout
 from pagure.ui import UI_NS
 from pagure.utils import (
     authenticated,
-    is_safe_url,
-    login_required,
     get_task_redirect_url,
+    is_safe_url,
     is_true,
+    login_required,
 )
-
 
 _log = logging.getLogger(__name__)
 
