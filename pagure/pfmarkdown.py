@@ -25,6 +25,7 @@ import logging
 import re
 
 import flask
+
 import markdown.inlinepatterns
 import markdown.postprocessors
 import markdown.preprocessors

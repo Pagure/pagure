@@ -48,7 +48,7 @@ class TestStyle(unittest.TestCase):
             sys.executable,
             "-m",
             "flake8",
-            "--ignore=E712,W503,E203,E902",
+            "--ignore=E712,W503,E203,E902,I201,I100",
             "--max-line-length=80",
             REPO_PATH,
         ]
@@ -116,6 +116,49 @@ class TestStyle(unittest.TestCase):
         print(stdout.decode("utf-8"))
         print("stderr: ")
         print(stderr.decode("utf-8"))
+
+        self.assertEqual(proc.returncode, 0)
+
+    def test_code_with_isort(self):
+        """Enforce isort compliance on the codebase.
+
+        This test runs isort on the code, and will fail if it returns a
+        non-zero exit code.
+        If isort is not installed, this test auto-skips.
+        """
+        try:
+            import isort
+        except ImportError as e:
+            raise unittest.SkipTest(
+                "isort is not installed, skipping isort style check..."
+            )
+        # We ignore the hooks files that have a bunch of symlink
+        isort_command = [
+            sys.executable,
+            "-m",
+            "isort",
+            "-v",
+            "--profile",
+            "black",
+            "-s",
+            os.path.join(REPO_PATH, "hooks/files"),
+            "-l",
+            "79",
+            REPO_PATH,
+        ]
+
+        # check if we have an old isort or not
+        import isort
+
+        print(" ".join(isort_command))
+        proc = subprocess.Popen(
+            isort_command, stdout=subprocess.PIPE, cwd=REPO_PATH
+        )
+        stdout, stderr = proc.communicate()
+        print("stdout: ")
+        print(stdout.decode("utf-8")) if stdout else ""
+        print("stderr: ")
+        print(stderr.decode("utf-8")) if stderr else ""
 
         self.assertEqual(proc.returncode, 0)
 
