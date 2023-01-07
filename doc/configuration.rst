@@ -44,7 +44,7 @@ Examples values:
 ::
 
     DB_URL = 'mysql://user:pass@host/db_name'
-    DB_URL = 'postgres://user:pass@host/db_name'
+    DB_URL = 'postgresql://user:pass@host/db_name'
     DB_URL = 'sqlite:////var/tmp/pagure_dev.sqlite'
 
 Defaults to ``sqlite:////var/tmp/pagure_dev.sqlite``
