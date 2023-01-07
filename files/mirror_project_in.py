@@ -47,7 +47,7 @@ def main(debug=False):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Script to send email before the api token expires"
+        description="Script to PULL external repositories into local repositories"
     )
     parser.add_argument(
         "--debug",
