@@ -22,7 +22,7 @@ if "PAGURE_CONFIG" not in os.environ and os.path.exists(
 _config = pagure.config.reload_config()
 
 
-def main(check=False, debug=False):
+def main(debug=False):
     """ The function pulls in all the changes from upstream"""
 
     session = pagure.lib.model_base.create_session(_config["DB_URL"])
@@ -48,13 +48,6 @@ def main(check=False, debug=False):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Script to send email before the api token expires"
-    )
-    parser.add_argument(
-        "--check",
-        dest="check",
-        action="store_true",
-        default=False,
-        help="Print the some output but does not send any email",
     )
     parser.add_argument(
         "--debug",
