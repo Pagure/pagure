@@ -23,7 +23,7 @@ _config = pagure.config.reload_config()
 
 
 def main(debug=False):
-    """ The function pulls in all the changes from upstream"""
+    """The function pulls in all the changes from upstream"""
 
     session = pagure.lib.model_base.create_session(_config["DB_URL"])
     projects = (
