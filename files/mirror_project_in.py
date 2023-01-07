@@ -3,9 +3,6 @@
 from __future__ import print_function, absolute_import
 import os
 import argparse
-from datetime import datetime, timedelta
-
-from sqlalchemy.exc import SQLAlchemyError
 
 import pagure.config
 import pagure.lib.model as model
@@ -28,7 +25,7 @@ def main(debug=False):
     session = pagure.lib.model_base.create_session(_config["DB_URL"])
     projects = (
         session.query(model.Project)
-        .filter(model.Project.mirrored_from != None)
+        .filter(model.Project.mirrored_from is not None)
         .all()
     )
 
@@ -47,7 +44,7 @@ def main(debug=False):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Script to PULL external repositories into local repositories"
+        description="Script to PULL external repos into local (mirroring)"
     )
     parser.add_argument(
         "--debug",
