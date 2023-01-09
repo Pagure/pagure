@@ -105,10 +105,10 @@ This configuration key is used to point celery to the broker to use. This
 is the broker that is used to communicate between the web application and
 its workers.
 
-Defaults to: ``'redis://%s' % APP.config['REDIS_HOST']``
+Defaults to: ``"redis://%s:%d/%d" % (pagure_config["REDIS_HOST"], pagure_config["REDIS_PORT"], pagure_config["REDIS_DB"])``
 
-.. note:: See the :ref:`redis-section` for the ``REDIS_HOST`` configuration
-          key
+.. note:: See the :ref:`redis-section` for the ``REDIS_HOST``, ``REDIS_PORT``
+          and ``REDIS_DB``configuration keys
 
 
 Repo Directories
