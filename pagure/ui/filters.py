@@ -23,11 +23,14 @@ from os.path import splitext
 import arrow
 import bleach
 import flask
-import six
 import pygit2
+import six
 
-from six.moves.urllib.parse import urlparse, parse_qsl
-from jinja2 import escape
+try:
+    from jinja2 import escape
+except ImportError:
+    from markupsafe import escape
+from six.moves.urllib.parse import parse_qsl, urlparse
 
 import pagure.exceptions
 import pagure.lib.query
