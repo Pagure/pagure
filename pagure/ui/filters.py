@@ -25,7 +25,11 @@ import bleach
 import flask
 import pygit2
 import six
-from jinja2 import escape
+
+try:
+    from jinja2 import escape
+except ImportError:
+    from markupsafe import escape
 from six.moves.urllib.parse import parse_qsl, urlparse
 
 import pagure.exceptions
