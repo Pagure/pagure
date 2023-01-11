@@ -172,7 +172,7 @@ add_comment = function(data, username) {
     + '              <button class="reply btn btn-outline-primary border-0" type="button"'
     + '                  data-comment="' + data.comment_id + '"'
     + '                  title="Reply to this comment">'
-    + '                <span class="fa fa-share-square-o" title="Reply to this comment"></span>'
+    + '                <span class="fa fa-reply" title="Reply to this comment"></span>'
     + '              </a>';
     if ( data.comment_user == username) {
 

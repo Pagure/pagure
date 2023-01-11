@@ -162,7 +162,7 @@
                 <button class="reply btn btn-outline-primary border-0" type="button"
                     data-comment="{{ comment.id }}"
                     title="Reply to this comment">
-                <span class="fa fa-share-square-o"></span>
+                <span class="fa fa-reply"></span>
             </button>
             {% endif %}
             {% if id != 0 and g.fas_user and (g.repo_committer or (
@@ -253,7 +253,7 @@
             {% if g.fas_user %}
               <a class="reply btn btn-outline-primary border-0 pointer" data-toggle="tooltip"
                   title="Reply to this comment">
-                <span class="fa fa-share-square-o"></span>
+                <span class="fa fa-reply"></span>
               </a>
             {% endif %}
             {% if g.fas_user and (g.repo_committer or g.fas_user.username == pull_request.user.username) %}
@@ -317,7 +317,7 @@
       {% if g.fas_user %}
         <a class="btn btn-outline-secondary border-0 btn-sm reply pointer"
           title="Reply to the initial comment - lose formatting">
-          <i class="fa fa-share-square-o"></i> Reply
+          <i class="fa fa-reply"></i> Reply
         </a>
       {% endif %}
     </div>
