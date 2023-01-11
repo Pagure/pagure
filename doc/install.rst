@@ -101,19 +101,19 @@ To install pagure via this mechanism simply follow these steps:
 
 # Install the additional files as follow:
 
-+------------------------------+------------------------------------------+
-|         Source               |             Destination                  |
-+=============================+===========================================+
-| ``files/pagure.cfg.sample``  | ``/etc/pagure/pagure.cfg``               |
-+------------------------------+------------------------------------------+
-| ``files/alembic.ini``        | ``/etc/pagure/alembic.ini``              |
-+------------------------------+------------------------------------------+
-| ``files/pagure.conf``        | ``/etc/httpd/conf.d/pagure.conf``        |
-+------------------------------+------------------------------------------+
-| ``files/pagure.wsgi``        | ``/usr/share/pagure/pagure.wsgi``        |
-+------------------------------+------------------------------------------+
-| ``createdb.py``              | ``/usr/share/pagure/pagure_createdb.py`` |
-+------------------------------+------------------------------------------+
++------------------------------------+------------------------------------------+
+|         Source                     |             Destination                  |
++====================================+==========================================+
+| ``files/pagure.cfg.sample``        | ``/etc/pagure/pagure.cfg``               |
++------------------------------------+------------------------------------------+
+| ``files/alembic.ini``              | ``/etc/pagure/alembic.ini``              |
++------------------------------------+------------------------------------------+
+| ``files/pagure-apache-httpd.conf`` | ``/etc/httpd/conf.d/pagure.conf``        |
++------------------------------------+------------------------------------------+
+| ``files/pagure.wsgi``              | ``/usr/share/pagure/pagure.wsgi``        |
++------------------------------------+------------------------------------------+
+| ``createdb.py``                    | ``/usr/share/pagure/pagure_createdb.py`` |
++------------------------------------+------------------------------------------+
 
 
 
@@ -160,7 +160,7 @@ If installed by RPM, you will find an example apache configuration file
 at: ``/etc/httpd/conf.d/pagure.conf``.
 
 If not installed by RPM, the example file is present in the sources at:
-``files/pagure.conf``.
+``files/pagure-apache-httpd.conf``.
 
 Adjust it for your needs.
 
