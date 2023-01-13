@@ -14,3 +14,8 @@
 .footer a.notblue{
   opacity:0.7;
 }
+
+.enforce-text-break {
+  word-wrap: break-word !important;
+  word-break: break-all !important;
+}
