@@ -7,6 +7,7 @@
 {% set tag = "users"%}
 
 {% macro render_email(email, form, validated=True) %}
+{% set random_number = range(0, 256) | random() %}
 <div class="list-group-item {% if not validated %}disabled{% endif %}">
   <span class="fa fa-envelope text-muted"></span> &nbsp;{{ email.email }}
   {% if validated %}
@@ -25,11 +26,11 @@
     </div>
     {% else %}
     <form class="inline" method="POST"
-      action="{{ url_for('ui_ns.set_default_email') }}" id="default_mail">
+      action="{{ url_for('ui_ns.set_default_email') }}" id="default_mail_{{ random_number }}">
       <input type="hidden" value="{{ email.email }}" name="email" />
       {{ form.csrf_token }}
       <a class="float-right p-r-1 btn btn-outline-warning border-0 text-secondary mr-1 pointer submit-btn"
-         data-form-id="default_mail" title="Set as default email address">
+         data-form-id="default_mail_{{ random_number }}" title="Set as default email address">
          <span class="fa fa-star" data-toggle="tooltip"></span>
       </a>
     </form>
