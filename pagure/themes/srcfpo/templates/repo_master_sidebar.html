@@ -1,4 +1,4 @@
-<nav class="nav nav-tabs nav-sidetabs flex-column">
+<nav class="nav nav-tabs nav-sidetabs flex-column flex-nowrap">
   <a class=
       "nav-link nowrap
       {%if select == 'overview' %} active{% endif %}"
@@ -66,7 +66,7 @@
   </a>
 
   {% if 'distgit_ns' in g.main_app.blueprints and not repo.is_fork and repo.namespace != 'tests'%}
-  <div class="col-xs-2 line-height-1"></div>
+  <div class="line-height-1"></div>
   <h6>Monitoring status:</h6>
   <div class="btn-group">
     {% if g.authenticated %}
@@ -158,9 +158,9 @@
     {% endif %}
   </div>
 
-  <div class="col-xs-2 line-height-1"></div>
-  <div id="orphan-section" class="pt-3">
-      <div class="col-xs-2 line-height-1"></div>
+  <div class="line-height-1"></div>
+  <div id="orphan-section" class="pt-3 enforce-text-break">
+      <div class="line-height-1"></div>
       {% if repo.user.user == "orphan" %}
       <p>Orphaned for: {{ repo.orphan_reason.reason }}
       {% if repo.orphan_reason.reason_info %}
@@ -194,7 +194,7 @@
   </div>
 
   <div class="pt-3">
-    <div class="col-xs-2 line-height-1">
+    <div class="line-height-1">
     <h6>Bugzilla Assignee:</h6>
       <dl>
         <dt>Fedora: </dt>
