@@ -226,7 +226,7 @@ def check_ssh_access():
 @internal_access_only
 def pull_request_add_comment():
     """Add a comment to a pull-request."""
-    pform = pagure.forms.ProjectCommentForm(csrf_enabled=False)
+    pform = pagure.forms.ProjectCommentForm(meta={'csrf': False})
     if not pform.validate_on_submit():
         flask.abort(400, description="Invalid request")
 
@@ -240,7 +240,7 @@ def pull_request_add_comment():
     if not request:
         flask.abort(404, description="Pull-request not found")
 
-    form = pagure.forms.AddPullRequestCommentForm(csrf_enabled=False)
+    form = pagure.forms.AddPullRequestCommentForm(meta={'csrf': False})
 
     if not form.validate_on_submit():
         flask.abort(400, description="Invalid request")
@@ -277,7 +277,7 @@ def pull_request_add_comment():
 @internal_access_only
 def ticket_add_comment():
     """Add a comment to an issue."""
-    pform = pagure.forms.ProjectCommentForm(csrf_enabled=False)
+    pform = pagure.forms.ProjectCommentForm(meta={'csrf': False})
     if not pform.validate_on_submit():
         flask.abort(400, description="Invalid request")
 
@@ -308,7 +308,7 @@ def ticket_add_comment():
             "to view it",
         )
 
-    form = pagure.forms.CommentForm(csrf_enabled=False)
+    form = pagure.forms.CommentForm(meta={'csrf': False})
 
     if not form.validate_on_submit():
         flask.abort(400, description="Invalid request")

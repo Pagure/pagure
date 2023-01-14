@@ -108,7 +108,7 @@ def api_install_plugin(repo, plugin, username=None, namespace=None):
         else:
             dbobj = plugin.db_object()
 
-    form = plugin.form(obj=dbobj, csrf_enabled=False)
+    form = plugin.form(obj=dbobj, meta={'csrf': False})
     form.active.data = True
     for field in plugin.form_fields:
         fields.append(getattr(form, field))
