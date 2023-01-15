@@ -205,7 +205,7 @@ def api_project_tags_new(repo, username=None, namespace=None):
     repo = _get_repo(repo, username, namespace)
     _check_token(repo, project_token=False)
 
-    form = pagure.forms.ApiAddIssueTagForm(meta={'csrf': False})
+    form = pagure.forms.ApiAddIssueTagForm(meta={"csrf": False})
     if form.validate_on_submit():
         tag_name = form.tag.data
         tag_description = form.tag_description.data
@@ -433,7 +433,7 @@ def api_new_git_tags(repo, username=None, namespace=None):
         flask.request.values.get("with_commits", False)
     )
 
-    form = pagure.forms.AddGitTagForm(meta={'csrf': False})
+    form = pagure.forms.AddGitTagForm(meta={"csrf": False})
     created = None
     if form.validate_on_submit():
         user_obj = pagure.lib.query.get_user(
@@ -1455,7 +1455,9 @@ def api_new_project():
     if user:
         namespaces.extend([grp for grp in user.groups])
 
-    form = pagure.forms.ProjectForm(namespaces=namespaces, meta={'csrf': False})
+    form = pagure.forms.ProjectForm(
+        namespaces=namespaces, meta={"csrf": False}
+    )
     if form.validate_on_submit():
         name = form.name.data
         description = form.description.data
@@ -1739,7 +1741,7 @@ def api_fork_project():
     """
     output = {}
 
-    form = pagure.forms.ForkRepoForm(meta={'csrf': False})
+    form = pagure.forms.ForkRepoForm(meta={"csrf": False})
     if form.validate_on_submit():
         repo = form.repo.data
         username = form.username.data or None
@@ -2433,7 +2435,7 @@ def api_commit_add_flag(repo, commit_hash, username=None, namespace=None):
     except ValueError:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOCOMMIT)
 
-    form = pagure.forms.AddPullRequestFlagForm(meta={'csrf': False})
+    form = pagure.forms.AddPullRequestFlagForm(meta={"csrf": False})
     if form.validate_on_submit():
         username = form.username.data
         percent = form.percent.data.strip() if form.percent.data else None
@@ -2700,7 +2702,7 @@ def api_modify_acls(repo, namespace=None, username=None):
     project = _get_repo(repo, username, namespace)
     _check_token(project, project_token=False)
 
-    form = pagure.forms.ModifyACLForm(meta={'csrf': False})
+    form = pagure.forms.ModifyACLForm(meta={"csrf": False})
     if form.validate_on_submit():
         acl = form.acl.data
         group = None
@@ -3189,7 +3191,9 @@ def api_project_create_api_token(repo, namespace=None, username=None):
         )
 
     authorized_acls = pagure_config.get("USER_ACLS", [])
-    form = pagure.forms.NewTokenForm(meta={'csrf': False}, sacls=authorized_acls)
+    form = pagure.forms.NewTokenForm(
+        meta={"csrf": False}, sacls=authorized_acls
+    )
     if form.validate_on_submit():
         acls = form.acls.data
         description = form.description.data

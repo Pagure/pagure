@@ -504,7 +504,7 @@ def api_pull_request_update(repo, requestid, username=None, namespace=None):
     request = _get_request(repo, requestid)
     _check_pull_request_access(request, assignee=True)
 
-    form = pagure.forms.RequestPullForm(meta={'csrf': False})
+    form = pagure.forms.RequestPullForm(meta={"csrf": False})
     if not form.validate_on_submit():
         raise pagure.exceptions.APIError(
             400, error_code=APIERROR.EINVALIDREQ, errors=form.errors
@@ -942,7 +942,7 @@ def api_pull_request_add_comment(
     _check_token(repo, project_token=False)
     request = _get_request(repo, requestid)
 
-    form = pagure.forms.AddPullRequestCommentForm(meta={'csrf': False})
+    form = pagure.forms.AddPullRequestCommentForm(meta={"csrf": False})
     if form.validate_on_submit():
         comment = form.comment.data
         commit = form.commit.data or None
@@ -1123,9 +1123,9 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
     request = _get_request(repo, requestid)
 
     if "status" in get_request_data():
-        form = pagure.forms.AddPullRequestFlagForm(meta={'csrf': False})
+        form = pagure.forms.AddPullRequestFlagForm(meta={"csrf": False})
     else:
-        form = pagure.forms.AddPullRequestFlagFormV1(meta={'csrf': False})
+        form = pagure.forms.AddPullRequestFlagFormV1(meta={"csrf": False})
     if form.validate_on_submit():
         username = form.username.data
         percent = form.percent.data.strip() if form.percent.data else None
@@ -1376,7 +1376,7 @@ def api_subscribe_pull_request(repo, requestid, username=None, namespace=None):
     _check_token(repo)
     request = _get_request(repo, requestid)
 
-    form = pagure.forms.SubscribtionForm(meta={'csrf': False})
+    form = pagure.forms.SubscribtionForm(meta={"csrf": False})
     if form.validate_on_submit():
         status = is_true(form.status.data)
         try:
@@ -1549,7 +1549,7 @@ def api_pull_request_create(repo, username=None, namespace=None):
     _check_pull_request(repo_to)
     _check_token(repo_from, project_token=False)
 
-    form = pagure.forms.RequestPullForm(meta={'csrf': False})
+    form = pagure.forms.RequestPullForm(meta={"csrf": False})
     if not form.validate_on_submit():
         raise pagure.exceptions.APIError(
             400, error_code=APIERROR.EINVALIDREQ, errors=form.errors
@@ -1838,7 +1838,7 @@ def api_pull_request_assign(repo, requestid, username=None, namespace=None):
     request = _get_request(repo, requestid)
     _check_pull_request_access(request, assignee=True)
 
-    form = pagure.forms.AssignIssueForm(meta={'csrf': False})
+    form = pagure.forms.AssignIssueForm(meta={"csrf": False})
     if form.validate_on_submit():
         assignee = form.assignee.data or None
         # Create our metadata comment object

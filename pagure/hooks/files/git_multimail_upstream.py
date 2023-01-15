@@ -114,7 +114,6 @@ if PYTHON3:
         except UnicodeEncodeError:
             return out.decode(ENCODING)
 
-
 else:
 
     def is_string(s):

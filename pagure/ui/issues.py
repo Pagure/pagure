@@ -225,7 +225,11 @@ def update_issue(repo, issueid, username=None, namespace=None):
         new_milestone = None
         try:
             if repo.milestones:
-                new_milestone = form.milestone.data.strip() if form.milestone.data else None
+                new_milestone = (
+                    form.milestone.data.strip()
+                    if form.milestone.data
+                    else None
+                )
         except AttributeError:
             pass
 

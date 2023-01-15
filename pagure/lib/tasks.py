@@ -932,7 +932,7 @@ def update_checksums_file(self, session, folder, filenames):
         # for each files computes the different algorythm supported
         with open(os.path.join(folder, filename), "rb") as stream:
             while True:
-                buf = stream.read(2 * 2 ** 10)
+                buf = stream.read(2 * 2**10)
                 if buf:
                     for hasher in algos.values():
                         hasher.update(buf)
