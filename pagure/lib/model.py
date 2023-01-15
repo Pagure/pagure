@@ -152,7 +152,10 @@ def create_default_status(session, acls=None):
 
 
 def arrow_ts(value):
-    return "%s" % arrow.get(value).timestamp
+    if hasattr(arrow, 'timestamp'):
+        return "%s" % arrow.get(value).timestamp # arrow < v1.0.0
+    else:
+        return "%s" % arrow.get(value).int_timestamp # arrow >= v1.0.0
 
 
 class AccessLevels(BASE):
