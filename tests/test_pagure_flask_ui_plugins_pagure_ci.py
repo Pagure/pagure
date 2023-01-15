@@ -223,12 +223,27 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
             )
             self.assertNotIn("Hook Pagure CI activated", output_text)
 
-            if self.get_wtforms_version() >= (2, 2):
+            if self.get_wtforms_version() >= (3, 0):
+                self.assertIn(
+                    '<div class="col-sm-10">\n        '
+                    '<input class="form-control pl-0" id="ci_url" maxlength="255" name="ci_url" '
+                    'required type="text" value="">\n    </div>\n  </div>\n      '
+                    '<div class="alert alert-danger">This field is required.</div',
+                    output_text,
+                )
+                self.assertIn(
+                    '<div class="col-sm-10">\n        '
+                    '<input class="form-control pl-0" id="ci_job" maxlength="255" name="ci_job" '
+                    'required type="text" value="">\n    </div>\n  </div>\n      '
+                    '<div class="alert alert-danger">This field is required.</div>',
+                    output_text,
+                )
+            elif self.get_wtforms_version() >= (2, 2):
                 self.assertIn(
                     '<div class="col-sm-10">\n        '
                     '<input class="form-control pl-0" id="ci_url" name="ci_url" '
                     'required type="text" value="">\n    </div>\n  </div>\n      '
-                    '<div class="alert alert-danger">This field is required.</div>',
+                    '<div class="alert alert-danger">This field is required.</div',
                     output_text,
                 )
                 self.assertIn(
