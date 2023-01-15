@@ -671,7 +671,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             {
                 "error": "Invalid or incomplete input submitted",
                 "error_code": "EINVALIDREQ",
-                "errors": {"milestone": ["Not a valid choice"]},
+                "errors": {"milestone": ["Not a valid choice."]},
             },
         )
 
@@ -3159,7 +3159,7 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
             {
                 "error": "Invalid or incomplete input submitted",
                 "error_code": "EINVALIDREQ",
-                "errors": {"milestone": ["Not a valid choice"]},
+                "errors": {"milestone": ["Not a valid choice."]},
             },
         )
 

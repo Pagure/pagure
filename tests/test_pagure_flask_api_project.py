@@ -2780,7 +2780,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
         expected_output = {
             "error": "Invalid or incomplete input submitted",
             "error_code": "EINVALIDREQ",
-            "errors": {"status": ["Not a valid choice"]},
+            "errors": {"status": ["Not a valid choice."]},
         }
         if self.get_wtforms_version() >= (2, 3):
             expected_output["errors"]["status"] = ["This field is required."]
@@ -2919,7 +2919,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
         self.assertEqual(
             data,
             {
-                "errors": {"status": ["Not a valid choice"]},
+                "errors": {"status": ["Not a valid choice."]},
                 "error_code": "EINVALIDREQ",
                 "error": "Invalid or incomplete input submitted",
             },
@@ -3371,7 +3371,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
         self.assertEqual(
             data,
             {
-                "errors": {"status": ["Not a valid choice"]},
+                "errors": {"status": ["Not a valid choice."]},
                 "error_code": "EINVALIDREQ",
                 "error": "Invalid or incomplete input submitted",
             },
@@ -3582,7 +3582,7 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
             "error_code": "EINVALIDREQ",
             "errors": {
                 "name": ["This field is required."],
-                "user_type": ["Not a valid choice"],
+                "user_type": ["Not a valid choice."],
             },
         }
         if self.get_wtforms_version() >= (2, 3):
@@ -3605,7 +3605,7 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
         expected_output = {
             "error": "Invalid or incomplete input submitted",
             "error_code": "EINVALIDREQ",
-            "errors": {"acl": ["Not a valid choice"]},
+            "errors": {"acl": ["Not a valid choice."]},
         }
         self.assertEqual(data, expected_output)
 
@@ -5669,7 +5669,7 @@ class PagureFlaskApiProjectCreateProjectTests(tests.Modeltests):
             {
                 "error": "Invalid or incomplete input submitted",
                 "error_code": "EINVALIDREQ",
-                "errors": {"namespace": ["Not a valid choice"]},
+                "errors": {"namespace": ["Not a valid choice."]},
             },
         )
 

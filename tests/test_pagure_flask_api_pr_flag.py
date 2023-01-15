@@ -902,7 +902,7 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
             {
                 "error": "Invalid or incomplete input submitted",
                 "error_code": "EINVALIDREQ",
-                "errors": {"status": ["Not a valid choice"]},
+                "errors": {"status": ["Not a valid choice."]},
             },
         )
 
@@ -1059,7 +1059,7 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
             {
                 "error": "Invalid or incomplete input submitted",
                 "error_code": "EINVALIDREQ",
-                "errors": {"status": ["Not a valid choice"]},
+                "errors": {"status": ["Not a valid choice."]},
             },
         )
 

@@ -378,7 +378,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
                 "error": "Could not match input '2016asd' to any of the following formats: "
                 "YYYY-MM-DD, YYYY-M-DD, YYYY-M-D, YYYY/MM/DD, YYYY/M/DD, YYYY/M/D, "
                 "YYYY.MM.DD, YYYY.M.DD, YYYY.M.D, YYYYMMDD, YYYY-DDDD, YYYYDDDD, "
-                "YYYY-MM, YYYY/MM, YYYY.MM, YYYY, W",
+                "YYYY-MM, YYYY/MM, YYYY.MM, YYYY, W.",
                 "error_code": "ENOCODE",
             }
             self.assertEqual(json.loads(output.get_data(as_text=True)), exp)
