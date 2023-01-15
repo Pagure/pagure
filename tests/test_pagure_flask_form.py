@@ -68,9 +68,14 @@ class PagureFlaskFormTests(tests.SimplePagureTest):
             data = form.csrf_token.current_token
 
             # CSRF token expired
-            if hasattr(flask_wtf, "__version__") and tuple(
-                [int(v) for v in flask_wtf.__version__.split(".")]
-            ) < (0, 10, 0):
+            if hasattr(flask_wtf, "__version__"):
+                flask_wtf_version = tuple(
+                    [int(v) for v in flask_wtf.__version__.split(".")]
+                )
+            if flask_wtf_version and (
+                    flask_wtf_version < (0, 10, 0) or
+                    flask_wtf_version >= (0, 14, 0)
+            ):
                 expires = time.time() - 1
             else:
                 expires = (
