@@ -2439,7 +2439,7 @@ def get_git_tags(project, with_commits=False):
     return tags
 
 
-def new_git_tag(project, tagname, target, user, message=None, force=False):
+def new_git_tag(project, tagname, target, user, message=str(), force=False):
     """Create a new git tag in the git repositorie of the specified project.
 
     :arg project: the project in which we want to create a git tag
@@ -2471,7 +2471,7 @@ def new_git_tag(project, tagname, target, user, message=None, force=False):
         target,
         target_obj.type,
         pygit2.Signature(user.fullname, user.default_email),
-        message,
+        message if message else str(),
     )
 
     return tag
