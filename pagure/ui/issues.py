@@ -207,7 +207,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
         # Check if the optional field is filled
         if form.assignee.data:
             assignee = form.assignee.data.strip()
-        new_status = form.status.data.strip() or None
+        new_status = form.status.data.strip() if form.status.data else None
         close_status = form.close_status.data or None
         if close_status not in repo.close_status:
             close_status = None
@@ -225,7 +225,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
         new_milestone = None
         try:
             if repo.milestones:
-                new_milestone = form.milestone.data.strip() or None
+                new_milestone = form.milestone.data.strip() if form.milestone.data else None
         except AttributeError:
             pass
 

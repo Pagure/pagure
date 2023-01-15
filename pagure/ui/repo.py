@@ -2374,7 +2374,7 @@ def add_token(repo, username=None, namespace=None):
             pagure.lib.query.add_token_to_user(
                 flask.g.session,
                 repo,
-                description=form.description.data.strip() or None,
+                description=form.description.data.strip() if form.description.data else None,
                 acls=form.acls.data,
                 username=flask.g.fas_user.username,
                 expiration_date=form.expiration_date.data,

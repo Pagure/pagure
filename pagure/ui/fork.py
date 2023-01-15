@@ -556,9 +556,9 @@ def request_pull_edit(repo, requestid, username=None, namespace=None):
 
     form = pagure.forms.RequestPullEditForm(branches=flask.g.branches)
     if form.validate_on_submit():
-        request.title = form.title.data.strip()
-        request.initial_comment = form.initial_comment.data.strip()
-        request.branch = form.branch_to.data.strip()
+        request.title = form.title.data.strip() if form.title.data else None
+        request.initial_comment = form.initial_comment.data.strip() if form.initial_comment.data else None
+        request.branch = form.branch_to.data.strip() if form.branch_to.data else None
         if flask.g.fas_user.username == request.user.username:
             request.allow_rebase = form.allow_rebase.data
         flask.g.session.add(request)
@@ -1721,7 +1721,7 @@ def new_request_pull(
             if orig_commit:
                 orig_commit = orig_commit.oid.hex
 
-            initial_comment = form.initial_comment.data.strip() or None
+            initial_comment = form.initial_comment.data.strip() if form.initial_comment.data else None
             commit_start = commit_stop = None
             if diff_commits:
                 commit_stop = diff_commits[0].oid.hex
@@ -1887,9 +1887,9 @@ def new_remote_request_pull(repo, username=None, namespace=None):
             except Exception as err:
                 flask.abort(500, description=err)
 
-        branch_from = form.branch_from.data.strip()
-        branch_to = form.branch_to.data.strip()
-        remote_git = form.git_repo.data.strip()
+        branch_from = form.branch_from.data.strip() if form.branch_from.data else None
+        branch_to = form.branch_to.data.strip() if form.branch_to.data else None
+        remote_git = form.git_repo.data.strip() if form.git_repo.data else None
 
         repopath = pagure.utils.get_remote_repo_path(remote_git, branch_from)
         if not repopath:
@@ -1969,7 +1969,7 @@ def new_remote_request_pull(repo, username=None, namespace=None):
                 user=flask.g.fas_user.username,
             )
 
-            if form.initial_comment.data.strip() != "":
+            if form.initial_comment.data and form.initial_comment.data.strip() != "":
                 pagure.lib.query.add_pull_request_comment(
                     flask.g.session,
                     request=request,
@@ -2027,7 +2027,7 @@ def new_remote_request_pull(repo, username=None, namespace=None):
         except pygit2.GitError:
             branch_to = "master"
     else:
-        branch_to = form.branch_to.data.strip()
+        branch_to = form.branch_to.data.strip() if form.branch_to.data else None
 
     return flask.render_template(
         "remote_pull_request.html",

@@ -1128,7 +1128,7 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
         form = pagure.forms.AddPullRequestFlagFormV1(meta={'csrf': False})
     if form.validate_on_submit():
         username = form.username.data
-        percent = form.percent.data.strip() or None
+        percent = form.percent.data.strip() if form.percent.data else None
         comment = form.comment.data.strip()
         url = form.url.data.strip()
         uid = form.uid.data.strip() if form.uid.data else None
