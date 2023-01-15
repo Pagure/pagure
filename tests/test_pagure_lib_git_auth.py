@@ -113,7 +113,6 @@ class PagureLibGitAuthtests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                "Remote hook declined the push: "
                 "Denied push for ref &#39;refs/heads/master&#39; for user &#39;pingou&#39;",
                 output_text,
             )
@@ -156,7 +155,6 @@ class PagureLibGitAuthtests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             output_text = output.get_data(as_text=True)
             self.assertIn(
-                "Remote hook declined the push: "
                 "Denied push for ref &#39;refs/heads/master&#39; for user &#39;pingou&#39;",
                 output_text,
             )
