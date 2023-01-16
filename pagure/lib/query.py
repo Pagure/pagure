@@ -5524,7 +5524,7 @@ def get_pagination_metadata(
             flask_request.endpoint,
             per_page=per_page,
             _external=True,
-            **request_args_wo_page
+            **request_args_wo_page,
         )
 
     prev_page = None
@@ -5534,7 +5534,7 @@ def get_pagination_metadata(
             flask_request.endpoint,
             per_page=per_page,
             _external=True,
-            **request_args_wo_page
+            **request_args_wo_page,
         )
 
     request_args_wo_page.update({key_page: 1})
@@ -5542,7 +5542,7 @@ def get_pagination_metadata(
         flask_request.endpoint,
         per_page=per_page,
         _external=True,
-        **request_args_wo_page
+        **request_args_wo_page,
     )
 
     request_args_wo_page.update({key_page: pages})
@@ -5550,7 +5550,7 @@ def get_pagination_metadata(
         flask_request.endpoint,
         per_page=per_page,
         _external=True,
-        **request_args_wo_page
+        **request_args_wo_page,
     )
 
     return {

@@ -880,7 +880,7 @@ class PagureGitAuth(GitAuthHelper):
         pull_request,
         repotype,
         is_internal,
-        **info
+        **info,
     ):
         if is_internal:
             self.info("Internal push allowed")

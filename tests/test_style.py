@@ -102,6 +102,8 @@ class TestStyle(unittest.TestCase):
             "--diff",
             "--exclude",
             '"/(.eggs|.git|.hg|.mypy_cache|.nox|.tox|.venv|_build|buck-out|build|dist)/"',
+            "--target-version",
+            "py39",
             REPO_PATH,
             TESTS_PATH,
         ]

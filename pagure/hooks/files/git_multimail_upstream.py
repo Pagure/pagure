@@ -84,6 +84,7 @@ def is_ascii(s):
     return all(ord(c) < 128 and ord(c) > 0 for c in s)
 
 
+# fmt: off
 if PYTHON3:
 
     def is_string(s):
@@ -114,7 +115,9 @@ if PYTHON3:
         except UnicodeEncodeError:
             return out.decode(ENCODING)
 
+
 else:
+# fmt: on
 
     def is_string(s):
         try:
@@ -471,7 +474,7 @@ def read_output(cmd, input=None, keepends=False, **kw):
         stdin=stdin,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
-        **kw
+        **kw,
     )
     (out, err) = p.communicate(input)
     out = bytes_to_str(out, errors=errors)
@@ -2939,7 +2942,7 @@ class FilterLinesEnvironmentMixin(Environment):
         strict_utf8=True,
         email_max_line_length=500,
         max_subject_length=500,
-        **kw
+        **kw,
     ):
         super(FilterLinesEnvironmentMixin, self).__init__(**kw)
         self.__strict_utf8 = strict_utf8
@@ -3076,7 +3079,7 @@ class StaticRecipientsEnvironmentMixin(Environment):
         announce_recipients,
         revision_recipients,
         scancommitforcc,
-        **kw
+        **kw,
     ):
         super(StaticRecipientsEnvironmentMixin, self).__init__(**kw)
 
@@ -3171,7 +3174,7 @@ class ConfigRecipientsEnvironmentMixin(
                 config, "commitlist", "mailinglist"
             ),
             scancommitforcc=config.get("scancommitforcc"),
-            **kw
+            **kw,
         )
 
     def _get_recipients(self, config, *names):
@@ -3206,7 +3209,7 @@ class StaticRefFilterEnvironmentMixin(Environment):
         ref_filter_excl_regex,
         ref_filter_do_send_regex,
         ref_filter_dont_send_regex,
-        **kw
+        **kw,
     ):
         super(StaticRefFilterEnvironmentMixin, self).__init__(**kw)
 
@@ -3293,7 +3296,7 @@ class ConfigRefFilterEnvironmentMixin(
             ref_filter_dont_send_regex=self._get_regex(
                 config, "refFilterDontSendRegex"
             ),
-            **kw
+            **kw,
         )
 
 

@@ -634,7 +634,7 @@ def view_issues(repo, username=None, namespace=None):
                 no_milestones=no_stone,
                 count=True,
                 status=status,
-                **fields
+                **fields,
             )
         else:
             if status.lower() in ["open", "true"]:
@@ -658,7 +658,7 @@ def view_issues(repo, username=None, namespace=None):
             order=order,
             order_key=order_key,
             status=status,
-            **fields
+            **fields,
         )
         issues_cnt = pagure.lib.query.search_issues(
             flask.g.session,
@@ -669,7 +669,7 @@ def view_issues(repo, username=None, namespace=None):
             no_milestones=no_stone,
             count=True,
             status=status_count,
-            **fields
+            **fields,
         )
         oth_issues_cnt = pagure.lib.query.search_issues(
             flask.g.session,
@@ -680,7 +680,7 @@ def view_issues(repo, username=None, namespace=None):
             no_milestones=no_stone,
             count=True,
             status=other_status_count,
-            **fields
+            **fields,
         )
     else:
         issues = pagure.lib.query.search_issues(
@@ -693,7 +693,7 @@ def view_issues(repo, username=None, namespace=None):
             custom_search=custom_search,
             order=order,
             order_key=order_key,
-            **fields
+            **fields,
         )
         issues_cnt = pagure.lib.query.search_issues(
             flask.g.session,
@@ -702,7 +702,7 @@ def view_issues(repo, username=None, namespace=None):
             search_pattern=search_pattern,
             custom_search=custom_search,
             count=True,
-            **fields
+            **fields,
         )
         oth_issues_cnt = pagure.lib.query.search_issues(
             flask.g.session,
@@ -713,7 +713,7 @@ def view_issues(repo, username=None, namespace=None):
             no_milestones=no_stone,
             count=True,
             status="Open",
-            **fields
+            **fields,
         )
     tag_list = pagure.lib.query.get_tags_of_project(flask.g.session, repo)
 
@@ -745,7 +745,7 @@ def view_issues(repo, username=None, namespace=None):
         total_open=total_open,
         total_closed=total_closed,
         no_milestones=no_stone,
-        **fields
+        **fields,
     )
 
 

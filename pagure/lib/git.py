@@ -1354,7 +1354,7 @@ def read_output(cmd, abspath, input=None, keepends=False, error=False, **kw):
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         cwd=abspath,
-        **kw
+        **kw,
     )
     (out, err) = procs.communicate(input)
     retcode = procs.wait()
@@ -1386,7 +1386,7 @@ def read_git_output(
         input=input,
         keepends=keepends,
         error=error,
-        **kw
+        **kw,
     )
 
 

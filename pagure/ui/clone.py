@@ -267,7 +267,7 @@ def proxy_repospanner(project, service):
             "x-Extra-project_user": project.user if project.is_fork else "",
             "X-Extra-project_namespace": project.namespace,
         },
-        **streamargs
+        **streamargs,
     )
 
     # Strip out any headers that cause problems
