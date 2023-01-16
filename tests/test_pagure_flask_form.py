@@ -73,8 +73,8 @@ class PagureFlaskFormTests(tests.SimplePagureTest):
                     [int(v) for v in flask_wtf.__version__.split(".")]
                 )
             if flask_wtf_version and (
-                    flask_wtf_version < (0, 10, 0) or
-                    flask_wtf_version >= (0, 14, 0)
+                flask_wtf_version < (0, 10, 0)
+                or flask_wtf_version >= (0, 14, 0)
             ):
                 expires = time.time() - 1
             else:
