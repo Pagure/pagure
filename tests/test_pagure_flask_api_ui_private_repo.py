@@ -3239,14 +3239,14 @@ class PagurePrivateRepotest(tests.Modeltests):
             )
             self.assertEqual(output.status_code, 400)
             data = json.loads(output.get_data(as_text=True))
-            self.assertDictEqual(
-                data,
-                {
-                    "error": "Invalid or incomplete input submitted",
-                    "error_code": "EINVALIDREQ",
-                    "errors": {"status": ["Not a valid choice."]},
-                },
-            )
+            expected_output = {
+                "error": "Invalid or incomplete input submitted",
+                "error_code": "EINVALIDREQ",
+                "errors": {"status": ["Not a valid choice"]},
+            }
+            if self.get_wtforms_version() >= (3, 0):
+                expected_output["errors"]["status"] = ["Not a valid choice."]
+            self.assertDictEqual(data, expected_output)
 
             # No change
             repo = pagure.lib.query._get_project(self.session, "test4")

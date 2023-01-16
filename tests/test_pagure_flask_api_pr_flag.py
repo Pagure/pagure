@@ -897,14 +897,14 @@ class PagureFlaskApiPRFlagtests(tests.Modeltests):
         )
         data = json.loads(output.get_data(as_text=True))
         self.assertEqual(output.status_code, 400)
-        self.assertDictEqual(
-            data,
-            {
-                "error": "Invalid or incomplete input submitted",
-                "error_code": "EINVALIDREQ",
-                "errors": {"status": ["Not a valid choice."]},
-            },
-        )
+        expected_output = {
+            "error": "Invalid or incomplete input submitted",
+            "error_code": "EINVALIDREQ",
+            "errors": {"status": ["Not a valid choice"]},
+        }
+        if self.get_wtforms_version() >= (3, 0):
+            expected_output["errors"]["status"] = ["Not a valid choice."]
+        self.assertDictEqual(data, expected_output)
 
 
 class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
@@ -1054,14 +1054,14 @@ class PagureFlaskApiPRFlagUserTokentests(tests.Modeltests):
         )
         self.assertEqual(output.status_code, 400)
         data = json.loads(output.get_data(as_text=True))
-        self.assertDictEqual(
-            data,
-            {
-                "error": "Invalid or incomplete input submitted",
-                "error_code": "EINVALIDREQ",
-                "errors": {"status": ["Not a valid choice."]},
-            },
-        )
+        expected_output = {
+            "error": "Invalid or incomplete input submitted",
+            "error_code": "EINVALIDREQ",
+            "errors": {"status": ["Not a valid choice"]},
+        }
+        if self.get_wtforms_version() >= (3, 0):
+            expected_output["errors"]["status"] = ["Not a valid choice."]
+        self.assertDictEqual(data, expected_output)
 
         # No change
         self.session.commit()

@@ -666,14 +666,14 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
         self.assertEqual(output.status_code, 400)
         data = json.loads(output.get_data(as_text=True))
-        self.assertDictEqual(
-            data,
-            {
-                "error": "Invalid or incomplete input submitted",
-                "error_code": "EINVALIDREQ",
-                "errors": {"milestone": ["Not a valid choice."]},
-            },
-        )
+        expected_output = {
+            "error": "Invalid or incomplete input submitted",
+            "error_code": "EINVALIDREQ",
+            "errors": {"milestone": ["Not a valid choice"]},
+        }
+        if self.get_wtforms_version() >= (3, 0):
+            expected_output["errors"]["milestone"] = ["Not a valid choice."]
+        self.assertDictEqual(data, expected_output)
 
     def test_api_new_issue_milestone(self):
         """Test the api_new_issue method of the flask api."""
@@ -3154,14 +3154,14 @@ class PagureFlaskApiIssuetests(tests.SimplePagureTest):
         )
         self.assertEqual(output.status_code, 400)
         data = json.loads(output.get_data(as_text=True))
-        self.assertDictEqual(
-            data,
-            {
-                "error": "Invalid or incomplete input submitted",
-                "error_code": "EINVALIDREQ",
-                "errors": {"milestone": ["Not a valid choice."]},
-            },
-        )
+        expected_output = {
+            "error": "Invalid or incomplete input submitted",
+            "error_code": "EINVALIDREQ",
+            "errors": {"milestone": ["Not a valid choice"]},
+        }
+        if self.get_wtforms_version() >= (3, 0):
+            expected_output["errors"]["milestone"] = ["Not a valid choice."]
+        self.assertDictEqual(data, expected_output)
 
     @patch.dict(
         "pagure.config.config", {"FEDORA_MESSAGING_NOTIFICATIONS": True}

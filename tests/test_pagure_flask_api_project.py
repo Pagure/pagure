@@ -2780,7 +2780,7 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
         expected_output = {
             "error": "Invalid or incomplete input submitted",
             "error_code": "EINVALIDREQ",
-            "errors": {"status": ["Not a valid choice."]},
+            "errors": {"status": ["Not a valid choice"]},
         }
         if self.get_wtforms_version() >= (2, 3):
             expected_output["errors"]["status"] = ["This field is required."]
@@ -2916,14 +2916,14 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
         )
         self.assertEqual(output.status_code, 400)
         data = json.loads(output.get_data(as_text=True))
-        self.assertEqual(
-            data,
-            {
-                "errors": {"status": ["Not a valid choice."]},
-                "error_code": "EINVALIDREQ",
-                "error": "Invalid or incomplete input submitted",
-            },
-        )
+        expected_output = {
+            "error": "Invalid or incomplete input submitted",
+            "error_code": "EINVALIDREQ",
+            "errors": {"status": ["Not a valid choice"]},
+        }
+        if self.get_wtforms_version() >= (3, 0):
+            expected_output["errors"]["status"] = ["Not a valid choice."]
+        self.assertDictEqual(data, expected_output)
 
     def test_flag_commit_with_uid(self):
         """Test flagging a commit with provided uid."""
@@ -3368,14 +3368,14 @@ class PagureFlaskApiProjectFlagtests(tests.Modeltests):
         )
         self.assertEqual(output.status_code, 400)
         data = json.loads(output.get_data(as_text=True))
-        self.assertEqual(
-            data,
-            {
-                "errors": {"status": ["Not a valid choice."]},
-                "error_code": "EINVALIDREQ",
-                "error": "Invalid or incomplete input submitted",
-            },
-        )
+        expected_output = {
+            "error": "Invalid or incomplete input submitted",
+            "error_code": "EINVALIDREQ",
+            "errors": {"status": ["Not a valid choice"]},
+        }
+        if self.get_wtforms_version() >= (3, 0):
+            expected_output["errors"]["status"] = ["Not a valid choice."]
+        self.assertDictEqual(data, expected_output)
 
     def test_commit_flags(self):
         """Test retrieving commit flags."""
@@ -3605,9 +3605,11 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
         expected_output = {
             "error": "Invalid or incomplete input submitted",
             "error_code": "EINVALIDREQ",
-            "errors": {"acl": ["Not a valid choice."]},
+            "errors": {"acl": ["Not a valid choice"]},
         }
-        self.assertEqual(data, expected_output)
+        if self.get_wtforms_version() >= (3, 0):
+            expected_output["errors"]["acl"] = ["Not a valid choice."]
+        self.assertDictEqual(data, expected_output)
 
     def test_api_modify_acls_user(self):
         """Test the api_modify_acls method of the flask api for
@@ -5664,14 +5666,14 @@ class PagureFlaskApiProjectCreateProjectTests(tests.Modeltests):
         output = self.app.post("/api/0/new/", data=data, headers=headers)
         self.assertEqual(output.status_code, 400)
         data = json.loads(output.get_data(as_text=True))
-        self.assertDictEqual(
-            data,
-            {
-                "error": "Invalid or incomplete input submitted",
-                "error_code": "EINVALIDREQ",
-                "errors": {"namespace": ["Not a valid choice."]},
-            },
-        )
+        expected_output = {
+            "error": "Invalid or incomplete input submitted",
+            "error_code": "EINVALIDREQ",
+            "errors": {"namespace": ["Not a valid choice"]},
+        }
+        if self.get_wtforms_version() >= (3, 0):
+            expected_output["errors"]["namespace"] = ["Not a valid choice."]
+        self.assertDictEqual(data, expected_output)
 
         data = {
             "name": "test_42",
