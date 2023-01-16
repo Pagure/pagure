@@ -372,7 +372,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         # previous versions parsed it
         output = self.app.get("/api/0/user/pingou/activity/2016asd")
         arrow_version = self.get_arrow_version()
-        if arrow_version >= (0, 15, 6):
+        if arrow_version >= (1, 0, 0):
             self.assertEqual(output.status_code, 400)
             exp = {
                 "error": "Could not match input '2016asd' to any of the following formats: "
@@ -388,7 +388,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
                 "error": "Could not match input '2016asd' to any of the following formats: "
                 "YYYY-MM-DD, YYYY-M-DD, YYYY-M-D, YYYY/MM/DD, YYYY/M/DD, YYYY/M/D, "
                 "YYYY.MM.DD, YYYY.M.DD, YYYY.M.D, YYYYMMDD, YYYY-DDDD, YYYYDDDD, "
-                "YYYY-MM, YYYY/MM, YYYY.MM, YYYY",
+                "YYYY-MM, YYYY/MM, YYYY.MM, YYYY, W",
                 "error_code": "ENOCODE",
             }
             self.assertEqual(json.loads(output.get_data(as_text=True)), exp)
