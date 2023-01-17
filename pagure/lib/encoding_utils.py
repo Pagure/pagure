@@ -68,7 +68,7 @@ def detect_encodings(data):
     if cchardet:
         return encodings
 
-    if ch_version[0] in ("3", "4"):
+    if ch_version[0] in ("3", "4", "5"):
         for prober in detector._charset_probers:
             if hasattr(prober, "probers"):
                 for prober in prober.probers:
