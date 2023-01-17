@@ -158,7 +158,9 @@ class PagureFlaskApiBoardstests(tests.SimplePagureTest):
         )
 
     def test_api_board_create_no_data(self):
-        headers = {"Authorization": "token aaabbbcccddd"}
+        headers = {
+            "Authorization": "token aaabbbcccddd",
+        }
         data = {}
         output = self.app.post(
             "/api/0/test/boards", headers=headers, data=data
@@ -497,9 +499,6 @@ class PagureFlaskApiBoardsWithBoardtests(tests.SimplePagureTest):
         }
 
         # Remove the board
-        headers = {
-            "Authorization": "token aaabbbcccddd",
-        }
         data = {}
         output = self.app.post(
             "/api/0/test/boards/delete", headers=headers, data=data

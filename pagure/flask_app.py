@@ -19,6 +19,7 @@ import time
 import warnings
 
 import flask
+from flask.wrappers import Request
 import pygit2
 from six.moves.urllib.parse import urljoin
 from whitenoise import WhiteNoise
@@ -60,10 +61,21 @@ if pagure_config.get("PAGURE_CI_SERVICES"):
     pagure.lib.query.set_pagure_ci(pagure_config["PAGURE_CI_SERVICES"])
 
 
+# Enforce behavior of 'get_json' to return json even if
+# Content-Type application/json is missing as in werkzeug < v2.1.0
+# https://github.com/pallets/flask/issues/4552#issuecomment-1109785314
+class AnyJsonRequest(Request):
+    def on_json_loading_failed(self, e):
+        if e is not None:
+            return super().on_json_loading_failed(e)
+
+
 def create_app(config=None):
     """Create the flask application."""
     app = flask.Flask(__name__)
     app.config = pagure_config
+
+    app.request_class = AnyJsonRequest
 
     if config:
         app.config.update(config)
