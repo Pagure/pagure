@@ -3582,7 +3582,7 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
             "error_code": "EINVALIDREQ",
             "errors": {
                 "name": ["This field is required."],
-                "user_type": ["Not a valid choice."],
+                "user_type": ["Not a valid choice"],
             },
         }
         if self.get_wtforms_version() >= (2, 3):
