@@ -1,1 +1,1 @@
-trololio
+trololio == 1.0

@@ -1,2 +1,2 @@
-cryptography
-python-jenkins
+cryptography <= 36.0.0
+python-jenkins <= 1.7.0

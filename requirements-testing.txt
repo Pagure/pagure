@@ -1,18 +1,19 @@
-bcrypt
-beautifulsoup4
-black
-cryptography
-eventlet
-fedmsg
-flake8
-flask-oidc
-mock
+bcrypt <= 3.2.2
+beautifulsoup4 <= 4.11.1
+black <= 22.8.0
+cryptography <= 36.0.0
+eventlet <= 0.33.2
+fedmsg <= 1.1.2
+flake8 <= 4.0.1
+flask-oidc <= 1.4.0
+mock <= 4.0.3
 pagure-messages >= 0.0.1
-pytest
-pytest-cov
-pytest-xdist
-python-fedora
-trololio
+pytest <= 6.2.5
+pytest-cov <= 4.0.0
+pytest-xdist <= 2.5.0
+
+python-fedora == 1.1.1
+trololio == 1.0
 
 # Seems that mock doesn't list this one
-funcsigs
+funcsigs <= 1.0.2

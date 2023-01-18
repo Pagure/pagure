@@ -1,42 +1,47 @@
 # Used for when working from a virtualenv.
 # Use this file by running "$ pip install -r requirements.txt"
-alembic
-arrow
-bcrypt
-binaryornot
-bleach
-blinker
-celery
-chardet
-cryptography
-docutils
+alembic <= 1.8.1
+arrow <= 1.2.3
+bcrypt <= 3.2.2
+binaryornot == 0.4.4
+bleach <= 5.0.1
+blinker <= 1.5
+celery <= 5.2.6
+chardet <= 4.0.0
+cryptography <= 36.0.0
+docutils <= 0.17.1
+
+# required for backward compatibility
 email_validator
-flask
-flask-wtf
-kitchen
-markdown
-munch
-Pillow
-psutil
-pygit2 >= 0.26.0
-python3-openid
-python-openid-cla
-python-openid-teams
-redis
-requests
+
+flask <= 2.2.2
+flask-wtf <= 1.0.0
+kitchen == 1.2.6
+markdown <= 3.3.7
+munch <= 2.5.0
+Pillow <= 9.2.0
+psutil <= 5.9.2
+pygit2 >= 0.26.0, <=1.8.0
+python3-openid <= 3.2.0
+python-openid-cla == 1.2
+python-openid-teams == 1.1
+redis <= 3.5.3
+requests <= 2.28.1
+six <= 1.16.0
+
+# required for backward compatibility
 setuptools
-six
-# sqlalchemy minimum 0.8
-sqlalchemy >= 0.8
-straight.plugin >= 1.5.0
-whitenoise
-wtforms
+
+sqlalchemy >= 0.8, <=1.4.46
+straight.plugin == 1.5.0
+whitenoise <= 6.2.0
+wtforms <= 3.0.1
 
 # Required only for the `oidc` authentication backend
-# flask-oidc
+# flask-oidc <= 1.4.0
 
 # Required only if `USE_FLASK_SESSION_EXT` is set to `True`
 # flask-session
 
 # Required only for the `fas` and `openid` authentication backends
-# python-fedora
+# python-fedora == 1.1.1
