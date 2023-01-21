@@ -20,6 +20,7 @@ import time
 import unittest
 
 import pygit2
+import werkzeug
 import wtforms
 from mock import patch, MagicMock
 from bs4 import BeautifulSoup
@@ -173,9 +174,21 @@ class PagureRemotePRtests(tests.Modeltests):
         # Try creating a remote PR
         output = self.app.get("/test/diff/remote")
         self.assertEqual(output.status_code, 302)
-        self.assertIn(
+        expected_response = (
             "You should be redirected automatically to target URL: "
-            '<a href="/login/?',
+            '<a href="/login/?'
+        )
+        if hasattr(werkzeug, "__version__"):
+            werkzeug_v = tuple(
+                int(el) for el in werkzeug.__version__.split(".")
+            )
+            if werkzeug_v >= (2, 1, 2):
+                expected_response = (
+                    "You should be redirected automatically to the target URL: "
+                    '<a href="/login/?'
+                )
+        self.assertIn(
+            expected_response,
             output.get_data(as_text=True),
         )
 
