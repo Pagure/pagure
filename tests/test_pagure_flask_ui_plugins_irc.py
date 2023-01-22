@@ -24,7 +24,7 @@ import tests
 class PagureFlaskPluginIRCtests(tests.SimplePagureTest):
     """Tests for pagure_hook plugin of pagure"""
 
-    def test_plugin_mail(self):
+    def test_plugin_irc(self):
         """Test the irc plugin on/off endpoint."""
 
         tests.create_projects(self.session)
