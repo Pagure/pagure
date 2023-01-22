@@ -49,8 +49,8 @@ class RtdTable(BASE):
     active = sa.Column(sa.Boolean, nullable=False, default=False)
 
     branches = sa.Column(sa.Text, nullable=True)
-    api_url = sa.Column(sa.Text, nullable=False)
-    api_token = sa.Column(sa.Text, nullable=False)
+    api_url = sa.Column(sa.Text, nullable=False, default="")
+    api_token = sa.Column(sa.Text, nullable=False, default="")
 
     project = relation(
         "Project",

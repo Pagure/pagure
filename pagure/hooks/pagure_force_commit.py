@@ -42,7 +42,7 @@ class PagureForceCommitTable(BASE):
         index=True,
     )
 
-    branches = sa.Column(sa.Text, nullable=False)
+    branches = sa.Column(sa.Text, nullable=False, default="")
 
     active = sa.Column(sa.Boolean, nullable=False, default=False)
 

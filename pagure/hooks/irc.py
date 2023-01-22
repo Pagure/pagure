@@ -43,9 +43,9 @@ class IrcTable(BASE):
         index=True,
     )
 
-    server = sa.Column(sa.Text, nullable=False)
-    port = sa.Column(sa.Text, nullable=False)
-    room = sa.Column(sa.Text, nullable=False)
+    server = sa.Column(sa.Text, nullable=False, default="")
+    port = sa.Column(sa.Text, nullable=False, default="")
+    room = sa.Column(sa.Text, nullable=False, default="")
     nick = sa.Column(sa.Text, nullable=True, default=None)
     nick_pass = sa.Column(sa.Text, nullable=True, default=None)
     active = sa.Column(sa.Boolean, nullable=False, default=False)

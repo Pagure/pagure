@@ -46,7 +46,7 @@ class MailTable(BASE):
         index=True,
     )
 
-    mail_to = sa.Column(sa.Text, nullable=False)
+    mail_to = sa.Column(sa.Text, nullable=False, default="")
     active = sa.Column(sa.Boolean, nullable=False, default=False)
 
     project = relation(
