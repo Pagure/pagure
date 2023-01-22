@@ -17,9 +17,13 @@ import textwrap
 import docutils
 import docutils.core
 import docutils.examples
-import jinja2
+
+try:
+    from jinja2 import escape
+except ImportError:
+    from markupsafe import escape
 import kitchen.text.converters as ktc
-import markupsafe
+from markupsafe import Markup
 
 import pagure.lib.encoding_utils
 import pagure.lib.query
@@ -85,7 +89,7 @@ def convert_doc(rst_string, view_file_url=None):
             source=rst, writer_name="html", settings_overrides=overrides
         )
     except Exception:
-        return "<pre>%s</pre>" % jinja2.escape(rst)
+        return "<pre>%s</pre>" % escape(rst)
 
     else:
 
@@ -93,7 +97,7 @@ def convert_doc(rst_string, view_file_url=None):
 
         html_string = modify_html(html_string)
 
-        html_string = markupsafe.Markup(html_string)
+        html_string = Markup(html_string)
         return html_string
 
 
@@ -111,7 +115,7 @@ def convert_readme(content, ext, view_file_url=None):
         safe = True
     elif not ext or (ext and ext in [".text", ".txt"]):
         safe = True
-        output = "<pre>%s</pre>" % jinja2.escape(output)
+        output = "<pre>%s</pre>" % escape(output)
     return output, safe
 
 
@@ -124,7 +128,7 @@ def load_doc(endpoint):
 
     api_docs = modify_html(api_docs)
 
-    api_docs = markupsafe.Markup(api_docs)
+    api_docs = Markup(api_docs)
     return api_docs
 
 
