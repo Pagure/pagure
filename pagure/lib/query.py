@@ -2806,7 +2806,7 @@ def list_users_projects(
         projects = projects.filter(model.Project.namespace == namespace)
 
     query = session.query(model.Project).filter(
-        model.Project.id.in_(projects.subquery())
+        model.Project.id.in_(projects.as_scalar())
     )
 
     if sort == "latest":
