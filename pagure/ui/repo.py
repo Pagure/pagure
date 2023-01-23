@@ -2598,7 +2598,7 @@ def edit_file(repo, branchname, filename, username=None, namespace=None):
                 branch=branchname,
                 branchto=form.branch.data,
                 filename=filename,
-                content=form.content.data,
+                content=form.content.data if form.content.data else str(),
                 message="%s\n\n%s"
                 % (
                     form.commit_title.data.strip(),
