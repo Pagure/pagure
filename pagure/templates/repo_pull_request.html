@@ -170,7 +170,7 @@
               </a>
               <div id="merge-alert" class="text-xs-center dropdown-menu dropdown-menu-right p-0">
                 <div class="alert text-center mb-0">
-                  {% if g.repo_committer %}
+                  {% if g.authenticated and (g.repo_committer or g.fas_user.username in g.repo.collaborators) %}
                     <small id="merge-alert-message"></small>
                     <form action="{{ url_for('ui_ns.merge_request_pull',
                         repo=repo.name,
