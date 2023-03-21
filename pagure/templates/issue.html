@@ -263,7 +263,7 @@ namespace=repo.namespace, repo=repo.name, issueid=issueid)
         </p>
       {% else %}
         <p>
-          <a href="{{ url_for('auth_login', next=request.url) }}">Login</a>
+          <a href="{{ url_for('auth_login', next=request.url) }}">Log in</a>
           to comment on this ticket.
         </p>
       {% endif %}

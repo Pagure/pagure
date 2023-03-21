@@ -89,7 +89,7 @@ when a commit is pushed to the repository.
 If you specify one or more branches (using commas `,` to separate them) only
 pushes made to these branches will trigger a new build of the documentation.
 
-To set up this hook, you will need to login to https://readthedocs.org/
+To set up this hook, you will need to log in to https://readthedocs.org/
 Go to your project's admin settings, and in the ``Integrations`` section
 add a new ``Generic API incoming webhook``.
 

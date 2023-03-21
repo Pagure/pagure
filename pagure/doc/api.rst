@@ -1,7 +1,7 @@
 Authentication
 ~~~~~~~~~~~~~~
 
-To access some endpoints, you need to login to Pagure using API token. You
+To access some endpoints, you need to log in to Pagure using an API token. You
 can generate one in the project setting page.
 
 When sending HTTP request, include an ``Authorization`` field in the header
