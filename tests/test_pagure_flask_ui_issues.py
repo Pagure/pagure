@@ -1316,7 +1316,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         )
         self.assertIn(
             '<a href="/login/?next=http%3A%2F%2Flocalhost%2Ftest%2Fissue%2F1">'
-            "Login</a>\n          to comment on this ticket.",
+            "Log in</a>\n          to comment on this ticket.",
             output_text,
         )
 
@@ -1359,7 +1359,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         )
         self.assertIn(
             '<a href="/login/?next=http%3A%2F%2Flocalhost%2Ftest%2Fissue%2F1">'
-            "Login</a>\n          to comment on this ticket.",
+            "Log in</a>\n          to comment on this ticket.",
             output_text,
         )
 
@@ -1380,7 +1380,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output_text,
             )
             self.assertFalse(
-                '<a href="/login/">Login</a> to comment on this ticket.'
+                '<a href="/login/">Log in</a> to comment on this ticket.'
                 in output_text
             )
             # Not author nor admin = No take
@@ -1503,7 +1503,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         )
         self.assertIn(
             '<a href="/login/?next=http%3A%2F%2Flocalhost%2Ftest%2Fissue%2F1">'
-            "Login</a>\n          to comment on this ticket.",
+            "Log in</a>\n          to comment on this ticket.",
             output_text,
         )
 
@@ -1530,7 +1530,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output_text,
             )
             self.assertFalse(
-                '<a href="/login/">Login</a> to comment on this ticket.'
+                '<a href="/login/">Log in</a> to comment on this ticket.'
                 in output_text
             )
             # author admin = take
@@ -1577,7 +1577,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         )
         self.assertTrue(
             '<a href="/login/?next=http%3A%2F%2Flocalhost%2Ftest%2Fissue%2F1">'
-            "Login</a>\n          to comment on this ticket." in output_text
+            "Log in</a>\n          to comment on this ticket." in output_text
         )
 
         # Create issues to play with
@@ -1607,7 +1607,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output_text,
             )
             self.assertFalse(
-                '<a href="/login/">Login</a> to comment on this ticket.'
+                '<a href="/login/">Log in</a> to comment on this ticket.'
                 in output_text
             )
             # user has ticket = take ok
@@ -1718,7 +1718,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output_text,
             )
             self.assertNotIn(
-                '<a href="/login/">Login</a> to comment on this ticket.',
+                '<a href="/login/">Log in</a> to comment on this ticket.',
                 output_text,
             )
             # user has ticket = take ok

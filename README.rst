@@ -59,7 +59,7 @@ container with test data and create a new account ::
 
     $ docker-compose -f dev/docker-compose.yml exec web python3 dev-data.py --all
 
-You can then login with any of the created users, by example:
+You can then log in with any of the created users, by example:
 
 - username: pingou
 - password: testing123

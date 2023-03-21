@@ -297,8 +297,8 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         self.assertEqual(item.user, "foouser")
         self.assertEqual(item.token, None)
 
-        # Login but cannot save the session to the DB due to the missing IP
-        # address in the flask request
+        # Login works but cannot save the session to the DB due to the missing
+        # IP address in the flask request
         data["password"] = "barpass"
         output = self.app.post("/dologin", data=data, follow_redirects=True)
         self.assertEqual(output.status_code, 200)
@@ -522,7 +522,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
     @patch.dict("pagure.config.config", {"PAGURE_AUTH": "local"})
     @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
     def test_non_ascii_password(self):
-        """Test login and create user functionality when the password is
+        """Test login and user creation functionality when the password is
         non-ascii.
         """
 

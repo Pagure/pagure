@@ -6,8 +6,8 @@ First Steps on pagure
 When coming to pagure for the first time there are a few things one should
 do or check to ensure all works as desired.
 
-Login to pagure or create your account
---------------------------------------
+Log in to pagure or create your account
+---------------------------------------
 
 Pagure has its own user account system.
 
@@ -16,7 +16,7 @@ where the authentication is delegated to a third party (in the case of
 pagure.io, the Fedora Account System) via OpenID, the local user account
 is created upon login.
 
-This means, you cannot be added to a group or a project before you login for
+This means, you cannot be added to a group or a project before you log in for
 the first time as the system will simply not know you.
 
 If you run your own pagure instance which uses the local authentication
@@ -54,7 +54,7 @@ the public key that can be uploaded on pagure to give you ssh access.
 
 To upload your public key onto pagure:
 
-1. Login into pagure and click on the user icon on
+1. Log in to pagure and click on the user icon on
 the top right corner, there, select ``My settings``.
 
 .. image:: _static/pagure_my_settings.png

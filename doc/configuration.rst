@@ -1747,9 +1747,9 @@ ADMIN_SESSION_LIFETIME
 ~~~~~~~~~~~~~~~~~~~~~~
 
 This configuration key allows specifying the lifetime of the session during
-which the user won't have to re-login for admin actions.
+which the user won't have to log in again for admin actions.
 In other words, the maximum time between which an user can access a project's
-settings page without re-login.
+settings page without a re-login.
 
 Defaults to: ``timedelta(minutes=20)``
 
