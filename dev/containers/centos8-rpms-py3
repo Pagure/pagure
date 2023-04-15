@@ -7,7 +7,7 @@ ENV REPO=$repo
 ENV BRANCH=$branch
 
 RUN dnf -y install \
-    epel-release epel-next-release
+    epel-release epel-next-release 'dnf-command(config-manager)'
 
 RUN dnf -y config-manager --enable epel-testing epel-next-testing powertools
 
