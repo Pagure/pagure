@@ -125,28 +125,29 @@ with the ``LOGGING`` parameter.
 Running the unit-tests in container
 ***********************************
 
-To run the unit-tests, there is container available with all the dependencies needed.
+To run the unit-tests, there are container available with all the dependencies needed.
 
-First you will need to have podman installed on your workstation. ::
+First you will need to have podman and git installed on your workstation. ::
 
-    $ sudo dnf install podman
+    $ sudo dnf install podman git
 
-
-Use the following command to run the tests ::
+Use the following command to run all tests on all container images, if the images not exist on your system, they will be build ::
 
     $ ./dev/run-tests-container.py
-
-This command will build a fedora based container and execute the test suite.
 
 If you wish to execute the test suite on a centos based container run the following command ::
 
     $ ./dev/run-tests-container.py --centos
 
-When the test container image has been built you can skip the building step to save time
-and run directly the test suite. ::
+Container images are separated from the pagure source that will be tested.
+Therefore they will only automatically build if they not exist.
 
-    $ ./dev/run-tests-container.py --skip-build
-    $ ./dev/run-tests-container.py --centos --skip-build
+A manual rebuild should be done from time to time to include new package versions.
+Also if you work on any changes in the pagure spec file, the tox config or any requirements.txt file,
+perform a rebuild to ensure your changed will taken into account. ::
+
+    $ ./dev/run-tests-container.py --rebuild # all base and code container
+    $ ./dev/run-tests-container.py --rebuild-code # code container only
 
 You can also run a single test case ::
 
@@ -156,16 +157,18 @@ Or a single test ::
 
     $ ./dev/run-tests-container.py tests/test_pagure_flask_ui_priorities.py:PagureFlaskPrioritiestests.test_ticket_with_no_priority
 
-You can also get `run-tests-container` help ::
+You can also get ``run-tests-container`` help ::
 
     $ ./dev/run-tests-container.py --help
 
-Run the tests on your own development branch in your fork ::
+By default, tests run against the git repo and the active branch in the current folder.
+To override this behavior and run the tests on your remote development branch in your fork ::
 
     $ ./dev/run-tests-container.py --repo https://pagure.io/forks/<username>/pagure.git --branch <name of branch to test>
 
-  .. note:: This run could take pretty long to finish and there isn't any useful summary.
-            So it's better to redirect the output to some file. You can use `tee` for this.
+  .. note:: All build, test and shell activities executed via ``run-tests-container`` will automatically be logged.
+            Every container has it's own ``dev/results_<test-container-name>`` folder, every run creates separate
+            files with the current unix timestamp as prefix. You should cleanup this folder from time to time.
 
  
 Running the unit-tests in tox
