@@ -15,12 +15,14 @@ def _container_image_exist(container_name, container_type):
         "podman",
         "image",
         "exists",
-        containers[container_name][container_type]
+        containers[container_name][container_type],
     ]
     return _call_command(cmd)
 
 
+# fmt: off
 def _build_container(container_name, container_type, result_path, container_volume=None, **kwargs):
+# fmt: on
     # kwargs can be used to pass '--build-arg'
     build_args = []
     for arg in kwargs.values():
@@ -55,7 +57,9 @@ def _build_container(container_name, container_type, result_path, container_volu
     cmd += build_args
     cmd += volume
 
-    logfile = "{}/{}_{}-build.log".format(result_path, TIMESTAMP, container_type)
+    logfile = "{}/{}_{}-build.log".format(
+        result_path, TIMESTAMP, container_type
+    )
     return _call_command(cmd, logfile)
 
 
@@ -79,19 +83,13 @@ def _call_command(cmd, logfile=None):
 
 def _check_pre_reqs():
     programs = [
-        {
-            "name": "podman",
-            "cmd": ["podman", "version"]
-        },
-        {
-            "name": "git",
-            "cmd": ["git", "version"]
-        }
+        {"name": "podman", "cmd": ["podman", "version"]},
+        {"name": "git", "cmd": ["git", "version"]},
     ]
 
     # 'os.devnull' used for backward compatibility with Python2.
     # for Py3 only, 'sp.DEVNULL' can be used and this workaround removed.
-    FNULL = open(os.devnull, 'w')
+    FNULL = open(os.devnull, "w")
 
     missing = []
     for program in programs:
@@ -106,7 +104,7 @@ def _check_pre_reqs():
 
 
 def setup_parser():
-    """ Setup the cli arguments """
+    """Setup the cli arguments"""
     parser = argparse.ArgumentParser(prog="pagure-test")
     parser.add_argument(
         "test_case", nargs="?", default="", help="Run the given test case"
@@ -174,18 +172,18 @@ if __name__ == "__main__":
         "centos": {
             "name": "pagure-tests-centos-stream8-rpms-py3",
             "base": "base-centos-stream8-rpms-py3",
-            "code": "code-centos-stream8-rpms-py3"
+            "code": "code-centos-stream8-rpms-py3",
         },
         "fedora": {
             "name": "pagure-tests-fedora-rpms-py3",
             "base": "base-fedora-rpms-py3",
-            "code": "code-fedora-rpms-py3"
+            "code": "code-fedora-rpms-py3",
         },
         "pip": {
             "name": "pagure-tests-fedora-pip-py3",
             "base": "base-fedora-pip-py3",
-            "code": "code-fedora-pip-py3"
-        }
+            "code": "code-fedora-pip-py3",
+        },
     }
 
     if args.centos:
@@ -201,68 +199,89 @@ if __name__ == "__main__":
     if args.repo == "/wrkdir":
         # 'git rev-parse --show-toplevel' via python, Kudos: Ryne Everett
         # https://stackoverflow.com/questions/22081209#comment44778829_22081487
-        wrkdir_path = sp.Popen(['git', 'rev-parse', '--show-toplevel'],
-                               stdout=sp.PIPE).communicate()[0].rstrip().decode('ascii')
+        wrkdir_path = (
+            sp.Popen(["git", "rev-parse", "--show-toplevel"], stdout=sp.PIPE)
+            .communicate()[0]
+            .rstrip()
+            .decode("ascii")
+        )
         mount_wrkdir = True
     # 'args.repo' will be set as path to mount it into the container and then
     # overridden with '/wrkdir' to leverage existing logic to use a local path
-    elif 'http://' not in args.repo \
-            and 'https://' not in args.repo:
+    elif "http://" not in args.repo and "https://" not in args.repo:
         wrkdir_path = args.repo
         args.repo = "/wrkdir"
         mount_wrkdir = True
 
     if args.branch == "wrkdirbranch":
-        args.branch = sp.Popen(['git', 'branch', '--show-current'],
-                               stdout=sp.PIPE).communicate()[0].rstrip().decode('ascii')
+        args.branch = (
+            sp.Popen(["git", "branch", "--show-current"], stdout=sp.PIPE)
+            .communicate()[0]
+            .rstrip()
+            .decode("ascii")
+        )
 
     failed = []
     print("Running for %d containers:" % len(container_names))
     print("  - " + "\n  - ".join(container_names))
     for container_name in container_names:
-        result_path = "{}/results_{}".format(os.getcwd(), containers[container_name]["name"])
+        result_path = "{}/results_{}".format(
+            os.getcwd(), containers[container_name]["name"]
+        )
         if not os.path.exists(result_path):
             os.mkdir(result_path)
 
         print("\n------ Building Container Image -----")
 
         if not _container_image_exist(container_name, "base") or args.rebuild:
-            print("Container does not exist, building: %s" % containers[container_name]["base"])
+            print(
+                "Container does not exist, building: %s"
+                % containers[container_name]["base"]
+            )
             if _build_container(
                 container_name,
                 "base",
                 result_path,
                 branch="{}".format(os.environ.get("BRANCH") or args.branch),
-                repo="{}".format(os.environ.get("REPO") or args.repo)
+                repo="{}".format(os.environ.get("REPO") or args.repo),
             ):
                 base_build = True
             else:
-                print("Failed building: %s" % containers[container_name]["base"])
+                print(
+                    "Failed building: %s" % containers[container_name]["base"]
+                )
                 break
         else:
             base_build = False
-            print("Container already exist, skipped building: %s" % containers[container_name]["base"])
+            print(
+                "Container already exist, skipped building: %s"
+                % containers[container_name]["base"]
+            )
 
-        if not _container_image_exist(container_name, "code") or \
-                base_build or \
-                args.rebuild or \
-                args.rebuild_code:
-            print("Container does not exist, building: %s" % containers[container_name]["code"])
+        if (
+            not _container_image_exist(container_name, "code")
+            or base_build
+            or args.rebuild
+            or args.rebuild_code
+        ):
+            print(
+                "Container does not exist, building: %s"
+                % containers[container_name]["code"]
+            )
             if not _build_container(container_name, "code", result_path):
-                print("Failed building: %s" % containers[container_name]["code"])
+                print(
+                    "Failed building: %s" % containers[container_name]["code"]
+                )
                 break
         else:
-            print("Container already exist, skipped building: %s" % containers[container_name]["code"])
+            print(
+                "Container already exist, skipped building: %s"
+                % containers[container_name]["code"]
+            )
 
-        volumes = [
-            "-v",
-            "{}:/results:z".format(result_path)
-        ]
+        volumes = ["-v", "{}:/results:z".format(result_path)]
         if mount_wrkdir:
-            volumes += [
-                "-v",
-                "{}:/wrkdir:z,ro".format(wrkdir_path)
-            ]
+            volumes += ["-v", "{}:/wrkdir:z,ro".format(wrkdir_path)]
 
         env_vars = [
             "-e",
@@ -281,7 +300,7 @@ if __name__ == "__main__":
                 "-it",
                 "--rm",
                 "--name",
-                containers[container_name]["name"]
+                containers[container_name]["name"],
             ]
             cmd += volumes
             cmd += env_vars
