@@ -64,6 +64,34 @@ def _call_command(cmd):
         return True
 
 
+def _check_pre_reqs():
+    programs = [
+        {
+            "name": "podman",
+            "cmd": ["podman", "version"]
+        },
+        {
+            "name": "git",
+            "cmd": ["git", "version"]
+        }
+    ]
+
+    # 'os.devnull' used for backward compatibility with Python2.
+    # for Py3 only, 'sp.DEVNULL' can be used and this workaround removed.
+    FNULL = open(os.devnull, 'w')
+
+    missing = []
+    for program in programs:
+        try:
+            sp.call(program["cmd"], stdout=FNULL, stderr=sp.STDOUT)
+        except OSError:
+            missing.append(program["name"])
+
+    if len(missing) > 0:
+        print("Error! Required programs not found: " + ", ".join(missing))
+        os._exit(1)
+
+
 def setup_parser():
     """ Setup the cli arguments """
     parser = argparse.ArgumentParser(prog="pagure-test")
@@ -130,6 +158,8 @@ def setup_parser():
 
 
 if __name__ == "__main__":
+    _check_pre_reqs()
+
     parser = setup_parser()
     args = parser.parse_args()
 
