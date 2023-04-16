@@ -3,9 +3,11 @@
 import argparse
 import os
 import subprocess as sp
+import time
 
 
 ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+TIMESTAMP = int(time.time())
 
 
 def _container_image_exist(container_name, container_type):
@@ -18,7 +20,7 @@ def _container_image_exist(container_name, container_type):
     return _call_command(cmd)
 
 
-def _build_container(container_name, container_type, container_volume=None, **kwargs):
+def _build_container(container_name, container_type, result_path, container_volume=None, **kwargs):
     # kwargs can be used to pass '--build-arg'
     build_args = []
     for arg in kwargs.values():
@@ -53,12 +55,22 @@ def _build_container(container_name, container_type, container_volume=None, **kw
     cmd += build_args
     cmd += volume
 
-    return _call_command(cmd)
+    logfile = "{}/{}_{}-build.log".format(result_path, TIMESTAMP, container_type)
+    return _call_command(cmd, logfile)
 
 
-def _call_command(cmd):
+def _call_command(cmd, logfile=None):
     print("Command: " + " ".join(cmd))
-    rc = sp.call(cmd)
+
+    if logfile is None:
+        rc = sp.call(cmd)
+    else:
+        # 'tee' like behavior, Kudos: falsetru
+        # https://stackoverflow.com/a/31583238
+        tee = sp.Popen(["tee", logfile], stdin=sp.PIPE)
+        rc = sp.call(cmd, stdout=tee.stdin, stderr=sp.STDOUT)
+        tee.stdin.close()
+
     if rc != 0:
         return False
     else:
@@ -193,7 +205,7 @@ if __name__ == "__main__":
 
     # get full path of git repo in current directory and set var to mount it into the container
     if args.repo == "/wrkdir":
-        # Kudos: Ryne Everett
+        # 'git rev-parse --show-toplevel' via python, Kudos: Ryne Everett
         # https://stackoverflow.com/questions/22081209#comment44778829_22081487
         wrkdir_path = sp.Popen(['git', 'rev-parse', '--show-toplevel'],
                                stdout=sp.PIPE).communicate()[0].rstrip().decode('ascii')
@@ -214,6 +226,10 @@ if __name__ == "__main__":
     print("Running for %d containers:" % len(container_names))
     print("  - " + "\n  - ".join(container_names))
     for container_name in container_names:
+        result_path = "{}/results_{}".format(os.getcwd(), containers[container_name]["name"])
+        if not os.path.exists(result_path):
+            os.mkdir(result_path)
+
         print("\n------ Building Container Image -----")
 
         if not _container_image_exist(container_name, "base") or args.rebuild:
@@ -221,6 +237,7 @@ if __name__ == "__main__":
             if _build_container(
                 container_name,
                 "base",
+                result_path,
                 branch="{}".format(os.environ.get("BRANCH") or args.branch),
                 repo="{}".format(os.environ.get("REPO") or args.repo)
             ):
@@ -237,15 +254,11 @@ if __name__ == "__main__":
                 args.rebuild or \
                 args.rebuild_code:
             print("Container does not exist, building: %s" % containers[container_name]["code"])
-            if not _build_container(container_name, "code"):
+            if not _build_container(container_name, "code", result_path):
                 print("Failed building: %s" % containers[container_name]["code"])
                 break
         else:
             print("Container already exist, skipped building: %s" % containers[container_name]["code"])
-
-        result_path = "{}/results_{}".format(os.getcwd(), containers[container_name]["name"])
-        if not os.path.exists(result_path):
-            os.mkdir(result_path)
 
         volumes = [
             "-v",
@@ -282,7 +295,8 @@ if __name__ == "__main__":
                 "--entrypoint=/bin/bash",
                 containers[container_name]["code"],
             ]
-            sp.call(cmd)
+            logfile = "{}/{}_shell.log".format(result_path, TIMESTAMP)
+            _call_command(cmd, logfile)
         else:
             print("--------- Running Test --------------")
             cmd = [
@@ -298,7 +312,8 @@ if __name__ == "__main__":
             cmd += [
                 containers[container_name]["code"],
             ]
-            if not _call_command(cmd):
+            logfile = "{}/{}_tests.log".format(result_path, TIMESTAMP)
+            if not _call_command(cmd, logfile):
                 failed.append(container_name)
 
     if not args.shell:
