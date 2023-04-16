@@ -127,12 +127,6 @@ def setup_parser():
         help="Run the tests in a venv on a Fedora host",
     )
     parser.add_argument(
-        "--skip-build",
-        dest="skip_build",
-        action="store_false",
-        help="Skip building the container image",
-    )
-    parser.add_argument(
         "--rebuild",
         dest="rebuild",
         action="store_true",
