@@ -1,0 +1,39 @@
+FROM quay.io/fedora/fedora:36-x86_64
+
+LABEL org.opencontainers.image.authors="pagure community"
+LABEL org.opencontainers.image.url="https://pagure.io/pagure"
+LABEL org.opencontainers.image.source="https://pagure.io/pagure/blob/master/f/dev/containers"
+LABEL org.opencontainers.image.documentation="https://docs.pagure.org/pagure/index.html"
+
+ARG specfile=https://pagure.io/pagure/raw/master/f/files/pagure.spec
+
+ENV SPECFILE=$specfile
+
+RUN dnf -y --enablerepo=updates-testing install \
+      python3-setuptools \
+      python3-beautifulsoup4 \
+      python3-coverage \
+      python3-mock \
+      python3-docutils \
+      python3-black \
+      python3-flake8 \
+      python3-pytest-xdist \
+      python3-flask-oidc \
+      python3-cchardet \
+      python3-fedora-messaging \
+      python3-pip \
+      redis \
+      which \
+      git \
+    && dnf clean all
+
+RUN pip install pagure-messages
+
+# Install all the requirements from the spec file and replace the macro
+# %{python_pkgversion} by '3' which thus installs all the py3 version of
+# the dependencies.
+RUN curl ${SPECFILE} -o /pagure.spec \
+    && dnf install -y --enablerepo=updates-testing `grep "Requires:" /pagure.spec | \
+      awk '{split($0, a, " "); print a[2]}' | grep -v "%{name}" | \
+      sed -e "s|%{python_pkgversion}|3|"` \
+    && dnf clean all
