@@ -142,16 +142,16 @@ def setup_parser():
     parser.add_argument(
         "--repo",
         dest="repo",
-        default="https://pagure.io/pagure.git",
-        help="URL of the public repo to use as source, can be overridden using "
-        "the REPO environment variable",
+        default="/wrkdir",
+        help="URL or local path to git repository as source of the public repo to use as source, "
+        "defaults to git repo in current directory, can also be overridden using the REPO environment variable",
     )
     parser.add_argument(
         "--branch",
         dest="branch",
-        default="master",
-        help="Branch of the repo to use as source, can be overridden using "
-        "the BRANCH environment variable",
+        default="wrkdirbranch",
+        help="Branch name to use as source, defaults to the active branch in current directory, "
+        "can also be overridden by using the BRANCH environment variable",
     )
 
     return parser
@@ -190,6 +190,25 @@ if __name__ == "__main__":
     else:
         container_names = ["centos", "fedora", "pip"]
 
+    # get full path of git repo in current directory and set var to mount it into the container
+    if args.repo == "/wrkdir":
+        # Kudos: Ryne Everett
+        # https://stackoverflow.com/questions/22081209#comment44778829_22081487
+        wrkdir_path = sp.Popen(['git', 'rev-parse', '--show-toplevel'],
+                               stdout=sp.PIPE).communicate()[0].rstrip().decode('ascii')
+        mount_wrkdir = True
+    # 'args.repo' will be set as path to mount it into the container and then
+    # overridden with '/wrkdir' to leverage existing logic to use a local path
+    elif 'http://' not in args.repo \
+            and 'https://' not in args.repo:
+        wrkdir_path = args.repo
+        args.repo = "/wrkdir"
+        mount_wrkdir = True
+
+    if args.branch == "wrkdirbranch":
+        args.branch = sp.Popen(['git', 'branch', '--show-current'],
+                               stdout=sp.PIPE).communicate()[0].rstrip().decode('ascii')
+
     failed = []
     print("Running for %d containers:" % len(container_names))
     print("  - " + "\n  - ".join(container_names))
@@ -227,6 +246,25 @@ if __name__ == "__main__":
         if not os.path.exists(result_path):
             os.mkdir(result_path)
 
+        volumes = [
+            "-v",
+            "{}:/results:z".format(result_path)
+        ]
+        if mount_wrkdir:
+            volumes += [
+                "-v",
+                "{}:/wrkdir:z,ro".format(wrkdir_path)
+            ]
+
+        env_vars = [
+            "-e",
+            "BRANCH={}".format(os.environ.get("BRANCH") or args.branch),
+            "-e",
+            "REPO={}".format(os.environ.get("REPO") or args.repo),
+            "-e",
+            "TESTCASE={}".format(args.test_case or ""),
+        ]
+
         if args.shell:
             print("--------- Shelling in the container --------------")
             cmd = [
@@ -235,15 +273,11 @@ if __name__ == "__main__":
                 "-it",
                 "--rm",
                 "--name",
-                containers[container_name]["name"],
-                "-v",
-                "{}/results_{}:/results:z".format(
-                    os.getcwd(), containers[container_name]["name"]
-                ),
-                "-e",
-                "BRANCH={}".format(os.environ.get("BRANCH") or args.branch),
-                "-e",
-                "REPO={}".format(os.environ.get("REPO") or args.repo),
+                containers[container_name]["name"]
+            ]
+            cmd += volumes
+            cmd += env_vars
+            cmd += [
                 "--entrypoint=/bin/bash",
                 containers[container_name]["code"],
             ]
@@ -257,16 +291,10 @@ if __name__ == "__main__":
                 "--rm",
                 "--name",
                 containers[container_name]["name"],
-                "-v",
-                "{}/results_{}:/results:z".format(
-                    os.getcwd(), containers[container_name]["name"]
-                ),
-                "-e",
-                "BRANCH={}".format(os.environ.get("BRANCH") or args.branch),
-                "-e",
-                "REPO={}".format(os.environ.get("REPO") or args.repo),
-                "-e",
-                "TESTCASE={}".format(args.test_case or ""),
+            ]
+            cmd += volumes
+            cmd += env_vars
+            cmd += [
                 containers[container_name]["code"],
             ]
             if not _call_command(cmd):
