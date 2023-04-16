@@ -1,6 +1,6 @@
 #!/bin/bash
 cd / \
-&& git clone -b ${BRANCH} ${REPO} /pagure \
+&& GIT_TRACE=1 GIT_CURL_VERBOSE=1 git clone -b ${BRANCH} ${REPO} /pagure \
 && cp /tox_py3.sh /pagure/dev/containers/tox_py3.sh \
 && chmod +x /pagure/dev/containers/tox_py3.sh \
 && ln -s /tox /pagure/.tox \
