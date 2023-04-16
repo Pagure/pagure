@@ -21,8 +21,9 @@ def _container_image_exist(container_name, container_type):
 
 
 # fmt: off
-def _build_container(container_name, container_type, result_path, container_volume=None, **kwargs):
-# fmt: on
+def _build_container(container_name, container_type, result_path,
+                     container_volume=None, **kwargs):
+    # fmt: on
     # kwargs can be used to pass '--build-arg'
     build_args = []
     for arg in kwargs.values():
@@ -148,15 +149,18 @@ def setup_parser():
         "--repo",
         dest="repo",
         default="/wrkdir",
-        help="URL or local path to git repository as source of the public repo to use as source, "
-        "defaults to git repo in current directory, can also be overridden using the REPO environment variable",
+        help="URL or local path to git repository as source of the "
+             "public repo to use as source, defaults to git repo in "
+             "current directory, can also be overridden using the "
+             "REPO environment variable",
     )
     parser.add_argument(
         "--branch",
         dest="branch",
         default="wrkdirbranch",
-        help="Branch name to use as source, defaults to the active branch in current directory, "
-        "can also be overridden by using the BRANCH environment variable",
+        help="Branch name to use as source, defaults to the active "
+             "branch in current directory, can also be overridden by "
+             "using the BRANCH environment variable",
     )
 
     return parser
@@ -195,7 +199,8 @@ if __name__ == "__main__":
     else:
         container_names = ["centos", "fedora", "pip"]
 
-    # get full path of git repo in current directory and set var to mount it into the container
+    # get full path of git repo in current directory
+    # and set var to mount it into the container
     if args.repo == "/wrkdir":
         # 'git rev-parse --show-toplevel' via python, Kudos: Ryne Everett
         # https://stackoverflow.com/questions/22081209#comment44778829_22081487
