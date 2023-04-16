@@ -41,6 +41,7 @@ def _build_container(container_name, container_type, container_volume=None, **kw
     cmd = [
         "podman",
         "build",
+        "--no-cache",
         "--rm",
         "-t",
         container_name,
