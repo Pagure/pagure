@@ -8,6 +8,62 @@ import subprocess as sp
 ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
 
+def _container_image_exist(container_name, container_type):
+    cmd = [
+        "podman",
+        "image",
+        "exists",
+        containers[container_name][container_type]
+    ]
+    return _call_command(cmd)
+
+
+def _build_container(container_name, container_type, container_volume=None, **kwargs):
+    # kwargs can be used to pass '--build-arg'
+    build_args = []
+    for arg in kwargs.values():
+        build_args.append("--build-arg")
+        build_args.append(arg)
+
+    volume = []
+    if container_volume:
+        volume.append("-v")
+        volume.append(volume)
+
+    container_file = ""
+    if container_type == "base":
+        container_file = containers[container_name]["base"]
+        container_name = container_file
+    if container_type == "code":
+        container_file = containers[container_name]["code"]
+        container_name = container_file
+
+    cmd = [
+        "podman",
+        "build",
+        "--rm",
+        "-t",
+        container_name,
+        "-f",
+        ROOT + "/dev/containers/%s" % container_file,
+        ROOT + "/dev/containers",
+    ]
+
+    cmd += build_args
+    cmd += volume
+
+    return _call_command(cmd)
+
+
+def _call_command(cmd):
+    print("Command: " + " ".join(cmd))
+    rc = sp.call(cmd)
+    if rc != 0:
+        return False
+    else:
+        return True
+
+
 def setup_parser():
     """ Setup the cli arguments """
     parser = argparse.ArgumentParser(prog="pagure-test")
@@ -34,6 +90,18 @@ def setup_parser():
         dest="skip_build",
         action="store_false",
         help="Skip building the container image",
+    )
+    parser.add_argument(
+        "--rebuild",
+        dest="rebuild",
+        action="store_true",
+        help="Enforce rebuild of container images",
+    )
+    parser.add_argument(
+        "--rebuild-code",
+        dest="rebuild_code",
+        action="store_true",
+        help="Enforce rebuild of code container images only",
     )
     parser.add_argument(
         "--shell",
@@ -65,90 +133,103 @@ if __name__ == "__main__":
     parser = setup_parser()
     args = parser.parse_args()
 
-    if args.centos is True:
-        container_names = ["pagure-c8s-rpms-py3"]
-        container_files = ["centos8-rpms-py3"]
-    elif args.fedora is True:
-        container_names = ["pagure-fedora-rpms-py3"]
-        container_files = ["fedora-rpms-py3"]
-    elif args.pip is True:
-        container_names = ["pagure-fedora-pip-py3"]
-        container_files = ["fedora-pip-py3"]
+    containers = {
+        "centos": {
+            "name": "pagure-tests-centos-stream8-rpms-py3",
+            "base": "base-centos-stream8-rpms-py3",
+            "code": "code-centos-stream8-rpms-py3"
+        },
+        "fedora": {
+            "name": "pagure-tests-fedora-rpms-py3",
+            "base": "base-fedora-rpms-py3",
+            "code": "code-fedora-rpms-py3"
+        },
+        "pip": {
+            "name": "pagure-tests-fedora-pip-py3",
+            "base": "base-fedora-pip-py3",
+            "code": "code-fedora-pip-py3"
+        }
+    }
+
+    if args.centos:
+        container_names = ["centos"]
+    elif args.fedora:
+        container_names = ["fedora"]
+    elif args.pip:
+        container_names = ["pip"]
     else:
-        container_names = [
-            "pagure-fedora-rpms-py3",
-            "pagure-c8s-rpms-py3",
-            "pagure-fedora-pip-py3",
-        ]
-        container_files = [
-            "fedora-rpms-py3",
-            "centos8-rpms-py3",
-            "fedora-pip-py3",
-        ]
+        container_names = ["centos", "fedora", "pip"]
 
     failed = []
-    print("Running for {} containers:".format(len(container_names)))
+    print("Running for %d containers:" % len(container_names))
     print("  - " + "\n  - ".join(container_names))
-    for idx, container_name in enumerate(container_names):
-        if args.skip_build is not False:
-            print("------ Building Container Image -----")
-            cmd = [
-                "podman",
-                "build",
-                "--build-arg",
-                "branch={}".format(os.environ.get("BRANCH") or args.branch),
-                "--build-arg",
-                "repo={}".format(os.environ.get("REPO") or args.repo),
-                "--rm",
-                "-t",
-                container_name,
-                "-f",
-                ROOT + "/dev/containers/%s" % container_files[idx],
-                ROOT + "/dev/containers",
-            ]
-            print(" ".join(cmd))
-            output_code = sp.call(cmd)
-            if output_code:
-                print("Failed building: %s", container_name)
-                break
+    for container_name in container_names:
+        print("\n------ Building Container Image -----")
 
-        result_path = "{}/results_{}".format(os.getcwd(), container_files[idx])
+        if not _container_image_exist(container_name, "base") or args.rebuild:
+            print("Container does not exist, building: %s" % containers[container_name]["base"])
+            if _build_container(
+                container_name,
+                "base",
+                branch="{}".format(os.environ.get("BRANCH") or args.branch),
+                repo="{}".format(os.environ.get("REPO") or args.repo)
+            ):
+                base_build = True
+            else:
+                print("Failed building: %s" % containers[container_name]["base"])
+                break
+        else:
+            base_build = False
+            print("Container already exist, skipped building: %s" % containers[container_name]["base"])
+
+        if not _container_image_exist(container_name, "code") or \
+                base_build or \
+                args.rebuild or \
+                args.rebuild_code:
+            print("Container does not exist, building: %s" % containers[container_name]["code"])
+            if not _build_container(container_name, "code"):
+                print("Failed building: %s" % containers[container_name]["code"])
+                break
+        else:
+            print("Container already exist, skipped building: %s" % containers[container_name]["code"])
+
+        result_path = "{}/results_{}".format(os.getcwd(), containers[container_name]["name"])
         if not os.path.exists(result_path):
             os.mkdir(result_path)
 
         if args.shell:
             print("--------- Shelling in the container --------------")
-            command = [
+            cmd = [
                 "podman",
                 "run",
                 "-it",
                 "--rm",
                 "--name",
-                container_name,
+                containers[container_name]["name"],
                 "-v",
-                "{}/results_{}:/pagure/results:z".format(
-                    os.getcwd(), container_files[idx]
+                "{}/results_{}:/results:z".format(
+                    os.getcwd(), containers[container_name]["name"]
                 ),
                 "-e",
                 "BRANCH={}".format(os.environ.get("BRANCH") or args.branch),
                 "-e",
                 "REPO={}".format(os.environ.get("REPO") or args.repo),
                 "--entrypoint=/bin/bash",
-                container_name,
+                containers[container_name]["code"],
             ]
-            sp.call(command)
+            sp.call(cmd)
         else:
             print("--------- Running Test --------------")
-            command = [
+            cmd = [
                 "podman",
                 "run",
                 "-it",
                 "--rm",
                 "--name",
-                container_name,
+                containers[container_name]["name"],
                 "-v",
-                "{}/results_{}:/pagure/results:z".format(
-                    os.getcwd(), container_files[idx]
+                "{}/results_{}:/results:z".format(
+                    os.getcwd(), containers[container_name]["name"]
                 ),
                 "-e",
                 "BRANCH={}".format(os.environ.get("BRANCH") or args.branch),
@@ -156,10 +237,9 @@ if __name__ == "__main__":
                 "REPO={}".format(os.environ.get("REPO") or args.repo),
                 "-e",
                 "TESTCASE={}".format(args.test_case or ""),
-                container_name,
+                containers[container_name]["code"],
             ]
-            output_code = sp.call(command)
-            if output_code:
+            if not _call_command(cmd):
                 failed.append(container_name)
 
     if not args.shell:
