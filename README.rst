@@ -125,7 +125,7 @@ with the ``LOGGING`` parameter.
 Running the unit-tests in container
 ***********************************
 
-To run the unit-tests, there are container available with all the dependencies needed.
+To run the unit-tests, there are containers available with all the dependencies needed.
 
 First you will need to have podman and git installed on your workstation. ::
 
