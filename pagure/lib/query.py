@@ -4659,12 +4659,12 @@ def get_pull_request_of_user(
         query = query.filter(model.PullRequest.date_created <= created_until)
 
     if updated_since:
-        query = query.filter(model.PullRequest.updated_on <= updated_since)
+        query = query.filter(model.PullRequest.updated_on >= updated_since)
     if updated_until:
         query = query.filter(model.PullRequest.updated_on <= updated_until)
 
     if closed_since:
-        query = query.filter(model.PullRequest.closed_at <= closed_since)
+        query = query.filter(model.PullRequest.closed_at >= closed_since)
     if closed_until:
         query = query.filter(model.PullRequest.closed_at <= closed_until)
 

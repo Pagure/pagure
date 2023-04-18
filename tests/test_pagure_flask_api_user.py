@@ -1214,7 +1214,7 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         )
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
-        self.assertEqual(len(data["requests"]), 0)
+        self.assertEqual(len(data["requests"]), 6)
 
         yesterday = today - datetime.timedelta(days=1)
         output = self.app.get(
@@ -1223,7 +1223,7 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         )
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
-        self.assertEqual(len(data["requests"]), 0)
+        self.assertEqual(len(data["requests"]), 6)
 
         tomorrow = today + datetime.timedelta(days=1)
         output = self.app.get(
@@ -1232,7 +1232,7 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         )
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
-        self.assertEqual(len(data["requests"]), 6)
+        self.assertEqual(len(data["requests"]), 0)
 
     @patch("pagure.lib.notify.send_email")
     def test_api_view_user_requests_filed_closed(self, mockemail):
@@ -1598,7 +1598,7 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         )
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
-        self.assertEqual(len(data["requests"]), 0)
+        self.assertEqual(len(data["requests"]), 6)
 
         yesterday = today - datetime.timedelta(days=1)
         output = self.app.get(
@@ -1607,7 +1607,7 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         )
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
-        self.assertEqual(len(data["requests"]), 0)
+        self.assertEqual(len(data["requests"]), 6)
 
         tomorrow = today + datetime.timedelta(days=1)
         output = self.app.get(
@@ -1616,7 +1616,7 @@ class PagureFlaskApiUsertestrequests(tests.Modeltests):
         )
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
-        self.assertEqual(len(data["requests"]), 6)
+        self.assertEqual(len(data["requests"]), 0)
 
     @patch("pagure.lib.notify.send_email")
     def test_api_view_user_requests_actionable_closed(self, mockemail):
