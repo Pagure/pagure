@@ -440,6 +440,30 @@ def _parser_delete_project(subparser):
     local_parser.set_defaults(func=do_delete_project)
 
 
+def _parser_sanitize_spam_user(subparser):
+    """Set up the CLI argument parser for the delete-user-activity action.
+
+    :arg subparser: an argparse subparser allowing to have action's specific
+        arguments
+
+    """
+    local_parser = subparser.add_parser(
+        "sanitize-spam-user",
+        help="Delete repos and tickets by the user specified",
+    )
+
+    local_parser.add_argument(
+        "user",
+        help="Username of the spam user to sanitize",
+    )
+    local_parser.add_argument(
+        "action_user",
+        help="Username of the admin user doing the action (ie: deleting the "
+        "users activity)",
+    )
+    local_parser.set_defaults(func=do_sanitize_spam_user)
+
+
 def _parser_create_branch(subparser):
     """Set up the CLI argument parser for the create-branch action.
 
@@ -578,6 +602,9 @@ def parse_arguments(args=None):
 
     # delete-project
     _parser_delete_project(subparser)
+
+    # delete-all-user-acitvity
+    _parser_sanitize_spam_user(subparser)
 
     # create-branch
     _parser_create_branch(subparser)
@@ -923,6 +950,156 @@ def do_delete_project(args):
     )
     session.commit()
     print("Project deleted")
+
+
+def do_sanitize_spam_user(args):
+    """Block and remove activity by a spam user
+
+    :arg args: the argparse object returned by ``parse_arguments()``.
+
+    """
+    _log.debug("user:          %s", args.user)
+    _log.debug("user deleting: %s", args.action_user)
+
+    # Validate users
+    user = pagure.lib.query.get_user(session, args.user)
+    action_user = pagure.lib.query.get_user(session, args.action_user)
+
+    projects = (
+        session.query(pagure.lib.model.Project).filter(
+            pagure.lib.model.Project.user_id == user.id
+        )
+    ).all()
+
+    issues = (
+        session.query(pagure.lib.model.Issue).filter(
+            pagure.lib.model.Issue.user_id == user.id
+        )
+    ).all()
+
+    comments = (
+        session.query(pagure.lib.model.IssueComment).filter(
+            pagure.lib.model.IssueComment.user_id == user.id
+        )
+    ).all()
+
+    prs = (
+        session.query(pagure.lib.model.PullRequest).filter(
+            pagure.lib.model.PullRequest.user_id == user.id
+        )
+    ).all()
+
+    prcomments = (
+        session.query(pagure.lib.model.PullRequestComment).filter(
+            pagure.lib.model.PullRequestComment.user_id == user.id
+        )
+    ).all()
+
+    groups = (
+        session.query(pagure.lib.model.PagureGroup).filter(
+            pagure.lib.model.PagureGroup.user_id == user.id
+        )
+    ).all()
+
+    blocked = bool(
+        pagure.lib.query.get_blocked_users(
+            session, username=user.user, date=None
+        )
+    )
+
+    print("# Projects")
+    if projects:
+        for project in projects:
+            print(f"* {project.full_url}")
+    else:
+        print("    ***User has no Projects***")
+
+    print("# Issues")
+    if issues:
+        for issue in issues:
+            print(f"* {issue.full_url}")
+    else:
+        print("    ***User has no Issues***")
+
+    print("# Blocked Status")
+    if blocked:
+        print("    ***User is already blocked***")
+    else:
+        print("    User is NOT blocked on pagure")
+
+    if issues or projects or not blocked:
+        print("\nAre you sure you want to:")
+        if projects:
+            print(f"* DELETE {len(projects)} projects")
+        if issues:
+            print(f"* DELETE {len(issues)} issues")
+        if not blocked:
+            print(f"* BLOCK {user.user} on pagure until 2099-01-01")
+
+        if not _ask_confirmation():
+            return
+
+        if issues:
+            for issue in issues:
+                print(f"DELETING ISSUE: {issue.full_url}")
+                pagure.lib.query.drop_issue(
+                    session,
+                    issue=issue,
+                    user=action_user.user,
+                )
+                session.commit()
+
+        if projects:
+            for project in projects:
+                print(f"DELETING PROJECT: {project.full_url}")
+                pagure.lib.tasks.delete_project(
+                    namespace=project.namespace,
+                    name=project.name,
+                    user=project.user.user if project.is_fork else None,
+                    action_user=action_user.user,
+                )
+                session.commit()
+
+        if not blocked:
+            # block the user
+            print(f"BLOCKING USER: {user.user} until 2099-01-01")
+            date = arrow.get("2099-01-01", "YYYY-MM-DD").replace(tzinfo="UTC")
+            user.refuse_sessions_before = date.datetime
+            session.add(user)
+            session.commit()
+
+    print(
+        f"\n\n# Other Activity by {user.user} that needs to be removed manually:"
+    )
+
+    print("## Issue Comments")
+    if comments:
+        for comment in comments:
+            print(f"* {comment.issue.full_url}#comment-{comment.id}")
+    else:
+        print("    ***User has no Issue Comments***")
+    print("## Pull Requests")
+    if prs:
+        for pr in prs:
+            print(f"* {pr.full_url}")
+    else:
+        print("    ***User has no Pull Requests***")
+
+    print("## Pull Request Comments")
+    if prcomments:
+        for prcomment in prcomments:
+            print(
+                f"* {prcomment.pull_request.full_url}#comment-{prcomment.id}"
+            )
+    else:
+        print("    ***User has no Pull Request Comments***")
+
+    print("## Groups Created by the User")
+    if groups:
+        for group in groups:
+            print(f"* {group.full_url}")
+    else:
+        print("    ***User has not created any Groups***")
 
 
 def do_update_acls(args):
