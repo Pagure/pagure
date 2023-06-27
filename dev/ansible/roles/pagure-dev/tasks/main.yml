@@ -18,6 +18,7 @@
       - vim-enhanced
       - python3-pip
       - httpd
+      - acl
     state: present
 
 - name: Install Pagure development packages
@@ -62,13 +63,13 @@
 
 - name: Create the folder where we'll place the symbolic link for pagure
   file:
-    path: /usr/local/lib/python3.9/site-packages/
+    path: /usr/lib/python3.11/site-packages/
     state: directory
 
 - name: Create symbolic link for pagure to be in the python path
   file:
     src: /srv/pagure/pagure
-    dest: /usr/local/lib/python3.9/site-packages/pagure
+    dest: /usr/lib/python3.11/site-packages/pagure
     state: link
 
 - name: Create symbolic link for python to be py3 by default
