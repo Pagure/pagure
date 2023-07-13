@@ -1,7 +1,7 @@
 Cron Jobs
 =========
 
-Some actions in pagure are meant to the run via a cron job.
+Some actions in Pagure are meant to the run via a cron job.
 
 
 API key expiration reminder

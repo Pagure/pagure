@@ -1,7 +1,7 @@
 Contributing
 ============
 
-If you're submitting patches to pagure, please observe the following:
+If you're submitting patches to Pagure, please observe the following:
 
 - Check that your python code is `PEP8-compliant
   <http://www.python.org/dev/peps/pep-0008/>`_.  There is a `flake8 tool

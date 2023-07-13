@@ -15,7 +15,7 @@ given that he had at least commit access, until the read only mode is over.
 
 In Pagure, we use gitolite for Access Control Lists when using SSH.
 Modifying gitolite may be a time taking task (depending on number of projects
-hosted on the pagure instance) that's why Pagure does it outside of HTTP
+hosted on the Pagure instance) that's why Pagure does it outside of HTTP
 Request-Response Cycle.
 
 Whenever you fork a project or add/remove a new user/group to project,

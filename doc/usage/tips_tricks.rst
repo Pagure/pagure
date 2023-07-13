@@ -1,7 +1,7 @@
 Tips and tricks
 ===============
 
-This page contains some tips and tricks on how to use pagure. These do not
+This page contains some tips and tricks on how to use Pagure. These do not
 fit in their own page but are worth mentioning.
 
 Place image onto your overview page
@@ -21,7 +21,7 @@ Text in the square brackets will be used as an alt description.
 Pre-fill issue using the URL
 ----------------------------
 
-When creating issues for a project pagure supports pre-filling the title
+When creating issues for a project Pagure supports pre-filling the title
 and description input text using URL parameters.
 
 Example:
@@ -35,7 +35,7 @@ with Title set to <Issue> and Description set to <Issue Content>.
 Pre-fill issue template using the URL
 -------------------------------------
 
-When creating issues for a project pagure supports pre-filling the title
+When creating issues for a project Pagure supports pre-filling the title
 and description input text using URL parameters.
 
 Example:
@@ -50,8 +50,8 @@ TemplateName should be the name of the template file on disk (in the
 Filter for issues *not* having a certain tag
 --------------------------------------------
 
-Very much in the same way pagure allows you to filter for issues having a
-certain tag, pagure allows one to filter for issues *not* having a certain tag.
+Very much in the same way Pagure allows you to filter for issues having a
+certain tag, Pagure allows one to filter for issues *not* having a certain tag.
 To do this, simply prepend a ``!`` in front of the tag.
 
 Example:

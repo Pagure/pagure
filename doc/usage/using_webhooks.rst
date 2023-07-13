@@ -2,7 +2,7 @@ Using web-hooks
 ===============
 
 Web-hooks are a notification system that could be compared to a callback.
-Basically, pagure will make a HTTP POST request to one or more third party
+Basically, Pagure will make a HTTP POST request to one or more third party
 server/application with information about what is or just happened.
 
 Activating web-hooks notifications
@@ -18,15 +18,15 @@ on this project: new issue, new pull-request, new comments, new commits...
 
 .. note:: The notifications sent via web-hooks have the same payload as the
     notifications sent via `fedmsg <https://fedmsg.readthedocs.io/en/latest/>`_.
-    Therefore, the list of pagure topics as well as example messages can be
-    found in the `fedmsg documentation about pagure
+    Therefore, the list of Pagure topics as well as example messages can be
+    found in the `fedmsg documentation about Pagure
     <https://fedora-fedmsg.readthedocs.io/en/latest/topics.html#id550>`_
 
 Authenticating the notifications
 --------------------------------
 
 There is, in the settings page, a web-hook key which is used by the
-server (here pagure) to sign the message sent and which you can use to
+server (here Pagure) to sign the message sent and which you can use to
 ensure the notifications received are coming from the right source.
 
 Each POST request made contains some specific headers:
@@ -39,15 +39,15 @@ Each POST request made contains some specific headers:
     X-Pagure-Signature-256
     X-Pagure-Topic
 
-``X-Pagure`` contains URL of the pagure instance sending this notification.
+``X-Pagure`` contains URL of the Pagure instance sending this notification.
 
-``X-Pagure-Project`` contains the name of the project on that pagure instance.
+``X-Pagure-Project`` contains the name of the project on that Pagure instance.
 
 ``X-Pagure-Signature`` contains the signature of the message allowing to
-check that the message comes from pagure.
+check that the message comes from Pagure.
 
 ``X-Pagure-Signature-256`` contains the SHA-256 signature of the message
-allowing to check that the message comes from pagure.
+allowing to check that the message comes from Pagure.
 
 .. note:: These headers are present to allow you to verify that the webhook
         was actually sent by the correct Pagure instance. These are not

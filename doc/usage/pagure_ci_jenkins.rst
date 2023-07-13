@@ -2,7 +2,7 @@ Jenkins with Pagure-ci
 ======================
 
 Jenkins is a Continuous Integration service that can be configured to be
-integrated with pagure.
+integrated with Pagure.
 
 This document describe the steps needed to make it work.
 
@@ -11,17 +11,17 @@ How does it work?
 
 The principal is:
 
-* pagure will trigger a build on jenkins when a pull-request is created,
-  updated or when someone explicitly asks pagure to do so or when a new commit
+* Pagure will trigger a build on jenkins when a pull-request is created,
+  updated or when someone explicitly asks Pagure to do so or when a new commit
   is pushed (if pagure-ci is configured to trigger on commit).
 
-* pagure will send a few information to jenkins when triggering a build:
+* Pagure will send a few information to jenkins when triggering a build:
   ``REPO``, ``BRANCH``, ``BRANCH_TO``, ``cause``.
 
-* jenkins will do its work and, using webhook, report to pagure that it has
+* jenkins will do its work and, using webhook, report to Pagure that it has
   finished its task
 
-* pagure will query jenkins to know the outcome of the task and flag the PR
+* Pagure will query jenkins to know the outcome of the task and flag the PR
   accordingly
 
 ``REPO`` corresponds to the url of the repository the pull-request originates
@@ -87,7 +87,7 @@ Configure your project on Jenkins
     FORMAT: JSON
     PROTOCOL: HTTP
     EVENT: All Events
-    URL: <The URL provided in the Pagure CI hook on pagure>
+    URL: <The URL provided in the Pagure CI hook on Pagure>
     TIMEOUT: 3000
     LOG: 1
 
@@ -95,10 +95,10 @@ Configure your project on Jenkins
 
 * Add two `String Parameters` named REPO and BRANCH
 
-* Source Code Management select Git  and give the URL of the pagure project
+* Source Code Management select Git  and give the URL of the Pagure project
 
 * Under Build Trigger click on Trigger build remotely and specify the token
-  given by pagure.
+  given by Pagure.
 
 * Under Build -> Add build step -> Execute Shell
 

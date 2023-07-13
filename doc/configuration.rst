@@ -5,7 +5,7 @@ Pagure offers a wide varieties of options that must or can be used to
 adjust its behavior.
 
 All of these options can be edited or added to your configuration file.
-If you have installed pagure, this configuration file is likely located in
+If you have installed Pagure, this configuration file is likely located in
 ``/etc/pagure/pagure.cfg``. Otherwise, it will depend on your
 setup/deployment.
 
@@ -13,7 +13,7 @@ setup/deployment.
 Must options
 ------------
 
-Here are the options you must set up in order to get pagure running.
+Here are the options you must set up in order to get Pagure running.
 
 
 SECRET_KEY
@@ -53,7 +53,7 @@ Defaults to ``sqlite:////var/tmp/pagure_dev.sqlite``
 APP_URL
 ~~~~~~~
 
-This configuration key indicates the URL at which this pagure instance will be made available.
+This configuration key indicates the URL at which this Pagure instance will be made available.
 
 Defaults to: ``http://localhost.localdomain/``
 
@@ -72,7 +72,7 @@ GIT_URL_SSH
 ~~~~~~~~~~~
 
 This configuration key provides the information to the user on how to clone
-the git repos hosted on pagure via `SSH <https://en.wikipedia.org/wiki/Secure_Shell>`_.
+the git repos hosted on Pagure via `SSH <https://en.wikipedia.org/wiki/Secure_Shell>`_.
 
 The URL should end with a slash ``/``.
 
@@ -90,7 +90,7 @@ GIT_URL_GIT
 ~~~~~~~~~~~
 
 This configuration key provides the information to the user on how to clone
-the git repos hosted on pagure anonymously. This access can be granted via
+the git repos hosted on Pagure anonymously. This access can be granted via
 the ``git://`` or ``http(s)://`` protocols.
 
 The URL should end with a slash ``/``.
@@ -114,7 +114,7 @@ Defaults to: ``"redis://%s:%d/%d" % (pagure_config["REDIS_HOST"], pagure_config[
 Repo Directories
 ----------------
 
-Each project in pagure has 2 to 4 git repositories, depending on configuration
+Each project in Pagure has 2 to 4 git repositories, depending on configuration
 of the Pagure instance (see below):
 
 - the main repo for the code
@@ -124,7 +124,7 @@ of the Pagure instance (see below):
 
 There are then another 3 folders: one for specifying the locations of the forks, one
 for the remote git repo used for the remotes pull-requests (ie: those coming from
-a project not hosted on this instance of pagure), and one for user-uploaded tarballs.
+a project not hosted on this instance of Pagure), and one for user-uploaded tarballs.
 
 
 GIT_FOLDER
@@ -149,8 +149,8 @@ REMOTE_GIT_FOLDER
 ~~~~~~~~~~~~~~~~~
 
 This configuration key points to the folder where the remote git repos (ie:
-not hosted on pagure) that someone used to open a pull-request against a
-project hosted on pagure are stored.
+not hosted on Pagure) that someone used to open a pull-request against a
+project hosted on Pagure are stored.
 
 
 UPLOAD_FOLDER_PATH
@@ -213,7 +213,7 @@ or MongoDB for storing shared session keys.
 FROM_EMAIL
 ~~~~~~~~~~
 
-This configuration key specifies the email address used by this pagure instance
+This configuration key specifies the email address used by this Pagure instance
 when sending emails (notifications).
 
 Defaults to: ``pagure@localhost.localdomain``
@@ -222,7 +222,7 @@ Defaults to: ``pagure@localhost.localdomain``
 DOMAIN_EMAIL_NOTIFICATIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This configuration key specifies the domain used by this pagure instance
+This configuration key specifies the domain used by this Pagure instance
 when sending emails (notifications). More precisely, it is used
 when building the ``msg-id`` header of the emails sent.
 
@@ -247,11 +247,11 @@ Git auth backends can either be static (like gitolite), where a file is
 generated when something changed and then used on login, or dynamic,
 where the actual ACLs are checked in a git hook before being applied.
 
-By default pagure provides the following backends:
+By default Pagure provides the following backends:
 
 - `test_auth`: simple debugging backend printing and returning the string ``Called GitAuthTestHelper.generate_acls()``
-- `gitolite2`: allows deploying pagure on the top of gitolite 2
-- `gitolite3`: allows deploying pagure on the top of gitolite 3
+- `gitolite2`: allows deploying Pagure on the top of gitolite 2
+- `gitolite3`: allows deploying Pagure on the top of gitolite 3
 - `pagure`: Pagure git auth implementation (using keyhelper.py and aclchecker.py) that is used via sshd AuthorizedKeysCommand
 - `pagure_authorized_keys`: Pagure git auth implementation that writes to authorized_keys file
 
@@ -384,21 +384,21 @@ GITOLITE_KEYDIR
 This configuration key points to the folder where gitolite stores and accesses
 the public SSH keys of all the user have access to the server.
 
-Since pagure is the user interface, it is pagure that writes down the files
+Since Pagure is the user interface, it is Pagure that writes down the files
 in this directory, effectively setting up the users to be able to use gitolite.
 
 
 GITOLITE_CONFIG
 ^^^^^^^^^^^^^^^
 
-This configuration key points to the gitolite.conf file where pagure writes
+This configuration key points to the gitolite.conf file where Pagure writes
 the gitolite repository access configuration.
 
 
 GITOLITE_CELERY_QUEUE
 ^^^^^^^^^^^^^^^^^^^^^
 
-This configuration is useful for large pagure deployment where recompiling
+This configuration is useful for large Pagure deployment where recompiling
 the gitolite config file can take a long time. By default the compilation
 of gitolite's configuration file is done by the pagure_worker, which spawns
 by default 4 concurrent workers. If it takes a while to recompile the
@@ -478,7 +478,7 @@ EVENTSOURCE_SOURCE
 ~~~~~~~~~~~~~~~~~~
 
 This configuration key indicates the URL at which the EventSource server is
-available. If not defined, pagure will behave as if there are no EventSource
+available. If not defined, Pagure will behave as if there are no EventSource
 server running.
 
 
@@ -499,7 +499,7 @@ WEBHOOK
 ~~~~~~~
 
 This configuration key allows turning on or off web-hooks notifications for
-this pagure instance.
+this Pagure instance.
 
 Defaults to: ``False``.
 
@@ -555,7 +555,7 @@ PAGURE_ADMIN_USERS
 
 List of local users that are the site admins. These admins have the same rights as
 the users in the admin groups listed above as well as admin rights to
-all projects hosted on this pagure instance.
+all projects hosted on this Pagure instance.
 
 
 Celery Queue options
@@ -663,7 +663,7 @@ ALWAYS_STOMP_ON_COMMITS
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 This configuration key can be used to enforce `stomp <https://stomp.github.io/>`_
-notifications on commits made on all projects in a pagure instance.
+notifications on commits made on all projects in a Pagure instance.
 
 Defaults to: ``False``.
 
@@ -729,8 +729,8 @@ For more information about theming see the :doc:`usage/theming`
 
 Default options:
 
-- ``chameleon``  The OpenSUSE theme for pagure
-- ``default``  The default theme for pagure
+- ``chameleon``  The OpenSUSE theme for Pagure
+- ``default``  The default theme for Pagure
 - ``pagureio``  The theme used at https://pagure.io
 - ``srcfpo``  The theme used at https://src.fedoraproject.org
 
@@ -797,7 +797,7 @@ Defaults to:
         "style-src 'self' 'nonce-{nonce}'"
     )
 
-Where ``{nonce}`` is dynamically set by pagure.
+Where ``{nonce}`` is dynamically set by Pagure.
 
 
 LOGGING_GIT_HOOKS
@@ -906,7 +906,7 @@ The default value is:
 
 .. note:: as you can see there is an ``email`` handler defined. It's not used
     anywhere by default but you can use it to get report of errors by email
-    and thus monitor your pagure instance.
+    and thus monitor your Pagure instance.
     To do this the easiest is to set, on the ``root`` logger:
     ::
 
@@ -930,7 +930,7 @@ The default value is:
 
     This snippet will automatically make the logs rotate at midnight each day,
     keep the logs for 10 days and use UTC as timezone for the logs. Depending on
-    how your pagure instance is set-up, you may have to tweak the filesystem
+    how your Pagure instance is set-up, you may have to tweak the filesystem
     permissions on the folder and file so the rotation works properly.
 
 
@@ -960,9 +960,9 @@ Defaults to: ``False``.
 SSH_ACCESS_GROUPS
 ~~~~~~~~~~~~~~~~~
 
-Some instances of pagure are deployed in such a way that only the members of
+Some instances of Pagure are deployed in such a way that only the members of
 certain groups are allowed to commit via ssh. This configuration key allows
-to specify which groups have commit access and thus let pagure hide the ssh
+to specify which groups have commit access and thus let Pagure hide the ssh
 URL from the drop-down "Clone" menu for all the person who are not in one of
 these groups.
 If this configuration key is not defined or left empty, it is assume that there
@@ -1011,7 +1011,7 @@ Defaults to: ``False``
 SMTP_STARTTLS
 ^^^^^^^^^^^^^
 
-This configuration key specifies instructs pagure to starts connecting to
+This configuration key specifies instructs Pagure to starts connecting to
 the SMTP server via a `starttls` command.
 
 When enabling STARTTLS in conjunction with a local smtp server, you should
@@ -1116,7 +1116,7 @@ Valid options are ``fas``, ``openid``, ``oidc``, or ``local``.
 * ``oidc`` enables OpenID Connect using any provider.  This provider requires
   the configuration options starting with ``OIDC_`` (see below) to be provided.
 
-* ``local`` causes pagure to use the local pagure database for user management.
+* ``local`` causes Pagure to use the local Pagure database for user management.
   User registration can be disabled with the ALLOW_USER_REGISTRATION configuration key.
 
 Defaults to: ``local``.
@@ -1208,7 +1208,7 @@ MAX_CONTENT_LENGTH
 ~~~~~~~~~~~~~~~~~~
 
 This configuration key specifies the maximum file size allowed when
-uploading content to pagure (for example, screenshots to a ticket).
+uploading content to Pagure (for example, screenshots to a ticket).
 
 Defaults to: ``4 * 1024 * 1024`` which corresponds to 4 megabytes.
 
@@ -1217,7 +1217,7 @@ ENABLE_TICKETS
 ~~~~~~~~~~~~~~
 
 This configuration key activates or deactivates the ticketing system
-for all the projects hosted on this pagure instance.
+for all the projects hosted on this Pagure instance.
 
 Defaults to: ``True``
 
@@ -1227,7 +1227,7 @@ ENABLE_TICKETS_NAMESPACE
 
 This configuration key can be used to restrict the namespace in which the ticketing
 system is enabled.
-So if your pagure instance has ``ENABLE_TICKETS`` as ``True`` and sets
+So if your Pagure instance has ``ENABLE_TICKETS`` as ``True`` and sets
 ``ENABLE_TICKETS_NAMESPACE`` to ``['tests', 'infra']`` only the projects opened
 in these two namespaces will have the ticketing system enabled. All the other
 namespaces will not.
@@ -1240,7 +1240,7 @@ ENABLE_DOCS
 ~~~~~~~~~~~
 
 This configuration key activates or deactivates creation of git repos
-for documentation for all the projects hosted on this pagure instance.
+for documentation for all the projects hosted on this Pagure instance.
 
 Defaults to: ``True``
 
@@ -1249,7 +1249,7 @@ ENABLE_NEW_PROJECTS
 ~~~~~~~~~~~~~~~~~~~
 
 This configuration key permits or forbids creation of new projects via
-the user interface and the API of this pagure instance.
+the user interface and the API of this Pagure instance.
 
 Defaults to: ``True``
 
@@ -1258,7 +1258,7 @@ ENABLE_UI_NEW_PROJECTS
 ~~~~~~~~~~~~~~~~~~~~~~
 
 This configuration key permits or forbids creation of new projects via
-the user interface (only) of this pagure instance. It allows forbidding
+the user interface (only) of this Pagure instance. It allows forbidding
 to create new project in the user interface while letting a set of trusted
 person to create projects via the API granted they have the API token with
 the corresponding ACL.
@@ -1270,7 +1270,7 @@ ENABLE_DEL_PROJECTS
 ~~~~~~~~~~~~~~~~~~~
 
 This configuration key permits or forbids deletion of projects via
-the user interface of this pagure instance.
+the user interface of this Pagure instance.
 
 Defaults to: ``True``
 
@@ -1279,7 +1279,7 @@ ENABLE_DEL_FORKS
 ~~~~~~~~~~~~~~~~
 
 This configuration key permits or forbids deletion of forks via
-the user interface of this pagure instance.
+the user interface of this Pagure instance.
 
 Defaults to: ``ENABLE_DEL_PROJECTS``
 
@@ -1289,12 +1289,12 @@ GIT_HOOK_DB_RO
 
 This configuration key specifies if the git hook have a read-only (RO) access
 to the database or not.
-Some pagure deployment provide an actual shell account on the host and thus the
+Some Pagure deployment provide an actual shell account on the host and thus the
 git hook called upon git push are executed under that account. If the user
 manages to by-pass git and is able to access the configuration file, they could
 have access to "private" information. So in those deployments the git hooks
 have a specific configuration file with a database access that is read-only,
-making pagure behave differently in those situations.
+making Pagure behave differently in those situations.
 
 Defaults to: ``False``
 
@@ -1303,8 +1303,8 @@ EMAIL_SEND
 ~~~~~~~~~~
 
 This configuration key enables or disables all email notifications for
-this pagure instance. This can be useful to turn off when developing on
-pagure, or for test or pre-production instances.
+this Pagure instance. This can be useful to turn off when developing on
+Pagure, or for test or pre-production instances.
 
 Defaults to: ``False``.
 
@@ -1334,7 +1334,7 @@ ALWAYS_FEDMSG_ON_COMMITS
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 This configuration key can be used to enforce `fedmsg <https://fedmsg.readthedocs.io/>`_
-notifications on commits made on all projects in a pagure instance.
+notifications on commits made on all projects in a Pagure instance.
 
 Defaults to: ``True``.
 
@@ -1343,7 +1343,7 @@ ALLOW_DELETE_BRANCH
 ~~~~~~~~~~~~~~~~~~~
 
 This configuration keys enables or disables allowing users to delete git
-branches from the user interface. In sensible pagure instance you may
+branches from the user interface. In sensible Pagure instance you may
 want to turn this off and with a customized gitolite configuration you can
 prevent users from deleting branches in their git repositories.
 
@@ -1372,9 +1372,9 @@ Defaults to: ``[]``.
 LOCAL_SSH_KEY
 ~~~~~~~~~~~~~
 
-This configuration key can be used to let pagure administrate the user's ssh keys
+This configuration key can be used to let Pagure administrate the user's ssh keys
 or have a third party tool do it for you.
-In most cases, it will be fine to let pagure handle it.
+In most cases, it will be fine to let Pagure handle it.
 
 Defaults to ``True``.
 
@@ -1383,7 +1383,7 @@ DEPLOY_KEY
 ~~~~~~~~~~
 
 This configuration key can be used to disable the deploy keys feature of an
-entire pagure instance. This feature enable to add extra public ssh keys
+entire Pagure instance. This feature enable to add extra public ssh keys
 that a third party could use to push to a project.
 
 Defaults to ``True``.
@@ -1392,16 +1392,16 @@ Defaults to ``True``.
 OLD_VIEW_COMMIT_ENABLED
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-In version 1.3, pagure changed its URL scheme to view the commit of a
+In version 1.3, Pagure changed its URL scheme to view the commit of a
 project in order to add support for pseudo-namespaced projects.
 
-For pagure instances older than 1.3, who care about backward compatibility,
+For Pagure instances older than 1.3, who care about backward compatibility,
 we added an endpoint ``view_commit_old`` that brings URL backward
 compatibility for URLs using the complete git hash (the 40 characters).
 For URLs using a shorter hash, the URLs will remain broken.
 
 This configuration key enables or disables this backward compatibility
-which is useful for pagure instances running since before 1.3 but is not
+which is useful for Pagure instances running since before 1.3 but is not
 for newer instances.
 
 Defaults to: ``False``.
@@ -1410,7 +1410,7 @@ Defaults to: ``False``.
 DISABLE_REMOTE_PR
 ~~~~~~~~~~~~~~~~~
 
-In some pagure deployments remote pull requests need to be disabled
+In some Pagure deployments remote pull requests need to be disabled
 due to legal / policy reasons.
 
 Defaults to: ``False``.
@@ -1434,7 +1434,7 @@ Defaults to: ``None``.
 INSTANCE_NAME
 ~~~~~~~~~~~~~
 
-This allows giving a name to this running instance of pagure. The name is
+This allows giving a name to this running instance of Pagure. The name is
 then used in the welcome screen shown upon first login.
 
 Defaults to: ``Pagure``
@@ -1467,7 +1467,7 @@ DOC_APP_URL
 This configuration key allows you to specify where the documentation server
 is running (preferably in a different domain name entirely).
 If not set, the documentation page will show an error message saying that
-this pagure instance does not have a documentation server.
+this Pagure instance does not have a documentation server.
 
 Defaults to: ``None``
 
@@ -1490,13 +1490,13 @@ EXCLUDE_GROUP_INDEX
 This configuration key can be used to hide project an user has access to via
 one of the groups listed in this key.
 
-The use-case is the following: the Fedora project is deploying pagure has a
+The use-case is the following: the Fedora project is deploying Pagure has a
 front-end for the git repos of the packages in the distribution, that means
-about 17,000 git repositories in pagure. The project has a group of people
+about 17,000 git repositories in Pagure. The project has a group of people
 that have access to all of these repositories, so when viewing the user's
 page of one member of that group, instead of seeing all the project that
-this user works on, you can see all the projects hosted in that pagure
-instance. Using this configuration key, pagure will hide all the projects
+this user works on, you can see all the projects hosted in that Pagure
+instance. Using this configuration key, Pagure will hide all the projects
 that this user has access to via the specified groups and thus return only
 the groups of forks of that users.
 
@@ -1567,8 +1567,8 @@ EXTERNAL_COMMITTER
 ~~~~~~~~~~~~~~~~~~
 
 The external committer feature is a way to allow members of groups defined
-outside pagure (and provided to pagure upon login by the authentication
-system) to be consider committers on pagure.
+outside Pagure (and provided to Pagure upon login by the authentication
+system) to be consider committers on Pagure.
 
 This feature can give access to all the projects on the instance, all but
 some or just some.
@@ -1645,7 +1645,7 @@ GITOLITE_PRE_CONFIG
 This configuration key allows you to include some content at the *top* of
 the gitolite configuration file (such as some specific group definition),
 thus allowing to customize the gitolite configuration file with elements
-and information that are outside of pagure's control.
+and information that are outside of Pagure's control.
 
 This can be used in combination with ``GITOLITE_POST_CONFIG`` to further
 customize gitolite's configuration file. It can also be used with
@@ -1661,7 +1661,7 @@ GITOLITE_POST_CONFIG
 This configuration key allows you to include some content at the *end* of
 the gitolite configuration file (such as some project definition or access),
 thus allowing to customize the gitolite configuration file with elements
-and information that are outside of pagure's control.
+and information that are outside of Pagure's control.
 
 This can be used in combination with ``GITOLITE_PRE_CONFIG`` to further
 customize gitolite's configuration file. It can also be used with
@@ -1711,7 +1711,7 @@ Defaults to: ``{}``
 CASE_SENSITIVE
 ~~~~~~~~~~~~~~
 
-This configuration key can be used to make this pagure instance case sensitive
+This configuration key can be used to make this Pagure instance case sensitive
 instead of its default: case-insensitive.
 
 Defaults to: ``False``
@@ -1729,7 +1729,7 @@ Defaults to: ``^[a-zA-z0-9_][a-zA-Z0-9-_]*$``
 APPLICATION_ROOT
 ~~~~~~~~~~~~~~~~
 
-This configuration key is used in the path of the cookie used by pagure.
+This configuration key is used in the path of the cookie used by Pagure.
 
 Defaults to: ``'/'``
 
@@ -1768,8 +1768,8 @@ ENABLE_GROUP_MNGT
 ~~~~~~~~~~~~~~~~~
 
 This configuration key can be used to turn on or off managing (ie: creating a
-group, adding or removing users in that group) groups in this pagure instance.
-If turned off, groups and group members are to be managed outside of pagure
+group, adding or removing users in that group) groups in this Pagure instance.
+If turned off, groups and group members are to be managed outside of Pagure
 and synced upon login.
 
 Defaults to: ``True``
@@ -1779,8 +1779,8 @@ ENABLE_USER_MNGT
 ~~~~~~~~~~~~~~~~
 
 This configuration key can be used to turn on or off managing users (adding or
-removing them from a project) in this pagure instance.
-If turned off, users are managed outside of pagure.
+removing them from a project) in this Pagure instance.
+If turned off, users are managed outside of Pagure.
 
 Defaults to: ``True``
 
@@ -1789,9 +1789,9 @@ ALLOW_USER_REGISTRATION
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 This configuration key can be used to turn on or off user registration
-(that is, the ability for users to create an account) in this pagure instance.
+(that is, the ability for users to create an account) in this Pagure instance.
 If turned off, user accounts cannot be created through the UI or API.
-Currently, this key only applies to pagure instances configured with the ``local``
+Currently, this key only applies to Pagure instances configured with the ``local``
 authentication backend and has no effect with the other authentication backends.
 
 Defaults to: ``True``
@@ -1801,7 +1801,7 @@ SESSION_COOKIE_NAME
 ~~~~~~~~~~~~~~~~~~~
 
 This configuration key can be used to specify the name of the session cookie used
-by pagure.
+by Pagure.
 
 Defaults to: ``'pagure'``
 
@@ -1818,9 +1818,9 @@ Defaults to: ``['repos', 'myrepos', 'myforks']``
 EMAIL_ON_WATCHCOMMITS
 ~~~~~~~~~~~~~~~~~~~~~
 
-By default pagure sends an email to every one watch commits on a project when a
+By default Pagure sends an email to every one watch commits on a project when a
 commit is made.
-However some pagure instances may be using a different notification mechanism on
+However some Pagure instances may be using a different notification mechanism on
 commits and thus may not want this feature to double the notifications received.
 This configuration key can be used to turn on or off email being sent to people
 watching commits on a project upon commits.
@@ -1863,7 +1863,7 @@ Defaults to: ``/usr/share/gitolite3/gitolite-shell``
 MIRROR_SSHKEYS_FOLDER
 ~~~~~~~~~~~~~~~~~~~~~
 
-This configuration key specificies where pagure should store the ssh keys
+This configuration key specificies where Pagure should store the ssh keys
 generated for the mirroring feature. This folder should be properly backed up
 and kept secure.
 
@@ -1873,7 +1873,7 @@ Defaults to: ``/var/lib/pagure/sshkeys/``
 LOG_ALL_COMMITS
 ~~~~~~~~~~~~~~~
 
-This configuration key will make pagure log all commits pushed to all
+This configuration key will make Pagure log all commits pushed to all
 branches of all repositories instead of logging only the once that are
 pushed to the default branch.
 
@@ -1883,7 +1883,7 @@ Defaults to: ``False``
 DISABLE_MIRROR_IN
 ~~~~~~~~~~~~~~~~~
 
-This configuration key allows a pagure instance to not support mirroring in
+This configuration key allows a Pagure instance to not support mirroring in
 projects (from third party git server).
 
 Defaults to: ``False``
@@ -1950,12 +1950,12 @@ RepoSpanner Options
 -------------------
 
 Pagure can be integrated with `repoSpanner <https://repospanner.org>`_
-allowing to deploy pagure in a load-balanced environment since the git
+allowing to deploy Pagure in a load-balanced environment since the git
 repositories are then synced across multiple servers simultaneously.
 
 Support for this integration has been included in Pagure version 5.0 and higher.
 
-Here below are the different options one can/should use to integrate pagure
+Here below are the different options one can/should use to integrate Pagure
 with repoSpanner.
 
 REPOBRIDGE_BINARY
@@ -1970,7 +1970,7 @@ Defaults to: ``/usr/libexec/repobridge``.
 REPOSPANNER_NEW_REPO
 ~~~~~~~~~~~~~~~~~~~~
 
-This configuration key instructs pagure to create new git repositories on
+This configuration key instructs Pagure to create new git repositories on
 repoSpanner or not.
 Its value should be the region in which the new git repositories should be
 created on.
@@ -1980,7 +1980,7 @@ Defaults to: ``None``.
 REPOSPANNER_NEW_REPO_ADMIN_OVERRIDE
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This configuration key can be used to let pagure admin override the default
+This configuration key can be used to let Pagure admin override the default
 region used when creating new git repositories on repoSpanner.
 Its value should be a boolean.
 
@@ -1989,7 +1989,7 @@ Defaults to: ``False``
 REPOSPANNER_NEW_FORK
 ~~~~~~~~~~~~~~~~~~~~
 
-This configuration key instructs pagure on where/how to create new git
+This configuration key instructs Pagure on where/how to create new git
 repositories for the forks with repoSpanner.
 If ``None``, git repositories for forks are created outside of repoSpanner
 entirely.
@@ -2012,7 +2012,7 @@ REPOSPANNER_REGIONS
 ~~~~~~~~~~~~~~~~~~~
 
 This configuration key can be used to specify the different region where repoSpanner
-is deployed and thus with which this pagure instance can be integrated.
+is deployed and thus with which this Pagure instance can be integrated.
 
 An example entry could look like:
 
@@ -2029,7 +2029,7 @@ An example entry could look like:
                                   'key': '/etc/pki/repospanner/pki/pagure.key'}}
     }
 
-If this configuration key is not defined, pagure will consider that it is
+If this configuration key is not defined, Pagure will consider that it is
 not set to be integrated with repoSpanner.
 
 Defaults to: ``{}``
@@ -2095,7 +2095,7 @@ The command to run if a repository is not on repospanner when aclchecker is in u
 MQTT Options
 ------------
 
-If approprietly configured pagure supports sending messages to an MQTT
+If approprietly configured Pagure supports sending messages to an MQTT
 message queue.
 
 Here below are the different configuration options to make it so.
@@ -2197,7 +2197,7 @@ MQTT_TOPIC_PREFIX
 ~~~~~~~~~~~~~~~~~
 
 This configuration key can be used to specify a prefix to the mqtt messages sent.
-This prefix will be added to the topic used by pagure thus allowing the mqtt
+This prefix will be added to the topic used by Pagure thus allowing the mqtt
 admins to specify a parent topic for all pagure-related messages.
 
 Defaults to: ``None``
@@ -2207,7 +2207,7 @@ ALWAYS_MQTT_ON_COMMITS
 ~~~~~~~~~~~~~~~~~~~~~~
 
 This configuration key can be used to enforce `mqtt <https://mqtt.org/>`_
-notifications on commits made on all projects in a pagure instance.
+notifications on commits made on all projects in a Pagure instance.
 
 Defaults to: ``False``.
 
@@ -2218,7 +2218,7 @@ NOGITHOOKS
 This configuration key should not be touched. It is used in the test suite as a
 way to prevent all the git hooks from running (which includes checking if the
 user is allowed to push). Using this mechanism we are able to check some
-behavior in the test suite that in a deployed pagure instance are happening in
+behavior in the test suite that in a deployed Pagure instance are happening in
 a different process.
 
 **Do not change this option in production**
@@ -2234,7 +2234,7 @@ FORK_FOLDER
 ~~~~~~~~~~~
 
 This configuration key used to be use to specify the folder where the forks
-are placed. Since the release 2.0 of pagure, it has been deprecated, forks
+are placed. Since the release 2.0 of Pagure, it has been deprecated, forks
 are now automatically placed in a sub-folder of the folder containing the
 mains git repositories (ie ``GIT_FOLDER``).
 
@@ -2247,7 +2247,7 @@ UPLOAD_FOLDER
 
 This configuration key used to be use to specify where the uploaded releases
 are available. It has been replaced by `UPLOAD_FOLDER_PATH` in the release
-2.10 of pagure.
+2.10 of Pagure.
 
 
 GITOLITE_VERSION
@@ -2258,7 +2258,7 @@ using, it can be either ``2`` or ``3``.
 
 Defaults to: ``3``.
 
-This has been replaced by `GITOLITE_BACKEND` in the release 3.0 of pagure.
+This has been replaced by `GITOLITE_BACKEND` in the release 3.0 of Pagure.
 
 
 DOCS_FOLDER, REQUESTS_FOLDER, TICKETS_FOLDER
@@ -2293,7 +2293,7 @@ are not restricted in browser access.
 
 Defaults to: ``'https://apps.fedoraproject.org/global/fedora-bootstrap-1.1.1/fedora-bootstrap.css'``
 
-This has been deprecated by the new way of theming pagure, see the `theming
+This has been deprecated by the new way of theming Pagure, see the `theming
 documentation <https://docs.pagure.org/pagure/usage/theming.html>`_
 
 
@@ -2306,7 +2306,7 @@ are not restricted in browser access.
 
 Defaults to: ``'https://apps.fedoraproject.org/global/fedora-bootstrap-1.1.1/fedora-bootstrap.js'``
 
-This has been deprecated by the new way of theming pagure, see the `theming
+This has been deprecated by the new way of theming Pagure, see the `theming
 documentation <https://docs.pagure.org/pagure/usage/theming.html>`_
 
 
@@ -2318,7 +2318,7 @@ pages, from ``... - pagure`` (default) to ``... - <your value>``.
 
 Defaults to: ``Pagure``
 
-This has been deprecated by the new way of theming pagure, see the `theming
+This has been deprecated by the new way of theming Pagure, see the `theming
 documentation <https://docs.pagure.org/pagure/usage/theming.html>`_
 
 

@@ -20,7 +20,7 @@ This document records all notable changes to `Pagure <https://pagure.io>`_.
 
 5.13.0 (2021-01-19)
 -------------------
-- When failing to find a git repo, log where pagure looked
+- When failing to find a git repo, log where Pagure looked
 - Get the default branch of the target repo when linking for new PR
 - Add an hascommit API endpoint
 - Fixing sample input and output for alias related api (Mohan Boddu)
@@ -55,7 +55,7 @@ pull-request.
 - Allow using the modifyacl API endpoint to remove groups from a project
 - Add a note that repo_from* argument are mandatory in some situations when
   opening a Pull-Request from the API
-- Increase the list of running pagure instances in the documentation (Neal Gompa)
+- Increase the list of running Pagure instances in the documentation (Neal Gompa)
 - Remove fenced code block when checking mention (Michael Scherer)
 - Add support for using cchardet to detect files' encoding
 - Show the default branch in the project overview page
@@ -145,11 +145,11 @@ pull-request.
 - Add support for customizing the new issue page
 - Introducing the boards feature
 - Add an API endpoint to view the content of a git repo
-- Port pagure's markdown extension to the new API
+- Port Pagure's markdown extension to the new API
 - Multiple small fixes for the vagrant-based development environment
 - Use WhiteNoise to serve static assets for the Pagure web
 - Fix running the tests on py 3.8
-- Port pagure's test suite to pytest
+- Port Pagure's test suite to pytest
 - Fix the title of the graph showing the evolution of the number of open tickets
   on a project
 - Do not assume there is a SMTP_STARTTLS configuration key set
@@ -173,14 +173,14 @@ pull-request.
 - Allow viewing issues via the API using project-less API token (Julen Landa
   Alustiza)
 - Rename Koshei to Koschei in the srcfpo theme (Fabio Valentini)
-- Make pagure work with recent sqlalchemy versions (>= 1.3.0)
-- Improve the vagrant-based dev environment for pagure developers
+- Make Pagure work with recent sqlalchemy versions (>= 1.3.0)
+- Improve the vagrant-based dev environment for Pagure developers
 - Add a new API endpoint to retrieve detailed stats about the issues
 - Improve the graphs displayed in the stats tab of each projects
   - Remove dependency on d3.js
   - Add dependency on chartjs
 - Add a new graph tracking the number of open issues throughout the year
-- Upgrade the container based development environment for pagure developers
+- Upgrade the container based development environment for Pagure developers
   (Andrew Engelbrecht)
 - Improve loading tickets from git
 - Support pygit2 >= 1.1.0 (Andrew Engelbrecht)
@@ -204,13 +204,13 @@ pull-request.
 - Improve email text for new user registration (zPlus)
 - Set the USER environment variable when pushing over http
 - Add support for git push via http using basic auth relying on API token
-- If pagure is set up for local auth, allow git push via https to use it
-- Add an example nginx configuration file for pagure (Neal Gompa)
-- Create two subpackages in the pagure for the apache and nginx configuration
+- If Pagure is set up for local auth, allow git push via https to use it
+- Add an example nginx configuration file for Pagure (Neal Gompa)
+- Create two subpackages in the Pagure for the apache and nginx configuration
   files (Neal Gompa)
-- Add some documentation on how git push over http works in pagure
-- Make pagure compatible with the latest version of flake8
-- Add PAGURE_PLUGINS_CONFIG setting in pagure configuration file (zPlus)
+- Add some documentation on how git push over http works in Pagure
+- Make Pagure compatible with the latest version of flake8
+- Add PAGURE_PLUGINS_CONFIG setting in Pagure configuration file (zPlus)
 
 
 5.9.1 (2020-03-30)
@@ -410,7 +410,7 @@ pull-request.
   Alustiza)
 - Document the git auth backend `pagure` (mrx@mailinator.com)
 - Catch ImportError before trying to catch any fedora_messaging exceptions
-- pagure markdown extension: encapsulate our markdowns on a div tag (Julen Landa
+- Pagure markdown extension: encapsulate our markdowns on a div tag (Julen Landa
   Alustiza)
 - Add styling for markdown tables (Julen Landa Alustiza)
 - Always notify the person who opened the ticket/PR or are assigned to it
@@ -431,7 +431,7 @@ pull-request.
 - Include a small introduction text to email on loading files
 - Move the side-bar of the repo_master into its own template for easier
   overriding by other themes
-- Enforce black on all pagure, including tests, docs and all
+- Enforce black on all Pagure, including tests, docs and all
 - Add an option to pagure-admin to delete a project
 - Add an option to pagure-admin block-user to list the users blocked
 - Ensure "No activity" rows get removed on subsequent updates of the calendar
@@ -439,7 +439,7 @@ pull-request.
 - Send a notification upon editing the initial comment of a PR
 - Send notifications on tag creation and tag and branch deletion
 - Comment reply button: remove icon title (Frank Dana)
-- Fix updating project options when running pagure in python 2
+- Fix updating project options when running Pagure in python 2
 - Fix the test button for webhook notifications
 - Fix opening PR on forks on the page listing the PRs
 - Add repo_from argument for API create pull request (Lenka Segura)
@@ -551,7 +551,7 @@ pull-request.
 - Fix repoSpanner integration (Patrick Uiterwijk)
 - Make sure repoSpanner tests run in CentOS CI (Patrick Uiterwijk)
 - Only block new branches in hooks (Lubomír Sedlář)
-- Add support for fedora-messaging in pagure
+- Add support for fedora-messaging in Pagure
 - Fix calculation of days until API key expires in the emails (Karsten Hopp)
 - Move to container-based testing on jenkins testing the following environment
   - F29 using python3 with dependencies installed as RPMs
@@ -574,7 +574,7 @@ pull-request.
 - Add support for the MQTT protocol (jingjing)
 - Add support for mirroring in git repositories from outside sources
 - Add the possibility to give a group away
-- Port pagure to markdown 3.0+ while remaining backward compatible
+- Port Pagure to markdown 3.0+ while remaining backward compatible
 - Add support to merge a PR when the fork was deleted
 - Indicate that the file can be either empty or a binary file in diffs
 - Add the API endpoint to create new PR in the API doc
@@ -604,7 +604,7 @@ pull-request.
 - Allow commenting on a PR when clicking on the merge button
 - Include whether the PR passed the threshold or not in the API data
 - Change the way votes are recorded on PRs
-- Add support for third-party extensions to pagure (this is very much
+- Add support for third-party extensions to Pagure (this is very much
   work in progress and might/will fluctuate as it is polished - Do Not
   Consider This Stable)
 - Enable token authentication on internal endpoints (Slavek Kabrda)
@@ -741,7 +741,7 @@ pull-request.
 - Add to theme the possibility to display site-wide messages (Ryan Lerch)
 - Multiple adjustments to the scripts keyhelper and aclchecker (Patrick Uiterwijk)
 - Only enforce Signed-Off-By on the main git repo
-- Ignore any and all action done by the pagure user when loading JSON into the db
+- Ignore any and all action done by the Pagure user when loading JSON into the db
 - Fix the last modified date on the PR list
 - Updating regex for URLs and SSH urls
 - Use gitolite's own mechanism to bypass the update hook
@@ -894,12 +894,12 @@ pull-request.
 4.0 (2018-04-26)
 ----------------
 
-- Re-architecture the project to allow potentially extending pagure outside of
+- Re-architecture the project to allow potentially extending Pagure outside of
   its core
 - Fix running the tests on newer pygit
 - Add a space between the fork and the watch buttons
 - Add a global configuration option to turn on or off fedmsg notifications for
-  the entire pagure instance
+  the entire Pagure instance
 - Set the default username to be 'Pagure' when sending git commit notifications
   by email
 - Add project setting to show roadmap by default (Vivek Anand)
@@ -907,7 +907,7 @@ pull-request.
 - Expand and document the tokenization search
 - Add document that multiple keys are supported
 - Add a way to block non fast-forwardable commits on all branches
-- Fix running pagure on docker for development (Clément Verna)
+- Fix running Pagure on docker for development (Clément Verna)
 - Make the accordeon in the settings page work correctly
 - Allow calling git blame on a commit instead of a branch
 - Exclude the .pyc files from all folders
@@ -971,7 +971,7 @@ pull-request.
 - Specify which service is logging the action for easier debugging/reading of
   the logs
 - Merge the fedmsg notifications on commit logic into the default hook
-- Merge pagure-ci into the pagure's celery-based services
+- Merge pagure-ci into the Pagure's celery-based services
 - When creating a new PR, allow updating the branch from
 - Allow pull changes from a different repo than the parent one
 - Add a new internal endpoint to get the family of a project
@@ -1016,7 +1016,7 @@ pull-request.
   web-hook
 - Fix supporting branches containing multiple dots
 - Do not convert to markdown commit messages in notifications
-- Port pagure to use the compile-1 script from upstream gitolite (if
+- Port Pagure to use the compile-1 script from upstream gitolite (if
   configured to do so) (Slavek Kabrda)
 - Add preview when editing a comment (Rahul Bajaj) and the initial comment
 - Ensure that deployment keys are managed correctly (Michael Watters)
@@ -1087,7 +1087,7 @@ pull-request.
 - Fix the doc about custom gitolite config
 - Fix displaying the filename on the side and linking to file for remote PRs
 - Add irc info in Readme (Vivek Anand)
-- Make pagure compatible with newer python chardet
+- Make Pagure compatible with newer python chardet
 - Check that the identifier isn't the hash of a git tree in view_file
 - Fix if the identifier provided is one of a blob instead of a commit in
   view_commit
@@ -1131,7 +1131,7 @@ pull-request.
 - Add a default_priority field to projects
 - Bail on merge a PR that is already closed
 - Add a graph of the history of the open issues on the project
-- Make the pagure hook act as the person doing the push
+- Make the Pagure hook act as the person doing the push
 - Clean spec file to drop deprecated lines and macros (Igor Gnatenko)
 - Include selectize in the settings page to fix the autocomplete in the give
   project action
@@ -1172,7 +1172,7 @@ pull-request.
 - Add a button and an API endpoint to subscribe to PR's notifications
 - Fix showing the file names in PR (pre)view
 - Fix number of typos in the documentation (René Genz)
-- Improve the documentation about documentation hosting in pagure (René Genz)
+- Improve the documentation about documentation hosting in Pagure (René Genz)
 - Allow priorities and milestones to be 0 or -1
 - Return the flag UID when adding or updating a flag on a PR not in fedmsg
 - Add flags on commits
@@ -1199,7 +1199,7 @@ pull-request.
 - Show the branches' head in the commit list
 - Log which IP is being denied access to the internal endpoints (makes debugging
   easier)
-- Link to pagure's own markdown documentation and warn that remote images are
+- Link to Pagure's own markdown documentation and warn that remote images are
   not supported
 - Document how to run a single test file or a single test in a file
 - Fix trying to decode when the encoding is None
@@ -1250,7 +1250,7 @@ pull-request.
 - Allow viewing a PR when its origin (fork or branch) is gone
 - Fix linking to issue or PR in namespaced projects via #<id>
 - Make it more obvious that the namespace and the project are different links
-- Tell fedmsg to send things with pagure certificates (Patrick Uiterwijk)
+- Tell fedmsg to send things with Pagure certificates (Patrick Uiterwijk)
 - Fix loading ticket templates on namespaced project and extracting their names
 - Add a banner on the overview page when the ACLs are being refreshed on the
   backend (and thus ssh access may not be entirely functional) (Vivek Anand)
@@ -1259,7 +1259,7 @@ pull-request.
 - Add the possibility to get the group members when asking the project info
 - Make the PROJECT_NAME_REGEX used in form be configurable
 - Adjust the milter to support replying with any email addresses associated
-- Allow pagure admin to give a project
+- Allow Pagure admin to give a project
 
 
 3.7.1 (2017-09-05)
@@ -1337,7 +1337,7 @@ pull-request.
   project (Vivek Anand)
 - Update the refresh-gitolite action of pagure-admin for the new interface
   (turns out this wasn't in fact merged in 3.4)
-- Add a configuration key to make pagure case sensitive
+- Add a configuration key to make Pagure case sensitive
 - Add an USER_ACLS configuration key
 - Document the different API token ACLs configuration keys
 - Fix syncing groups from external account sources (Patrick Uiterwijk)
@@ -1351,14 +1351,14 @@ pull-request.
 - Fix logging by properly formatting the message
 - Fix the issue count in the My Issues page (Vivek Anand)
 - Add a configuration key to disable deleting branches from the UI
-- Add a configuration key to disable managing user's ssh key in pagure
+- Add a configuration key to disable managing user's ssh key in Pagure
 - Fix the vagrant environment (Clement Verna)
 - Fix branch support for the git blame view
 - Update the PR ref when the PR is updated
-- Add a configuration key to disable the deploy keys in a pagure instance
-- Fix login when groups are managed outside of pagure
+- Add a configuration key to disable the deploy keys in a Pagure instance
+- Fix login when groups are managed outside of Pagure
 - Fix setting up the git hooks when there is no DOCS_FOLDER set
-- Fix installing up the pagure hooks when there is no DOCS_FOLDER set
+- Fix installing up the Pagure hooks when there is no DOCS_FOLDER set
 
 
 3.3.1 (2017-07-24)
@@ -1414,11 +1414,11 @@ pull-request.
 ----------------
 
 - Since 2.90 celery has become a requirement as well as one of the queueing
-  system it supports (pagure defaults to using redis)
+  system it supports (Pagure defaults to using redis)
 - Multiple stability and performance improvements (mainly thanks to Patrick
   Uiterwijk)
 - Fix the assignee value in fedmsg when assigning a ticket (Ricky Elrod)
-- Make pagure support bleach 2.0.0 (Shengjing Zhu)
+- Make Pagure support bleach 2.0.0 (Shengjing Zhu)
 - Fixes in CI support (Tim Flink)
 - Update the documentation
 - Fix plain readme html escape (Shengjing Zhu)
@@ -1449,7 +1449,7 @@ pull-request.
 - Fix diffing the branch of a project against the target branch
 - Fix displaying the new PR button on the default branch
 - Do not send a notification upon merge conflicts
-- Do not let pagure return 500 when hit with bogus URL
+- Do not let Pagure return 500 when hit with bogus URL
 - When loading comment from JSON rely on username/comment rather than comment id
 - When deleting a comment, refresh the ticket git repo
 - Make patch_to_diff use lists instead of string concatenation (Patrick
@@ -1651,7 +1651,7 @@ pull-request.
 - Allow filtering issues for certain custom keys using <key>:<value> in the
   search input (Patric Uiterwijk)
 - Make loading the JSON blob into the database its own async service
-- Add ACLs to pagure (Vivek Anand)
+- Add ACLs to Pagure (Vivek Anand)
 - Fix running the tests against postgresql
 - Let the doc server return the content as is when it fails to decode it
 - Fix rendering a issue when one of the custom fields has not been properly
@@ -1707,7 +1707,7 @@ pull-request.
 - Do not edit multiple times the milestone info when updating a ticket
 - Only update the custom field if there is a value to give it, otherwise remote
   it
-- Make pagure compatible with flask-wtf >= 0.14.0
+- Make Pagure compatible with flask-wtf >= 0.14.0
 - Add a button to test web-hook notifications
 - Fix the layout on the page listing all the closed issues (Rahul Bajaj)
 - Load priorities when refreshing the DB from the ticket git repos (Mark
@@ -1763,7 +1763,7 @@ pull-request.
   (Clement Verna)
 - Add a button to create a default set of close status (as we have a default set
   of priorities)
-- Have pagure bail with an error message if the OpenID server did not return an
+- Have Pagure bail with an error message if the OpenID server did not return an
   username
 - Let the error email use the FROM_EMAIL address set in the configuration file
 - Fix theprogress bar shown when listing issues (Gaurav Kumar)
@@ -1796,7 +1796,7 @@ pull-request.
 - Update API doc for api_view_user (Clement Verna)
 - Don't return 404 when viewing empty files (Pradeep CE (cep))
 - Do not automatically update the last_updated or updated_on fields
-- Make alembic use the DB url specified in the configuration file of pagure
+- Make alembic use the DB url specified in the configuration file of Pagure
 - Only connect to the smtp server if we're going to send an email
 - Add a type list to the custom fields (allows restricting the options) (Mark
   Reynolds)
@@ -1850,7 +1850,7 @@ pull-request.
 - Adjust the markdown processor to have 1 regex for all cross-project links
 - Remove unused variables (Farhaan Bukhsh)
 - Hide the title of private tickets when linking to them in markdown
-- Show user activity in pagure on the user's page
+- Show user activity in Pagure on the user's page
 - Add the possibility to subscribe to issues
 - Do not cache the session in pagure-ci (as we did for pagure-webhook)
 - Fix rendering raw file when the sha1 provided is one of a blob
@@ -1882,7 +1882,7 @@ pull-request.
 - Fix handling namespaced project in the SSE server (Adam Williamson)
 - Add a pylintrc configuration file to help with code standards (Adam
   Williamson)
-- Add go-import meta tag allowing go projects to be hosted on pagure (Patrick
+- Add go-import meta tag allowing go projects to be hosted on Pagure (Patrick
   Uiterwijk)
 - Fix index overflow when opening remote pull-request (Mark Reynolds)
 - Add SSE support for custom fields
@@ -1976,7 +1976,7 @@ pull-request.
   pull-request
 - Fix the progress bar on the page listing the issues (d3prof3t)
 - Do not call the API when viewing a diff or a PR if issues or PRs are disabled
-- Port pagure to flask 0.13+
+- Port Pagure to flask 0.13+
 - Fix displaying the reason when a PR cannot be merged
 - Allow projects to turn on/off fedmsg notifications
 - Fix the web-hook service so when a project is updated the service is as well
@@ -1987,7 +1987,7 @@ pull-request.
   Cline)
 - Use long dash in footer instead of two short ones (Lubomír Sedlář)
 - Add a welcome screen to new comers (does not work with local auth)
-- Ensure user are not logged in if we couldn't properly set them up in pagure
+- Ensure user are not logged in if we couldn't properly set them up in Pagure
 - Add the possibility to search through issues (AnjaliPardeshi)
 - Add a default hook to all new projects, this hook re-set the merge status of
   all the open PR upon push to the main branch of the repo
@@ -2015,7 +2015,7 @@ pull-request.
 - Add the possibility for projects to notify specific email addresses about
   issues/PRs update
 - Fix loading tickets from the ticket git repository (fixes importing project to
-  pagure)
+  Pagure)
 
 
 2.5 (2016-09-13)
@@ -2057,7 +2057,7 @@ pull-request.
 - [Security] Avoid all html related mimetypes and force the download if any
   (CVE-2016-1000037) -- Fixed in 2.3.4 as well
 - Redirect the URL to projects <foo>.git to <foo> (Abhishek Goswami)
-- Allow creating projects with 40 chars length name on newer pagure instances
+- Allow creating projects with 40 chars length name on newer Pagure instances
 - Fix @<user> and #<id> when editing a comment (Eric Barbour)
 - Display properly and nicely the ACLs of the API tokens (Lubomír Sedlář)
 - Removing html5lib so bleach installation finds what version is best (Tiago M.
@@ -2065,7 +2065,7 @@ pull-request.
 - Remove the branchchooser from the repoheader (again) (Ryan Lerch)
 - Fix hard-coded urls in the master template
 - Made the interaction with the watch button clearer (Ryan Lerch)
-- Introduce pagure-ci, a service allowing to integrate pagure with a jenkins
+- Introduce pagure-ci, a service allowing to integrate Pagure with a jenkins
   instance (Farhaan Bukhsh and I)
 - Accept Close{,s,d} in the same way as Merges and Fixes (Patrick Uiterwijk)
 - Avoid showing the 'New PR' button on the overview page is a PR already exists
@@ -2073,7 +2073,7 @@ pull-request.
 - Fix presenting the readme file and display the readme in the tree page if
   there is one in the folder displayed (Ryan Lerch)
 - Move the new issue button to be available on every page (AnjaliPardeshi)
-- Fix pagure for when an user enters a comment containing #<id> where the id
+- Fix Pagure for when an user enters a comment containing #<id> where the id
   isn't found in the db
 - Make the bootstrap URLs configurable (so that they don't necessarily point to
   the Fedora infra) (Farhaan Bukhsh)
@@ -2083,7 +2083,7 @@ pull-request.
 - Improve the load_from_disk utility script
 - Fix our mardown processor to avoid crashing on #<text> (where we expect #<id>)
 - Fix the search for projects with a / in their names
-- Fix adding a file to a ticket when running pagure with `local` auth
+- Fix adding a file to a ticket when running Pagure with `local` auth
 - Improve the grammar around the allowed prefix in our fake-namespaces (Jason
   Tibbitts)
 - Implement scanning of attached files for viruses (Patrick Uiterwijk)
@@ -2168,9 +2168,9 @@ pull-request.
 - Fix the edit link when adding a comment to a ticket via SSE
 - Add notifications to issues as we have for pull-requests
 - Record in the db the date at which a ticket was closed (Vivek Anand)
-- Add the possibility for pagure to rely on external groups provided by the auth
+- Add the possibility for Pagure to rely on external groups provided by the auth
   service
-- Add the possibility for pagure to use an SMTP server requiring auth
+- Add the possibility for Pagure to use an SMTP server requiring auth
   (Vyacheslav Anzhiganov)
 - Add autocomple/suggestion on typing #<id> for tickets and pull-requests (Eric
   Barbour)
@@ -2254,14 +2254,14 @@ pull-request.
 - Rework installing and removing git hooks (Clement Verna)
 - Rework the summary of the changes on the PR page (Ryan Lerch)
 - Improve the description of the priority system (Lubomír Sedlář)
-- Fix commit url in the pagure hook (Mike McLean)
+- Fix commit url in the Pagure hook (Mike McLean)
 - Improve the regex when fixing/relating a commit to a ticket or a PR (Mike
   McLean)
-- Improve the description of the pagure hook (Mike McLean)
+- Improve the description of the Pagure hook (Mike McLean)
 - Fix the priority system to support tickets without priority
 - Fix the ordering of the priority in the drop-down list of priorities
 - Ensure the drop-down list of priorities defaults to the current priority
-- Adjust the runserver.py script to setup PAGURE_CONFIG before importing pagure
+- Adjust the runserver.py script to setup PAGURE_CONFIG before importing Pagure
 - Remove flashed message when creating a new project
 - Add markdown support for making of PR# a link to the corresponding PR
 - Include the priority in the JSON representation of a ticket
@@ -2311,7 +2311,7 @@ pull-request.
   not)
 - Fix the pagination on the browse pages when the results are sorted
 - Disable the Commit and Files tabs if a repo is new
-- Update the pagure logo to look better (Ryan Lerch)
+- Update the Pagure logo to look better (Ryan Lerch)
 - Allow anyone to fork any project (Ryan Lerch)
 - Fix searching on the browse pages by preventing submission of the 'enter' key
   (Ryan Lerch)
@@ -2342,7 +2342,7 @@ pull-request.
   Lerch)
 - Fix hiding the reply buttons when users are not authenticated (Paul W. Frields)
 - Improve the description of the git hooks (Lubomír Sedlář)
-- Allow reply to a notification of pagure and setting the reply email address as
+- Allow reply to a notification of Pagure and setting the reply email address as
   Cc
 - In the fedmsg git hook, publish the username of all the users who authored the
   commits pushed
@@ -2352,7 +2352,7 @@ pull-request.
 - Fix showing the list of branches when viewing a file
 - Add priorities to issues, with the possibility to filter or sort them by it in
   the page listing them.
-- Add support for pseudo-namespace to pagure (ie: allow one '/' in project name
+- Add support for pseudo-namespace to Pagure (ie: allow one '/' in project name
   with a limited set of prefix allowed)
 - Add a new plugin/hook to block push containing commits missing the
   'Signed-off-by' line
@@ -2361,7 +2361,7 @@ pull-request.
 - Add support for using the keyword Merge(s|d) to close a ticket or pull-request
   via a commit message (Patrick Uiterwijk)
 - Add an UPGRADING.rst documentation file explaining how to upgrade between
-  pagure releases
+  Pagure releases
 
 
 1.2 (2016-03-01)
@@ -2380,7 +2380,7 @@ pull-request.
   current logo (Ryan Lerch)
 - Drop the svg of the old logo from the source (Ryan Lerch)
 - Add descriptions to the git hooks in the settings page (farhaanbukhsh)
-- Fix the pagure git hook
+- Fix the Pagure git hook
 
 
 1.1.1 (2016-02-24)

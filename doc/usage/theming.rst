@@ -3,7 +3,7 @@ Theming Guide
 
 Pagure is built on Flask, and uses Jinja2 for templates. Pagure also
 includes the ability to apply different themes that control the look
-and feel of your pagure instance, or add or remove elements from the
+and feel of your Pagure instance, or add or remove elements from the
 interface.
 
 Setting a theme
@@ -26,9 +26,9 @@ is placed in the templates directory
 
 templates/
 ~~~~~~~~~~
-The `templates` directory is where pagure will look for the `theme.html`
+The `templates` directory is where Pagure will look for the `theme.html`
 template. Additionally, if you wish to override any template in Pagure,
-place it in the theme templates/ directory, and pagure will use that
+place it in the theme templates/ directory, and Pagure will use that
 template rather than the standard one.
 
 .. warning:: Take care when overriding templates, as any changes to Pagure
@@ -52,7 +52,7 @@ templates/theme.html
 The theme.html file defines a subset of items in the Pagure interface that
 are commonly changed when creating a new theme. Theming is a new feature in
 Pagure, so this set is currently small, but please file issues or PRs against
-pagure with ideas of new items to include.
+Pagure with ideas of new items to include.
 
 The current items configurable in theme.html are:
 

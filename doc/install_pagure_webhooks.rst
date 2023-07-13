@@ -1,4 +1,4 @@
-Installing pagure's web-hooks notification system
+Installing Pagure's web-hooks notification system
 =================================================
 
 Web-hooks are a notification system upon which a system makes a http POST

@@ -31,7 +31,7 @@ Configure your system
 +--------------------------------------------------+----------------------------------------------------+
 
 The first file is the pagure-loadjson service itself, triggered by the git
-hook (shipped with pagure itself) and loading the JSON files into the database.
+hook (shipped with Pagure itself) and loading the JSON files into the database.
 
 The second file is the systemd service file.
 

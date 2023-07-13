@@ -2,12 +2,12 @@ Magic Words
 ===========
 
 Magic words are words and constructs you can use in your commit message to
-make pagure act on tickets or pull-requests.
+make Pagure act on tickets or pull-requests.
 
 Enabling magic words
 --------------------
 
-These magic words are enabled if the ``pagure`` git hook is enable. To do
+These magic words are enabled if the ``Pagure`` git hook is enable. To do
 so, go to your project's ``settings`` page, open the ``Hooks`` tab and
 activate there the ``Pagure`` hook.
 

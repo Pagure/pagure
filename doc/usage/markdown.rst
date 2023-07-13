@@ -33,7 +33,7 @@ While comments use:
 
 
 .. warning:: Pagure does not support linking to remote images, if you want
-    to link to an image on a ticket, you will have to upload it to pagure.
+    to link to an image on a ticket, you will have to upload it to Pagure.
 
 Styling
 -------
