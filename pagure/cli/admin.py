@@ -1067,9 +1067,7 @@ def do_sanitize_spam_user(args):
             session.add(user)
             session.commit()
 
-    print(
-        f"\n\n# Other Activity by {user.user} that needs to be removed manually:"
-    )
+    print(f"\n\n# Activity by {user.user} that needs to be removed manually:")
 
     print("## Issue Comments")
     if comments:
