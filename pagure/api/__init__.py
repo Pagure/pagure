@@ -112,6 +112,9 @@ class APIERROR(enum.Enum):
     ENEWPROJECTDISABLED = (
         "Creating project have been disabled for this instance"
     )
+    ENEWPROJECTFORBIDDEN = (
+        "You are not allowed to create new projects on this instance"
+    )
     ETIMESTAMP = "Invalid timestamp format"
     EDATETIME = "Invalid datetime format"
     EINVALIDISSUEFIELD = "Invalid custom field submitted"

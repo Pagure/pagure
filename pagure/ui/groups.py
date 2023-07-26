@@ -354,6 +354,9 @@ def add_group():
     if not pagure_config.get("ENABLE_GROUP_MNGT", False):
         flask.abort(404)
 
+    if pagure_config["PAGURE_AUTH"] == 'oidc' and flask.g.fas_user.can_create is False:
+        flask.abort(403,description="You are not allowed to create new groups on this instance")
+
     user = pagure.lib.query.search_user(
         flask.g.session, username=flask.g.fas_user.username
     )

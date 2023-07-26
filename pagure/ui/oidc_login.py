@@ -58,6 +58,16 @@ def fas_user_from_oidc():
                 ssh_key = b64decode(ssh_key).decode("ascii")
             except (TypeError, ValueError):
                 pass
+
+        oidc_group = pagure_config.get("RESTRICT_CREATE_BY_OIDC_GROUP", None)
+        oidc_group_count = pagure_config.get("RESTRICT_CREATE_BY_OIDC_GROUP_COUNT", 0)
+        can_create = True
+        if oidc_group:
+            if oidc_group not in info.get(groups_key, []):
+                can_create = False
+            elif (oidc_group_count != 0) and (len(info.get(groups_key, [])) < oidc_group_count):
+                can_create = False
+
         # Create the user object
         flask.g.fas_user = munch.Munch(
             username=username,
@@ -66,6 +76,7 @@ def fas_user_from_oidc():
             ssh_key=ssh_key,
             groups=info.get(groups_key, []),
             login_time=flask.session["oidc_logintime"],
+            can_create=can_create,
         )
         flask.session["oidc_cached_userdata"] = dict(flask.g.fas_user)
 
