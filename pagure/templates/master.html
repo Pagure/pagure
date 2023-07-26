@@ -39,6 +39,8 @@
           </li>
           {% if (config.get('ENABLE_NEW_PROJECTS', True) and config.get('ENABLE_UI_NEW_PROJECTS', True))
           or config.get('ENABLE_GROUP_MNGT', False)  %}
+          {#can_create is only defined if using OIDC so assume we cancreate #}
+          {% if (g.fas_user.can_create is not defined) or (g.fas_user.can_create is true)%}
           <li class="nav-item dropdown ml-3">
             <a class="nav-link dropdown-toggle font-weight-bold"
               data-toggle="dropdown"
@@ -60,6 +62,7 @@
               {% endif %}
             </div>
           </li>
+          {% endif %}
           {% endif %}
           <li class="nav-item dropdown ml-3">
             <a class="nav-link dropdown-toggle" data-toggle="dropdown"

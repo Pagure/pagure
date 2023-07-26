@@ -1266,6 +1266,25 @@ the corresponding ACL.
 Defaults to: ``True``
 
 
+RESTRICT_CREATE_BY_OIDC_GROUP
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This configuration key, when defined, only allows users that are a member of the group defined
+the ability to create new projects and groups.
+
+Defaults to: ``None``
+
+
+RESTRICT_CREATE_BY_OIDC_GROUP_COUNT
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This configuration key, when defined, only allows users that are a member of the group defined
+by RESTRICT_CREATE_BY_OIDC_GROUP and a member of at least the number of groups defined by this
+key the ability to create new projects.
+
+Defaults to: 0
+
+
 ENABLE_DEL_PROJECTS
 ~~~~~~~~~~~~~~~~~~~
 

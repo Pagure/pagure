@@ -1054,6 +1054,10 @@ def new_project():
             description="Creation of new project is not allowed on this \
                 pagure instance",
         )
+    
+    if pagure_config["PAGURE_AUTH"] == 'oidc' and flask.g.fas_user.can_create is False:
+        flask.abort(403,description="You are not allowed to create new projects on this instance")
+
 
     namespaces = pagure_config["ALLOWED_PREFIX"][:]
     if user:
