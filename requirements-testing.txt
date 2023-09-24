@@ -18,7 +18,6 @@ pytest-cov
 pytest-xdist
 
 python-fedora == 1.1.1
-trololio == 1.0
 
 # Seems that mock doesn't list this one
 funcsigs <= 1.0.2

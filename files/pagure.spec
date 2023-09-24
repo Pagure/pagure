@@ -144,7 +144,6 @@ This is useful for example to allow commenting on a ticket by email.
 Summary:            EventSource server for pagure
 BuildArch:          noarch
 Requires:           %{name} = %{version}-%{release}
-Requires:           python%{python_pkgversion}-trololio
 %{?systemd_requires}
 %description        ev
 Pagure comes with an eventsource server allowing live update of the pages
