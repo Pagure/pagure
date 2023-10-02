@@ -28,7 +28,7 @@ def pagure_task(function):
         """Decorated function, actually does the work."""
         if self is not None:
             try:
-                self.update_state(state="RUNNING")
+                self.update_state(self=self, state="RUNNING")
             except TypeError:
                 pass
         session = pagure.lib.model_base.create_session(pagure_config["DB_URL"])
