@@ -19,9 +19,9 @@ import docutils.core
 import docutils.examples
 
 try:
-    from jinja2 import escape
-except ImportError:
     from markupsafe import escape
+except ImportError:
+    from jinja2 import escape
 import kitchen.text.converters as ktc
 from markupsafe import Markup
 

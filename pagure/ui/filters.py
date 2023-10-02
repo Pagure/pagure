@@ -27,9 +27,9 @@ import pygit2
 import six
 
 try:
-    from jinja2 import escape
-except ImportError:
     from markupsafe import escape
+except ImportError:
+    from jinja2 import escape
 from six.moves.urllib.parse import parse_qsl, urlparse
 
 import pagure.exceptions
