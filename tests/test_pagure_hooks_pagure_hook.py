@@ -93,6 +93,10 @@ class PagureHooksPagureHooktests(tests.SimplePagureTest):
         # Add a README to the git repo - First commit
         tests.add_readme_git_repo(self.folder)
 
+    @mock.patch.dict(
+        "pagure.hooks.pagure_hook.pagure_config",
+        {"APP_URL": "http://localhost.localdomain/"},
+    )
     @mock.patch("pagure.hooks.pagure_hook.fixes_relation")
     def test_generate_revision_change_log_short_url(self, fixes_relation):
         """Test generate_revision_change_log when the comment contains
@@ -125,6 +129,10 @@ class PagureHooksPagureHooktests(tests.SimplePagureTest):
             "http://localhost.localdomain/",
         )
 
+    @mock.patch.dict(
+        "pagure.hooks.pagure_hook.pagure_config",
+        {"APP_URL": "http://localhost.localdomain/"},
+    )
     @mock.patch("pagure.hooks.pagure_hook.fixes_relation")
     def test_generate_revision_change_log_full_url(self, fixes_relation):
         """Test generate_revision_change_log when the comment contains
@@ -161,6 +169,10 @@ class PagureHooksPagureHooktests(tests.SimplePagureTest):
             "http://localhost.localdomain/",
         )
 
+    @mock.patch.dict(
+        "pagure.hooks.pagure_hook.pagure_config",
+        {"APP_URL": "http://localhost.localdomain/"},
+    )
     @mock.patch("pagure.hooks.pagure_hook.fixes_relation")
     def test_generate_revision_change_log_full_url_fork(self, fixes_relation):
         """Test generate_revision_change_log when the comment contains
