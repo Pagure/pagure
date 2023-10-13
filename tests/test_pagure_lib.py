@@ -5668,6 +5668,7 @@ foo bar
                 "delete_git_alias",
                 "fork_project",
                 "generate_acls_project",
+                "group_modify",
                 "internal_access",
                 "issue_assign",
                 "issue_change_status",

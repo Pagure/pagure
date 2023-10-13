@@ -373,6 +373,7 @@ ACLS = {
     "modify_git_alias": "Modify git aliases (create or delete)",
     "create_git_alias": "Create git aliases",
     "delete_git_alias": "Delete git aliases",
+    "group_modify": "Add/Remove members from group",
 }
 
 # List of ACLs which a regular user is allowed to associate to an API token
@@ -389,6 +390,7 @@ CROSS_PROJECT_ACLS = [
     "create_project",
     "fork_project",
     "modify_project",
+    "group_modify",
     "update_watch_status",
     "pull_request_create",
     "commit",
@@ -404,6 +406,7 @@ ADMIN_API_ACLS = [
     "pull_request_comment",
     "pull_request_merge",
     "generate_acls_project",
+    "group_modify",
     "commit_flag",
     "create_branch",
     "tag_project",

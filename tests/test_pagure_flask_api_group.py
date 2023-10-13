@@ -15,6 +15,8 @@ import unittest
 import sys
 import os
 import json
+from unittest.mock import patch
+from sqlalchemy.exc import SQLAlchemyError
 
 sys.path.insert(
     0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
@@ -22,6 +24,7 @@ sys.path.insert(
 
 import pagure.api
 import pagure.lib.query
+from pagure.exceptions import PagureException
 import tests
 
 
@@ -772,6 +775,388 @@ class PagureFlaskApiGroupTests(tests.SimplePagureTest):
         # Note that pagure sorts projects alphabetically, so we're comparing
         # a different order that was the order of requests
         assert projects == ["test", "test2"]
+
+    def test_api_group_add_member_authenticated(self):
+        """
+        Test the api_group_add_member method of the flask api with an
+        authenticated user.
+        """
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        headers = {"Authorization": "token aaabbbcccddd"}
+        payload = {"user": "foo"}
+        output = self.app.post(
+            "/api/0/group/some_group/add", data=payload, headers=headers
+        )
+        self.assertEqual(output.status_code, 200)
+        exp = {
+            "display_name": "Some Group",
+            "full_url": "http://localhost.localdomain/group/some_group",
+            "description": None,
+            "creator": {
+                "fullname": "PY C",
+                "full_url": "http://localhost.localdomain/user/pingou",
+                "url_path": "user/pingou",
+                "default_email": "bar@pingou.com",
+                "emails": ["bar@pingou.com", "foo@pingou.com"],
+                "name": "pingou",
+            },
+            "members": ["pingou", "foo"],
+            "date_created": "1492020239",
+            "group_type": "user",
+            "name": "some_group",
+        }
+        data = json.loads(output.get_data(as_text=True))
+        data["date_created"] = "1492020239"
+        self.assertDictEqual(data, exp)
+
+    def test_api_group_add_member_unauthenticated(self):
+        """
+        Assert that api_group_add_member method will fail with
+        unauthenticated user.
+        """
+        headers = {"Authorization": "token aaabbbcccddd"}
+        payload = {"user": "foo"}
+        output = self.app.post(
+            "/api/0/group/some_group/add", data=payload, headers=headers
+        )
+        self.assertEqual(output.status_code, 401)
+        exp = {
+            "error": (
+                "Invalid or expired token. "
+                "Please visit "
+                "http://localhost.localdomain/settings#nav-api-tab "
+                "to get or renew your API token."
+            ),
+            "error_code": "EINVALIDTOK",
+            "errors": "Invalid token",
+        }
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(data, exp)
+
+    def test_api_group_add_member_no_permission(self):
+        """
+        Assert that api_group_add_member method will fail with
+        user that don't have permissions to add member to group.
+        """
+        # Create tokens for foo user
+        tests.create_tokens(self.session, user_id=2)
+        tests.create_tokens_acl(self.session)
+        headers = {"Authorization": "token aaabbbcccddd"}
+        payload = {"user": "foo"}
+        output = self.app.post(
+            "/api/0/group/some_group/add", data=payload, headers=headers
+        )
+        self.assertEqual(output.status_code, 400)
+        exp = {
+            "error": (
+                "An error occurred at the database level "
+                "and prevent the action from reaching completion"
+            ),
+            "error_code": "EDBERROR",
+            "errors": ["You are not allowed to add user to this group"],
+        }
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(data, exp)
+
+    def test_api_group_add_member_no_group(self):
+        """
+        Assert that api_group_add_member method will fail when group doesn't
+        exist.
+        """
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        headers = {"Authorization": "token aaabbbcccddd"}
+        payload = {"user": "foo"}
+        output = self.app.post(
+            "/api/0/group/no_group/add", data=payload, headers=headers
+        )
+        self.assertEqual(output.status_code, 404)
+        exp = {"error": "Group not found", "error_code": "ENOGROUP"}
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(data, exp)
+
+    def test_api_group_add_member_invalid_request(self):
+        """
+        Assert that api_group_add_member method will fail when request
+        is invalid.
+        """
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        headers = {"Authorization": "token aaabbbcccddd"}
+        payload = {"dummy": "foo"}
+        output = self.app.post(
+            "/api/0/group/some_group/add", data=payload, headers=headers
+        )
+        self.assertEqual(output.status_code, 400)
+        exp = {
+            "error": "Invalid or incomplete input submitted",
+            "error_code": "EINVALIDREQ",
+            "errors": {"user": ["This field is required."]},
+        }
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(data, exp)
+
+    @patch("pagure.lib.query.add_user_to_group")
+    def test_api_group_add_member_pagure_error(self, mock_add_user):
+        """
+        Assert that api_group_add_member method will fail when pagure
+        throws exception.
+        """
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+        mock_add_user.side_effect = PagureException("Error")
+
+        headers = {"Authorization": "token aaabbbcccddd"}
+        payload = {"user": "foo"}
+        output = self.app.post(
+            "/api/0/group/some_group/add", data=payload, headers=headers
+        )
+        self.assertEqual(output.status_code, 400)
+        exp = {
+            "error": (
+                "An error occurred at the database level "
+                "and prevent the action from reaching completion"
+            ),
+            "error_code": "EDBERROR",
+            "errors": ["Error"],
+        }
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(data, exp)
+
+    @patch("pagure.lib.query.add_user_to_group")
+    def test_api_group_add_member_sqlalchemy_error(self, mock_add_user):
+        """
+        Assert that api_group_add_member method will fail when SQLAlchemy
+        throws exception.
+        """
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+        mock_add_user.side_effect = SQLAlchemyError("Error")
+
+        headers = {"Authorization": "token aaabbbcccddd"}
+        payload = {"user": "foo"}
+        output = self.app.post(
+            "/api/0/group/some_group/add", data=payload, headers=headers
+        )
+        self.assertEqual(output.status_code, 400)
+        exp = {
+            "error": (
+                "An error occurred at the database level "
+                "and prevent the action from reaching completion"
+            ),
+            "error_code": "EDBERROR",
+            "errors": ["Error"],
+        }
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(data, exp)
+
+    def test_api_group_remove_member_authenticated(self):
+        """
+        Test the api_group_remove_member method of the flask api with an
+        authenticated user.
+        """
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        headers = {"Authorization": "token aaabbbcccddd"}
+        payload = {"user": "foo"}
+        # Add user first
+        output = self.app.post(
+            "/api/0/group/some_group/add", data=payload, headers=headers
+        )
+        exp = {
+            "display_name": "Some Group",
+            "full_url": "http://localhost.localdomain/group/some_group",
+            "description": None,
+            "creator": {
+                "fullname": "PY C",
+                "full_url": "http://localhost.localdomain/user/pingou",
+                "url_path": "user/pingou",
+                "default_email": "bar@pingou.com",
+                "emails": ["bar@pingou.com", "foo@pingou.com"],
+                "name": "pingou",
+            },
+            "members": ["pingou", "foo"],
+            "date_created": "1492020239",
+            "group_type": "user",
+            "name": "some_group",
+        }
+        data = json.loads(output.get_data(as_text=True))
+        data["date_created"] = "1492020239"
+        self.assertDictEqual(data, exp)
+
+        # Then remove it
+        output = self.app.post(
+            "/api/0/group/some_group/remove", data=payload, headers=headers
+        )
+        self.assertEqual(output.status_code, 200)
+        exp = {
+            "display_name": "Some Group",
+            "full_url": "http://localhost.localdomain/group/some_group",
+            "description": None,
+            "creator": {
+                "fullname": "PY C",
+                "full_url": "http://localhost.localdomain/user/pingou",
+                "url_path": "user/pingou",
+                "default_email": "bar@pingou.com",
+                "emails": ["bar@pingou.com", "foo@pingou.com"],
+                "name": "pingou",
+            },
+            "members": ["pingou"],
+            "date_created": "1492020239",
+            "group_type": "user",
+            "name": "some_group",
+        }
+        data = json.loads(output.get_data(as_text=True))
+        data["date_created"] = "1492020239"
+        self.assertDictEqual(data, exp)
+
+    def test_api_group_remove_member_unauthenticated(self):
+        """
+        Assert that api_group_remove_member method will fail with
+        unauthenticated user.
+        """
+        headers = {"Authorization": "token aaabbbcccddd"}
+        payload = {"user": "foo"}
+        output = self.app.post(
+            "/api/0/group/some_group/remove", data=payload, headers=headers
+        )
+        self.assertEqual(output.status_code, 401)
+        exp = {
+            "error": (
+                "Invalid or expired token. "
+                "Please visit "
+                "http://localhost.localdomain/settings#nav-api-tab "
+                "to get or renew your API token."
+            ),
+            "error_code": "EINVALIDTOK",
+            "errors": "Invalid token",
+        }
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(data, exp)
+
+    def test_api_group_remove_member_no_permission(self):
+        """
+        Assert that api_group_remove_member method will fail with
+        user that don't have permissions to remove member to group.
+        """
+        # Create tokens for foo user
+        tests.create_tokens(self.session, user_id=2)
+        tests.create_tokens_acl(self.session)
+        headers = {"Authorization": "token aaabbbcccddd"}
+        payload = {"user": "foo"}
+        output = self.app.post(
+            "/api/0/group/some_group/remove", data=payload, headers=headers
+        )
+        self.assertEqual(output.status_code, 400)
+        exp = {
+            "error": (
+                "An error occurred at the database level "
+                "and prevent the action from reaching completion"
+            ),
+            "error_code": "EDBERROR",
+            "errors": ["You are not allowed to remove user from this group"],
+        }
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(data, exp)
+
+    def test_api_group_remove_member_no_group(self):
+        """
+        Assert that api_group_remove_member method will fail when group doesn't
+        exist.
+        """
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        headers = {"Authorization": "token aaabbbcccddd"}
+        payload = {"user": "foo"}
+        output = self.app.post(
+            "/api/0/group/no_group/remove", data=payload, headers=headers
+        )
+        self.assertEqual(output.status_code, 404)
+        exp = {"error": "Group not found", "error_code": "ENOGROUP"}
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(data, exp)
+
+    def test_api_group_remove_member_invalid_request(self):
+        """
+        Assert that api_group_remove_member method will fail when request
+        is invalid.
+        """
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        headers = {"Authorization": "token aaabbbcccddd"}
+        payload = {"dummy": "foo"}
+        output = self.app.post(
+            "/api/0/group/some_group/remove", data=payload, headers=headers
+        )
+        self.assertEqual(output.status_code, 400)
+        exp = {
+            "error": "Invalid or incomplete input submitted",
+            "error_code": "EINVALIDREQ",
+            "errors": {"user": ["This field is required."]},
+        }
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(data, exp)
+
+    @patch("pagure.lib.query.delete_user_of_group")
+    def test_api_group_remove_member_pagure_error(self, mock_remove_user):
+        """
+        Assert that api_group_remove_member method will fail when pagure
+        throws exception.
+        """
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+        mock_remove_user.side_effect = PagureException("Error")
+
+        headers = {"Authorization": "token aaabbbcccddd"}
+        payload = {"user": "foo"}
+        output = self.app.post(
+            "/api/0/group/some_group/remove", data=payload, headers=headers
+        )
+        self.assertEqual(output.status_code, 400)
+        exp = {
+            "error": (
+                "An error occurred at the database level "
+                "and prevent the action from reaching completion"
+            ),
+            "error_code": "EDBERROR",
+            "errors": ["Error"],
+        }
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(data, exp)
+
+    @patch("pagure.lib.query.delete_user_of_group")
+    def test_api_group_remove_member_sqlalchemy_error(self, mock_remove_user):
+        """
+        Assert that api_group_remove_member method will fail when SQLAlchemy
+        throws exception.
+        """
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+        mock_remove_user.side_effect = SQLAlchemyError("Error")
+
+        headers = {"Authorization": "token aaabbbcccddd"}
+        payload = {"user": "foo"}
+        output = self.app.post(
+            "/api/0/group/some_group/remove", data=payload, headers=headers
+        )
+        self.assertEqual(output.status_code, 400)
+        exp = {
+            "error": (
+                "An error occurred at the database level "
+                "and prevent the action from reaching completion"
+            ),
+            "error_code": "EDBERROR",
+            "errors": ["Error"],
+        }
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(data, exp)
 
 
 if __name__ == "__main__":
