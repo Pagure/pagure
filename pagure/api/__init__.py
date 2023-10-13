@@ -613,7 +613,12 @@ def api():
     ]
     sections.append(build_docs_section("users", users_methods))
 
-    groups_methods = [group.api_groups, group.api_view_group]
+    groups_methods = [
+        group.api_groups,
+        group.api_view_group,
+        group.api_group_add_member,
+        group.api_group_remove_member,
+    ]
     sections.append(build_docs_section("groups", groups_methods))
 
     plugins_methods = [

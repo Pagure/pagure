@@ -12,6 +12,7 @@
 from __future__ import unicode_literals, absolute_import
 
 import flask
+from sqlalchemy.exc import SQLAlchemyError
 
 import pagure
 import pagure.exceptions
@@ -19,6 +20,8 @@ import pagure.lib.query
 from pagure.api import (
     API,
     APIERROR,
+    api_login_optional,
+    api_login_required,
     api_method,
     api_login_optional,
     get_page,
@@ -286,6 +289,182 @@ def api_view_group(group):
         output["projects"] = [
             project.to_json(public=True) for project in page_projects
         ]
+    jsonout = flask.jsonify(output)
+    jsonout.status_code = 200
+    return jsonout
+
+
+@API.route("/group/<group>/add", methods=["POST"])
+@api_login_required(acls=["group_modify"])
+@api_method
+def api_group_add_member(group):
+    """
+    Add member to group
+    -------------------
+    Add new member to group. To be able to add users to group the requester
+    needs to have permissions to do that.
+
+    ::
+
+        POST /api/0/group/<group>/add
+
+    Input
+    ^^^^^
+
+    +---------------------+--------+-------------+-----------------------------+
+    | Key                 | Type   | Optionality | Description                 |
+    +=====================+========+=============+=============================+
+    | ``user``            | string | Mandatory   | | User to add as member     |
+    |                     |        |             |   of group                  |
+    +---------------------+--------+-------------+-----------------------------+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "creator": {
+            "default_email": "user1@example.com",
+            "emails": [
+              "user1@example.com"
+            ],
+            "fullname": "User1",
+            "name": "user1"
+          },
+          "date_created": "1492011511",
+          "description": "Some Group",
+          "display_name": "Some Group",
+          "group_type": "user",
+          "members": [
+            "user1",
+            "user2"
+          ],
+          "name": "some_group_name"
+        }
+
+    """  # noqa
+
+    group = pagure.lib.query.search_groups(flask.g.session, group_name=group)
+    if not group:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOGROUP)
+
+    # Validate inputs
+    form = pagure.forms.AddUserToGroupForm(meta={"csrf": False})
+    if not form.validate_on_submit():
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.EINVALIDREQ, errors=form.errors
+        )
+    else:
+        # Add user to group
+        try:
+            pagure.lib.query.add_user_to_group(
+                flask.g.session,
+                username=form.user.data,
+                group=group,
+                user=flask.g.fas_user.username,
+                is_admin=pagure.utils.is_admin(),
+            )
+            flask.g.session.commit()
+            pagure.lib.git.generate_gitolite_acls(
+                project=None, group=group.group_name
+            )
+        except (pagure.exceptions.PagureException, SQLAlchemyError) as err:
+            flask.g.session.rollback()
+            raise pagure.exceptions.APIError(
+                400, error_code=APIERROR.EDBERROR, errors=[str(err)]
+            )
+
+    # Return the updated group
+    output = group.to_json(public=(not pagure.utils.api_authenticated()))
+    jsonout = flask.jsonify(output)
+    jsonout.status_code = 200
+    return jsonout
+
+
+@API.route("/group/<group>/remove", methods=["POST"])
+@api_login_required(acls=["group_modify"])
+@api_method
+def api_group_remove_member(group):
+    """
+    Remove member from group
+    ------------------------
+    Remove member from group. To be able to remove users from group the requester
+    needs to have permissions to do that.
+
+    ::
+
+        POST /api/0/group/<group>/remove
+
+    Input
+    ^^^^^
+
+    +---------------------+--------+-------------+-----------------------------+
+    | Key                 | Type   | Optionality | Description                 |
+    +=====================+========+=============+=============================+
+    | ``user``            | string | Mandatory   | | User to add as member     |
+    |                     |        |             |   of group                  |
+    +---------------------+--------+-------------+-----------------------------+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "creator": {
+            "default_email": "user1@example.com",
+            "emails": [
+              "user1@example.com"
+            ],
+            "fullname": "User1",
+            "name": "user1"
+          },
+          "date_created": "1492011511",
+          "description": "Some Group",
+          "display_name": "Some Group",
+          "group_type": "user",
+          "members": [
+            "user1",
+            "user2"
+          ],
+          "name": "some_group_name"
+        }
+
+    """  # noqa
+
+    group = pagure.lib.query.search_groups(flask.g.session, group_name=group)
+    if not group:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOGROUP)
+
+    # Validate inputs
+    form = pagure.forms.AddUserToGroupForm(meta={"csrf": False})
+    if not form.validate_on_submit():
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.EINVALIDREQ, errors=form.errors
+        )
+    else:
+        # Remove user to group
+        try:
+            pagure.lib.query.delete_user_of_group(
+                flask.g.session,
+                username=form.user.data,
+                groupname=group.group_name,
+                user=flask.g.fas_user.username,
+                is_admin=pagure.utils.is_admin(),
+            )
+            flask.g.session.commit()
+            pagure.lib.git.generate_gitolite_acls(
+                project=None, group=group.group_name
+            )
+        except (pagure.exceptions.PagureException, SQLAlchemyError) as err:
+            flask.g.session.rollback()
+            raise pagure.exceptions.APIError(
+                400, error_code=APIERROR.EDBERROR, errors=[str(err)]
+            )
+
+    # Return the updated group
+    output = group.to_json(public=(not pagure.utils.api_authenticated()))
     jsonout = flask.jsonify(output)
     jsonout.status_code = 200
     return jsonout
