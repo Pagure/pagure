@@ -1,10 +1,10 @@
 ---
 
-- include: clamav.yml
-- include: eventsource.yml
+- import_tasks: clamav.yml
+- import_tasks: eventsource.yml
 #- include: gitolite.yml
-- include: milter.yml
-- include: postgres.yml
+- import_tasks: milter.yml
+- import_tasks: postgres.yml
 
 - name: Install helpful development packages
   dnf:
