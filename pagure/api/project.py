@@ -1451,7 +1451,10 @@ def api_new_project():
             404, error_code=APIERROR.ENEWPROJECTDISABLED
         )
 
-    if pagure_config["PAGURE_AUTH"] == 'oidc' and flask.g.fas_user.can_create is False:
+    if (
+        pagure_config["PAGURE_AUTH"] == "oidc"
+        and flask.g.fas_user.can_create is False
+    ):
         raise pagure.exceptions.APIError(
             403, error_code=APIERROR.ENEWPROJECTFORBIDDEN
         )

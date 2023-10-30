@@ -65,7 +65,8 @@ ENABLE_NEW_PROJECTS = True
 # When using OIDC auth, users must be in this OIDC group to create new projects
 RESTRICT_CREATE_BY_OIDC_GROUP = None
 
-# When using OIDC auth, users must be a member of RESTRICT_NEW_PROJECTS_BY_OIDC_GROUP and in total
+# When using OIDC auth, users must be a member of
+# RESTRICT_NEW_PROJECTS_BY_OIDC_GROUP and in total
 # this many groups to create new projects
 RESTRICT_CREATE_BY_OIDC_GROUP_COUNT = 0
 

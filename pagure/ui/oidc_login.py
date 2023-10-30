@@ -60,12 +60,16 @@ def fas_user_from_oidc():
                 pass
 
         oidc_group = pagure_config.get("RESTRICT_CREATE_BY_OIDC_GROUP", None)
-        oidc_group_count = pagure_config.get("RESTRICT_CREATE_BY_OIDC_GROUP_COUNT", 0)
+        oidc_group_count = pagure_config.get(
+            "RESTRICT_CREATE_BY_OIDC_GROUP_COUNT", 0
+        )
         can_create = True
         if oidc_group:
             if oidc_group not in info.get(groups_key, []):
                 can_create = False
-            elif (oidc_group_count != 0) and (len(info.get(groups_key, [])) < oidc_group_count):
+            elif (oidc_group_count != 0) and (
+                len(info.get(groups_key, [])) < oidc_group_count
+            ):
                 can_create = False
 
         # Create the user object
