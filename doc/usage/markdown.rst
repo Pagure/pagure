@@ -16,7 +16,6 @@ It has enabled a few extensions:
 - `Definition Lists <https://python-markdown.github.io/extensions/definition_lists/>`_
 - `Fenced Code Blocks <https://python-markdown.github.io/extensions/fenced_code_blocks/>`_
 - `Tables <https://python-markdown.github.io/extensions/tables/>`_
-- `Smart Strong <https://python-markdown.github.io/extensions/smart_strong/>`_
 - `Admonition <https://python-markdown.github.io/extensions/admonition/>`_
 - `CodeHilite <https://python-markdown.github.io/extensions/code_hilite/>`_
 - `Sane lists <https://python-markdown.github.io/extensions/sane_lists/>`_
