@@ -23,4 +23,4 @@ git --no-pager log -2
 fi
 
 export LANG="en_US.UTF-8"
-tox -v -e "${PYVER:-py38}" -- ${TESTCASE:-tests/}
+tox -v -e "${PYVER:-py39}" -- ${TESTCASE:-tests/}
