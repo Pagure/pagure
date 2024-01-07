@@ -36,21 +36,6 @@ podman run --rm -it --name pagure-fedora-rpms-py3 \
     pagure-fedora-rpms-py3
 
 
-podman build --rm -t pagure-c8s-rpms-py3 \
-    -f dev/containers/centos8-rpms-py3 \
-    dev/containers
-
-if [ ! -d `pwd`/results_centos8-rpms-py3 ]; then
-  mkdir `pwd`/results_centos8-rpms-py3;
-fi
-
-podman run --rm -it --name pagure-c8s-rpms-py3 \
-    -v `pwd`/results_centos8-rpms-py3:/pagure/results:z \
-    -e BRANCH=$BRANCH \
-    -e REPO=$REPO \
-    pagure-c8s-rpms-py3
-
-
 podman build --rm -t pagure-fedora-pip-py3 \
     -f dev/containers/fedora-pip-py3 \
     dev/containers
