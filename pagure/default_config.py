@@ -393,6 +393,7 @@ CROSS_PROJECT_ACLS = [
     "group_modify",
     "update_watch_status",
     "pull_request_create",
+    "pull_request_update",
     "commit",
 ]
 
