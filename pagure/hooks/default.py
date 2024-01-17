@@ -190,6 +190,12 @@ def send_notifications(
         authors.append(author)
 
     if revs:
+        changed_files = pagure.lib.git.get_changed_files(
+            revs[-1],
+            oldrev,
+            repodir,
+        )
+
         revs.reverse()
         print("* Publishing information for %i commits" % len(revs))
 
@@ -202,6 +208,7 @@ def send_notifications(
             branch=refname,
             forced=forced,
             authors=list(authors),
+            changed_files=changed_files,
             agent=user,
             repo=project.to_json(public=True)
             if not isinstance(project, six.string_types)
