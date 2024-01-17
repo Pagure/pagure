@@ -1478,6 +1478,16 @@ def get_commit_subject(commit, abspath):
     return subject
 
 
+def get_changed_files(torev, fromrev, abspath):
+    """Return files changed between HEAD and BASE.
+    Return as a dict with paths as keys and status letters as values.
+    """
+    cmd = ["diff", "--name-status", "-z", fromrev, torev]
+    output = pagure.lib.git.read_git_output(cmd, abspath)
+    items = output.split("\0")
+    return {k: v for v, k in zip(items[0::2], items[1::2])}
+
+
 def get_repo_info_from_path(gitdir, hide_notfound=False):
     """Returns the name, username, namespace and type of a git directory
 
