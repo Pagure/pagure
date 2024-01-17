@@ -3210,6 +3210,47 @@ index 0000000..60f7480
             output = pagure.lib.git.get_author_email(githash, gitrepo)
             self.assertEqual(output, "pagure")
 
+    def test_get_changed_files(self):
+        """Test the get_changed_files method of pagure.lib.git."""
+
+        self.test_update_git()
+
+        repo = pagure.lib.query.get_authorized_project(
+            self.session, "test_ticket_repo"
+        )
+        issue = pagure.lib.query.search_issues(self.session, repo, issueid=1)
+
+        gitrepo = os.path.join(
+            self.path, "repos", "tickets", "test_ticket_repo.git"
+        )
+        output = pagure.lib.git.read_git_lines(
+            ["log", "-3", "--pretty='%H'"], gitrepo
+        )
+        self.assertEqual(len(output), 2)
+
+        hash0 = output[0].replace("'", "")
+        hash1 = output[1].replace("'", "")
+
+        # Case 1: hash1 => hash0
+        output1 = pagure.lib.git.get_changed_files(hash0, hash1, gitrepo)
+        self.assertEqual(output1, {issue.uid: "M"})
+
+        # Case 2: hash0 => hash1
+        output2 = pagure.lib.git.get_changed_files(hash1, hash0, gitrepo)
+        self.assertEqual(output2, {issue.uid: "M"})
+
+        # Case 3: hash0 => hash0
+        output3 = pagure.lib.git.get_changed_files(hash0, hash0, gitrepo)
+        self.assertEqual(output3, {})
+
+        # Case 4: NULL => hash0
+        output4 = pagure.lib.git.get_changed_files(hash0, "", gitrepo)
+        self.assertEqual(output4, {})
+
+        # Case 5: NULL => NULL
+        output5 = pagure.lib.git.get_changed_files("", "", gitrepo)
+        self.assertEqual(output5, {})
+
     def test_get_repo_name(self):
         """ Test the get_repo_name method of pagure.lib.git. """
 
