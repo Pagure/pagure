@@ -38,13 +38,15 @@ class PagureHooksDefault(tests.SimplePagureTest):
     def init_test_repo(self):
         tests.add_content_git_repo(self.projects[0])
         repo = pygit2.Repository(self.projects[0])
-        sha = repo.references["refs/heads/master"].peel().hex
+        commit = repo.references["refs/heads/master"].peel()
+        sha = commit.hex
+        oldsha = commit.parents[0].hex
         project = pagure.lib.query.get_authorized_project(self.session, "test")
-        return project, sha
+        return project, sha, oldsha
 
     @mock.patch("pagure.hooks.default.send_fedmsg_notifications")
     def test_send_action_notification(self, fedmsg):
-        project, sha = self.init_test_repo()
+        project, sha, _ = self.init_test_repo()
         pagure.hooks.default.send_action_notification(
             self.session,
             "tag",
@@ -62,8 +64,7 @@ class PagureHooksDefault(tests.SimplePagureTest):
 
     @mock.patch("pagure.hooks.default.send_fedmsg_notifications")
     def test_send_notifications(self, fedmsg):
-        oldrev = "9e5f51c951c6cab20fe81419320ed740533e2f2f"
-        project, sha = self.init_test_repo()
+        project, sha, oldsha = self.init_test_repo()
         pagure.hooks.default.send_notifications(
             self.session,
             project,
@@ -72,14 +73,21 @@ class PagureHooksDefault(tests.SimplePagureTest):
             "master",
             [sha],
             False,
-            oldrev,
+            oldsha,
         )
         (_, args, kwargs) = fedmsg.mock_calls[0]
         self.assertEqual(args[1], "git.receive")
         self.assertEqual(args[2]["repo"]["name"], "test")
         self.assertEqual(args[2]["start_commit"], sha)
         self.assertEqual(args[2]["forced"], False)
-        self.assertEqual(args[2]["old_commit"], oldrev)
+        self.assertEqual(args[2]["old_commit"], oldsha)
+        self.assertEqual(
+            args[2]["changed_files"],
+            {
+                "folder1/folder2/file": "A",
+                "folder1/folder2/fileŠ": "A",
+            },
+        )
 
 
 if __name__ == "__main__":
