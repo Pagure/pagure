@@ -29,6 +29,8 @@ import pagure.lib.query
 import pagure.lib.model
 import tests
 
+from pagure.config import config as pagure_config
+
 
 class PagureLibtests_search_user(tests.Modeltests):
     """
@@ -5706,6 +5708,25 @@ foo bar
         )
         self.assertEqual(
             [a.name for a in acls], ["create_project", "issue_create"]
+        )
+
+    def test_get_acls_restrict_CROSS_PROJECT_ACLS(self):
+        """Test CROSS_PROJECT_ACLS is well formed and working with get_acls."""
+        acls = pagure.lib.query.get_acls(
+            self.session, restrict=pagure_config.get("CROSS_PROJECT_ACLS")
+        )
+        self.assertEqual(
+            sorted([a.name for a in acls]),
+            [
+                "commit",
+                "create_project",
+                "fork_project",
+                "group_modify",
+                "modify_project",
+                "pull_request_create",
+                "pull_request_update",
+                "update_watch_status",
+            ],
         )
 
     def test_filter_img_src(self):
