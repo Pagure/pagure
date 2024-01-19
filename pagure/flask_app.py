@@ -50,8 +50,9 @@ if (
     or pagure_config.get("PAGURE_CI_SERVICES")
 ):
     pagure.lib.query.set_redis(
-        host=pagure_config["REDIS_HOST"],
-        port=pagure_config["REDIS_PORT"],
+        host=pagure_config.get("REDIS_HOST", None),
+        port=pagure_config.get("REDIS_PORT", None),
+        socket=pagure_config.get("REDIS_SOCKET", None),
         dbname=pagure_config["REDIS_DB"],
     )
 
