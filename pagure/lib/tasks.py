@@ -46,7 +46,12 @@ if os.environ.get("PAGURE_BROKER_URL"):
     broker_url = os.environ["PAGURE_BROKER_URL"]
 elif pagure_config.get("BROKER_URL"):
     broker_url = pagure_config["BROKER_URL"]
-else:
+elif pagure_config.get("REDIS_SOCKET"):
+    broker_url = "redis+socket://%s?virtual_host=%d" % (
+        pagure_config["REDIS_SOCKET"],
+        pagure_config["REDIS_DB"],
+    )
+elif "REDIS_HOST" in pagure_config and "REDIS_PORT" in pagure_config:
     broker_url = "redis://%s:%d/%d" % (
         pagure_config["REDIS_HOST"],
         pagure_config["REDIS_PORT"],

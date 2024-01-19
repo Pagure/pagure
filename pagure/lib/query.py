@@ -105,10 +105,19 @@ class Unspecified(object):
     pass
 
 
-def set_redis(host, port, dbname):
+def set_redis(host=None, port=None, socket=None, dbname=0):
     """Set the redis connection with the specified information."""
     global REDIS
-    pool = redis.ConnectionPool(host=host, port=port, db=dbname)
+    if socket:
+        pool = redis.ConnectionPool(
+            connection_class=redis.UnixDomainSocketConnection, path=socket
+        )
+    elif host and port:
+        pool = redis.ConnectionPool(host=host, port=port, db=dbname)
+    else:
+        raise pagure.exceptions.PagureException(
+            "Configure either REDIS_HOST and REDIS_PORT or REDIS_SOCKET"
+        )
     REDIS = redis.StrictRedis(connection_pool=pool)
 
 

@@ -5229,10 +5229,16 @@ foo bar
             html = pagure.lib.query.text2markdown(text)
             self.assertEqual(html, expected)
 
-    def test_set_redis(self):
-        """Test the set_redis function of pagure.lib.query."""
+    def test_set_redis_tcpip(self):
+        """Test the set_redis function of pagure.lib.query using address/port."""
         self.assertIsNone(pagure.lib.query.REDIS)
-        pagure.lib.query.set_redis("0.0.0.0", 6379, 0)
+        pagure.lib.query.set_redis("0.0.0.0", 6379)
+        self.assertIsNotNone(pagure.lib.query.REDIS)
+
+    def test_set_redis_unix(self):
+        """Test the set_redis function of pagure.lib.query using a Unix socket."""
+        self.assertIsNone(pagure.lib.query.REDIS)
+        pagure.lib.query.set_redis(socket="/run/redis/pagure.sock")
         self.assertIsNotNone(pagure.lib.query.REDIS)
 
     def test_set_pagure_ci(self):
