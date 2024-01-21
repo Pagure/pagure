@@ -21,7 +21,6 @@ import zipfile
 
 import arrow
 import pygit2
-import requests
 import six
 
 # from sqlalchemy.orm.session import Session
@@ -438,7 +437,6 @@ def get_project_from_json(session, jsondata):
                 user=user.username,
                 name=name,
                 namespace=namespace,
-                repospanner_region=None,
                 description=jsondata.get("description"),
                 parent_id=parent.id if parent else None,
                 blacklist=pagure_config.get("BLACKLISTED_PROJECTS", []),
@@ -1008,62 +1006,22 @@ class TemporaryClone(object):
         if self._parent:
             self.repopath = os.path.join(self.repopath, self._parent)
             os.makedirs(self.repopath)
-        if not self._project.is_on_repospanner:
-            # This is the simple case. Just do a local clone
-            # use either the specified path or the use the path of the
-            # specified project
-            self._origpath = self._path or self._project.repopath(
-                self._repotype
-            )
-            if self._origpath is None:
-                # No repository of this type
-                # 'main' is already caught and returns an error in repopath()
-                return None
-            if not os.path.exists(self._origpath):
-                return None
-            PagureRepo.clone(self._origpath, self.repopath)
-            # Because for whatever reason, one pygit2.Repository is not
-            # equal to another.... The pygit2.Repository returned from
-            # pygit2.clone_repository does not have the "branches" attribute.
-            self.repo = pygit2.Repository(self.repopath)
-            self._origrepo = pygit2.Repository(self._origpath)
-        else:
-            repourl, regioninfo = self._project.repospanner_repo_info(
-                self._repotype
-            )
-
-            command = [
-                "git",
-                "-c",
-                "protocol.ext.allow=always",
-                "clone",
-                "ext::%s %s"
-                % (
-                    pagure_config["REPOBRIDGE_BINARY"],
-                    self._project._repospanner_repo_name(self._repotype),
-                ),
-                self.repopath,
-            ]
-            environ = os.environ.copy()
-            environ.update(
-                {
-                    "USER": "pagure",
-                    "REPOBRIDGE_CONFIG": ":environment:",
-                    "REPOBRIDGE_BASEURL": regioninfo["url"],
-                    "REPOBRIDGE_CA": regioninfo["ca"],
-                    "REPOBRIDGE_CERT": regioninfo["push_cert"]["cert"],
-                    "REPOBRIDGE_KEY": regioninfo["push_cert"]["key"],
-                }
-            )
-            with open(os.devnull, "w") as devnull:
-                subprocess.check_call(
-                    command,
-                    stdout=devnull,
-                    stderr=subprocess.STDOUT,
-                    env=environ,
-                )
-            self.repo = pygit2.Repository(self.repopath)
-            self._origrepo = self.repo
+        # This is the simple case. Just do a local clone
+        # use either the specified path or the use the path of the
+        # specified project
+        self._origpath = self._path or self._project.repopath(self._repotype)
+        if self._origpath is None:
+            # No repository of this type
+            # 'main' is already caught and returns an error in repopath()
+            return None
+        if not os.path.exists(self._origpath):
+            return None
+        PagureRepo.clone(self._origpath, self.repopath)
+        # Because for whatever reason, one pygit2.Repository is not
+        # equal to another.... The pygit2.Repository returned from
+        # pygit2.clone_repository does not have the "branches" attribute.
+        self.repo = pygit2.Repository(self.repopath)
+        self._origrepo = pygit2.Repository(self._origpath)
 
         # Make sure that all remote refs are mapped to local ones.
         headname = None
@@ -1101,10 +1059,7 @@ class TemporaryClone(object):
                 this TemporaryClone instance with
         """
         self._project = new_project
-        if not new_project.is_on_repospanner:
-            self.repo.remotes.set_push_url(
-                "origin", new_project.repopath("main")
-            )
+        self.repo.remotes.set_push_url("origin", new_project.repopath("main"))
 
     def mirror(self, username, force=False, **extra):
         """Run ``git push --mirror`` of the repo to its origin.
@@ -1147,52 +1102,10 @@ class TemporaryClone(object):
             extra["pull_request_uid"] = extra["pull_request"].uid
             del extra["pull_request"]
 
-        if self._project.is_on_repospanner:
-            regioninfo = pagure_config["REPOSPANNER_REGIONS"][
-                self._project.repospanner_region
-            ]
-
-            extra.update(
-                {
-                    "username": username,
-                    "repotype": self._repotype,
-                    "project_name": self._project.name,
-                    "project_user": self._project.user.username
-                    if self._project.is_fork
-                    else "",
-                    "project_namespace": self._project.namespace or "",
-                }
-            )
-            args = []
-            for opt in extra:
-                args.extend(["--extra", opt, extra[opt]])
-            command = [
-                "git",
-                "-c",
-                "protocol.ext.allow=always",
-                "push",
-                "ext::%s %s %s"
-                % (
-                    pagure_config["REPOBRIDGE_BINARY"],
-                    " ".join(args),
-                    self._project._repospanner_repo_name(self._repotype),
-                ),
-                "--repo",
-                self.repopath,
-            ]
-            environ = {
-                "USER": "pagure",
-                "REPOBRIDGE_CONFIG": ":environment:",
-                "REPOBRIDGE_BASEURL": regioninfo["url"],
-                "REPOBRIDGE_CA": regioninfo["ca"],
-                "REPOBRIDGE_CERT": regioninfo["push_cert"]["cert"],
-                "REPOBRIDGE_KEY": regioninfo["push_cert"]["key"],
-            }
-        else:
-            command = ["git", "push", "origin"]
-            if force:
-                command.append("--force")
-            environ = {}
+        command = ["git", "push", "origin"]
+        if force:
+            command.append("--force")
+        environ = {}
 
         command.append("--follow-tags")
 
@@ -2729,198 +2642,91 @@ def drop_branch_aliases(project, source, dest):
 
 
 def delete_project_repos(project):
-    """Deletes the actual git repositories on disk or repoSpanner
+    """Deletes the actual git repositories on disk
 
     Args:
         project (Project): Project to delete repos for
     """
     for repotype in pagure.lib.query.get_repotypes():
-        if project.is_on_repospanner:
-            _, regioninfo = project.repospanner_repo_info(repotype)
+        repopath = project.repopath(repotype)
+        if repopath is None:
+            continue
 
-            _log.debug("Deleting repotype %s", repotype)
-            data = {
-                "Reponame": project._repospanner_repo_name(
-                    repotype, project.repospanner_region
-                )
-            }
-            resp = requests.post(
-                "%s/admin/deleterepo" % regioninfo["url"],
-                json=data,
-                verify=regioninfo["ca"],
-                cert=(
-                    regioninfo["admin_cert"]["cert"],
-                    regioninfo["admin_cert"]["key"],
-                ),
+        try:
+            shutil.rmtree(repopath)
+        except Exception:
+            _log.exception(
+                "Failed to remove repotype %s for %s",
+                repotype,
+                project.fullname,
             )
-            resp.raise_for_status()
-            resp = resp.json()
-            _log.debug("Response json: %s", resp)
-            if not resp["Success"]:
-                raise Exception(
-                    "Error in repoSpanner API call: %s" % resp["Error"]
-                )
-
-        else:
-            repopath = project.repopath(repotype)
-            if repopath is None:
-                continue
-
-            try:
-                shutil.rmtree(repopath)
-            except Exception:
-                _log.exception(
-                    "Failed to remove repotype %s for %s",
-                    repotype,
-                    project.fullname,
-                )
 
 
-def set_up_project_hooks(project, region, hook=None):
+def set_up_project_hooks(project, hook=None):
     """Makes sure the git repositories for a project have their hooks setup.
 
     Args:
         project (model.Project): Project to set up hooks for
-        region (string or None): repoSpanner region to set hooks up for
-        hook (string): The hook ID to set up in repoSpanner (tests only)
     """
-    if region is None:
-        # This repo is not on repoSpanner, create hooks locally
-        pagure.hooks.BaseHook.set_up(project)
-    else:
-        regioninfo = pagure_config["REPOSPANNER_REGIONS"].get(region)
-        if not regioninfo:
-            raise ValueError(
-                "Invalid repoSpanner region %s looked up" % region
-            )
-        if not hook:
-            hook = regioninfo["hook"]
-        if not hook:
-            # No hooks to set up for this region
-            return
-
-        for repotype in pagure.lib.query.get_repotypes():
-            data = {
-                "Reponame": project._repospanner_repo_name(repotype, region),
-                "UpdateRequest": {
-                    "hook-prereceive": hook,
-                    "hook-update": hook,
-                    "hook-postreceive": hook,
-                },
-            }
-            resp = requests.post(
-                "%s/admin/editrepo" % regioninfo["url"],
-                json=data,
-                verify=regioninfo["ca"],
-                cert=(
-                    regioninfo["admin_cert"]["cert"],
-                    regioninfo["admin_cert"]["key"],
-                ),
-            )
-            resp.raise_for_status()
-            resp = resp.json()
-            _log.debug("Response json: %s", resp)
-            if not resp["Success"]:
-                raise Exception(
-                    "Error in repoSpanner API call: %s" % resp["Error"]
-                )
+    # Create hooks locally
+    pagure.hooks.BaseHook.set_up(project)
 
 
-def _create_project_repo(project, region, templ, ignore_existing, repotype):
-    """Creates a single specific git repository on disk or repoSpanner
+def _create_project_repo(project, templ, ignore_existing, repotype):
+    """Creates a single specific git repository on disk
 
     Args:
         project (Project): Project to create repos for
-        region (string or None): repoSpanner region to create the repos in
-        templ (string): Template directory, only valid for non-repoSpanner
+        templ (string): Template directory
         ignore_existing (bool): Whether a repo already existing is fatal
         repotype (string): Repotype to create
     Returns: (string or None): Directory created
     """
-    if region:
-        # repoSpanner creation
-        regioninfo = pagure_config["REPOSPANNER_REGIONS"][region]
-        # First create the repository on the repoSpanner region
-        _log.debug("Creating repotype %s", repotype)
-        data = {
-            "Reponame": project._repospanner_repo_name(repotype, region),
-            "Public": False,
-        }
-        resp = requests.post(
-            "%s/admin/createrepo" % regioninfo["url"],
-            json=data,
-            verify=regioninfo["ca"],
-            cert=(
-                regioninfo["admin_cert"]["cert"],
-                regioninfo["admin_cert"]["key"],
-            ),
-        )
-        resp.raise_for_status()
-        resp = resp.json()
-        _log.debug("Response json: %s", resp)
-        if not resp["Success"]:
-            if "already exists" in resp["Error"]:
-                if ignore_existing:
-                    return None
-                else:
-                    raise pagure.exceptions.RepoExistsException(resp["Error"])
-            raise Exception(
-                "Error in repoSpanner API call: %s" % resp["Error"]
-            )
-
+    repodir = project.repopath(repotype)
+    if repodir is None:
+        # This repo type is disabled
         return None
-
-    else:
-        # local repo
-        repodir = project.repopath(repotype)
-        if repodir is None:
-            # This repo type is disabled
-            return None
-        if os.path.exists(repodir):
-            if not ignore_existing:
-                raise pagure.exceptions.RepoExistsException(
-                    "The %s repo %s already exists" % (repotype, project.path)
-                )
-            else:
-                return None
-
-        if repotype == "main":
-            pygit2.init_repository(repodir, bare=True, template_path=templ)
-
-            if not project.private:
-                # Make the repo exportable via apache
-                http_clone_file = os.path.join(repodir, "git-daemon-export-ok")
-                if not os.path.exists(http_clone_file):
-                    with open(http_clone_file, "w"):
-                        pass
-        else:
-            pygit2.init_repository(
-                repodir,
-                bare=True,
-                mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP,
+    if os.path.exists(repodir):
+        if not ignore_existing:
+            raise pagure.exceptions.RepoExistsException(
+                "The %s repo %s already exists" % (repotype, project.path)
             )
+        else:
+            return None
 
-        return repodir
+    if repotype == "main":
+        pygit2.init_repository(repodir, bare=True, template_path=templ)
+
+        if not project.private:
+            # Make the repo exportable via apache
+            http_clone_file = os.path.join(repodir, "git-daemon-export-ok")
+            if not os.path.exists(http_clone_file):
+                with open(http_clone_file, "w"):
+                    pass
+    else:
+        pygit2.init_repository(
+            repodir,
+            bare=True,
+            mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP,
+        )
+
+    return repodir
 
 
-def create_project_repos(project, region, templ, ignore_existing):
-    """Creates the actual git repositories on disk or repoSpanner
+def create_project_repos(project, templ, ignore_existing):
+    """Creates the actual git repositories on disk
 
     Args:
         project (Project): Project to create repos for
-        region (string or None): repoSpanner region to create the repos in
-        templ (string): Template directory, only valid for non-repoSpanner
+        templ (string): Template directory
         ignore_existing (bool): Whether a repo already existing is fatal
     """
-    if region and templ:
-        raise Exception("repoSpanner is incompatible with template directory")
-
     created_dirs = []
 
     try:
         for repotype in pagure.lib.query.get_repotypes():
             created = _create_project_repo(
-                project, region, templ, ignore_existing, repotype
+                project, templ, ignore_existing, repotype
             )
             if created:
                 created_dirs.append(created)
@@ -2929,7 +2735,7 @@ def create_project_repos(project, region, templ, ignore_existing):
             shutil.rmtree(created)
         raise
 
-    set_up_project_hooks(project, region)
+    set_up_project_hooks(project)
 
 
 def get_stats_patch(patch):
@@ -3123,50 +2929,8 @@ def mirror_pull_project(session, project, debug=False):
         if debug:
             print("Pushing to the local git repo")
         extra = {}
-        if project.is_on_repospanner:
-            regioninfo = pagure_config["REPOSPANNER_REGIONS"][
-                project.repospanner_region
-            ]
-
-            extra.update(
-                {
-                    "username": "pagure",
-                    "repotype": "main",
-                    "project_name": project.name,
-                    "project_user": project.user.username
-                    if project.is_fork
-                    else "",
-                    "project_namespace": project.namespace or "",
-                }
-            )
-            args = []
-            for opt in extra:
-                args.extend(["--extra", opt, extra[opt]])
-            command = [
-                "git",
-                "-c",
-                "protocol.ext.allow=always",
-                "push",
-                "ext::%s %s %s"
-                % (
-                    pagure_config["REPOBRIDGE_BINARY"],
-                    " ".join(args),
-                    project._repospanner_repo_name("main"),
-                ),
-                "--repo",
-                repopath,
-            ]
-            environ = {
-                "USER": "pagure",
-                "REPOBRIDGE_CONFIG": ":environment:",
-                "REPOBRIDGE_BASEURL": regioninfo["url"],
-                "REPOBRIDGE_CA": regioninfo["ca"],
-                "REPOBRIDGE_CERT": regioninfo["push_cert"]["cert"],
-                "REPOBRIDGE_KEY": regioninfo["push_cert"]["key"],
-            }
-        else:
-            command = ["git", "push", "local", "--mirror"]
-            environ = {}
+        command = ["git", "push", "local", "--mirror"]
+        environ = {}
 
         _log.debug("Running a git push to %s", project.fullname)
         env = os.environ.copy()

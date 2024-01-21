@@ -1411,12 +1411,6 @@ def api_new_project():
     |                            |         |              |   already a coresopnding  |
     |                            |         |              |   git repository on disk  |
     +----------------------------+---------+--------------+---------------------------+
-    | ``repospanner_region``     | boolean | Optional     | | Only available to admins|
-    |                            |         |              |   this option allows them |
-    |                            |         |              |   to override the default |
-    |                            |         |              |   respoSpanner region     |
-    |                            |         |              |   configured              |
-    +----------------------------+---------+--------------+---------------------------+
     | ``wait``                   | boolean | Optional     | | A boolean to specify if |
     |                            |         |              |   this API call should    |
     |                            |         |              |   return a taskid or if it|
@@ -1480,10 +1474,6 @@ def api_new_project():
         private = False
         if pagure_config.get("PRIVATE_PROJECTS", False):
             private = form.private.data
-        if form.repospanner_region:
-            repospanner_region = form.repospanner_region.data
-        else:
-            repospanner_region = None
         if form.ignore_existing_repos:
             ignore_existing_repos = form.ignore_existing_repos.data
         else:
@@ -1500,7 +1490,6 @@ def api_new_project():
                 flask.g.session,
                 name=name,
                 namespace=namespace,
-                repospanner_region=repospanner_region,
                 ignore_existing_repo=ignore_existing_repos,
                 description=description,
                 private=private,

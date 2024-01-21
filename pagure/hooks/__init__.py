@@ -157,11 +157,6 @@ class BaseHook(object):
         """Install the generic post-receive hook that allow us to call
         multiple post-receive hooks as set per plugin.
         """
-        if project.is_on_repospanner:
-            # If the project is on repoSpanner, there's nothing to set up,
-            # as the hook script will be arranged by repo creation.
-            return
-
         hook_files = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), "files"
         )
@@ -297,8 +292,7 @@ def run_project_hooks(
     """Function to run the hooks on a project
 
     This will first call all the plugins with a Runner on the project,
-    and afterwards, for a non-repoSpanner repo, run all hooks/<hooktype>.*
-    scripts in the repo.
+    and afterwards run all hooks/<hooktype>.* scripts in the repo.
 
     Args:
         session: Database session
@@ -397,10 +391,6 @@ def run_project_hooks(
                 else:
                     print(str(e))
                 haderrors = True
-
-    if project.is_on_repospanner:
-        # We are done. We are not doing any legacy hooks for repoSpanner
-        return
 
     hookdir = os.path.join(repodir, "hooks")
     if not os.path.exists(hookdir):

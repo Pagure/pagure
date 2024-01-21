@@ -332,8 +332,7 @@ sed -e "s|#!/usr/bin/env python|#!%{__python}|" -i \
     $RPM_BUILD_ROOT/%{python_sitelib}/pagure/hooks/files/*.py \
     $RPM_BUILD_ROOT/%{python_sitelib}/pagure/hooks/files/hookrunner \
     $RPM_BUILD_ROOT/%{python_sitelib}/pagure/hooks/files/post-receive \
-    $RPM_BUILD_ROOT/%{python_sitelib}/pagure/hooks/files/pre-receive \
-    $RPM_BUILD_ROOT/%{python_sitelib}/pagure/hooks/files/repospannerhook
+    $RPM_BUILD_ROOT/%{python_sitelib}/pagure/hooks/files/pre-receive
 
 # Switch interpreter for systemd units
 sed -e "s|/usr/bin/python|%{__python}|g" -i $RPM_BUILD_ROOT/%{_unitdir}/*.service

@@ -15,7 +15,6 @@ import datetime
 import hashlib
 import os
 import os.path
-import shutil
 import subprocess
 import time
 
@@ -276,7 +275,6 @@ def create_project(
         with project.lock("WORKER"):
             pagure.lib.git.create_project_repos(
                 project,
-                project.repospanner_region,
                 templ,
                 ignore_existing_repo,
             )
@@ -484,9 +482,7 @@ def fork(
     )
 
     with repo_to.lock("WORKER"):
-        pagure.lib.git.create_project_repos(
-            repo_to, repo_to.repospanner_region, None, False
-        )
+        pagure.lib.git.create_project_repos(repo_to, None, False)
 
         with pagure.lib.git.TemporaryClone(
             repo_from, "main", "fork"
@@ -506,14 +502,14 @@ def fork(
             tempclone.change_project_association(repo_to)
             tempclone.mirror("pagure", internal_no_hooks="yes")
 
-        if not repo_to.is_on_repospanner and not repo_to.private:
+        if not repo_to.private:
             # Create the git-daemon-export-ok file on the clone
             http_clone_file = os.path.join(
                 repo_to.repopath("main"), "git-daemon-export-ok"
             )
-            if not os.path.exists(http_clone_file):
-                with open(http_clone_file, "w"):
-                    pass
+        if not os.path.exists(http_clone_file):
+            with open(http_clone_file, "w"):
+                pass
 
         # Finally set the default branch to be the same as the parent
         repo_from_obj = pygit2.Repository(repo_from.repopath("main"))
@@ -602,105 +598,6 @@ def refresh_remote_pr(self, session, name, namespace, user, requestid):
         namespace=namespace,
         repo=name,
         requestid=requestid,
-    )
-
-
-@conn.task(queue=pagure_config.get("FAST_CELERY_QUEUE", None), bind=True)
-@pagure_task
-def move_to_repospanner(self, session, name, namespace, user, region):
-    """Move a repository to a repoSpanner region."""
-    project = pagure.lib.query._get_project(
-        session, namespace=namespace, name=name, user=user
-    )
-    regioninfo = pagure_config.get("REPOSPANNER_REGIONS", {}).get(region)
-    if not regioninfo:
-        raise Exception("Missing region config")
-
-    with project.lock("WORKER"):
-        # Perform some pre-flight checks
-        if project.is_on_repospanner:
-            raise Exception("Project is already on repoSpanner")
-
-        #  Make sure that no non-runner hooks are enabled for this project
-        incompatible_hooks = []
-        for repotype in pagure.lib.query.get_repotypes():
-            path = project.repopath(repotype)
-            if path is None:
-                continue
-            hookpath = os.path.join(path, "hooks")
-            for hook in os.listdir(hookpath):
-                if not hook.startswith(
-                    ("pre-receive.", "update.", "post-receive.")
-                ):
-                    continue
-                if hook.endswith(".sample"):
-                    # Ignore the samples that Git inserts
-                    continue
-                if hook not in pagure.lib.query.ORIGINAL_PAGURE_HOOK:
-                    incompatible_hooks.append((repotype, hook))
-
-        if incompatible_hooks:
-            raise Exception(
-                "Repository contains repoSpanner-incompatible "
-                "hooks: %s"
-                % ", ".join(["%s" % (hook,) for hook in incompatible_hooks])
-            )
-
-        # Create the repositories
-        pagure.lib.git.create_project_repos(project, region, None, False)
-
-        for repotype in pagure.lib.query.get_repotypes():
-            repopath = project.repopath(repotype)
-            if repopath is None:
-                continue
-            repourl, _ = project.repospanner_repo_info(repotype, region)
-            repo_obj = pagure.lib.repo.PagureRepo(repopath)
-            repo_obj.create_remote("repospanner_push", repourl)
-
-            command = [
-                "git",
-                "-c",
-                "http.sslcainfo=%s" % regioninfo["ca"],
-                "-c",
-                "http.sslcert=%s" % regioninfo["push_cert"]["cert"],
-                "-c",
-                "http.sslkey=%s" % regioninfo["push_cert"]["key"],
-                "push",
-                "--mirror",
-                "repospanner_push",
-            ]
-            _log.debug("Running push command: %s", command)
-            out = subprocess.check_output(
-                command, cwd=repopath, stderr=subprocess.STDOUT
-            )
-            _log.debug("Out: %s" % out)
-
-        for repotype in pagure.lib.query.get_repotypes():
-            repopath = project.repopath(repotype)
-            if repopath is None:
-                continue
-            repo_obj = pagure.lib.repo.PagureRepo(repopath)
-
-            # At this moment, this subrepo has been migrated
-            # Move the "refs" folder to "refsold", so that we don't actually
-            # delete any data, but it's no longer a valid git repo.
-            # On next use, a pseudo repository will be created.
-            refsdir = os.path.join(repopath, "refs")
-            shutil.move(refsdir, refsdir + "old")
-            with open(
-                os.path.join(repopath, "repospanner_status"), "w"
-            ) as info:
-                info.write(
-                    "This repository has migrated to repoSpanner region %s"
-                    % region
-                )
-
-        project.repospanner_region = region
-        session.add(project)
-        session.commit()
-
-    return ret(
-        "ui_ns.view_repo", username=user, namespace=namespace, repo=name
     )
 
 

@@ -294,7 +294,7 @@ To use this variant, set the following in ``pagure.cfg``:
 
     SSH_KEYS_USERNAME_EXPECT = "git"
 
-    SSH_COMMAND_NON_REPOSPANNER = ([
+    SSH_COMMAND = ([
         "/usr/bin/%(cmd)s",
         "/srv/git/repositories/%(reponame)s",
     ], {"GL_USER": "%(username)s"})
@@ -329,7 +329,7 @@ set the following to ``pagure.cfg``:
 
     HTTP_REPO_ACCESS_GITOLITE = None
 
-    SSH_COMMAND_NON_REPOSPANNER = ([
+    SSH_COMMAND = ([
         "/usr/bin/%(cmd)s",
         "/srv/git/repositories/%(reponame)s",
     ], {"GL_USER": "%(username)s"})
@@ -353,7 +353,7 @@ Using Gitolite also requires setting the following in ``pagure.cfg``:
 
     HTTP_REPO_ACCESS_GITOLITE = "/usr/share/gitolite3/gitolite-shell"
 
-    SSH_COMMAND_NON_REPOSPANNER = (
+    SSH_COMMAND = (
         [
             "/usr/share/gitolite3/gitolite-shell",
             "%(username)s",
@@ -1709,9 +1709,6 @@ This is especially useful if repositories are stored on NFS (or similar
 network storage), where file metadata access is expensive - having unpacked
 objects in repositories requires *a lot* of metadata reads.
 
-Note that the garbage collection is only run on repos that are not on
-repoSpanner.
-
 Defaults to: ``False``
 
 
@@ -1965,95 +1962,6 @@ Defaults to:
     ])
 
 
-RepoSpanner Options
--------------------
-
-Pagure can be integrated with `repoSpanner <https://repospanner.org>`_
-allowing to deploy pagure in a load-balanced environment since the git
-repositories are then synced across multiple servers simultaneously.
-
-Support for this integration has been included in Pagure version 5.0 and higher.
-
-Here below are the different options one can/should use to integrate pagure
-with repoSpanner.
-
-REPOBRIDGE_BINARY
-~~~~~~~~~~~~~~~~~
-
-This should contain the path to the repoBridge binary, which is used for pushing
-and pulling to/from repoSpanner.
-
-Defaults to: ``/usr/libexec/repobridge``.
-
-
-REPOSPANNER_NEW_REPO
-~~~~~~~~~~~~~~~~~~~~
-
-This configuration key instructs pagure to create new git repositories on
-repoSpanner or not.
-Its value should be the region in which the new git repositories should be
-created on.
-
-Defaults to: ``None``.
-
-REPOSPANNER_NEW_REPO_ADMIN_OVERRIDE
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-This configuration key can be used to let pagure admin override the default
-region used when creating new git repositories on repoSpanner.
-Its value should be a boolean.
-
-Defaults to: ``False``
-
-REPOSPANNER_NEW_FORK
-~~~~~~~~~~~~~~~~~~~~
-
-This configuration key instructs pagure on where/how to create new git
-repositories for the forks with repoSpanner.
-If ``None``, git repositories for forks are created outside of repoSpanner
-entirely.
-If ``True``, git repositories for forks are created in the same region as
-the parent project.
-Otherwise, a region can be directly specified where git repositories for
-forks will be created.
-
-Defaults to: ``True``
-
-REPOSPANNER_ADMIN_MIGRATION
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-This configuration key can be used to let admin manually migrate individual
-project into repoSpanner once it is set up.
-
-Defaults to: ``False``
-
-REPOSPANNER_REGIONS
-~~~~~~~~~~~~~~~~~~~
-
-This configuration key can be used to specify the different region where repoSpanner
-is deployed and thus with which this pagure instance can be integrated.
-
-An example entry could look like:
-
-::
-
-    REPOSPANNER_REGIONS = {
-        'default': {'url': 'https://nodea.regiona.repospanner.local:8444',
-                    'repo_prefix': 'pagure/',
-                    'hook': None,
-                    'ca': '/etc/pki/repospanner/pki/ca.crt',
-                    'admin_cert': {'cert': '/etc/pki/repospanner/pki/admin.crt',
-                                   'key': '/etc/pki/repospanner/pki/admin.key'},
-                    'push_cert': {'cert': '/etc/pki/repospanner/pki/pagure.crt',
-                                  'key': '/etc/pki/repospanner/pki/pagure.key'}}
-    }
-
-If this configuration key is not defined, pagure will consider that it is
-not set to be integrated with repoSpanner.
-
-Defaults to: ``{}``
-
-
 SSH_KEYS_USERNAME_LOOKUP
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -2098,16 +2006,10 @@ it's not possible to use the ``IP_ALLOWED_INTERNAL`` address list.
 Defaults to: ``None``
 
 
-SSH_COMMAND_REPOSPANNER
-~~~~~~~~~~~~~~~~~~~~~~~
+SSH_COMMAND
+~~~~~~~~~~~
 
-The command to run if a repository is on repospanner when aclchecker is in use.
-
-
-SSH_COMMAND_NON_REPOSPANNER
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The command to run if a repository is not on repospanner when aclchecker is in use.
+The command to run when aclchecker is in use.
 
 
 

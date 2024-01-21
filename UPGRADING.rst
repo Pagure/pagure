@@ -1,6 +1,29 @@
 Upgrading Pagure
 ================
 
+From 5.13 to 6.0
+-----------------
+
+The 6.0 release contains database schema updates, so:
+
+* Update the data schema using alembic: ``alembic upgrade head``
+
+(As usual, do your backups before).
+
+Removed features (in 6.0):
+
+* repoSpanner, which was never completed and eventually abandoned.
+
+Configuration keys removed (in 6.0);
+
+* REPOSPANNER_PSEUDO_FOLDER
+* REPOSPANNER_NEW_REPO
+* REPOSPANNER_NEW_REPO_ADMIN_OVERRIDE
+* REPOSPANNER_NEW_FORK
+* REPOSPANNER_ADMIN_MIGRATION
+* REPOSPANNER_REGIONS
+
+
 From 5.12 to 5.13
 -----------------
 

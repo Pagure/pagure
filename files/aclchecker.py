@@ -90,10 +90,7 @@ if not result["access"]:
 # Now go run the configured command
 # We verified that cmd is either "git-receive-pack" or "git-send-pack"
 # and "path" is a path that points to a valid Pagure repository.
-if result["region"]:
-    runner, env = pagure_config["SSH_COMMAND_REPOSPANNER"]
-else:
-    runner, env = pagure_config["SSH_COMMAND_NON_REPOSPANNER"]
+runner, env = pagure_config["SSH_COMMAND"]
 
 result.update({"username": remoteuser, "cmd": cmd})
 

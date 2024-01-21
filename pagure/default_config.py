@@ -173,11 +173,6 @@ ATTACHMENTS_FOLDER = os.path.join(
     os.path.abspath(os.path.dirname(__file__)), "..", "lcl", "attachments"
 )
 
-# Folder for repoSpanner pseudo repos
-REPOSPANNER_PSEUDO_FOLDER = os.path.join(
-    os.path.abspath(os.path.dirname(__file__)), "..", "lcl", "pseudo"
-)
-
 # Whether to enable scanning for viruses in attachments
 VIRUS_SCAN_ATTACHMENTS = False
 
@@ -222,8 +217,7 @@ GL_BINDIR = None
 
 
 # Whether or not to run "git gc --auto" after every change to a project
-# This will only run for projects not on repospanner and will use
-# default git config values
+# This will use default git config values
 # See https://git-scm.com/docs/git-gc#git-gc---auto for more details
 GIT_GARBAGE_COLLECT = False
 
@@ -575,31 +569,6 @@ ALLOW_HTTP_PUSH = False
 # Path to Gitolite-shell if using that, None to use Git directly
 HTTP_REPO_ACCESS_GITOLITE = None
 
-# repoSpanner integration settings
-# Path the the repoBridge binary
-REPOBRIDGE_BINARY = "/usr/libexec/repobridge"
-# Whether to create new repositories on repoSpanner by default.
-# Either None or a region name.
-REPOSPANNER_NEW_REPO = None
-# Whether to allow admins to override region selection on creation.
-REPOSPANNER_NEW_REPO_ADMIN_OVERRIDE = False
-# Whether to create new forks on repoSpanner.
-# Either None (no repoSpanner), True (same as origin project) or a region name.
-REPOSPANNER_NEW_FORK = True
-# Whether to allow an admin to manually migrate an individual project.
-REPOSPANNER_ADMIN_MIGRATION = False
-# The repoSpanner regions to be used in this Pagure instance.
-# Example entry:
-# 'default': {'url': 'https://nodea.regiona.repospanner.local:8444',
-#             'repo_prefix': 'pagure/',
-#             'hook': None,
-#             'ca': '',
-#             'admin_cert': {'cert': '',
-#                            'key': ''},
-#             'push_cert': {'cert': '',
-#                           'key': ''}}
-REPOSPANNER_REGIONS = {}
-
 # Configuration for the key helper
 # Look a username up in the database, overrides SSH_KEYS_USERNAME_EXPECT
 SSH_KEYS_USERNAME_LOOKUP = False
@@ -618,30 +587,7 @@ SSH_KEYS_OPTIONS = (
 SSH_ADMIN_TOKEN = None
 
 # ACL Checker options
-SSH_COMMAND_REPOSPANNER = (
-    [
-        "/usr/libexec/repobridge",
-        "--extra",
-        "username",
-        "%(username)s",
-        "--extra",
-        "repotype",
-        "%(repotype)s",
-        "--extra",
-        "project_name",
-        "%(project_name)s",
-        "--extra",
-        "project_user",
-        "%(project_user)s",
-        "--extra",
-        "project_namespace",
-        "%(project_namespace)s",
-        "%(cmd)s",
-        "'%(repospanner_reponame)s'",
-    ],
-    {"REPOBRIDGE_CONFIG": "/etc/repospanner/bridge_%(region)s.json"},
-)
-SSH_COMMAND_NON_REPOSPANNER = (
+SSH_COMMAND = (
     [
         "/usr/bin/%(cmd)s",
         os.path.join(GIT_FOLDER, "%(reponame)s"),

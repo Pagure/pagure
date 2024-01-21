@@ -17,7 +17,6 @@ import subprocess
 import tempfile
 
 import flask
-import requests
 import werkzeug.wsgi
 
 import pagure.exceptions
@@ -94,11 +93,7 @@ def _get_remote_user(project):
 
 
 def proxy_raw_git(project):
-    """Proxy a request to Git or gitolite3 via a subprocess.
-
-    This should get called after it is determined the requested project
-    is not on repoSpanner.
-    """
+    """Proxy a request to Git or gitolite3 via a subprocess."""
     _log.debug("Raw git clone proxy started")
     remote_user = _get_remote_user(project)
     # We are going to shell out to gitolite-shell. Prepare the env it needs.
@@ -224,63 +219,6 @@ def proxy_raw_git(project):
             headers=headers,
             direct_passthrough=True,
         )
-
-
-def proxy_repospanner(project, service):
-    """Proxy a request to repoSpanner.
-
-    Args:
-        project (model.Project): The project being accessed
-        service (String): The service as indicated by ?Service= in /info/refs
-    """
-    oper = os.path.basename(flask.request.path)
-    if oper == "refs":
-        oper = "info/refs?service=%s" % service
-    regionurl, regioninfo = project.repospanner_repo_info("main")
-    url = "%s/%s" % (regionurl, oper)
-
-    # Older flask/werkzeug versions don't support both an input and output
-    #  stream: this results in a blank upload.
-    # So, we optimize for the direction the majority of the data will likely
-    #  flow.
-    streamargs = {}
-    if service == "git-receive-pack":
-        # This is a Push operation, optimize for data from the client
-        streamargs["data"] = flask.request.stream
-        streamargs["stream"] = False
-    else:
-        # This is a Pull operation, optimize for data from the server
-        streamargs["data"] = flask.request.data
-        streamargs["stream"] = True
-
-    resp = requests.request(
-        flask.request.method,
-        url,
-        verify=regioninfo["ca"],
-        cert=(regioninfo["push_cert"]["cert"], regioninfo["push_cert"]["key"]),
-        headers={
-            "Content-Encoding": flask.request.content_encoding,
-            "Content-Type": flask.request.content_type,
-            "X-Extra-Username": flask.request.remote_user,
-            "X-Extra-Repotype": "main",
-            "X-Extra-project_name": project.name,
-            "x-Extra-project_user": project.user if project.is_fork else "",
-            "X-Extra-project_namespace": project.namespace,
-        },
-        **streamargs,
-    )
-
-    # Strip out any headers that cause problems
-    for name in ("transfer-encoding",):
-        if name in resp.headers:
-            del resp.headers[name]
-
-    return flask.Response(
-        resp.iter_content(chunk_size=128),
-        status=resp.status_code,
-        headers=dict(resp.headers),
-        direct_passthrough=True,
-    )
 
 
 def clone_proxy(project, username=None, namespace=None):
@@ -419,10 +357,7 @@ def clone_proxy(project, username=None, namespace=None):
         )
         flask.abort(404, description="Project not found")
 
-    if project_obj.is_on_repospanner:
-        return proxy_repospanner(project_obj, service)
-    else:
-        return proxy_raw_git(project_obj)
+    return proxy_raw_git(project_obj)
 
 
 def add_clone_proxy_cmds():

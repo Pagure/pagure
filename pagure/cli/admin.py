@@ -15,11 +15,9 @@ import datetime
 import logging
 import os
 import sys
-from string import Template
 
 import arrow
 import pygit2
-import requests
 from six.moves import input
 
 if "PAGURE_CONFIG" not in os.environ and os.path.exists(
@@ -382,21 +380,6 @@ def _parser_block_user(subparser):
     local_parser.set_defaults(func=do_block_user)
 
 
-def _parser_upload_repospanner_hooks(subparser):
-    """Set up the CLI argument parser to upload repospanner hook.
-
-    Args:
-        subparser: An argparse subparser
-    """
-    local_parser = subparser.add_parser(
-        "upload-repospanner-hook", help="Upload repoSpanner hook script"
-    )
-    local_parser.add_argument(
-        "region", help="repoSpanner region where to " "upload hook"
-    )
-    local_parser.set_defaults(func=do_upload_repospanner_hooks)
-
-
 def _parser_ensure_project_hooks(subparser):
     """Set up the CLI argument parser to ensure project hooks are setup
 
@@ -406,9 +389,6 @@ def _parser_ensure_project_hooks(subparser):
     local_parser = subparser.add_parser(
         "ensure-project-hooks",
         help="Ensure all projects have their hooks setup",
-    )
-    local_parser.add_argument(
-        "hook", help="repoSpanner hook ID to set", default=None
     )
     local_parser.set_defaults(func=do_ensure_project_hooks)
 
@@ -592,9 +572,6 @@ def parse_arguments(args=None):
 
     # block-user
     _parser_block_user(subparser)
-
-    # upload-repospanner-hooks
-    _parser_upload_repospanner_hooks(subparser)
 
     # ensure-project-hooks
     _parser_ensure_project_hooks(subparser)
@@ -1378,52 +1355,6 @@ def do_block_user(args):
     session.commit()
 
 
-def do_upload_repospanner_hooks(args):
-    """Upload hooks to repoSpanner
-
-    Args:
-        args (argparse.Namespace): Parsed arguments
-    """
-    regioninfo = pagure.config.config["REPOSPANNER_REGIONS"].get(args.region)
-    if not regioninfo:
-        raise ValueError(
-            "repoSpanner region %s not in config file" % args.region
-        )
-
-    env = {
-        "config": os.environ.get("PAGURE_CONFIG", "/etc/pagure/pagure.cfg"),
-        "pypath": os.environ.get("PYTHONPATH", "None"),
-    }
-    sourcefile = os.path.abspath(
-        os.path.join(
-            os.path.dirname(os.path.realpath(__file__)),
-            "../hooks/files/repospannerhook",
-        )
-    )
-    with open(sourcefile, "r") as source:
-        template = source.read()
-    hookcontents = Template(template).substitute(env)
-
-    resp = requests.post(
-        "%s/admin/hook/admin.git/upload" % regioninfo["url"],
-        data=hookcontents,
-        headers={"X-Object-Size": str(len(hookcontents))},
-        verify=regioninfo["ca"],
-        cert=(
-            regioninfo["admin_cert"]["cert"],
-            regioninfo["admin_cert"]["key"],
-        ),
-    )
-    resp.raise_for_status()
-    resp = resp.json()
-    _log.debug("Response json: %s", resp)
-    if not resp["Success"]:
-        raise Exception("Error in repoSpanner API call: %s" % resp["Error"])
-    hook = resp["Info"]
-    print("Hook ID for region %s: %s" % (args.region, hook))
-    return hook
-
-
 def do_ensure_project_hooks(args):
     """Ensures that all projects have their hooks setup
 
@@ -1437,9 +1368,7 @@ def do_ensure_project_hooks(args):
     for project in query.all():
         print("Ensuring hooks for %s" % project.fullname)
         projects.append(project.fullname)
-        pagure.lib.git.set_up_project_hooks(
-            project, project.repospanner_region, hook=args.hook
-        )
+        pagure.lib.git.set_up_project_hooks(project, hook=args.hook)
     return projects
 
 

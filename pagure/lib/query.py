@@ -1650,7 +1650,6 @@ def new_project(
     name,
     blacklist,
     allowed_prefix,
-    repospanner_region,
     description=None,
     url=None,
     avatar_email=None,
@@ -1716,21 +1715,9 @@ def new_project(
             'It is not possible to create the repo "%s"' % (path)
         )
 
-    if repospanner_region == "none":
-        repospanner_region = None
-    elif repospanner_region is None:
-        repospanner_region = pagure_config["REPOSPANNER_NEW_REPO"]
-
-    if (
-        repospanner_region
-        and repospanner_region not in pagure_config["REPOSPANNER_REGIONS"]
-    ):
-        raise Exception("repoSpanner region %s invalid" % repospanner_region)
-
     project = model.Project(
         name=name,
         namespace=namespace,
-        repospanner_region=repospanner_region,
         description=description if description else None,
         url=url if url else None,
         avatar_email=avatar_email if avatar_email else None,
@@ -2336,19 +2323,10 @@ def fork_project(session, user, repo, editbranch=None, editfile=None):
 
     user_obj = get_user(session, user)
 
-    fork_repospanner_setting = pagure_config["REPOSPANNER_NEW_FORK"]
-    if fork_repospanner_setting is None:
-        repospanner_region = None
-    elif fork_repospanner_setting is True:
-        repospanner_region = repo.repospanner_region
-    else:
-        repospanner_region = fork_repospanner_setting
-
     project = model.Project(
         name=repo.name,
         namespace=repo.namespace,
         description=repo.description,
-        repospanner_region=repospanner_region,
         private=repo.private,
         user_id=user_obj.id,
         parent_id=repo.id,

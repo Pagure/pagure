@@ -91,7 +91,6 @@ GIT_FOLDER = '%(path)s/repos'
 REQUESTS_FOLDER = '%(path)s/repos/requests'
 TICKETS_FOLDER = %(tickets_folder)r
 DOCS_FOLDER = %(docs_folder)r
-REPOSPANNER_PSEUDO_FOLDER = '%(path)s/repos/pseudo'
 ATTACHMENTS_FOLDER = '%(path)s/attachments'
 BROKER_URL = 'redis+socket://%(global_path)s/broker'
 CELERY_CONFIG = {
@@ -100,21 +99,6 @@ CELERY_CONFIG = {
 }
 GIT_AUTH_BACKEND = '%(authbackend)s'
 TEST_AUTH_STATUS = '%(path)s/testauth_status.json'
-REPOBRIDGE_BINARY = '%(repobridge_binary)s'
-REPOSPANNER_NEW_REPO = %(repospanner_new_repo)s
-REPOSPANNER_NEW_REPO_ADMIN_OVERRIDE = %(repospanner_admin_override)s
-REPOSPANNER_NEW_FORK = %(repospanner_new_fork)s
-REPOSPANNER_ADMIN_MIGRATION = %(repospanner_admin_migration)s
-REPOSPANNER_REGIONS = {
-    'default': {'url': 'https://repospanner.localhost.localdomain:%(repospanner_gitport)s',
-                'repo_prefix': 'pagure/',
-                'hook': None,
-                'ca': '%(path)s/repospanner/pki/ca.crt',
-                'admin_cert': {'cert': '%(path)s/repospanner/pki/admin.crt',
-                               'key': '%(path)s/repospanner/pki/admin.key'},
-                'push_cert': {'cert': '%(path)s/repospanner/pki/pagure.crt',
-                              'key': '%(path)s/repospanner/pki/pagure.key'}}
-}
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -393,12 +377,6 @@ class SimplePagureTest(unittest.TestCase):
             "tickets_folder": "%s/repos/tickets" % self.path,
             "global_path": self.dbfolder,
             "authbackend": "gitolite3",
-            "repobridge_binary": "/usr/libexec/repobridge",
-            "repospanner_gitport": str(8443 + sys.version_info.major),
-            "repospanner_new_repo": "None",
-            "repospanner_admin_override": "False",
-            "repospanner_new_fork": "True",
-            "repospanner_admin_migration": "False",
             "nogithooks": False,
         }
         config_values.update(self.config_values)

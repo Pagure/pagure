@@ -1084,10 +1084,6 @@ def new_project():
         namespace = form.namespace.data
         if namespace:
             namespace = namespace.strip()
-        if form.repospanner_region:
-            repospanner_region = form.repospanner_region.data
-        else:
-            repospanner_region = None
         if form.ignore_existing_repos:
             ignore_existing_repos = form.ignore_existing_repos.data
         else:
@@ -1108,7 +1104,6 @@ def new_project():
                 private=private,
                 description=description,
                 namespace=namespace,
-                repospanner_region=repospanner_region,
                 url=url,
                 avatar_email=avatar_email,
                 user=flask.g.fas_user.username,

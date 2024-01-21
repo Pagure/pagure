@@ -20,7 +20,6 @@ import re
 from operator import attrgetter
 
 import arrow
-import pygit2
 import six
 import sqlalchemy as sa
 from sqlalchemy import create_engine
@@ -422,7 +421,6 @@ class Project(BASE):
         backref="projects",
     )
     private = sa.Column(sa.Boolean, nullable=False, default=False)
-    repospanner_region = sa.Column(sa.Text, nullable=True)
 
     users = relation(
         "User",
@@ -538,87 +536,12 @@ class Project(BASE):
         return "%s-project-%s" % (self.fullname, self.id)
 
     @property
-    def is_on_repospanner(self):
-        """Returns whether this repo is on repoSpanner."""
-        return self.repospanner_region is not None
-
-    @property
     def path(self):
         """Return the name of the git repo on the filesystem."""
         return "%s.git" % self.fullname
 
-    def repospanner_repo_info(self, repotype, region=None):
-        """Returns info for getting a repoSpanner repo for a project.
-
-        Args:
-            repotype (string): Type of repository
-            region (string): If repo is not on repoSpanner, return url as if
-                it was in this region. Used for migrating to repoSpanner.
-        Return type: (url, dict): First is the clone url, then a dict with
-            the regioninfo.
-        """
-        if not self.is_on_repospanner and region is None:
-            raise ValueError("Repo %s is not on repoSpanner" % self.fullname)
-        if self.is_on_repospanner and region is not None:
-            raise ValueError(
-                "Repo %s is already on repoSpanner" % self.fullname
-            )
-        if region is None:
-            region = self.repospanner_region
-        regioninfo = pagure_config["REPOSPANNER_REGIONS"].get(region)
-        if not regioninfo:
-            raise ValueError(
-                "Invalid repoSpanner region %s looked up" % region
-            )
-
-        url = "%s/repo/%s.git" % (
-            regioninfo["url"],
-            self._repospanner_repo_name(repotype, region),
-        )
-        return url, regioninfo
-
-    def _repospanner_repo_name(self, repotype, region=None):
-        """Returns the name of a repo as named in repoSpanner.
-
-        Args:
-            repotype (string): Type of repository
-            region (string): repoSpanner region name
-        Return type: (string)
-        """
-        if region is None:
-            region = self.repospanner_region
-        return os.path.join(
-            pagure_config["REPOSPANNER_REGIONS"][region].get(
-                "repo_prefix", ""
-            ),
-            repotype,
-            self.fullname,
-        )
-
     def repopath(self, repotype):
-        """Return the full repository path of the git repo on the filesystem.
-
-        If the repository is on repoSpanner, this will be a pseudo repository,
-        which is "git repo enough" to be considered a valid repo, but any
-        access should go through a repoSpanner enlightened libgit2.
-        """
-        if self.is_on_repospanner:
-            pseudopath = os.path.join(
-                pagure_config["REPOSPANNER_PSEUDO_FOLDER"], repotype, self.path
-            )
-            if not os.path.exists(pseudopath):
-                repourl, regioninfo = self.repospanner_repo_info(repotype)
-                fake = pygit2.init_repository(pseudopath, bare=True)
-                fake.config["repospanner.url"] = repourl
-                fake.config["repospanner.cert"] = regioninfo["push_cert"][
-                    "cert"
-                ]
-                fake.config["repospanner.key"] = regioninfo["push_cert"]["key"]
-                fake.config["repospanner.cacert"] = regioninfo["ca"]
-                fake.config["repospanner.enabled"] = True
-                del fake
-            return pseudopath
-
+        """Return the full repository path of the git repo on the filesystem."""
         maindir = None
         if repotype == "main":
             maindir = pagure_config["GIT_FOLDER"]

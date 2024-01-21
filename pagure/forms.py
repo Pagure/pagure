@@ -192,19 +192,6 @@ class ProjectForm(ProjectFormSimplified):
         [wtforms.validators.optional()],
         false_values=FALSE_VALUES,
     )
-    repospanner_region = wtforms.SelectField(
-        "repoSpanner Region",
-        [wtforms.validators.optional()],
-        choices=(
-            [("none", "Disabled")]
-            + [
-                (region, region)
-                for region in pagure_config["REPOSPANNER_REGIONS"].keys()
-            ]
-        ),
-        coerce=convert_value,
-        default=pagure_config["REPOSPANNER_NEW_REPO"],
-    )
     default_branch = wtforms.StringField(
         "Default branch",
         [wtforms.validators.optional()],
@@ -240,12 +227,6 @@ class ProjectForm(ProjectFormSimplified):
             not in pagure_config["USERS_IGNORE_EXISTING_REPOS"]
         ):
             self.ignore_existing_repos = None
-
-        if not (
-            is_admin()
-            and pagure_config.get("REPOSPANNER_NEW_REPO_ADMIN_OVERRIDE")
-        ):
-            self.repospanner_region = None
 
 
 class IssueFormSimplied(PagureForm):

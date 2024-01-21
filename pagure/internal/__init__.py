@@ -209,12 +209,8 @@ def check_ssh_access():
         {
             "access": True,
             "reponame": gitdir,
-            "repospanner_reponame": project._repospanner_repo_name(repotype)
-            if project.is_on_repospanner
-            else None,
             "repopath": path,
             "repotype": repotype,
-            "region": project.repospanner_region,
             "project_name": project.name,
             "project_user": project.user.username if project.is_fork else None,
             "project_namespace": project.namespace,
