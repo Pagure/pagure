@@ -11,7 +11,7 @@ if [ -n "$REPO" -a -n "$BRANCH" ]; then
 git remote rm proposed || true
 git gc --auto
 git remote add proposed "$REPO"
-GIT_TRACE=1 GIT_CURL_VERBOSE=1 git fetch proposed
+GIT_TRACE=1 git fetch proposed
 git checkout origin/master
 git config --global user.email "you@example.com"
 git config --global user.name "Your Name"
