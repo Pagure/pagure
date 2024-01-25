@@ -24,7 +24,7 @@ RUN dnf -y --enablerepo=updates-testing install \
 RUN pip install pagure-messages
 
 RUN cd / \
-    && GIT_TRACE=1 GIT_CURL_VERBOSE=1 git clone -b $BRANCH $REPO \
+    && GIT_TRACE=1 git clone -b $BRANCH $REPO \
     && chmod +x /pagure/dev/containers/runtests_py3.sh
 
 # Install all the requirements from the spec file and replace the macro
