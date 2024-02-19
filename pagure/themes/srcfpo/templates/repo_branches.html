@@ -138,78 +138,80 @@
 {{ super() }}
 <script type="text/javascript" nonce="{{ g.nonce }}">
 function disable_branches() {
-    function checkForDeadPackage(branch, namespace, repo_name) {
-        return new Promise((resolve, reject) => {
-            const branchUrl = `https://src.stg.fedoraproject.org/${namespace}/${repo_name}/blob/${branch}/f/dead.package`;
-            $.ajax({
-                url: branchUrl,
-                type: "HEAD",
-                success: function () {
-                    resolve({ branch, hasDeadPackage: true });
-                },
-                error: function (error) {
-                    if (error.status === 404) {
-                        resolve({ branch, hasDeadPackage: false });
-                    } else {
-                        reject(`Error: ${error.status} on branch ${branch}`);
-                    }
-                }
-            });
-        });
-    }
-
-    function checkForDeadPackagesInBranches(branches, namespace, repo_name) {
-        const promises = branches.map(branch => checkForDeadPackage(branch, namespace, repo_name));
-        Promise.all(promises).then(results => {
-            let act_br = $('#active_branches');
-            let inact_br = $('#inactive_branches');
-            results.forEach(result => {
-                if (result.hasDeadPackage) {
-                    console.log(_ns, _repo_name, result.branch);
-                    let _it = $('#branch-' + result.branch);
-                    _it.addClass('disabled_branch');
-                    inact_br.append(_it);
-                }
-            });
-        });
-    }
-
-    function fetchReleases(url) {
-        return $.ajax({
-            url: url,
-            method: 'GET',
-            dataType: 'json',
-        });
-    }
-
-    function getBranches() {
-        let request1 = fetchReleases('https://bodhi.stg.fedoraproject.org/list_releases/?state=current');
-        let request2 = fetchReleases('https://bodhi.stg.fedoraproject.org/list_releases/?state=pending');
-
-        return Promise.all([request1, request2]).then(function (responses) {
-            let releases1 = responses[0].releases;
-            let releases2 = responses[1].releases;
-
-            let mergedReleases = releases1.concat(releases2);
-            let tags = mergedReleases.map(release => release.branch);
-            console.log(tags)
-            return [...new Set(tags)]; // Return the unique tags
-        }).catch(function (error) {
-            console.error('Error:', error);
-        });
-    }
-
-
-    const _ns = '{{ repo.namespace }}'
-    const _repo_name = '{{ repo.name }}'
-    console.log(_ns, _repo_name);
-
-    getBranches().then(branches => {
-        console.log(branches)
-        checkForDeadPackagesInBranches(branches, _ns, _repo_name);
-    }).catch(function (error) {
-        console.error("Error:", error);
+  function checkForDeadPackage(branch, namespace, repo_name) {
+    return new Promise((resolve, reject) => {
+      const branchUrl = `https://src.stg.fedoraproject.org/${namespace}/${repo_name}/blob/${branch}/f/dead.package`;
+      $.ajax({
+        url: branchUrl,
+        type: "HEAD",
+        success: function () {
+          resolve({ branch, hasDeadPackage: true });
+        },
+        error: function (error) {
+          if (error.status === 404) {
+            resolve({ branch, hasDeadPackage: false });
+          } else {
+            reject(`Error: ${error.status} on branch ${branch}`);
+          }
+        }
+      });
     });
+  }
+
+  function checkForDeadPackagesInBranches(branches, namespace, repo_name) {
+    const promises = branches.map(branch => checkForDeadPackage(branch, namespace, repo_name));
+    Promise.all(promises).then(results => {
+      let act_br = $('#active_branches');
+      let inact_br = $('#inactive_branches');
+      results.forEach(result => {
+        if (result.hasDeadPackage) {
+          console.log(_ns, _repo_name, result.branch);
+          let _it = $('#branch-' + result.branch);
+          _it.addClass('disabled_branch');
+          inact_br.append(_it);
+        }
+      });
+    });
+  }
+
+  function fetchReleases(url) {
+    return $.ajax({
+      url: url,
+      method: 'GET',
+      dataType: 'json',
+    });
+  }
+
+  function getBranches() {
+    let request1 = fetchReleases('https://bodhi.stg.fedoraproject.org/list_releases/?state=current');
+    let request2 = fetchReleases('https://bodhi.stg.fedoraproject.org/list_releases/?state=pending');
+    let request3 = fetchReleases('https://bodhi.stg.fedoraproject.org/list_releases/?state=frozen')
+
+    return Promise.all([request1, request2, request3]).then(function (responses) {
+      let currentReleases = responses[0].releases;
+      let pendingReleases = responses[1].releases;
+      let frozenReleases = responses[2].releases;
+
+      let mergedReleases = currentReleases.concat(pendingReleases).concat(frozenReleases);
+      let tags = mergedReleases.map(release => release.branch);
+
+      return [...new Set(tags)]; // Return the unique tags
+    }).catch(function (error) {
+      console.error('Error:', error);
+    });
+  }
+
+
+  const _ns = '{{ repo.namespace }}'
+  const _repo_name = '{{ repo.name }}'
+  console.log(_ns, _repo_name);
+
+  getBranches().then(branches => {
+    console.log(branches)
+    checkForDeadPackagesInBranches(branches, _ns, _repo_name);
+  }).catch(function (error) {
+    console.error("Error:", error);
+  });
 }
 
 $(function() {
