@@ -65,7 +65,9 @@ class PagureTicketRunner(BaseRunner):
     """ Runner for the git hook updating the DB of tickets on push. """
 
     @staticmethod
-    def post_receive(session, username, project, repotype, repodir, changes):
+    def post_receive(
+        session, username, project, repotype, repodir, changes, pull_request
+    ):
         """Run the post-receive tasks of a hook.
 
         For args, see BaseRunner.runhook.

@@ -74,6 +74,7 @@ class PagureHooksDefault(tests.SimplePagureTest):
             [sha],
             False,
             oldsha,
+            None,
         )
         (_, args, kwargs) = fedmsg.mock_calls[0]
         self.assertEqual(args[1], "git.receive")
@@ -88,6 +89,7 @@ class PagureHooksDefault(tests.SimplePagureTest):
                 "folder1/folder2/fileŠ": "A",
             },
         )
+        self.assertIsNone(args[2]["pull_request_id"])
 
 
 if __name__ == "__main__":
