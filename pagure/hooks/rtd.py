@@ -101,7 +101,9 @@ will have to provide below.
 
 class RtdRunner(BaseRunner):
     @staticmethod
-    def post_receive(session, username, project, repotype, repodir, changes):
+    def post_receive(
+        session, username, project, repotype, repodir, changes, pull_request
+    ):
         """Perform the RTD Post Receive hook.
 
         For arguments, see BaseRunner.runhook.

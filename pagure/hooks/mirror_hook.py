@@ -67,7 +67,9 @@ class MirrorRunner(BaseRunner):
     """Runner for the mirror hook."""
 
     @staticmethod
-    def post_receive(session, username, project, repotype, repodir, changes):
+    def post_receive(
+        session, username, project, repotype, repodir, changes, pull_request
+    ):
         """Run the default post-receive hook.
 
         For args, see BaseRunner.runhook.

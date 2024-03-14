@@ -62,7 +62,15 @@ class BaseRunner(object):
 
     @classmethod
     def runhook(
-        cls, session, username, hooktype, project, repotype, repodir, changes
+        cls,
+        session,
+        username,
+        hooktype,
+        project,
+        repotype,
+        repodir,
+        changes,
+        pull_request,
     ):
         """Run a specific hook on a project.
 
@@ -81,6 +89,8 @@ class BaseRunner(object):
             changes (dict): A dict with keys being the ref to update, values
                 being a tuple of (from, to).
                 For example: {'refs/heads/master': (hash_from, hash_to), ...}
+            pull_request (model.PullRequest or None): The pull request whose
+                merge is initiating this hook run.
         """
         if hooktype == "pre-receive":
             cls.pre_receive(
@@ -90,6 +100,7 @@ class BaseRunner(object):
                 repotype=repotype,
                 repodir=repodir,
                 changes=changes,
+                pull_request=pull_request,
             )
         elif hooktype == "update":
             cls.update(
@@ -99,6 +110,7 @@ class BaseRunner(object):
                 repotype=repotype,
                 repodir=repodir,
                 changes=changes,
+                pull_request=pull_request,
             )
 
         elif hooktype == "post-receive":
@@ -109,12 +121,15 @@ class BaseRunner(object):
                 repotype=repotype,
                 repodir=repodir,
                 changes=changes,
+                pull_request=pull_request,
             )
         else:
             raise ValueError('Invalid hook type "%s"' % hooktype)
 
     @staticmethod
-    def pre_receive(session, username, project, repotype, repodir, changes):
+    def pre_receive(
+        session, username, project, repotype, repodir, changes, pull_request
+    ):
         """Run the pre-receive tasks of a hook.
 
         For args, see BaseRunner.runhook.
@@ -122,7 +137,9 @@ class BaseRunner(object):
         pass
 
     @staticmethod
-    def update(session, username, project, repotype, repodir, changes):
+    def update(
+        session, username, project, repotype, repodir, changes, pull_request
+    ):
         """Run the update tasks of a hook.
 
         For args, see BaseRunner.runhook.
@@ -131,7 +148,9 @@ class BaseRunner(object):
         pass
 
     @staticmethod
-    def post_receive(session, username, project, repotype, repodir, changes):
+    def post_receive(
+        session, username, project, repotype, repodir, changes, pull_request
+    ):
         """Run the post-receive tasks of a hook.
 
         For args, see BaseRunner.runhook.
@@ -384,6 +403,7 @@ def run_project_hooks(
                     repotype=repotype,
                     repodir=repodir,
                     changes=changes,
+                    pull_request=pull_request,
                 )
             except Exception as e:
                 if hooktype != "pre-receive" or debug:

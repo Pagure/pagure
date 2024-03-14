@@ -163,7 +163,7 @@ def send_action_notification(
 
 
 def send_notifications(
-    session, project, repodir, user, refname, revs, forced, oldrev
+    session, project, repodir, user, refname, revs, forced, oldrev, pr_id
 ):
     """Send out-going notifications about the commits that have just been
     pushed.
@@ -212,6 +212,7 @@ def send_notifications(
             repo=project.to_json(public=True)
             if not isinstance(project, six.string_types)
             else project,
+            pull_request_id=pr_id,
         )
 
         # Send blink notification to any 3rd party plugins, if there are any
@@ -313,7 +314,9 @@ class DefaultRunner(BaseRunner):
     """Runner for the default hook."""
 
     @staticmethod
-    def post_receive(session, username, project, repotype, repodir, changes):
+    def post_receive(
+        session, username, project, repotype, repodir, changes, pull_request
+    ):
         """Run the default post-receive hook.
 
         For args, see BaseRunner.runhook.
@@ -442,6 +445,7 @@ class DefaultRunner(BaseRunner):
                 commits,
                 forced,
                 oldrev,
+                pull_request.id if pull_request else None,
             )
 
             # Now display to the user if this isn't the default branch links to

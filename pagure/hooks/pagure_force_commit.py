@@ -63,7 +63,9 @@ class PagureForceCommitRunner(BaseRunner):
     """Runner for the hook blocking force push."""
 
     @staticmethod
-    def pre_receive(session, username, project, repotype, repodir, changes):
+    def pre_receive(
+        session, username, project, repotype, repodir, changes, pull_request
+    ):
         """Run the pre-receive tasks of a hook.
 
         For args, see BaseRunner.runhook.

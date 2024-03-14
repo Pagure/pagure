@@ -59,7 +59,9 @@ class PagureNoNewBranchRunner(BaseRunner):
     """Runner for the hook blocking new branches from being created."""
 
     @staticmethod
-    def pre_receive(session, username, project, repotype, repodir, changes):
+    def pre_receive(
+        session, username, project, repotype, repodir, changes, pull_request
+    ):
         """Run the pre-receive tasks of a hook.
 
         For args, see BaseRunner.runhook.
