@@ -146,7 +146,7 @@
                   <label for="tags">Project tags</label>
                   <input class="form-control" name="tags" value="{{ repo.tags_text |join(', ') if repo.tags else '' }}" />
                   <small class="text-muted">
-                    Tags for project itself, as a comma-separated list. Tags
+                    Tags for the project itself, as a comma-separated list. Tags
                     for issues are managed further down on this page.
                   </small>
                 </fieldset>
@@ -187,11 +187,11 @@
               <div class="row">
                 <div class="col">
                     <p>
-                        Each message sent to the web-hook are signed via hmac and SHA1 using
+                        Each message sent to the web-hook is signed via hmac and SHA1 using
                         this private key.
                       </p>
                       <p>
-                        This key is private to your project, make sure to store in a safe place
+                        This key is private to your project.  Be sure to store it in a safe place
                         and do not share it.
                       </p>
                       <div class="form-group">
@@ -208,7 +208,7 @@
                           method="post" class="icon">
                       <button class="btn btn-primary" type="submit" id="generate_new_hook_token"
                         title="Generate a new hook token">
-                        <span class="fa fa-refresh"></span> &nbsp;Re-generate
+                        <span class="fa fa-refresh"></span> &nbsp;Regenerate
                       </button>
                       {{ form.csrf_token }}
                     </form>
@@ -234,7 +234,7 @@
                     <p>
                         The email addresses entered below will receive all the notifications
                         related to {% if g.issues_enabled %}
-                        (public) issues and {% endif %}pull-requests, this includes
+                        (public) issues and {% endif %}pull-requests. This includes
                         notifications about {% if g.issues_enabled %}
                         new issue or {% endif %} new pull-request, new comment
                         and status change.
@@ -506,7 +506,7 @@
                     <p>
                         Below are the priorities you may assign to a ticket, allowing you
                         to sort them with it. The Weight determines the ordering. Higher
-                        priority should correspond to lower weight.
+                        priority corresponds to lower weight.
                         <span class="italic">
                           To remove an entry, simply clean the Weight and Title
                         </span>
@@ -571,7 +571,7 @@
                 <div class="row">
                   <div class="col">
                           <p>
-                            The default priority will be set to all issues created after
+                            The default priority will be set on all issues created after
                             it has been set.
                           </p>
                         <form action="{{ url_for(
@@ -618,7 +618,7 @@
                 <div class="row">
                   <div class="col">
                       <p>
-                          Here is the list of all the status that can be used when closing
+                          Here is the list of all statuses that can be used when closing
                           an issue.
                         </p>
                       <form action="{{ url_for(
@@ -688,7 +688,7 @@
                     <div class="col">
                         <p>
                             Set some custom fields for your issues.  <i>Field Values</i> are currently
-                            only used for Lists, and it accepts a comma separated list of items
+                            only used for Lists, and consist of a comma separated list of items
                             for the drop down list.
                           </p>
                         <form action="{{ url_for(
@@ -934,7 +934,7 @@
               </h3>
               <div class="row">
                 <div class="col">
-                    <p>Quick replies will be offered in a new comment form on Issue or
+                    <p>Quick replies will be offered in a new comment form on the Issue or
                         Pull Request page. This allows you to reply to common problems with a
                         click of a button.</p>
                         <p>The reply can use the same Markdown formatting as regular
@@ -1127,21 +1127,21 @@ $(document).ready(function() {
     updateform();
 
     $('#generate_new_hook_token').click(function() {
-        return confirm('Are you sure to generate a new token for '
-                          + 'this project/fork? \nThis will break all web hook in place and '
-                          + 'cannot be un-done.');
+        return confirm('Are you sure you want to generate a new token for '
+                          + 'this project/fork? \nThis will break all web hooks in place and '
+                          + 'cannot be undone.');
     });
 
     $('.remove_user_btn').click(function(){
-      return confirm('You sure you want to remove this user from this project?');
+      return confirm('Are you sure you want to remove this user from this project?');
     });
 
     $('.remove_group_btn').click(function(){
-      return confirm('You sure you want to remove this group from this project?');
+      return confirm('Are you sure you want to remove this group from this project?');
     });
 
     $('.remove_deploy_key_btn').click(function(){
-      return confirm('You sure you want to remove this deploy key from this project?');
+      return confirm('Are you sure you want to remove this deploy key from this project?');
     });
 
     $('.delete_report_btn').click(function(){
@@ -1154,21 +1154,21 @@ $(document).ready(function() {
     });
 
     $('.give_project_btn').click(function(){
-      return confirm('Are you sure to give {{ repo.fullname }}? \nThis is final and cannot be un-done.');
+      return confirm('Are you sure you want to give {{ repo.fullname }}? \nThis is final and cannot be undone.');
     });
 
     $('.delete_project_btn').click(function(){
-      return confirm('Are you sure to delete {{ repo.fullname }}? \nThis is final and cannot be un-done.');
+      return confirm('Are you sure you want to delete {{ repo.fullname }}? \nThis is final and cannot be undone.');
     });
 
     $('.revoke_token_btn').click(function(){
-      return confirm('Are you sure to revoke this token ?'
-                     + '\nThis will break all application using it and '
-                     + 'cannot be un-done.');
+      return confirm('Are you sure you want to revoke this token ?'
+                     + '\nThis will break all applications using it and '
+                     + 'cannot be undone.');
     });
 
     $('.renew_token_btn').click(function(){
-      return confirm('Are you sure to renew this token ?'
+      return confirm('Are you sure you want to renew this token ?'
                      + '\nIt will have the same ACL but will be a different key.');
     });
 

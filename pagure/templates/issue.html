@@ -845,7 +845,7 @@ $(document).ready(function() {
         'value': '{{ form.csrf_token.current_token }}',
         'type': 'hidden'
     })).appendTo('body');
-    if (confirm('Are you sure to delete this ticket? \nThis is final and cannot be un-done.')){
+    if (confirm('Are you sure you want to delete this ticket? \nThis is final and cannot be undone.')){
       closeForm.submit();
     }
     return false;
@@ -1009,7 +1009,7 @@ function take_issue(){
       setup_btn_take_drop();
     }
   ).fail(function() {
-    alert( "An error occured, could not assign this ticket to you." );
+    alert( "An error occurred, could not assign this ticket to you." );
   })
   return false;
 }
@@ -1034,7 +1034,7 @@ function drop_issue(){
       setup_btn_take_drop();
     }
   ).fail(function() {
-    alert( "An error occured, could not drop the current assignee." );
+    alert( "An error occurred, could not drop the current assignee." );
   })
   return false;
 }
