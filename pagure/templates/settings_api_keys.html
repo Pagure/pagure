@@ -29,16 +29,16 @@
   <div class="col">
     <p>
       API keys are tokens used to authenticate you on pagure. They can also
-      be used to grant access to 3rd party application to behave on this
-      project on your name.
+      be used to grant access to 3rd party applications to act on this
+      project on your behalf.
     </p>
     <p>
       These are your personal tokens; they are not visible to the other
       admins of this repository.
     </p>
     <p>
-      These keys are private to your project, make sure to store in a safe
-      place and do not share it.
+      These keys are private to your project. Be sure to store them in a safe
+      place and do not share them.
     </p>
     {% if repo.tokens %}
     {% for token in repo.tokens %}

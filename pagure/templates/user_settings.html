@@ -147,15 +147,15 @@
             <div class="col">
               <p>
                 API keys are tokens used to authenticate you on pagure. They can also
-                be used to grant access to 3rd party application to behave on all
+                be used to grant access to 3rd party applications to act on all
                 {{projectstring(plural=True)}} in your name.
               </p>
               <p>
                 These are your personal tokens; they are not visible to others.
               </p>
               <p>
-                These keys are private, make sure to store in a safe place and
-                do not share it.
+                These keys are private. Be sure to store them in a safe place and
+                do not share them.
               </p>
               {% if user.tokens %}
               {% for token in user.tokens %}
@@ -273,7 +273,7 @@
                 <div class="row">
                   <div class="col">
                       <p>
-                          Forcefully log out from every current open session.
+                          Forcefully log out from every currently open session.
                       </p>
                       <form action="{{ url_for('ui_ns.force_logout') }}" method="post">
                         <input type="submit" class="btn btn-outline-danger"
@@ -300,15 +300,15 @@
         $('#' + _form_name).submit();
     });
     $('.remove-token-btn').click(function() {
-      return confirm('Are you sure to revoke this token ?'
-                     + '\nThis will break all application using it and '
-                     + 'cannot be un-done.');
+      return confirm('Are you sure you want to revoke this token ?'
+                     + '\nThis will break all applications using it and '
+                     + 'cannot be undone.');
     })
     $('.delete-email-btn').click(function() {
       return confirm('Do you really want to remove the email: ' + $(this).attr('data-email') + '?');
     })
     $('.delete-sshkey-btn').click(function() {
-      return confirm('You sure you want to remove this SSH key?');
+      return confirm('Are you sure you want to remove this SSH key?');
     })
 
     $('#nav-tab a.nav-link').on('shown.bs.tab', function (e) {
