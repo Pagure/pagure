@@ -203,7 +203,9 @@ def _check_pull_request_access(request, assignee=False):
 
     error = False
     # Public tickets require ticket access
-    error = not is_repo_user(request.project)
+    error = not is_repo_user(request.project) and not (
+        request.user.user == flask.g.fas_user.username
+    )
 
     if assignee:
         if (

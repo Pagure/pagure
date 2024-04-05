@@ -764,5 +764,239 @@ class PagureFlaskApiForkUpdatetests(tests.SimplePagureTest):
         self.assertEqual(len(project.issues[0].related_prs), 1)
 
 
+class PagureFlaskApiForkUpdateNoCommitterTests(tests.SimplePagureTest):
+    """Tests for the flask API of pagure for updating a PR
+    when the PR owner is not a committer in the target project
+    but he is the owner of the PR.
+    """
+
+    maxDiff = None
+
+    @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
+    @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
+    def setUp(self):
+        """Set up the environnment, ran before every tests.
+
+        Pingou is the owner of the target project (test).
+        Maja has a fork of the test project and creates
+        a PR against Pingou parent project.
+        She should be able to update her own PR.
+        """
+        super(PagureFlaskApiForkUpdateNoCommitterTests, self).setUp()
+
+        tests.create_projects(self.session)
+        tests.add_content_git_repo(
+            os.path.join(self.path, "repos", "test.git")
+        )
+
+        # Fork
+        tests.create_user(self.session, "maja", "Maja M.", ["mm@f.com"])
+        project = pagure.lib.query.get_authorized_project(self.session, "test")
+        task = pagure.lib.query.fork_project(
+            session=self.session, user="maja", repo=project
+        )
+        self.session.commit()
+        self.assertEqual(
+            task.get(),
+            {
+                "endpoint": "ui_ns.view_repo",
+                "repo": "test",
+                "namespace": None,
+                "username": "maja",
+            },
+        )
+
+        tests.add_readme_git_repo(
+            os.path.join(self.path, "repos", "forks", "maja", "test.git")
+        )
+        project = pagure.lib.query.get_authorized_project(self.session, "test")
+        fork = pagure.lib.query.get_authorized_project(
+            self.session, "test", user="maja"
+        )
+
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        req = pagure.lib.query.new_pull_request(
+            session=self.session,
+            repo_from=fork,
+            branch_from="master",
+            repo_to=project,
+            branch_to="master",
+            title="test pull-request",
+            user="maja",
+        )
+        self.session.commit()
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, "test pull-request")
+
+        # Assert the PR is open
+        self.session = pagure.lib.query.create_session(self.dbpath)
+        project = pagure.lib.query.get_authorized_project(self.session, "test")
+        self.assertEqual(len(project.requests), 1)
+        self.assertEqual(project.requests[0].status, "Open")
+        # Check how the PR renders in the API and the UI
+        output = self.app.get("/api/0/test/pull-request/1")
+        self.assertEqual(output.status_code, 200)
+        output = self.app.get("/test/pull-request/1")
+        self.assertEqual(output.status_code, 200)
+
+    def test_api_pull_request_updated_by_owner(self):
+        """Owners of PRs can update their own PRs."""
+
+        headers = {"Authorization": "token aaabbbcccddd"}
+
+        data = {
+            "title": "edited test PR",
+            "initial_comment": "Edited initial comment",
+        }
+
+        user = tests.FakeUser()
+        user.username = "maja"
+        with tests.user_set(self.app.application, user):
+            output = self.app.post(
+                "/api/0/test/pull-request/1", data=data, headers=headers
+            )
+
+            self.assertEqual(output.status_code, 200)
+
+    def test_api_pull_request_not_updated_by_other_user(self):
+        """No repo committers or PR owners are allowed to update PR."""
+
+        headers = {"Authorization": "token aaabbbcccddd"}
+
+        data = {
+            "title": "edited test PR",
+            "initial_comment": "Edited initial comment",
+        }
+
+        tests.create_user(self.session, "other", "Another User", ["au@rh.com"])
+        user = tests.FakeUser()
+        user.username = "other"
+        with tests.user_set(self.app.application, user):
+            output = self.app.post(
+                "/api/0/test/pull-request/1", data=data, headers=headers
+            )
+
+            self.assertEqual(output.status_code, 403)
+
+
+class PagureFlaskApiForkUpdateNoCommitterTests(tests.SimplePagureTest):
+    """Tests for the flask API of pagure for updating a PR
+    when the PR owner is not a committer in the target project
+    but he is the owner of the PR.
+    """
+
+    maxDiff = None
+
+    @patch("pagure.lib.git.update_git", MagicMock(return_value=True))
+    @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
+    def setUp(self):
+        """Set up the environnment, ran before every tests.
+
+        Pingou is the owner of the target project (test).
+        Maja has a fork of the test project and creates
+        a PR against Pingou parent project.
+        She should be able to update her own PR.
+        """
+        super(PagureFlaskApiForkUpdateNoCommitterTests, self).setUp()
+
+        tests.create_projects(self.session)
+        tests.add_content_git_repo(
+            os.path.join(self.path, "repos", "test.git")
+        )
+
+        # Fork
+        tests.create_user(self.session, "maja", "Maja M.", ["mm@f.com"])
+        project = pagure.lib.query.get_authorized_project(self.session, "test")
+        task = pagure.lib.query.fork_project(
+            session=self.session, user="maja", repo=project
+        )
+        self.session.commit()
+        self.assertEqual(
+            task.get(),
+            {
+                "endpoint": "ui_ns.view_repo",
+                "repo": "test",
+                "namespace": None,
+                "username": "maja",
+            },
+        )
+
+        tests.add_readme_git_repo(
+            os.path.join(self.path, "repos", "forks", "maja", "test.git")
+        )
+        project = pagure.lib.query.get_authorized_project(self.session, "test")
+        fork = pagure.lib.query.get_authorized_project(
+            self.session, "test", user="maja"
+        )
+
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        req = pagure.lib.query.new_pull_request(
+            session=self.session,
+            repo_from=fork,
+            branch_from="master",
+            repo_to=project,
+            branch_to="master",
+            title="test pull-request",
+            user="maja",
+        )
+        self.session.commit()
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, "test pull-request")
+
+        # Assert the PR is open
+        self.session = pagure.lib.query.create_session(self.dbpath)
+        project = pagure.lib.query.get_authorized_project(self.session, "test")
+        self.assertEqual(len(project.requests), 1)
+        self.assertEqual(project.requests[0].status, "Open")
+        # Check how the PR renders in the API and the UI
+        output = self.app.get("/api/0/test/pull-request/1")
+        self.assertEqual(output.status_code, 200)
+        output = self.app.get("/test/pull-request/1")
+        self.assertEqual(output.status_code, 200)
+
+    def test_api_pull_request_updated_by_owner(self):
+        """Owners of PRs can update their own PRs."""
+
+        headers = {"Authorization": "token aaabbbcccddd"}
+
+        data = {
+            "title": "edited test PR",
+            "initial_comment": "Edited initial comment",
+        }
+
+        user = tests.FakeUser()
+        user.username = "maja"
+        with tests.user_set(self.app.application, user):
+            output = self.app.post(
+                "/api/0/test/pull-request/1", data=data, headers=headers
+            )
+
+            self.assertEqual(output.status_code, 200)
+
+    def test_api_pull_request_not_updated_by_other_user(self):
+        """No repo committers or PR owners are allowed to update PR."""
+
+        headers = {"Authorization": "token aaabbbcccddd"}
+
+        data = {
+            "title": "edited test PR",
+            "initial_comment": "Edited initial comment",
+        }
+
+        tests.create_user(self.session, "other", "Another User", ["au@rh.com"])
+        user = tests.FakeUser()
+        user.username = "other"
+        with tests.user_set(self.app.application, user):
+            output = self.app.post(
+                "/api/0/test/pull-request/1", data=data, headers=headers
+            )
+
+            self.assertEqual(output.status_code, 403)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
