@@ -83,7 +83,6 @@ BuildArch:          noarch
 Requires:           %{name} = %{version}-%{release}
 Requires:           httpd-filesystem
 Requires:           python%{python_pkgversion}-mod_wsgi
-%endif
 %description        web-apache-httpd
 This package provides the configuration files for deploying
 a Pagure server using the Apache HTTPD server.
