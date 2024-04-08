@@ -1485,6 +1485,10 @@ def get_changed_files(torev, fromrev, abspath):
     """Return files changed between HEAD and BASE.
     Return as a dict with paths as keys and status letters as values.
     """
+    if set(fromrev) == set("0") or set(fromrev) == set("^0"):
+        # get hash of the empty tree
+        cmd = ["hash-object", "-t", "tree", "/dev/null"]
+        fromrev = pagure.lib.git.read_git_output(cmd, abspath)
     cmd = ["diff", "--name-status", "-z", fromrev, torev]
     output = pagure.lib.git.read_git_output(cmd, abspath)
     items = output.split("\0")
