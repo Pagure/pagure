@@ -3231,6 +3231,12 @@ index 0000000..60f7480
         hash0 = output[0].replace("'", "")
         hash1 = output[1].replace("'", "")
 
+        # Case 0: EMPTY_TREE => hash0
+        output0 = pagure.lib.git.get_changed_files(
+            hash0, "^" + 40 * "0", gitrepo
+        )
+        self.assertEqual(output0, {issue.uid: "A"})
+
         # Case 1: hash1 => hash0
         output1 = pagure.lib.git.get_changed_files(hash0, hash1, gitrepo)
         self.assertEqual(output1, {issue.uid: "M"})
