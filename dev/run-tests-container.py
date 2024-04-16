@@ -34,7 +34,7 @@ def _build_container(container_name, container_type, result_path,
     volume = []
     if container_volume:
         volume.append("-v")
-        volume.append(volume)
+        volume.append(container_volume)
 
     container_file = ""
     if container_type == "base":
@@ -200,6 +200,7 @@ if __name__ == "__main__":
     else:
         container_names = ["centos", "fedora", "pip"]
 
+    mount_wrkdir = False
     # get full path of git repo in current directory
     # and set var to mount it into the container
     if args.repo == "/wrkdir":
@@ -244,10 +245,14 @@ if __name__ == "__main__":
                 "Container does not exist, building: %s"
                 % containers[container_name]["base"]
             )
+            container_volume = None
+            if mount_wrkdir:
+                container_volume = "{}:/wrkdir:z,ro".format(wrkdir_path)
             if _build_container(
                 container_name,
                 "base",
                 result_path,
+                container_volume,
                 branch="{}".format(os.environ.get("BRANCH") or args.branch),
                 repo="{}".format(os.environ.get("REPO") or args.repo),
             ):
