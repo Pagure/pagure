@@ -88,7 +88,7 @@ def commit_to_patch(
             # First commit in the repo
             diff = commit.tree.diff_to_tree(swap=True)
 
-        if diff.patch is None:
+        if diff.patch is None or diff.patch == "":
             continue
 
         if find_similar and diff:
