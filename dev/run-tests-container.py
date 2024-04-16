@@ -112,6 +112,13 @@ def setup_parser():
         "test_case", nargs="?", default="", help="Run the given test case"
     )
     parser.add_argument(
+        "--toxenv",
+        default="",
+        help="Pass a custom value for the target python environment to tox tests. "
+             "Only used by the pip test container. "
+             "Default: Use all Environments defined in tox.ini",
+    )
+    parser.add_argument(
         "--fedora",
         action="store_true",
         help="Run the tests in fedora environment (DEFAULT)",
@@ -145,7 +152,6 @@ def setup_parser():
         help="Gives you a shell into the container instead "
         "of running the tests",
     )
-
     parser.add_argument(
         "--repo",
         dest="repo",
@@ -301,6 +307,8 @@ if __name__ == "__main__":
             "REPO={}".format(os.environ.get("REPO") or args.repo),
             "-e",
             "TESTCASE={}".format(args.test_case or ""),
+            "-e",
+            "TOXENV={}".format(os.environ.get("TOXENV") or args.toxenv),
         ]
 
         if args.shell:

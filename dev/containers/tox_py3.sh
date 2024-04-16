@@ -23,4 +23,10 @@ git --no-pager log -2
 fi
 
 export LANG="en_US.UTF-8"
-tox -v -e "${PYVER:-py39}" -- ${TESTCASE:-tests/}
+
+echo TOXENV: "${TOXENV}"
+if [ -z "${TOXENV}" ]; then
+  tox -v -- ${TESTCASE:-tests/}
+else
+  tox -v -e "${TOXENV}" -- ${TESTCASE:-tests/}
+fi
