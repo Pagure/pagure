@@ -24,6 +24,9 @@ RUN dnf -y install \
         which \
         git \
         glibc-langpack-en \
+        libtiff-devel libjpeg-devel openjpeg2-devel zlib-devel \
+        freetype-devel lcms2-devel libwebp-devel tcl-devel tk-devel \
+        harfbuzz-devel fribidi-devel libraqm-devel libimagequant-devel libxcb-devel \
     && dnf clean all
 
 # Pre-build tox environments and keep em in the base container
