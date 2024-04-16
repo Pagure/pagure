@@ -1102,7 +1102,9 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
                 in (
                     "http://localhost/login/",
                     "/login/?next=http%3A%2F%2Flocalhost%2Fsettings%2F",
+                    "/login/?next=http://localhost/settings/",
                     "http://localhost/login/?next=http%3A%2F%2Flocalhost%2Fsettings%2F",
+                    "http://localhost/login/?next=http://localhost/settings/",
                 )
             )
         # session did not expire
