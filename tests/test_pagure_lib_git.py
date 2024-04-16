@@ -3729,6 +3729,7 @@ class PagureLibGitCommitToPatchtests(tests.Modeltests):
         )
 
         self.third_commit = repo.revparse_single("HEAD")
+        print(self.third_commit)
 
     def test_commit_to_patch_first_commit(self):
         """Test the commit_to_patch function of pagure.lib.git."""
@@ -4079,6 +4080,7 @@ index 9f44358..2a552bb 100644
         repo = pygit2.init_repository(self.gitrepo)
 
         patch = pagure.lib.git.commit_to_patch(repo, self.third_commit)
+        print(patch)
         exp = ""
         self.assertEqual(patch, exp)
 
