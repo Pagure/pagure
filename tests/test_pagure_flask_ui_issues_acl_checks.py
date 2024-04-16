@@ -109,7 +109,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             output.get_data(as_text=True),
         )
         self.assertTrue(
-            '<a href="/login/?next=http%3A%2F%2Flocalhost%2Ftest%2Fissue%2F1">'
+            '<a href="/login/?next=http://localhost/test/issue/1">'
             "Log in</a>\n          to comment on this ticket."
             in output.get_data(as_text=True)
         )
@@ -371,8 +371,8 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             'href="/test/issue/1/edit" title="Edit this issue">\n',
             output_text,
         )
-        self.assertTrue(
-            '<a href="/login/?next=http%3A%2F%2Flocalhost%2Ftest%2Fissue%2F1">'
+        self.assertIn(
+            '<a href="/login/?next=http://localhost/test/issue/1">'
             "Log in</a>\n          to comment on this ticket.",
             output_text,
         )
@@ -627,7 +627,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             output_text,
         )
         self.assertTrue(
-            '<a href="/login/?next=http%3A%2F%2Flocalhost%2Ftest%2Fissue%2F1">'
+            '<a href="/login/?next=http://localhost/test/issue/1">'
             "Log in</a>\n            to comment on this ticket.",
             output_text,
         )
@@ -880,7 +880,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
             output.get_data(as_text=True),
         )
         self.assertTrue(
-            '<a href="/login/?next=http%3A%2F%2Flocalhost%2Ftest%2Fissue%2F1">'
+            '<a href="/login/?next=http://localhost/test/issue/1">'
             "Log in</a>\n          to comment on this ticket."
             in output.get_data(as_text=True)
         )
