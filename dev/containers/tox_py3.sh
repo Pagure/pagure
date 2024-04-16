@@ -26,7 +26,7 @@ export LANG="en_US.UTF-8"
 
 echo TOXENV: "${TOXENV}"
 if [ -z "${TOXENV}" ]; then
-  tox -v -- ${TESTCASE:-tests/}
-else
   tox -v -e "${TOXENV}" -- ${TESTCASE:-tests/}
+else
+  tox -v -- ${TESTCASE:-tests/}
 fi

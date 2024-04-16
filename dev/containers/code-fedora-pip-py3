@@ -11,7 +11,6 @@ ARG branch=master
 ENV REPO=$repo
 ENV BRANCH=$branch
 
-COPY tox_py3.sh /tox_py3.sh
 COPY entrypoint_pip.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 ENTRYPOINT /entrypoint.sh
