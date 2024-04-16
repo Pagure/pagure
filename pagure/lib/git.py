@@ -24,7 +24,7 @@ import pygit2
 import six
 
 # from sqlalchemy.orm.session import Session
-from pygit2.remote import RemoteCollection
+from pygit2.remotes import RemoteCollection
 from sqlalchemy.exc import SQLAlchemyError
 
 import pagure.exceptions

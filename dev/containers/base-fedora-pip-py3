@@ -36,6 +36,6 @@ RUN mkdir /tox \
     && GIT_TRACE=1 git clone -b ${BRANCH} ${REPO} /pagure \
     && ln -s /tox /pagure/.tox \
     && cd /pagure \
-    && tox --notest \
+    && tox --notest -vv \
     && cd / \
     && rm -rf /pagure
