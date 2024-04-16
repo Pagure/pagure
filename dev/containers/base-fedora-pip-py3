@@ -33,7 +33,7 @@ RUN dnf -y install \
 # to avoid re-build on every run, even if tox config not changed
 RUN mkdir /tox \
     && echo Repo: ${REPO}, Branch: ${BRANCH} \
-    && git clone -b ${BRANCH} ${REPO} /pagure \
+    && GIT_TRACE=1 git clone -b ${BRANCH} ${REPO} /pagure \
     && ln -s /tox /pagure/.tox \
     && cd /pagure \
     && tox --notest \
