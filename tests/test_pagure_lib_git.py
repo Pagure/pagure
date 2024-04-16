@@ -3639,8 +3639,12 @@ index 0000000..60f7480
 
         # make sure the function works fine even if there's a leftover
         # ref from previous failed run of the function
-        with patch("pygit2.remote.RemoteCollection.delete"):
-            pagure.lib.git.update_pull_ref(fake_pr, fork)
+        try:
+            with patch("pygit2.remote.RemoteCollection.delete"):
+                pagure.lib.git.update_pull_ref(fake_pr, fork)
+        except ImportError:
+            with patch("pygit2.remotes.RemoteCollection.delete"):
+                pagure.lib.git.update_pull_ref(fake_pr, fork)
         self.assertIsNotNone(fork.remotes["pingou_1234567"])
         tests.add_content_git_repo(projects[1], append="foobarbaz")
         newesthex = fork.references["refs/heads/master"].peel().hex

@@ -23,8 +23,11 @@ import arrow
 import pygit2
 import six
 
-# from sqlalchemy.orm.session import Session
-from pygit2.remotes import RemoteCollection
+try:
+    from pygit2.remote import RemoteCollection
+except ImportError:
+    from pygit2.remotes import RemoteCollection
+
 from sqlalchemy.exc import SQLAlchemyError
 
 import pagure.exceptions
