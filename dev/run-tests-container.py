@@ -26,9 +26,10 @@ def _build_container(container_name, container_type, result_path,
     # fmt: on
     # kwargs can be used to pass '--build-arg'
     build_args = []
-    for arg in kwargs.values():
+    #for arg in kwargs.values():
+    for key, value in kwargs.items():
         build_args.append("--build-arg")
-        build_args.append(arg)
+        build_args.append("{}={}".format(key, value))
 
     volume = []
     if container_volume:
