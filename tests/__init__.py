@@ -1173,7 +1173,7 @@ def add_pull_request_git_repo(
 
     # Add the main project as remote repo
     upstream_path = os.path.join(folder, "repos", repo.path)
-    remote = clone_repo.create_remote("upstream", upstream_path)
+    remote = clone_repo.remotes.create("upstream", upstream_path)
     remote.fetch()
 
     # Edit the sources file again

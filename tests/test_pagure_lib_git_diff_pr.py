@@ -125,7 +125,7 @@ class PagureFlaskForkPrtests(tests.Modeltests):
         PagureRepo.push(ori_remote, refname)
 
         # Push to the fork repo
-        remote = clone_repo.create_remote("pingou_fork", gitrepo2)
+        remote = clone_repo.remotes.create("pingou_fork", gitrepo2)
         PagureRepo.push(remote, refname)
 
         # Do another 3 commits to the main repo

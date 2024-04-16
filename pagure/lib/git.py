@@ -1626,7 +1626,7 @@ def merge_pull_request(session, request, username, domerge=True):
             _log.info(
                 "  Adding remote: %s pointing to: %s", reponame, repopath
             )
-            remote = new_repo.create_remote(reponame, repopath)
+            remote = new_repo.remotes.create(reponame, repopath)
 
             # Fetch the commits
             remote.fetch()
@@ -1926,7 +1926,7 @@ def rebase_pull_request(session, request, username):
         _log.info(
             "  Adding remote: %s pointing to: %s", upstream, upstream_path
         )
-        remote = new_repo.create_remote(upstream, upstream_path)
+        remote = new_repo.remotes.create(upstream, upstream_path)
 
         # Fetch the commits
         remote.fetch()

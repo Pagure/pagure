@@ -85,7 +85,7 @@ class PagureFlaskDocstests(tests.SimplePagureTest):
         )
 
         # Push the changes to the bare repo
-        remote = repo.create_remote(
+        remote = repo.remotes.create(
             "origin", os.path.join(self.path, "repos", "docs", "test.git")
         )
 

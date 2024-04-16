@@ -5440,7 +5440,7 @@ More information</textarea>
         PagureRepo.push(ori_remote, refname)
 
         # Push to the fork repo
-        remote = clone_repo.create_remote("pingou_fork", gitrepo2)
+        remote = clone_repo.remotes.create("pingou_fork", gitrepo2)
         PagureRepo.push(remote, refname)
 
         # Add 1 commits to the fork repo
