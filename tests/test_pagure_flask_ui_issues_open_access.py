@@ -213,7 +213,7 @@ class PagureFlaskIssuesOpenAccesstests(tests.Modeltests):
             output_text,
         )
         self.assertIn(
-            '<a href="/login/?next=http%3A%2F%2Flocalhost%2Ftest%2Fissue%2F1">'
+            '<a href="/login/?next=http://localhost/test/issue/1">'
             "Log in</a>\n          to comment on this ticket.",
             output_text,
         )
@@ -313,7 +313,7 @@ class PagureFlaskIssuesOpenAccesstests(tests.Modeltests):
             output_text,
         )
         self.assertTrue(
-            '<a href="/login/?next=http%3A%2F%2Flocalhost%2Ftest%2Fissue%2F1">'
+            '<a href="/login/?next=http://localhost/test/issue/1">'
             "Log in</a>\n          to comment on this ticket." in output_text
         )
 
