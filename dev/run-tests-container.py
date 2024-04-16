@@ -175,9 +175,9 @@ if __name__ == "__main__":
 
     containers = {
         "centos": {
-            "name": "pagure-tests-centos-stream8-rpms-py3",
-            "base": "base-centos-stream8-rpms-py3",
-            "code": "code-centos-stream8-rpms-py3",
+            "name": "pagure-tests-centos-stream9-rpms-py3",
+            "base": "base-centos-stream9-rpms-py3",
+            "code": "code-centos-stream9-rpms-py3",
         },
         "fedora": {
             "name": "pagure-tests-fedora-rpms-py3",
