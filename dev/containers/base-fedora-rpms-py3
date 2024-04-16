@@ -1,4 +1,4 @@
-FROM quay.io/fedora/fedora:36-x86_64
+FROM quay.io/fedora/fedora:39-x86_64
 
 LABEL org.opencontainers.image.authors="pagure community"
 LABEL org.opencontainers.image.url="https://pagure.io/pagure"
