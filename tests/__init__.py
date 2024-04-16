@@ -10,7 +10,7 @@
 
 from __future__ import unicode_literals, absolute_import
 
-import imp
+import importlib
 import json
 import logging
 import os
@@ -388,9 +388,9 @@ class SimplePagureTest(unittest.TestCase):
         os.environ["PAGURE_CONFIG"] = self.config_path
         pagure_config.update(reload_config())
 
-        imp.reload(pagure.lib.tasks)
-        imp.reload(pagure.lib.tasks_mirror)
-        imp.reload(pagure.lib.tasks_services)
+        importlib.reload(pagure.lib.tasks)
+        importlib.reload(pagure.lib.tasks_mirror)
+        importlib.reload(pagure.lib.tasks_services)
 
         self._app = pagure.flask_app.create_app({"DB_URL": self.dbpath})
 
