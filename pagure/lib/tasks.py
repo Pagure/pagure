@@ -881,15 +881,18 @@ def commits_author_stats(self, session, repopath):
     stats = collections.defaultdict(int)
     number_of_commits = 0
     authors_email = set()
-    for commit in repo_obj.walk(
-        repo_obj.head.peel().oid.hex, pygit2.GIT_SORT_NONE
-    ):
-        # For each commit record how many times each combination of name and
-        # e-mail appears in the git history.
-        number_of_commits += 1
-        email = commit.author.email
-        author = commit.author.name
-        stats[(author, email)] += 1
+    try:
+        for commit in repo_obj.walk(
+            repo_obj.head.peel().oid.hex, pygit2.GIT_SORT_NONE
+        ):
+            # For each commit record how many times each combination of name and
+            # e-mail appears in the git history.
+            number_of_commits += 1
+            email = commit.author.email
+            author = commit.author.name
+            stats[(author, email)] += 1
+    except pygit2.errors.GitError as e:
+        return e
 
     for (name, email), val in list(stats.items()):
         if not email:
@@ -942,15 +945,20 @@ def commits_history_stats(self, session, repopath):
     repo_obj = pygit2.Repository(repopath)
 
     dates = collections.defaultdict(int)
-    for commit in repo_obj.walk(
-        repo_obj.head.peel().oid.hex, pygit2.GIT_SORT_NONE
-    ):
-        delta = (
-            datetime.datetime.utcnow() - arrow.get(commit.commit_time).naive
-        )
-        if delta.days > 365:
-            break
-        dates[arrow.get(commit.commit_time).date().isoformat()] += 1
+
+    try:
+        for commit in repo_obj.walk(
+            repo_obj.head.peel().oid.hex, pygit2.GIT_SORT_NONE
+        ):
+            delta = (
+                datetime.datetime.utcnow()
+                - arrow.get(commit.commit_time).naive
+            )
+            if delta.days > 365:
+                break
+            dates[arrow.get(commit.commit_time).date().isoformat()] += 1
+    except pygit2.errors.GitError as e:
+        return e
 
     return [(key, dates[key]) for key in sorted(dates)]
 

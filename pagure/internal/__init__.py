@@ -745,6 +745,7 @@ def get_stats_commits():
         return response
 
     repopath = repo.repopath("main")
+    print(repopath)
 
     task = pagure.lib.tasks.commits_author_stats.delay(repopath)
 
