@@ -26,7 +26,7 @@ pygit2
 python3-openid <= 3.2.0
 python-openid-cla == 1.2
 python-openid-teams == 1.1
-redis <= 3.5.3
+redis
 requests <= 2.28.1
 six <= 1.16.0
 
