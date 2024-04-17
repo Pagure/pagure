@@ -61,6 +61,10 @@ elif "REDIS_HOST" in pagure_config and "REDIS_PORT" in pagure_config:
 conn = Celery("tasks", broker=broker_url, backend=broker_url)
 conn.conf.update(pagure_config["CELERY_CONFIG"])
 
+
+### Monkey Patch - start ###
+# Issues that celery task_id is None are related to https://github.com/celery/celery/commit/726b664840b6a1fcea9225b254a393e665363ad0
+# Monkey Path to introduce the previous logic till it's clear how the Pagure code has to be adjusted,
 from celery.backends.base import BaseKeyValueStoreBackend
 def get_key_for_task(self, task_id, key=''):
     key_t = self.key_t
@@ -68,6 +72,8 @@ def get_key_for_task(self, task_id, key=''):
         self.task_keyprefix, key_t(task_id), key_t(key),
     ])
 BaseKeyValueStoreBackend.get_key_for_task = get_key_for_task
+### Monkey Patch - end ###
+
 
 @after_setup_task_logger.connect
 def augment_celery_log(**kwargs):
