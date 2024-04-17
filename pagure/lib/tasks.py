@@ -62,10 +62,12 @@ conn = Celery("tasks", broker=broker_url, backend=broker_url)
 conn.conf.update(pagure_config["CELERY_CONFIG"])
 
 
-### Monkey Patch - start ###
-# Issues that celery task_id is None are related to https://github.com/celery/celery/commit/726b664840b6a1fcea9225b254a393e665363ad0
-# Monkey Path to introduce the previous logic till it's clear how the Pagure code has to be adjusted,
-from celery.backends.base import BaseKeyValueStoreBackend
+# Monkey Patch - start
+# Issues that celery task_id is None are related to
+# https://github.com/celery/celery/commit/726b664840b6a1fcea9225b254a393e665363ad0
+# Monkey Path to introduce the previous logic
+# till it's clear how the Pagure code has to be adjusted.
+from celery.backends.base import BaseKeyValueStoreBackend  # noqa: E402
 
 
 def get_key_for_task(self, task_id, key=""):
@@ -80,7 +82,7 @@ def get_key_for_task(self, task_id, key=""):
 
 
 BaseKeyValueStoreBackend.get_key_for_task = get_key_for_task
-### Monkey Patch - end ###
+# Monkey Patch - end
 
 
 @after_setup_task_logger.connect
