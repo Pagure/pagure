@@ -10,9 +10,17 @@
 
 from __future__ import absolute_import, unicode_literals
 
-from straight.plugin import load
-
 from pagure.lib.model_base import BASE
+
+# latest straight.plugin release still use 'imp',
+# which is dropped in python 3.12. mock 'imp' as workaround till
+# https://github.com/ironfroggy/straight.plugin/pull/30 is published.
+import sys
+import mock
+
+sys.modules["imp"] = mock.Mock()
+
+from straight.plugin import load  # noqa: E402
 
 
 def get_plugin_names(blacklist=None, without_backref=False):

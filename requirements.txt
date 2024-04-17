@@ -34,7 +34,7 @@ six <= 1.16.0
 setuptools
 
 sqlalchemy >= 0.8, <=1.4.46
-straight.plugin == 1.5.0
+straight.plugin
 whitenoise <= 6.2.0
 wtforms <= 3.0.1
 
