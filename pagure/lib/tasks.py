@@ -61,6 +61,13 @@ elif "REDIS_HOST" in pagure_config and "REDIS_PORT" in pagure_config:
 conn = Celery("tasks", broker=broker_url, backend=broker_url)
 conn.conf.update(pagure_config["CELERY_CONFIG"])
 
+from celery.backends.base import BaseKeyValueStoreBackend
+def get_key_for_task(self, task_id, key=''):
+    key_t = self.key_t
+    return key_t('').join([
+        self.task_keyprefix, key_t(task_id), key_t(key),
+    ])
+BaseKeyValueStoreBackend.get_key_for_task = get_key_for_task
 
 @after_setup_task_logger.connect
 def augment_celery_log(**kwargs):
