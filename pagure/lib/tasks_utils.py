@@ -28,7 +28,6 @@ def pagure_task(function):
         """Decorated function, actually does the work."""
         if self is not None:
             try:
-                print(self.request.id)
                 self.update_state(state="RUNNING")
             except TypeError:
                 pass

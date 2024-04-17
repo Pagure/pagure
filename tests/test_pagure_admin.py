@@ -1959,9 +1959,9 @@ class PagureAdminDeleteProjectTests(tests.Modeltests):
                 "action_user": "pingou",
             }
         )
-        #with tests.capture_output() as output:
-        output = pagure.cli.admin.do_delete_project(args)
-        #output = output.getvalue()
+        with tests.capture_output() as output:
+            pagure.cli.admin.do_delete_project(args)
+        output = output.getvalue()
         self.assertEqual(
             "Are you sure you want to delete: somenamespace/test?\n"
             "  This cannot be undone!\n"
