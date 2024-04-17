@@ -33,7 +33,7 @@ six <= 1.16.0
 # required for backward compatibility
 setuptools
 
-sqlalchemy >= 0.8, <=1.4.46
+sqlalchemy < 2.0.0
 straight.plugin
 whitenoise <= 6.2.0
 wtforms <= 3.0.1
