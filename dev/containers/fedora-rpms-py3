@@ -17,7 +17,7 @@ RUN dnf -y --enablerepo=updates-testing install \
     python3-isort \
     python3-pytest-xdist \
     python3-flask-oidc \
-    python3-cchardet \
+    python3-chardet \
     python3-fedora-messaging \
     python3-pip \
     redis \
