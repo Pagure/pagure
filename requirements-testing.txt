@@ -4,7 +4,7 @@ black <= 22.8.0
 cryptography <= 36.0.0
 eventlet <= 0.33.2
 fedmsg <= 1.1.2
-flake8 <= 4.0.1
+flake8
 
 # Important: Until https://github.com/puiterwijk/flask-oidc/pull/144 is merged and a new version of flask-oidc is released,
 # it's necessary to ensure `itsdangerous` is pinned to a version lower as 2.1 as well.
