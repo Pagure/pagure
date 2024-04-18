@@ -3482,7 +3482,7 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
         tests.create_tokens_acl(self.session, "aaabbbcccddd", "modify_project")
 
         project = pagure.lib.query._get_project(self.session, "test")
-        self.assertEquals(
+        self.assertEqual(
             project.access_users,
             {"admin": [], "collaborator": [], "commit": [], "ticket": []},
         )
@@ -3746,7 +3746,7 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
         headers = {"Authorization": "token aaabbbcccddd"}
 
         project = pagure.lib.query._get_project(self.session, "test")
-        self.assertEquals(
+        self.assertEqual(
             project.access_users,
             {"admin": [], "collaborator": [], "commit": [], "ticket": []},
         )
@@ -3795,7 +3795,7 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
         # Ensure `foo` was properly added:
         project = pagure.lib.query._get_project(self.session, "test")
         user_foo = pagure.lib.query.search_user(self.session, username="foo")
-        self.assertEquals(
+        self.assertEqual(
             project.access_users,
             {
                 "admin": [],
@@ -3877,7 +3877,7 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
         # Ensure `foo` was properly removed
         self.session = pagure.lib.query.create_session(self.dbpath)
         project = pagure.lib.query._get_project(self.session, "test")
-        self.assertEquals(
+        self.assertEqual(
             project.access_users,
             {"admin": [], "collaborator": [], "commit": [], "ticket": []},
         )
@@ -3891,7 +3891,7 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
         # Ensure `foo` was properly added:
         project = pagure.lib.query._get_project(self.session, "test")
         user_foo = pagure.lib.query.search_user(self.session, username="foo")
-        self.assertEquals(
+        self.assertEqual(
             project.access_users,
             {
                 "admin": [],
@@ -3958,7 +3958,7 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
         # Ensure `foo` was properly removed
         self.session = pagure.lib.query.create_session(self.dbpath)
         project = pagure.lib.query._get_project(self.session, "test")
-        self.assertEquals(
+        self.assertEqual(
             project.access_users,
             {"admin": [], "collaborator": [], "commit": [], "ticket": []},
         )
@@ -4039,7 +4039,7 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
         # Ensure `baz` was properly added
         self.session = pagure.lib.query.create_session(self.dbpath)
         project = pagure.lib.query._get_project(self.session, "test")
-        self.assertEquals(
+        self.assertEqual(
             project.access_users,
             {"admin": [], "collaborator": [], "commit": [], "ticket": []},
         )
@@ -4047,7 +4047,7 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
             project.access_groups,
             {"admin": [], "collaborator": [], "commit": [], "ticket": []},
         )
-        self.assertEquals(len(project.access_groups["ticket"]), 1)
+        self.assertEqual(len(project.access_groups["ticket"]), 1)
 
         # Remove the group from the project
         data = {"user_type": "group", "name": "baz", "acl": None}
@@ -4106,11 +4106,11 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
         # Ensure `baz` was properly removed
         self.session = pagure.lib.query.create_session(self.dbpath)
         project = pagure.lib.query._get_project(self.session, "test")
-        self.assertEquals(
+        self.assertEqual(
             project.access_users,
             {"admin": [], "collaborator": [], "commit": [], "ticket": []},
         )
-        self.assertEquals(
+        self.assertEqual(
             project.access_groups,
             {"admin": [], "collaborator": [], "commit": [], "ticket": []},
         )
@@ -4191,11 +4191,11 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
         # Ensure `baz` was properly removed
         self.session = pagure.lib.query.create_session(self.dbpath)
         project = pagure.lib.query._get_project(self.session, "test")
-        self.assertEquals(
+        self.assertEqual(
             project.access_users,
             {"admin": [], "collaborator": [], "commit": [], "ticket": []},
         )
-        self.assertEquals(
+        self.assertEqual(
             project.access_groups,
             {"admin": [], "collaborator": [], "commit": [], "ticket": []},
         )
@@ -4214,7 +4214,7 @@ class PagureFlaskApiProjectOptionsTests(tests.Modeltests):
         tests.create_tokens_acl(self.session, "aaabbbcccddd", "modify_project")
 
         project = pagure.lib.query._get_project(self.session, "test")
-        self.assertEquals(
+        self.assertEqual(
             project.access_users,
             {"admin": [], "collaborator": [], "commit": [], "ticket": []},
         )

@@ -662,7 +662,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
             output_text,
         )
         self.assertIn('<a class="notblue" href="/test/issue/2">', output_text)
-        self.assertEquals(
+        self.assertEqual(
             output_text.count('<a class="notblue" href="/test/issue/2">'), 1
         )
 

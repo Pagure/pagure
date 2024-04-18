@@ -5450,8 +5450,8 @@ index 0000000..fb7093d
         tests.add_readme_git_repo(os.path.join(self.path, "repos", "test.git"))
 
         user = pagure.lib.query.search_user(self.session, username="pingou")
-        self.assertEquals(len(user.emails), 2)
-        self.assertEquals(user.default_email, "bar@pingou.com")
+        self.assertEqual(len(user.emails), 2)
+        self.assertEqual(user.default_email, "bar@pingou.com")
 
         user = tests.FakeUser(username="pingou")
         with tests.user_set(self.app.application, user):

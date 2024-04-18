@@ -60,19 +60,19 @@ class PagureUtilsTests(tests.SimplePagureTest):
         """Test lookup_deploykey with a non-deploykey username."""
         project = pagure.lib.query._get_project(self.session, "test")
         res = pagure.utils.lookup_deploykey(project, "pingou")
-        self.assertEquals(res, None)
+        self.assertEqual(res, None)
 
     def test_lookup_deploykey_different_project(self):
         """Test lookup_deploykey with a username for another project."""
         project = pagure.lib.query._get_project(self.session, "test2")
         res = pagure.utils.lookup_deploykey(project, "deploykey_test_1")
-        self.assertEquals(res, None)
+        self.assertEqual(res, None)
 
     def test_lookup_deploykey_non_existent_key(self):
         """Test lookup_deploykey with a non-existing deploykey."""
         project = pagure.lib.query._get_project(self.session, "test")
         res = pagure.utils.lookup_deploykey(project, "deploykey_test_2")
-        self.assertEquals(res, None)
+        self.assertEqual(res, None)
 
     def test_lookup_deploykey(self):
         """Test lookup_deploykey with a correct username."""
