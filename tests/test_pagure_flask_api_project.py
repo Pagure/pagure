@@ -4043,7 +4043,7 @@ class PagureFlaskApiProjectModifyAclTests(tests.Modeltests):
             project.access_users,
             {"admin": [], "collaborator": [], "commit": [], "ticket": []},
         )
-        self.assertNotEquals(
+        self.assertNotEqual(
             project.access_groups,
             {"admin": [], "collaborator": [], "commit": [], "ticket": []},
         )

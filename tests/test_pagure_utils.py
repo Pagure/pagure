@@ -78,5 +78,5 @@ class PagureUtilsTests(tests.SimplePagureTest):
         """Test lookup_deploykey with a correct username."""
         project = pagure.lib.query._get_project(self.session, "test")
         res = pagure.utils.lookup_deploykey(project, "deploykey_test_1")
-        self.assertNotEquals(res, None)
+        self.assertNotEqual(res, None)
         self.assertFalse(res.pushaccess)
