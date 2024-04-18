@@ -21,6 +21,7 @@ echo "Last commits:"
 git --no-pager log -2
 fi
 
+
 # F39 RPM SKIPPED - Bug with pytest+xdist, tests stuck and trigger OOM Killer - see https://pagure.io/pagure/pull-request/5463
 #podman build --rm -t pagure-fedora-rpms-py3 \
 #    -f dev/containers/fedora-rpms-py3 \
