@@ -71,7 +71,7 @@ class TestGuessEncodings(unittest.TestCase):
             # The last one in the list (which apparently has only one)
             self.assertEqual(result[-1].encoding, "WINDOWS-1250")
         else:
-            if chardet.__version__[0] in ("3", "4"):
+            if chardet.__version__[0] in ("3", "4", "5"):
                 # The first three have different confidence values
                 expexted_list = ["utf-8", "ISO-8859-9", "ISO-8859-1"]
                 # This is the one with the least confidence

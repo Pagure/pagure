@@ -4409,11 +4409,17 @@ def text2markdown(text, extended=True, readme=False):
         # Install our markdown modifications
         extensions.append("pagure.pfmarkdown")
 
+    extensions_configs = {
+        "markdown.extensions.codehilite": {"guess_lang": False},
+    }
+    if md_version >= (3, 4):
+        extensions_configs["markdown.extensions.tables"] = {
+            "use_align_attribute": True
+        }
+
     md_processor = markdown.Markdown(
         extensions=extensions,
-        extension_configs={
-            "markdown.extensions.codehilite": {"guess_lang": False}
-        },
+        extension_configs=extensions_configs,
         output_format="xhtml5",
     )
 

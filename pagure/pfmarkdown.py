@@ -31,6 +31,7 @@ import markdown.preprocessors
 import markdown.util
 import pygit2
 import six
+import xml.etree.ElementTree as etree
 
 import pagure.lib.query
 from pagure.config import config as pagure_config
@@ -100,7 +101,7 @@ class MentionPattern(markdown.inlinepatterns.Pattern):
         if not user:
             return text
 
-        element = markdown.util.etree.Element("a")
+        element = etree.Element("a")
         base_url = pagure_config["APP_URL"]
         if base_url.endswith("/"):
             base_url = base_url[:-1]
@@ -338,7 +339,7 @@ class StrikeThroughPattern(markdown.inlinepatterns.Pattern):
 
         text = markdown.util.AtomicString(m.group(2))
 
-        element = markdown.util.etree.Element("del")
+        element = etree.Element("del")
         element.text = text
         return element
 
@@ -359,7 +360,7 @@ class AutolinkPattern2(markdown.inlinepatterns.Pattern):
             url = url[1:]
         if url.endswith(">"):
             url = url[:-1]
-        el = markdown.util.etree.Element("a")
+        el = etree.Element("a")
         el.set("href", self.unescape(url))
         el.text = markdown.util.AtomicString(url)
         return el
@@ -376,11 +377,11 @@ class ImagePatternLazyLoad(ImagePattern):
             el = out
 
         # Add a noscript tag with the untouched img tag
-        noscript = markdown.util.etree.Element("noscript")
+        noscript = etree.Element("noscript")
         noscript.append(el)
 
         # Modify the origina img tag
-        img = markdown.util.etree.Element("img")
+        img = etree.Element("img")
         img.set("data-src", el.get("src"))
         img.set("src", "")
         img.set("alt", el.get("alt"))
@@ -388,7 +389,7 @@ class ImagePatternLazyLoad(ImagePattern):
 
         # Create a global span in which we add both the new img tag and the
         # noscript one
-        outel = markdown.util.etree.Element("span")
+        outel = etree.Element("span")
         outel.append(img)
         outel.append(noscript)
 
@@ -607,7 +608,7 @@ def _obj_anchor_tag(user, namespace, repo, obj, text):
         else:
             title = obj.title
 
-    element = markdown.util.etree.Element("a")
+    element = etree.Element("a")
     element.set("href", url)
     element.set("title", title)
     element.text = text
