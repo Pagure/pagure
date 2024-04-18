@@ -41,5 +41,5 @@ RUN dnf install -y --enablerepo=updates-testing `grep "Requires:" /pagure/files/
     python3 setup.py build
 
 WORKDIR /pagure
-ENTRYPOINT ["/pagure/dev/containers/runtests_py3.sh"]
+ENTRYPOINT ["/bin/sh", "-c", "echo F39 RPM SKIPPED - Bug with pytest+xdist, tests stuck and trigger OOM Killer - see https://pagure.io/pagure/pull-request/5463"]
 CMD []
