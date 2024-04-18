@@ -22,6 +22,7 @@ sys.modules["imp"] = mock.Mock()
 
 from straight.plugin import load  # noqa: E402
 
+
 def get_plugin_names(blacklist=None, without_backref=False):
     """Return the list of plugins names.
 
