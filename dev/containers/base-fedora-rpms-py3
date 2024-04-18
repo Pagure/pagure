@@ -25,6 +25,7 @@ RUN dnf -y --enablerepo=updates-testing install \
       redis \
       which \
       git \
+      python3-pytest-timeout \
     && dnf clean all
 
 RUN pip install pagure-messages
