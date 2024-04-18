@@ -21,23 +21,28 @@ echo "Last commits:"
 git --no-pager log -2
 fi
 
-podman build --rm -t pagure-fedora-rpms-py3 \
-    -f dev/containers/fedora-rpms-py3 \
-    dev/containers
-
-if [ ! -d `pwd`/results_fedora-rpms-py3 ]; then
-  mkdir `pwd`/results_fedora-rpms-py3;
-fi
-
-podman run --rm -it --name pagure-fedora-rpms-py3 \
-    -v `pwd`/results_fedora-rpms-py3:/pagure/results:z \
-    -e BRANCH=$BRANCH \
-    -e REPO=$REPO \
-    pagure-fedora-rpms-py3
+# F39 RPM SKIPPED - Bug with pytest+xdist, tests stuck and trigger OOM Killer - see https://pagure.io/pagure/pull-request/5463
+#podman build --rm -t pagure-fedora-rpms-py3 \
+#    -f dev/containers/fedora-rpms-py3 \
+#    --build-arg BRANCH=$BRANCH \
+#    --build-arg REPO=$REPO \
+#    dev/containers
+#
+#if [ ! -d `pwd`/results_fedora-rpms-py3 ]; then
+#  mkdir `pwd`/results_fedora-rpms-py3;
+#fi
+#
+#podman run --rm -it --name pagure-fedora-rpms-py3 \
+#    -v `pwd`/results_fedora-rpms-py3:/pagure/results:z \
+#    -e BRANCH=$BRANCH \
+#    -e REPO=$REPO \
+#    pagure-fedora-rpms-py3
 
 
 podman build --rm -t pagure-fedora-pip-py3 \
     -f dev/containers/fedora-pip-py3 \
+    --build-arg BRANCH=$BRANCH \
+    --build-arg REPO=$REPO \
     dev/containers
 
 if [ ! -d `pwd`/results_fedora-pip-py3 ]; then
