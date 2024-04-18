@@ -24,8 +24,8 @@ fi
 # F39 RPM SKIPPED - Bug with pytest+xdist, tests stuck and trigger OOM Killer - see https://pagure.io/pagure/pull-request/5463
 #podman build --rm -t pagure-fedora-rpms-py3 \
 #    -f dev/containers/fedora-rpms-py3 \
-#    --build-arg BRANCH=$BRANCH \
-#    --build-arg REPO=$REPO \
+#    --build-arg branch=$BRANCH \
+#    --build-arg repo=$REPO \
 #    dev/containers
 #
 #if [ ! -d `pwd`/results_fedora-rpms-py3 ]; then
@@ -41,8 +41,8 @@ fi
 
 podman build --rm -t pagure-fedora-pip-py3 \
     -f dev/containers/fedora-pip-py3 \
-    --build-arg BRANCH=$BRANCH \
-    --build-arg REPO=$REPO \
+    --build-arg branch=$BRANCH \
+    --build-arg repo=$REPO \
     dev/containers
 
 if [ ! -d `pwd`/results_fedora-pip-py3 ]; then
