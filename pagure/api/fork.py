@@ -503,7 +503,7 @@ def api_pull_request_update(repo, requestid, username=None, namespace=None):
     _check_token(repo, project_token=False)
 
     request = _get_request(repo, requestid)
-    _check_pull_request_access(request, assignee=True)
+    _check_pull_request_access(request, assignee=True, allow_author=True)
 
     form = pagure.forms.RequestPullForm(csrf_enabled=False)
     if not form.validate_on_submit():
