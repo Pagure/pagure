@@ -59,6 +59,7 @@
         {% endif %}
     </div>
   </div>
+    <!-- .card -->
     <div class="card mb-3">
       <div class="card-header">
         <ol class="breadcrumb p-0 bg-transparent mb-0">
@@ -94,9 +95,11 @@
         </ol>
       </div>
 
-{% if content is not none %}
-  {% if output_type in ('file','binary','image','markup') %}
+{% if content is none %}
+  No content found in this repository
+{% else %}
   <div class="card-body p-0">
+  {% if output_type in ('file','binary','image','markup') %}
         {% if content is not none %}
           {% if output_type in ('file','binary','image','markup') %}
             <div class="bg-light border text-right pr-2">
@@ -209,10 +212,8 @@
           </a>
         </p>
     {% endif %}
-  </div>
   {% else %}
-      <div class="card-body p-0">
-          <table class="table table-sm mb-0">
+      <table class="table table-sm mb-0">
         <tbody>
           {% for entry in content %}
             <tr>
@@ -243,10 +244,8 @@
           {% endfor %}
         </tbody>
       </table>
-      </div>
   {% endif %}
-{% else %}
-No content found in this repository
+  </div>
 {% endif %}
  </div> <!-- end .card-->
 
