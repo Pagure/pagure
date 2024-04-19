@@ -18,7 +18,10 @@ RUN dnf -y install \
     redis \
     which \
     git \
-    glibc-langpack-en
+    glibc-langpack-en \
+    libtiff-devel libjpeg-devel openjpeg2-devel zlib-devel \
+    freetype-devel lcms2-devel libwebp-devel tcl-devel tk-devel \
+    harfbuzz-devel fribidi-devel libraqm-devel libimagequant-devel libxcb-devel
 
 RUN cd / \
     && GIT_TRACE=1 git clone -b $BRANCH $REPO \
