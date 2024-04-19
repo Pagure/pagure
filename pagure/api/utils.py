@@ -190,12 +190,14 @@ def _check_private_issue_access(issue):
         )
 
 
-def _check_pull_request_access(request, assignee=False):
+def _check_pull_request_access(request, assignee=False, allow_author=False):
     """Check if user can access Pull-Request. Must be repo committer
-    or author to see private pull-requests.
+    or author (if flag is true) to see private pull-requests.
     :param request: PullRequest object
     :param assignee: a boolean specifying whether to allow the assignee or not
         defaults to False
+    :param allow_author: a boolean specifying whether the PR author should be
+        allowed, defaults to False
     :raises pagure.exceptions.APIError: when access denied
     """
     # Private PRs require commit access
@@ -204,7 +206,7 @@ def _check_pull_request_access(request, assignee=False):
     error = False
     # Public tickets require ticket access
     error = not is_repo_user(request.project) and not (
-        request.user.user == flask.g.fas_user.username
+        allow_author and request.user.user == flask.g.fas_user.username
     )
 
     if assignee:
