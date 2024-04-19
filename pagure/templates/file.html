@@ -16,7 +16,9 @@
 </style>
 {% endblock %}
 
+
 {% block repo %}
+  <!-- template: file.html -->
   <div class="row">
     <div class="col-2">
         {% block overviewtabs %}{{ super() }}{% endblock %}
@@ -29,14 +31,13 @@
     </h3>
     </div>
 
-    <div class="col-sm-6">
-      <div class="float-right">
+    <div class="col-sm-6 text-right">
         {% if branchname in g.branches %}
           <div class="btn-group">
             <a href="#" class="btn btn-outline-light border-secondary text-dark btn-sm dropdown-toggle"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="fa fa-random fa-fw"></span> Branch: <span class="font-weight-bold">{{ branchname }}</span>
-          </a>
+            </a>
             <div class="dropdown-menu dropdown-menu-right">
               {% for branch in g.branches %}
                   <a class="dropdown-item pl-1 {{'active' if branchname == branch}}" href="{{ url_for(
@@ -57,7 +58,6 @@
         </a>
         {% endif %}
     </div>
-  </div>
   </div>
     <div class="card mb-3">
       <div class="card-header">
@@ -262,7 +262,9 @@ No content found in this repository
  {% endif %}
 </div>
 </div>
+<!-- /template: file.html -->
 {% endblock %}
+
 
 {% block jscripts %}
 {{ super() }}
