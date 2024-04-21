@@ -60,7 +60,6 @@ class PagureFlaskApiProjectDeleteProjecttests(tests.Modeltests):
         tests.create_tokens_acl(self.session, token_id="aaabbbcccddd_foo")
 
         project = pagure.lib.query.get_authorized_project(self.session, "test")
-        project.read_only = False
         self.session.add(project)
         self.session.commit()
 
@@ -94,16 +93,6 @@ class PagureFlaskApiProjectDeleteProjecttests(tests.Modeltests):
             pagure.api.APIERROR.EINVALIDTOK.name, data["error_code"]
         )
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data["error"])
-
-    def test_delete_project_read_only_project(self):
-        headers = {"Authorization": "token aaabbbcccddd_test2"}
-
-        output = self.app.post("/api/0/test2/delete", headers=headers)
-        self.assertEqual(output.status_code, 400)
-        data = json.loads(output.get_data(as_text=True))
-        self.assertEqual(pagure.api.APIERROR.ENOCODE.name, data["error_code"])
-        error = "The ACLs of this project are being refreshed in the backend this prevents the project from being deleted. Please wait for this task to finish before trying again. Thanks!"
-        self.assertEqual(data["error"], error)
 
     def test_delete_project_not_allowed(self):
         headers = {"Authorization": "token aaabbbcccddd_foo"}

@@ -383,7 +383,6 @@ class Project(BASE):
     hook_token = sa.Column(sa.String(40), nullable=False, unique=True)
     avatar_email = sa.Column(sa.Text, nullable=True)
     is_fork = sa.Column(sa.Boolean, default=False, nullable=False)
-    read_only = sa.Column(sa.Boolean, default=True, nullable=False)
     parent_id = sa.Column(
         sa.Integer,
         sa.ForeignKey("projects.id", onupdate="CASCADE"),

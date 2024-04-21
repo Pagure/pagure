@@ -13,6 +13,7 @@ The 6.0 release contains database schema updates, so:
 Removed features (in 6.0):
 
 * repoSpanner, which was never completed and eventually abandoned.
+* gitolite, ``pagure_authorized_keys`` is now the default auth backend.
 
 Configuration keys removed (in 6.0);
 
@@ -22,6 +23,19 @@ Configuration keys removed (in 6.0);
 * REPOSPANNER_NEW_FORK
 * REPOSPANNER_ADMIN_MIGRATION
 * REPOSPANNER_REGIONS
+* GITOLITE_CONFIG
+* GITOLITE_HOME
+* GITOLITE_VERSION
+* GITOLITE_KEYDIR
+* GITOLITE_BACKEND
+* GITOLITE_HAS_COMPILE_1
+* GL_RC
+* GL_BINDIR
+* HTTP_REPO_ACCESS_GITOLITE
+* GITOLITE_CELERY_QUEUE
+* GL_REPO_BASE
+* GITOLITE_PRE_CONFIG
+* GITOLITE_POST_CONFIG
 
 
 From 5.12 to 5.13

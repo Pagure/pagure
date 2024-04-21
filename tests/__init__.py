@@ -376,7 +376,7 @@ class SimplePagureTest(unittest.TestCase):
             "enable_tickets": True,
             "tickets_folder": "%s/repos/tickets" % self.path,
             "global_path": self.dbfolder,
-            "authbackend": "gitolite3",
+            "authbackend": "pagure",
             "nogithooks": False,
         }
         config_values.update(self.config_values)

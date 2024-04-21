@@ -1239,10 +1239,6 @@ def add_user_sshkey():
                 user=user,
             )
             flask.g.session.commit()
-            pagure.lib.query.create_user_ssh_keys_on_disk(
-                user, pagure_config.get("GITOLITE_KEYDIR", None)
-            )
-            pagure.lib.tasks.gitolite_post_compile_only.delay()
             if (
                 pagure_config.get("GIT_AUTH_BACKEND")
                 == "pagure_authorized_keys"
@@ -1301,10 +1297,6 @@ def remove_user_sshkey(keyid):
 
         try:
             flask.g.session.commit()
-            pagure.lib.query.create_user_ssh_keys_on_disk(
-                user, pagure_config.get("GITOLITE_KEYDIR", None)
-            )
-            pagure.lib.tasks.gitolite_post_compile_only.delay()
             if (
                 pagure_config.get("GIT_AUTH_BACKEND")
                 == "pagure_authorized_keys"

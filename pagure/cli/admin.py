@@ -33,7 +33,6 @@ import pagure.lib.model  # noqa: E402
 import pagure.lib.model_base  # noqa: E402
 import pagure.lib.query  # noqa: E402
 import pagure.lib.tasks_utils  # noqa: E402
-from pagure.flask_app import generate_user_key_files  # noqa: E402
 from pagure.utils import get_repo_path  # noqa: E402
 
 _config = pagure.config.reload_config()
@@ -48,49 +47,6 @@ WATCH = {
     "2": "watch commits",
     "3": "watch issues, PRs and commits",
 }
-
-
-def _parser_refresh_gitolite(subparser):
-    """Set up the CLI argument parser for the refresh-gitolite action.
-
-    :arg subparser: an argparse subparser allowing to have action's specific
-        arguments
-
-    """
-    local_parser = subparser.add_parser(
-        "refresh-gitolite", help="Re-generate the gitolite config file"
-    )
-    local_parser.add_argument(
-        "--user", help="User of the project (to use only on forks)"
-    )
-    local_parser.add_argument(
-        "--project",
-        help="Project to update (as namespace/project if there "
-        "is a namespace)",
-    )
-    local_parser.add_argument("--group", help="Group to refresh")
-    local_parser.add_argument(
-        "--all",
-        dest="all_",
-        default=False,
-        action="store_true",
-        help="Refresh all the projects",
-    )
-    local_parser.set_defaults(func=do_generate_acl)
-
-
-def _parser_refresh_ssh(subparser):
-    """Set up the CLI argument parser for the refresh-ssh action.
-
-    :arg subparser: an argparse subparser allowing to have action's specific
-        arguments
-
-    """
-    local_parser = subparser.add_parser(
-        "refresh-ssh",
-        help="Re-write to disk every user's ssh key stored in the database",
-    )
-    local_parser.set_defaults(func=do_refresh_ssh)
 
 
 def _parser_clear_hook_token(subparser):
@@ -285,32 +241,6 @@ def _parser_update_watch(subparser):
         "-s", "--status", help="Watch status to update to"
     )
     local_parser.set_defaults(func=do_update_watch_status)
-
-
-def _parser_read_only(subparser):
-    """Set up the CLI argument parser for the read-only action.
-
-    :arg subparser: an argparse subparser allowing to have action's specific
-        arguments
-
-    """
-    local_parser = subparser.add_parser(
-        "read-only", help="Get or set the read-only flag on a project"
-    )
-    local_parser.add_argument(
-        "--user", help="User of the project (to use only on forks)"
-    )
-    local_parser.add_argument(
-        "project",
-        help="Project to update (as namespace/project if there "
-        "is a namespace)",
-    )
-    local_parser.add_argument(
-        "--ro",
-        help="Read-Only status to set (has to be: true or false), do not "
-        "specify to get the current status",
-    )
-    local_parser.set_defaults(func=do_read_only)
 
 
 def _parser_new_group(subparser):
@@ -543,12 +473,6 @@ def parse_arguments(args=None):
 
     subparser = parser.add_subparsers(title="actions")
 
-    # refresh-gitolite
-    _parser_refresh_gitolite(subparser)
-
-    # refresh-ssh
-    _parser_refresh_ssh(subparser)
-
     # clear-hook-token
     _parser_clear_hook_token(subparser)
 
@@ -560,9 +484,6 @@ def parse_arguments(args=None):
 
     # update-watch
     _parser_update_watch(subparser)
-
-    # read-only
-    _parser_read_only(subparser)
 
     # new-group
     _parser_new_group(subparser)
@@ -632,78 +553,6 @@ def _check_project(_project, **kwargs):
                 )
             )
         )
-
-
-def do_generate_acl(args):
-    """Regenerate the gitolite ACL file.
-
-
-    :arg args: the argparse object returned by ``parse_arguments()``.
-
-    """
-    _log.debug("group:          %s", args.group)
-    _log.debug("project:        %s", args.project)
-    _log.debug("user:           %s", args.user)
-    _log.debug("all:            %s", args.all_)
-
-    title = None
-    project = None
-    if args.project:
-        project = _get_project(args.project, user=args.user)
-        title = project.fullname
-    if args.all_:
-        title = "all"
-        project = -1
-
-    if not args.all_ and not args.project:
-        print(
-            "Please note that you have not selected a project or --all. "
-            "Do you want to recompile the existing config file?"
-        )
-        if not _ask_confirmation():
-            return
-
-    helper = pagure.lib.git_auth.get_git_auth_helper()
-    _log.debug("Got helper: %s", helper)
-
-    group_obj = None
-    if args.group:
-        group_obj = pagure.lib.query.search_groups(
-            session, group_name=args.group
-        )
-    _log.debug(
-        "Calling helper: %s with arg: project=%s, group=%s",
-        helper,
-        project,
-        group_obj,
-    )
-
-    print(
-        "Do you want to re-generate the gitolite.conf file for group: %s "
-        "and project: %s?" % (group_obj, title)
-    )
-    if _ask_confirmation():
-        helper.generate_acls(project=project, group=group_obj)
-        pagure.lib.tasks_utils.gc_clean()
-        print("Gitolite ACLs updated")
-
-
-def do_refresh_ssh(_):
-    """Regenerate the user key files.
-
-    :arg _: the argparse object returned by ``parse_arguments()``, which is
-        ignored as there are no argument to pass to this action.
-
-    """
-    print(
-        "Do you want to re-generate all the ssh keys for every user in "
-        "the database? (Depending on your instance this may take a while "
-        "and result in an outage while it lasts)"
-    )
-    if _ask_confirmation():
-        generate_user_key_files()
-        print("User key files regenerated")
-        do_generate_acl()
 
 
 def do_generate_hook_token(_):
@@ -1171,48 +1020,6 @@ def do_update_watch_status(args):
         session=session, project=project, user=args.user, watch=args.status
     )
     session.commit()
-
-
-def do_read_only(args):
-    """Set or update the read-only status of a project.
-
-    :arg args: the argparse object returned by ``parse_arguments()``.
-
-    """
-
-    _log.debug("project:       %s", args.project)
-    _log.debug("user:          %s", args.user)
-    _log.debug("read-only:     %s", args.ro)
-
-    # Validate user
-    pagure.lib.query.get_user(session, args.user)
-
-    # Get the project
-    project = _get_project(args.project, user=args.user)
-
-    _check_project(project, project=args.project)
-
-    # Validate ro flag
-    if args.ro and args.ro.lower() not in ["true", "false"]:
-        raise pagure.exceptions.PagureException(
-            "Invalid read-only status specified: %s is not in: "
-            "true, false" % args.ro.lower()
-        )
-
-    if not args.ro:
-        print(
-            "The current read-only flag of the project %s is set to %s"
-            % (project.fullname, project.read_only)
-        )
-    else:
-        pagure.lib.query.update_read_only_mode(
-            session, project, read_only=(args.ro.lower() == "true")
-        )
-        session.commit()
-        print(
-            "The read-only flag of the project %s has been set to %s"
-            % (project.fullname, args.ro.lower() == "true")
-        )
 
 
 def do_new_group(args):

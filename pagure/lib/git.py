@@ -143,36 +143,6 @@ Subject: {subject}
         return "".join(filter(None, patch))
 
 
-def generate_gitolite_acls(project=None, group=None):
-    """Generate the gitolite configuration file.
-
-    :arg project: the project of which to update the ACLs. This argument
-            can take three values: ``-1``, ``None`` and a project.
-            If project is ``-1``, the configuration should be refreshed for
-            *all* projects.
-            If project is ``None``, there no specific project to refresh
-            but the ssh key of an user was added and updated.
-            If project is a pagure.lib.model.Project, the configuration of
-            this project should be updated.
-    :type project: None, int or pagure.lib.model.Project
-    :kwarg group: the group to refresh the members of
-    :type group: None or str
-
-    """
-    if project != -1:
-        task = pagure.lib.tasks.generate_gitolite_acls.delay(
-            namespace=project.namespace if project else None,
-            name=project.name if project else None,
-            user=project.user.user if project and project.is_fork else None,
-            group=group,
-        )
-    else:
-        task = pagure.lib.tasks.generate_gitolite_acls.delay(
-            name=-1, group=group
-        )
-    return task
-
-
 def update_git(obj, repo):
     """Schedules an update_repo task after determining arguments."""
     ticketuid = None
@@ -401,7 +371,6 @@ def get_user_from_json(session, jsondata, key="user"):
             fullname=fullname or username,
             default_email=default_email,
             emails=useremails,
-            keydir=pagure_config.get("GITOLITE_KEYDIR", None),
         )
         session.commit()
 
@@ -1119,9 +1088,6 @@ class TemporaryClone(object):
             )
             env = os.environ.copy()
             env["GL_USER"] = username
-            env["GL_BYPASS_ACCESS_CHECKS"] = "1"
-            if pagure_config.get("GITOLITE_HOME"):
-                env["HOME"] = pagure_config["GITOLITE_HOME"]
             env.update(environ)
             env.update(extra)
             out = subprocess.check_output(
@@ -2942,10 +2908,7 @@ def mirror_pull_project(session, project, debug=False):
         _log.debug("Running a git push to %s", project.fullname)
         env = os.environ.copy()
         env["GL_USER"] = "pagure"
-        env["GL_BYPASS_ACCESS_CHECKS"] = "1"
         env["internal"] = "yes"
-        if pagure_config.get("GITOLITE_HOME"):
-            env["HOME"] = pagure_config["GITOLITE_HOME"]
         env.update(environ)
         env.update(extra)
         out = subprocess.check_output(

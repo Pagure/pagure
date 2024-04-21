@@ -1070,13 +1070,6 @@
               </h3>
               <div class="row">
                 <div class="col">
-                    {% if repo.read_only %}
-          <button class="btn btn-danger disabled"
-            title="Action disabled while project's ACLs are being refreshed">
-              <i class="fa fa-trash"></i>
-              &nbsp; Delete the {{ repo.fullname }} project
-          </button>
-        {% else %}
           <form action="{{ url_for(
             'ui_ns.delete_repo',
             repo=repo.name,
@@ -1090,7 +1083,6 @@
                 &nbsp; Delete the {{ repo.fullname }} project
             </button>
           </form>
-        {% endif %}
                 </div>
               </div>
           </div>

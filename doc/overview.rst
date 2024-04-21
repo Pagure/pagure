@@ -26,8 +26,8 @@ And here is a diagram of all the components together:
 Pagure core application
 -----------------------
 
-The core application is the flask application interacting with gitolite to
-provide a web UI to the git repositories as well as tickets and pull-requests.
+The core application is the flask application and provide a web UI to
+the git repositories as well as tickets and pull-requests.
 This is the main application for the forge.
 
 
@@ -45,18 +45,6 @@ The communication between the core application and its worker is based on
 `celery <http://www.celeryproject.org/>`_ and defaults to using `redis
 <https://redis.org>`_ but any of the queueing system supported by `celery
 <http://www.celeryproject.org/>`_ could be used instead.
-
-
-Gitolite
---------
-
-Currently pagure uses `gitolite <http://gitolite.com/gitolite/index.html>`_
-to grant or deny `ssh <https://en.wikipedia.org/wiki/Secure_Shell>`_ access
-to the git repositories, in other words to grant or deny read and/or write
-access to the git repositories.
-
-Pagure supports cloning over both ssh and http, but writing can only be done
-via ssh, through gitolite.
 
 
 Pagure doc server

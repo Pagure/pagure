@@ -8,9 +8,6 @@
     </a>
   {% elif not (current_user | user_group_can_ssh_commit) %}
     Only members of the {{ config["SSH_ACCESS_GROUPS"] | join(", ") }} group(s) can clone via ssh
-  {% elif repo.read_only %}
-     The permissions on this repository are being updated.
-     Cloning over SSH is disabled.
   {% else %}
     <div class="form-group">
       <div class="input-group input-group-sm">
@@ -260,19 +257,6 @@
 </div>
 
 <div class="container pt-5 repo-body-container">
-    {% if repo.read_only %}
-    <div class="container pt-2">
-        <div class="alert alert-danger alert-dismissible" role="alert">
-          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-            <span class="sr-only">Close</span>
-          </button>
-          The permissions on this repository are being updated. This may take a while.
-          During this time, you or some of the project's contributors may not be able
-          to push to this repository.
-        </div>
-    </div>
-    {% endif %}
     {% if g.authenticated and repo.settings.get('pull_request_access_only') %}
     <div class="container pt-2">
         <div class="alert alert-info alert-dismissible" role="alert">

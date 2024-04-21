@@ -99,31 +99,6 @@ REMOTE_GIT_FOLDER = os.path.join(
 VIRUS_SCAN_ATTACHMENTS = False
 
 
-### Configuration file for gitolite
-GITOLITE_CONFIG = os.path.join(
-    os.path.abspath(os.path.dirname(__file__)),
-    '..',
-    'gitolite.conf'
-)
-
-
-### Home folder of the gitolite user
-### Folder where to run gl-compile-conf from
-GITOLITE_HOME = None
-
-### Version of gitolite used: 2 or 3?
-GITOLITE_VERSION = 3
-
-### Folder containing all the public ssh keys for gitolite
-GITOLITE_KEYDIR = None
-
-### Path to the gitolite.rc file
-GL_RC = None
-
-### Path to the /bin directory where the gitolite tools can be found
-GL_BINDIR = None
-
-
 # SSH Information
 
 ### SSH commend for interacting with repositories

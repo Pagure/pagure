@@ -222,22 +222,6 @@ def create_app(config=None):
     return app
 
 
-def generate_user_key_files():
-    """Regenerate the key files used by gitolite."""
-    gitolite_home = pagure_config.get("GITOLITE_HOME", None)
-    if gitolite_home:
-        users = pagure.lib.query.search_user(flask.g.session)
-        for user in users:
-            pagure.lib.query.update_user_ssh(
-                flask.g.session,
-                user,
-                None,
-                pagure_config.get("GITOLITE_KEYDIR", None),
-                update_only=True,
-            )
-    pagure.lib.git.generate_gitolite_acls(project=None)
-
-
 def admin_session_timedout():
     """Check if the current user has been authenticated for more than what
     is allowed (defaults to 15 minutes).

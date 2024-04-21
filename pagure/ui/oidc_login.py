@@ -109,7 +109,6 @@ def set_user():
             fullname=flask.g.fas_user.fullname,
             default_email=flask.g.fas_user.email,
             ssh_key=flask.g.fas_user.get("ssh_key"),
-            keydir=pagure_config.get("GITOLITE_KEYDIR", None),
         )
 
         # If groups are managed outside pagure, set up the user at login

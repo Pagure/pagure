@@ -93,10 +93,10 @@ def _get_remote_user(project):
 
 
 def proxy_raw_git(project):
-    """Proxy a request to Git or gitolite3 via a subprocess."""
+    """Proxy a request to Git via a subprocess."""
     _log.debug("Raw git clone proxy started")
     remote_user = _get_remote_user(project)
-    # We are going to shell out to gitolite-shell. Prepare the env it needs.
+    # We are going to shell out, prepare the env it needs.
     gitenv = {
         "PATH": os.environ["PATH"],
         # These are the vars git-http-backend needs
@@ -130,18 +130,7 @@ def proxy_raw_git(project):
         )
     )
 
-    gitolite = pagure_config["HTTP_REPO_ACCESS_GITOLITE"]
-    if gitolite:
-        gitenv.update(
-            {
-                # These are the additional vars gitolite needs
-                # Fun fact: REQUEST_URI is not even mentioned in RFC3875
-                "REQUEST_URI": flask.request.full_path,
-                "GITOLITE_HTTP_HOME": pagure_config["GITOLITE_HOME"],
-                "HOME": pagure_config["GITOLITE_HOME"],
-            }
-        )
-    elif remote_user:
+    if remote_user:
         gitenv.update({"GL_USER": remote_user})
 
     # These keys are optional
@@ -162,12 +151,8 @@ def proxy_raw_git(project):
         if not gitenv[key]:
             raise ValueError("Value for key %s unknown" % key)
 
-    if gitolite:
-        _log.debug("Running git via: %s", gitolite)
-        cmd = [gitolite]
-    else:
-        _log.debug("Running git via git directly")
-        cmd = ["/usr/bin/git", "http-backend"]
+    _log.debug("Running git via git directly")
+    cmd = ["/usr/bin/git", "http-backend"]
 
     # Note: using a temporary files to buffer the input contents
     # is non-ideal, but it is a way to make sure we don't need to have

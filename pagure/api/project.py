@@ -1674,8 +1674,6 @@ def api_modify_project(repo, namespace=None):
         flask.g.session.rollback()
         raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
-    pagure.lib.git.generate_gitolite_acls(project=project)
-
     return flask.jsonify(project.to_json(public=False, api=True))
 
 
@@ -1778,83 +1776,6 @@ def api_fork_project():
     else:
         raise pagure.exceptions.APIError(
             400, error_code=APIERROR.EINVALIDREQ, errors=form.errors
-        )
-
-    jsonout = flask.jsonify(output)
-    return jsonout
-
-
-@API.route("/<repo>/git/generateacls", methods=["POST"])
-@API.route("/<namespace>/<repo>/git/generateacls", methods=["POST"])
-@API.route("/fork/<username>/<repo>/git/generateacls", methods=["POST"])
-@API.route(
-    "/fork/<username>/<namespace>/<repo>/git/generateacls", methods=["POST"]
-)
-@api_login_required(acls=["generate_acls_project"])
-@api_method
-def api_generate_acls(repo, username=None, namespace=None):
-    """
-    Generate Gitolite ACLs on a project
-    -----------------------------------
-    Generate Gitolite ACLs on a project. This is restricted to Pagure admins.
-
-    This is an asynchronous call.
-
-    ::
-
-        POST /api/0/rpms/python-requests/git/generateacls
-
-
-    Input
-    ^^^^^
-
-    +------------------+---------+--------------+---------------------------+
-    | Key              | Type    | Optionality  | Description               |
-    +==================+=========+==============+===========================+
-    | ``wait``         | boolean | Optional     | | A boolean to specify if |
-    |                  |         |              |   this API call should    |
-    |                  |         |              |   return a taskid or if it|
-    |                  |         |              |   should wait for the task|
-    |                  |         |              |   to finish.              |
-    +------------------+---------+--------------+---------------------------+
-
-
-    Sample response
-    ^^^^^^^^^^^^^^^
-
-    ::
-
-        wait=False:
-        {
-          'message': 'Project ACL generation queued',
-          'taskid': '123-abcd'
-        }
-
-        wait=True:
-        {
-          'message': 'Project ACLs generated'
-        }
-
-    """
-    project = _get_repo(repo, username, namespace)
-    _check_token(project, project_token=False)
-
-    wait = pagure.utils.is_true(get_request_data().get("wait"))
-
-    try:
-        task = pagure.lib.git.generate_gitolite_acls(project=project)
-
-        if wait:
-            task.get()
-            output = {"message": "Project ACLs generated"}
-        else:
-            output = {
-                "message": "Project ACL generation queued",
-                "taskid": task.id,
-            }
-    except pagure.exceptions.PagureException as err:
-        raise pagure.exceptions.APIError(
-            400, error_code=APIERROR.ENOCODE, error=str(err)
         )
 
     jsonout = flask.jsonify(output)
@@ -2807,10 +2728,6 @@ def api_modify_acls(repo, namespace=None, username=None):
                     if grp.id == group_obj.id:
                         project.groups.remove(grp)
                         break
-                pagure.lib.query.update_read_only_mode(
-                    flask.g.session, project, read_only=True
-                )
-                pagure.lib.git.generate_gitolite_acls(project=project)
 
         try:
             flask.g.session.commit()
@@ -2823,7 +2740,6 @@ def api_modify_acls(repo, namespace=None, username=None):
             flask.g.session.rollback()
             raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
-        pagure.lib.git.generate_gitolite_acls(project=project)
         output = project.to_json(api=True, public=True)
     else:
         raise pagure.exceptions.APIError(
@@ -3498,16 +3414,6 @@ def delete_project(repo, username=None, namespace=None):
     if flask.g.fas_user.username not in authorized_users:
         raise pagure.exceptions.APIError(
             401, error_code=APIERROR.ENOTHIGHENOUGH
-        )
-
-    if project.read_only:
-        error = (
-            "The ACLs of this project are being refreshed in the backend "
-            "this prevents the project from being deleted. Please wait "
-            "for this task to finish before trying again. Thanks!"
-        )
-        raise pagure.exceptions.APIError(
-            400, error_code=APIERROR.ENOCODE, error=error
         )
 
     project_json = project.to_json(public=True, api=True)

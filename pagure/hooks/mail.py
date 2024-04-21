@@ -88,9 +88,6 @@ class MailRunner(BaseRunner):
             "multimailhook.mailingList", "", project.mail_hook.mail_to
         )
         repo_obj.config.set_multivar(
-            "multimailhook.environment", "", "gitolite"
-        )
-        repo_obj.config.set_multivar(
             "multimailhook.repoName", "", project.fullname
         )
         repo_obj.config.set_multivar("multimailhook.mailer", "", "smtp")

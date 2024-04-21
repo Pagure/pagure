@@ -2094,7 +2094,6 @@ class PagureLibtests(tests.Modeltests):
             username="skvidal",
             fullname="Seth",
             default_email="skvidal@fp.o",
-            keydir=pagure.config.config.get("GITOLITE_KEYDIR", None),
             ssh_key="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDtgzSO9d1IrKdmyBFUvtAJPLgGOhp0lSySkWRSe+/+3KXYjSnsLnCJQlO5M7JfaXhtTHEow86rh4W9+FoJdzo5iocAwH5xPZ5ttHLy7VHgTzNMUeMgKpjy6bBOdPoGPPG4mo7QCMCRJdWBRDv4OSEMLU5jQAvC272YK2V8L918VQ== root@test",
         )
         self.session.commit()
@@ -2118,7 +2117,6 @@ class PagureLibtests(tests.Modeltests):
             username="skvidal",
             fullname="Seth V",
             default_email="skvidal@fp.o",
-            keydir=pagure.config.config.get("GITOLITE_KEYDIR", None),
         )
         self.session.commit()
         # Nothing changed
@@ -2136,7 +2134,6 @@ class PagureLibtests(tests.Modeltests):
             username="skvidal",
             fullname="Seth",
             default_email="svidal@fp.o",
-            keydir=pagure.config.config.get("GITOLITE_KEYDIR", None),
         )
         self.session.commit()
         # Email added
@@ -2153,7 +2150,6 @@ class PagureLibtests(tests.Modeltests):
             username="skvidal",
             fullname="Seth",
             default_email="svidal@example.o",
-            keydir=pagure.config.config.get("GITOLITE_KEYDIR", None),
         )
         self.session.commit()
         # Email should not be added
@@ -2186,7 +2182,6 @@ class PagureLibtests(tests.Modeltests):
             username="skvidal",
             fullname="Seth",
             default_email="skvidal@fp.o",
-            keydir=pagure.config.config.get("GITOLITE_KEYDIR", None),
         )
         self.session.commit()
 
@@ -2196,7 +2191,6 @@ class PagureLibtests(tests.Modeltests):
             username="skvidal",
             fullname="Seth",
             default_email="skvidal@example.c",
-            keydir=pagure.config.config.get("GITOLITE_KEYDIR", None),
         )
         self.session.commit()
         # Email added
@@ -2213,7 +2207,6 @@ class PagureLibtests(tests.Modeltests):
             username="skvidal",
             fullname="Seth",
             default_email="svidal@example.o",
-            keydir=pagure.config.config.get("GITOLITE_KEYDIR", None),
         )
         self.session.commit()
         # Email should not be added
@@ -5291,157 +5284,6 @@ foo bar
         )
         self.assertEqual(key[3], "(RSA)")
 
-    def test_create_deploykeys_ssh_keys_on_disk_empty(self):
-        """Test the create_deploykeys_ssh_keys_on_disk function of
-        pagure.lib.query."""
-        self.assertIsNone(
-            pagure.lib.query.create_deploykeys_ssh_keys_on_disk(None, None)
-        )
-        self.assertFalse(
-            os.path.exists(os.path.join(self.path, "deploykeys", "test"))
-        )
-
-    def test_create_deploykeys_ssh_keys_on_disk_nokey(self):
-        """Test the create_deploykeys_ssh_keys_on_disk function of
-        pagure.lib.query."""
-        tests.create_projects(self.session)
-        project = pagure.lib.query._get_project(self.session, "test")
-
-        self.assertIsNone(
-            pagure.lib.query.create_deploykeys_ssh_keys_on_disk(
-                project, self.path
-            )
-        )
-        self.assertTrue(
-            os.path.exists(os.path.join(self.path, "deploykeys", "test"))
-        )
-        self.assertEqual(
-            os.listdir(os.path.join(self.path, "deploykeys", "test")), []
-        )
-
-    @patch(
-        "pagure.lib.query.is_valid_ssh_key", MagicMock(return_value="foo bar")
-    )
-    def test_create_deploykeys_ssh_keys_on_disk(self):
-        """Test the create_deploykeys_ssh_keys_on_disk function of
-        pagure.lib.query."""
-        tests.create_projects(self.session)
-        project = pagure.lib.query._get_project(self.session, "test")
-
-        # Add a deploy key to the project
-        pingou = pagure.lib.query.get_user(self.session, "pingou")
-        msg = pagure.lib.query.add_sshkey_to_project_or_user(
-            self.session,
-            project=project,
-            ssh_key="foo bar",
-            pushaccess=False,
-            creator=pingou,
-        )
-        self.assertEqual(msg, "SSH key added")
-
-        self.assertIsNone(
-            pagure.lib.query.create_deploykeys_ssh_keys_on_disk(
-                project, self.path
-            )
-        )
-        self.assertTrue(
-            os.path.exists(os.path.join(self.path, "deploykeys", "test"))
-        )
-        self.assertEqual(
-            os.listdir(os.path.join(self.path, "deploykeys", "test")),
-            ["deploykey_test_1.pub"],
-        )
-
-        # Remove the deploykey
-        project = pagure.lib.query._get_project(self.session, "test")
-        self.session.delete(project.deploykeys[0])
-        self.session.commit()
-
-        # Remove the file on disk
-        self.assertIsNone(
-            pagure.lib.query.create_deploykeys_ssh_keys_on_disk(
-                project, self.path
-            )
-        )
-        self.assertTrue(
-            os.path.exists(os.path.join(self.path, "deploykeys", "test"))
-        )
-        self.assertEqual(
-            os.listdir(os.path.join(self.path, "deploykeys", "test")), []
-        )
-
-    @patch(
-        "pagure.lib.query.is_valid_ssh_key",
-        MagicMock(return_value="\nfoo bar"),
-    )
-    def test_create_deploykeys_ssh_keys_on_disk_empty_first_key(self):
-        """Test the create_deploykeys_ssh_keys_on_disk function of
-        pagure.lib.query."""
-        tests.create_projects(self.session)
-        project = pagure.lib.query._get_project(self.session, "test")
-
-        # Add a deploy key to the project
-        new_key_obj = pagure.lib.model.SSHKey(
-            project_id=project.id,
-            pushaccess=False,
-            public_ssh_key="\n foo bar",
-            ssh_short_key="\n foo bar",
-            ssh_search_key="\n foo bar",
-            creator_user_id=1,  # pingou
-        )
-
-        self.session.add(new_key_obj)
-        self.session.commit()
-
-        self.assertIsNone(
-            pagure.lib.query.create_deploykeys_ssh_keys_on_disk(
-                project, self.path
-            )
-        )
-        self.assertTrue(
-            os.path.exists(os.path.join(self.path, "deploykeys", "test"))
-        )
-        self.assertEqual(
-            os.listdir(os.path.join(self.path, "deploykeys", "test")), []
-        )
-
-    def test_create_deploykeys_ssh_keys_on_disk_invalid(self):
-        """Test the create_deploykeys_ssh_keys_on_disk function of
-        pagure.lib.query."""
-        tests.create_projects(self.session)
-        project = pagure.lib.query._get_project(self.session, "test")
-
-        # Add a deploy key to the project
-        new_key_obj = pagure.lib.model.SSHKey(
-            project_id=project.id,
-            pushaccess=False,
-            public_ssh_key="foo bar",
-            ssh_short_key="foo bar",
-            ssh_search_key="foo bar",
-            creator_user_id=1,  # pingou
-        )
-
-        self.session.add(new_key_obj)
-        self.session.commit()
-
-        self.assertIsNone(
-            pagure.lib.query.create_deploykeys_ssh_keys_on_disk(
-                project, self.path
-            )
-        )
-        self.assertTrue(
-            os.path.exists(os.path.join(self.path, "deploykeys", "test"))
-        )
-        self.assertEqual(
-            os.listdir(os.path.join(self.path, "deploykeys", "test")), []
-        )
-
-    def test_create_user_ssh_keys_on_disk_none(self):
-        """Test the create_user_ssh_keys_on_disk function of pagure.lib.query."""
-        self.assertIsNone(
-            pagure.lib.query.create_user_ssh_keys_on_disk(None, None)
-        )
-
     def test_update_user_settings_invalid_user(self):
         """Test the update_user_settings function of pagure.lib.query."""
         self.assertRaises(
@@ -5559,23 +5401,6 @@ foo bar
         # Check emails after
         self.assertEqual(len(user.emails), 4)
 
-    @patch(
-        "pagure.lib.query.is_valid_ssh_key", MagicMock(return_value="foo bar")
-    )
-    def test_update_user_ssh_valid_key(self):
-        """Test the update_user_ssh function of pagure.lib.query."""
-        pagure.SESSION = self.session
-
-        pagure.lib.query.update_user_ssh(
-            self.session, user="pingou", ssh_key="foo key", keydir=self.path
-        )
-        self.session.commit()
-
-        self.assertTrue(os.path.exists(os.path.join(self.path, "keys_0")))
-        self.assertEqual(
-            os.listdir(os.path.join(self.path, "keys_0")), ["pingou.pub"]
-        )
-
     def test_add_user_pending_email_existing_email(self):
         """Test the add_user_pending_email function of pagure.lib.query."""
         user = pagure.lib.query.search_user(self.session, username="pingou")
@@ -5658,7 +5483,6 @@ foo bar
                 "create_project",
                 "delete_git_alias",
                 "fork_project",
-                "generate_acls_project",
                 "group_modify",
                 "internal_access",
                 "issue_assign",
@@ -6068,31 +5892,6 @@ foo bar
             self.session, "issue_create", expired=True
         )
         self.assertEqual(len(out), 0)
-
-    def test_update_read_only_mode(self):
-        """Test the update_read_only_mode method of pagure.lib"""
-
-        tests.create_projects(self.session)
-
-        project_obj = pagure.lib.query._get_project(self.session, "test")
-        # Default mode of project is read only
-        self.assertEqual(project_obj.read_only, True)
-
-        # Remove read only
-        pagure.lib.query.update_read_only_mode(
-            self.session, project_obj, False
-        )
-        self.session.commit()
-
-        project_obj = pagure.lib.query._get_project(self.session, "test")
-        self.assertEqual(project_obj.read_only, False)
-
-        # Try reversing it back
-        pagure.lib.query.update_read_only_mode(self.session, project_obj, True)
-        self.session.commit()
-
-        project_obj = pagure.lib.query._get_project(self.session, "test")
-        self.assertEqual(project_obj.read_only, True)
 
 
 if __name__ == "__main__":

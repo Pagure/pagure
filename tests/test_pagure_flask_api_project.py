@@ -42,15 +42,8 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
 
     def setUp(self):
         super(PagureFlaskApiProjecttests, self).setUp()
-        self.gga_patcher = patch(
-            "pagure.lib.tasks.generate_gitolite_acls.delay"
-        )
-        self.mock_gen_acls = self.gga_patcher.start()
-        task_result = EagerResult("abc-1234", True, "SUCCESS")
-        self.mock_gen_acls.return_value = task_result
 
     def tearDown(self):
-        self.gga_patcher.stop()
         super(PagureFlaskApiProjecttests, self).tearDown()
 
     def test_api_git_tags(self):
@@ -2520,115 +2513,6 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertDictEqual(
             data, {"error": "Project not found", "error_code": "ENOPROJECT"}
         )
-
-    def test_api_generate_acls(self):
-        """Test the api_generate_acls method of the flask api"""
-        tests.create_projects(self.session)
-        tests.create_tokens(self.session, project_id=None)
-        tests.create_tokens_acl(
-            self.session, "aaabbbcccddd", "generate_acls_project"
-        )
-        headers = {"Authorization": "token aaabbbcccddd"}
-
-        user = pagure.lib.query.get_user(self.session, "pingou")
-        output = self.app.post(
-            "/api/0/test/git/generateacls",
-            headers=headers,
-            data={"wait": False},
-        )
-        self.assertEqual(output.status_code, 200)
-        data = json.loads(output.get_data(as_text=True))
-        expected_output = {
-            "message": "Project ACL generation queued",
-            "taskid": "abc-1234",
-        }
-        self.assertEqual(data, expected_output)
-        self.mock_gen_acls.assert_called_once_with(
-            name="test", namespace=None, user=None, group=None
-        )
-
-    def test_api_generate_acls_json(self):
-        """Test the api_generate_acls method of the flask api using JSON"""
-        tests.create_projects(self.session)
-        tests.create_tokens(self.session, project_id=None)
-        tests.create_tokens_acl(
-            self.session, "aaabbbcccddd", "generate_acls_project"
-        )
-        headers = {
-            "Authorization": "token aaabbbcccddd",
-            "Content-Type": "application/json",
-        }
-
-        user = pagure.lib.query.get_user(self.session, "pingou")
-
-        output = self.app.post(
-            "/api/0/test/git/generateacls",
-            headers=headers,
-            data=json.dumps({"wait": False}),
-        )
-        self.assertEqual(output.status_code, 200)
-        data = json.loads(output.get_data(as_text=True))
-        expected_output = {
-            "message": "Project ACL generation queued",
-            "taskid": "abc-1234",
-        }
-        self.assertEqual(data, expected_output)
-        self.mock_gen_acls.assert_called_once_with(
-            name="test", namespace=None, user=None, group=None
-        )
-
-    def test_api_generate_acls_wait_true(self):
-        """Test the api_generate_acls method of the flask api when wait is
-        set to True"""
-        tests.create_projects(self.session)
-        tests.create_tokens(self.session, project_id=None)
-        tests.create_tokens_acl(
-            self.session, "aaabbbcccddd", "generate_acls_project"
-        )
-        headers = {"Authorization": "token aaabbbcccddd"}
-
-        task_result = Mock()
-        task_result.id = "abc-1234"
-        self.mock_gen_acls.return_value = task_result
-
-        user = pagure.lib.query.get_user(self.session, "pingou")
-        output = self.app.post(
-            "/api/0/test/git/generateacls",
-            headers=headers,
-            data={"wait": True},
-        )
-        self.assertEqual(output.status_code, 200)
-        data = json.loads(output.get_data(as_text=True))
-        expected_output = {"message": "Project ACLs generated"}
-        self.assertEqual(data, expected_output)
-        self.mock_gen_acls.assert_called_once_with(
-            name="test", namespace=None, user=None, group=None
-        )
-        self.assertTrue(task_result.get.called)
-
-    def test_api_generate_acls_no_project(self):
-        """Test the api_generate_acls method of the flask api when the project
-        doesn't exist"""
-        tests.create_projects(self.session)
-        tests.create_tokens(self.session, project_id=None)
-        tests.create_tokens_acl(
-            self.session, "aaabbbcccddd", "generate_acls_project"
-        )
-        headers = {"Authorization": "token aaabbbcccddd"}
-
-        user = pagure.lib.query.get_user(self.session, "pingou")
-        output = self.app.post(
-            "/api/0/test12345123/git/generateacls",
-            headers=headers,
-            data={"wait": False},
-        )
-        self.assertEqual(output.status_code, 404)
-        data = json.loads(output.get_data(as_text=True))
-        expected_output = {
-            "error_code": "ENOPROJECT",
-            "error": "Project not found",
-        }
-        self.assertEqual(data, expected_output)
 
     def test_api_new_git_branch(self):
         """Test the api_new_branch method of the flask api"""

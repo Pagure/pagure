@@ -365,9 +365,6 @@ def api_group_add_member(group):
                 is_admin=pagure.utils.is_admin(),
             )
             flask.g.session.commit()
-            pagure.lib.git.generate_gitolite_acls(
-                project=None, group=group.group_name
-            )
         except (pagure.exceptions.PagureException, SQLAlchemyError) as err:
             flask.g.session.rollback()
             raise pagure.exceptions.APIError(
@@ -453,9 +450,6 @@ def api_group_remove_member(group):
                 is_admin=pagure.utils.is_admin(),
             )
             flask.g.session.commit()
-            pagure.lib.git.generate_gitolite_acls(
-                project=None, group=group.group_name
-            )
         except (pagure.exceptions.PagureException, SQLAlchemyError) as err:
             flask.g.session.rollback()
             raise pagure.exceptions.APIError(

@@ -2,7 +2,8 @@
                                       Grants/Denies access
                                          +------------+                           +-----------+
                                          |cfffca4     |                           |           |
-User's git actions+--------------------->+  Gitolite  +-------------------------->+ Git repos |
+User's git actions+--------------------->+  pagure    +-------------------------->+ Git repos |
+                                         |  auth keys |                           |           |
                                          |            |                           |           |
                                          +------------+                           +-----------+
                                                  ^                                          ^

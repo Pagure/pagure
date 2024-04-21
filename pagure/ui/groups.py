@@ -90,9 +90,6 @@ def view_group(group):
                 is_admin=pagure.utils.is_admin(),
             )
             flask.g.session.commit()
-            pagure.lib.git.generate_gitolite_acls(
-                project=None, group=group.group_name
-            )
             flask.flash(msg)
         except pagure.exceptions.PagureException as err:
             flask.g.session.rollback()
@@ -277,7 +274,6 @@ def group_user_delete(user, group):
                 is_admin=pagure.utils.is_admin(),
             )
             flask.g.session.commit()
-            pagure.lib.git.generate_gitolite_acls(project=None, group=group)
             flask.flash(
                 "User `%s` removed from the group `%s`" % (user, group)
             )
@@ -337,7 +333,6 @@ def group_delete(group):
         flask.g.session.delete(group_obj)
 
         flask.g.session.commit()
-        pagure.lib.git.generate_gitolite_acls(project=None)
         flask.flash("Group `%s` has been deleted" % (group))
 
     return flask.redirect(flask.url_for("ui_ns.group_lists"))

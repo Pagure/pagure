@@ -4864,10 +4864,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
         user = tests.FakeUser()
         user.username = "pingou"
 
-        repo = pagure.lib.query._get_project(self.session, "test")
-        pagure.lib.query.update_read_only_mode(
-            self.session, repo, read_only=False
-        )
         pingou = pagure.lib.query.get_user(self.session, "pingou")
         pagure.lib.query.add_sshkey_to_project_or_user(
             session=self.session,

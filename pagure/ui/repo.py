@@ -1732,22 +1732,6 @@ def delete_repo(repo, username=None, namespace=None):
     ):
         flask.abort(404)
 
-    if repo.read_only:
-        flask.flash(
-            "The ACLs of this project are being refreshed in the backend "
-            "this prevents the project from being deleted. Please wait "
-            "for this task to finish before trying again. Thanks!"
-        )
-        return flask.redirect(
-            flask.url_for(
-                "ui_ns.view_settings",
-                repo=repo.name,
-                username=username,
-                namespace=namespace,
-            )
-            + "#deleteproject-tab"
-        )
-
     task = pagure.lib.tasks.delete_project.delay(
         namespace=repo.namespace,
         name=repo.name,
@@ -1844,10 +1828,6 @@ def remove_deploykey(repo, keyid, username=None, namespace=None):
 
         try:
             flask.g.session.commit()
-            pagure.lib.query.create_deploykeys_ssh_keys_on_disk(
-                repo, pagure_config.get("GITOLITE_KEYDIR", None)
-            )
-            pagure.lib.tasks.gitolite_post_compile_only.delay()
             if (
                 pagure_config.get("GIT_AUTH_BACKEND")
                 == "pagure_authorized_keys"
@@ -1974,10 +1954,6 @@ def add_deploykey(repo, username=None, namespace=None):
                 pushaccess=form.pushaccess.data,
             )
             flask.g.session.commit()
-            pagure.lib.query.create_deploykeys_ssh_keys_on_disk(
-                repo, pagure_config.get("GITOLITE_KEYDIR", None)
-            )
-            pagure.lib.tasks.gitolite_post_compile_only.delay()
             if (
                 pagure_config.get("GIT_AUTH_BACKEND")
                 == "pagure_authorized_keys"
@@ -2069,7 +2045,6 @@ def add_user(repo, username=None, namespace=None):
                 required_groups=pagure_config.get("REQUIRED_GROUPS"),
             )
             flask.g.session.commit()
-            pagure.lib.git.generate_gitolite_acls(project=repo)
             flask.flash(msg)
             return flask.redirect(
                 flask.url_for(
@@ -2161,12 +2136,7 @@ def remove_group_project(repo, groupid, username=None, namespace=None):
                     agent=flask.g.fas_user.username,
                 ),
             )
-            # Mark the project as read_only, celery will unmark it
-            pagure.lib.query.update_read_only_mode(
-                flask.g.session, repo, read_only=True
-            )
             flask.g.session.commit()
-            pagure.lib.git.generate_gitolite_acls(project=repo)
             flask.flash("Group removed")
         except SQLAlchemyError as err:  # pragma: no cover
             flask.g.session.rollback()
@@ -2242,7 +2212,6 @@ def add_group_project(repo, username=None, namespace=None):
                 is_admin=pagure.utils.is_admin(),
             )
             flask.g.session.commit()
-            pagure.lib.git.generate_gitolite_acls(project=repo)
             flask.flash(msg)
             return flask.redirect(
                 flask.url_for(
@@ -3179,7 +3148,6 @@ def give_project(repo, username=None, namespace=None):
                     "error",
                 )
 
-            pagure.lib.git.generate_gitolite_acls(project=repo)
             flask.flash(
                 "The project has been transferred to %s" % new_username
             )

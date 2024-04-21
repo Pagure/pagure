@@ -268,10 +268,6 @@ mkdir -p $RPM_BUILD_ROOT/%{_unitdir}
 install -p -m 644 files/pagure_worker.service \
     $RPM_BUILD_ROOT/%{_unitdir}/pagure_worker.service
 
-# Install the systemd file for the gitolite worker
-install -p -m 644 files/pagure_gitolite_worker.service \
-    $RPM_BUILD_ROOT/%{_unitdir}/pagure_gitolite_worker.service
-
 # Install the systemd file for the web-hook
 install -p -m 644 files/pagure_webhook.service \
     $RPM_BUILD_ROOT/%{_unitdir}/pagure_webhook.service
@@ -365,7 +361,6 @@ done
 
 %post
 %systemd_post pagure_worker.service
-%systemd_post pagure_gitolite_worker.service
 %systemd_post pagure_api_key_expire_mail.timer
 %systemd_post pagure_mirror_project_in.timer
 %post web-nginx
@@ -388,7 +383,6 @@ done
 
 %preun
 %systemd_preun pagure_worker.service
-%systemd_preun pagure_gitolite_worker.service
 %systemd_preun pagure_api_key_expire_mail.timer
 %systemd_preun pagure_mirror_project_in.timer
 %preun web-nginx
@@ -411,7 +405,6 @@ done
 
 %postun
 %systemd_postun_with_restart pagure_worker.service
-%systemd_postun_with_restart pagure_gitolite_worker.service
 %systemd_postun pagure_api_key_expire_mail.timer
 %systemd_postun pagure_mirror_project_in.timer
 %postun web-nginx
@@ -451,7 +444,6 @@ done
 %{python_sitelib}/pagure*.egg-info
 %{_bindir}/pagure-admin
 %{_unitdir}/pagure_worker.service
-%{_unitdir}/pagure_gitolite_worker.service
 %{_unitdir}/pagure_api_key_expire_mail.service
 %{_unitdir}/pagure_api_key_expire_mail.timer
 %{_unitdir}/pagure_mirror_project_in.service

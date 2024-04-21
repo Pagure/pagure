@@ -84,82 +84,14 @@ def ret(endpoint, **kwargs):
     return toret
 
 
-@conn.task(queue=pagure_config.get("GITOLITE_CELERY_QUEUE", None), bind=True)
-@pagure_task
-def generate_gitolite_acls(
-    self, session, namespace=None, name=None, user=None, group=None
-):
-    """Generate the gitolite configuration file either entirely or for a
-    specific project.
-
-    :arg session: SQLAlchemy session object
-    :type session: sqlalchemy.orm.session.Session
-    :kwarg namespace: the namespace of the project
-    :type namespace: None or str
-    :kwarg name: the name of the project
-    :type name: None or str
-    :kwarg user: the user of the project, only set if the project is a fork
-    :type user: None or str
-    :kwarg group: the group to refresh the members of
-    :type group: None or str
-
-    """
-    project = None
-    if name and name != -1:
-        project = pagure.lib.query._get_project(
-            session, namespace=namespace, name=name, user=user
-        )
-
-    elif name == -1:
-        project = name
-    helper = pagure.lib.git_auth.get_git_auth_helper()
-    _log.debug("Got helper: %s", helper)
-
-    group_obj = None
-    if group:
-        group_obj = pagure.lib.query.search_groups(session, group_name=group)
-    _log.debug(
-        "Calling helper: %s with arg: project=%s, group=%s",
-        helper,
-        project,
-        group_obj,
-    )
-    helper.generate_acls(project=project, group=group_obj)
-
-    pagure.lib.query.update_read_only_mode(session, project, read_only=False)
-    try:
-        session.commit()
-        _log.debug("Project %s is no longer in Read Only Mode", project)
-    except SQLAlchemyError:
-        session.rollback()
-        _log.exception("Failed to unmark read_only for: %s project", project)
-
-
-@conn.task(queue=pagure_config.get("GITOLITE_CELERY_QUEUE", None), bind=True)
-@pagure_task
-def gitolite_post_compile_only(self, session):
-    """Do gitolite post-processing only. Most importantly, this processes SSH
-    keys used by gitolite. This is an optimization task that's supposed to be
-    used if you only need to run `gitolite trigger POST_COMPILE` without
-    touching any other gitolite configuration
-    """
-    helper = pagure.lib.git_auth.get_git_auth_helper()
-    _log.debug("Got helper: %s", helper)
-    if hasattr(helper, "post_compile_only"):
-        helper.post_compile_only()
-    else:
-        helper.generate_acls(project=None)
-
-
-@conn.task(queue=pagure_config.get("GITOLITE_CELERY_QUEUE", None), bind=True)
+@conn.task(queue=pagure_config.get("FAST_CELERY_QUEUE", None), bind=True)
 @pagure_task
 def delete_project(
     self, session, namespace=None, name=None, user=None, action_user=None
 ):
     """Delete a project in pagure.
 
-    This is achieved in three steps:
-    - Remove the project from gitolite.conf
+    This is achieved in two steps:
     - Remove the git repositories on disk
     - Remove the project from the DB
 
@@ -185,14 +117,12 @@ def delete_project(
             % (namespace, name, user)
         )
 
-    # Remove the project from gitolite.conf
     helper = pagure.lib.git_auth.get_git_auth_helper()
     _log.debug("Got helper: %s", helper)
 
     _log.debug(
         "Calling helper: %s with arg: project=%s", helper, project.fullname
     )
-    helper.remove_acls(session=session, project=project)
 
     # Remove the git repositories on disk
     pagure.lib.git.delete_project_repos(project)
@@ -322,13 +252,6 @@ def create_project(
 
                 master_ref = temp_gitrepo.lookup_reference("HEAD").resolve()
                 tempclone.push("pagure", master_ref.name, internal="yes")
-
-    task = generate_gitolite_acls.delay(
-        namespace=project.namespace,
-        name=project.name,
-        user=project.user.user if project.is_fork else None,
-    )
-    _log.info("Refreshing gitolite config queued in task: %s", task.id)
 
     return ret("ui_ns.view_repo", repo=name, namespace=namespace)
 
@@ -527,13 +450,7 @@ def fork(
             msg=dict(project=repo_to.to_json(public=True), agent=user_forker),
         )
 
-    _log.info("Project created, refreshing auth async")
-    task = generate_gitolite_acls.delay(
-        namespace=repo_to.namespace,
-        name=repo_to.name,
-        user=repo_to.user.user if repo_to.is_fork else None,
-    )
-    _log.info("Refreshing gitolite config queued in task: %s", task.id)
+    _log.info("Project created.")
 
     if editfile is None:
         return ret(

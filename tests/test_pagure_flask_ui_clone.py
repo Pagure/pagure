@@ -83,7 +83,6 @@ class PagureFlaskAppClonetests(tests.Modeltests):
         {
             "ALLOW_HTTP_PULL_PUSH": True,
             "ALLOW_HTTP_PUSH": False,
-            "HTTP_REPO_ACCESS_GITOLITE": None,
         },
     )
     def test_http_push_disabled(self):
@@ -102,7 +101,6 @@ class PagureFlaskAppClonetests(tests.Modeltests):
         {
             "ALLOW_HTTP_PULL_PUSH": True,
             "ALLOW_HTTP_PUSH": True,
-            "HTTP_REPO_ACCESS_GITOLITE": None,
         },
     )
     def test_http_push_unauthed(self):
@@ -132,7 +130,6 @@ class PagureFlaskAppClonetests(tests.Modeltests):
         {
             "ALLOW_HTTP_PULL_PUSH": True,
             "ALLOW_HTTP_PUSH": False,
-            "HTTP_REPO_ACCESS_GITOLITE": None,
         },
     )
     def test_http_clone(self):
@@ -161,7 +158,6 @@ class PagureFlaskAppClonetests(tests.Modeltests):
         {
             "ALLOW_HTTP_PULL_PUSH": True,
             "ALLOW_HTTP_PUSH": False,
-            "HTTP_REPO_ACCESS_GITOLITE": None,
         },
     )
     def test_http_clone_private(self):
@@ -193,7 +189,6 @@ class PagureFlaskAppClonetests(tests.Modeltests):
         {
             "ALLOW_HTTP_PULL_PUSH": True,
             "ALLOW_HTTP_PUSH": True,
-            "HTTP_REPO_ACCESS_GITOLITE": None,
         },
     )
     def test_http_push(self):
@@ -212,7 +207,6 @@ class PagureFlaskAppClonetests(tests.Modeltests):
         {
             "ALLOW_HTTP_PULL_PUSH": True,
             "ALLOW_HTTP_PUSH": True,
-            "HTTP_REPO_ACCESS_GITOLITE": None,
         },
     )
     def test_http_push_api_token(self):
@@ -236,7 +230,6 @@ class PagureFlaskAppClonetests(tests.Modeltests):
         {
             "ALLOW_HTTP_PULL_PUSH": True,
             "ALLOW_HTTP_PUSH": True,
-            "HTTP_REPO_ACCESS_GITOLITE": None,
         },
     )
     def test_http_push_projectless_api_token(self):
@@ -264,7 +257,6 @@ class PagureFlaskAppClonetests(tests.Modeltests):
         {
             "ALLOW_HTTP_PULL_PUSH": True,
             "ALLOW_HTTP_PUSH": True,
-            "HTTP_REPO_ACCESS_GITOLITE": None,
         },
     )
     def test_http_push__invalid_project_for_api_token(self):
@@ -286,7 +278,6 @@ class PagureFlaskAppClonetests(tests.Modeltests):
         {
             "ALLOW_HTTP_PULL_PUSH": True,
             "ALLOW_HTTP_PUSH": True,
-            "HTTP_REPO_ACCESS_GITOLITE": None,
         },
     )
     def test_http_push_api_token_invalid_user(self):
@@ -308,7 +299,6 @@ class PagureFlaskAppClonetests(tests.Modeltests):
         {
             "ALLOW_HTTP_PULL_PUSH": True,
             "ALLOW_HTTP_PUSH": True,
-            "HTTP_REPO_ACCESS_GITOLITE": None,
         },
     )
     def test_http_push_invalid_api_token(self):
@@ -330,7 +320,6 @@ class PagureFlaskAppClonetests(tests.Modeltests):
         {
             "ALLOW_HTTP_PULL_PUSH": True,
             "ALLOW_HTTP_PUSH": True,
-            "HTTP_REPO_ACCESS_GITOLITE": None,
         },
     )
     def test_http_push_invalid_acl_on_token(self):
@@ -356,7 +345,6 @@ class PagureFlaskAppClonetests(tests.Modeltests):
         {
             "ALLOW_HTTP_PULL_PUSH": True,
             "ALLOW_HTTP_PUSH": True,
-            "HTTP_REPO_ACCESS_GITOLITE": None,
             "PAGURE_AUTH": "local",
         },
     )
@@ -380,7 +368,6 @@ class PagureFlaskAppClonetests(tests.Modeltests):
         {
             "ALLOW_HTTP_PULL_PUSH": True,
             "ALLOW_HTTP_PUSH": True,
-            "HTTP_REPO_ACCESS_GITOLITE": None,
             "PAGURE_AUTH": "local",
         },
     )

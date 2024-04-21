@@ -158,7 +158,6 @@ SSH_FOLDER = os.path.join(
 )
 
 # Folder containing to the git repos
-# Note that this must be exactly the same as GL_REPO_BASE in gitolite.rc
 GIT_FOLDER = os.path.join(
     os.path.abspath(os.path.dirname(__file__)), "..", "lcl", "repos"
 )
@@ -176,45 +175,14 @@ ATTACHMENTS_FOLDER = os.path.join(
 # Whether to enable scanning for viruses in attachments
 VIRUS_SCAN_ATTACHMENTS = False
 
-# Configuration file for gitolite
-GITOLITE_CONFIG = os.path.join(
-    os.path.abspath(os.path.dirname(__file__)), "..", "lcl", "gitolite.conf"
-)
-
 # Configuration keys to specify where the upload folder is and what is its
 # name
 UPLOAD_FOLDER_PATH = os.path.join(
     os.path.abspath(os.path.dirname(__file__)), "..", "lcl", "releases"
 )
 
-
-# Home folder of the gitolite user -- Folder where to run gl-compile-conf from
-GITOLITE_HOME = None
-
-# Version of gitolite used: 2 or 3?
-GITOLITE_VERSION = 3
-
-# Folder containing all the public ssh keys for gitolite
-GITOLITE_KEYDIR = None
-
 # Backend for git auth decisions
-# This may be either a static helper (like gitolite based) or dynamic.
 GIT_AUTH_BACKEND = "pagure_authorized_keys"
-
-# Legacy option name for GIT_AUTH_BACKEND, retained for backwards compatibility
-# This option overrides GIT_AUTH_BACKEND
-# GITOLITE_BACKEND = "gitolite3"
-
-# Whether or not this installation of Pagure should use `gitolite compile-1`
-# to improve speed of some gitolite operations. See documentation for more
-# info about how to set this up.
-GITOLITE_HAS_COMPILE_1 = False
-
-# Path to the gitolite.rc file
-GL_RC = None
-# Path to the /bin directory where the gitolite tools can be found
-GL_BINDIR = None
-
 
 # Whether or not to run "git gc --auto" after every change to a project
 # This will use default git config values
@@ -337,7 +305,6 @@ ACLS = {
     "create_project": "Create a new project",
     "commit_flag": "Flag a commit",
     "fork_project": "Fork a project",
-    "generate_acls_project": "Generate the Gitolite ACLs on a project",
     "internal_access": "Access Pagure's internal APIs",
     "issue_assign": "Assign issue to someone",
     "issue_change_status": "Change the status of a ticket",
@@ -372,11 +339,7 @@ ACLS = {
 
 # List of ACLs which a regular user is allowed to associate to an API token
 # from the ACLs above
-USER_ACLS = [
-    key
-    for key in ACLS.keys()
-    if key not in ["generate_acls_project", "internal_access"]
-]
+USER_ACLS = [key for key in ACLS.keys() if key not in ["internal_access"]]
 
 # From the ACLs above lists which ones are tolerated to be associated with
 # an API token that isn't linked to a particular project.
@@ -400,7 +363,6 @@ ADMIN_API_ACLS = [
     "pull_request_flag",
     "pull_request_comment",
     "pull_request_merge",
-    "generate_acls_project",
     "group_modify",
     "commit_flag",
     "create_branch",
@@ -566,8 +528,6 @@ _REACTIONS_DICT = dict(REACTIONS)
 ALLOW_HTTP_PULL_PUSH = True
 # Whether to allow pushing via HTTP
 ALLOW_HTTP_PUSH = False
-# Path to Gitolite-shell if using that, None to use Git directly
-HTTP_REPO_ACCESS_GITOLITE = None
 
 # Configuration for the key helper
 # Look a username up in the database, overrides SSH_KEYS_USERNAME_EXPECT

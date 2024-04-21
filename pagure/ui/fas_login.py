@@ -85,7 +85,6 @@ def set_user(return_url):
                 fullname=flask.g.fas_user.fullname,
                 default_email=flask.g.fas_user.email,
                 ssh_key=ssh_key,
-                keydir=pagure_config.get("GITOLITE_KEYDIR", None),
             )
         except pagure.exceptions.PagureException as err:
             message = str(err)

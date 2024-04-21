@@ -60,8 +60,6 @@ setup(
 
     [pagure.git_auth.helpers]
     test_auth = pagure.lib.git_auth:GitAuthTestHelper
-    gitolite2 = pagure.lib.git_auth:Gitolite2Auth
-    gitolite3 = pagure.lib.git_auth:Gitolite3Auth
     pagure = pagure.lib.git_auth:PagureGitAuth
     pagure_authorized_keys = pagure.lib.git_auth:PagureGitAuth
     """,

@@ -283,93 +283,6 @@ def find_ssh_key(session, search_key, username):
         return None
 
 
-def create_deploykeys_ssh_keys_on_disk(project, gitolite_keydir):
-    """Create the ssh keys for the projects' deploy keys on the key dir.
-
-    This method does NOT support multiple ssh keys per deploy key.
-    """
-    if not gitolite_keydir:
-        # Nothing to do here, move right along
-        return
-
-    # First remove deploykeys that no longer exist
-    keyfiles = [
-        "deploykey_%s_%s.pub"
-        % (werkzeug.utils.secure_filename(project.fullname), key.id)
-        for key in project.deploykeys
-    ]
-
-    project_key_dir = os.path.join(
-        gitolite_keydir, "deploykeys", project.fullname
-    )
-    if not os.path.exists(project_key_dir):
-        os.makedirs(project_key_dir)
-
-    for keyfile in os.listdir(project_key_dir):
-        if keyfile not in keyfiles:
-            # This key is no longer in the project. Remove it.
-            os.remove(os.path.join(project_key_dir, keyfile))
-
-    for deploykey in project.deploykeys:
-        # See the comment in lib/git.py:write_gitolite_acls about why this
-        # name for a file is sane and does not inject a new security risk.
-        keyfile = "deploykey_%s_%s.pub" % (
-            werkzeug.utils.secure_filename(project.fullname),
-            deploykey.id,
-        )
-        if not os.path.exists(os.path.join(project_key_dir, keyfile)):
-            # We only take the very first key - deploykeys must be single keys
-            key = deploykey.public_ssh_key.split("\n")[0]
-            if not key:
-                continue
-            if not is_valid_ssh_key(key):
-                continue
-            with open(os.path.join(project_key_dir, keyfile), "w") as f:
-                f.write(deploykey.public_ssh_key)
-
-
-def create_user_ssh_keys_on_disk(user, gitolite_keydir):
-    """Create the ssh keys for the user on the specific folder.
-
-    This is the method allowing to have multiple ssh keys per user.
-    """
-    if gitolite_keydir:
-        # First remove any old keyfiles for the user
-        # Assumption: we populated the keydir. This means that files
-        #  will be in 0/<username>.pub, ..., and not in any deeper
-        #  directory structures. Also, this means that if a user
-        #  had 5 lines, they will be up to at most keys_4/<username>.pub,
-        #  meaning that if a user is not in keys_<i>/<username>.pub, with
-        #  i being any integer, the user is most certainly not in
-        #  keys_<i+1>/<username>.pub.
-        i = 0
-        keyline_file = os.path.join(
-            gitolite_keydir, "keys_%i" % i, "%s.pub" % user.user
-        )
-        while os.path.exists(keyline_file):
-            os.unlink(keyline_file)
-            i += 1
-            keyline_file = os.path.join(
-                gitolite_keydir, "keys_%i" % i, "%s.pub" % user.user
-            )
-
-        if not user.sshkeys:
-            return
-
-        # Now let's create new keyfiles for the user
-        i = 0
-        for key in user.sshkeys:
-            if not is_valid_ssh_key(key.public_ssh_key):
-                continue
-            keyline_dir = os.path.join(gitolite_keydir, "keys_%i" % i)
-            if not os.path.exists(keyline_dir):
-                os.mkdir(keyline_dir)
-            keyfile = os.path.join(keyline_dir, "%s.pub" % user.user)
-            with open(keyfile, "w") as stream:
-                stream.write(key.public_ssh_key.strip())
-            i += 1
-
-
 def add_issue_comment(
     session,
     issue,
@@ -1182,7 +1095,6 @@ def add_user_to_project(
         access_obj.access = access
         access_obj.branches = branches
         project.date_modified = datetime.datetime.utcnow()
-        update_read_only_mode(session, project, read_only=True)
         session.add(access_obj)
         session.add(project)
         session.commit()
@@ -1209,8 +1121,6 @@ def add_user_to_project(
     )
     project.date_modified = datetime.datetime.utcnow()
     session.add(project_user)
-    # Mark the project as read only, celery will then unmark it
-    update_read_only_mode(session, project, read_only=True)
     session.add(project)
     # Commit so the JSON sent in the notification is up to date
     session.commit()
@@ -1295,7 +1205,6 @@ def add_group_to_project(
         access_obj.branches = branches
         session.add(access_obj)
         project.date_modified = datetime.datetime.utcnow()
-        update_read_only_mode(session, project, read_only=True)
         session.add(project)
         # Commit so the JSON sent in the notification is up to date
         session.commit()
@@ -1323,8 +1232,6 @@ def add_group_to_project(
     session.add(project_group)
     # Make sure we won't have SQLAlchemy error before we continue
     project.date_modified = datetime.datetime.utcnow()
-    # Mark the project read_only, celery will then unmark it
-    update_read_only_mode(session, project, read_only=True)
     session.add(project)
     # Commit so the JSON sent in the notification is up to date
     session.commit()
@@ -2289,10 +2196,8 @@ def update_project_settings(session, repo, settings, user, from_api=False):
         )
 
         if "pull_request_access_only" in update:
-            update_read_only_mode(session, repo, read_only=True)
             session.add(repo)
             session.flush()
-            pagure.lib.git.generate_gitolite_acls(project=repo)
 
         return "Edited successfully settings of repo: %s" % repo.fullname
 
@@ -3680,13 +3585,7 @@ def get_commit_flag_by_uid(session, commit_hash, flag_uid):
 
 
 def set_up_user(
-    session,
-    username,
-    fullname,
-    default_email,
-    emails=None,
-    ssh_key=None,
-    keydir=None,
+    session, username, fullname, default_email, emails=None, ssh_key=None
 ):
     """Set up a new user into the database or update its information."""
     user = search_user(session, username=username)
@@ -3714,7 +3613,7 @@ def set_up_user(
             _log.exception(err)
 
     if ssh_key and not user.sshkeys:
-        update_user_ssh(session, user, ssh_key, keydir)
+        update_user_ssh(session, user, ssh_key)
 
     return user
 
@@ -3751,7 +3650,7 @@ def add_email_to_user(session, user, user_email):
             update_log_email_user(session, user_email, user)
 
 
-def update_user_ssh(session, user, ssh_key, keydir, update_only=False):
+def update_user_ssh(session, user, ssh_key):
     """Set up a new user into the database or update its information."""
     if isinstance(user, six.string_types):
         user = get_user(session, user)
@@ -3770,12 +3669,6 @@ def update_user_ssh(session, user, ssh_key, keydir, update_only=False):
             )
         session.commit()
 
-    if keydir:
-        create_user_ssh_keys_on_disk(user, keydir)
-        if update_only:
-            pagure.lib.tasks.gitolite_post_compile_only.delay()
-        else:
-            pagure.lib.git.generate_gitolite_acls(project=None)
     session.add(user)
     session.flush()
 
@@ -5653,30 +5546,6 @@ def has_starred(session, repo, user):
     return False
 
 
-def update_read_only_mode(session, repo, read_only=True):
-    """Remove the read only mode from the project
-
-    :arg session: The session object to query the db with
-    :arg repo: model.Project object to mark/unmark read only
-    :arg read_only: True if project is to be made read only,
-        False otherwise
-    """
-
-    if (
-        not repo
-        or not isinstance(repo, model.Project)
-        or read_only not in [True, False]
-    ):
-        return
-    helper = pagure.lib.git_auth.get_git_auth_helper()
-    if helper.is_dynamic and read_only:
-        # No need to set a readonly flag if a dynamic auth backend is in use
-        return
-    if repo.read_only != read_only:
-        repo.read_only = read_only
-        session.add(repo)
-
-
 def issues_history_stats(session, project, detailed=False, weeks_range=53):
     """Returns the number of opened issues on the specified project over
     the last 365 days
@@ -5867,11 +5736,8 @@ def remove_user_of_project(session, user, project, agent):
             project.users.remove(u)
             break
 
-    # Mark the project as read_only, celery will unmark it
-    update_read_only_mode(session, project, read_only=True)
     session.commit()
 
-    pagure.lib.git.generate_gitolite_acls(project=project)
     pagure.lib.notify.log(
         project,
         topic="project.user.removed",

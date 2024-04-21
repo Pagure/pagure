@@ -3335,67 +3335,6 @@ class GenericEnvironmentMixin(Environment):
         )
 
 
-class GitoliteEnvironmentHighPrecMixin(Environment):
-    def get_pusher(self):
-        return self.osenv.get("GL_USER", "unknown user")
-
-
-class GitoliteEnvironmentLowPrecMixin(Environment):
-    def get_repo_shortname(self):
-        # The gitolite environment variable $GL_REPO is a pretty good
-        # repo_shortname (though it's probably not as good as a value
-        # the user might have explicitly put in his config).
-        return (
-            self.osenv.get("GL_REPO", None)
-            or super(
-                GitoliteEnvironmentLowPrecMixin, self
-            ).get_repo_shortname()
-        )
-
-    def get_fromaddr(self, change=None):
-        GL_USER = self.osenv.get("GL_USER")
-        if GL_USER is not None:
-            # Find the path to gitolite.conf.  Note that gitolite v3
-            # did away with the GL_ADMINDIR and GL_CONF environment
-            # variables (they are now hard-coded).
-            GL_ADMINDIR = self.osenv.get(
-                "GL_ADMINDIR",
-                os.path.expanduser(os.path.join("~", ".gitolite")),
-            )
-            GL_CONF = self.osenv.get(
-                "GL_CONF", os.path.join(GL_ADMINDIR, "conf", "gitolite.conf")
-            )
-            if os.path.isfile(GL_CONF):
-                f = open(GL_CONF, "rU")
-                try:
-                    in_user_emails_section = False
-                    re_template = r"^\s*#\s*%s\s*$"
-                    re_begin, re_user, re_end = (
-                        re.compile(re_template % x)
-                        for x in (
-                            r"BEGIN\s+USER\s+EMAILS",
-                            re.escape(GL_USER) + r"\s+(.*)",
-                            r"END\s+USER\s+EMAILS",
-                        )
-                    )
-                    for l in f:
-                        l = l.rstrip("\n")
-                        if not in_user_emails_section:
-                            if re_begin.match(l):
-                                in_user_emails_section = True
-                            continue
-                        if re_end.match(l):
-                            break
-                        m = re_user.match(l)
-                        if m:
-                            return m.group(1)
-                finally:
-                    f.close()
-        return super(GitoliteEnvironmentLowPrecMixin, self).get_fromaddr(
-            change
-        )
-
-
 class IncrementalDateTime(object):
     """Simple wrapper to give incremental date/times.
 
@@ -4063,10 +4002,6 @@ def choose_mailer(config, environment):
 
 KNOWN_ENVIRONMENTS = {
     "generic": {"highprec": GenericEnvironmentMixin},
-    "gitolite": {
-        "highprec": GitoliteEnvironmentHighPrecMixin,
-        "lowprec": GitoliteEnvironmentLowPrecMixin,
-    },
     "stash": {
         "highprec": StashEnvironmentHighPrecMixin,
         "lowprec": StashEnvironmentLowPrecMixin,
@@ -4097,10 +4032,7 @@ def choose_environment_name(config, env, osenv):
         env = config.get("environment")
 
     if not env:
-        if "GL_USER" in osenv and "GL_REPO" in osenv:
-            env = "gitolite"
-        else:
-            env = "generic"
+        env = "generic"
     return env
 
 
@@ -4139,7 +4071,6 @@ def build_environment_klass(env_name):
 
 GerritEnvironment = build_environment_klass("gerrit")
 StashEnvironment = build_environment_klass("stash")
-GitoliteEnvironment = build_environment_klass("gitolite")
 GenericEnvironment = build_environment_klass("generic")
 
 

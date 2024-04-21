@@ -547,7 +547,6 @@ def api():
         project.api_new_branch,
         project.api_fork_project,
         project.api_modify_acls,
-        project.api_generate_acls,
         project.api_commit_flags,
         project.api_commit_add_flag,
         project.api_update_project_watchers,

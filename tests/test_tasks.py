@@ -228,22 +228,3 @@ class TestCommitsAuthorStats(unittest.TestCase):
         self.assertEqual(
             authors, [(2, [("Alice", None, None)]), (1, [("Bob", "", None)])]
         )
-
-
-class TestGitolitePostCompileOnly(object):
-    @patch("pagure.lib.git_auth.get_git_auth_helper")
-    def test_backend_has_post_compile_only(self, get_helper):
-        helper = MagicMock()
-        get_helper.return_value = helper
-        helper.post_compile_only = MagicMock()
-        tasks.gitolite_post_compile_only()
-        helper.post_compile_only.assert_called_once()
-
-    @patch("pagure.lib.git_auth.get_git_auth_helper")
-    def test_backend_doesnt_have_post_compile_only(self, get_helper):
-        helper = MagicMock()
-        get_helper.return_value = helper
-        helper.generate_acls = MagicMock()
-        del helper.post_compile_only
-        tasks.gitolite_post_compile_only()
-        helper.generate_acls.assert_called_once_with(project=None)

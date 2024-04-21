@@ -5,7 +5,7 @@
 # FAST_CELERY_QUEUE, MEDIUM_CELERY_QUEUE or SLOW_CELERY_QUEUE
 
 [Unit]
-Description=Pagure worker for gitolite interactions
+Description=Pagure worker
 After=redis.target
 Documentation=https://pagure.io/pagure
 

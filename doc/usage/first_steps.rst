@@ -29,9 +29,6 @@ account.
 Upload your SSH key
 -------------------
 
-Pagure uses gitolite to manage who has read/write access to which git
-repository via `ssh <https://en.wikipedia.org/wiki/Secure_Shell>`_.
-
 An ssh key is composed of two parts:
 
 * a private key, which you must keep to yourself and never share with anyone.

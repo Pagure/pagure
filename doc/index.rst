@@ -41,7 +41,6 @@ Contents:
    install_crons
    configuration
    plugins
-   custom_gitolite_conf
    development
    contributing
    contributors

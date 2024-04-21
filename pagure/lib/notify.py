@@ -1104,7 +1104,7 @@ def notify_new_commits(abspath, project, branch, commits):
     been added.
     """
     # string note: abspath, project and branch can only contain ASCII
-    # by policy (pagure and/or gitolite)
+    # by policy (pagure)
     commits_info = []
     for commit in commits:
         commits_info.append(

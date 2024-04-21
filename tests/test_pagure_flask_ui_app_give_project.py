@@ -216,7 +216,6 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
             self._check_user()
 
     @patch.dict("pagure.config.config", {"PAGURE_ADMIN_USERS": "foo"})
-    @patch("pagure.lib.git.generate_gitolite_acls", MagicMock())
     def test_give_project_not_owner_but_admin(self):
         """Test the give_project endpoint.
 
@@ -248,7 +247,6 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
             self._check_user("foo")
 
     @patch.dict("pagure.config.config", {"PAGURE_ADMIN_USERS": "foo"})
-    @patch("pagure.lib.git.generate_gitolite_acls", MagicMock())
     def test_give_project(self):
         """Test the give_project endpoint."""
 
@@ -280,7 +278,6 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
             self.assertEqual(project.users[0].user, "pingou")
 
     @patch.dict("pagure.config.config", {"PAGURE_ADMIN_USERS": "foo"})
-    @patch("pagure.lib.git.generate_gitolite_acls", MagicMock())
     def test_give_project_already_user(self):
         """Test the give_project endpoint when the new main_admin is already
         a committer on the project."""
@@ -325,7 +322,6 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
         "pagure.config.config", {"REQUIRED_GROUPS": {"*": ["packager"]}}
     )
     @patch.dict("pagure.config.config", {"PAGURE_ADMIN_USERS": "foo"})
-    @patch("pagure.lib.git.generate_gitolite_acls", MagicMock())
     def test_give_project_not_in_required_group(self):
         """Test the give_project endpoint."""
 
@@ -355,7 +351,6 @@ class PagureFlaskGiveRepotests(tests.SimplePagureTest):
         "pagure.config.config", {"REQUIRED_GROUPS": {"*": ["packager"]}}
     )
     @patch.dict("pagure.config.config", {"PAGURE_ADMIN_USERS": "foo"})
-    @patch("pagure.lib.git.generate_gitolite_acls", MagicMock())
     def test_give_project_in_required_group(self):
         """Test the give_project endpoint."""
 

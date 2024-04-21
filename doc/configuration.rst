@@ -140,10 +140,6 @@ For every project, two to four repos are created:
   (if ``ENABLE_TICKETS`` is ``True``)
 * a repo with metadata of pull requests opened against the project
 
-Note that gitolite config value ``GL_REPO_BASE`` (if using gitolite 3)
-or ``$REPO_BASE`` (if using gitolite 2) **must** have exactly the same
-value as ``GIT_FOLDER``.
-
 
 REMOTE_GIT_FOLDER
 ~~~~~~~~~~~~~~~~~
@@ -243,23 +239,13 @@ GIT_AUTH_BACKEND
 
 This configuration key allows specifying which git auth backend to use.
 
-Git auth backends can either be static (like gitolite), where a file is
-generated when something changed and then used on login, or dynamic,
-where the actual ACLs are checked in a git hook before being applied.
-
 By default pagure provides the following backends:
 
 - `test_auth`: simple debugging backend printing and returning the string ``Called GitAuthTestHelper.generate_acls()``
-- `gitolite2`: allows deploying pagure on the top of gitolite 2
-- `gitolite3`: allows deploying pagure on the top of gitolite 3
 - `pagure`: Pagure git auth implementation (using keyhelper.py and aclchecker.py) that is used via sshd AuthorizedKeysCommand
 - `pagure_authorized_keys`: Pagure git auth implementation that writes to authorized_keys file
 
 Defaults to: ``pagure_authorized_keys``
-
-.. note:: The option GITOLITE_BACKEND is the legacy name, and for backwards compatibility reasons will override this setting
-
-.. note:: These options can be expended, cf :ref:`custom-gitolite`.
 
 
 Configure Pagure Auth
@@ -289,8 +275,6 @@ To use this variant, set the following in ``pagure.cfg``:
 ::
 
     GIT_AUTH_BACKEND = "pagure"
-
-    HTTP_REPO_ACCESS_GITOLITE = None
 
     SSH_KEYS_USERNAME_EXPECT = "git"
 
@@ -327,148 +311,10 @@ set the following to ``pagure.cfg``:
 
     GIT_AUTH_BACKEND = "pagure_authorized_keys"
 
-    HTTP_REPO_ACCESS_GITOLITE = None
-
     SSH_COMMAND = ([
         "/usr/bin/%(cmd)s",
         "/srv/git/repositories/%(reponame)s",
     ], {"GL_USER": "%(username)s"})
-
-
-Configure Gitolite
-------------------
-
-Pagure can use `gitolite <http://gitolite.com/>`_ as an authorization layer.
-Gitolite relies on `SSH <https://en.wikipedia.org/wiki/Secure_Shell>`_ for
-the authentication. In other words, SSH lets you in and gitolite checks if
-you are allowed to do what you are trying to do once you are inside.
-
-Pagure supports both gitolite 2 and gitolite 3 and the code generating
-the gitolite configuration can be customized for easier integration with
-other systems (cf :ref:`custom-gitolite`).
-
-Using Gitolite also requires setting the following in ``pagure.cfg``:
-
-::
-
-    HTTP_REPO_ACCESS_GITOLITE = "/usr/share/gitolite3/gitolite-shell"
-
-    SSH_COMMAND = (
-        [
-            "/usr/share/gitolite3/gitolite-shell",
-            "%(username)s",
-            "%(cmd)s",
-            "%(reponame)s",
-        ],
-        {},
-    )
-
-
-This ensures that the Gitolite environment is used for interacting with
-Git repositories. Further customizations are listed below.
-
-
-**gitolite 2 and 3**
-~~~~~~~~~~~~~~~~~~~~
-
-GITOLITE_HOME
-^^^^^^^^^^^^^
-
-This configuration key points to the home directory of the user under which
-gitolite is ran.
-
-
-GITOLITE_KEYDIR
-^^^^^^^^^^^^^^^
-
-This configuration key points to the folder where gitolite stores and accesses
-the public SSH keys of all the user have access to the server.
-
-Since pagure is the user interface, it is pagure that writes down the files
-in this directory, effectively setting up the users to be able to use gitolite.
-
-
-GITOLITE_CONFIG
-^^^^^^^^^^^^^^^
-
-This configuration key points to the gitolite.conf file where pagure writes
-the gitolite repository access configuration.
-
-
-GITOLITE_CELERY_QUEUE
-^^^^^^^^^^^^^^^^^^^^^
-
-This configuration is useful for large pagure deployment where recompiling
-the gitolite config file can take a long time. By default the compilation
-of gitolite's configuration file is done by the pagure_worker, which spawns
-by default 4 concurrent workers. If it takes a while to recompile the
-gitolite configuration file, these workers may be stepping on each others'
-toes.
-In this situation, this configuration key allows you to direct the messages
-asking for the gitolite configuration file to be compiled to a different
-queue which can then be handled by a different service/worker.
-
-Pagure provides a ``pagure_gitolite_worker.service`` systemd service file
-pre-configured to handles these messages if this configuration key is set
-to ``gitolite_queue``.
-
-
-**gitolite 2 only**
-~~~~~~~~~~~~~~~~~~~
-
-GL_RC
-^^^^^
-
-This configuration key points to the file ``gitolite.rc`` used by gitolite
-to record who has access to what (ie: who has access to which repo/branch).
-
-
-GL_BINDIR
-^^^^^^^^^
-
-This configuration key indicates the folder in which the gitolite tools can
-be found. It can be as simple as ``/usr/bin/`` if the tools have been installed
-using a package manager or something like ``/opt/bin/`` for a more custom
-install.
-
-
-**gitolite 3 only**
-~~~~~~~~~~~~~~~~~~~
-
-GITOLITE_HAS_COMPILE_1
-^^^^^^^^^^^^^^^^^^^^^^
-
-By setting this configuration key to ``True``, you can turn on using the
-gitolite ``compile-1`` binary. This speeds up gitolite task when it recompiles
-configuration after new project is created. In order to use this, you need to
-have the ``compile-1`` gitolite command.
-
-There are two ways to have it,
-
-#. You distribution already has the file installed for you and you can then
-   just use it.
-#. You need to download and install it yourself. We are describing what
-   needs to be done for this here below.
-
-Installing the ``compile-1`` command:
-
-* You also have to make sure that your distribution of gitolite contains
-  `patch <https://github.com/sitaramc/gitolite/commit/c4b6521a4b82e639f6ed776abad79c>`_
-  which makes gitolite respect ``ALLOW_ORPHAN_GL_CONF`` configuration variable,
-  if this patch isn't already present, you will have to make the change yourself.
-* In your ``gitolite.rc`` set ``ALLOW_ORPHAN_GL_CONF`` to ``1`` (you may
-  have to add it yourself).
-* Still in your ``gitolite.rc`` file, uncomment ``LOCAL_CODE`` file and set
-  it to a full path of a directory that you choose (for example
-  ``/usr/local/share/gitolite3``).
-* Create a subdirectory ``commands`` under the path you picked for ``LOCAL_CODE``
-  (in our example, you will need to do: ``mkdir -p /usr/local/share/gitolite3/commands``)
-* Finally, install the ``compile-1`` command in this ``commands`` subdirectory
-  If your installation doesn't ship this file, you can `download it
-  <https://github.com/sitaramc/gitolite/blob/master/contrib/commands/compile-1>`_.
-  (Ensure the file is executable, otherwise gitolite will not find it)
-
-Defaults to: ``False``
 
 
 EventSource options
@@ -546,7 +392,7 @@ ADMIN_GROUP
 
 List of groups, either local or remote (if the openid server used supports the
 group extension), that are the site admins. These admins can regenerate the
-gitolite configuration, the ssh key files, and the hook-token for every project
+ssh key files, and the hook-token for every project
 as well as manage users and groups.
 
 
@@ -1363,8 +1209,7 @@ ALLOW_DELETE_BRANCH
 
 This configuration keys enables or disables allowing users to delete git
 branches from the user interface. In sensible pagure instance you may
-want to turn this off and with a customized gitolite configuration you can
-prevent users from deleting branches in their git repositories.
+want to turn this off.
 
 Defaults to: ``True``.
 
@@ -1658,38 +1503,6 @@ With this configuration (evaluated in the provided order):
   any project on this pagure instance.
 
 
-GITOLITE_PRE_CONFIG
-~~~~~~~~~~~~~~~~~~~
-
-This configuration key allows you to include some content at the *top* of
-the gitolite configuration file (such as some specific group definition),
-thus allowing to customize the gitolite configuration file with elements
-and information that are outside of pagure's control.
-
-This can be used in combination with ``GITOLITE_POST_CONFIG`` to further
-customize gitolite's configuration file. It can also be used with
-``EXTERNAL_COMMITTER`` to give commit access to git repos based on external
-information.
-
-Defaults to: ``None``
-
-
-GITOLITE_POST_CONFIG
-~~~~~~~~~~~~~~~~~~~~
-
-This configuration key allows you to include some content at the *end* of
-the gitolite configuration file (such as some project definition or access),
-thus allowing to customize the gitolite configuration file with elements
-and information that are outside of pagure's control.
-
-This can be used in combination with ``GITOLITE_PRE_CONFIG`` to further
-customize gitolite's configuration file. It can also be used with
-``EXTERNAL_COMMITTER`` to give commit access to git repos based on external
-information.
-
-Defaults to: ``None``
-
-
 GIT_GARBAGE_COLLECT
 ~~~~~~~~~~~~~~~~~~~
 
@@ -1863,17 +1676,6 @@ This is disabled by default, as it requires setting up an authentication mechani
 on the webserver that sets REMOTE_USER.
 
 Defaults to: ``False``
-
-
-HTTP_REPO_ACCESS_GITOLITE
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-This configuration key configures the path to the gitolite-shell binary.
-If this is set to None, Git http-backend is used directly.
-Only set this to ``None`` if you intend to provide HTTP push access via Pagure, and
-are using a dynamic ACL backend.
-
-Defaults to: ``/usr/share/gitolite3/gitolite-shell``
 
 
 MIRROR_SSHKEYS_FOLDER
@@ -2171,23 +1973,11 @@ are available. It has been replaced by `UPLOAD_FOLDER_PATH` in the release
 2.10 of pagure.
 
 
-GITOLITE_VERSION
-~~~~~~~~~~~~~~~~
-
-This configuration key specifies which version of gitolite you are
-using, it can be either ``2`` or ``3``.
-
-Defaults to: ``3``.
-
-This has been replaced by `GITOLITE_BACKEND` in the release 3.0 of pagure.
-
-
 DOCS_FOLDER, REQUESTS_FOLDER, TICKETS_FOLDER
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-These configuration values were removed. It has been found out that
-due to how Pagure writes repo names in the gitolite configuration file,
-these must have fixed paths relative to `GIT_FOLDER`. Specifically, they
+These configuration values were removed. These must have
+fixed paths relative to `GIT_FOLDER`. Specifically, they
 must occupy subdirectories `docs`, `requests` and `tickets` under `GIT_FOLDER`.
 They are now computed automatically based on value of `GIT_FOLDER`.
 Usage of docs and tickets can be triggered by setting `ENABLE_DOCS` and
@@ -2242,13 +2032,6 @@ Defaults to: ``Pagure``
 This has been deprecated by the new way of theming pagure, see the `theming
 documentation <https://docs.pagure.org/pagure/usage/theming.html>`_
 
-
-GITOLITE_BACKEND
-~~~~~~~~~~~~~~~~
-
-This configuration key allowed specifying the gitolite backend.
-This has now been replaced by GIT_AUTH_BACKEND, please see that option
-for information on valid values.
 
 PAGURE_PLUGIN
 ~~~~~~~~~~~~~

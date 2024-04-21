@@ -42,7 +42,6 @@ Contents:
 
    first_steps
    forks
-   read_only
    http_push
    pull_requests
    markdown
