@@ -150,6 +150,7 @@ class PagureRepo(pygit2.Repository):
         cmd = ["git", "log"]
         if log_options:
             cmd.extend(log_options)
+        cmd.append("--end-of-options")
         if fromref:
             cmd.append(fromref)
         if target:
