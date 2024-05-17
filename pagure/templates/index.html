@@ -32,7 +32,7 @@
   <div class="container mt-5">
     {{ render_repos(
         repos, total_page, 'page', page,
-        'All '+projectstring()+'s', repos_length, 'repos', username, sorting=sorting, select=select) }}
+        'All '+projectstring(plural=True), repos_length, 'repos', username, sorting=sorting, select=select) }}
   </div>
 
 {% endblock %}
