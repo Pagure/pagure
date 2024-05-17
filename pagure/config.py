@@ -33,6 +33,10 @@ def reload_config():
     # from config and we add them here.
     if config["ENABLE_DOCS"]:
         config["DOCS_FOLDER"] = os.path.join(config["GIT_FOLDER"], "docs")
+    else:
+        config[
+            "DOCS_FOLDER"
+        ] = None  # Avoid 'KeyError' Exception down the line
     if config["ENABLE_TICKETS"]:
         config["TICKETS_FOLDER"] = os.path.join(
             config["GIT_FOLDER"], "tickets"
