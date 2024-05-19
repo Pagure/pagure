@@ -25,6 +25,7 @@ from math import ceil
 import flask
 import pygit2
 import werkzeug.datastructures
+import werkzeug.security
 from binaryornot.helpers import is_binary_string
 from six.moves.urllib.parse import urljoin
 from sqlalchemy.exc import SQLAlchemyError
@@ -1483,7 +1484,10 @@ def view_issue_raw_file(repo, filename=None, username=None, namespace=None):
     attachdir = os.path.join(
         pagure_config["ATTACHMENTS_FOLDER"], repo.fullname
     )
-    attachpath = os.path.join(attachdir, filename)
+
+    # sanitize path, filename must be inside attachdir to be valid
+    attachpath = werkzeug.security.safe_join(attachdir, filename)
+
     if not os.path.exists(attachpath):
         if not os.path.exists(attachdir):
             os.makedirs(attachdir)
