@@ -14,6 +14,7 @@ import json
 import logging
 import os
 import shutil
+import stat
 import subprocess
 import tarfile
 import tempfile
@@ -2842,7 +2843,17 @@ def generate_archive(project, commit, tag, name, archive_fmt):
             def addToZip(zf, path, zippath):
                 if _exclude_git(path):
                     return
-                if os.path.isfile(path):
+                # if path is symlink, add actual link and not target to zip
+                if os.path.islink(path):
+                    zi = zipfile.ZipInfo.from_file(path, zippath)
+                    zi.compress_type = zipfile.ZIP_DEFLATED
+                    # System which created zip, 3 = Unix; 0 = Windows
+                    zi.create_system = 3
+                    # mark as a symlink
+                    zi.external_attr |= stat.S_IFLNK << 16
+                    zf.writestr(zi, path)
+                    return
+                elif os.path.isfile(path):
                     zf.write(path, zippath, zipfile.ZIP_DEFLATED)
                 elif os.path.isdir(path):
                     if zippath:
