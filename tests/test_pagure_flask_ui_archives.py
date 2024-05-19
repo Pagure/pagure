@@ -13,7 +13,7 @@ from __future__ import unicode_literals, absolute_import
 import unittest
 import sys
 import os
-import time
+from zipfile import ZipFile
 
 import mock
 import pygit2
@@ -122,6 +122,78 @@ class PagureFlaskUiArchivesTest(tests.Modeltests):
             )
 
         self.assertEqual(os.listdir(self.archive_path), [])
+
+    # All tests against test3 repo complete, re-use repo for symlink test
+    def test_project_with_symlink_zip(self):
+        """Test that symlink rather than target file gets added to zip"""
+        filename = "os-release"
+        symlinkfile_target = "/etc/os-release"
+        directory = "etc"
+        symlinkdir_target = "/etc"
+        readme = "README.rst"
+        archivename = "test3.zip"
+        namespace = "somenamespace"
+        reponame = "test3"
+        repopath = os.path.join(
+            self.path, "repos", namespace, "%s.git" % reponame
+        )
+        repo = pygit2.Repository(repopath)
+        archivepath = os.path.join(self.archive_path, namespace, reponame)
+        tests.add_commit_git_repo(
+            repopath,
+            ncommits=1,
+            filename=filename,
+            symlink_to=symlinkfile_target,
+        )
+        tests.add_commit_git_repo(
+            repopath,
+            ncommits=1,
+            filename=directory,
+            symlink_to=symlinkdir_target,
+        )
+        tests.add_readme_git_repo(repopath)
+        commit = repo.head.target.hex
+
+        with mock.patch.dict(
+            "pagure.config.config",
+            {"ARCHIVE_FOLDER": os.path.join(self.path, "archives")},
+        ):
+            output = self.app.get(
+                "/%s/%s/archive/%s/%s"
+                % (namespace, reponame, commit, archivename),
+                follow_redirects=True,
+            )
+
+            self.assertEqual(output.status_code, 200)
+
+        # Was a subfolder for the correct commit created?
+        self.assertEqual(os.listdir(archivepath), [commit])
+
+        archivepath_commit = os.path.join(archivepath, commit)
+        # Does the subfolder contain the expected zip file?
+        self.assertEqual(os.listdir(archivepath_commit), [archivename])
+
+        archivepath_zip = os.path.join(archivepath_commit, archivename)
+        # Is the test file in the zip archive a symlink?
+        with ZipFile(os.path.join(archivepath_zip)) as testzip:
+            self.assertIn(
+                "lrw-r--r--",
+                str(testzip.getinfo("%s/%s" % (reponame, filename))),
+            )
+
+        # Is the test directory in the zip archive a symlink?
+        with ZipFile(os.path.join(archivepath_zip)) as testzip:
+            self.assertIn(
+                "?rwxr-xr-x",
+                str(testzip.getinfo("%s/%s/" % (reponame, directory))),
+            )
+
+        # Is the readme still an actual file in the zip archive?
+        with ZipFile(os.path.join(archivepath_zip)) as testzip:
+            self.assertIn(
+                "-rw-r--r--",
+                str(testzip.getinfo("%s/%s" % (reponame, readme))),
+            )
 
     def test_project_no_tag(self):
         """Test getting the archive of a non-empty project but without
