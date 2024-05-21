@@ -1262,7 +1262,15 @@ def _update_file_in_git(
 
         new_repo.checkout("refs/heads/%s" % branch)
 
-        file_path = os.path.join(newpath, filename)
+        # Resolve path to identify path traversal and symlinks
+        file_path = os.path.realpath(os.path.join(newpath, filename))
+        # Bail out of file path is outside temp repo or inside the .git/ folder
+        # Avoids data leak and unauthorized changes in files or git config.
+        if (
+            not file_path.startswith(newpath)
+            or os.path.join(newpath, ".git") in file_path
+        ):
+            return
 
         # Get the current index
         index = new_repo.index
