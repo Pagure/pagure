@@ -3,6 +3,81 @@ Changelog
 
 This document records all notable changes to `Pagure <https://pagure.io>`_.
 
+5.14.1 (2024-05-24)
+-------------------
+
+Feature:
+
+- Support Redis Unix sockets `#5437 <https://pagure.io/pagure/pull-request/5437>`_ (Georg Pfuetzenreuter)
+- Add a new admin command to clean a spam user `#5392 <https://pagure.io/pagure/pull-request/5392>`_ (Ryan Lerch)
+- Add config option to restrict creating by OIDC groups `#5399 <https://pagure.io/pagure/pull-request/5399>`_ (Ryan Lerch)
+- Add api endpoints for adding/removing user to group `#5416 <https://pagure.io/pagure/pull-request/5416>`_ (Michal Konecny)
+- Add new monitoring options for release monitoring `#5294 <https://pagure.io/pagure/pull-request/5294>`_ (Michal Konečný)
+- Add API endpoint for reopening pull requests `#5291 <https://pagure.io/pagure/pull-request/5291>`_ (Matej Focko)
+- Add info about changed files to push notification payload `#5435 <https://pagure.io/pagure/pull-request/5435>`_ (Nikola Forró)
+- Enable pull_request_update acl for user tokens `#5436 <https://pagure.io/pagure/pull-request/5436>`_ (Maja Massarini)
+- Enable collaborators to merge pull requests `#5438 <https://pagure.io/pagure/pull-request/5438>`_ (Samyak Jain)
+- Add pull request ID to push notification payload `#5452 <https://pagure.io/pagure/pull-request/5452>`_ (Nikola Forró)
+- Owner of a PR can update is own PR `#5457 <https://pagure.io/pagure/pull-request/5457>`_ (Maja Massarini)
+- Add history button to the tree view `#5184 <https://pagure.io/pagure/pull-request/5184>`_ (Anatoli Babenia)
+- dist-git: Added a condition that decides whether to use the stg or prod version of the link `#5468 <https://pagure.io/pagure/pull-request/5468>`_ (amedvede)
+
+Fix:
+
+- Reduce noise, remove GIT_CURL_VERBOSE=1 from git commands `#5440 <https://pagure.io/pagure/pull-request/5440>`_ (Frank Dana)
+- libravatar.org account login url `#5367 <https://pagure.io/pagure/pull-request/5367>`_ (Dominik Wombacher)
+- wrong reply icon in issues and pull requests `#5361 <https://pagure.io/pagure/pull-request/5361>`_ (Dominik Wombacher)
+- Reorder celery arguments (and s/info/INFO/) `#5215 <https://pagure.io/pagure/pull-request/5215>`_ (Sergio Durigan Junior)
+- Please make sure you give each node a unique nodename using the celery worker '-n' option `#5332 <https://pagure.io/pagure/pull-request/5332>`_ (Sérgio M. Basto)
+- TypeError: BaseEventLoop.create_server() got an unexpected keyword argument 'loop' `#5332 <https://pagure.io/pagure/pull-request/5332>`_ (Sérgio M. Basto)
+- dialect 'postgres://' deprecated in sqlalchemy `#5357 <https://pagure.io/pagure/pull-request/5357>`_ (Dominik Wombacher)
+- Ensure the url we redirect to are full URLs `#5355 <https://pagure.io/pagure/pull-request/5355>`_ (Pierre-Yves Chibon)
+- BROKER_URL default that honors REDIS_PORT and REDIS_DB `#5358 <https://pagure.io/pagure/pull-request/5358>`_ (Dominik Wombacher)
+- Fix grammar issue `#5241 <https://pagure.io/pagure/pull-request/5241>`_ (AJ Jordan)
+- Update Translation Status button `#5246 <https://pagure.io/pagure/pull-request/5246>`_ (Sundeep Anand)
+- Crash when config:[ENABLE_DOCS = False] `#5475 <https://pagure.io/pagure/pull-request/5475>`_ (Dominik Wombacher)
+- Added data-toggle attribute to missing tooltips `#5474 <https://pagure.io/pagure/pull-request/5474>`_ (Dominik Wombacher)
+- Drop the ssh key from the information stored in the cookie `#5249 <https://pagure.io/pagure/pull-request/5249>`_ (Pierre-Yves Chibon)
+- Fix for mysql alembic migration `#5280 <https://pagure.io/pagure/pull-request/5280>`_ (Michal Konečný)
+- PR close in API for user token `#5206 <https://pagure.io/pagure/pull-request/5206>`_ (Michal Konečný)
+- Ensuring integer for mqtt port, needed by paho-mqtt `#5290 <https://pagure.io/pagure/pull-request/5290>`_ (Fabian Arrotin)
+- Change 'Browse All' emoji link `#5295 <https://pagure.io/pagure/pull-request/5295>`_ (Benjamin A. Beasley)
+- Fix package unretirement URL `#5296 <https://pagure.io/pagure/pull-request/5296>`_ (Ewoud Kohl van Wijngaarden)
+- error when logging exception on event listener `#5319 <https://pagure.io/pagure/pull-request/5319>`_ (Michal Konečný)
+- typo on pagure_authorized_keys_worker.service `#5331 <https://pagure.io/pagure/pull-request/5331>`_ (Sérgio M. Basto)
+- fix object of 'rebased onto' comment `#5341 <https://pagure.io/pagure/pull-request/5341>`_ (Adam Williamson)
+- mirror_project_in: unused '--check' arg removed, description adjusted `#5356 <https://pagure.io/pagure/pull-request/5356>`_ (Dominik Wombacher)
+- theme: long words in source nav break layout `#5363 <https://pagure.io/pagure/pull-request/5363>`_ (Dominik Wombacher)
+- user_settings: unable to change default email `#5364 <https://pagure.io/pagure/pull-request/5364>`_ (Dominik Wombacher)
+- cannot import name 'escape' from 'jinja2' `#5360 <https://pagure.io/pagure/pull-request/5360>`_ (Dominik Wombacher)
+- Fix query filter for date ranges `#5385 <https://pagure.io/pagure/pull-request/5385>`_ (Michal Konečný)
+- cli/admin: Shorten message to fit length rule for the style check `#5398 <https://pagure.io/pagure/pull-request/5398>`_ (Neal Gompa)
+- grammar of "log in" `#5382 <https://pagure.io/pagure/pull-request/5382>`_ (Zbigniew Jędrzejewski-Szmek)
+- English improvements `#5454 <https://pagure.io/pagure/pull-request/5454>`_ (Jerry James)
+- Update pagure/themes/srcfpo/templates/repo_info.html `#5446 <https://pagure.io/pagure/pull-request/5446>`_ (Sundeep Anand)
+- Changed logic with using PDC for getting inactive branches to use bodhi instead `#5419 <https://pagure.io/pagure/pull-request/5419>`_ (amedvede)
+- File history page breadcrumb fixes `#5201 <https://pagure.io/pagure/pull-request/5201>`_ (L. Guruprasad)
+- Extra whitespace in "packages" on src.fpo front page `#5476 <https://pagure.io/pagure/pull-request/5476>`_ (Dominik Wombacher)
+
+Security Fix:
+
+- Argument Injection in PagureRepo.log() rhbz#2277121 `#tbd <https://pagure.io/pagure/pull-request/>`_ (Thomas Chauchefoin)
+- CVE-2024-4982: Path traversal in view_issue_raw_file() rhbz#2279411 `#tbd <https://pagure.io/pagure/pull-request/>`_ (Thomas Chauchefoin and Dominik Wombacher)
+- CVE-2024-4981: _update_file_in_git() follows symbolic links in temporary clones rhbz#2278745 `#tbd <https://pagure.io/pagure/pull-request/>`_ (Thomas Chauchefoin and Dominik Wombacher)
+- generate_archive() follows symbolic links in temporary clones rhbz#2280030 `#tbd <https://pagure.io/pagure/pull-request/>`_ (Thomas Chauchefoin and Dominik Wombacher)
+
+Docs:
+
+- Add some basic documentation for boards `#5237 <https://pagure.io/pagure/pull-request/5237>`_ (Ben Cotton)
+- Document MySQL migration issue `#5282 <https://pagure.io/pagure/pull-request/5282>`_ (Michal Konečný)
+- Add API key information to Jenkins CI setup `#5347 <https://pagure.io/pagure/pull-request/5347>`_ (Michal Konečný)
+- Add Global security step to Jenkins CI configuration `#5348 <https://pagure.io/pagure/pull-request/5348>`_ (Michal Konečný)
+- Update pagure CI guide `#5349 <https://pagure.io/pagure/pull-request/5349>`_ (Michal Konečný)
+- install: filename apache sample config wrong `#5362 <https://pagure.io/pagure/pull-request/5362>`_ (Dominik Wombacher)
+- Update chatroom reference to the new official Matrix room `#5409 <https://pagure.io/pagure/pull-request/5409>`_ (Neal Gompa)
+- Remove deprecated smart_strong xtn `#5430 <https://pagure.io/pagure/pull-request/5430>`_ (Frank Dana)
+
+
 5.13.3 (2021-11-01)
 -------------------
 - Warn users when a PR contains some characters
