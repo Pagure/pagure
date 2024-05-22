@@ -3,13 +3,13 @@ Contributors to pagure
 
 Pagure would be nothing without its contributors.
 
-On November 1, 2021 (release 5.13.3) the list looks as follow:
+On May 24, 2024 (release 5.14.1) the list looks as follow:
 
 =================  ===========
 Number of commits  Contributor
 =================  ===========
-  6901              Pierre-Yves Chibon <pingou@pingoured.fr>
-   328              Ryan Lerch <rlerch@redhat.com>
+  6905              Pierre-Yves Chibon <pingou@pingoured.fr>
+   330              Ryan Lerch <rlerch@redhat.com>
    172              Vivek Anand <vivekanand1101@gmail.com>
    147              Julen Landa Alustiza <jlanda@fedoraproject.org>
    139              farhaanbukhsh <farhaan.bukhsh@gmail.com>
@@ -33,8 +33,10 @@ Number of commits  Contributor
     19              Gaurav Kumar <aavrug@gmail.com>
     19              Lenka Segura <lenka@sepu.cz>
     18              Abhijeet Kasurde <akasurde@redhat.com>
+    18              Adam Williamson <awilliam@redhat.com>
+    18              Dominik Wombacher <dominik@wombacher.cc>
+    18              Michal Konečný <mkonecny@redhat.com>
     18              Sayan Chowdhury <sayan.chowdhury2012@gmail.com>
-    17              Adam Williamson <awilliam@redhat.com>
     17              Brian Stinson <brian@bstinson.com>
     17              Ralph Bean <rbean@redhat.com>
     15              Igor Gnatenko <ignatenkobrain@fedoraproject.org>
@@ -43,6 +45,7 @@ Number of commits  Contributor
     13              Ghost-script <subho.prp@gmail.com>
     13              Martin Basti <mbasti@redhat.com>
     13              Mathieu Bridon <bochecha@fedoraproject.org>
+    11              Anatoli Babenia <anatoli@rainforce.org>
     11              Shengjing Zhu <zsj950618@gmail.com>
      9              Björn Persson <Bjorn@Rombobjörn.se>
      9              Michael Watters <michael.watters@dart.biz>
@@ -50,13 +53,12 @@ Number of commits  Contributor
      8              Lei Yang <yltt1234512@gmail.com>
      8              Michael Scherer <misc@redhat.com>
      8              Paul W. Frields <stickster@gmail.com>
-     7              Anatoli Babenia <anatoli@rainforce.org>
+     8              Sergio Durigan Junior <sergiodj@sergiodj.net>
      7              René Genz <liebundartig@freenet.de>
-     7              Sergio Durigan Junior <sergiodj@sergiodj.net>
      7              zPlus <zplus@peers.community>
-     6              Michal Konečný <mkonecny@redhat.com>
      6              ymdatta <ymdatta@protonmail.com>
      5              Fabio Valentini <decathorpe@gmail.com>
+     5              FeRD (Frank Dana) <ferdnyc@gmail.com>
      5              Lukas Holecek <hluk@email.cz>
      5              Mike McLean <mikem@redhat.com>
      5              Oliver Gutierrez <ogutierrez@redhat.com>
@@ -70,6 +72,7 @@ Number of commits  Contributor
      4              Eric Barbour <ebarbour@redhat.com>
      4              Maciej Lasyk <maciek@lasyk.info>
      4              Miro Hrončok <miro@hroncok.cz>
+     4              Nikola Forró <nforro@redhat.com>
      4              clime <clime@redhat.com>
      3              Akanksha <akanksha_mishra01@yahoo.com>
      3              Ankush Behl <cloudbehl@gmail.com>
@@ -77,15 +80,18 @@ Number of commits  Contributor
      3              Chenxiong Qi <cqi@redhat.com>
      3              Dhriti Shikhar <dhriti.shikhar.rokz@gmail.com>
      3              Eric Barbour <emb4gu@virginia.edu>
-     3              FeRD (Frank Dana) <ferdnyc@gmail.com>
      3              Jan Pokorný <jpokorny@redhat.com>
      3              Jason Tibbitts <tibbs@math.uh.edu>
      3              Kushal Khandelwal <kushal124@gmail.com>
+     3              L. Guruprasad <lgp171188@gmail.com>
+     3              Maja Massarini <mmassari@redhat.com>
      3              Pedro Lima <pedro.lima@gmail.com>
      3              Pierre-YvesChibon <pingou@fedoraproject.org>
      3              Ricky Elrod <ricky@elrod.me>
      3              Ryan Lerch <rlerch@localhost.localdomain>
      3              Stefan Bühler <stbuehler@web.de>
+     3              Sérgio M. Basto <sergio@serjux.com>
+     3              amedvede <amedvede@redhat.com>
      3              bill auger <mr.j.spam.me@gmail.com>
      3              cep <breathingcode@gmail.com>
      3              shivani <smshivani579@gmail.com>
@@ -98,10 +104,12 @@ Number of commits  Contributor
      2              Fabian Arrotin <fabian.arrotin@arrfab.net>
      2              František Zatloukal <fzatlouk@redhat.com>
      2              Hervé Beraud <hberaud@redhat.com>
+     2              Jerry James <loganjerry@gmail.com>
      2              Kamil Páral <kparal@redhat.com>
      2              Luis Guzman <ark@switnet.org>
      2              MR <mrx@mailinator.com>
      2              Mohan Boddu <mboddu@bhujji.com>
+     2              Neal Gompa <neal@gompa.dev>
      2              Neha Kandpal <iec2015048@iiita.ac.in>
      2              Nuno Maltez <nuno@cognitiva.com>
      2              Ompragash <om.apsara@gmail.com>
@@ -110,17 +118,20 @@ Number of commits  Contributor
      2              Richard Marko <rmarko@fedoraproject.org>
      2              Simo Sorce <simo@redhat.com>
      2              Stasiek Michalski <hellcp@opensuse.org>
+     2              Sundeep Anand <suanand@redhat.com>
      2              Tim Flink <tflink@fedoraproject.org>
      2              Tim Landscheidt <tim@tim-landscheidt.de>
      2              Todd Zullinger <tmz@pobox.com>
      2              William Moreno Reyes <williamjmorenor@gmail.com>
      2              Your Name <jlanda@fedoraproject.org>
+     2              Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl>
      2              bruno <bruno@wolff.to>
      2              dhrish20 <dhrish20@gmail.com>
      2              hellcp <hellcp@opensuse.org>
      2              siddharthvipul <siddharthvipul1@gmail.com>
      2              yadneshk <yadnesh45@gmail.com>
      2              “AnjaliPardeshi” <“anjalipardeshi92@gmail.com”>
+     1              AJ Jordan <alex@strugee.net>
      1              Akanksha Mishra <akanksha_mishra01@yahoo.com>
      1              Aleksandra Fedorova (bookwar) <afedorova@mirantis.com>
      1              Alexander Scheel <ascheel@redhat.com>
@@ -130,6 +141,8 @@ Number of commits  Contributor
      1              Anthony Lackey <alackey@localhost.localdomain>
      1              Antoni Segura Puimedon <celebdor@gmail.com>
      1              Arti Laddha <artiladdha53@gmail.com>
+     1              Ben Cotton <bcotton@fedoraproject.org>
+     1              Benjamin A. Beasley <code@musicinmybrain.net>
      1              Brendan Early <mymindstorm@evermiss.net>
      1              Brian (bex) Exelbierd <bex@pobox.com>
      1              Carl George <carl@george.computer>
@@ -138,14 +151,16 @@ Number of commits  Contributor
      1              David Caro <dcaroest@redhat.com>
      1              Devesh Kumar Singh <deveshkusingh@gmail.com>
      1              Eashan <eashankadam@gmail.com>
+     1              Ewoud Kohl van Wijngaarden <ewoud@kohlvanwijngaarden.nl>
+     1              Fabian Arrotin <arrfab@centos.org>
      1              Felix Yan <felixonmars@users.sf.net>
      1              Filip Valder <fvalder@redhat.com>
      1              Frank Dana (FeRD) <ferdnyc@gmail.com>
+     1              Georg Pfuetzenreuter <mail@georg-pfuetzenreuter.net>
      1              Haikel Guemar <hguemar@fedoraproject.org>
      1              Hazel Smith <hazel@hazelesque.uk>
      1              Jan Kuparinen <copper_fin@hotmail.com>
      1              Jeremy Cline <jcline@redhat.com>
-     1              Jerry James <loganjerry@gmail.com>
      1              Jingjing Shao <sanri.ok@163.com>
      1              John Florian <jflorian@doubledog.org>
      1              Jun Aruga <jaruga@redhat.com>
@@ -157,7 +172,9 @@ Number of commits  Contributor
      1              Lukas Brabec <lbrabec@redhat.com>
      1              Mark O Brien <markobri@redhat.com>
      1              Mary Kate Fain <mk@marykatefain.com>
+     1              Matej Focko <mfocko@redhat.com>
      1              Mathew Robinson <mathew.robinson3114@gmail.com>
+     1              Michal Konecny <mkonecny@redhat.com>
      1              Michal Srb <michal@redhat.com>
      1              Michel Alexandre Salim <michel@michel-slm.name>
      1              Mohan Boddu <mboddu@redhat.com>
@@ -171,17 +188,18 @@ Number of commits  Contributor
      1              Romain DEP. <rom1dep@gmail.com>
      1              Ryan Lerch <ryanlerch@gmail.com>
      1              Sachin Kamath <sskamath96@gmail.com>
+     1              Samyak Jain <samyak.jn11@gmail.com>
      1              Snehal Karale <skarale@redhat.com>
      1              Stanislav Laznicka <slaznick@redhat.com>
      1              Stanislav Ochotnicky <sochotnicky@redhat.com>
      1              Stephen Gallagher <sgallagh@redhat.com>
-     1              Sundeep Anand <suanand@redhat.com>
+     1              Sundeep Anand <suanand@fedoraproject.org>
+     1              Thomas Chauchefoin <thomas@chauchefoin.fr>
      1              Tiago M. Vieira <tiago@tvieira.com>
      1              Till Hofmann <hofmann@kbsg.rwth-aachen.de>
      1              Vadim Rutkovsky <vrutkovs@redhat.com>
      1              Vyacheslav Anzhiganov <vanzhiganov@ya.ru>
      1              Yves Martin <ymartin1040@gmail.com>
-     1              Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl>
      1              abhishek <abhishekarora12@gmail.com>
      1              abhishek goswami <abhishekg785@gmail.com>
      1              alunux <fadlun.net@gmail.com>
@@ -191,6 +209,7 @@ Number of commits  Contributor
      1              anshukira <aks.anshu03@gmail.com>
      1              chocos10 <iec2015048@iiita.ac.in>
      1              d3prof3t <saurabhpysharma@gmail.com>
+     1              four_4 <fruitloopsgo@gmail.com>
      1              ishcherb <ishcherb@redhat.com>
      1              jcvicelli <jcvicelli@gmail.com>
      1              josef radinger <cheese@nosuchhost.net>
