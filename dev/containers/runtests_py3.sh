@@ -24,4 +24,4 @@ fi
 
 sed -i -e "s|#!/usr/bin/env python|#!/usr/bin/env python3|" pagure/hooks/files/hookrunner
 
-pytest-3 -n auto ${TESTCASE:-tests/}
+pytest-3 -rf -n auto ${TESTCASE:-tests/}
