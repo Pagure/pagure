@@ -41,7 +41,6 @@ if os.environ.get("PAGURE_PERFREPO"):
 else:
     perfrepo = None
 
-
 logger = logging.getLogger(__name__)
 
 REDIS = None

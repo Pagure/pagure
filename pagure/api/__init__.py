@@ -20,6 +20,7 @@ import codecs
 import functools
 import logging
 import os
+import sys
 
 import docutils
 import enum
@@ -43,6 +44,9 @@ from pagure.utils import authenticated, check_api_acls  # noqa: E402
 
 
 _log = logging.getLogger(__name__)
+
+# Mitigate bug in flask-wtf 0.14.2 on EL8 for 5.14.1 release
+sys.modules["werkzeug.url_encode"] = "werkzeug.urls.url_encode"
 
 
 def preload_docs(endpoint):
