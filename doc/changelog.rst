@@ -61,10 +61,10 @@ Fix:
 
 Security Fix:
 
-- Argument Injection in PagureRepo.log() rhbz#2277121 `#tbd <https://pagure.io/pagure/pull-request/>`_ (Thomas Chauchefoin)
-- CVE-2024-4982: Path traversal in view_issue_raw_file() rhbz#2279411 `#tbd <https://pagure.io/pagure/pull-request/>`_ (Thomas Chauchefoin and Dominik Wombacher)
-- CVE-2024-4981: _update_file_in_git() follows symbolic links in temporary clones rhbz#2278745 `#tbd <https://pagure.io/pagure/pull-request/>`_ (Thomas Chauchefoin and Dominik Wombacher)
-- generate_archive() follows symbolic links in temporary clones rhbz#2280030 `#tbd <https://pagure.io/pagure/pull-request/>`_ (Thomas Chauchefoin and Dominik Wombacher)
+- Argument Injection in PagureRepo.log() rhbz#2277121 `#5481 <https://pagure.io/pagure/pull-request/5481>`_ (Thomas Chauchefoin)
+- CVE-2024-4982: Path traversal in view_issue_raw_file() rhbz#2279411 `#5484 <https://pagure.io/pagure/pull-request/5484>`_ (Thomas Chauchefoin and Dominik Wombacher)
+- CVE-2024-4981: _update_file_in_git() follows symbolic links in temporary clones rhbz#2278745 `#5483 <https://pagure.io/pagure/pull-request/5483>`_ (Thomas Chauchefoin and Dominik Wombacher)
+- generate_archive() follows symbolic links in temporary clones rhbz#2280030 `#5482 <https://pagure.io/pagure/pull-request/5482>`_ (Thomas Chauchefoin and Dominik Wombacher)
 
 Docs:
 
