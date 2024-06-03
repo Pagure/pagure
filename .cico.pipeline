@@ -36,7 +36,7 @@ node('cico-workspace') {
 
     stage('Allocate Node'){
         duffy_rtn=sh(
-            script: 'duffy client --url https://duffy.ci.centos.org/api/v1 --auth-name pagure --auth-key $CICO_API_KEY request-session pool=virt-ec2-t2-centos-8s-x86_64,quantity=1',
+            script: 'duffy client --url https://duffy.ci.centos.org/api/v1 --auth-name pagure --auth-key $CICO_API_KEY request-session pool=virt-ec2-t2-centos-9s-x86_64,quantity=1',
             returnStdout: true
             )
         def jsonObj = readJSON text: duffy_rtn
