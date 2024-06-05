@@ -125,7 +125,7 @@ class PagureLibTaskServicestests(tests.Modeltests):
             "/path/to/git", ANY, "master", ["hash1", "hash2"]
         )
 
-    @patch("pagure.lib.tasks_services.trigger_jenkins_build")
+    @patch("pagure.api.ci.jenkins.trigger_build")
     def test_trigger_ci_build_invalid_project(self, trigger_jenk):
         """Test the trigger_ci_build method."""
         output = pagure.lib.tasks_services.trigger_ci_build(
@@ -138,7 +138,7 @@ class PagureLibTaskServicestests(tests.Modeltests):
         self.assertIsNone(output)
         trigger_jenk.assert_not_called()
 
-    @patch("pagure.lib.tasks_services.trigger_jenkins_build")
+    @patch("pagure.api.ci.jenkins.trigger_build")
     def test_trigger_ci_build_not_configured_project(self, trigger_jenk):
         """Test the trigger_ci_build method."""
         self.assertRaises(
@@ -152,7 +152,7 @@ class PagureLibTaskServicestests(tests.Modeltests):
         )
         trigger_jenk.assert_not_called()
 
-    @patch("pagure.lib.tasks_services.trigger_jenkins_build")
+    @patch("pagure.api.ci.jenkins.trigger_build")
     def test_trigger_ci_build_not_configured_project_fork(self, trigger_jenk):
         """Test the trigger_ci_build method."""
         self.assertRaises(
@@ -595,7 +595,7 @@ class PagureLibTaskServicesJenkinsCItests(tests.Modeltests):
         self.session.add(item)
         self.session.commit()
 
-    @patch("pagure.lib.tasks_services.trigger_jenkins_build")
+    @patch("pagure.api.ci.jenkins.trigger_build")
     def test_trigger_ci_build_invalid_ci(self, trigger_jenk):
         """Test the trigger_ci_build method."""
         output = pagure.lib.tasks_services.trigger_ci_build(
@@ -608,7 +608,7 @@ class PagureLibTaskServicesJenkinsCItests(tests.Modeltests):
         self.assertIsNone(output)
         trigger_jenk.assert_not_called()
 
-    @patch("pagure.lib.tasks_services.trigger_jenkins_build")
+    @patch("pagure.api.ci.jenkins.trigger_build")
     def test_trigger_ci_build_invalid_ci_fork(self, trigger_jenk):
         """Test the trigger_ci_build method."""
         output = pagure.lib.tasks_services.trigger_ci_build(
@@ -621,7 +621,7 @@ class PagureLibTaskServicesJenkinsCItests(tests.Modeltests):
         self.assertIsNone(output)
         trigger_jenk.assert_not_called()
 
-    @patch("pagure.lib.tasks_services.trigger_jenkins_build")
+    @patch("pagure.api.ci.jenkins.trigger_build")
     def test_trigger_ci_build_valid_project(self, trigger_jenk):
         """Test the trigger_ci_build method."""
         output = pagure.lib.tasks_services.trigger_ci_build(
@@ -644,7 +644,7 @@ class PagureLibTaskServicesJenkinsCItests(tests.Modeltests):
             branch_to="master",
         )
 
-    @patch("pagure.lib.tasks_services.trigger_jenkins_build")
+    @patch("pagure.api.ci.jenkins.trigger_build")
     def test_trigger_ci_build_valid_project_fork(self, trigger_jenk):
         """Test the trigger_ci_build method."""
         output = pagure.lib.tasks_services.trigger_ci_build(
@@ -714,7 +714,7 @@ class PagureLibTaskServicesJenkinsCIAuthtests(tests.Modeltests):
         self.session.add(item)
         self.session.commit()
 
-    @patch("pagure.lib.tasks_services.trigger_jenkins_build")
+    @patch("pagure.api.ci.jenkins.trigger_build")
     def test_trigger_ci_build_invalid_ci(self, trigger_jenk):
         """Test the trigger_ci_build method."""
         output = pagure.lib.tasks_services.trigger_ci_build(
@@ -727,7 +727,7 @@ class PagureLibTaskServicesJenkinsCIAuthtests(tests.Modeltests):
         self.assertIsNone(output)
         trigger_jenk.assert_not_called()
 
-    @patch("pagure.lib.tasks_services.trigger_jenkins_build")
+    @patch("pagure.api.ci.jenkins.trigger_build")
     def test_trigger_ci_build_invalid_ci_fork(self, trigger_jenk):
         """Test the trigger_ci_build method."""
         output = pagure.lib.tasks_services.trigger_ci_build(
@@ -740,7 +740,7 @@ class PagureLibTaskServicesJenkinsCIAuthtests(tests.Modeltests):
         self.assertIsNone(output)
         trigger_jenk.assert_not_called()
 
-    @patch("pagure.lib.tasks_services.trigger_jenkins_build")
+    @patch("pagure.api.ci.jenkins.trigger_build")
     def test_trigger_ci_build_valid_project(self, trigger_jenk):
         """Test the trigger_ci_build method."""
         output = pagure.lib.tasks_services.trigger_ci_build(
@@ -763,7 +763,7 @@ class PagureLibTaskServicesJenkinsCIAuthtests(tests.Modeltests):
             branch_to="master",
         )
 
-    @patch("pagure.lib.tasks_services.trigger_jenkins_build")
+    @patch("pagure.api.ci.jenkins.trigger_build")
     def test_trigger_ci_build_valid_project_fork(self, trigger_jenk):
         """Test the trigger_ci_build method."""
         output = pagure.lib.tasks_services.trigger_ci_build(

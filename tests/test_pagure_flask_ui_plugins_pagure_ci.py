@@ -369,7 +369,7 @@ class PagureFlaskPluginPagureCItests(tests.SimplePagureTest):
                 output_text,
             )
 
-    @mock.patch("pagure.lib.tasks_services.trigger_jenkins_build")
+    @mock.patch("pagure.api.ci.jenkins.trigger_build")
     def test_plugin_pagure_ci_namespaced_auth(self, trigger_jenk):
         """Test the pagure ci plugin on/off endpoint."""
 

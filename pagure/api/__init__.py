@@ -19,6 +19,7 @@ from __future__ import absolute_import, unicode_literals
 import codecs
 import enum
 import functools
+import importlib
 import logging
 import os
 
@@ -627,8 +628,16 @@ def api():
 
     if pagure_config.get("PAGURE_CI_SERVICES", False):
         ci_methods = []
-        for ci in pagure_config["PAGURE_CI_SERVICES"]:
-            ci_methods.append(f"{ci}.ci_notification")
+        for ci_type in pagure_config["PAGURE_CI_SERVICES"]:
+            if ci_type not in locals():
+                # Necessary to pass the tests and avoid:
+                # AttributeError: 'str' object has no attribute '__name__'
+                # 'build_docs_section' expects type function down the line.
+                ci = importlib.import_module(
+                    f"pagure.api.ci.{ci_type}"
+                )  # noqa: E402, F811
+                ci_notification = getattr(ci, f"{ci_type}_ci_notification")
+            ci_methods.append(ci_notification)
         if ci_methods:
             sections.append(
                 build_docs_section(

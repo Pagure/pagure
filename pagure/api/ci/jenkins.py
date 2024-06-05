@@ -47,7 +47,11 @@ _log = logging.getLogger(__name__)
     methods=["POST"],
 )
 @api_method
-def ci_notification(repo, pagure_ci_token, username=None, namespace=None):
+# <ci_type>_ci_notification
+# convention required to ensure unique names in API namespace
+def jenkins_ci_notification(
+    repo, pagure_ci_token, username=None, namespace=None
+):
     """
     Jenkins Build Notification
     --------------------------
@@ -98,7 +102,7 @@ def ci_notification(repo, pagure_ci_token, username=None, namespace=None):
         raise pagure.exceptions.APIError(400, error_code=APIERROR.EINVALIDREQ)
 
     try:
-        process_build(flask.g.session, project, build_id)
+        _process_build(flask.g.session, project, build_id)
     except pagure.exceptions.NoCorrespondingPR as err:
         raise pagure.exceptions.APIError(
             400, error_code=APIERROR.ENOCODE, error=str(err)
@@ -113,7 +117,7 @@ def ci_notification(repo, pagure_ci_token, username=None, namespace=None):
     return ("", 204)
 
 
-def process_build(session, project, build_id, iteration=0):
+def _process_build(session, project, build_id, iteration=0):
     """Gets the build info from jenkins and flags that particular
     pull-request.
     """
@@ -146,7 +150,7 @@ def process_build(session, project, build_id, iteration=0):
         if iteration < 5:
             _log.info("Build is still going, let's wait a sec and try again")
             time.sleep(1)
-            return process_build(
+            return _process_build(
                 session, project, build_id, iteration=iteration + 1
             )
         _log.info(
