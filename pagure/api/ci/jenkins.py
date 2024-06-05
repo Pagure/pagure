@@ -25,7 +25,10 @@ import pagure.lib.query
 from pagure.api import API, APIERROR, api_method
 from pagure.api.ci import BUILD_STATS
 
+import time
+
 _log = logging.getLogger(__name__)
+
 
 @API.route(
     "/ci/jenkins/<repo>/<pagure_ci_token>/build-finished", methods=["POST"]
@@ -44,9 +47,7 @@ _log = logging.getLogger(__name__)
     methods=["POST"],
 )
 @api_method
-def ci_notification(
-    repo, pagure_ci_token, username=None, namespace=None
-):
+def ci_notification(repo, pagure_ci_token, username=None, namespace=None):
     """
     Jenkins Build Notification
     --------------------------
@@ -110,6 +111,7 @@ def ci_notification(
 
     _log.info("Successfully proccessed jenkins notification")
     return ("", 204)
+
 
 def process_build(session, project, build_id, iteration=0):
     """Gets the build info from jenkins and flags that particular

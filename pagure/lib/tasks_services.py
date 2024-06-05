@@ -479,17 +479,20 @@ def trigger_ci_build(
             ci_project = project.parent
         ci = importlib.import_module(f"pagure.api.ci.{ci_type}")
         ci.trigger_build(
-                project_path=project.path,
-                url=ci_project.ci_hook.ci_url,
-                job=ci_project.ci_hook.ci_job,
-                token=ci_project.ci_hook.pagure_ci_token,
-                branch=branch,
-                branch_to=branch_to,
-                cause=cause,
-                ci_username=ci_project.ci_hook.ci_username,
-                ci_password=ci_project.ci_hook.ci_password,
-            )
+            project_path=project.path,
+            url=ci_project.ci_hook.ci_url,
+            job=ci_project.ci_hook.ci_job,
+            token=ci_project.ci_hook.pagure_ci_token,
+            branch=branch,
+            branch_to=branch_to,
+            cause=cause,
+            ci_username=ci_project.ci_hook.ci_username,
+            ci_password=ci_project.ci_hook.ci_password,
+        )
     except Exception as e:
-        _log.error(f"Pagure-CI: Un-supported CI type {ci_type}. Error while loading CI plugin: {e}")
+        _log.error(
+            f"Pagure-CI: Un-supported CI type {ci_type}. "
+            f"Error while loading CI plugin: {e}"
+        )
 
     _log.info("Pagure-CI: Ready for another")
