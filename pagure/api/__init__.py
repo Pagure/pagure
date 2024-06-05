@@ -344,9 +344,6 @@ from pagure.api import plugins  # noqa: E402, I202
 from pagure.api import project  # noqa: E402, I202
 from pagure.api import user  # noqa: E402, I202
 
-if pagure_config.get("PAGURE_CI_SERVICES", False):
-    from pagure.api.ci import jenkins  # noqa: E402, F401
-
 
 @API.route("/version/")
 @API.route("/version")
@@ -630,12 +627,8 @@ def api():
 
     if pagure_config.get("PAGURE_CI_SERVICES", False):
         ci_methods = []
-        if "jenkins" in pagure_config["PAGURE_CI_SERVICES"]:
-            if "jenkins" not in locals():
-                # We run into this situation in the tests
-                from pagure.api.ci import jenkins  # noqa: E402, F811
-            ci_methods.append(jenkins.jenkins_ci_notification)
-
+        for ci in pagure_config["PAGURE_CI_SERVICES"]:
+            ci_methods.append(f"{ci}.ci_notification")
         if ci_methods:
             sections.append(
                 build_docs_section(

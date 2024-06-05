@@ -13,8 +13,8 @@ from __future__ import absolute_import, unicode_literals
 import datetime
 import hashlib
 import hmac
+import importlib
 import json
-import os
 import os.path
 import time
 import uuid
@@ -29,7 +29,6 @@ from sqlalchemy.exc import SQLAlchemyError
 
 import pagure.lib.query
 from pagure.config import config as pagure_config
-from pagure.lib.lib_ci import trigger_jenkins_build
 from pagure.lib.tasks_utils import pagure_task
 from pagure.mail_logging import format_callstack
 from pagure.utils import set_up_logging, split_project_fullname
@@ -474,25 +473,23 @@ def trigger_ci_build(
         branch,
     )
 
-    if ci_type == "jenkins":
-
-        jenk_project = project
+    try:
+        ci_project = project
         if project.is_fork:
-            jenk_project = project.parent
-
-        trigger_jenkins_build(
-            project_path=project.path,
-            url=jenk_project.ci_hook.ci_url,
-            job=jenk_project.ci_hook.ci_job,
-            token=jenk_project.ci_hook.pagure_ci_token,
-            branch=branch,
-            branch_to=branch_to,
-            cause=cause,
-            ci_username=jenk_project.ci_hook.ci_username,
-            ci_password=jenk_project.ci_hook.ci_password,
-        )
-
-    else:
-        _log.warning("Pagure-CI:Un-supported CI type")
+            ci_project = project.parent
+        ci = importlib.import_module(f"pagure.api.ci.{ci_type}")
+        ci.trigger_build(
+                project_path=project.path,
+                url=ci_project.ci_hook.ci_url,
+                job=ci_project.ci_hook.ci_job,
+                token=ci_project.ci_hook.pagure_ci_token,
+                branch=branch,
+                branch_to=branch_to,
+                cause=cause,
+                ci_username=ci_project.ci_hook.ci_username,
+                ci_password=ci_project.ci_hook.ci_password,
+            )
+    except Exception as e:
+        _log.error(f"Pagure-CI: Un-supported CI type {ci_type}. Error while loading CI plugin: {e}")
 
     _log.info("Pagure-CI: Ready for another")

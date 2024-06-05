@@ -77,7 +77,7 @@ tmpl = """
 {% if repo | hasattr('ci_hook') and repo.ci_hook and
     repo.ci_hook.pagure_ci_token %}
 
-The token to be used by jenkins to trigger the build is:
+The token to be used by the CI to trigger the build is:
 <pre>
 {{ repo.ci_hook.pagure_ci_token}}
 </pre>

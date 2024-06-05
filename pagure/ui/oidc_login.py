@@ -33,7 +33,7 @@ _log = logging.getLogger(__name__)
 def fas_user_from_oidc():
     if "oidc_cached_userdata" in flask.session:
         flask.g.fas_user = munch.Munch(**flask.session["oidc_cached_userdata"])
-        # Edge case, avoid 'KeyError' after pagure update if a cached session is used
+        # Edge case, avoid 'KeyError' after pagure update with cached sessions
         flask.g.fas_user.can_create = flask.g.fas_user.get("can_create", False)
     elif oidc.user_loggedin and "oidc_logintime" in flask.session:
         email_key, fulln_key, usern_key, ssh_key, groups_key = [
