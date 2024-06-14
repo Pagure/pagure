@@ -12,7 +12,6 @@ from __future__ import unicode_literals, absolute_import
 
 import datetime
 import os
-import pytz
 import shutil
 import sys
 import unittest
@@ -29,6 +28,8 @@ import pagure.config
 import pagure.lib.model as model
 import pagure.lib.query
 import tests
+
+import zoneinfo
 
 
 class PagureFlaskApiUSertests(tests.Modeltests):
@@ -550,8 +551,12 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         utcts = str(
             int(
                 (
-                    datetime.datetime(year, 2, 15, 12, 0, tzinfo=pytz.UTC)
-                    - datetime.datetime(1970, 1, 1, tzinfo=pytz.UTC)
+                    datetime.datetime(
+                        year, 2, 15, 12, 0, tzinfo=datetime.timezone.utc
+                    )
+                    - datetime.datetime(
+                        1970, 1, 1, tzinfo=datetime.timezone.utc
+                    )
                 ).total_seconds()
             )
         )
@@ -566,10 +571,13 @@ class PagureFlaskApiUSertests(tests.Modeltests):
                         14,
                         17,
                         0,
-                        tzinfo=pytz.timezone("America/New_York"),
+                        tzinfo=zoneinfo.ZoneInfo("America/New_York"),
                     )
                     - datetime.datetime(
-                        1970, 1, 1, tzinfo=pytz.timezone("America/New_York")
+                        1970,
+                        1,
+                        1,
+                        tzinfo=zoneinfo.ZoneInfo("America/New_York"),
                     )
                 ).total_seconds()
             )
@@ -667,8 +675,12 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         utcts = str(
             int(
                 (
-                    datetime.datetime(year, 2, 15, 12, 0, tzinfo=pytz.UTC)
-                    - datetime.datetime(1970, 1, 1, tzinfo=pytz.UTC)
+                    datetime.datetime(
+                        year, 2, 15, 12, 0, tzinfo=datetime.timezone.utc
+                    )
+                    - datetime.datetime(
+                        1970, 1, 1, tzinfo=datetime.timezone.utc
+                    )
                 ).total_seconds()
             )
         )
@@ -678,10 +690,15 @@ class PagureFlaskApiUSertests(tests.Modeltests):
             int(
                 (
                     datetime.datetime(
-                        year, 2, 16, 8, 0, tzinfo=pytz.timezone("Asia/Dubai")
+                        year,
+                        2,
+                        16,
+                        8,
+                        0,
+                        tzinfo=zoneinfo.ZoneInfo("Asia/Dubai"),
                     )
                     - datetime.datetime(
-                        1970, 1, 1, tzinfo=pytz.timezone("Asia/Dubai")
+                        1970, 1, 1, tzinfo=zoneinfo.ZoneInfo("Asia/Dubai")
                     )
                 ).total_seconds()
             )
