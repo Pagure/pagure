@@ -28,7 +28,6 @@ parser.add_argument(
     default=None,
     help="Name of the queue to run the worker against.",
 )
-
 parser.add_argument(
     "--tasks",
     dest="tasks",
@@ -42,6 +41,12 @@ parser.add_argument(
     default=False,
     help="Reduce the log level.",
 )
+parser.add_argument(
+    "--name",
+    dest="name",
+    default="worker",
+    help="Name of the celery worker, has to be unique.",
+)
 
 args = parser.parse_args()
 
@@ -53,7 +58,7 @@ if args.config:
         config = os.path.join(here, config)
     env["PAGURE_CONFIG"] = config
 
-cmd = [sys.executable, "-m", "celery", "-A", "worker", args.tasks]
+cmd = [sys.executable, "-m", "celery", "-A", args.tasks, "worker", "-n", args.name]
 
 if args.queue:
     cmd.extend(["-Q", args.queue])
