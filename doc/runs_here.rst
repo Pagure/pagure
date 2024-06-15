@@ -18,7 +18,5 @@ describe what you are using it for.
 +---------+---------------------------------------------------+--------------------------------+----------------------------------------------+
 | 3       | `Cool Bug <https://coolbug.org>`__                | https://repo.coolbug.org       | Development of personal projects             |
 +---------+---------------------------------------------------+--------------------------------+----------------------------------------------+
-| 4       | `Sergio Durigan Junior <https://sergiodj.net>`__  | https://git.sergiodj.net       | Development of personal projects             |
-+---------+---------------------------------------------------+--------------------------------+----------------------------------------------+
-| 5       | `openSUSE <https://opensuse.org>`__               | https://code.opensuse.org      | Development of openSUSE community projects   |
+| 4       | `openSUSE <https://opensuse.org>`__               | https://code.opensuse.org      | Development of openSUSE community projects   |
 +---------+---------------------------------------------------+--------------------------------+----------------------------------------------+
