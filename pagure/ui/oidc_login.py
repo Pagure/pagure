@@ -15,7 +15,7 @@ from base64 import b64decode
 
 import flask
 import munch
-from flask import Markup
+from markupsafe import Markup
 from flask_oidc import OpenIDConnect
 from sqlalchemy.exc import SQLAlchemyError
 

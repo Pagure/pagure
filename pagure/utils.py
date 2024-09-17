@@ -385,7 +385,7 @@ def login_required(function):
         elif auth_method == "fas" and not flask.g.fas_user.cla_done:
             flask.session["_requires_fpca"] = True
             flask.flash(
-                flask.Markup(
+                markupsafe.Markup(
                     'You must <a href="https://accounts.fedoraproject'
                     '.org/">sign the FPCA</a> (Fedora Project '
                     "Contributor Agreement) to use pagure"

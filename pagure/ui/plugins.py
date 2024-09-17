@@ -16,7 +16,7 @@ from __future__ import absolute_import, unicode_literals
 import logging
 
 import flask
-from flask import Markup
+from markupsafe import Markup
 from sqlalchemy.exc import SQLAlchemyError
 
 import pagure.exceptions

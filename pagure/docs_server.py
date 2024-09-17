@@ -188,7 +188,7 @@ def view_docs(repo, username=None, namespace=None, filename=None):
     else:
         flask.abort(
             404,
-            flask.Markup(
+            markupsafe.Markup(
                 "No content found in the repository, you may want to read "
                 'the <a href="'
                 'https://docs.pagure.org/pagure/usage/using_doc.html">'

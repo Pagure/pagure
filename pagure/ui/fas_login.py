@@ -15,7 +15,7 @@ from base64 import b64decode
 
 import flask
 import flask_fas_openid
-from flask import Markup
+from markupsafe import Markup
 from sqlalchemy.exc import SQLAlchemyError
 
 import pagure.lib.query
