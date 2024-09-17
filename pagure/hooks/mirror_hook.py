@@ -17,7 +17,7 @@ try:
 except ImportError:
     from flask_wtf import Form as FlaskForm
 
-from sqlalchemy.orm import backref, relation
+from sqlalchemy.orm import backref, relationship as relation
 
 import pagure.config
 import pagure.lib.tasks_mirror

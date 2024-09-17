@@ -18,7 +18,7 @@ try:
 except ImportError:
     from flask_wtf import Form as FlaskForm
 
-from sqlalchemy.orm import backref, relation
+from sqlalchemy.orm import backref, relationship as relation
 
 from pagure.hooks import BaseHook, BaseRunner
 from pagure.lib.model import BASE, Project

@@ -22,7 +22,7 @@ try:
 except ImportError:
     from flask_wtf import Form as FlaskForm
 
-from sqlalchemy.orm import backref, relation
+from sqlalchemy.orm import backref, relationship as relation
 
 from pagure.config import config as pagure_config
 from pagure.hooks import BaseHook, BaseRunner, RequiredIf

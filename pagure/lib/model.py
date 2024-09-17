@@ -26,7 +26,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import (
     backref,
-    relation,
+    relationship as relation,
     scoped_session,
     sessionmaker,
     validates,
