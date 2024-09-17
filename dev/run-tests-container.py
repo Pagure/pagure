@@ -169,6 +169,15 @@ def setup_parser():
              "branch in current directory, can also be overridden by "
              "using the BRANCH environment variable",
     )
+    parser.add_argument(
+        "--specfile",
+        dest="specfile",
+        default="https://pagure.io/pagure/raw/master/f/files/pagure.spec",
+        help="Specfile to use when installing RPM packages during container build. "
+             "Defaults to https://pagure.io/pagure/raw/master/f/files/pagure.spec. "
+             "Can also be overridden by using the SPECFILE environment variable "
+             "Use spec file from current pagure folder: file:///wrkdir/files/pagure.spec",
+    )
 
     return parser
 
@@ -261,6 +270,7 @@ if __name__ == "__main__":
                 container_volume,
                 branch="{}".format(os.environ.get("BRANCH") or args.branch),
                 repo="{}".format(os.environ.get("REPO") or args.repo),
+                specfile="{}".format(os.environ.get("SPECFILE") or args.specfile),
             ):
                 base_build = True
             else:
