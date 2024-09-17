@@ -19,6 +19,7 @@ import re
 from functools import wraps
 
 import flask
+import markupsafe
 import pygit2
 import six
 import werkzeug.utils

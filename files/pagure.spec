@@ -51,6 +51,7 @@ Requires:           python%{python_pkgversion}-flask-wtf
 Requires:           python%{python_pkgversion}-flask-oidc
 Requires:           python%{python_pkgversion}-kitchen
 Requires:           python%{python_pkgversion}-markdown
+Requires:           python%{python_pkgversion}-markupsafe
 Requires:           python%{python_pkgversion}-munch
 Requires:           python%{python_pkgversion}-pillow
 Requires:           python%{python_pkgversion}-psutil

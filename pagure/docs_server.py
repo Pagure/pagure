@@ -18,6 +18,8 @@ import pygit2
 from binaryornot.helpers import is_binary_string
 from whitenoise import WhiteNoise
 
+import markupsafe
+
 import pagure.config
 import pagure.doc_utils
 import pagure.exceptions

@@ -38,6 +38,8 @@ straight.plugin
 whitenoise <= 6.2.0
 wtforms <= 3.0.1
 
+markupsafe
+
 # Required only for the `oidc` authentication backend
 # Important: Until https://github.com/puiterwijk/flask-oidc/pull/144 is merged and a new version of flask-oidc is released, 
 # it's necessary to ensure `itsdangerous` is pinned to a version lower as 2.1 as well.

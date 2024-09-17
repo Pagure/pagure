@@ -66,7 +66,7 @@ def get_git_auth_helper(backend=None):
             "pagure_authorized_keys": PagureGitAuth,
         }[backend]
     else:
-        cls = classes[backend].load()
+        cls = classes[backend].load(False)
     _log.debug("Returning helper %r from backend key %r" % (cls, backend))
 
     GIT_AUTH_BACKEND_NAME = backend
