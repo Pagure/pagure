@@ -40,7 +40,7 @@ class TestGuessEncoding(unittest.TestCase):
         """
         Test that strings that could be UTF-8 or ISO-8859-* result in UTF-8.
 
-        python-chardet-3.0.4-2.fc27.noarch detects it as ISO-8859-9
+        python-chardet-3.0.4-2.fc27.noarch and above detects it as ISO-8859-9
         python-chardet-2.2.1-1.el7_1.noarch detects it as ISO-8859-2
         """
         data = "Šabata".encode("utf-8")
@@ -50,7 +50,7 @@ class TestGuessEncoding(unittest.TestCase):
             self.assertEqual(result, "WINDOWS-1250")
         else:
             self.assertEqual(result, "utf-8")
-            if chardet.__version__[0] in ("3", "4"):
+            if chardet.__version__[0] in ("3", "4", "5"):
                 self.assertEqual(chardet_result["encoding"], "ISO-8859-9")
             else:
                 self.assertEqual(chardet_result["encoding"], "ISO-8859-2")
