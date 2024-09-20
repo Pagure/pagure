@@ -36,13 +36,13 @@ class PagureHooksDefault(tests.SimplePagureTest):
         self.folder = os.path.join(self.path, "repos", "test.git")
 
     def init_test_repo(self):
-        tests.add_content_git_repo(self.projects[0])
+        tests.add_content_git_repo(self.projects[0], extra_commit=True)
         repo = pygit2.Repository(self.projects[0])
         commit = repo.references["refs/heads/master"].peel()
         sha = commit.hex
-        oldsha = commit.parents[0].hex
+        history = [c.hex for c in repo.walk(sha)]
         project = pagure.lib.query.get_authorized_project(self.session, "test")
-        return project, sha, oldsha
+        return project, sha, history
 
     @mock.patch("pagure.hooks.default.send_fedmsg_notifications")
     def test_send_action_notification(self, fedmsg):
@@ -64,29 +64,30 @@ class PagureHooksDefault(tests.SimplePagureTest):
 
     @mock.patch("pagure.hooks.default.send_fedmsg_notifications")
     def test_send_notifications(self, fedmsg):
-        project, sha, oldsha = self.init_test_repo()
+        project, _, history = self.init_test_repo()
         pagure.hooks.default.send_notifications(
             self.session,
             project,
             self.folder,
             "pingou",
             "master",
-            [sha],
+            history[:-1],
             False,
-            oldsha,
+            history[-1],
             None,
         )
         (_, args, kwargs) = fedmsg.mock_calls[0]
         self.assertEqual(args[1], "git.receive")
         self.assertEqual(args[2]["repo"]["name"], "test")
-        self.assertEqual(args[2]["start_commit"], sha)
+        self.assertEqual(args[2]["start_commit"], history[1])
         self.assertEqual(args[2]["forced"], False)
-        self.assertEqual(args[2]["old_commit"], oldsha)
+        self.assertEqual(args[2]["old_commit"], history[-1])
         self.assertEqual(
             args[2]["changed_files"],
             {
                 "folder1/folder2/file": "A",
                 "folder1/folder2/fileŠ": "A",
+                "test": "A",
             },
         )
         self.assertIsNone(args[2]["pull_request_id"])

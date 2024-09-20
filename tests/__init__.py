@@ -768,7 +768,9 @@ def _clone_and_top_commits(folder, branch, branch_ref=False):
     return (repo, newfolder, parents)
 
 
-def add_content_git_repo(folder, branch="master", append=None):
+def add_content_git_repo(
+    folder, branch="master", append=None, extra_commit=False
+):
     """Create some content for the specified git repo."""
     repo, newfolder, parents = _clone_and_top_commits(folder, branch)
 
@@ -828,6 +830,31 @@ def add_content_git_repo(folder, branch="master", append=None):
         # list of binary strings representing parents of the new commit
         parents,
     )
+
+    if extra_commit:
+        if commit:
+            parents = [commit.hex]
+
+        # Create another file in that git repo
+        with open(os.path.join(newfolder, "test"), "w") as stream:
+            stream.write("test")
+        repo.index.add("test")
+        repo.index.write()
+
+        # Commit the file added
+        tree = repo.index.write_tree()
+        author = pygit2.Signature("Alice Author", "alice@authors.tld")
+        committer = pygit2.Signature("Cecil Committer", "cecil@committers.tld")
+        commit = repo.create_commit(
+            "refs/heads/%s" % branch,  # the name of the reference to update
+            author,
+            committer,
+            "Add one more file for more testing",
+            # binary string representing the tree object ID
+            tree,
+            # list of binary strings representing parents of the new commit
+            parents,
+        )
 
     # Push to origin
     ori_remote = repo.remotes[0]

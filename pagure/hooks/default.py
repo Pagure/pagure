@@ -191,13 +191,14 @@ def send_notifications(
         authors.append(author)
 
     if revs:
+        revs.reverse()
+
         changed_files = pagure.lib.git.get_changed_files(
             revs[-1],
             oldrev,
             repodir,
         )
 
-        revs.reverse()
         print("* Publishing information for %i commits" % len(revs))
 
         topic = "git.receive"
