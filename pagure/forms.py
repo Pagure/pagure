@@ -609,7 +609,7 @@ class AddSSHKeyForm(PagureForm):
 
     ssh_key = wtforms.StringField(
         "SSH Key",
-        [wtforms.validators.DataRequired()]
+        [wtforms.validators.DataRequired()],
         # TODO: Add an ssh key validator?
     )
 

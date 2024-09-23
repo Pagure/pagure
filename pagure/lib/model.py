@@ -1039,9 +1039,11 @@ class Project(BASE):
             "full_url": self.full_url,
             "description": self.description,
             "namespace": self.namespace,
-            "parent": self.parent.to_json(public=public, api=api)
-            if self.parent
-            else None,
+            "parent": (
+                self.parent.to_json(public=public, api=api)
+                if self.parent
+                else None
+            ),
             "date_created": arrow_ts(self.date_created),
             "date_modified": arrow_ts(self.date_modified),
             "user": self.user.to_json(public=public),
@@ -1507,20 +1509,22 @@ class Issue(BASE):
             "tags": self.tags_text,
             "depends": ["%s" % item for item in self.depending_text],
             "blocks": ["%s" % item for item in self.blocking_text],
-            "assignee": self.assignee.to_json(public=public)
-            if self.assignee
-            else None,
+            "assignee": (
+                self.assignee.to_json(public=public) if self.assignee else None
+            ),
             "priority": self.priority,
             "milestone": self.milestone,
             "custom_fields": custom_fields,
-            "closed_by": self.closed_by.to_json(public=public)
-            if self.closed_by
-            else None,
-            "related_prs": [
-                {"id": pr.id, "title": pr.title} for pr in self.related_prs
-            ]
-            if self.related_prs
-            else [],
+            "closed_by": (
+                self.closed_by.to_json(public=public)
+                if self.closed_by
+                else None
+            ),
+            "related_prs": (
+                [{"id": pr.id, "title": pr.title} for pr in self.related_prs]
+                if self.related_prs
+                else []
+            ),
             "full_url": self.full_url,
         }
 
@@ -1683,9 +1687,9 @@ class IssueComment(BASE):
             "date_created": arrow_ts(self.date_created),
             "user": self.user.to_json(public=public),
             "edited_on": arrow_ts(self.edited_on) if self.edited_on else None,
-            "editor": self.editor.to_json(public=public)
-            if self.editor_id
-            else None,
+            "editor": (
+                self.editor.to_json(public=public) if self.editor_id else None
+            ),
             "notification": self.notification,
             "reactions": self.reactions,
         }
@@ -2212,24 +2216,28 @@ class PullRequest(BASE):
             "branch": self.branch,
             "project": self.project.to_json(public=public, api=api),
             "branch_from": self.branch_from,
-            "repo_from": self.project_from.to_json(public=public, api=api)
-            if self.project_from
-            else None,
+            "repo_from": (
+                self.project_from.to_json(public=public, api=api)
+                if self.project_from
+                else None
+            ),
             "remote_git": self.remote_git,
             "date_created": arrow_ts(self.date_created),
             "updated_on": arrow_ts(self.updated_on),
             "last_updated": arrow_ts(self.last_updated),
             "closed_at": arrow_ts(self.closed_at) if self.closed_at else None,
             "user": self.user.to_json(public=public),
-            "assignee": self.assignee.to_json(public=public)
-            if self.assignee
-            else None,
+            "assignee": (
+                self.assignee.to_json(public=public) if self.assignee else None
+            ),
             "status": self.status,
             "commit_start": self.commit_start,
             "commit_stop": self.commit_stop,
-            "closed_by": self.closed_by.to_json(public=public)
-            if self.closed_by
-            else None,
+            "closed_by": (
+                self.closed_by.to_json(public=public)
+                if self.closed_by
+                else None
+            ),
             "initial_comment": self.initial_comment,
             "cached_merge_status": self.merge_status or "unknown",
             "threshold_reached": self.threshold_reached,
@@ -2358,9 +2366,9 @@ class PullRequestComment(BASE):
             "date_created": arrow_ts(self.date_created),
             "user": self.user.to_json(public=public),
             "edited_on": arrow_ts(self.edited_on) if self.edited_on else None,
-            "editor": self.editor.to_json(public=public)
-            if self.editor_id
-            else None,
+            "editor": (
+                self.editor.to_json(public=public) if self.editor_id else None
+            ),
             "notification": self.notification,
             "reactions": self.reactions,
         }

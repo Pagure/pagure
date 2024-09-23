@@ -415,7 +415,6 @@ def trigger_ci_build(
     project_name=None,
     pr_uid=None,
 ):
-
     """Triggers a new run of the CI system on the specified pull-request."""
     pagure.lib.plugins.get_plugin("Pagure CI")
 

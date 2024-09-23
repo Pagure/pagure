@@ -39,7 +39,7 @@ CLIENT_SECRETS = {
         "token_uri": "dummy-uri://",
         "userinfo_uri": "dummy-uri://",
         "redirect_uris": ["http://localhost:5000/oidc"],
-        "issuer": "http://localhost:5000/oidc/"  # Additional field, required since flask-oidc v2.0.0
+        "issuer": "http://localhost:5000/oidc/",  # Additional field, required since flask-oidc v2.0.0
     }
 }
 
@@ -82,7 +82,9 @@ class PagureFlaskOIDCLogintests(tests.SimplePagureTest):
         flask.g.session = Mock()  # the DB session should be here
 
         flask.g.oidc_id_token = {"sub": "dummy"}  # Used in flask-oidc < 2.0.0
-        flask.session["oidc_auth_token"] = {"sub": "dummy"}  # Used in flask-oidc >= 2.0.0
+        flask.session["oidc_auth_token"] = {
+            "sub": "dummy"
+        }  # Used in flask-oidc >= 2.0.0
 
         self.user_info = {
             "email": "dummy@example.com",
@@ -101,7 +103,9 @@ class PagureFlaskOIDCLogintests(tests.SimplePagureTest):
         user_info = self.user_info.copy()
 
         flask.g._oidc_userinfo = user_info  # Used in flask-oidc < 2.0.0
-        flask.session["oidc_auth_profile"] = user_info  # Used in flask-oidc >= 2.0.0
+        flask.session["oidc_auth_profile"] = (
+            user_info  # Used in flask-oidc >= 2.0.0
+        )
 
         fas_user_from_oidc()
         self.assertIsNotNone(getattr(flask.g, "fas_user", None))
@@ -116,7 +120,9 @@ class PagureFlaskOIDCLogintests(tests.SimplePagureTest):
         user_info["groups"] = ["group1", "group2"]
 
         flask.g._oidc_userinfo = user_info  # Used in flask-oidc < 2.0.0
-        flask.session["oidc_auth_profile"] = user_info  # Used in flask-oidc >= 2.0.0
+        flask.session["oidc_auth_profile"] = (
+            user_info  # Used in flask-oidc >= 2.0.0
+        )
 
         fas_user_from_oidc()
         self.assertEqual(flask.g.fas_user.groups, ["group1", "group2"])
@@ -127,7 +133,9 @@ class PagureFlaskOIDCLogintests(tests.SimplePagureTest):
         user_info["ssh_key"] = "dummy ssh key"
 
         flask.g._oidc_userinfo = user_info  # Used in flask-oidc < 2.0.0
-        flask.session["oidc_auth_profile"] = user_info  # Used in flask-oidc >= 2.0.0
+        flask.session["oidc_auth_profile"] = (
+            user_info  # Used in flask-oidc >= 2.0.0
+        )
 
         fas_user_from_oidc()
         self.assertEqual(flask.g.fas_user.ssh_key, "dummy ssh key")
@@ -138,7 +146,9 @@ class PagureFlaskOIDCLogintests(tests.SimplePagureTest):
         user_info["ssh_key"] = "ZHVtbXkgc3NoIGtleQ=="
 
         flask.g._oidc_userinfo = user_info  # Used in flask-oidc < 2.0.0
-        flask.session["oidc_auth_profile"] = user_info  # Used in flask-oidc >= 2.0.0
+        flask.session["oidc_auth_profile"] = (
+            user_info  # Used in flask-oidc >= 2.0.0
+        )
 
         fas_user_from_oidc()
         self.assertEqual(flask.g.fas_user.ssh_key, "dummy ssh key")

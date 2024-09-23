@@ -445,9 +445,9 @@ class PagureExtension(markdown.extensions.Extension):
             md.inlinePatterns["striked"] = StrikeThroughPattern(
                 STRIKE_THROUGH_RE
             )
-            md.postprocessors[
-                "encapsulate"
-            ] = EncapsulateMarkdownPostprocessor()
+            md.postprocessors["encapsulate"] = (
+                EncapsulateMarkdownPostprocessor()
+            )
 
         def _new_markdown_way():
             idx = md.inlinePatterns.get_index_for_name("autolink")

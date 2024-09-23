@@ -294,7 +294,7 @@ def api_view_plugins_project(repo, username=None, namespace=None):
 
     output["plugins"] = []
 
-    for (plugin, dbobj) in plugins.items():
+    for plugin, dbobj in plugins.items():
         if dbobj:
             form = plugin.form(obj=dbobj)
             fields = _filter_fields(plugin)

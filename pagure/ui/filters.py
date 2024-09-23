@@ -242,9 +242,11 @@ def format_loc(
                         flask.url_for(
                             "ui_ns.view_file",
                             repo=prequest.project_from.name,
-                            username=prequest.project_from.user.username
-                            if prequest.project_from.is_fork
-                            else None,
+                            username=(
+                                prequest.project_from.user.username
+                                if prequest.project_from.is_fork
+                                else None
+                            ),
                             namespace=prequest.project_from.namespace,
                             identifier=prequest.branch_from,
                             filename=filename,
@@ -328,9 +330,11 @@ def format_loc(
                                 namespace=comment.parent.project.namespace,
                                 requestid=comment.parent.id,
                                 commentid=comment.id,
-                                username=comment.parent.user.user
-                                if comment.parent.project.is_fork
-                                else None,
+                                username=(
+                                    comment.parent.user.user
+                                    if comment.parent.project.is_fork
+                                    else None
+                                ),
                             ),
                             "requestid": comment.parent.id,
                             "commentid": comment.id,

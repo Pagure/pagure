@@ -76,7 +76,7 @@ class TestGuessEncodings(unittest.TestCase):
                 expexted_list = ["utf-8", "ISO-8859-9", "ISO-8859-1"]
                 # This is the one with the least confidence
                 print(result)
-                if chardet.__version__ >= '5.1.0':
+                if chardet.__version__ >= "5.1.0":
                     self.assertEqual(result[-1].encoding, "TIS-620")
                 else:
                     self.assertEqual(result[-1].encoding, "windows-1255")
@@ -87,7 +87,7 @@ class TestGuessEncodings(unittest.TestCase):
 
                 # The values in the middle of the list all have the same confidence
                 # value and can't be sorted reliably: use sets.
-                if chardet.__version__ >= '5.1.0':
+                if chardet.__version__ >= "5.1.0":
                     expected_list = sorted(
                         [
                             "utf-8",

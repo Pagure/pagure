@@ -68,9 +68,11 @@ class TestMIMEType(unittest.TestCase):
             (
                 "hello",
                 b"#!",
-                "text/plain; charset=ascii"
-                if cchardet is None
-                else "text/plain; charset=ASCII",
+                (
+                    "text/plain; charset=ascii"
+                    if cchardet is None
+                    else "text/plain; charset=ASCII"
+                ),
             ),
             ("hello.jpg", None, "image/jpeg"),
             ("hello.jpg", b"#!", "image/jpeg"),

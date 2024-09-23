@@ -610,9 +610,9 @@ def view_projects(pattern=None, namespace=None):
                 "ui_ns.view_repo",
                 repo=projects[0].name,
                 namespace=projects[0].namespace,
-                username=projects[0].user.username
-                if projects[0].is_fork
-                else None,
+                username=(
+                    projects[0].user.username if projects[0].is_fork else None
+                ),
             )
         )
 

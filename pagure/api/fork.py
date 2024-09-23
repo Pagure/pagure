@@ -701,9 +701,11 @@ def api_pull_request_rebase(repo, requestid, username=None, namespace=None):
     if not ((is_repo_committer(repo) and request.allow_rebase) or can_rebase):
         raise pagure.exceptions.APIError(
             403,
-            error_code=APIERROR.EREBASENOTALLOWED
-            if not request.allow_rebase
-            else APIERROR.ENOPRCLOSE,
+            error_code=(
+                APIERROR.EREBASENOTALLOWED
+                if not request.allow_rebase
+                else APIERROR.ENOPRCLOSE
+            ),
         )
 
     task = pagure.lib.tasks.rebase_pull_request.delay(

@@ -4288,9 +4288,11 @@ class PagureLibtests(tests.Modeltests):
             # and the version 1.4.3 that we have won't let us adjust the
             # list of supported protocols
             # '<p><a href="ircs://pagure.io">ircs://pagure.io</a></p>',
-            '<div class="markdown"><p><a href="ircs://pagure.io">ircs://pagure.io</a></p></div>'
-            if tuple(bleach_v) >= (1, 5, 0)
-            else '<div class="markdown"><p><a>ircs://pagure.io</a></p></div>',
+            (
+                '<div class="markdown"><p><a href="ircs://pagure.io">ircs://pagure.io</a></p></div>'
+                if tuple(bleach_v) >= (1, 5, 0)
+                else '<div class="markdown"><p><a>ircs://pagure.io</a></p></div>'
+            ),
             # 'http://pagure.io'
             '<div class="markdown"><p><a href="http://pagure.io">http://pagure.io</a></p></div>',
             # 'https://pagure.io'

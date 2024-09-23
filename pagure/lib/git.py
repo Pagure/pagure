@@ -1596,9 +1596,11 @@ def merge_pull_request(session, request, username, domerge=True):
                     "Branch %s could not be found in the repo %s"
                     % (
                         request.branch_from,
-                        request.project_from.fullname
-                        if request.project_from
-                        else request.remote_git,
+                        (
+                            request.project_from.fullname
+                            if request.project_from
+                            else request.remote_git
+                        ),
                     )
                 )
 

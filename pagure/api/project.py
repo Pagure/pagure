@@ -545,10 +545,10 @@ def api_project_watchers(repo, username=None, namespace=None):
     # Get the explicit watch statuses
     for watcher in repo.watchers:
         if watcher.watch_issues or watcher.watch_commits:
-            watching_users_to_watch_level[
-                watcher.user.username
-            ] = pagure.lib.query.get_watch_level_on_repo(
-                flask.g.session, watcher.user.username, repo
+            watching_users_to_watch_level[watcher.user.username] = (
+                pagure.lib.query.get_watch_level_on_repo(
+                    flask.g.session, watcher.user.username, repo
+                )
             )
         else:
             if watcher.user.username in watching_users_to_watch_level:
@@ -1228,9 +1228,11 @@ def api_projects():
             {
                 "name": p.name,
                 "namespace": p.namespace,
-                "fullname": p.fullname.replace("forks/", "fork/", 1)
-                if p.fullname.startswith("forks/")
-                else p.fullname,
+                "fullname": (
+                    p.fullname.replace("forks/", "fork/", 1)
+                    if p.fullname.startswith("forks/")
+                    else p.fullname
+                ),
                 "description": p.description,
             }
             for p in projects
