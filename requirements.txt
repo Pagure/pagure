@@ -1,53 +1,53 @@
 # Used for when working from a virtualenv.
 # Use this file by running "$ pip install -r requirements.txt"
-alembic <= 1.8.1
+alembic <= 1.13.2
 arrow <= 1.2.3
-bcrypt <= 3.2.2
+bcrypt <= 4.0.1
 binaryornot == 0.4.4
-bleach <= 5.0.1
-blinker <= 1.5
-celery
-chardet <= 4.0.0
-cryptography <= 36.0.0
-docutils <= 0.17.1
+bleach <= 6.1.0
+blinker <= 1.7.0
+celery <= 5.3.5
+chardet <= 5.2.0
+cryptography <= 41.0.7
+docutils <= 0.20.1
 
 # required for backward compatibility
 email_validator
 
-flask <= 2.2.2
-werkzeug < 3.0.0
-flask-wtf <= 1.0.0
+flask <= 3.0.3
+werkzeug <= 3.0.3
+flask-wtf <= 1.2.1
 kitchen == 1.2.6
-markdown
+markdown <= 3.5.2
 munch <= 2.5.0
-Pillow <= 9.2.0
-psutil <= 5.9.2
+Pillow <= 10.3.0
+psutil <= 5.9.8
 pygit2 < 1.15.0
 python3-openid <= 3.2.0
 python-openid-cla == 1.2
 python-openid-teams == 1.1
 redis
-requests <= 2.28.1
+requests <= 2.31.0
 six <= 1.16.0
 
 # required for backward compatibility
 setuptools
 
-sqlalchemy < 2.0.0
+sqlalchemy <= 2.0.34
 straight.plugin
-whitenoise <= 6.2.0
+whitenoise <= 6.4.0
 wtforms <= 3.0.1
 
 markupsafe
 
 # Required only for the `oidc` authentication backend
-# Important: Until https://github.com/puiterwijk/flask-oidc/pull/144 is merged and a new version of flask-oidc is released, 
-# it's necessary to ensure `itsdangerous` is pinned to a version lower as 2.1 as well.
-# flask-oidc <= 1.4.0
-# itsdangerous < 2.1
+# fedora-infra maintains its own flask-oidc fork: https://github.com/fedora-infra/flask-oidc
+# previous upstream PR (https://github.com/puiterwijk/flask-oidc/pull/144) fixed in fork.
+# flask-oidc <= 2.1.1
+# itsdangerous >=2.1.2
 
 # Required only if `USE_FLASK_SESSION_EXT` is set to `True`
-# flask-session
+# flask-session <= 0.5.0
 
 # Required only for the `fas` and `openid` authentication backends
 # python-fedora == 1.1.1

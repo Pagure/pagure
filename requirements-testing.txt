@@ -1,15 +1,13 @@
-bcrypt <= 3.2.2
-beautifulsoup4 <= 4.11.1
-black <= 22.8.0
-cryptography <= 36.0.0
-eventlet <= 0.33.2
+beautifulsoup4 <= 4.12.3
+black <= 24.4.2
+eventlet <= 0.35.1
 fedmsg <= 1.1.2
-flake8
+flake8 <= 6.0.0
 
-# Important: Until https://github.com/puiterwijk/flask-oidc/pull/144 is merged and a new version of flask-oidc is released,
-# it's necessary to ensure `itsdangerous` is pinned to a version lower as 2.1 as well.
-flask-oidc <= 1.4.0
-itsdangerous < 2.1          
+# fedora-infra maintains its own flask-oidc fork: https://github.com/fedora-infra/flask-oidc
+# previous upstream PR (https://github.com/puiterwijk/flask-oidc/pull/144) fixed in fork.
+flask-oidc <= 2.1.1
+itsdangerous >=2.1.2
 
 mock <= 4.0.3
 pagure-messages >= 0.0.1
