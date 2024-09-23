@@ -458,10 +458,12 @@ def auth_login():  # pragma: no cover
         # execution will go through the else clause, making the Pagure
         # authentication machinery pick the user up
         if not oidc.user_loggedin:
-            if "redirect_to_auth_server" in dir(oidc):  # Available in flask-oidc < 2.0.0
+            # Available in flask-oidc < 2.0.0
+            if "redirect_to_auth_server" in dir(oidc):
                 return oidc.redirect_to_auth_server(flask.request.url)
             else:
-                # flask-oidc >= 2.0.0 offers decorator 'oidc.require_login' and removed method 'redirect_to_auth_server'
+                # flask-oidc >= 2.0.0 offers decorator 'oidc.require_login'
+                # and removed method 'redirect_to_auth_server'
                 @oidc.require_login
                 def _oidc_redirect_to_auth_server():
                     pass

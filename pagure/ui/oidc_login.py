@@ -45,7 +45,8 @@ def fas_user_from_oidc():
         ]
 
         # flask-oidc >= 2.0.0, < 3.0.0
-        # The user_getinfo method is deprecated, please use session['oidc_auth_profile']
+        # "The user_getinfo method is deprecated
+        # please use session['oidc_auth_profile']"
         # Requires attention on next major release
         info = oidc.user_getinfo(
             [email_key, fulln_key, usern_key, ssh_key, groups_key]

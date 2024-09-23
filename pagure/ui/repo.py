@@ -28,6 +28,7 @@ from math import ceil
 
 import flask
 import kitchen.text.converters as ktc
+import markupsafe
 import pygit2
 import six
 import werkzeug.utils
