@@ -545,13 +545,13 @@ $(document).ready(function() {
     });
 
     $.ajax({
- 	  url: 'https://transtats.fedoraproject.org/api/package/' + repo.name + '/exist?format=json',
+ 	  url: 'https://transtats.fedoraproject.org/api/package/{{ repo.name }}/exist?format=json',
  	  type: 'GET',
  	  dataType: 'json',
  	  success: function(res){
  	     console.log(res);
- 	     if (res[repo.name]) {
-               $("#transtats").html("<div class='btn-group'><a class='transtats' href='https://transtats.fedoraproject.org/packages/view/" + repo.name + "'><button type='button' class='btn btn-sm btn-outline-primary font-weight-bold'>&nbsp;Translation Status</button></a></div>");
+ 	     if (res[{{ repo.name }}]) {
+               $("#transtats").html("<div class='btn-group'><a class='transtats' href='https://transtats.fedoraproject.org/packages/view/{{ repo.name }}'><button type='button' class='btn btn-sm btn-outline-primary font-weight-bold'>&nbsp;Translation Status</button></a></div>");
  	     }
  	  }
      });
