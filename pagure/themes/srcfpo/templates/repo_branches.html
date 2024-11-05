@@ -159,8 +159,8 @@ function disable_branches() {
     });
   }
 
-  function checkForDeadPackagesInBranches(activeReleases, inactiveReleases, namespace, repo_name) {
-    const activeReleaseChecks = activeReleases.map(branch => checkForDeadPackage(branch, namespace, repo_name));
+  function checkForDeadPackagesInBranches(activeBranchesOnPackage, inactiveBrancesOnPackage, namespace, repo_name) {
+    const activeReleaseChecks = activeBranchesOnPackage.map(branch => checkForDeadPackage(branch, namespace, repo_name));
 
     Promise.all(activeReleaseChecks).then(results => {
       let act_br = $('#active_branches');
@@ -178,7 +178,7 @@ function disable_branches() {
       });
 
       // Automatically mark all inactiveReleases (branches) as inactive
-      inactiveReleases.forEach(branch => {
+      inactiveBrancesOnPackage.forEach(branch => {
         let _it = $('#branch-' + branch);
         _it.addClass('disabled_branch');
         inact_br.append(_it);
@@ -210,11 +210,14 @@ function disable_branches() {
     });
   }
 
-  function fetchMultipleTypeOfReleases(urls) {
-    const promises = urls.map(url => fetchReleases(url));
-    return Promise.all(promises).then(function(results) {
-      return results;
+  function getBranchNames() {
+    const branches = document.querySelectorAll('#active_branches .list-group-item');
+    const branchNames = [];
+    branches.forEach(branch => {
+        let branchName = branch.id.replace("branch-", "");
+        branchNames.push(branchName);
     });
+    return branchNames;
   }
 
   const _ns = '{{ repo.namespace }}'
@@ -222,36 +225,25 @@ function disable_branches() {
   console.log(_ns, _repo_name);
 
   let appUrl = "{{ config['APP_URL'] }}"
-  let urls;
+  let urlOfNonActiveReleases;
+
   if (appUrl === "https://stg.pagure.io/") {
-    urls = [
-      'https://bodhi.stg.fedoraproject.org/list_releases/?state=archived',
-      'https://bodhi.stg.fedoraproject.org/list_releases/?state=current',
-      'https://bodhi.stg.fedoraproject.org/list_releases/?state=pending',
-      'https://bodhi.stg.fedoraproject.org/list_releases/?state=frozen'
-    ]
+    urlOfNonActiveReleases = "https://bodhi.stg.fedoraproject.org/list_releases/?state=archived";
   } else {
-    urls = [
-      'https://bodhi.fedoraproject.org/list_releases/?state=archived',
-      'https://bodhi.fedoraproject.org/list_releases/?state=current',
-      'https://bodhi.fedoraproject.org/list_releases/?state=pending',
-      'https://bodhi.fedoraproject.org/list_releases/?state=frozen'
-    ]
+    urlOfNonActiveReleases = "https://bodhi.fedoraproject.org/list_releases/?state=archived";
   }
 
-  fetchMultipleTypeOfReleases(urls).then(function(allReleases) {
-    const [archivedReleases, currentReleases,
-      pendingReleases, frozenReleases] = allReleases;
+  fetchReleases(urls).then(inactiveReleases => {
+    let branchesOfPackage = getBranchNames();
+    let inactiveBrancesOnPackage = branchesOfPackage.filter(branch => inactiveReleases.includes(branch));
+    let activeBranchesOnPackage = branchesOfPackage.filter(branch => !inactiveReleases.includes(branch));
+    console.log(branchesOfPackage);
+    console.log(inactiveReleases);
+    console.log(nonActiveBrancesOnPackage);
+    console.log(activeBranchesOnPackage);
 
-    let mergedReleases = currentReleases.concat(pendingReleases).concat(frozenReleases);
-    const activeReleases = [...new Set(mergedReleases)];
-    const inactiveReleases = archivedReleases;
-
-    {#console.log('Active Releases:', activeReleases);#}
-    {#console.log('Inactive Releases:', inactiveReleases);#}
-
-    checkForDeadPackagesInBranches(activeReleases, inactiveReleases, _ns, _repo_name);
-  });
+    checkForDeadPackagesInBranches(activeBranchesOnPackage, inactiveBrancesOnPackage, _ns, _repo_name);
+  })
 }
 
 $(function() {
