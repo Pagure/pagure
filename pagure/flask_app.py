@@ -540,7 +540,8 @@ def end_request(exception=None):
         Details: https://pagure.io/pagure/issue/2302
 
     """
-    flask.g.session.remove()
+    if hasattr(flask.g, "session") and flask.g.session:
+        flask.g.session.remove()
     gc.collect()
 
 
