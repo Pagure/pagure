@@ -429,7 +429,7 @@ def __get_file_in_tree(repo_obj, tree, filepath, bail_on_tree=False):
                 ):
                     try:
                         dereferenced = tree[content]
-                    except KeyError:
+                    except (KeyError, TypeError):
                         pass
                     else:
                         if dereferenced.filemode == pygit2.GIT_FILEMODE_BLOB:
