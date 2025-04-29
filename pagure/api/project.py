@@ -1449,6 +1449,7 @@ def api_new_project():
 
     if (
         pagure_config["PAGURE_AUTH"] == "oidc"
+        and hasattr(flask.g.fas_user, "can_create")
         and flask.g.fas_user.can_create is False
     ):
         raise pagure.exceptions.APIError(
