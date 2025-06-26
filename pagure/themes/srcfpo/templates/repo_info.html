@@ -331,7 +331,7 @@
 
                 <div class="btn-group">
                   <a class="koji"
-                    href="http://koji.fedoraproject.org/koji/search?type=package&match=glob&terms={{ repo.name }}">
+                    href="http://koji.fedoraproject.org/koji/search?type=package&match=glob&terms={{ repo.name|urlencode }}">
                     <button type="button"
                       class="btn btn-sm btn-outline-primary font-weight-bold">
                       Builds Status
@@ -341,7 +341,7 @@
 
                 <div class="btn-group">
                   <a class="bodhi"
-                    href="https://bodhi.fedoraproject.org/updates/?packages={{ repo.name }}">
+                    href="https://bodhi.fedoraproject.org/updates/?packages={{ repo.name|urlencode }}">
                     <button type="button"
                       class="btn btn-sm btn-outline-primary font-weight-bold">
                       Updates Status
@@ -352,11 +352,11 @@
                 <div class="btn-group">
                   {% if repo.namespace in ['rpms', 'container', 'modules'] %}
                   {% if repo.namespace == 'rpms' %}
-                  <a class="bugz" href="https://bugzilla.redhat.com/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&classification=Fedora&product=Fedora&product=Fedora EPEL&component={{ repo.name }}">
+                  <a class="bugz" href="https://bugzilla.redhat.com/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&classification=Fedora&product=Fedora&product=Fedora EPEL&component={{ repo.name|urlencode }}">
                   {% elif repo.namespace == 'container' %}
-                  <a class="bugz" href="https://bugzilla.redhat.com/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&classification=Fedora&product=Fedora Container Images&component={{ repo.name }}">
+                  <a class="bugz" href="https://bugzilla.redhat.com/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&classification=Fedora&product=Fedora Container Images&component={{ repo.name|urlencode }}">
                   {% elif repo.namespace == 'modules' %}
-                  <a class="bugz" href="https://bugzilla.redhat.com/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&classification=Fedora&product=Fedora Modules&component={{ repo.name }}">
+                  <a class="bugz" href="https://bugzilla.redhat.com/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&classification=Fedora&product=Fedora Modules&component={{ repo.name|urlencode }}">
                   {% endif %}
                   <button type="button"
                       class="btn btn-sm btn-outline-primary font-weight-bold">
@@ -368,7 +368,7 @@
 
                 <div class="btn-group">
                   <a class="community"
-                    href="https://packages.fedoraproject.org/pkgs/{{ repo.name }}">
+                    href="https://packages.fedoraproject.org/pkgs/{{ repo.name|urlencode }}">
                     <button type="button"
                       class="btn btn-sm btn-outline-primary font-weight-bold">
                       Packages
@@ -378,7 +378,7 @@
 
                 <div class="btn-group">
                   <a class="koschei"
-                    href="https://apps.fedoraproject.org/koschei/package/{{ repo.name }}">
+                    href="https://apps.fedoraproject.org/koschei/package/{{ repo.name|urlencode }}">
                     <button type="button"
                       class="btn btn-sm btn-outline-primary font-weight-bold">
                       Koschei Status
@@ -551,7 +551,7 @@ $(document).ready(function() {
  	  success: function(res){
  	     console.log(res);
  	     if (res[{{ repo.name }}]) {
-               $("#transtats").html("<div class='btn-group'><a class='transtats' href='https://transtats.fedoraproject.org/packages/view/{{ repo.name }}'><button type='button' class='btn btn-sm btn-outline-primary font-weight-bold'>&nbsp;Translation Status</button></a></div>");
+               $("#transtats").html("<div class='btn-group'><a class='transtats' href='https://transtats.fedoraproject.org/packages/view/{{ repo.name|urlencode }}'><button type='button' class='btn btn-sm btn-outline-primary font-weight-bold'>&nbsp;Translation Status</button></a></div>");
  	     }
  	  }
      });
