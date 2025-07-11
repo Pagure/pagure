@@ -1764,6 +1764,18 @@ Defaults to:
     ])
 
 
+DB_POOL_RECYCLE
+~~~~~~~~~~~~~~~
+
+This is the lifetime of a database connection in the connection pool, in seconds.
+For more details, refer to `SQLAlchemy's documentation`_ on the ``pool_recycle``
+option.
+
+Defaults to: ``3600`` (1 hour)
+
+.. _SQLAlchemy's documentation: https://docs.sqlalchemy.org/en/21/core/engines.html#sqlalchemy.create_engine.params.pool_recycle
+
+
 SSH_KEYS_USERNAME_LOOKUP
 ~~~~~~~~~~~~~~~~~~~~~~~~
 

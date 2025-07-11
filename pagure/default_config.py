@@ -577,3 +577,5 @@ PR_WARN_CHARACTERS = set(
         chr(0x2069),
     ]
 )
+
+DB_POOL_RECYCLE = 3600

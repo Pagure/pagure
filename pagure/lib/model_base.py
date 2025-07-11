@@ -14,6 +14,9 @@ import sqlalchemy
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
 
+from pagure.config import config as pagure_config
+
+
 CONVENTION = {
     "ix": "ix_%(table_name)s_%(column_0_label)s",
     # Checks are currently buggy and prevent us from naming them correctly
@@ -31,7 +34,7 @@ BASE = declarative_base(
 SESSIONMAKER = None
 
 
-def create_session(db_url=None, debug=False, pool_recycle=3600):
+def create_session(db_url=None, debug=False, pool_recycle=None):
     """Create the Session object to use to query the database.
 
     :arg db_url: URL used to connect to the database. The URL contains
@@ -44,6 +47,7 @@ def create_session(db_url=None, debug=False, pool_recycle=3600):
 
     """
     global SESSIONMAKER
+    pool_recycle = pool_recycle or pagure_config["DB_POOL_RECYCLE"]
 
     if SESSIONMAKER is None or (
         db_url and db_url != ("{}".format(SESSIONMAKER.kw["bind"].engine.url))
