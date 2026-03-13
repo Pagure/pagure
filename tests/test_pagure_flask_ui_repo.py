@@ -3126,7 +3126,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         # The output must not contain the content of the file pointed to by the
         # include directive
         self.assertNotIn(
-            'root:x:0:0',
+            "root:x:0:0",
             output_text,
         )
 
