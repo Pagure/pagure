@@ -3111,6 +3111,25 @@ class PagureFlaskRepotests(tests.Modeltests):
         output_text = output.get_data(as_text=True)
         self.assertEqual("foo\n bar", output_text)
 
+    def test_view_rst_no_include(self):
+        """Test that the include directive is disabled in RST files."""
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, "repos"), bare=True)
+        tests.add_content_to_git(
+            os.path.join(self.path, "repos", "test.git"),
+            filename="with-include.rst",
+            content=".. include:: /etc/passwd",
+        )
+        output = self.app.get("/test/blob/master/f/with-include.rst")
+        self.assertEqual(output.status_code, 200)
+        output_text = output.get_data(as_text=True)
+        # The output must not contain the content of the file pointed to by the
+        # include directive
+        self.assertNotIn(
+            'root:x:0:0',
+            output_text,
+        )
+
     def test_view_raw_file(self):
         """Test the view_raw_file endpoint."""
         output = self.app.get("/foo/raw/foo/sources")

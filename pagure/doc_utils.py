@@ -83,7 +83,7 @@ def convert_doc(rst_string, view_file_url=None):
     """Utility to load an RST file and turn it into fancy HTML."""
     rst = modify_rst(rst_string, view_file_url)
 
-    overrides = {"report_level": "quiet"}
+    overrides = {"report_level": "quiet", "file_insertion_enabled": False}
     try:
         html = docutils.core.publish_parts(
             source=rst, writer_name="html", settings_overrides=overrides
