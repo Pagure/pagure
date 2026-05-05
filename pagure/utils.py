@@ -938,3 +938,20 @@ def parse_path(path):
         )
 
     return username, namespace, repo, objtype, objid
+
+
+def check_user_required_groups(user_obj, path, required_groups=None):
+    """Check if a user's groups are in the required groups for the specified path."""
+    if not required_groups:
+        return
+    for key in required_groups:
+        if not fnmatch.fnmatch(path, key):
+            continue
+        user_grps = set(user_obj.groups)
+        req_grps = set(required_groups[key])
+        if not user_grps.intersection(req_grps):
+            raise PagureException(
+                "This user must be in one of the following groups "
+                "to be allowed to be added to this project: %s"
+                % ", ".join(req_grps)
+            )

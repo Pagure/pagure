@@ -1509,6 +1509,7 @@ def api_new_project():
                 ),
                 user_ns=pagure_config.get("USER_NAMESPACE", False),
                 default_branch=form.default_branch.data,
+                required_groups=pagure_config.get("REQUIRED_GROUPS"),
             )
             flask.g.session.commit()
             output = {"message": "Project creation queued", "taskid": task.id}

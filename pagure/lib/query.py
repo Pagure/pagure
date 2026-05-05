@@ -1058,17 +1058,10 @@ def add_user_to_project(
 
     new_user_obj = get_user(session, new_user)
 
-    if required_groups and access != "ticket":
-        for key in required_groups:
-            if fnmatch.fnmatch(project.fullname, key):
-                user_grps = set(new_user_obj.groups)
-                req_grps = set(required_groups[key])
-                if not user_grps.intersection(req_grps):
-                    raise pagure.exceptions.PagureException(
-                        "This user must be in one of the following groups "
-                        "to be allowed to be added to this project: %s"
-                        % ", ".join(req_grps)
-                    )
+    if access != "ticket":
+        pagure.utils.check_user_required_groups(
+            new_user_obj, project.fullname, required_groups
+        )
 
     user_obj = get_user(session, user)
 
@@ -1579,6 +1572,7 @@ def new_project(
     ignore_existing_repo=False,
     private=False,
     default_branch=None,
+    required_groups=None,
 ):
     """Create a new project based on the information provided.
 
@@ -1621,6 +1615,8 @@ def new_project(
             "Your project name cannot have exactly 40 characters after "
             "the `/`"
         )
+
+    pagure.utils.check_user_required_groups(user_obj, path, required_groups)
 
     # Repo exists in the DB
     repo = _get_project(session, name, namespace=namespace)
