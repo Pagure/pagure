@@ -11,6 +11,7 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
 import logging
+from functools import wraps
 
 import flask
 
@@ -18,7 +19,13 @@ import pagure.exceptions
 from pagure.api import APIERROR, get_authorized_api_project
 from pagure.config import config as pagure_config
 from pagure.lib import plugins
-from pagure.utils import api_authenticated, is_repo_committer, is_repo_user
+from pagure.utils import (
+    api_authenticated,
+    authenticated,
+    is_repo_admin,
+    is_repo_committer,
+    is_repo_user,
+)
 
 _log = logging.getLogger(__name__)
 
@@ -58,6 +65,66 @@ def _check_token(repo, project_token=True):
             raise pagure.exceptions.APIError(
                 401, error_code=APIERROR.EINVALIDTOK
             )
+
+
+def check_repo_permissions(permission, is_api=True):
+    """Check that the logged-in user has sufficient permissions."""
+
+    def _decorator(function):
+        @wraps(function)
+        def _wrapper(*args, **kwargs):
+            # return function(*args, **kwargs)  # abompard TESTING
+            # print(authenticated(), getattr(flask.g, "fas_user", None))
+            if not authenticated():
+                return function(*args, **kwargs)
+            if is_api:
+                # Check if there is a `repo` and an `username`
+                repo_name = flask.request.view_args.get("repo")
+                username = flask.request.view_args.get("username")
+                namespace = flask.request.view_args.get("namespace")
+                if not repo_name:
+                    raise TypeError(
+                        "This decorator can only be set on repo-based views"
+                    )
+                # This sets flask.g.repo, and we use it below
+                get_authorized_api_project(
+                    flask.g.session,
+                    repo_name,
+                    user=username,
+                    namespace=namespace,
+                )
+            if permission == "committer":
+                checking_func = is_repo_committer
+            elif permission == "admin":
+                checking_func = is_repo_admin
+            else:
+                raise ValueError(f"unknown permission: {permission}")
+            if not flask.g.repo or checking_func(
+                flask.g.repo, flask.g.fas_user.username
+            ):
+                return function(*args, **kwargs)
+            if is_api:
+                return (
+                    flask.jsonify(
+                        {
+                            "error": APIERROR.ENOTHIGHENOUGH.value,
+                            "error_code": APIERROR.ENOTHIGHENOUGH.name,
+                        }
+                    ),
+                    403,
+                )
+            else:
+                flask.abort(
+                    403,
+                    description=(
+                        "You don't have sufficient permissions "
+                        "on this project"
+                    ),
+                )
+
+        return _wrapper
+
+    return _decorator
 
 
 def _get_issue(repo, issueid, issueuid=None):

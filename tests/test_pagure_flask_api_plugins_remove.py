@@ -184,6 +184,25 @@ class PagureFlaskApiPluginRemovetests(tests.Modeltests):
         )
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data["error"])
 
+    @patch("pagure.lib.notify.send_email", MagicMock(return_value=True))
+    def test_remove_plugin_project_cookie_login_no_access(self):
+        """Test removing a plugin from a project with a regular
+        project-specific token.
+        """
+        user = tests.add_user_to_project(self.session, "test", "commit")
+        with tests.user_set(self.app.application, user):
+            output = self.app.post("/api/0/test/settings/Mail/remove")
+        print(output.get_data(as_text=True))
+        self.assertEqual(output.status_code, 403)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                "error": "You do not have sufficient permissions to perform this action",
+                "error_code": "ENOTHIGHENOUGH",
+            },
+        )
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

@@ -176,6 +176,28 @@ class PagureFlaskApiProjectGitAliastests(tests.SimplePagureTest):
             },
         )
 
+    def test_api_new_git_alias_cookie_login_no_access(self):
+        user = tests.add_user_to_project(self.session, "test", "commit")
+        data = json.dumps({"alias_from": "main", "alias_to": "master"})
+        headers = {
+            "Content-Type": "application/json",
+        }
+        with tests.user_set(self.app.application, user):
+            output = self.app.post(
+                "/api/0/test/git/alias/new", headers=headers, data=data
+            )
+
+        print(output.get_data(as_text=True))
+        self.assertEqual(output.status_code, 403)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                "error": "You do not have sufficient permissions to perform this action",
+                "error_code": "ENOTHIGHENOUGH",
+            },
+        )
+
     def test_api_new_git_alias(self):
         data = json.dumps({"alias_from": "main", "alias_to": "master"})
         headers = {
@@ -267,6 +289,27 @@ class PagureFlaskApiProjectGitAliastests(tests.SimplePagureTest):
             {
                 "error": "Branch not found in this git repository",
                 "error_code": "EBRANCHNOTFOUND",
+            },
+        )
+
+    def test_api_drop_git_alias_cookie_login_no_access(self):
+        user = tests.add_user_to_project(self.session, "test", "commit")
+        data = json.dumps({"alias_from": "main", "alias_to": "master"})
+        headers = {
+            "Content-Type": "application/json",
+        }
+        with tests.user_set(self.app.application, user):
+            output = self.app.post(
+                "/api/0/test/git/alias/drop", headers=headers, data=data
+            )
+        print(output.get_data(as_text=True))
+        self.assertEqual(output.status_code, 403)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                "error": "You do not have sufficient permissions to perform this action",
+                "error_code": "ENOTHIGHENOUGH",
             },
         )
 

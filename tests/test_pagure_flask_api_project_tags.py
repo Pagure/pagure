@@ -126,6 +126,25 @@ class PagureFlaskApiProjectTagstests(tests.Modeltests):
         data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(data, expected_rv)
 
+    def test_api_project_tags_new_cookie_login_no_access(self):
+        """Test the api_tags_new method of the flask api."""
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session, acl_name="create_project")
+        user = tests.add_user_to_project(self.session, "test", "commit")
+        with tests.user_set(self.app.application, user):
+            output = self.app.post("/api/0/test/tags/new")
+        print(output.get_data(as_text=True))
+        self.assertEqual(output.status_code, 403)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                "error": "You do not have sufficient permissions to perform this action",
+                "error_code": "ENOTHIGHENOUGH",
+            },
+        )
+
     def test_api_project_tags_new_no_input(self):
         """Test the api_tags_new method of the flask api."""
         tests.create_projects(self.session)
@@ -236,6 +255,25 @@ class PagureFlaskApiProjectTagstests(tests.Modeltests):
         }
         data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(data, expected_rv)
+
+    def test_api_project_tag_delete_cookie_login_no_access(self):
+        """Test the api_project_tag_delete method of flask api."""
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+        user = tests.add_user_to_project(self.session, "test", "commit")
+        with tests.user_set(self.app.application, user):
+            output = self.app.delete("/api/0/test/tag/blue")
+        print(output.get_data(as_text=True))
+        self.assertEqual(output.status_code, 403)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                "error": "You do not have sufficient permissions to perform this action",
+                "error_code": "ENOTHIGHENOUGH",
+            },
+        )
 
     def test_api_project_tag_delete_wrong_project(self):
         """Test the api_project_tag_delete method of flask api."""

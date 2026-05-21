@@ -25,7 +25,12 @@ from pagure.api import (
     api_login_required,
     api_method,
 )
-from pagure.api.utils import _check_plugin, _check_token, _get_repo
+from pagure.api.utils import (
+    _check_plugin,
+    _check_token,
+    _get_repo,
+    check_repo_permissions,
+)
 
 _log = logging.getLogger(__name__)
 
@@ -58,6 +63,7 @@ def _filter_fields(plugin):
     "/fork/<username>/<namespace>/<repo>/settings/<plugin>/install",
     methods=["POST"],
 )
+@check_repo_permissions("admin")
 @api_login_required(acls=["modify_project"])
 @api_method
 def api_install_plugin(repo, plugin, username=None, namespace=None):
@@ -165,6 +171,7 @@ def api_install_plugin(repo, plugin, username=None, namespace=None):
     "/fork/<username>/<namespace>/<repo>/settings/<plugin>/remove",
     methods=["POST"],
 )
+@check_repo_permissions("admin")
 @api_login_required(acls=["modify_project"])
 @api_method
 def api_remove_plugin(repo, plugin, username=None, namespace=None):

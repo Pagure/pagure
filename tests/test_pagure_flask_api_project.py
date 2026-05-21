@@ -2626,6 +2626,32 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertEqual(data, expected_output)
         self.assertIn("test123", repo_obj.listall_branches())
 
+    def test_api_new_git_branch_cookie_login_no_access(self):
+        """Test the api_new_branch method of the flask api"""
+        tests.create_projects(self.session)
+        repo_path = os.path.join(self.path, "repos")
+        tests.create_projects_git(repo_path, bare=True)
+        tests.add_content_git_repo(os.path.join(repo_path, "test.git"))
+
+        user = tests.add_user_to_project(self.session, "test", "ticket")
+        with tests.user_set(self.app.application, user):
+            output = self.app.post(
+                "/api/0/test/git/branch", data={"branch": "test123"}
+            )
+        print(output.get_data(as_text=True))
+        self.assertEqual(output.status_code, 403)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                "error": "You do not have sufficient permissions to perform this action",
+                "error_code": "ENOTHIGHENOUGH",
+            },
+        )
+        git_path = os.path.join(self.path, "repos", "test.git")
+        repo_obj = pygit2.Repository(git_path)
+        self.assertNotIn("test123", repo_obj.listall_branches())
+
 
 class PagureFlaskApiProjectFlagtests(tests.Modeltests):
     """Tests for the flask API of pagure for flagging commit in project"""
@@ -4131,6 +4157,23 @@ class PagureFlaskApiProjectOptionsTests(tests.Modeltests):
             },
         )
 
+    def test_api_get_project_options_cookie_login_no_access(self):
+        """Test accessing api_get_project_options as a logged-in user."""
+
+        user = tests.add_user_to_project(self.session, "test", "commit")
+        with tests.user_set(self.app.application, user):
+            output = self.app.get("/api/0/test/options")
+        print(output.get_data(as_text=True))
+        self.assertEqual(output.status_code, 403)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                "error": "You do not have sufficient permissions to perform this action",
+                "error_code": "ENOTHIGHENOUGH",
+            },
+        )
+
     def test_api_get_project_options_w_header(self):
         """Test accessing api_get_project_options w/ auth header."""
 
@@ -4425,6 +4468,35 @@ class PagureFlaskApiProjectOptionsTests(tests.Modeltests):
         after = json.loads(output.get_data(as_text=True))
         self.assertNotEqual(before, after)
         before["settings"]["issue_tracker"] = False
+        self.assertEqual(after, before)
+
+    def test_api_modify_project_options_cookie_login_no_access(self):
+        """Test accessing api_modify_project_options w/ auth header."""
+        # check before
+        admin_headers = {"Authorization": "token aaabbbcccddd"}
+        output = self.app.get("/api/0/test/options", headers=admin_headers)
+        self.assertEqual(output.status_code, 200)
+        before = json.loads(output.get_data(as_text=True))
+
+        user = tests.add_user_to_project(self.session, "test", "commit")
+        with tests.user_set(self.app.application, user):
+            data = {"issues_default_to_private": True}
+            output = self.app.post("/api/0/test/options/update", data=data)
+        print(output.get_data(as_text=True))
+        self.assertEqual(output.status_code, 403)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                "error": "You do not have sufficient permissions to perform this action",
+                "error_code": "ENOTHIGHENOUGH",
+            },
+        )
+
+        # check after
+        output = self.app.get("/api/0/test/options", headers=admin_headers)
+        self.assertEqual(output.status_code, 200)
+        after = json.loads(output.get_data(as_text=True))
         self.assertEqual(after, before)
 
 
@@ -5142,6 +5214,25 @@ class PagureFlaskApiProjectGitBranchestests(tests.Modeltests):
             {
                 "error": "An error occurred during a git operation",
                 "error_code": "EGITERROR",
+            },
+        )
+
+    def test_api_set_git_default_branch_cookie_login(self):
+        """Test the api_git_branches method of the flask api when logged in."""
+        user = tests.add_user_to_project(self.session, "test", "commit")
+        with tests.user_set(self.app.application, user):
+            output = self.app.post(
+                "/api/0/test/git/branches",
+                data={"branch_name": "pats-win-49"},
+            )
+        print(output.get_data(as_text=True))
+        self.assertEqual(output.status_code, 403)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                "error": "You do not have sufficient permissions to perform this action",
+                "error_code": "ENOTHIGHENOUGH",
             },
         )
 

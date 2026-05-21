@@ -363,3 +363,26 @@ class PagureFlaskApiProjectGitTagstests(tests.Modeltests):
         )
         self.assertEqual(data["total_tags"], 1)
         self.assertEqual(data["tag_created"], True)
+
+    def test_api_new_git_tag_user_no_access_cookie_login(self):
+        """Test the api_new_git_tags function."""
+        user = tests.add_user_to_project(self.session, "test", "commit")
+        repo = pygit2.Repository(os.path.join(self.path, "repos", "test.git"))
+        latest_commit = repo.revparse_single("HEAD")
+        data = {
+            "tagname": "test-tag-no-message",
+            "commit_hash": latest_commit.oid.hex,
+            "message": "test message",
+        }
+        with tests.user_set(self.app.application, user):
+            output = self.app.post("/api/0/test/git/tags", data=data)
+        print(output.get_data(as_text=True))
+        self.assertEqual(output.status_code, 403)
+        data = json.loads(output.get_data(as_text=True))
+        self.assertDictEqual(
+            data,
+            {
+                "error": "You do not have sufficient permissions to perform this action",
+                "error_code": "ENOTHIGHENOUGH",
+            },
+        )

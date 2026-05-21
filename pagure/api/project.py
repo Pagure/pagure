@@ -40,7 +40,12 @@ from pagure.api import (
     get_per_page,
     get_request_data,
 )
-from pagure.api.utils import _check_token, _get_project_tag, _get_repo
+from pagure.api.utils import (
+    _check_token,
+    _get_project_tag,
+    _get_repo,
+    check_repo_permissions,
+)
 from pagure.config import config as pagure_config
 
 _log = logging.getLogger(__name__)
@@ -153,6 +158,7 @@ def api_project_tag_view(repo, tag, username=None, namespace=None):
 @API.route("/<namespace>/<repo>/tags/new", methods=["POST"])
 @API.route("/fork/<username>/<repo>/tags/new", methods=["POST"])
 @API.route("/fork/<username>/<namespace>/<repo>/tags/new", methods=["POST"])
+@check_repo_permissions("admin")
 @api_login_required(acls=["modify_project"])
 @api_method
 def api_project_tags_new(repo, username=None, namespace=None):
@@ -236,6 +242,7 @@ def api_project_tags_new(repo, username=None, namespace=None):
 @API.route("/<namespace>/<repo>/tag/<tag>", methods=["DELETE"])
 @API.route("/fork/<username>/<repo>/tag/<tag>", methods=["DELETE"])
 @API.route("/fork/<username>/<namespace>/<repo>/tag/<tag>", methods=["DELETE"])
+@check_repo_permissions("admin")
 @api_login_required(acls=["modify_project"])
 @api_method
 def api_project_tag_delete(repo, tag, username=None, namespace=None):
@@ -354,6 +361,7 @@ def api_git_tags(repo, username=None, namespace=None):
 @API.route("/<namespace>/<repo>/git/tags", methods=["POST"])
 @API.route("/fork/<username>/<repo>/git/tags", methods=["POST"])
 @API.route("/fork/<username>/<namespace>/<repo>/git/tags", methods=["POST"])
+@check_repo_permissions("admin")
 @api_login_required(acls=["modify_project", "tag_project"])
 @api_method
 def api_new_git_tags(repo, username=None, namespace=None):
@@ -710,6 +718,7 @@ def api_git_branches(repo, username=None, namespace=None):
 @API.route(
     "/fork/<username>/<namespace>/<repo>/git/branches", methods=["POST"]
 )
+@check_repo_permissions("admin")
 @api_login_required(acls=["modify_project"])
 @api_method
 def api_set_git_default_branch(repo, username=None, namespace=None):
@@ -1790,6 +1799,7 @@ def api_fork_project():
 @API.route("/<namespace>/<repo>/git/branch", methods=["POST"])
 @API.route("/fork/<username>/<repo>/git/branch", methods=["POST"])
 @API.route("/fork/<username>/<namespace>/<repo>/git/branch", methods=["POST"])
+@check_repo_permissions("committer")
 @api_login_required(acls=["create_branch"])
 @api_method
 def api_new_branch(repo, username=None, namespace=None):
@@ -1879,6 +1889,7 @@ def api_new_branch(repo, username=None, namespace=None):
 @API.route(
     "/fork/<username>/<namespace>/<repo>/git/alias/drop", methods=["POST"]
 )
+@check_repo_permissions("admin")
 @api_login_required(
     acls=["delete_git_alias", "modify_git_alias", "modify_project"]
 )
@@ -1968,6 +1979,7 @@ def api_drop_git_alias(repo, username=None, namespace=None):
 @API.route(
     "/fork/<username>/<namespace>/<repo>/git/alias/new", methods=["POST"]
 )
+@check_repo_permissions("admin")
 @api_login_required(
     acls=["create_git_alias", "modify_git_alias", "modify_project"]
 )
@@ -2758,6 +2770,7 @@ def api_modify_acls(repo, namespace=None, username=None):
 @API.route("/<namespace>/<repo>/options", methods=["GET"])
 @API.route("/fork/<username>/<repo>/options", methods=["GET"])
 @API.route("/fork/<username>/<namespace>/<repo>/options", methods=["GET"])
+@check_repo_permissions("admin")
 @api_login_required(acls=["modify_project"])
 @api_method
 def api_get_project_options(repo, username=None, namespace=None):
@@ -2961,6 +2974,7 @@ def _check_value(value):
 @API.route(
     "/fork/<username>/<namespace>/<repo>/options/update", methods=["POST"]
 )
+@check_repo_permissions("admin")
 @api_login_required(acls=["modify_project"])
 @api_method
 def api_modify_project_options(repo, username=None, namespace=None):

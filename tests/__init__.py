@@ -254,6 +254,21 @@ def create_user(session, username, fullname, emails):
         item = pagure.lib.model.UserEmail(user_id=user.id, email=email)
         session.add(item)
     session.commit()
+    return user
+
+
+def add_user_to_project(session, repo, access):
+    project = pagure.lib.query._get_project(session, repo)
+    username = f"{access}_user"
+    create_user(session, username, username, [f"{username}@example.com"])
+    pagure.lib.query.add_user_to_project(
+        session,
+        project,
+        username,
+        "pingou",
+        access=access,
+    )
+    return FakeUser(username=username)
 
 
 def _populate_db(session):

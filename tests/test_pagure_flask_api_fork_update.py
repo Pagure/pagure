@@ -980,22 +980,24 @@ class PagureFlaskApiForkUpdateNoCommitterTests(tests.SimplePagureTest):
     def test_api_pull_request_not_updated_by_other_user(self):
         """No repo committers or PR owners are allowed to update PR."""
 
-        headers = {"Authorization": "token aaabbbcccddd"}
-
         data = {
             "title": "edited test PR",
             "initial_comment": "Edited initial comment",
         }
 
-        tests.create_user(self.session, "other", "Another User", ["au@rh.com"])
-        user = tests.FakeUser()
-        user.username = "other"
-        with tests.user_set(self.app.application, user):
-            output = self.app.post(
-                "/api/0/test/pull-request/1", data=data, headers=headers
-            )
+        user = tests.create_user(
+            self.session, "other", "Another User", ["au@rh.com"]
+        )
+        tests.create_tokens(self.session, user_id=user.id, suffix="-other")
+        token_other = "aaabbbcccddd-other"
+        tests.create_tokens_acl(self.session, token_id=token_other)
+        headers = {"Authorization": f"token {token_other}"}
 
-            self.assertEqual(output.status_code, 403)
+        output = self.app.post(
+            "/api/0/test/pull-request/1", data=data, headers=headers
+        )
+
+        self.assertEqual(output.status_code, 403)
 
 
 if __name__ == "__main__":
