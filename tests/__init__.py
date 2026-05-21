@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2015-2018 - Copyright Red Hat Inc
+(c) 2015-2018 - Copyright Red Hat Inc
 
- Authors:
-   Pierre-Yves Chibon <pingou@pingoured.fr>
+Authors:
+  Pierre-Yves Chibon <pingou@pingoured.fr>
 
 """
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import importlib
 import json
@@ -22,28 +22,23 @@ import sys
 import tempfile
 import time
 import unittest
-from io import open, StringIO
+from io import StringIO, open
 
 logging.basicConfig(stream=sys.stderr)
 
-from bs4 import BeautifulSoup
 from contextlib import contextmanager
-from datetime import date
-from datetime import datetime
-from datetime import timedelta
+from datetime import date, datetime, timedelta
 from functools import wraps
-from six.moves.urllib.parse import urlparse, parse_qs
 
 import mock
 import pygit2
 import redis
 import six
-
 from bs4 import BeautifulSoup
 from celery.app.task import EagerResult
+from six.moves.urllib.parse import parse_qs, urlparse
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.orm import scoped_session
+from sqlalchemy.orm import scoped_session, sessionmaker
 
 if six.PY2:
     # Always enable performance counting for tests
@@ -55,7 +50,6 @@ sys.path.insert(
 
 import pagure
 import pagure.api
-from pagure.api.ci import jenkins
 import pagure.flask_app
 import pagure.lib.git
 import pagure.lib.login
@@ -63,7 +57,9 @@ import pagure.lib.model
 import pagure.lib.query
 import pagure.lib.tasks_mirror
 import pagure.perfrepo as perfrepo
-from pagure.config import config as pagure_config, reload_config
+from pagure.api.ci import jenkins
+from pagure.config import config as pagure_config
+from pagure.config import reload_config
 from pagure.lib.repo import PagureRepo
 
 HERE = os.path.join(os.path.dirname(os.path.abspath(__file__)))

@@ -1,31 +1,30 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2015 - Copyright Red Hat Inc
+(c) 2015 - Copyright Red Hat Inc
 
- Authors:
-   Pierre-Yves Chibon <pingou@pingoured.fr>
+Authors:
+  Pierre-Yves Chibon <pingou@pingoured.fr>
 
 """
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
-import arrow
 import copy
 import datetime
-import unittest
+import json
+import os
 import shutil
 import sys
 import time
-import os
+import unittest
 
+import arrow
 import flask
-import pagure_messages
-import json
 import munch
-
+import pagure_messages
 from fedora_messaging import api, testing
-from mock import ANY, patch, MagicMock
+from mock import ANY, MagicMock, patch
 from sqlalchemy.exc import SQLAlchemyError
 
 sys.path.insert(

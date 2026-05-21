@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 
 """
- Authors:
-  Pierre-Yves Chibon <pingou@pingoured.fr>
+Authors:
+ Pierre-Yves Chibon <pingou@pingoured.fr>
 """
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import json
-import sys
 import os
+import sys
 
 import pygit2
 
@@ -17,8 +17,8 @@ sys.path.insert(
     0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 )
 
-import tests
 import pagure.lib.query
+import tests
 
 
 class PagureFlaskApiProjectGitTagstests(tests.Modeltests):

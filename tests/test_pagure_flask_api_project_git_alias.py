@@ -1,23 +1,23 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2020 - Copyright Red Hat Inc
+(c) 2020 - Copyright Red Hat Inc
 
- Authors:
-   Pierre-Yves Chibon <pingou@pingoured.fr>
+Authors:
+  Pierre-Yves Chibon <pingou@pingoured.fr>
 
 """
 
-from __future__ import unicode_literals, absolute_import
-
-import unittest
-import shutil
-import sys
-import os
+from __future__ import absolute_import, unicode_literals
 
 import json
+import os
+import shutil
+import sys
+import unittest
+
 import pygit2
-from mock import patch, MagicMock
+from mock import MagicMock, patch
 
 sys.path.insert(
     0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")

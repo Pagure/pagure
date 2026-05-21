@@ -1,22 +1,22 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2019 - Copyright Red Hat Inc
+(c) 2019 - Copyright Red Hat Inc
 
- Authors:
-   Michal Konecny <mkonecny@redhat.com>
+Authors:
+  Michal Konecny <mkonecny@redhat.com>
 
 """
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import datetime
-import unittest
-import sys
-import os
 import json
+import os
+import sys
+import unittest
 
-from mock import patch, MagicMock
+from mock import MagicMock, patch
 
 sys.path.insert(
     0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")

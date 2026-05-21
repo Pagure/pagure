@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2019 - Copyright Red Hat Inc
+(c) 2019 - Copyright Red Hat Inc
 
- Authors:
-   Michal Konecny <mkonecny@redhat.com>
+Authors:
+  Michal Konecny <mkonecny@redhat.com>
 
 """
 

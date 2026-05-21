@@ -11,7 +11,7 @@ Tests for flake8 compliance of the code
 
 """
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import os
 import subprocess

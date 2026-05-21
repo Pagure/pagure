@@ -1,22 +1,22 @@
 # -*- coding: utf-8 -*-
 
 """
- Authors:
-   Julen Landa Alustiza <jlanda@fedoraproject.org>
+Authors:
+  Julen Landa Alustiza <jlanda@fedoraproject.org>
 """
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import json
-import sys
 import os
+import sys
 
 sys.path.insert(
     0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 )
 
-import tests
 import pagure.lib.query
+import tests
 
 
 class PagureFlaskApiProjectTagstests(tests.Modeltests):

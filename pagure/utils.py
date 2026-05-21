@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2017-2020 - Copyright Red Hat Inc
+(c) 2017-2020 - Copyright Red Hat Inc
 
- Authors:
-   Pierre-Yves Chibon <pingou@pingoured.fr>
+Authors:
+  Pierre-Yves Chibon <pingou@pingoured.fr>
 
 """
 
@@ -912,7 +912,7 @@ def parse_path(path):
         # objid is the item after objtype, we need all items up to it
         items = items[: items.index(objtype) + 2]
         # now strip the repo, objtype and objid off the end
-        (repo, objtype, objid) = items[-3:]
+        repo, objtype, objid = items[-3:]
         items = items[:-3]
     except (IndexError, ValueError):
         raise PagureException(
@@ -941,7 +941,7 @@ def parse_path(path):
 
 
 def check_user_required_groups(user_obj, path, required_groups=None):
-    """Check if a user's groups are in the required groups for the specified path."""
+    """Check if a user's groups are in the required groups for the path."""
     if not required_groups:
         return
     for key in required_groups:

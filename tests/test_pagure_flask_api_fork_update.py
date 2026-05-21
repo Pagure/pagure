@@ -1,28 +1,28 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2019 - Copyright Red Hat Inc
+(c) 2019 - Copyright Red Hat Inc
 
- Authors:
-   Pierre-Yves Chibon <pingou@pingoured.fr>
+Authors:
+  Pierre-Yves Chibon <pingou@pingoured.fr>
 
 """
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
-import arrow
 import copy
 import datetime
-import unittest
+import json
+import os
 import shutil
 import sys
 import time
-import os
+import unittest
 
+import arrow
 import flask
-import json
 import munch
-from mock import patch, MagicMock
+from mock import MagicMock, patch
 from sqlalchemy.exc import SQLAlchemyError
 
 sys.path.insert(

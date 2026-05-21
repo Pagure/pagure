@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2015-2019 - Copyright Red Hat Inc
+(c) 2015-2019 - Copyright Red Hat Inc
 
- Authors:
-   Pierre-Yves Chibon <pingou@pingoured.fr>
+Authors:
+  Pierre-Yves Chibon <pingou@pingoured.fr>
 
 """
 

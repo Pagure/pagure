@@ -1,30 +1,30 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2015 - Copyright Red Hat Inc
+(c) 2015 - Copyright Red Hat Inc
 
- Authors:
-   Pierre-Yves Chibon <pingou@pingoured.fr>
+Authors:
+  Pierre-Yves Chibon <pingou@pingoured.fr>
 
 """
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import datetime
-import unittest
+import json
+import os
 import shutil
 import sys
-import os
+import unittest
 
-import json
-from mock import patch, MagicMock
+from mock import MagicMock, patch
 
 sys.path.insert(
     0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 )
 
-import pagure.lib.query
 import pagure.default_config
+import pagure.lib.query
 import tests
 
 
@@ -2619,7 +2619,8 @@ class PagureFlaskApiForktests(tests.Modeltests):
         with tests.user_set(self.app.application, user):
             data = {"status": True}
             output = self.app.post(
-                "/api/0/test/pull-request/1/subscribe", data=data
+                "/api/0/test/pull-request/1/subscribe",
+                data=data,
             )
             self.assertEqual(output.status_code, 200)
             data = json.loads(output.get_data(as_text=True))

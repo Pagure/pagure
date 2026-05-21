@@ -1,29 +1,29 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2015-2018 - Copyright Red Hat Inc
+(c) 2015-2018 - Copyright Red Hat Inc
 
- Authors:
-   Pierre-Yves Chibon <pingou@pingoured.fr>
-   Karsten Hopp <karsten@redhat.com>
+Authors:
+  Pierre-Yves Chibon <pingou@pingoured.fr>
+  Karsten Hopp <karsten@redhat.com>
 
 """
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import datetime
 import json
-import unittest
-import pagure_messages
+import os
 import shutil
 import sys
 import tempfile
-import os
+import unittest
 
+import pagure_messages
 import pygit2
 from celery.result import EagerResult
 from fedora_messaging import api, testing
-from mock import ANY, patch, Mock
+from mock import ANY, Mock, patch
 
 sys.path.insert(
     0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
