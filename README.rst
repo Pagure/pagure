@@ -1,3 +1,22 @@
+MOVED TO https://forge.fedoraproject.org/apps/pagure
+====================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Pagure
 ======
 
